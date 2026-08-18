@@ -10,8 +10,8 @@
 # ─────────────────────────────────────────────────────────────────
 
 [core]
-user_name = "Alex"
-communication_language = "Russian"
+user_name = "User"
+communication_language = "English"
 
 [modules.bmm]
 user_skill_level = "intermediate"
