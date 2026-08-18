@@ -6,7 +6,7 @@
 Spec-driven development workspace for the "people management" product, run with the
 BMad Method. Application code lives in two git submodules — `services/backend`
 (NestJS 11 + Prisma 7 + PostgreSQL) and `services/frontend` (React 19 + Vite 8) —
-each a separate GitLab repository. This root repo holds only BMad planning/spec
+each a separate Github repository. This root repo holds only BMad planning/spec
 artifacts, workspace skills, and submodule gitlinks.
 
 ## Policy
