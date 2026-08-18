@@ -1,0 +1,8 @@
+[submodule "services/backend"]
+	path = services/backend
+	url = git@gitlab.altexsoft.pro:gr_ai-bootcamp/backend.git
+	branch = main
+[submodule "services/frontend"]
+	path = services/frontend
+	url = git@gitlab.altexsoft.pro:gr_ai-bootcamp/frontend.git
+	branch = main
