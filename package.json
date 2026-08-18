@@ -7,7 +7,15 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "services:init": "git submodule update --init --recursive",
     "services:status": "git submodule status",
-    "services:sync": "git submodule update --remote"
+    "services:sync": "git submodule update --remote",
+    "services:install": "npm --prefix services/backend install && npm --prefix services/frontend install",
+    "services:build": "npm --prefix services/backend run build && npm --prefix services/frontend run build",
+    "services:lint": "npm --prefix services/backend run lint && npm --prefix services/frontend run lint",
+    "services:test": "npm --prefix services/backend test && npm --prefix services/frontend test",
+    "services:db:up": "npm --prefix services/backend run db:up",
+    "services:db:down": "npm --prefix services/backend run db:down",
+    "services:dev:backend": "npm --prefix services/backend run start:dev",
+    "services:dev:frontend": "npm --prefix services/frontend run dev"
   },
   "repository": {
     "type": "git",
@@ -15,5 +23,5 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC"  
 }
