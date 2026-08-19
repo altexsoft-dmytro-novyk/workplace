@@ -1,0 +1,36 @@
+# AC-SL-11 · Only a Manager/PP of the employee can create a link for them
+
+**Trace:** §4.8 opening (a **manager** generates the shareable view)
+**Preconditions:** [fixture](../README.md)
+
+## Test 1 — colleague
+
+- **inputURL:** `POST /share-links`
+- **inputRequest:**
+  ```json
+  {
+    "headers": {
+      "authorization": "Bearer <token:colin>"
+    },
+    "body": {
+      "employee": "alice"
+    }
+  }
+  ```
+- **expectedResult:** `403 Forbidden`; no link created — colleague tier cannot share what it cannot see
+
+## Test 2 — the employee themselves
+
+- **inputURL:** `POST /share-links`
+- **inputRequest:**
+  ```json
+  {
+    "headers": {
+      "authorization": "Bearer <token:alice>"
+    },
+    "body": {
+      "employee": "alice"
+    }
+  }
+  ```
+- **expectedResult:** `403 Forbidden` — self-sharing is not in §4.8; flag to requirements owner if wanted

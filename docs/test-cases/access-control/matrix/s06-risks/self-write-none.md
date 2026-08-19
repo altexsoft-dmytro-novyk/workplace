@@ -1,0 +1,21 @@
+# AC-M-S06-02 · S6 Risks — Self: no write path (negative)
+
+**Trace:** §3.2 S6 / Self `—` · §9 DoD
+**Preconditions:** [fixture](../../README.md)
+
+## Test
+
+- **inputURL:** `POST /users/alice/risks`
+- **inputRequest:**
+  ```json
+  {
+    "headers": {
+      "authorization": "Bearer <token:alice>"
+    },
+    "body": {
+      "level": "low",
+      "description": "all fine"
+    }
+  }
+  ```
+- **expectedResult:** `404`; nothing created

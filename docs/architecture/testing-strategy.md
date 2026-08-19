@@ -9,6 +9,7 @@ Every feature, every developer, in this order:
 1. **Scenario document** in `/docs/test-cases/`, written line-by-line:
    *actor (who, with which relationships/roles) → request (endpoint, payload) → expected outcome (status, body shape, what is absent)*.
    Every scenario cites the requirements section it implements (e.g. `§3.2 S6 / Manager line`, `§2.3 removing a permission`).
+   The authoring pattern — folder structure, file skeleton (`inputURL` / `inputRequest` / `expectedResult`), granularity and status-code conventions — is defined in [/docs/test-cases/README.md](../test-cases/README.md); [access-control/](../test-cases/access-control/) is the reference implementation.
    → **Approved by a developer** before anything else is written.
 2. **E2E test** translated from the approved scenario — the scenario is the script, the test follows it line by line.
    → **Approved by a developer.** Committed red.
