@@ -1,6 +1,15 @@
 # AC-M-S14-10 · S14 Action items — Colleague: no read path (negative)
 
 **Trace:** §3.2 S14 / Colleague `—` · §9 DoD
+
+## Scenario
+
+**Given** Alice has action items, and Colin is a plain colleague.
+
+**When** Colin fetches her profile and probes the section.
+
+**Then** no trace of her tasks on any surface.
+
 **Preconditions:** [fixture](../../README.md); Alice has items
 
 ## Test 1 — profile assembly

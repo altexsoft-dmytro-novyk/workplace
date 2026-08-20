@@ -1,6 +1,15 @@
 # AC-M-S13-09 · S13 Mentorship — Colleague: no read path (negative)
 
 **Trace:** §3.2 S13 / Colleague `—` · §4.11 (header mentor is for Manager line and PP) · §9 DoD
+
+## Scenario
+
+**Given** Alice's mentorship data exists, and Colin is a plain colleague.
+
+**When** Colin fetches her profile and probes the section.
+
+**Then** no trace — even the mentor shown in the profile header is for the Manager line and PP, not colleagues.
+
 **Preconditions:** [fixture](../../README.md); Alice's S13 populated
 
 ## Test 1 — profile assembly

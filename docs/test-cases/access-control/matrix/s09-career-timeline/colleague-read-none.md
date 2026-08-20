@@ -1,6 +1,15 @@
 # AC-M-S09-08 · S9 Career timeline — Colleague: no read path (negative)
 
 **Trace:** §3.2 S9 / Colleague `—` · §9 DoD
+
+## Scenario
+
+**Given** Alice's timeline is populated, and Colin is a plain colleague.
+
+**When** Colin fetches her profile and probes the section.
+
+**Then** no surface returns a trace of her career history.
+
 **Preconditions:** [fixture](../../README.md); Alice's timeline populated
 
 ## Test 1 — profile assembly

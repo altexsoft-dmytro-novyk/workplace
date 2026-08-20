@@ -1,6 +1,15 @@
 # AC-M-S15-06 · S15 Request history — Colleague: no access (negative)
 
 **Trace:** §3.2 S15 / Colleague `—` · §9 DoD
+
+## Scenario
+
+**Given** Alice has request history, and Colin is a plain colleague.
+
+**When** Colin fetches her profile and probes the section.
+
+**Then** no trace on any surface.
+
 **Preconditions:** [fixture](../../README.md); Alice has request history
 
 ## Test 1 — profile assembly

@@ -1,6 +1,15 @@
 # AC-M-S02-01 · S2 Personal contacts — Self: read
 
 **Trace:** §3.2 S2 / Self `RW` · §4.3
+
+## Scenario
+
+**Given** Alice is viewing her own profile.
+
+**When** she requests her personal contacts (S2).
+
+**Then** she gets them all — Self owns this section.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

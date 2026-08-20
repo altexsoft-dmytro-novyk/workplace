@@ -1,6 +1,15 @@
 # AC-SL-10 · Every access via the link is logged: when, from where
 
 **Trace:** §4.8 bullet 4
+
+## Scenario
+
+**Given** Dave opens Bob's link twice, from two different network addresses.
+
+**When** Bob reads the link's access log.
+
+**Then** it lists exactly two entries, each with its timestamp and origin address.
+
 **Preconditions:** [fixture](../README.md); Bob created a link for Alice; Dave holds the token
 
 ## Test 1 — first access, source address A

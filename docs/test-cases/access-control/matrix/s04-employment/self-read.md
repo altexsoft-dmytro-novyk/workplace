@@ -1,6 +1,15 @@
 # AC-M-S04-01 · S4 Employment — Self: read
 
 **Trace:** §3.2 S4 / Self `R` · §4.3
+
+## Scenario
+
+**Given** Alice is viewing her own profile.
+
+**When** she requests her employment section (S4).
+
+**Then** she sees her grade, seniority, English level and the rest — Self holds R on S4.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

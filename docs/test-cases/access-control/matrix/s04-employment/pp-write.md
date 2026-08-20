@@ -1,6 +1,15 @@
 # AC-M-S04-06 · S4 Employment — PP: write
 
 **Trace:** §3.2 S4 / PP `RW`
+
+## Scenario
+
+**Given** Alice's probation period ended.
+
+**When** Paula records the passed status.
+
+**Then** the change persists.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

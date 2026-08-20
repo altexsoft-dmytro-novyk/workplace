@@ -1,6 +1,15 @@
 # AC-M-S15-01 · S15 Request history — Self: no access (negative)
 
 **Trace:** §3.2 S15 / Self `—` · §9 DoD
+
+## Scenario
+
+**Given** Alice was proposed for a resourcing request and rejected with written feedback.
+
+**When** she checks her own profile and probes the section directly.
+
+**Then** no trace — an employee never learns they were proposed or rejected.
+
 **Preconditions:** [fixture](../../README.md); Alice was proposed for a request and rejected with feedback
 
 ## Test 1 — profile assembly
@@ -14,7 +23,7 @@
     }
   }
   ```
-- **expectedResult:** `200`; **no `s15` key** — she never learns she was proposed or rejected
+- **expectedResult:** `200`; **no `s15` key**
 
 ## Test 2 — direct request
 

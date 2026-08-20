@@ -1,6 +1,15 @@
 # AC-M-S04-03 · S4 Employment — Manager line: read
 
 **Trace:** §3.2 S4 / Manager line `RW`
+
+## Scenario
+
+**Given** Bob is Alice's unit manager.
+
+**When** he requests her employment section.
+
+**Then** he gets it in full — Manager line holds RW on S4.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

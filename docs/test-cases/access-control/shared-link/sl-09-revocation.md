@@ -1,6 +1,15 @@
 # AC-SL-09 · Link is revocable before expiry
 
 **Trace:** §4.8 bullet 5
+
+## Scenario
+
+**Given** Dave holds a working, unexpired link to Alice's profile.
+
+**When** Bob revokes it.
+
+**Then** Dave's very next request fails and returns no data — revocation is immediate.
+
 **Preconditions:** [fixture](../README.md); Bob created a 24h link for Alice; Dave holds the token, no Manager/PP relation to Alice
 
 ## Test 1 — baseline: link works

@@ -1,6 +1,15 @@
 # AC-SL-11 · Only a Manager/PP of the employee can create a link for them
 
 **Trace:** §4.8 opening (a **manager** generates the shareable view)
+
+## Scenario
+
+**Given** Colin is a plain colleague of Alice, and Alice is the profile owner herself.
+
+**When** each of them tries to create a share link for Alice's profile.
+
+**Then** both get 403 — only someone holding Manager/PP access can share a profile, and self-sharing is not in §4.8.
+
 **Preconditions:** [fixture](../README.md)
 
 ## Test 1 — colleague
@@ -33,4 +42,4 @@
     }
   }
   ```
-- **expectedResult:** `403 Forbidden` — self-sharing is not in §4.8; flag to requirements owner if wanted
+- **expectedResult:** `403 Forbidden` — flag to requirements owner if self-sharing is wanted

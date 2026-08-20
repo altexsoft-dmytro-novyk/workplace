@@ -1,7 +1,16 @@
 # AC-SL-07 · Link expires, default 24 hours
 
 **Trace:** §4.8 bullet 3
-**Preconditions:** [fixture](../README.md); Bob created the link at time T with no expiry given; Dave holds the token; test clock controllable
+
+## Scenario
+
+**Given** Bob created a link at time T without setting an expiry.
+
+**When** Dave opens it just before and just after the 24-hour mark.
+
+**Then** it works at 23h59 and is dead at 24h01 — the default lifetime is 24 hours.
+
+**Preconditions:** [fixture](../README.md); Bob created the link at time T with no expiry given; test clock controllable
 
 ## Test 1 — just before expiry
 

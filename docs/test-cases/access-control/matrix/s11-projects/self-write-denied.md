@@ -1,6 +1,15 @@
 # AC-M-S11-02 · S11 Projects — Self: write denied
 
 **Trace:** §3.2 S11 / Self `R` (assignments come from the timetracker)
+
+## Scenario
+
+**Given** Alice can see her project assignments.
+
+**When** she tries to change them here.
+
+**Then** 403 — assignments come from the timetracker sync.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

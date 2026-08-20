@@ -1,6 +1,15 @@
 # AC-M-S01-07 · S1 Identity card — PP: read
 
 **Trace:** §3.2 S1 / PP `RW`
+
+## Scenario
+
+**Given** Paula is Alice's assigned People Partner.
+
+**When** she requests Alice's identity card.
+
+**Then** she gets the full card — PP holds RW on S1.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

@@ -1,6 +1,15 @@
 # AC-M-S08-06 · S8 Feedbacks — Manager line: change record visibility
 
 **Trace:** §3.2 S8 / Manager line `RW` · §4.15
+
+## Scenario
+
+**Given** a management-only feedback record F2 about Alice exists.
+
+**When** Alice confirms she cannot see it, Bob flags it *shared with employee*, and Alice looks again.
+
+**Then** the record appears to her only after the flag change — visibility rides entirely on the flag.
+
 **Preconditions:** [fixture](../../README.md); feedback record F2 about Alice exists with default visibility (*management only*)
 
 ## Test 1 — baseline: Alice cannot see F2
@@ -43,4 +52,4 @@
     }
   }
   ```
-- **expectedResult:** `200`; F2 present — the flag change is observable to its audience on the next request
+- **expectedResult:** `200`; F2 present — observable to its audience on the next request

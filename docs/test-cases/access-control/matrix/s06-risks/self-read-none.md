@@ -1,6 +1,15 @@
 # AC-M-S06-01 · S6 Risks — Self: no read path, ever (critical negative)
 
 **Trace:** §3.2 S6 / Self `—` · §4.3 · §4.6 (never visible to the employee) · §9 DoD
+
+## Scenario
+
+**Given** managers track a high retention risk on Alice, with history.
+
+**When** Alice checks her own profile, requests the section directly, and asks for a risk column on the list.
+
+**Then** no surface returns any trace of it — an employee must never learn their own risk record exists.
+
 **Preconditions:** [fixture](../../README.md); Alice's S6 holds a `high` risk with history
 
 ## Test 1 — profile assembly
@@ -40,4 +49,4 @@
     }
   }
   ```
-- **expectedResult:** `200`; her own row carries no `riskLevel` key — own risk leaks through no surface
+- **expectedResult:** `200`; her own row carries no `riskLevel` key

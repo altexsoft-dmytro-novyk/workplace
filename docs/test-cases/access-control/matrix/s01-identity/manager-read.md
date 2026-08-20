@@ -1,6 +1,15 @@
 # AC-M-S01-04 · S1 Identity card — Manager line: read
 
 **Trace:** §3.2 S1 / Manager line `RW`
+
+## Scenario
+
+**Given** Bob is Alice's unit manager.
+
+**When** he requests her identity card.
+
+**Then** he gets the full card — Manager line holds RW on S1.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

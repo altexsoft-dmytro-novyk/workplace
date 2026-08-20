@@ -1,6 +1,15 @@
 # AC-SF-02 · xlsx export contains only entitled columns
 
 **Trace:** §4.1 Export · §3.3.1 (not an export)
+
+## Scenario
+
+**Given** Bob manages some employees and is a mere colleague to others; Colin manages no one.
+
+**When** each exports a list view that includes an Employment column (grade).
+
+**Then** Bob's file shows grades only for his own people; Colin's file does not contain the column at all — the export is as strict as the API.
+
 **Preconditions:** [fixture](../README.md)
 
 ## Test 1 — manager exports mixed scope

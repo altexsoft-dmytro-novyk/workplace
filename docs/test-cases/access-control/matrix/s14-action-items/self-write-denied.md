@@ -1,6 +1,15 @@
 # AC-M-S14-02 · S14 Action items — Self: no edits beyond completion
 
 **Trace:** §3.2 S14 / Self `R (own)` · §4.5 (cancel is the author's act)
+
+## Scenario
+
+**Given** Alice has an open action item.
+
+**When** she tries to move its due date, then to cancel it.
+
+**Then** both fail 403 — her only write is marking it complete (AC-M-S14-03); cancelling belongs to the author.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test 1 — editing

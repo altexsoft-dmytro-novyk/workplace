@@ -1,6 +1,6 @@
 # Access Control — Test-Case Suite
 
-Stage-1 quality-gate scenario documents (AD-1), following the team-wide authoring pattern in [../README.md](../README.md): **one test case per file**, each an explicit request spec — `inputURL`, `inputRequest` (headers + body), `expectedResult` with HTTP status — traced to `docs/project-requirements.md` (§) and/or an architecture decision (AD-n). **Status: draft — each file needs developer approval before its E2E is written.** Spec contract: `_bmad-output/specs/spec-access-control-test-cases/SPEC.md`.
+Stage-1 quality-gate scenario documents (AD-1), following the team-wide authoring pattern in [../README.md](../README.md): **one test case per file**, each opening with a plain-language **Scenario** (Given/When/Then) followed by the explicit request spec — `inputURL`, `inputRequest` (headers + body), `expectedResult` with HTTP status — traced to `docs/project-requirements.md` (§) and/or an architecture decision (AD-n). **Status: draft — each file needs developer approval before its E2E is written.** Spec contract: `_bmad-output/specs/spec-access-control-test-cases/SPEC.md`.
 
 ## Conventions (apply to every file)
 

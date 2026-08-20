@@ -1,7 +1,16 @@
 # AC-SL-08 · Expiry is configurable at creation
 
 **Trace:** §4.8 bullet 3 (configurable at creation)
-**Preconditions:** [fixture](../README.md); Bob created the link at time T with `expiresIn: 72h`; Dave holds the token; test clock controllable
+
+## Scenario
+
+**Given** Bob created a link at time T with a 72-hour expiry.
+
+**When** Dave opens it at 48h and again after 72h.
+
+**Then** it outlives the 24h default and dies at its configured time.
+
+**Preconditions:** [fixture](../README.md); Bob created the link at time T with `expiresIn: 72h`; test clock controllable
 
 ## Test 1 — outlives the 24h default
 

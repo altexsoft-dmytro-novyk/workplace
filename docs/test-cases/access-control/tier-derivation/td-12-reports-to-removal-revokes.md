@@ -1,6 +1,15 @@
 # AC-TD-12 · Reports-to edge removed → Manager access ends, transitively
 
 **Trace:** §2.1 (access derived live from relationships) · AD-10 (derived decisions never persisted)
+
+## Scenario
+
+**Given** Carol sees Alice only through the chain Alice→Bob→Carol.
+
+**When** Alice's reports-to-Bob edge is removed.
+
+**Then** Bob and everyone above him lose Manager access on their very next request.
+
 **Preconditions:** [fixture](../README.md); Alice → Bob → Carol reporting chain
 
 ## Test 1 — baseline: transitive Manager view

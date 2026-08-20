@@ -1,6 +1,15 @@
 # AC-M-S01-02 · S1 Identity card — Self: write denied (photo excepted)
 
 **Trace:** §3.2 S1 / Self `R`
+
+## Scenario
+
+**Given** Alice can read her identity card but not edit it.
+
+**When** she tries to change her own position.
+
+**Then** 403 and nothing changes — only her photo is Self-editable (AC-M-S01-03).
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test
@@ -17,4 +26,4 @@
     }
   }
   ```
-- **expectedResult:** `403 Forbidden`; unchanged — Self writes nothing in S1 except the photo (AC-M-S01-03)
+- **expectedResult:** `403 Forbidden`; unchanged

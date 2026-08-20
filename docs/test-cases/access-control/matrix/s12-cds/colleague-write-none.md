@@ -1,6 +1,15 @@
 # AC-M-S12-10 · S12 CDS — Colleague: no write path (negative)
 
 **Trace:** §3.2 S12 / Colleague `—` · §9 DoD
+
+## Scenario
+
+**Given** Colin has no standing over Alice.
+
+**When** he tries to register an assessment about her, then to complete her IDP.
+
+**Then** both fail 404 — for him the section does not exist.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test 1 — authoring

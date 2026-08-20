@@ -1,6 +1,15 @@
 # AC-UR-09 · One permission grants exactly its own feature, nothing adjacent
 
-**Trace:** §2.3 (permissions independently grantable: campaigns, action items, risks, resourcing, mentors, CDS, custom fields, dashboards)
+**Trace:** §2.3 (permissions independently grantable)
+
+## Scenario
+
+**Given** Ida's role holds *create form campaigns* and nothing else.
+
+**When** she tries the adjacent features — creating an action item, then a resourcing request.
+
+**Then** both fail 403; one permission grants exactly its own feature.
+
 **Preconditions:** [fixture](../../README.md); Ida's role holds *create form campaigns* only (positive case: AC-UR-07)
 
 ## Test 1 — adjacent feature 1

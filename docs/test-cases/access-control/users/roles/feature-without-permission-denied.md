@@ -1,6 +1,15 @@
 # AC-UR-08 · Feature without the permission is denied
 
 **Trace:** §2.2 (functional roles gate features)
+
+## Scenario
+
+**Given** Eve holds no functional role.
+
+**When** she tries to create a campaign.
+
+**Then** she gets 403 and nothing is created.
+
 **Preconditions:** [fixture](../../README.md); Eve holds no functional role
 
 ## Test

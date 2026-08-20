@@ -1,7 +1,16 @@
 # AC-UR-06 · Assign a person to a role through the UI
 
 **Trace:** §2.3 bullet 2 (people are assigned to functional roles through the UI)
-**Preconditions:** [fixture](../../README.md); Ida holds no role; role IT Campaigns exists with *create form campaigns*
+
+## Scenario
+
+**Given** Ida holds no functional role and the role IT Campaigns exists.
+
+**When** she first tries to create a campaign, Root then assigns her to the role, and she retries with the same token.
+
+**Then** the first attempt fails 403, the assignment succeeds, and the retry succeeds — the assignment takes effect immediately.
+
+**Preconditions:** [fixture](../../README.md); Ida holds no role yet; role IT Campaigns exists with *create form campaigns*
 
 ## Test 1 — baseline: feature denied without the role
 
@@ -53,4 +62,4 @@
     }
   }
   ```
-- **expectedResult:** `201`; campaign created — assignment effective immediately, same session token
+- **expectedResult:** `201`; campaign created — same session token

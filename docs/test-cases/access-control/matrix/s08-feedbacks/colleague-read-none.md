@@ -1,6 +1,15 @@
 # AC-M-S08-09 · S8 Feedbacks — Colleague: no read path (negative)
 
 **Trace:** §3.2 S8 / Colleague `—` · §4.15 (a colleague cannot browse feedback) · §9 DoD
+
+## Scenario
+
+**Given** feedback about Alice exists — including a record shared with her — and Colin is a plain colleague.
+
+**When** Colin fetches her profile and probes the section.
+
+**Then** no trace: a colleague can never browse feedback about another person.
+
 **Preconditions:** [fixture](../../README.md); feedback about Alice exists, incl. a record shared with her
 
 ## Test 1 — profile assembly

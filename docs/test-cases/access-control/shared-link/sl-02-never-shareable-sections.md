@@ -1,6 +1,15 @@
 # AC-SL-02 · S3, S7, S13 (and S14) can never be shared
 
-**Trace:** §4.8 bullet 2 · §3.2 shared-link column `—` (S14 per matrix; flagged as spec OQ6)
+**Trace:** §4.8 bullet 2 · §3.2 shared-link column `—` (S14 per matrix; spec OQ6)
+
+## Scenario
+
+**Given** Bob manages Alice.
+
+**When** he tries to include emergency contacts, management notes, mentorship, or action items in a link.
+
+**Then** every attempt is rejected and no link is created — those sections are never shareable, no matter who asks.
+
 **Preconditions:** [fixture](../README.md)
 
 ## Test 1 — S3

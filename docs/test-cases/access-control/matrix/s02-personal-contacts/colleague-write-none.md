@@ -1,6 +1,15 @@
 # AC-M-S02-08 · S2 Personal contacts — Colleague: no write path (negative)
 
 **Trace:** §3.2 S2 / Colleague `—` · §9 DoD
+
+## Scenario
+
+**Given** Colin cannot even see Alice's personal contacts.
+
+**When** he tries to write them.
+
+**Then** 404 — for him the section does not exist at all.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test
@@ -17,4 +26,4 @@
     }
   }
   ```
-- **expectedResult:** `404`; unchanged — the section does not exist for this viewer
+- **expectedResult:** `404`; unchanged

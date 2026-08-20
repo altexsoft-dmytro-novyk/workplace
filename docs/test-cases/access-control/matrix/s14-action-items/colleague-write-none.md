@@ -1,6 +1,15 @@
 # AC-M-S14-11 · S14 Action items — Colleague: no write path (negative)
 
 **Trace:** §3.2 S14 / Colleague `—` · §9 DoD
+
+## Scenario
+
+**Given** Colin has no standing over Alice.
+
+**When** he tries to create an item for her, then to complete one of hers.
+
+**Then** both are denied — creation is scope-bounded (403) and her items do not exist for him (404).
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test 1 — creating for Alice
@@ -32,4 +41,4 @@
     }
   }
   ```
-- **expectedResult:** `404`; unchanged — only the assignee (or Manager/PP) touches the item
+- **expectedResult:** `404`; unchanged

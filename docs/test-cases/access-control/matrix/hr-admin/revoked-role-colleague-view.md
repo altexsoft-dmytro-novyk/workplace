@@ -1,6 +1,15 @@
 # AC-M-HR-03 · HR Admin access rides entirely on the role
 
 **Trace:** §3.1 · AD-12 (revocable via the ordinary UI path)
+
+## Scenario
+
+**Given** Root's full visibility comes only from the HR Admin role, and Ida is a second, delegated admin.
+
+**When** Root confirms the full view, Ida revokes his role membership, and Root retries with the same token.
+
+**Then** the full view collapses to the plain Colleague view the moment the role is gone.
+
 **Preconditions:** [fixture](../../README.md); Ida also holds the HR Admin role (delegated), so a second admin can revoke Root
 
 ## Test 1 — baseline: admin view
@@ -40,4 +49,4 @@
     }
   }
   ```
-- **expectedResult:** `200`; **Colleague** view only (`s01`, `s10`, `s11` name only) — full access disappeared with the role, on the very next request, same session token
+- **expectedResult:** `200`; **Colleague** view only (`s01`, `s10`, `s11` name only) — on the very next request, same session token

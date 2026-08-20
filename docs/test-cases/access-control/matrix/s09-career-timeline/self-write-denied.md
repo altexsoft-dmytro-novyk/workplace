@@ -1,6 +1,15 @@
 # AC-M-S09-02 · S9 Career timeline — Self: write denied
 
 **Trace:** §3.2 S9 / Self `R`
+
+## Scenario
+
+**Given** Alice can read her own timeline.
+
+**When** she tries to add an event to it.
+
+**Then** 403 — the timeline is system-generated; manual overrides belong to UM and PP.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

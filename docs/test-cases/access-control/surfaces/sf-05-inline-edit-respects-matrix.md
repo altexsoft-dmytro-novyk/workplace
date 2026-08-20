@@ -1,6 +1,15 @@
 # AC-SF-05 · Inline list editing writes through the same matrix
 
 **Trace:** §4.1 inline editing (subject to the access matrix) · §3.3.1
+
+## Scenario
+
+**Given** grade (S4) is an inline-editable column on the employee list.
+
+**When** Bob edits Alice's cell, then Eve's cell, and Alice edits her own.
+
+**Then** only the first succeeds: Bob manages Alice (RW), is a colleague to Eve (no access), and Self is read-only on S4 — the list is just another surface over the same matrix.
+
 **Preconditions:** [fixture](../README.md)
 
 ## Test 1 — manager writes through

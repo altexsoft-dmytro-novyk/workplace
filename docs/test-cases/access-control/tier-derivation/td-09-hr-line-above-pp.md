@@ -1,7 +1,16 @@
 # AC-TD-09 · PP tier extends up the HR line above the assigned PP
 
 **Trace:** §3.1 PP audience (assigned people partner **and the HR line above them**)
-**Preconditions:** [fixture](../README.md); Hana holds no direct relation to Alice; Paula (Alice's PP) reports to Hana
+
+## Scenario
+
+**Given** Hana manages Paula, who is Alice's assigned PP; Hana has no direct relation to Alice.
+
+**When** Hana opens Alice's profile.
+
+**Then** the PP audience includes the HR line above the assigned partner, so Hana sees exactly what Paula sees.
+
+**Preconditions:** [fixture](../README.md); Hana holds no direct relation to Alice; Paula reports to Hana
 
 ## Test
 

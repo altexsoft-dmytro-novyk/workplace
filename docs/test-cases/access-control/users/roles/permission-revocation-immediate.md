@@ -1,7 +1,16 @@
 # AC-UR-10 · Removing a permission takes effect immediately for every holder
 
 **Trace:** §2.3 last bullet
-**Preconditions:** [fixture](../../README.md); Ida **and** Colin both hold role IT Campaigns (*create form campaigns*); their session tokens stay unchanged throughout
+
+## Scenario
+
+**Given** Ida and Colin both hold the IT Campaigns role and their sessions stay open.
+
+**When** Root removes the campaign permission from the role between Ida's two attempts.
+
+**Then** her first attempt succeeds; her next attempt and Colin's both fail 403 immediately — revocation hits every holder with no grace period.
+
+**Preconditions:** [fixture](../../README.md); Ida **and** Colin both hold role IT Campaigns (*create form campaigns*); session tokens unchanged throughout
 
 ## Test 1 — baseline: permission works
 
@@ -31,7 +40,9 @@
       "authorization": "Bearer <token:root>"
     },
     "body": {
-      "remove": ["create form campaigns"]
+      "remove": [
+        "create form campaigns"
+      ]
     }
   }
   ```
@@ -71,4 +82,4 @@
     }
   }
   ```
-- **expectedResult:** `403 Forbidden`; nothing created — revocation hits everyone holding the role, not just one user
+- **expectedResult:** `403 Forbidden`; nothing created — revocation hits everyone holding the role

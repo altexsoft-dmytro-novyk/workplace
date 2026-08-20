@@ -1,6 +1,15 @@
 # AC-M-S15-03 · S15 Request history — Manager line: write denied
 
-**Trace:** §3.2 S15 / Manager line `R` (history is written by the resourcing flow, not edited here)
+**Trace:** §3.2 S15 / Manager line `R` (history is written by the resourcing flow)
+
+## Scenario
+
+**Given** Dave can read Alice's request history.
+
+**When** he tries to edit an entry.
+
+**Then** 403 — history is written by the resourcing flow, never edited on the profile.
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test

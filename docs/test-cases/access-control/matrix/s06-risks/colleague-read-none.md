@@ -1,6 +1,15 @@
 # AC-M-S06-07 · S6 Risks — Colleague: no read path (negative)
 
 **Trace:** §3.2 S6 / Colleague `—` · §9 DoD
+
+## Scenario
+
+**Given** risk records about Alice exist, and Colin is a plain colleague.
+
+**When** Colin fetches her profile and probes the section directly.
+
+**Then** no surface returns a trace of them.
+
 **Preconditions:** [fixture](../../README.md); Alice's S6 populated
 
 ## Test 1 — profile assembly

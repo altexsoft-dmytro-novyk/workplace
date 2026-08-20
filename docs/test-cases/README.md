@@ -26,6 +26,15 @@ Every file follows this skeleton exactly:
 # <ID> · <Behavior name>
 
 **Trace:** §<requirements section> · <AD-n when architectural>
+
+## Scenario
+
+**Given** <who the actor is and the relationship/state that matters>.
+
+**When** <what they do>.
+
+**Then** <what must happen — and why, citing the cell or rule in plain words>.
+
 **Preconditions:** [fixture](<path to area README>); <per-case state on top of the fixture>
 
 ## Test
@@ -43,6 +52,7 @@ Every file follows this skeleton exactly:
 
 - **ID:** `<AREA>-<GROUP>-NN` (e.g. `AC-UR-01`). Stable and unique — never reused, never renumbered; E2E tests cite it.
 - **Trace:** mandatory. A scenario that cites no requirement is invalid.
+- **Scenario section is mandatory.** Plain language, Given/When/Then: who the actor is and their relationship, what they do, what must happen and why. A reviewer must understand the case from this paragraph alone, without decoding the request spec — the request spec below it is the machine-precise version of the same story.
 - **Preconditions hold static seeded state only** (fixture personas, existing records, role memberships). A state **transition** the scenario depends on is never a precondition — it is shown as explicit steps, so the reader sees cause and effect:
   1. baseline request proving the state before,
   2. the request that performs the change,

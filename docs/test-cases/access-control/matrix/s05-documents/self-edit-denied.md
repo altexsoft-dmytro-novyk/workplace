@@ -1,6 +1,15 @@
 # AC-M-S05-02 · S5 Documents — Self: editing/deleting documents denied
 
 **Trace:** §3.2 S5 / Self `R (own)`
+
+## Scenario
+
+**Given** Alice can see her own contract.
+
+**When** she tries to delete it.
+
+**Then** 403 and the document remains — her only write right in S5 is uploading certificates (AC-M-S05-03).
+
 **Preconditions:** [fixture](../../README.md)
 
 ## Test
@@ -14,4 +23,4 @@
     }
   }
   ```
-- **expectedResult:** `403 Forbidden`; document remains — Self writes are limited to certificate upload (AC-M-S05-03)
+- **expectedResult:** `403 Forbidden`; document remains
