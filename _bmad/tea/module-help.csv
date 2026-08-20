@@ -1,0 +1,5 @@
+module,skill,display-name,menu-code,description,action,args,phase,preceded-by,followed-by,required,output-location,outputs
+Test Architecture Enterprise,_meta,,,,,,,,,false,https://bmad-code-org.github.io/bmad-method-test-architecture-enterprise/llms.txt,
+Test Architecture Enterprise,bmad-testarch-test-design,Test Design,TD,Risk-based test planning.,,,3-solutioning,,,false,test_artifacts,test design document
+Test Architecture Enterprise,bmad-testarch-ci,CI Setup,CI,Configure CI/CD quality pipeline.,,,3-solutioning,,,false,test_artifacts,ci config
+Test Architecture Enterprise,bmad-testarch-trace,Traceability,TR,Coverage traceability and gate.,,,4-implementation,,,false,test_artifacts,traceability matrix|gate decision
