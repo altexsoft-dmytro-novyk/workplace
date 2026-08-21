@@ -48,3 +48,6 @@ canonicalId,name,description,module,path
 "bmad-sprint-status","bmad-sprint-status","Deprecated — forwards to bmad-sprint-planning (status view).","bmm","_bmad/bmm/v6-shims/bmad-sprint-status/SKILL.md"
 "bmad-technical-research","bmad-technical-research","Deprecated — forwards to bmad-deep-recon (technical type).","bmm","_bmad/bmm/v6-shims/bmad-technical-research/SKILL.md"
 "bmad-validate-prd","bmad-validate-prd","Deprecated — forwards to bmad-prd (validate intent).","bmm","_bmad/bmm/v6-shims/bmad-validate-prd/SKILL.md"
+"bmad-testarch-ci","bmad-testarch-ci","Scaffold CI/CD quality pipeline with test execution. Use when the user says ""lets setup CI pipeline"" or ""I want to create quality gates""","tea","_bmad/tea/workflows/testarch/bmad-testarch-ci/SKILL.md"
+"bmad-testarch-test-design","bmad-testarch-test-design","Create system-level or epic-level test plans. Use when the user says ""lets design test plan"" or ""I want to create test strategy""","tea","_bmad/tea/workflows/testarch/bmad-testarch-test-design/SKILL.md"
+"bmad-testarch-trace","bmad-testarch-trace","Generate traceability matrix and quality gate decision. Use when the user says ""lets create traceability matrix"" or ""I want to analyze test coverage""","tea","_bmad/tea/workflows/testarch/bmad-testarch-trace/SKILL.md"
