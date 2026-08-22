@@ -12,9 +12,11 @@
 
 **Preconditions:** [fixture](../../README.md); Alice's S12 populated
 
+**[Route note — not fully resolved]** `api-conventions.md` only fixes `assessments`/`idps` as separate collections; the `cds` context itself (and any skills-matrix-link endpoint) is still pending confirmation (spine Deferred). Test 2's `GET /users/alice/assessments` is a placeholder representative target, not necessarily the only surface a real implementation would need to check. Needs a real router decision once `cds` is confirmed; flag during developer approval.
+
 ## Test 1 — profile assembly
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -27,7 +29,7 @@
 
 ## Test 2 — direct request
 
-- **inputURL:** `GET /users/alice/sections/s12`
+- **inputURL:** `GET /users/alice/assessments`
 - **inputRequest:**
   ```json
   {

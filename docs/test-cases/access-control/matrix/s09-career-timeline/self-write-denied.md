@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `POST /users/alice/timeline-events`
+- **inputURL:** `POST /users/alice/events`
 - **inputRequest:**
   ```json
   {

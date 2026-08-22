@@ -14,7 +14,7 @@
 
 ## Test 1 — profile assembly
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -27,7 +27,7 @@
 
 ## Test 2 — direct request
 
-- **inputURL:** `GET /users/alice/sections/s03`
+- **inputURL:** `GET /users/alice/emergency-contacts`
 - **inputRequest:**
   ```json
   {

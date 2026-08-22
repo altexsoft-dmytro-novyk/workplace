@@ -32,7 +32,7 @@
 
 ## Test 2 — assign the role
 
-- **inputURL:** `POST /users/roles/it-campaigns/members`
+- **inputURL:** `POST /users/ida/policies`
 - **inputRequest:**
   ```json
   {
@@ -40,7 +40,10 @@
       "authorization": "Bearer <token:root>"
     },
     "body": {
-      "userId": "ida"
+      "type": "FR",
+      "targetType": "user",
+      "targetId": "ida",
+      "targetRole": "it-campaigns"
     }
   }
   ```

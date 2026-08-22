@@ -75,7 +75,7 @@ Every file follows this skeleton exactly:
 - **Global 401 rule:** every endpoint rejects a missing/invalid token with `401`. Write representative 401 scenarios per endpoint family; stage-2 suites apply the check to each real route.
 - Valid token, feature not permitted → `403`. Write to data the viewer may only read → `403`. Any request touching data the viewer must not know exists → `404` with a leak-free body (no field names, counts, or fragments; indistinguishable from a truly nonexistent resource).
 - **Absence is absence:** "not visible" means the key is missing from the JSON body — never `null`, never empty-but-present. All assertions are API-level; UI behavior is out of scope.
-- **Endpoints are placeholder vocabulary** until the real API contract lands; stage-2 authors bind them. Resource root is `/users`; role management is `/users/roles`.
+- **Endpoints are bound to the canonical router-tree convention**, `docs/architecture/api-conventions.md` (spine AD-14) — not placeholder. Resource root is `/users`; role/permission catalog management is top-level `/roles`, never nested under `/users`.
 
 ## Workflow and ownership
 

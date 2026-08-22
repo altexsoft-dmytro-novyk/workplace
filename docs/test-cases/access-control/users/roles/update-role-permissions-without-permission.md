@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `PATCH /users/roles/it-campaigns/permissions`
+- **inputURL:** `PATCH /roles/it-campaigns/permissions`
 - **inputRequest:**
   ```json
   {

@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `DELETE /users/alice/timeline-events/{wrongInferredId}`
+- **inputURL:** `DELETE /users/alice/events/{wrongInferredId}`
 - **inputRequest:**
   ```json
   {

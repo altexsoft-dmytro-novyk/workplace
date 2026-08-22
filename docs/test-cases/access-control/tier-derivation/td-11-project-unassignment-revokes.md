@@ -14,7 +14,7 @@
 
 ## Test 1 — baseline: Manager view via the project
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -31,7 +31,7 @@
 
 ## Test 3 — same token, access gone
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {

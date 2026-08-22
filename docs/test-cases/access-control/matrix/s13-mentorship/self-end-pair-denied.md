@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `DELETE /mentorship-pairs/{activePairId}`
+- **inputURL:** `DELETE /users/alice/relationships/{activePairId}`
 - **inputRequest:**
   ```json
   {

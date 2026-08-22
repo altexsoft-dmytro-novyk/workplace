@@ -14,7 +14,7 @@
 
 ## Test 1 — forbidden section
 
-- **inputURL:** `GET /users/alice/sections/s06`
+- **inputURL:** `GET /users/alice/risks`
 - **inputRequest:**
   ```json
   {
@@ -25,9 +25,9 @@
   ```
 - **expectedResult:** `404`; body carries no field names, record counts, or data fragments
 
-## Test 2 — nonexistent section, same shape
+## Test 2 — nonexistent item within the same forbidden collection, same shape
 
-- **inputURL:** `GET /users/alice/sections/s99`
+- **inputURL:** `GET /users/alice/risks/{nonexistentRiskId}`
 - **inputRequest:**
   ```json
   {
@@ -36,11 +36,11 @@
     }
   }
   ```
-- **expectedResult:** `404`; status and body **indistinguishable** from Test 1
+- **expectedResult:** `404`; status and body **indistinguishable** from Test 1. **[Route note]** rewritten from a bogus top-level path (`/users/alice/nonexistent`) that no longer exists once the generic `/sections/:sN` wrapper was removed — a genuinely unrouted path would hit the framework's default 404 handler, not the AccessControl facade, defeating the point of this test (proving the *facade's* 404 is uniform). A real item id that doesn't exist, inside the same forbidden collection Test 1 already denies, exercises the same code path instead.
 
 ## Test 3 — validation must not precede authorization
 
-- **inputURL:** `PATCH /users/alice/sections/s06`
+- **inputURL:** `POST /users/alice/risks`
 - **inputRequest:**
   ```json
   {

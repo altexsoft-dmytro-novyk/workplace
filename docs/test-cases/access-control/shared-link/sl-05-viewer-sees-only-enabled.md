@@ -27,7 +27,7 @@
 
 ## Test 2 — direct probe of a non-enabled section
 
-- **inputURL:** `GET /share/{token}/sections/s06`
+- **inputURL:** `GET /share/{token}/risks`
 - **inputRequest:**
   ```json
   {

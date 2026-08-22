@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `PATCH /users/alice/sections/s02`
+- **inputURL:** `PATCH /users/alice/personal-contacts`
 - **inputRequest:**
   ```json
   {

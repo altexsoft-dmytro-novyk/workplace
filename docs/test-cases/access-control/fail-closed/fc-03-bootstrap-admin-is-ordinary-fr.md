@@ -14,7 +14,7 @@
 
 ## Test 1 — delegable: Root grants HR Admin to Ida
 
-- **inputURL:** `POST /users/roles/hr-admin/members`
+- **inputURL:** `POST /users/ida/policies`
 - **inputRequest:**
   ```json
   {
@@ -22,7 +22,10 @@
       "authorization": "Bearer <token:root>"
     },
     "body": {
-      "userId": "ida"
+      "type": "FR",
+      "targetType": "user",
+      "targetId": "ida",
+      "targetRole": "hr-admin"
     }
   }
   ```
@@ -30,7 +33,7 @@
 
 ## Test 2 — revocable: Ida revokes the seed user
 
-- **inputURL:** `DELETE /users/roles/hr-admin/members/root`
+- **inputURL:** `DELETE /users/root/policies/{policyId}`
 - **inputRequest:**
   ```json
   {
@@ -43,7 +46,7 @@
 
 ## Test 3 — admin feature gone
 
-- **inputURL:** `POST /users/roles`
+- **inputURL:** `POST /roles`
 - **inputRequest:**
   ```json
   {
@@ -59,7 +62,7 @@
 
 ## Test 4 — data access gone
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {

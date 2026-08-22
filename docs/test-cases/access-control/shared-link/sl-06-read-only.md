@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `PATCH /share/{token}/sections/s02`
+- **inputURL:** `PATCH /share/{token}/personal-contacts`
 - **inputRequest:**
   ```json
   {

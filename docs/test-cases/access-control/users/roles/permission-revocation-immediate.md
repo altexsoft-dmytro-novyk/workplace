@@ -32,7 +32,7 @@
 
 ## Test 2 — admin removes the permission from the role
 
-- **inputURL:** `PATCH /users/roles/it-campaigns/permissions`
+- **inputURL:** `PATCH /roles/it-campaigns/permissions`
 - **inputRequest:**
   ```json
   {

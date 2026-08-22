@@ -14,7 +14,7 @@
 
 ## Test 1 — baseline: Manager view via the policy
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -31,7 +31,7 @@
 
 ## Test 3 — dangling policy grants nothing
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {

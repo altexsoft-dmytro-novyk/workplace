@@ -16,6 +16,7 @@ Every rule cites a spine decision ID (`AD-n`). To change a rule: change the spin
 | [testing-strategy.md](testing-strategy.md) | Three-stage gate, E2E definition, test data | AD-1, AD-3, AD-4 |
 | [access-control.md](access-control.md) | Policy engine, tier resolution, facade usage | AD-6…AD-12 |
 | [database-schema.md](database-schema.md) | Core tables, constraints, ID/edge rules | AD-7, AD-11 |
+| [api-conventions.md](api-conventions.md) | Router tree: resource/collection/field-group/attachment shapes | AD-14 |
 | [nestjs-di-tokens.md](nestjs-di-tokens.md) | Ports as DI tokens, production/test wiring | AD-2, AD-3 |
 | [custom-fields.md](custom-fields.md) | **Not yet decided — do not build** | — |
 | [dashboards.md](dashboards.md) | **Not yet decided — do not build** | — |

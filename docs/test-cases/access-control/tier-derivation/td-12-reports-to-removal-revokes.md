@@ -14,7 +14,7 @@
 
 ## Test 1 — baseline: transitive Manager view
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -31,7 +31,7 @@
 
 ## Test 3 — direct manager loses access
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -44,7 +44,7 @@
 
 ## Test 4 — whole chain above loses access
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {

@@ -14,7 +14,7 @@
 
 ## Test 1 — Manager tier over report
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -27,7 +27,7 @@
 
 ## Test 2 — PP tier over assignee
 
-- **inputURL:** `GET /users/colin/profile`
+- **inputURL:** `GET /users/colin`
 - **inputRequest:**
   ```json
   {
@@ -40,7 +40,7 @@
 
 ## Test 3 — Colleague tier over unrelated
 
-- **inputURL:** `GET /users/eve/profile`
+- **inputURL:** `GET /users/eve`
 - **inputRequest:**
   ```json
   {

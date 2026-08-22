@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `POST /users/roles`
+- **inputURL:** `POST /roles`
 - **inputRequest:**
   ```json
   {

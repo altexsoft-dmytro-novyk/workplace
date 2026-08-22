@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `POST /users/roles/it-campaigns/members`
+- **inputURL:** `POST /users/bob/policies`
 - **inputRequest:**
   ```json
   {
@@ -22,7 +22,10 @@
       "authorization": "Bearer <token:bob>"
     },
     "body": {
-      "userId": "bob"
+      "type": "FR",
+      "targetType": "user",
+      "targetId": "bob",
+      "targetRole": "it-campaigns"
     }
   }
   ```

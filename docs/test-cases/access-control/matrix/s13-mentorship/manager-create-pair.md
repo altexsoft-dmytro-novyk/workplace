@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `POST /mentorship-pairs`
+- **inputURL:** `POST /users/<employee available to Bob>/relationships`
 - **inputRequest:**
   ```json
   {
@@ -22,8 +22,8 @@
       "authorization": "Bearer <token:bob>"
     },
     "body": {
-      "mentor": "alice",
-      "mentee": "<employee available to Bob>"
+      "type": "mentorship",
+      "targetId": "alice"
     }
   }
   ```

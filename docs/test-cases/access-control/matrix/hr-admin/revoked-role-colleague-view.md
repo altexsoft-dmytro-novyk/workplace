@@ -14,7 +14,7 @@
 
 ## Test 1 — baseline: admin view
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {
@@ -27,7 +27,7 @@
 
 ## Test 2 — revoke Root's role membership
 
-- **inputURL:** `DELETE /users/roles/hr-admin/members/root`
+- **inputURL:** `DELETE /users/root/policies/{policyId}`
 - **inputRequest:**
   ```json
   {
@@ -40,7 +40,7 @@
 
 ## Test 3 — same token, colleague view
 
-- **inputURL:** `GET /users/alice/profile`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {

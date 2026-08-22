@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `GET /users/alice/sections/s16`
+- **inputURL:** `GET /users/alice/custom-fields`
 - **inputRequest:**
   ```json
   {

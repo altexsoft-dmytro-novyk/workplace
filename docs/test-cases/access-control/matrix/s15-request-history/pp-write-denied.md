@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `PATCH /users/alice/sections/s15`
+- **inputURL:** `PATCH /users/alice/request-history`
 - **inputRequest:**
   ```json
   {

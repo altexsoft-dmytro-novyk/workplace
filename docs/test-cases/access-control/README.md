@@ -7,7 +7,7 @@ Stage-1 quality-gate scenario documents (AD-1), following the team-wide authorin
 - **Authorization header:** `"Bearer <token:persona>"` = a valid session token for that persona; `""` (empty) = unauthenticated. **Global rule: every endpoint rejects a missing or invalid token with `401`** — representative scenarios per endpoint family (`au-*`, `sl-12`, `sf-07/08`, `ur-01`); stage-2 suites apply the check to each real route.
 - **Denial convention:** valid token, no permission for the feature → `403`. Write to a section the viewer can read → `403`. Any request touching a section the viewer cannot see at all (`—` cell) → `404` with a leak-free body.
 - **Absence is absence** (§3.3.4): "not visible" means the key is missing from the JSON body — never null, never empty-but-present. All assertions are API-level; UI behavior is out of scope.
-- **Endpoints are placeholder vocabulary** (`/users/:id/sections/:sN`, `/users/roles`, `/share/:token`, …). Stage-2 authors bind them to the real routes; the semantics are the contract.
+- **Endpoints are bound to the canonical convention** (`/users/:id`, `/roles`, `/share/:token`, …) per the router-tree convention in [api-conventions.md](../../architecture/api-conventions.md) (AD-14) — not placeholder vocabulary.
 - **Path × section:** relationship paths are proven once in `tier-derivation/` (single resolver, AD-10); matrix files test sections per audience and deliberately vary the manager persona (Bob/Carol/Pete/Dave/Frank) to spread path coverage.
 - A file with several `Test N` blocks is still one requirement, probed from multiple angles (e.g. a `—` cell probed via profile assembly and direct request).
 

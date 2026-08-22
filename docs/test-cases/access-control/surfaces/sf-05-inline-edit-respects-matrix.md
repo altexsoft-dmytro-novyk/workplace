@@ -14,7 +14,7 @@
 
 ## Test 1 — manager writes through
 
-- **inputURL:** `PATCH /users/alice/sections/s04`
+- **inputURL:** `PATCH /users/alice/employment`
 - **inputRequest:**
   ```json
   {
@@ -30,7 +30,7 @@
 
 ## Test 2 — colleague-tier target
 
-- **inputURL:** `PATCH /users/eve/sections/s04`
+- **inputURL:** `PATCH /users/eve/employment`
 - **inputRequest:**
   ```json
   {
@@ -46,7 +46,7 @@
 
 ## Test 3 — self R cell
 
-- **inputURL:** `PATCH /users/alice/sections/s04`
+- **inputURL:** `PATCH /users/alice/employment`
 - **inputRequest:**
   ```json
   {

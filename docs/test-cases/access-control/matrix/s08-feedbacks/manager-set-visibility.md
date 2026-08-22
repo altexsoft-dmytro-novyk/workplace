@@ -14,7 +14,7 @@
 
 ## Test 1 — baseline: Alice cannot see F2
 
-- **inputURL:** `GET /users/alice/sections/s08`
+- **inputURL:** `GET /users/alice/feedbacks`
 - **inputRequest:**
   ```json
   {
@@ -43,7 +43,7 @@
 
 ## Test 3 — Alice now sees exactly that record
 
-- **inputURL:** `GET /users/alice/sections/s08`
+- **inputURL:** `GET /users/alice/feedbacks`
 - **inputRequest:**
   ```json
   {

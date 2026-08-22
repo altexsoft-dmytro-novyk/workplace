@@ -7,7 +7,7 @@ paradigm: 'hexagonal (ports & adapters) over DDD bounded contexts'
 scope: 'People Management Platform — Iteration 1, greenfield, required features only (NORMATIVE + DESIGN FREEDOM of docs/project-requirements.md; GOOD TO HAVE out of scope)'
 status: draft
 created: '2026-08-19'
-updated: '2026-08-19'
+updated: '2026-08-22'
 binds: []
 sources:
   - docs/project-requirements.md
@@ -107,13 +107,13 @@ Dependency rule: `application` and `infrastructure` depend on `domain`; `domain`
 
 - **Binds:** access-control context; every list/profile/dashboard endpoint; NFR §7 (500 records / 2 s)
 - **Prevents:** per-row graph walks; stale-grant leaks; torn reads; broken compound chains (reports-to *then* project-manager-of)
-- **Rule:** one recursive SQL query (`WITH RECURSIVE`) resolves the viewer's tier (Self / Manager-line / PP / Colleague) to all requested employees in a single round trip, walking reports-to edges and manages-project/department policy attachments as **one** transitive graph. Section visibility = tier map joined against the seeded tier→section mapping. The profile single-target check is the degenerate case of the same query. Derived access decisions are never persisted or cached without invalidation-on-graph-change. When a resolution spans the policy query plus a per-`targetType` lookup, both calls run in one transaction. Secondary polymorphic lookups are allowed for feature/audience resolution but barred from the tier hot path.
+- **Rule:** one recursive SQL query (`WITH RECURSIVE`) resolves the viewer's tier (Self / Manager-line / PP / Colleague) to all requested employees in a single round trip, walking reports-to edges and manages-**project** policy attachments as **one** transitive graph. **Manages-department is not yet live**: `Policies.targetType:'department'` exists syntactically but the walk does not honor it today — Department edge modeling is still Deferred, and until it resolves, a `department`-targeted policy row contributes nothing to tier resolution (fail-closed default, same treatment as an unwired `mentorship` edge, AD-11/AD-12). The `Relationship` join in this query **filters `type = 'direct'` exclusively** — `project` and `mentorship` rows are never read by the tier walk; `mentorship`'s `reportsToUserId` sharing the column with `direct` (AD-11) does not make it eligible, that column-sharing is a storage-layout fact, not a walk-inclusion rule. Section visibility = tier map joined against the seeded tier→section mapping. The profile single-target check is the degenerate case of the same query. Derived access decisions are never persisted or cached without invalidation-on-graph-change. When a resolution spans the policy query plus a per-`targetType` lookup, both calls run in one transaction. Secondary polymorphic lookups are allowed for feature/audience resolution but barred from the tier hot path.
 
 ### AD-11 — Org-fact schema: typed edges, single source of truth
 
 - **Binds:** user-management context, database schema
 - **Prevents:** polymorphic FK-less edge columns breaking recursion; membership data drifting between two stores
-- **Rule:** `Relationship {id uuidv7, userId FK, type 'direct'|'project', reportsToUserId FK nullable, projectId FK nullable}` with a CHECK constraint per type — edge types share a table, never a target column. No `roleOnProject`: managerial semantics live in policy attachments (AD-7). At most one active `reportsTo` edge per user (tree, not graph). Project membership derives solely from `Relationship` rows. Dangling policy `targetId`s fail closed (join yields zero members → zero grants); a periodic consistency sweep keeps hygiene.
+- **Rule:** `Relationship {id uuidv7, userId FK, type 'direct'|'project'|'mentorship', reportsToUserId FK nullable, projectId FK nullable}` with a CHECK constraint per type — edge types share a table, never a target column, but two edge types (`direct`, `mentorship`) share `reportsToUserId` since both target `User`, the same table — `reportsToUserId` keeps the directional name across both because both point "up" from `userId` to the other party (manager, or mentor), same shape as reports-to. No `roleOnProject`: managerial semantics live in policy attachments (AD-7). At most one active `reportsTo` edge per user (tree, not graph) — this uniqueness does **not** extend to `mentorship` (no sourced one-mentor-at-a-time rule; left unconstrained). Project membership derives solely from `Relationship` rows. Mentor pairing is `type: 'mentorship'`, `userId` = mentee, `reportsToUserId` = the mentor, added via `POST /users/:id/relationships` (AD-14); it carries no start/end columns of its own — attach/detach fires the already-reserved `UserEvents.mentorship_start`/`mentorship_end` (`database-schema.md`), which is where that history lives. A `mentorship` edge grants no access tier unless/until explicitly wired into AD-10's walk (fail-closed default, AD-12). `Relationship` rows are **hard-deleted**, not soft-deleted — no `deletedAt`/`isActive` column, unlike `User`/`UserEvents` in this same schema; "active" in the UNIQUE clause means "row exists," nothing more. No `manager_change` `UserEvents` type is added for this: unlike grade/position/department/mentorship, no concrete consumer of reports-to history is named today — a hard delete simply loses that fact, by design, matching every other org-fact edge (`project`). If reports-to history is ever needed, it's a new, separately-scoped feature request, not a speculative column added now. `UserEvents` writes (system-triggered ones, e.g. `mentorship_start`/`position_change`) happen **synchronously, in the same transaction as the domain mutation that causes them, via an explicit call from that use-case** — no event bus, no generic table-change listener, in iteration 1; every feature owner wiring a new tracked change follows this same one pattern. Dangling policy `targetId`s fail closed (join yields zero members → zero grants); a periodic consistency sweep keeps hygiene.
 
 ### AD-12 — Fail-closed everywhere; bootstrap by seeded role
 
@@ -127,6 +127,12 @@ Dependency rule: `application` and `infrastructure` depend on `domain`; `domain`
 - **Prevents:** identity ambiguity across systems (§6); sync-vs-admin write conflicts in the policies table
 - **Rule:** `User.ttId` external-identity field exists from day one; managerial policy rows are seed/admin-written until the timetracker integration lands. When it lands: the sync is the sole writer of `managedBy:'sync'` rows and replaces a user's rows transactionally (no old+new coexistence window) — §2.1 non-sticky access depends on it.
 
+### AD-14 — Router tree: no generic sections wrapper; collections, field-groups, and generic attachment endpoints
+
+- **Binds:** every controller in every context; test-case authors binding placeholder URLs to real routes
+- **Prevents:** endpoint shapes drifting per feature-owner (already happened before this AD existed: `PUT` vs `PATCH` for the same photo upload, `events` vs `timeline-events` for the same table, functional roles nested under `/users` while every other cross-user resource sat top-level)
+- **Rule:** full mapping and rationale in `docs/architecture/api-conventions.md`. Four shapes, never a fifth invented ad hoc: (1) the `User` resource itself — `/users`, `/users/:id` (GET/PATCH/DELETE-as-soft-delete), `PUT /users/:id/photo`, `/users/export` declared **before** `:id` in the controller (literal siblings never lose to a param route); (2) owned collections with real row identity — `/users/:id/<collection>[/:itemId]` (`events`, `documents`, `notes`, `feedbacks`, `assessments`, `idps`, `risks`, `leaves`, `request-history`), or top-level when never user-scoped (`action-items`, `campaigns`, `resourcing/requests`, `share-links`); (3) field-group resources with no row identity — `GET/PATCH /users/:id/<name>` only, no item id, `PATCH` is **full-replace** (omitted fields cleared, not merged — the same semantics for every field-group, no per-owner choice) (`personal-contacts`, `emergency-contacts`, `employment`, `custom-fields` — **router shape only**, the custom-fields *storage* model is still Deferred and may force shape 3 to shape 2 if EAV wins; don't build custom-fields persistence against this shape yet); (4) generic attachment endpoints mirroring AD-7/AD-11 — `POST/DELETE /users/:id/relationships` (`type: 'direct'|'project'|'mentorship'`) and `POST/DELETE /users/:id/policies` (`type: 'AR'|'FR'`) cover every assignable fact instead of a bespoke endpoint per feature; role/permission catalog management is top-level (`GET/POST /roles`, `PATCH /roles/:roleId/permissions`, `DELETE /roles/:roleId`), never nested under `/users`. **Shape-2-vs-shape-3 test for any resource not yet in the table**: shape 2 (collection) iff members can be created or deleted independently without replacing the whole set; shape 3 (field-group) iff cardinality is fixed at one-per-user even when internally multi-field. Adding a resource to either shape is itself an AD-1-gated decision — the api-conventions.md table gets a row before the endpoint is built, not after. Section addressing uses the section's human-readable name (already established by each matrix folder), never the requirements doc's `sNN` id.
+
 ## Consistency Conventions
 
 | Concern | Convention |
@@ -136,6 +142,7 @@ Dependency rule: `application` and `infrastructure` depend on `domain`; `domain`
 | Ports | domain `interfaces/` + NestJS DI injection token per port; production and test modules bind the same token |
 | Auth checks | AccessControl facade only (AD-9) |
 | Test cases | `/docs/test-cases/`, each traced to a requirements section (AD-1) |
+| HTTP routes | four shapes only — resource, collection, field-group, generic attachment (AD-14, `api-conventions.md`) |
 
 ## Stack
 
@@ -156,6 +163,7 @@ erDiagram
   User ||--o{ UserPolicies : ""
   Policies ||--o{ UserPolicies : ""
   Department ||--o{ Project : "groups"
+  User ||--o{ UserEvents : "userId"
   User {
     uuid id
     string ttId
@@ -166,6 +174,12 @@ erDiagram
     string type
     uuid reportsToUserId
     uuid projectId
+  }
+  UserEvents {
+    uuid id
+    uuid userId
+    string type
+    string source
   }
   Policies {
     uuid id
@@ -192,5 +206,9 @@ erDiagram
 - **Department edge modeling detail** — departments group projects and extend the manager walk upward (generalizing §2.1 relation 2 over a resource tree, not a third relation); exact schema pending the non-manager-assignment answer. **New scope vs requirements doc — flag to requirements owner.**
 - **Timetracker & PeopleForce integration design** — API drafts not final; only `ttId` and the single-writer rule (AD-13) are fixed now.
 - **Agent rule-loading guarantee** — how `docs/architecture/` is force-loaded into every agent session (candidate: `project-context.md` / AGENTS.md wiring via bmad-project-context).
+- **S13 mentorship self-visibility flag's exact endpoint** — inferred as `PATCH /users/:id/relationships/:id` (`api-conventions.md`) since the flag most plausibly lives on the mentorship `Relationship` row; not directly sourced, flag for confirmation when S13 is actually built.
+- **S10 leaves / S15 request-history write paths** — no scenario in either test suite exercises a write; only the read route (`GET /users/:id/leaves`, `GET /users/:id/request-history`, AD-14) is fixed. The richer `mentorship` context (pairing status workflow, notifications) beyond the bare pairing fact (now `Relationship.type='mentorship'`, AD-11) is still pending, same as before.
+- **`resourcing` context's write path into `Relationship`** — once `resourcing` is confirmed (AD-5), its "request fulfilled → add user to project" flow must go through `user-management`'s application layer (AD-2), never write `Relationship` rows directly. AD-2 already makes this safe if followed; worth an explicit note on that specific seam once `resourcing` lands.
+- **`/roles` catalog surface** — AD-14 fixes attachment (`/users/:id/policies`) and now `GET/POST/DELETE /roles` + `PATCH /roles/:roleId/permissions`, but full request/response shapes aren't specified; low risk, AD-1's gate forces this out per-feature when `users/roles/` scenarios are actually built.
 - **Operational envelope** (deployment, environments, hosting) — not yet discussed; §9 requires deployed-and-demonstrable, so this must be resolved before first release.
 - **Out of scope by iteration-1 constraint:** notifications (§4.13), analytics (§4.14).

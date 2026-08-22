@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `GET /users/alice/sections/s13`
+- **inputURL:** `GET /users/alice`
 - **inputRequest:**
   ```json
   {

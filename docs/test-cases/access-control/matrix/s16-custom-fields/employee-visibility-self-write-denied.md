@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `PATCH /users/alice/sections/s16`
+- **inputURL:** `PATCH /users/alice/custom-fields`
 - **inputRequest:**
   ```json
   {
