@@ -36,7 +36,7 @@ Reuses the cast seeded for [access-control's suite](../access-control/README.md#
 
 | Folder | Covers | Files |
 | --- | --- | --- |
-| `registration/` | FR-3/FR-4: HR Admin creates a user on a new hire's behalf; registration triggers the magic-link flow rather than logging in directly; payload validation; `workEmail`/`ttId` uniqueness | 7 |
+| `registration/` | FR-3/FR-4: HR Admin creates a user on a new hire's behalf; registration triggers the magic-link flow rather than logging in directly; payload validation; `workEmail`/`ttId` uniqueness, including the concurrent-create race | 9 |
 | `auth/` | FR-2: request a magic link by `workEmail`, consume the token to establish a session | 5 |
 | `profile/` | User's own S1-field CRUD mechanics: Manager-line edits, Self photo upload, uniqueness constraints on write | 4 |
 | `deactivation/` | `isActive` soft delete: the record is preserved, excluded from active-only views | 3 |

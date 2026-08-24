@@ -14,7 +14,7 @@ Ida rather than a role-less persona is deliberate: a role-less caller would also
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Ida holds role *IT Campaigns* with the single permission *create form campaigns* and no HR Admin role; no user with `workEmail: nina.volkova@company.example`.
 
-## Test 1 — create is denied
+## Test
 
 - **inputURL:** `POST /users`
 - **inputRequest:**
@@ -33,14 +33,4 @@ Ida rather than a role-less persona is deliberate: a role-less caller would also
   }
   ```
 - **expectedResult:** `403`; the body names no permission, role, or field.
-
-## Test 2 — observe that nothing was created
-
-- **inputURL:** `GET /users?filter[workEmail]=nina.volkova@company.example`
-- **inputRequest:**
-  ```json
-  {
-    "headers": { "authorization": "Bearer <token:Root>" }
-  }
-  ```
-- **expectedResult:** `200` with an empty result set — no `User` row exists for that address.
+- **stateChange:** absence of a `User` row for that address is asserted against the datastore in stage 2, since Story 1.1 builds no read endpoint to observe it through.

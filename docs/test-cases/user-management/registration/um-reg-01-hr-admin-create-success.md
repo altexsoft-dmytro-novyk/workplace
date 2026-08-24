@@ -12,7 +12,7 @@
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Root seeded with the HR Admin functional role; no user with `workEmail: nina.volkova@company.example`.
 
-## Test 1 — create
+## Test
 
 - **inputURL:** `POST /users`
 - **inputRequest:**
@@ -30,15 +30,5 @@
     }
   }
   ```
-- **expectedResult:** `201`; body carries `id`, every submitted field at its submitted value, `isActive: true`, `createdBy: <rootId>`, a server-set `createdAt`, and `customFields: {}`. The omitted nullable columns (`photo`, `workPhone`, `birthDate`, `ttId`) are present and `null` — this is a genuinely empty field for an audience entitled to see it, not a field hidden from this viewer, so the suite's absence-is-absence rule does not apply. No `password`, `passwordHash`, `credential`, or equivalent key appears anywhere in the body.
-
-## Test 2 — observe persistence
-
-- **inputURL:** `GET /users/<ninaId>`
-- **inputRequest:**
-  ```json
-  {
-    "headers": { "authorization": "Bearer <token:Root>" }
-  }
-  ```
-- **expectedResult:** `200`; the same field values as Test 1, confirming the create response was persisted rather than echoed. Still no credential key of any kind. `createdBy` still resolves to Root.
+- **expectedResult:** `201`; body carries `id`, every submitted field at its submitted value, `isActive: true`, `createdBy: <rootId>`, a server-set `createdAt`, and `customFields: {}`. The omitted nullable columns (`photo`, `workPhone`, `birthDate`, `ttId`) are present and `null` — a genuinely empty field for an entitled audience, not a field hidden from this viewer, so the suite's absence-is-absence rule does not apply. No `password`, `passwordHash`, `credential`, or equivalent key appears anywhere in the body.
+- **stateChange:** persistence is asserted against the datastore in stage 2, not through a follow-up read. `GET /users/:id` belongs to Story 1.2 and `GET /users` to Story 1.5; observing through either would make this story's suite unrunnable until those land. The same stage-2 check confirms the persisted row carries no credential column.

@@ -14,7 +14,7 @@ The payload below is complete and valid, so `401` can only be the answer to the 
 
 **Preconditions:** [fixture](../README.md#canonical-personas); no user with `workEmail: nina.volkova@company.example`.
 
-## Test 1 — unauthenticated create is rejected
+## Test
 
 - **inputURL:** `POST /users`
 - **inputRequest:**
@@ -32,15 +32,5 @@ The payload below is complete and valid, so `401` can only be the answer to the 
     }
   }
   ```
-- **expectedResult:** `401`; the body names no field, role, permission, or persona, and is byte-identical in shape to the `401` any other endpoint returns for a missing token.
-
-## Test 2 — observe that nothing was created
-
-- **inputURL:** `GET /users?filter[workEmail]=nina.volkova@company.example`
-- **inputRequest:**
-  ```json
-  {
-    "headers": { "authorization": "Bearer <token:Root>" }
-  }
-  ```
-- **expectedResult:** `200` with an empty result set — no `User` row exists for that address.
+- **expectedResult:** `401`; the body names no field, role, permission, or persona, and is identical in shape to the `401` any other endpoint returns for a missing token.
+- **stateChange:** absence of a `User` row for that address is asserted against the datastore in stage 2. No read endpoint exists inside Story 1.1 — `GET /users` with filters is Story 1.5 — so asserting absence over HTTP would couple this case to a story that has not been built.

@@ -7,7 +7,7 @@ sources:
   - ../../planning-artifacts/prds/prd-user-management-2026-08-20/prd.md
 ---
 
-> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The README companion indexes the 26 scenario files that carry the request-level assertions.
+> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The README companion indexes the 28 scenario files that carry the request-level assertions.
 
 # User-Management Test-Case Suite
 
@@ -19,7 +19,7 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
 
 - **CAP-1** Registration
   - **intent:** HR Admin creates a `User` on a new hire's behalf; the record is created with no credential stored, completing registration never establishes a session directly, and neither an invalid payload nor a duplicate identity value can produce a row.
-  - **success:** `registration/` UM-REG-01..07 pass without opening another document: success with server-set audit columns, `401` unauthenticated, `403` for a functional-role holder lacking the user-creation permission, duplicate `workEmail` (exact, case-variant, and deactivated-holder), no-session-on-create asserted on body *and* headers, `400` on an invalid payload, and duplicate `ttId` on create.
+  - **success:** `registration/` UM-REG-01..09 pass without opening another document: success with server-set audit columns, `401` unauthenticated, `403` for a functional-role holder lacking the user-creation permission, exact duplicate `workEmail`, no-session-on-create asserted on body *and* headers, missing non-nullable field, duplicate `ttId`, concurrent duplicate `workEmail` resolving to one row, and malformed `workEmail`.
 - **CAP-2** Magic-link authentication
   - **intent:** A user requests a magic link by `workEmail` and consumes the resulting one-time token to establish a session, replacing password auth ahead of SSO.
   - **success:** `auth/` UM-AUTH-01..05: known-email request, enumeration-safe unknown-email request, successful consume, expired-token denial, single-use replay denial.
@@ -39,17 +39,14 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
 ## Constraints
 
 - RBAC is explicitly out of scope: actors in every file are drawn from personas access-control's suite already proves entitled. These scenarios assert workflow/data correctness given an entitled actor, never who is entitled. The one exception is the registration denial case, which probes permission *granularity* on this endpoint (a role-holder lacking this permission) rather than re-deriving the access matrix.
-- One test case per file; read/write and auth-state variants are split, following `docs/test-cases/README.md`'s granularity rules.
+- One requirement per file, enforced strictly. Where a file probes one requirement from several angles it may carry several `Test N` blocks, but a second requirement is a second file — a present-but-invalid field is not an absent one, and a concurrent duplicate is not a sequential one.
 - `UserEvents`' immutable-fact model is asserted literally: a correction is shown as explicit steps — soft-delete the wrong entry, append the corrected one, then a read that observes both — never a single in-place PATCH.
 - Every file carries a trace line to a requirements §, a PRD FR-n, and/or an AD-n; a scenario without a trace is invalid. "PRD FR-n" means FR-1..FR-4 — the only numbered FRs the PRD defines. FR-5..FR-16 exist solely in `epics.md` as derived requirements, so a scenario cites their underlying source (`database-schema.md`, an AD, a requirements §) rather than the derived number.
 - Endpoints are bound to the canonical router-tree convention (resource root `/users`, auth root `/auth`) — `docs/architecture/api-conventions.md` (spine AD-14), not placeholder vocabulary. Personas and the `Bearer <token:persona>` convention are shared with `docs/test-cases/access-control/README.md` so relationships stay consistent across both suites.
 - The `User` entity's own field surface is the ceiling for this suite's request/response bodies — no S2/S3/S4/S5 field appears anywhere, matching the PRD's deliberate decision to keep `User` thin and split employment/contacts/documents into their own future tables/contexts.
 - Every write request body carries the full set of non-nullable `User` columns, so a negative case can only fail for the condition under test. A partial body lets a validation error stand in for the intended status and the case passes for the wrong reason — the defect that made the original duplicate-`workEmail` case unable to reach its asserted `409`.
-- A negative case ends with a request observing absence or unchangedness. "No record created" is never asserted from the write response alone.
+- **A scenario asserts only through endpoints its own story builds.** A registration scenario therefore asserts through `POST /users` alone: `GET /users/:id` and `PATCH /users/:id` are Story 1.2, `DELETE /users/:id` is Story 1.4, and `GET /users` with filters is Story 1.5. Absence and persistence are asserted against the datastore in stage 2 instead. Observing through another story's endpoint would make this story's stage-2 suite unrunnable until that story lands, inverting the dependency order the epic set out.
 - Session-absence is asserted on response headers as well as body. `Set-Cookie` cannot appear in a body, so a body-only check would miss a cookie-based session entirely.
-- `workEmail` is normalized on write (trimmed, lower-cased) and uniqueness is enforced on the normalized value; a case variant conflicts rather than creating a second account. Two rows sharing one address would leave FR-2 unable to name a single account for a magic link.
-- `workEmail` and `ttId` uniqueness is absolute with respect to `isActive`. A deactivated user keeps their address and external id, because `isActive` is a soft delete that leaves the row in place; releasing an address would require an explicit reactivation or release flow, and none is specified.
-- A failed magic-link dispatch never rolls back a registration: creation commits and returns `201`, with dispatch treated as best-effort plus retry or manual resend. Rolling back would leave HR unable to onboard during an email outage, against NFR-3's graceful-degradation requirement.
 
 ## Non-goals
 
@@ -76,7 +73,11 @@ A reviewer can map each of CAP-1..6's sourced behaviors to exactly one approved 
 
 ## Open Questions
 
-1. **Server-owned fields on create.** When a client supplies `id`, `isActive`, `createdAt`, or `createdBy` in a registration payload, does the endpoint silently strip them and return `201`, or reject the request with `400`? FR-4 fixes the *outcome* (records go straight to `isActive: true`, and audit columns are server-set) but not the mechanism, and the two produce different assertions. No scenario asserts this today; it needs a decision before one can.
-2. **No scenario covers the dispatch-failure rule.** The rule is decided (Constraints: creation commits, `201` stands), but no file exercises it. It is a distinct requirement from UM-REG-05's no-session assertion, so folding it in would break the one-requirement-per-file rule — it needs its own file (`UM-REG-08`) or an `auth/` case.
-3. **The suite states no fixture-isolation model.** `UM-REG-01`/`05`/`06`/`07` create rows and `UM-REG-04` deactivates Alice, so cases mutate shared seeded state. Whether the fixture resets between cases, between files, or not at all is nowhere written, yet correctness of the registration group now depends on it. Stage 2 cannot be relied on to guess consistently.
-4. **Upstream drift.** `prd.md` carries no rule for `workEmail` normalization, deactivated-address reuse, or dispatch-failure behavior — all three were decided here. `epics.md` Story 1.1 still lists four registration acceptance criteria against seven scenarios, and its FR-6 claims `ttId` uniqueness at registration, which only became true with `UM-REG-07`. Both documents should be updated to match, in their own runs.
+Items 2–4 were briefly recorded as decided product rules and asserted in scenarios. They were not sourced from the PRD, the requirements doc, or any architecture decision, so the assertions have been withdrawn and the questions reopened. No scenario asserts any of them today.
+
+1. **Server-owned fields on create.** When a client supplies `id`, `isActive`, `createdAt`, or `createdBy` in a registration payload, does the endpoint silently strip them and return `201`, or reject with `400`? FR-4 fixes the *outcome* (records go straight to `isActive: true`, and audit columns are server-set) but not the mechanism, and the two produce different assertions.
+2. **`workEmail` normalization.** Is uniqueness case-insensitive and whitespace-trimmed on write? Until this is answered, `ALICE@company.example` and `alice@company.example` can both exist, and FR-2 cannot name a single account for a magic link sent to that address. `UM-REG-04` deliberately probes only the exact-match duplicate.
+3. **Magic-link dispatch failure.** If the email adapter throws after the row is written, does creation commit and return `201`, or roll back? With no passwords, a committed user whose link never sent cannot log in at all; a rollback leaves HR unable to onboard during an email outage. NFR-3 asks for graceful degradation without saying which way. No scenario covers this, and one is needed once it is settled.
+4. **Reuse of a deactivated holder's `workEmail`.** `isActive` is a soft delete, so the row keeps its address. Whether a rehire or a new hire may take it is unset. This is an ordinary HR turnover path, so leaving it unspecified means the implementation decides it by accident.
+5. **The suite states no fixture-isolation model.** Several registration cases create rows against shared seeded state, and `UM-REG-08` issues two concurrent creates. Whether the fixture resets between cases, between files, or not at all is nowhere written, yet the group's correctness depends on it.
+6. **Upstream drift.** `epics.md` Story 1.1 lists four registration acceptance criteria against nine scenarios, and its FR-6 claims `ttId` uniqueness at registration, which only became true with `UM-REG-07`. The Story 1.1 spec's frozen I/O matrix likewise lists four scenarios. Each needs updating in its own run, by whoever owns it.

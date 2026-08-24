@@ -14,7 +14,7 @@ This closes the uniqueness half that registration previously left to the profile
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Colin seeded with `ttId: "tt-1042"`; no user with `workEmail: nina.volkova@company.example`.
 
-## Test 1 — create with an in-use ttId
+## Test
 
 - **inputURL:** `POST /users`
 - **inputRequest:**
@@ -33,15 +33,5 @@ This closes the uniqueness half that registration previously left to the profile
     }
   }
   ```
-- **expectedResult:** `409`; the body reports a conflict on `ttId` without echoing Colin's name, id, or any other field. `workEmail` is unique and unused here, so the conflict can only be the `ttId`.
-
-## Test 2 — observe that nothing changed
-
-- **inputURL:** `GET /users?filter[ttId]=tt-1042`
-- **inputRequest:**
-  ```json
-  {
-    "headers": { "authorization": "Bearer <token:Root>" }
-  }
-  ```
-- **expectedResult:** `200` with exactly one record — Colin's, unchanged. No row exists for `nina.volkova@company.example`.
+- **expectedResult:** `409`; the body reports a conflict on `ttId` without echoing Colin's name, id, or any other field. `workEmail` here is unique and unused, so the conflict can only be the `ttId`.
+- **stateChange:** stage 2 asserts against the datastore that exactly one row holds `tt-1042` and that no row exists for `nina.volkova@company.example`. Story 1.1 has no read endpoint to observe this through.
