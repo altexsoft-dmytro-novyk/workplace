@@ -19,22 +19,24 @@ The `User` entity in this PRD carries only S1-identity-card fields (see [databas
 
 ## Canonical personas
 
-Reuses the cast seeded for [access-control's suite](../access-control/README.md#canonical-personas) so relationships stay consistent across both suites, plus one new persona for the registration story:
+Reuses the cast seeded for [access-control's suite](../access-control/README.md#canonical-personas) so relationships stay consistent across both suites, plus two new hires for the registration story:
 
 | Persona | Role in this suite |
 | --- | --- |
 | **Root** | HR Admin functional role. Creates users, deactivates users. |
 | **Nina** | New hire. Does not exist until `registration/um-reg-01` creates her — her target id is the response of that call, not a seeded fixture. |
+| **Tomas** | Second new hire, created only by `registration/um-reg-05`. Kept distinct from Nina so the no-session case does not collide with the success case over one `workEmail`. |
 | **Alice** | Existing employee (reports to Bob, PP Paula). Subject of profile-edit, auth, and career-timeline scenarios. |
 | **Bob** | Alice's unit manager (Manager-line). Edits Alice's identity fields; manually adds/corrects her career-timeline entries (§4.9: PP and UM only). |
 | **Paula** | Alice's people partner. Also manually adds/corrects career-timeline entries. |
-| **Colin** | Unrelated employee, no HR Admin role. Used for 403 probes on HR-Admin-gated actions. |
+| **Colin** | Unrelated employee, no HR Admin role. Holds `workEmail: colin@company.example` and `ttId: "tt-1042"` — the in-use values the uniqueness cases collide against. |
+| **Ida** | Holds the custom functional role *IT Campaigns*, whose only permission is *create form campaigns*. Used for the 403 probe on HR-Admin-gated actions: holding a functional role must not imply holding this one (§2.3). |
 
 ## Layout
 
 | Folder | Covers | Files |
 | --- | --- | --- |
-| `registration/` | FR-1..FR-3: HR Admin creates a user on a new hire's behalf; registration triggers the magic-link flow rather than logging in directly; `workEmail`/`ttId` uniqueness | 5 |
+| `registration/` | FR-3/FR-4: HR Admin creates a user on a new hire's behalf; registration triggers the magic-link flow rather than logging in directly; payload validation; `workEmail`/`ttId` uniqueness | 7 |
 | `auth/` | FR-2: request a magic link by `workEmail`, consume the token to establish a session | 5 |
 | `profile/` | User's own S1-field CRUD mechanics: Manager-line edits, Self photo upload, uniqueness constraints on write | 4 |
 | `deactivation/` | `isActive` soft delete: the record is preserved, excluded from active-only views | 3 |

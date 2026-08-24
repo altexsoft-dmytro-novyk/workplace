@@ -1,29 +1,46 @@
-# UM-REG-03 · Create user without the HR Admin permission
+# UM-REG-03 · Create user without the user-creation permission
 
-**Trace:** PRD FR-1 · requirements §2.3 (functional-role-gated features)
+**Trace:** requirements §2.3 (functional-role permissions are granular and independently grantable) · PRD FR-4 (registration is HR-Admin-gated)
 
 ## Scenario
 
-**Given** Colin, an authenticated employee holding no functional role that grants user creation.
+**Given** Ida, an authenticated employee holding the custom functional role *IT Campaigns*, whose only permission is *create form campaigns*.
 
-**When** Colin attempts to create a new user.
+**When** Ida submits a registration payload for a new hire.
 
-**Then** the request is denied — creating a user is an HR-Admin-gated feature, not something any authenticated employee can do.
+**Then** the request is denied with `403` and no `User` row is created. Ida holds a functional role, just not this permission — §2.3 requires feature permissions to be independently grantable, so passing the gate must depend on holding user creation specifically, never on holding some role.
 
-**Preconditions:** [fixture](../README.md#canonical-personas); Colin holds no functional role.
+Ida rather than a role-less persona is deliberate: a role-less caller would also be denied by an implementation that waves through any functional-role holder, so that variant cannot detect the failure this case exists to catch. Access-control's `users/roles/permissions-are-independent.md` proves the granularity rule itself; this case proves the registration endpoint honors it.
 
-## Test
+**Preconditions:** [fixture](../README.md#canonical-personas); Ida holds role *IT Campaigns* with the single permission *create form campaigns* and no HR Admin role; no user with `workEmail: nina.volkova@company.example`.
+
+## Test 1 — create is denied
 
 - **inputURL:** `POST /users`
 - **inputRequest:**
   ```json
   {
-    "headers": { "authorization": "Bearer <token:Colin>" },
+    "headers": { "authorization": "Bearer <token:Ida>" },
     "body": {
       "firstName": "Nina",
       "lastName": "Volkova",
-      "workEmail": "nina.volkova@company.example"
+      "position": "QA Engineer",
+      "country": "Poland",
+      "city": "Krakow",
+      "workEmail": "nina.volkova@company.example",
+      "companyJoinDate": "2026-09-01"
     }
   }
   ```
-- **expectedResult:** `403`; no `User` record created.
+- **expectedResult:** `403`; the body names no permission, role, or field.
+
+## Test 2 — observe that nothing was created
+
+- **inputURL:** `GET /users?filter[workEmail]=nina.volkova@company.example`
+- **inputRequest:**
+  ```json
+  {
+    "headers": { "authorization": "Bearer <token:Root>" }
+  }
+  ```
+- **expectedResult:** `200` with an empty result set — no `User` row exists for that address.

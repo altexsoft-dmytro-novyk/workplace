@@ -1,18 +1,18 @@
 # UM-REG-01 · HR Admin creates a new hire
 
-**Trace:** PRD FR-1..FR-3 (registration/auth scope) · requirements §10 (pre-onboarding is out of scope — this is day-one creation, not ATS pre-boarding)
+**Trace:** PRD FR-4 (HR Admin submits the registration form on the new hire's behalf) · PRD FR-2 (no password is ever stored) · PRD Data Model — `User` entity · requirements §3.2 (S1 identity card) · [api-conventions.md](../../../architecture/api-conventions.md) AD-14 shape 1 (`POST /users`)
 
 ## Scenario
 
-**Given** Root, holder of the seeded HR Admin functional role.
+**Given** Root, holder of the seeded HR Admin functional role, and no existing user carrying Nina's `workEmail`.
 
-**When** Root submits the registration form for a new hire, Nina, with her S1-identity-card fields.
+**When** Root submits the registration form for a new hire, Nina, with the full set of S1 identity-card fields.
 
-**Then** a `User` record is created for Nina with `isActive: true` and the fields as submitted; the response does not include a password or any credential — none is ever stored (FR-2).
+**Then** a `User` row is created with `isActive: true` and the submitted values; `createdBy` is Root and `createdAt` is server-set, since both are audit columns the caller never supplies. No password or credential field appears in the response, and none is stored — FR-2 makes the magic link the sole login mechanism, so there is no credential for this endpoint to accept or persist.
 
-**Preconditions:** [fixture](../README.md#canonical-personas); Root seeded with the HR Admin functional role; no existing user with Nina's `workEmail`.
+**Preconditions:** [fixture](../README.md#canonical-personas); Root seeded with the HR Admin functional role; no user with `workEmail: nina.volkova@company.example`.
 
-## Test
+## Test 1 — create
 
 - **inputURL:** `POST /users`
 - **inputRequest:**
@@ -30,4 +30,15 @@
     }
   }
   ```
-- **expectedResult:** `201`; body includes `id`, `isActive: true`, and the submitted fields; no `password` or credential field present anywhere in the body.
+- **expectedResult:** `201`; body carries `id`, every submitted field at its submitted value, `isActive: true`, `createdBy: <rootId>`, a server-set `createdAt`, and `customFields: {}`. The omitted nullable columns (`photo`, `workPhone`, `birthDate`, `ttId`) are present and `null` — this is a genuinely empty field for an audience entitled to see it, not a field hidden from this viewer, so the suite's absence-is-absence rule does not apply. No `password`, `passwordHash`, `credential`, or equivalent key appears anywhere in the body.
+
+## Test 2 — observe persistence
+
+- **inputURL:** `GET /users/<ninaId>`
+- **inputRequest:**
+  ```json
+  {
+    "headers": { "authorization": "Bearer <token:Root>" }
+  }
+  ```
+- **expectedResult:** `200`; the same field values as Test 1, confirming the create response was persisted rather than echoed. Still no credential key of any kind. `createdBy` still resolves to Root.
