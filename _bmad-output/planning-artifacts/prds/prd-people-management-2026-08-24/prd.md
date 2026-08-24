@@ -2,7 +2,7 @@
 title: People Management Platform
 status: draft
 created: 2026-08-24
-updated: 2026-08-24
+updated: 2026-08-24T22:15
 ---
 
 # PRD: People Management Platform
@@ -504,8 +504,8 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 | Analytics (§4.14) | GOOD TO HAVE |
 | Pre-onboarding | §10 deferred |
 | Full PeopleForce API automation | Lowest priority; fallback acceptable |
-| Custom-field storage decision | Architect must resolve — OQ-114 (escalated) |
-| Dashboard widget access model detail | Architect must resolve — OQ-115 (escalated) |
+| Custom-field storage decision | OQ-114 — architect AD by foundation-phase close |
+| Dashboard widget access model detail | OQ-115 — architect AD by foundation-phase close |
 
 ---
 
@@ -549,7 +549,7 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 |--------|-----------|---------|--------|
 | **Internal timetracker** | Inbound pull | (1) Leaves — types, dates, status for S10. (2) Projects/people — assignments, PM, DM for S11, identity card, Manager-line (**FR-37**). No new TT endpoints for bootcamp. | **Scope confirmed** (Q&A Aug 19). Demo instance live. API descriptions in progress — Oleksandr Herashchenko |
 | **PeopleForce** | Inbound pull / link | External resourcing candidates; vacancies as recruiting SoT | **Lowest priority** — external-link fallback satisfies MVP |
-| **Corporate identity** | Inbound | User authentication; cross-system identity anchor | **SSO preferred**, magic link fallback pending Artem confirmation (OQ-110 partial) |
+| **Corporate identity** | Inbound | User authentication; cross-system identity anchor | **SSO preferred** (OQ-110). If Artem confirmation not received by **foundation-phase close**, implement magic-link auth v1; SSO as upgrade path |
 | **External forms** | Outbound link | Campaign targets (MS Forms, Google Forms, etc.) | Ready |
 | **CDS files** | Outbound link | Matrix, assessment, IDP documents | Manual dictionary maintenance |
 
@@ -560,7 +560,7 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 ## 10. Data Governance and Constraints
 
 - **Classification:** Employee personal data (S2, S3), management-only notes (S7), risks (S6), and unshared feedback are restricted tiers.
-- **Retention:** [ASSUMPTION: no explicit retention policy in test assignment; follow organisation default when provided.]
+- **Retention:** No explicit policy in test assignment. HR stakeholder (Vitaliy Barkatov) to provide retention rules **before production deployment**. Architect to implement configurable retention hooks during foundation phase as a forward-compatible placeholder. Until then, follow organisation default when provided (**A-7**).
 - **Audit:** Shared-link access logged (FR-27). [ASSUMPTION: broader audit trail for profile reads not required in v1 unless HR specifies.]
 - **Environments:** Production-like structure with pseudonymised identities in lower environments (NFR-2).
 
@@ -574,10 +574,10 @@ Active gaps not resolved by Q&A Aug 19 or DEC-106–108. Resolved items removed;
 |----|----------|--------|------------|
 | OQ-105 | HR Admin grant/revoke chain for HR Admin role | Admin UX | Vitaliy — bootstrap + delegate pattern per Q&A |
 | OQ-109 | Pre-onboarding profile state | Out of scope if pre-onboarding deferred | Closed by scope — pre-onboarding out |
-| OQ-110 | SSO vs magic link — Artem final confirmation | Login implementation | Partial: SSO preferred |
+| OQ-110 | SSO vs magic link — Artem final confirmation | Foundation-phase auth | Partial: SSO preferred. **Fallback:** if no confirmation by **foundation-phase close**, magic-link auth v1; SSO as upgrade path |
 | OQ-111 | Exact cross-system provisioning flow | Identity sync | AD/SSO anchor confirmed; flow TBD |
-| OQ-114 | Custom-field storage (EAV vs JSONB) | FR-8 — **blocks Wave 1 directory** | Architect must propose by sprint planning; column-per-field excluded (§6) |
-| OQ-115 | Dashboard widget access model | FR-15–18 | Architect must propose before dashboard Wave |
+| OQ-114 | Custom-field storage (EAV vs JSONB) | FR-8 — **blocks Wave 1 directory kickoff** | Architect (Dmytro Novyk): record AD by **foundation-phase close**. **Column-per-field excluded** (`docs/project-requirements.md` §6) |
+| OQ-115 | Dashboard widget access model | FR-15–18 — **blocks dashboard Wave kickoff** | Architect (Dmytro Novyk): record AD by **foundation-phase close** |
 | OQ-116 | Non-manager project assignment (info-sec case) | Policy targetRole values | Stakeholders |
 | OQ-117 | Profile bounded context boundary | Repo structure | Architect |
 | OQ-121 | Token usage tracking for bootcamp | Process measurement | Bootcamp organizers |
@@ -587,10 +587,20 @@ Active gaps not resolved by Q&A Aug 19 or DEC-106–108. Resolved items removed;
 
 Resolved decisions incorporated: **DEC-101** through **DEC-108**.
 
+### Pre-sprint conditions (GO — parallel with foundation phase)
+
+These must land **before the named wave starts**, not before foundation phase begins:
+
+| Condition | Owner | Blocks |
+|-----------|-------|--------|
+| OQ-114 resolved: custom-field storage pattern confirmed (column-per-field excluded) | Architect (Dmytro Novyk) | FR-8, Wave 1 directory |
+| OQ-115 resolved: dashboard widget access model confirmed | Architect (Dmytro Novyk) | FR-15–18, dashboard Wave |
+| OQ-110 time-boxed: SSO confirmed by Artem **or** magic-link default adopted at foundation-phase close | Artem / PM | Foundation-phase auth implementation |
+
 ---
 
 ## 12. Assumptions Index
 
 - **A-1:** Authoritative scope is `docs/project-requirements.md` v1.2, with DEC-106–108 overriding named conflicts for v1 implementation.
 - **A-2:** Policy-attachment access engine per architecture spine implements FR-1–FR-4 without PRD-level mechanism detail (see addendum).
-- **A-7:** No explicit data-retention policy beyond pseudonymisation in non-prod until HR provides one.
+- **A-7:** No explicit data-retention policy until HR stakeholder (Vitaliy Barkatov) provides one **before production deployment**. Architect implements configurable retention hooks during foundation phase; pseudonymisation in non-prod applies until then.

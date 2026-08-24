@@ -52,8 +52,8 @@ Full text: `ARCHITECTURE-SPINE.md`, `docs/architecture/access-control.md`.
 
 | Topic | Open question | Risk if improvised | Escalation |
 |-------|---------------|-------------------|------------|
-| Custom-field storage (EAV vs JSONB) | OQ-114 | Breaks FR-8 filter/column model at scale | **Must resolve before Wave 1 directory** |
-| Dashboard engine & widget access | OQ-115 | Inconsistent tier checks across widgets | Before dashboard implementation |
+| Custom-field storage (EAV vs JSONB) | OQ-114 | Breaks FR-8 filter/column model at scale | Architect: AD by foundation-phase close; column-per-field excluded (requirements §6) |
+| Dashboard engine & widget access | OQ-115 | Inconsistent tier checks across widgets | Architect: AD by foundation-phase close; blocks dashboard Wave |
 | Department edge modeling | DEC-107 confirmed; schema detail | Wrong manager walk / resourcing routing | Architect + v1.3 spec |
 | Profile bounded context boundary | OQ-117 | Team collision in repo structure | Architect |
 | Operational envelope (hosting, envs) | Spine Deferred | Blocks Definition of Done deploy criterion | Team |
