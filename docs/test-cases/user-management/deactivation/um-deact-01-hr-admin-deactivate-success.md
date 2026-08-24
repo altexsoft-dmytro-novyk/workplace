@@ -15,7 +15,7 @@
 ## Test
 
 - **Test 1 — the write**
-  - **inputURL:** `PATCH /users/<colinId>/deactivate`
+  - **inputURL:** `DELETE /users/<colinId>`
   - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:Root>" } }`
   - **expectedResult:** `200`; body reflects `isActive: false`.
 - **Test 2 — the row survives**

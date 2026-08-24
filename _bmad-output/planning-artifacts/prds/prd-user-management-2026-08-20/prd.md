@@ -12,7 +12,7 @@ updated: 2026-08-22
 Covers the `user-management` bounded context (per [domain-driven-design.md](../../../../../docs/architecture/domain-driven-design.md)): the `User` entity, self-service profile CRUD, a temporary magic-link signup/login mechanism ahead of SSO, and the `UserEvents` career-timeline log (§4.9).
 
 Explicitly out of scope for this PRD:
-- Reports-to hierarchy sync / timetracker integration — deferred.
+- **Timetracker integration** — deferred (separate future integration; per project-requirements.md §5.1 it provides leave/vacation balances and reported working days only — no hierarchy data, so it has no bearing on reports-to; corrects an earlier draft of this PRD that conflated the two).
 - Department and Project creation/assignment — HR-Admin-gated, covered under access-control/policies.
 - Access-role and functional-role resolution and enforcement — owned by `access-control`.
 - Mentorship **workflow** (status tracking beyond active/ended, notifications) — future `mentorship` bounded context. The pairing *fact* itself is in scope: `Relationship.type='mentorship'`, assigned/revoked through the generic attachment endpoint (`POST`/`DELETE /users/:id/relationships`, architecture spine AD-11/AD-14) the same way project membership is — see Data Model note below. Attach/detach fires the `mentorship_start`/`mentorship_end` `UserEvents`.
@@ -40,7 +40,7 @@ One `User` record per person. Field list extracted from §3.2 (S1 Identity card)
 `updatedAt`/`updatedBy` deliberately dropped — no concrete consumer named for them here. Real change-history is a separate, deliberately-scoped feature, not a default add-on (see [database-schema.md](../../../../../docs/architecture/database-schema.md) Conventions).
 
 **Deliberately not stored on `User`** (conflicts with AD-11/AD-7's "no access-derived field" rule):
-- **Manager** and **current project(s)** — derived from `Relationship` rows (existing `reportsTo`/`project` edges).
+- **Manager** and **current project(s)** — derived from `Relationship` rows (existing `reportsTo`/`project` edges). No external sync feeds reports-to (see Scope note above) — assignment is a manual HR-Admin operation, in scope for this PRD: `POST`/`DELETE /users/:id/relationships` (`type: 'direct'`), the same generic attachment mechanism as mentorship pairing below.
 - **People Partner** — an access role per §2.1, "arises from assignment" the same way Manager access does; a policy attachment under AD-7, not a `User` column.
 - **Department** — deferred to policies/department-edge work (pending architect decision).
 - **Mentor** — not a scalar field: `Relationship.type='mentorship'` (architecture spine AD-11), the same treatment as Manager/current-project. Start/end are not new columns — they're the existing `UserEvents.mentorship_start`/`mentorship_end`, fired on attach/detach. Status beyond active/ended awaits the future `mentorship` context.
@@ -75,3 +75,4 @@ No `updatedAt`/`updatedBy` — an event is an immutable fact, not a mutable reco
 
 1. ~~Account provisioning~~ — resolved (FR-1..FR-4).
 2. ~~Department & Project CRUD~~ — **closed**: out of scope for this PRD, confirmed HR-Admin/policy work.
+3. ~~Reports-to hierarchy scope~~ — resolved: not tied to timetracker (earlier draft conflated the two, corrected 2026-08-22). No external sync exists; manual HR-Admin assignment via the generic relationship endpoint (`type: 'direct'`) is in scope, same treatment as mentorship pairing.

@@ -14,7 +14,7 @@
 
 ## Test
 
-- **inputURL:** `PATCH /users/<aliceId>/deactivate`
+- **inputURL:** `DELETE /users/<aliceId>`
 - **inputRequest:**
   ```json
   { "headers": { "authorization": "Bearer <token:Bob>" } }
