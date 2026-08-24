@@ -22,8 +22,11 @@ This PRD defines the **People Management Platform** for an internal engineering 
 | `docs/architecture/access-control.md` | Access-control binding rules |
 | `AI SLDC Bootcamp 2.0 Resources/Decision Log.md` | Confirmed `DEC-*` decisions |
 | `AI SLDC Bootcamp 2.0 Resources/Open Questions.md` | Unresolved `OQ-*` gaps |
+| Market landscape research (2026) | Strategic positioning — see `addendum.md` |
 
 Technical implementation choices belong in `addendum.md` and downstream architecture — not in this document.
+
+**Spec conflicts:** Where this PRD references `DEC-106`–`DEC-108`, those decisions supersede conflicting test-assignment v1.2 text for v1 implementation until the requirements owner publishes an amended spec.
 
 ---
 
@@ -34,6 +37,18 @@ The organisation needs a single place to understand, develop, and allocate its p
 The People Management Platform replaces ad hoc spreadsheets and fragmented tools with a web application where **every profile is decomposed into sections**, each governed by an explicit access matrix. Managers, delivery leads, and people partners work from role-appropriate dashboards; employees maintain their own contact and development data; resourcing flows connect unit managers, delivery managers, and project managers without leaking profile data across trust boundaries.
 
 For this bootcamp iteration, **demonstrating a spec-driven, parallel, AI-native delivery process is co-equal with shipping working software**. Access-control correctness is the primary quality attribute — a leak in any section, API surface, export, or notification path is a critical defect.
+
+### 1.1 Why build (strategic context)
+
+Market and requirements analysis confirms this is **not a conventional HRIS purchase decision**. The target combines four categories normally sold separately: core employee data, talent/development workflows, engineering resourcing, and **relationship-aware authorization**. No reviewed commercial product publicly demonstrates the full normative access matrix (dual reporting + project graphs, section-level assembly, S7 PM exception, visibility-safe filtering, expiring profile shares).
+
+**Recommended pattern (Pattern E — composable platform):**
+
+1. **Build** the policy engine, profile aggregation, resourcing state machine, and authorization regression tests.
+2. **Integrate** internal timetracker (leaves + projects/people — load-bearing for permissions) and PeopleForce (recruiting candidates/vacancies).
+3. **Use** enterprise and mid-market products (Workday, Kantata, HiBob, etc.) as **process and UX benchmarks**, not replacements.
+
+The machine-readable access matrix and its negative test catalogue are **deliverables**, not afterthoughts (SM-1, AD-1). Full market research: see addendum.
 
 ---
 
@@ -61,7 +76,7 @@ For this bootcamp iteration, **demonstrating a spec-driven, parallel, AI-native 
 **HR Admin**
 
 - Define custom fields, system dictionaries, and extensible functional roles — without developer involvement.
-- Govern who holds which functional capabilities across the organisation.
+- Govern who holds which functional capabilities across the organisation (**configuration only in v1 — DEC-108**).
 
 **Organisation (implicit)**
 
@@ -100,8 +115,11 @@ Dmytro opens the risk dashboard scoped to people in his Manager line, filters by
 |------|------------|
 | **Access role** | Computed relationship tier between viewer and subject employee: Self, Manager line, People Partner, Colleague. Never assigned or stored — derived from reporting and project relationships (§2.1). |
 | **Functional role** | Assigned capability bundle (UM, DM, PM, PP, HR Admin, or runtime-defined). Governs *features*, not data visibility (§2.2–2.3). |
+| **HR Admin** | Functional role for system configuration: functional roles, permissions, custom fields, dictionaries. **V1 scope is configuration only — no special data-section access beyond normal tier rules (DEC-108).** |
+| **Department** | Org entity: UM holds one-to-many relationship to departments; each employee belongs to one department. Confirmed Q&A Aug 19 (**DEC-107**); formal spec amendment to v1.3 pending. |
 | **Section (S1–S16)** | Atomic profile partition with its own access matrix cell per audience. No profile-level permission. |
 | **Manager line** | Transitive closure of reports-to and project-managed-by relationships (§2.1). |
+| **Direct unit manager** | The employee's immediate reports-to manager — distinct from project-derived PM/DM Manager-line access for S9 write scope (**DEC-106**). |
 | **Tier** | Resolved access role of a viewer with respect to a specific target employee. |
 | **Policy attachment** | Data record linking a user to a managerial or functional capability scope. [ASSUMPTION: implementation uses unified policy model per architecture spine — see addendum.] |
 | **Action item** | Single task entity: manual or campaign-generated; lifecycle open → completed (or cancelled by author). |
@@ -145,6 +163,7 @@ For each profile section S1–S16, the system enforces the normative matrix (Sel
 - Every `—` cell: section absent from UI, API payload, export, search results, error messages, and notifications for that audience.
 - S7 management notes default invisible to employee and PM; PM reads only notes flagged visible-for-PM; employee reads only notes flagged visible-for-employee.
 - Colleague view returns exactly S1, S10 (with leave type), S11 (project name only) — enforced server-side.
+- **HR Admin (v1):** configuration functional permissions only; data visibility follows normal tier resolution — no blanket matrix bypass (**DEC-108**). Test-assignment §3.1 "HR Admin — full access" is superseded for v1.
 
 #### FR-4: Server-side assembly on every request
 
@@ -162,7 +181,7 @@ Custom fields carry visibility level: management (default), employee, or colleag
 
 ### 4.2 Runtime Functional Role Administration
 
-**Description:** HR Admin creates functional roles, assigns granular permissions, and assigns people to roles through the UI — no deploy or schema change. Permission revocation takes effect immediately.
+**Description:** HR Admin creates functional roles, assigns granular permissions, and assigns people to roles through the UI — no deploy or schema change. Permission revocation takes effect immediately. **V1 HR Admin configures the system; does not receive special employee-data access (DEC-108).**
 
 **Functional Requirements:**
 
@@ -174,13 +193,17 @@ HR Admin can create, name, and configure functional roles; grant or revoke granu
 - New role creation and permission change require no code deploy.
 - Removing a permission immediately removes capability for all holders.
 - New functional role never grants access-role tier beyond holder's existing relationships.
+- HR Admin permission changes affect **features only**, not data scope (**DEC-108**).
 
-#### FR-7: People assignment to functional roles
+#### FR-7: People and relationship assignment
 
-HR Admin assigns and revokes functional roles for users via UI.
+HR Admin assigns and revokes **functional roles** for users via UI.
+
+**People Partner relationships** are assigned or revoked by: (a) the employee's direct manager, (b) HR Admin, or (c) a more senior People Partner (Q&A Aug 19).
 
 **Consequences (testable):**
 - User with custom "IT Security" role and create-campaign permission can target audience within their own access scope only.
+- PP assignment by unauthorized roles is rejected.
 
 ---
 
@@ -300,7 +323,7 @@ Counts by level (medium/high/leaver emphasised); sortable/filterable table (unit
 
 ### 4.8 Resourcing
 
-**Description:** DM/PM create requests; UM fulfils with internal or PeopleForce external candidates; DM approves/rejects. Realizes UJ-1.
+**Description:** DM/PM create requests; UM fulfils with internal or PeopleForce external candidates; DM approves/rejects. Realizes UJ-1. **Department entity confirmed (DEC-107); routing below.**
 
 **Functional Requirements:**
 
@@ -308,9 +331,11 @@ Counts by level (medium/high/leaver emphasised); sortable/filterable table (unit
 
 DM/PM create resourcing requests with vacancy details, compensation level expectation, duration, workload; project reference optional. DM sees own and PM requests on their projects.
 
+**UM routing:** Once Department entity is implemented, DM selects UM from department-matched list. **Interim (until Department live):** DM manually selects UM from visible manager list (Q&A Aug 19).
+
 #### FR-24: Request fulfilment
 
-UM sees assigned requests; proposes internal unit members and/or external PeopleForce candidates; submits for DM review.
+UM sees assigned requests; proposes internal unit members from their unit and/or external PeopleForce candidates; submits for DM review. Department membership determines eligible internal candidates once **DEC-107** is implemented.
 
 #### FR-25: Request review and rejection loop
 
@@ -319,8 +344,6 @@ DM approves or rejects each candidate with written reason. Rejected requests may
 #### FR-26: Request history on profile
 
 S15 records proposed → approved/rejected history for internal employees; visible to Manager line and PP per matrix.
-
-**Notes:** [ASSUMPTION: UM routing before formal Department entity uses DM-selected UM or visible-manager pick — OQ-102.]
 
 ---
 
@@ -332,12 +355,12 @@ S15 records proposed → approved/rejected history for internal employees; visib
 
 #### FR-27: Shared link creation and constraints
 
-Manager selects cfg-eligible sections per matrix; S2/S5/S6/S8 excluded by default; S3/S7/S13 never shareable; default expiry 24h (configurable); revocable; access logged (timestamp, origin).
+Manager selects cfg-eligible sections per matrix; S2/S5/S6/S8 excluded by default; S3/S7/S13 never shareable; **S14 (Action Items) never shareable** — matrix cell is `—` for Shared link audience; default expiry 24h (configurable); revocable; access logged (timestamp, origin).
 
 **Consequences (testable):**
 - Viewer must be authenticated platform user.
 - Shared link never grants write access.
-- [NOTE FOR PM: Confirm S14 treatment — OQ-119; matrix marks — for Shared link.]
+- S14 absent from shared-link API payload and UI.
 
 ---
 
@@ -353,7 +376,11 @@ System writes events on: join, grade change, position change, department change,
 
 #### FR-29: Manual timeline maintenance
 
-PP and direct unit manager can add, edit, delete timeline events for backfill/correction. [ASSUMPTION: DM/PM in Manager line do not get S9 write — aligns with Q&A over §4.9 wording; OQ-106.]
+PP and the **direct unit manager** may add, edit, and delete timeline events for backfill and correction. DM and PM holding Manager-line access via project assignment receive S9 as **R only** — not RW. Confirmed Q&A Aug 19 (**DEC-106**). Supersedes test-assignment §3.2 Manager-line RW on S9 for manual write in v1.
+
+**Consequences (testable):**
+- DM with project-only Manager-line access cannot POST/PATCH/DELETE S9 events.
+- Direct UM and PP can mutate S9 per matrix.
 
 ---
 
@@ -411,19 +438,21 @@ Managers and PP add feedback (subject, author, date, context, body) with visibil
 
 #### FR-36: Timetracker — leaves
 
-Pull leave types, dates, and status for S10 display and self-service link-out to manage leaves in timetracker.
+Pull leave types, dates, and status for S10 display and self-service link-out to manage leaves in timetracker. **Scope confirmed:** one of two timetracker APIs (Q&A Aug 19). No new timetracker endpoints will be created for this bootcamp.
 
 #### FR-37: Timetracker — projects and people
 
-Pull projects, assignments, PM, and DM mappings. Project assignment feeds Manager-line resolution (§2.1). Sync is sole writer of sync-managed policy rows; replaces rows transactionally on update.
+Pull projects, assignments, PM, and DM mappings. Project assignment feeds Manager-line resolution (§2.1). Sync is sole writer of sync-managed policy rows; replaces rows transactionally on update. **Scope confirmed:** second timetracker API (Q&A Aug 19). Demo instance live; formal API descriptions in progress (Oleksandr Herashchenko).
 
 **Consequences (testable):**
 - Integration failure degrades gracefully — app remains available; stale project data fails closed on access (no widened grants).
-- [ASSUMPTION: Demo timetracker instance used for bootcamp; prod duplication cleanup out of scope — OQ-113.]
+- Prod timetracker project duplication is an operations concern, not a bootcamp blocker.
 
 #### FR-38: PeopleForce — external candidates
 
-Pull candidate data for resourcing external proposals; vacancies as recruiting SoT. Where integration incomplete, external link to candidate in PeopleForce is acceptable fallback per §5.2. [ASSUMPTION: Full PeopleForce integration likely deferred; fallback path required — OQ-108.]
+**Lowest integration priority** (Q&A Aug 19). MVP accepts external link to candidate in PeopleForce as sufficient fallback. Full API pull is optional enhancement.
+
+**Identity resolution:** PeopleForce candidate ID is the durable cross-system key for external candidates — not email alone. When a candidate becomes an employee, Active Directory / SSO identity is the reconciliation anchor (Q&A Aug 19). Fallback external links must carry PeopleForce candidate ID for future reconciliation.
 
 ---
 
@@ -441,6 +470,16 @@ Pull candidate data for resourcing external proposals; vacancies as recruiting S
 - Internationalization — English only (**DEC-104**).
 - Anonymous or external-world shared-link access (**DEC-101**).
 - Two-way sync of project assignment to timetracker (**DEC-103**).
+- Full PeopleForce API automation (fallback link satisfies MVP).
+
+### 5.1 Deferred feature access constraints — Notifications
+
+Notifications (§4.13) are out of MVP scope. When implemented, these invariants are **non-negotiable**:
+
+- Notification content is assembled **after live tier resolution** — same server-side rule as FR-4.
+- An employee **never** receives a notification derived from S6 (risk), unflagged S7 (management notes), or any `—` matrix cell for the Self audience (including S15 where applicable).
+- A PM **never** receives a notification derived from an S7 note not flagged *visible-for-PM*.
+- Colleague-tier recipients receive no notification content outside the Colleague whitelist (S1, S10 with leave type, S11 project name only).
 
 ---
 
@@ -451,8 +490,9 @@ Pull candidate data for resourcing external proposals; vacancies as recruiting S
 - Normative §2–3 role model and S1–S16 access matrix with test coverage per audience and relationship path.
 - Runtime functional role administration (FR-6, FR-7).
 - All §4 required features: directory, profiles, self-service, four dashboards, action items, campaigns, risks, resourcing, sharing, timeline, CDS, mentorship, feedback.
-- Real timetracker integration (leaves + projects/people).
-- PeopleForce integration or documented fallback link.
+- Real timetracker integration (leaves + projects/people) — scope confirmed.
+- PeopleForce external-link fallback (full API optional).
+- **Department entity** — confirmed Q&A Aug 19 (**DEC-107**); formal requirements v1.3 amendment pending from Vitaliy.
 - Bootcamp engineering process requirements (BMAD, foundation phase, parallel decomposition, intelligent repository, three-stage quality gate).
 - Deployed demonstrable environment — not laptop-only.
 
@@ -460,13 +500,12 @@ Pull candidate data for resourcing external proposals; vacancies as recruiting S
 
 | Item | Reason |
 |------|--------|
-| Notifications (§4.13) | GOOD TO HAVE |
+| Notifications (§4.13) | GOOD TO HAVE — constraints in §5.1 |
 | Analytics (§4.14) | GOOD TO HAVE |
 | Pre-onboarding | §10 deferred |
-| Full PeopleForce automation | Likely deferred; fallback acceptable |
-| Formal Department entity | Pending requirements owner update — OQ-101 |
-| Custom-field storage decision | Architect blocked — OQ-114 |
-| Dashboard widget access model detail | Architect blocked — OQ-115 |
+| Full PeopleForce API automation | Lowest priority; fallback acceptable |
+| Custom-field storage decision | Architect must resolve — OQ-114 (escalated) |
+| Dashboard widget access model detail | Architect must resolve — OQ-115 (escalated) |
 
 ---
 
@@ -508,13 +547,13 @@ Pull candidate data for resourcing external proposals; vacancies as recruiting S
 
 | System | Direction | Purpose | Status |
 |--------|-----------|---------|--------|
-| **Internal timetracker** | Inbound pull | Leaves (S10), projects/people (S11, identity card, Manager-line) | API draft pending — OQ-112 |
-| **PeopleForce** | Inbound pull | External resourcing candidates | Likely partial/deferred — OQ-108 |
-| **Corporate identity** | Inbound | User authentication | SSO vs magic link TBD — OQ-110 |
-| **External forms** | Outbound link | Campaign targets (MS Forms, Google Forms, etc.) | No integration required |
+| **Internal timetracker** | Inbound pull | (1) Leaves — types, dates, status for S10. (2) Projects/people — assignments, PM, DM for S11, identity card, Manager-line (**FR-37**). No new TT endpoints for bootcamp. | **Scope confirmed** (Q&A Aug 19). Demo instance live. API descriptions in progress — Oleksandr Herashchenko |
+| **PeopleForce** | Inbound pull / link | External resourcing candidates; vacancies as recruiting SoT | **Lowest priority** — external-link fallback satisfies MVP |
+| **Corporate identity** | Inbound | User authentication; cross-system identity anchor | **SSO preferred**, magic link fallback pending Artem confirmation (OQ-110 partial) |
+| **External forms** | Outbound link | Campaign targets (MS Forms, Google Forms, etc.) | Ready |
 | **CDS files** | Outbound link | Matrix, assessment, IDP documents | Manual dictionary maintenance |
 
-**Dependency:** Timetracker project/people API is load-bearing for access model — schedule risk if OQ-112 slips.
+**Identity:** Platform user, timetracker user, and PeopleForce candidate reconciled via durable IDs (`ttId`, PeopleForce candidate ID, AD/SSO subject) — email alone insufficient (requirements §6, Q&A Aug 19).
 
 ---
 
@@ -529,34 +568,29 @@ Pull candidate data for resourcing external proposals; vacancies as recruiting S
 
 ## 11. Open Questions
 
-Carried from workspace governance; unresolved items block or constrain downstream work:
+Active gaps not resolved by Q&A Aug 19 or DEC-106–108. Resolved items removed; see Decision Log.
 
-| ID | Question | Impact |
-|----|----------|--------|
-| OQ-101 | Formal Department entity in scope? | Resourcing routing, manager walk, architect schema |
-| OQ-102 | UM assignment for resourcing requests pre-department | FR-26 routing |
-| OQ-103 | Who assigns/revokes PP relationships? | Admin UX |
-| OQ-104 / OQ-118 | HR Admin: config-only vs full matrix access | FR-3, FR-6 scope |
-| OQ-106 | Career timeline write: PP+UM only vs all Manager line | FR-29 |
-| OQ-108 | PeopleForce depth vs fallback-only | FR-38 |
-| OQ-110 / OQ-111 | Auth mechanism and cross-system identity | Login, provisioning |
-| OQ-112 | Timetracker API contracts | FR-36, FR-37 schedule |
-| OQ-114 | Custom-field storage model | FR-8 implementation |
-| OQ-115 | Dashboard engine/widget model | FR-15–18 implementation |
-| OQ-116 | Non-manager project assignment case | Policy targetRole values |
-| OQ-119 | S14 in shared-link never-share list | FR-27 |
+| ID | Question | Impact | Escalation |
+|----|----------|--------|------------|
+| OQ-105 | HR Admin grant/revoke chain for HR Admin role | Admin UX | Vitaliy — bootstrap + delegate pattern per Q&A |
+| OQ-109 | Pre-onboarding profile state | Out of scope if pre-onboarding deferred | Closed by scope — pre-onboarding out |
+| OQ-110 | SSO vs magic link — Artem final confirmation | Login implementation | Partial: SSO preferred |
+| OQ-111 | Exact cross-system provisioning flow | Identity sync | AD/SSO anchor confirmed; flow TBD |
+| OQ-114 | Custom-field storage (EAV vs JSONB) | FR-8 — **blocks Wave 1 directory** | Architect must propose by sprint planning; column-per-field excluded (§6) |
+| OQ-115 | Dashboard widget access model | FR-15–18 | Architect must propose before dashboard Wave |
+| OQ-116 | Non-manager project assignment (info-sec case) | Policy targetRole values | Stakeholders |
+| OQ-117 | Profile bounded context boundary | Repo structure | Architect |
+| OQ-121 | Token usage tracking for bootcamp | Process measurement | Bootcamp organizers |
+| OQ-122 | Agent rule-loading for architecture docs | Dev experience | Architect |
 
-Resolved decisions incorporated: **DEC-101** through **DEC-105** (see Decision Log).
+**Recently resolved (see Decision Log):** OQ-101 → DEC-107; OQ-102; OQ-103; OQ-104/OQ-118 → DEC-108; OQ-106 → DEC-106; OQ-108; OQ-112; OQ-113; OQ-119.
+
+Resolved decisions incorporated: **DEC-101** through **DEC-108**.
 
 ---
 
 ## 12. Assumptions Index
 
-- **A-1:** Authoritative scope is `docs/project-requirements.md` v1.2 over architecture-spine iteration-1 header scope note.
+- **A-1:** Authoritative scope is `docs/project-requirements.md` v1.2, with DEC-106–108 overriding named conflicts for v1 implementation.
 - **A-2:** Policy-attachment access engine per architecture spine implements FR-1–FR-4 without PRD-level mechanism detail (see addendum).
-- **A-3:** Resourcing UM routing uses DM-visible manager selection until Department entity confirmed (OQ-102).
-- **A-4:** Career timeline manual write limited to PP and direct unit manager, not DM/PM (OQ-106 pending confirmation).
-- **A-5:** PeopleForce full API integration deferred; external-link fallback satisfies MVP (OQ-108).
-- **A-6:** Demo timetracker instance suffices for bootcamp; production data cleanup is operations concern (OQ-113).
 - **A-7:** No explicit data-retention policy beyond pseudonymisation in non-prod until HR provides one.
-- **A-8:** S14 (action items) not shareable via shared links — follows matrix `—` unless OQ-119 resolves otherwise.
