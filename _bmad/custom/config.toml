@@ -5,3 +5,15 @@
 #
 # [agents.bmad-agent-pm]
 # description = "Prefers short, bulleted PRDs over narrative drafts."
+
+# `user-management` is currently the only bounded context in active implementation,
+# so its epic/story/spec/sprint-status artifacts were moved under an
+# implementation-artifacts/user-management/ subfolder to keep them separate from
+# other bounded contexts (access-control, dashboards, ...) as those start
+# implementation. Several bmad skills (bmad-build, bmad-sprint-planning,
+# bmad-dev-story, bmad-retrospective, bmad-code-review) resolve sprint-status.yaml,
+# epic-<N>-context.md, and spec-*.md via a flat {implementation_artifacts} path with
+# no per-domain awareness, so this override points that root the active domain
+# subfolder.
+[modules.bmm]
+implementation_artifacts = "{project-root}/_bmad-output/implementation-artifacts/{active-domain}"

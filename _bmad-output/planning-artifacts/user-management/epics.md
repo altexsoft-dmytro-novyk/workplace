@@ -13,9 +13,9 @@ inputDocuments:
 
 ## Overview
 
-This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
+This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
 
-Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../docs/architecture/api-conventions.md), [database-schema.md](../../../docs/architecture/database-schema.md), and the existing stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../docs/test-cases/user-management/README.md) (draft, pending developer approval).
+Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../../docs/architecture/api-conventions.md), [database-schema.md](../../../../docs/architecture/database-schema.md), and the existing stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../../docs/test-cases/user-management/README.md) (24 files, status: draft, pending developer approval).
 
 ## Requirements Inventory
 

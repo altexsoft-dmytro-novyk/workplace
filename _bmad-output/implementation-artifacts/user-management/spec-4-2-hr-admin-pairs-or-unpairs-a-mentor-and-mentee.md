@@ -4,7 +4,7 @@ type: 'feature'
 created: '2026-08-24'
 status: 'ready-for-dev'
 review_loop_iteration: 0
-context: ['{project-root}/_bmad-output/implementation-artifacts/epic-4-context.md']
+context: ['{project-root}/_bmad-output/implementation-artifacts/user-management/epic-4-context.md']
 baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
 ---
 

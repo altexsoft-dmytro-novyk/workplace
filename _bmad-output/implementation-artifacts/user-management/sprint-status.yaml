@@ -33,7 +33,7 @@ last_updated: 08-25-2026 21:10
 project: people management
 project_key: NOKEY
 tracking_system: file-system
-story_location: _bmad-output/implementation-artifacts
+story_location: _bmad-output/implementation-artifacts/user-management
 development_status:
   epic-1: in-progress
   1-1-hr-admin-registers-a-new-hire: in-progress
