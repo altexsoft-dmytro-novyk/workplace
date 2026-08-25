@@ -1,6 +1,8 @@
 # UM-DEACT-02 · A deactivated user is excluded from the active-only listing
 
-**Trace:** PRD Data Model — User.isActive
+**Trace:** epics.md FR-16 / Story 1.5 · PRD Data Model — User.isActive
+
+**Blocked until Story 1.5:** Requires `GET /users` with filters. Do not stub via Prisma in stage 2.
 
 ## Scenario
 

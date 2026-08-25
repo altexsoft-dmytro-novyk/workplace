@@ -42,7 +42,7 @@ User {
   companyJoinDate date
   isActive        boolean, default true  // soft delete
   ttId            string, nullable, unique
-  customFields    jsonb                  // interim, ahead of the dynamic custom-fields system (custom-fields.md)
+  customFields    jsonb, default '{}'   // interim, ahead of the dynamic custom-fields system (custom-fields.md); DEC-UM-003
   createdAt       timestamp
   createdBy       FK -> User
 }

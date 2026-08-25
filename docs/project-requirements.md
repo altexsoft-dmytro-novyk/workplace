@@ -283,6 +283,8 @@ Tracked events: joining the company, grade change, position change, department c
 
 **Manual override:** PP and UM can **edit, delete and manually add** timeline events. Manual entries are needed for historical backfill — the current data lives only in a separate Excel headcount change record — and to correct events the system inferred wrongly.
 
+**Read vs write audience [NORMATIVE, DEC-UM-001]:** §3.2 S9 grants the full Manager line and PP **read** access to the career timeline. **Manual** add/correct/delete is limited to the **assigned PP** and the employee's **direct Unit Manager** only — project-derived DM/PM and transitive managers are read-only for manual mutation.
+
 Presentation: a visual chronological timeline on the profile. Events are typed and categorised, and must be readable as a timeline in their own right.
 
 ### 4.10 CDS — Career Development System

@@ -1,14 +1,14 @@
 # UM-CT-04 · Unit Manager manually adds a backfill entry
 
-**Trace:** requirements §4.9 ("PP and UM can edit, delete and manually add timeline events")
+**Trace:** requirements §4.9 · [DEC-UM-001](../../../architecture/user-management-test-decisions.md)
 
 ## Scenario
 
-**Given** Bob, Alice's unit manager.
+**Given** Bob, Alice's **direct** unit manager (not a transitive or project-derived manager).
 
 **When** Bob manually adds an entry for the legacy Excel record.
 
-**Then** the entry is created with `source: "manual"` and appears in Alice's timeline — same mechanic as `um-ct-03`, proving the second of the two sourced actors (§4.9 names PP **and** UM, not the full Manager line — see SPEC assumptions).
+**Then** the entry is created with `source: "manual"` and appears in Alice's timeline — same mechanic as `um-ct-03`, proving the direct UM write actor under DEC-UM-001.
 
 **Preconditions:** [fixture](../README.md#canonical-personas).
 

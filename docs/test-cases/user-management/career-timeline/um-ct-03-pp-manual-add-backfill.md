@@ -1,14 +1,16 @@
 # UM-CT-03 · PP manually adds a backfill entry
 
-**Trace:** requirements §4.9 ("PP and UM can edit, delete and manually add timeline events... for historical backfill — the current data lives only in a separate Excel headcount change record")
+**Trace:** requirements §4.9 · [DEC-UM-001](../../../architecture/user-management-test-decisions.md) · [DEC-UM-011](../../../architecture/user-management-test-decisions.md)
 
 ## Scenario
 
-**Given** Paula, Alice's people partner.
+**Given** Paula, Alice's assigned people partner.
 
 **When** Paula manually adds a `mentorship_end` entry dated before the system existed, sourced from the legacy Excel record.
 
 **Then** the entry is created with `source: "manual"` and appears in Alice's timeline.
+
+This scenario proves the **manual backfill path only** (DEC-UM-011). It does not exercise Epic 4's automatic `mentorship_end` from relationship unpair — that is covered by `relationships/um-rel-05`.
 
 **Preconditions:** [fixture](../README.md#canonical-personas).
 

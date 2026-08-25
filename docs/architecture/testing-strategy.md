@@ -25,9 +25,14 @@ Faked: the outbound integration ports (timetracker, PeopleForce) — rebound to 
 
 Not faked: the database, the router, authentication, the AccessControl facade, tier resolution. If the test doesn't assert what the API actually returns, it isn't a gate test.
 
-## Test data isolation
+## Test data isolation (DEC-UM-010)
 
-Parallel developers and parallel CI workers never share mutable test state: each run/worker gets its own seeded slice (transactional rollback per test, or schema-per-worker). This is infrastructure, set up once — feature owners do not invent their own mechanism.
+Gate E2E for `user-management` follows an approved two-phase progression:
+
+1. **Initial (active now):** Run the Playwright suite with **one test worker**. Each run/test uses a collision-proof UUID namespace and deletes only data it owns. Concurrency scenarios (`@concurrency`) issue parallel HTTP inside one isolated test via `Promise.all`; they do not require multiple test workers.
+2. **Before enabling parallel test workers:** Provision **one PostgreSQL schema per worker** and clean up that schema after the run. `Date.now()` prefix alone is not sufficient.
+
+Parallel developers never share mutable test state across workers. This is platform infrastructure — feature owners do not invent ad-hoc isolation per story.
 
 ## Ownership (AD-4)
 

@@ -1,6 +1,10 @@
 # User Management — Test-Case Suite
 
-Stage-1 quality-gate scenario documents (AD-1), following the team-wide authoring pattern in [../README.md](../README.md): **one test case per file**, each opening with a plain-language **Scenario** (Given/When/Then) followed by the explicit request spec — `inputURL`, `inputRequest` (headers + body), `expectedResult` with HTTP status — traced to `docs/project-requirements.md` (§), the [user-management PRD](../../../_bmad-output/planning-artifacts/prds/prd-user-management-2026-08-20/prd.md) (FR-n), and/or an architecture decision (AD-n). **Status: draft — each file needs developer approval before its E2E is written.** Spec contract: `_bmad-output/specs/spec-user-management-test-cases/SPEC.md`.
+Stage-1 quality-gate scenario documents (AD-1), following the team-wide authoring pattern in [../README.md](../README.md): **one test case per file**, each opening with a plain-language **Scenario** (Given/When/Then) followed by the explicit request spec — `inputURL`, `inputRequest` (headers + body), `expectedResult` with HTTP status — traced to `docs/project-requirements.md` (§), the [user-management PRD](../../../_bmad-output/planning-artifacts/prds/prd-user-management-2026-08-20/prd.md) (FR-n), architecture decisions (AD-n), and/or [user-management-test-decisions.md](../../architecture/user-management-test-decisions.md) (DEC-UM-n).
+
+**Status:** Approved baseline (2026-08-25) — system-level test design and critical review approved; normative decisions propagated. Each file still requires **per-file developer approval** before its stage-2 E2E is written (AD-1).
+
+Spec contract: `_bmad-output/specs/spec-user-management-test-cases/SPEC.md`.
 
 ## Scope — read this before adding a file
 
@@ -12,9 +16,11 @@ The `User` entity in this PRD carries only S1-identity-card fields (see [databas
 
 - **Authorization header:** `"Bearer <token:persona>"` = a valid session token for that persona; `""` (empty) = unauthenticated. Every endpoint rejects a missing/invalid token with `401` — same global rule as [access-control's suite](../access-control/README.md).
 - **Denial convention:** valid token, no permission for the feature → `403`.
+- **Permission-negative probes (DEC-UM-002):** use **Ida** for generic feature-capability denials; use Bob only for manager-specific probes unrelated to the capability under test.
 - **Endpoints are bound to the canonical convention.** Resource root `/users`; auth root `/auth`; routes follow the router-tree convention in [api-conventions.md](../../architecture/api-conventions.md) (AD-14) — not placeholder vocabulary.
 - **Absence is absence:** a soft-deleted `UserEvents` row is excluded from reads, never returned with a null/placeholder body.
 - **Immutable-fact model:** a `UserEvents` correction is never a single in-place PATCH. It is shown as explicit steps — soft-delete the wrong entry, append the corrected one, then a read that observes both (old entry gone from the active view, new entry present) — per the granularity rule in [../README.md](../README.md).
+- **Isolation (DEC-UM-010):** one Playwright test worker + UUID-owned data initially; `@concurrency` scenarios use parallel HTTP inside one test; schema-per-worker before parallel CI workers.
 - A file with several `Test N` blocks is still one requirement, probed via its cause→effect sequence (baseline → change → observation).
 
 ## Canonical personas
@@ -23,27 +29,35 @@ Reuses the cast seeded for [access-control's suite](../access-control/README.md#
 
 | Persona | Role in this suite |
 | --- | --- |
-| **Root** | HR Admin functional role. Creates users, deactivates users. |
+| **Root** | HR Admin functional role. Creates users, deactivates users, manages relationships. |
 | **Nina** | New hire. Does not exist until `registration/um-reg-01` creates her — her target id is the response of that call, not a seeded fixture. |
 | **Tomas** | Second new hire, created only by `registration/um-reg-05`. Kept distinct from Nina so the no-session case does not collide with the success case over one `workEmail`. |
-| **Alice** | Existing employee (reports to Bob, PP Paula). Subject of profile-edit, auth, and career-timeline scenarios. |
-| **Bob** | Alice's unit manager (Manager-line). Edits Alice's identity fields; manually adds/corrects her career-timeline entries (§4.9: PP and UM only). |
-| **Paula** | Alice's people partner. Also manually adds/corrects career-timeline entries. |
+| **Alice** | Existing employee (reports to Bob, PP Paula). Subject of profile-edit, auth, career-timeline, and relationship scenarios. |
+| **Bob** | Alice's **direct** unit manager. Edits Alice's identity fields; manually adds/corrects her career-timeline entries under DEC-UM-001 (assigned PP + direct UM write). |
+| **Paula** | Alice's assigned people partner. Manually adds/corrects career-timeline entries. |
 | **Colin** | Unrelated employee, no HR Admin role. Holds `workEmail: colin@company.example` and `ttId: "tt-1042"` — the in-use values the uniqueness cases collide against. |
-| **Ida** | Holds the custom functional role *IT Campaigns*, whose only permission is *create form campaigns*. Used for the 403 probe on HR-Admin-gated actions: holding a functional role must not imply holding this one (§2.3). |
+| **Ida** | Holds the custom functional role *IT Campaigns*, whose only permission is *create form campaigns*. Used for generic feature-permission 403 probes (DEC-UM-002). |
 
 ## Layout
 
 | Folder | Covers | Files |
 | --- | --- | --- |
-| `registration/` | FR-3/FR-4: HR Admin creates a user on a new hire's behalf; registration triggers the magic-link flow rather than logging in directly; payload validation; `workEmail`/`ttId` uniqueness, including the concurrent-create race | 9 |
-| `auth/` | FR-2: request a magic link by `workEmail`, consume the token to establish a session | 5 |
-| `profile/` | User's own S1-field CRUD mechanics: Manager-line edits, Self photo upload, uniqueness constraints on write | 4 |
-| `deactivation/` | `isActive` soft delete: the record is preserved, excluded from active-only views | 3 |
-| `career-timeline/` | §4.9: system-generated events (`joined_company`, `position_change` — the only two currently triggerable, see SPEC assumptions) and PP/UM manual add/correct/delete mechanics | 7 |
+| `registration/` | FR-3/FR-4/FR-5/FR-6: create, validation, uniqueness, normalization, rehire, dispatch durability | 13 |
+| `auth/` | FR-2/FR-7: magic-link request/consume, security edge cases | 6 |
+| `profile/` | FR-8: Manager-line edits, Self photo upload, uniqueness on PATCH | 4 |
+| `deactivation/` | FR-9: soft delete, active-list exclusion | 3 |
+| `list/` | FR-16: pagination and S1-field filters (Story 1.5) | 4 |
+| `career-timeline/` | FR-10..FR-13: system events and PP/direct-UM manual mechanics (DEC-UM-001) | 7 |
+| `relationships/` | FR-14/FR-15: mentorship and reports-to (Epic 4) | 8 |
+
+**Total:** 45 stage-1 scenario files.
 
 File names state actor/behavior (`um-reg-01-hr-admin-create-success.md`), so a folder listing is its own index.
 
 ## Deliberately not covered here
 
-Whether an actor is entitled to perform an action (access-control's job, entirely). S2/S3/S4/S5 section content (no schema yet). Six of `UserEvents`' eight documented types (`grade_change`, `department_change`, `employment_type_change`, `extended_leave`, `mentorship_start`, `mentorship_end`) — they reference fields/contexts that don't exist in this PRD yet. Timetracker/PeopleForce sync-driven writes (AD-13, future integration). Seed-script bootstrap behavior (not an HTTP-driven scenario; access-control's `fc-03` already covers the bootstrap admin being an ordinary revocable FR).
+Whether an actor is entitled to perform an action (access-control's job, entirely). S2/S3/S4/S5 section content (no schema yet). Timetracker/PeopleForce sync-driven writes (AD-13, future integration). Seed-script bootstrap behavior (not an HTTP-driven scenario; access-control's `fc-03` already covers the bootstrap admin being an ordinary revocable FR). k6 NFR-2 load tests (planned in TEA QA design, not stage-1 prose scenarios).
+
+## Normative decisions
+
+Approved product/test rules: [user-management-test-decisions.md](../../architecture/user-management-test-decisions.md) (DEC-UM-001..011).

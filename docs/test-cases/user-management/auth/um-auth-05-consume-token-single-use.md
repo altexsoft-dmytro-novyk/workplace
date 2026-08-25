@@ -1,6 +1,6 @@
 # UM-AUTH-05 · A magic-link token cannot be consumed twice
 
-**Trace:** own addition — not sourced from requirements, see SPEC assumptions
+**Trace:** [DEC-UM-004](../../../architecture/user-management-test-decisions.md) · epics.md Story 2.2 (single-use token) · PRD FR-2
 
 ## Scenario
 

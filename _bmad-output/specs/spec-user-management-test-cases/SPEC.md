@@ -7,7 +7,7 @@ sources:
   - ../../planning-artifacts/prds/prd-user-management-2026-08-20/prd.md
 ---
 
-> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The README companion indexes the 28 scenario files that carry the request-level assertions.
+> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The README companion indexes the **45** scenario files that carry the request-level assertions.
 
 # User-Management Test-Case Suite
 
@@ -19,10 +19,10 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
 
 - **CAP-1** Registration
   - **intent:** HR Admin creates a `User` on a new hire's behalf; the record is created with no credential stored, completing registration never establishes a session directly, and neither an invalid payload nor a duplicate identity value can produce a row.
-  - **success:** `registration/` UM-REG-01..09 pass without opening another document: success with server-set audit columns, `401` unauthenticated, `403` for a functional-role holder lacking the user-creation permission, exact duplicate `workEmail`, no-session-on-create asserted on body *and* headers, missing non-nullable field, duplicate `ttId`, concurrent duplicate `workEmail` resolving to one row, and malformed `workEmail`.
+  - **success:** `registration/` UM-REG-01..12 pass without opening another document: success with server-set audit columns and `customFields: {}`, `401` unauthenticated, `403` for a functional-role holder lacking the user-creation permission (Ida), exact duplicate `workEmail`, no-session-on-create asserted on body *and* headers with exactly one email dispatch, missing non-nullable field, duplicate `ttId`, concurrent duplicate `workEmail` resolving to one row, malformed `workEmail`, server-owned fields rejected with `400`, normalized-email uniqueness, rehire identity preservation, and graceful dispatch failure after durable create.
 - **CAP-2** Magic-link authentication
   - **intent:** A user requests a magic link by `workEmail` and consumes the resulting one-time token to establish a session, replacing password auth ahead of SSO.
-  - **success:** `auth/` UM-AUTH-01..05: known-email request, enumeration-safe unknown-email request, successful consume, expired-token denial, single-use replay denial.
+  - **success:** `auth/` UM-AUTH-01..06: known-email request, enumeration-safe unknown-email request, successful consume, expired-token denial, single-use replay denial, deactivated-user denial.
 - **CAP-3** Profile field CRUD
   - **intent:** A Manager-line edit to Alice's own S1 fields persists correctly; Self's photo upload persists; `workEmail`/`ttId` uniqueness holds on write.
   - **success:** `profile/` UM-PF-01..04 cover a successful Manager-line field edit (observed via a follow-up read), a successful Self photo upload, and both uniqueness-conflict paths.
@@ -33,8 +33,14 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
   - **intent:** The system writes a `UserEvents` row automatically on a tracked change, with no request from any actor producing it directly.
   - **success:** `career-timeline/` UM-CT-01..02 prove `joined_company` on creation and `position_change` on a position edit — the only two of the eight documented types currently triggerable (see Assumptions).
 - **CAP-6** Career-timeline manual mechanics
-  - **intent:** PP and UM can manually add backfill entries and correct wrongly-inferred ones; a correction is never an in-place edit.
-  - **success:** `career-timeline/` UM-CT-03..07 cover PP add, UM add, PP correction (explicit soft-delete-then-append-then-observe sequence), UM delete, and the absence-not-null assertion on a deleted entry's read.
+  - **intent:** Assigned PP and direct UM can manually add backfill entries and correct wrongly-inferred ones; a correction is never an in-place edit. Full Manager line and PP may read per DEC-UM-001.
+  - **success:** `career-timeline/` UM-CT-03..07 cover PP add, direct UM add, PP correction (explicit soft-delete-then-append-then-observe sequence), UM delete, and the absence-not-null assertion on a deleted entry's read.
+- **CAP-7** Employee list (Story 1.5)
+  - **intent:** An entitled actor lists employees with pagination and S1-field filters; deactivated users are excluded from active-only views.
+  - **success:** `list/` UM-LIST-01..04 cover pagination metadata, single filter, compound filters, and inactive filter.
+- **CAP-8** Organizational relationships (Epic 4)
+  - **intent:** HR Admin assigns/revokes reports-to and pairs/unpairs mentorship; relationship mutations fire the correct system `UserEvents` where applicable.
+  - **success:** `relationships/` UM-REL-01..08 cover reports-to assign/revoke/409-on-second-post, mentorship pair/unpair/events, multiple mentors, permission denial, and concurrent reports-to assign.
 
 ## Constraints
 
@@ -47,6 +53,16 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
 - Every write request body carries the full set of non-nullable `User` columns, so a negative case can only fail for the condition under test. A partial body lets a validation error stand in for the intended status and the case passes for the wrong reason — the defect that made the original duplicate-`workEmail` case unable to reach its asserted `409`.
 - **A scenario asserts only through endpoints its own story builds.** A registration scenario therefore asserts through `POST /users` alone: `GET /users/:id` and `PATCH /users/:id` are Story 1.2, `DELETE /users/:id` is Story 1.4, and `GET /users` with filters is Story 1.5. Absence and persistence are asserted against the datastore in stage 2 instead. Observing through another story's endpoint would make this story's stage-2 suite unrunnable until that story lands, inverting the dependency order the epic set out.
 - Session-absence is asserted on response headers as well as body. `Set-Cookie` cannot appear in a body, so a body-only check would miss a cookie-based session entirely.
+- **Normative product/test decisions** live in [user-management-test-decisions.md](../../../docs/architecture/user-management-test-decisions.md) (DEC-UM-001..011). Scenarios trace those decisions where requirements text alone is insufficient.
+- **Gate E2E isolation** follows DEC-UM-010: one test worker + UUID-owned data initially; schema-per-worker before parallel workers. Concurrency scenarios use parallel HTTP inside one test.
+- **Registration dispatch durability (DEC-UM-008):** creation returns `201` even when downstream email transport fails after durable dispatch intent is stored; the User and `joined_company` event survive.
+- **Deactivation authorization (DEC-UM-002):** gated by AccessControl feature capability, not role-name checks in domain code.
+- **Magic-link security (DEC-UM-004):** enumeration-safe request response, zero dispatch for unknown email, configurable TTL with controllable clock in tests, single-use tokens.
+- **Reports-to reassignment (DEC-UM-005):** explicit DELETE then POST; second POST while direct edge exists returns `409`.
+- **`customFields` (DEC-UM-003):** database default `{}`; registration omits the field.
+- **Server-owned create fields (DEC-UM-006):** client-supplied `id`, `createdAt`, or `createdBy` → `400`.
+- **`workEmail` normalization (DEC-UM-007):** trim + lowercase before validation, storage, lookup, and uniqueness.
+- **Rehire (DEC-UM-009):** no second User for normalized email; reactivation preserves identity.
 
 ## Non-goals
 
@@ -63,21 +79,11 @@ A reviewer can map each of CAP-1..6's sourced behaviors to exactly one approved 
 
 ## Assumptions
 
-- Deactivation's actor is assumed to be HR Admin, by symmetry with registration — `isActive` is not one of S1's listed matrix fields, so no audience is directly sourced for it. Flagged for correction if wrong (`UM-DEACT-01`/`03`).
-- Magic-link request for an unregistered email returns the same `200` as a known one (enumeration-safe); token expiry and single-use invalidation are asserted as reasonable defaults. None of this is sourced from `project-requirements.md` — own additions (`UM-AUTH-02`, `04`, `05`).
-- Of `UserEvents`' 8 documented tracked types (§4.9), only `joined_company` and `position_change` are currently triggerable — the User entity has no `grade`, `department`, or `employmentType` field, and mentorship/leave live in contexts that don't exist yet. This extends the "reserved, unpopulated" treatment `database-schema.md` already gives `department_change`/`mentorship_start`/`mentorship_end` to `grade_change`/`employment_type_change`/`extended_leave` too, by the same logic.
-- Manual `UserEvents` mutation actors are strictly PP and UM per §4.9's literal text, not the full Manager line implied by the §3.2 S9 matrix cell — mirrors the standing open question already tracked as OQ5 in `spec-access-control-test-cases/SPEC.md`; not re-litigated here.
-- `workEmail` is the magic-link login identity — FR-2 already committed to it, and the PRD Data Model note that called this "pending confirmation" has been corrected.
-- `customFields` defaults to `{}` on create. `database-schema.md` declares the column non-nullable but names no default, and no registration payload supplies it, so an empty object is the only workable value. `UM-REG-01` asserts it; flagged for confirmation against the migration.
+- Of `UserEvents`' 8 documented tracked types (§4.9), only `joined_company` and `position_change` are **automatically triggerable from User/profile mutations today** — the User entity has no `grade`, `department`, or `employmentType` field, and mentorship/leave live in contexts that don't exist yet. **`mentorship_start`/`mentorship_end` are triggerable from Epic 4 relationship attach/detach** (`um-rel-04`/`05`), distinct from manual backfill (`um-ct-03`, DEC-UM-011).
 - Nullable columns a create omits (`photo`, `workPhone`, `birthDate`, `ttId`) come back present-and-`null` for an entitled viewer. The suite's absence-is-absence rule governs audience filtering — a field hidden from this viewer — not a field that is genuinely empty for everyone.
 
 ## Open Questions
 
-Items 2–4 were briefly recorded as decided product rules and asserted in scenarios. They were not sourced from the PRD, the requirements doc, or any architecture decision, so the assertions have been withdrawn and the questions reopened. No scenario asserts any of them today.
+None for the approved decision set (DEC-UM-001..011). Reopen through architecture change control if product direction shifts.
 
-1. **Server-owned fields on create.** When a client supplies `id`, `isActive`, `createdAt`, or `createdBy` in a registration payload, does the endpoint silently strip them and return `201`, or reject with `400`? FR-4 fixes the *outcome* (records go straight to `isActive: true`, and audit columns are server-set) but not the mechanism, and the two produce different assertions.
-2. **`workEmail` normalization.** Is uniqueness case-insensitive and whitespace-trimmed on write? Until this is answered, `ALICE@company.example` and `alice@company.example` can both exist, and FR-2 cannot name a single account for a magic link sent to that address. `UM-REG-04` deliberately probes only the exact-match duplicate.
-3. **Magic-link dispatch failure.** If the email adapter throws after the row is written, does creation commit and return `201`, or roll back? With no passwords, a committed user whose link never sent cannot log in at all; a rollback leaves HR unable to onboard during an email outage. NFR-3 asks for graceful degradation without saying which way. No scenario covers this, and one is needed once it is settled.
-4. **Reuse of a deactivated holder's `workEmail`.** `isActive` is a soft delete, so the row keeps its address. Whether a rehire or a new hire may take it is unset. This is an ordinary HR turnover path, so leaving it unspecified means the implementation decides it by accident.
-5. **The suite states no fixture-isolation model.** Several registration cases create rows against shared seeded state, and `UM-REG-08` issues two concurrent creates. Whether the fixture resets between cases, between files, or not at all is nowhere written, yet the group's correctness depends on it.
-6. **Upstream drift.** `epics.md` Story 1.1 lists four registration acceptance criteria against nine scenarios, and its FR-6 claims `ttId` uniqueness at registration, which only became true with `UM-REG-07`. The Story 1.1 spec's frozen I/O matrix likewise lists four scenarios. Each needs updating in its own run, by whoever owns it.
+**Upstream drift (maintenance, not open product questions):** `epics.md` Story 1.1 AC count should stay aligned with the registration folder; Story 4.1 no longer treats reports-to reassignment as undecided.

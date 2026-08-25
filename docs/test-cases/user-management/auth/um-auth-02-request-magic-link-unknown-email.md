@@ -1,6 +1,6 @@
 # UM-AUTH-02 · Request a magic link for an unregistered email
 
-**Trace:** PRD FR-2 · own addition — not sourced from requirements, see SPEC assumptions
+**Trace:** [DEC-UM-004](../../../architecture/user-management-test-decisions.md) · epics.md Story 2.1 (enumeration-safe unknown email) · PRD FR-2
 
 ## Scenario
 

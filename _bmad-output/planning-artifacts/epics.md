@@ -155,9 +155,9 @@ So that a new hire exists in the system on day one without any self-registration
 **When** `POST /users` is requested
 **Then** the response is `401` and no row is created (traces `um-reg-02`)
 
-**Given** Colin, authenticated but holding no functional role granting user creation
-**When** Colin attempts `POST /users`
-**Then** the response is `403` and no row is created (traces `um-reg-03`)
+**Given** Ida, authenticated and holding the custom functional role *IT Campaigns* (only permission: *create form campaigns*) but not user creation
+**When** Ida attempts `POST /users`
+**Then** the response is `403` and no row is created (DEC-UM-002; traces `um-reg-03`)
 
 **Given** an existing `User` with `workEmail: alice@company.example`
 **When** Root submits `POST /users` reusing that `workEmail`
@@ -214,8 +214,8 @@ So that someone who has left no longer appears active, without losing their hist
 **Then** the response is `200` reflecting `isActive: false`
 **And** a subsequent `GET /users/<colinId>` still returns the full record — not a `404` (FR-9; traces `um-deact-01`, corrected to `DELETE /users/:id` per AD-14)
 
-**Given** Bob holds no HR Admin functional role
-**When** Bob submits `DELETE /users/<aliceId>`
+**Given** Ida, authenticated and holding no deactivation capability (DEC-UM-002)
+**When** Ida submits `DELETE /users/<aliceId>`
 **Then** the response is `403`
 **And** Alice's `isActive` stays `true` on a follow-up read (traces `um-deact-03`, corrected to `DELETE /users/:id`)
 
@@ -227,7 +227,7 @@ As an entitled actor,
 I want to list employees with pagination and filters on identity-card fields,
 So that I can find relevant employees without pulling the entire directory.
 
-No scenario doc exists yet for this story (new this session) — its author starts stage 1 from scratch. Scope boundary: filters cover the S1 fields on the `User` row only — no dynamic custom-fields filtering, saved views, export, or inline editing; those stay out of this PRD per §4.1. Subject to NFR-2's 500-record/2s budget, jointly with access-control's tier resolution.
+No scenario doc exists yet for this story (new this session) — **stage-1 scenarios added 2026-08-25** (`um-list-01`..`04`). Scope boundary: filters cover the S1 fields on the `User` row only — no dynamic custom-fields filtering, saved views, export, or inline editing; those stay out of this PRD per §4.1. Subject to NFR-2's 500-record/2s budget, jointly with access-control's tier resolution.
 
 **Acceptance Criteria:**
 
@@ -289,6 +289,10 @@ So that I get a working session I can use for authenticated requests.
 **When** the same token value is submitted again, by anyone
 **Then** the response is `401` with no session token in the body — a consumed token is not replayable (traces `um-auth-05`)
 
+**Given** Colin is deactivated (`isActive: false`)
+**When** Colin requests a magic link for his `workEmail`
+**Then** no usable session is established — request and/or consume returns denial appropriate to the approved security rules (traces `um-auth-06`)
+
 Registration's "does not auto-login" contract (FR-3, Story 1.1 AC3) and this story together complete the full account lifecycle: an account can be created, and separately, logged into — never the former implying the latter.
 
 ## Epic 3: Career Timeline
@@ -316,11 +320,13 @@ Only `joined_company` and `position_change` have a triggering code path today �
 **When** Bob edits Alice's `position` to `"Senior Engineer"` via `PATCH /users/<aliceId>` (Story 1.2)
 **Then** a `UserEvents` row is written for Alice with `type: "position_change"`, `source: "system"`, `details: { from: "Engineer", to: "Senior Engineer" }` (FR-10; traces `um-ct-02`)
 
-### Story 3.2: PP/Manager-Line Manually Adds a Backfill Entry
+### Story 3.2: Assigned PP and Direct UM Manually Add a Backfill Entry
 
-As a People Partner or Manager-line,
+As an assigned People Partner or the employee's direct Unit Manager,
 I want to manually add a career-timeline entry,
 So that I can backfill history that predates the system (the legacy Excel headcount record).
+
+**Binding rule (DEC-UM-001):** Manual write is limited to assigned PP and direct UM. Full Manager line and PP may read; project-derived DM/PM and transitive managers are read-only for manual mutation.
 
 **Acceptance Criteria:**
 
@@ -332,7 +338,7 @@ So that I can backfill history that predates the system (the legacy Excel headco
 **Given** Bob is Alice's unit manager
 **When** Bob submits `POST /users/<aliceId>/events` with a backfill entry
 **Then** the response is `201` with `source: "manual"`
-**And** the entry appears on a subsequent read — proving both sourced actors, PP and UM, not the full Manager line (FR-11; traces `um-ct-04`)
+**And** the entry appears on a subsequent read — proving the direct UM actor under DEC-UM-001 (FR-11; traces `um-ct-04`)
 
 ### Story 3.3: PP/Manager-Line Corrects or Deletes an Event
 
@@ -359,7 +365,7 @@ So that the timeline stays accurate without ever rewriting history in place.
 
 HR Admin can set who reports to whom and pair/unpair mentors and mentees — the org-structure facts access-control's tier resolution and dashboards read downstream. **FRs covered:** FR-14, FR-15. Own resource (`Relationship`/`/users/:id/relationships`, generic attachment shape); builds on Epic 1 (users must exist) and Epic 3 (mentorship attach/detach fires `UserEvents`).
 
-No scenario docs exist yet for either story — both FRs are new to this session (reports-to's scope was resolved, mentorship pairing was never drafted in the original 24-file suite). Their author starts stage 1 from a blank page.
+No scenario docs existed for either story — **stage-1 scenarios added 2026-08-25** (`um-rel-01`..`08`).
 
 ### Story 4.1: HR Admin Assigns or Revokes Reports-To
 
@@ -367,7 +373,7 @@ As a HR Admin,
 I want to assign or revoke who an employee reports to,
 So that the org's management hierarchy reflects reality — no external sync exists for this (FR-15).
 
-**Design call, not directly sourced** — flagging since no scenario doc exists to confirm it: reassigning an employee who already has an active reports-to edge is treated as reject-then-retry (the DB-level UNIQUE constraint from AD-11 rejects a second concurrent edge), not an implicit replace. HR Admin must `DELETE` the existing edge before `POST`-ing a new one. Confirm this before stage-2 E2E is written.
+**Design decision (DEC-UM-005, approved 2026-08-25):** Reassigning an employee who already has an active reports-to edge requires explicit **`DELETE` then `POST`**. A second `POST` while a direct edge exists returns **`409`**. Traces: `um-rel-01`..`03`.
 
 **Acceptance Criteria:**
 
