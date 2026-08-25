@@ -316,6 +316,42 @@ The executor owns claim and fencing verification. Participants use the supplied 
 - **Prevents:** inventing a TimeTracker department hierarchy; storing membership as a Relationship type
 - **Rule:** `Department {id uuidv7, name, parentId nullable self-FK, isHr boolean}` with an index on `parentId`. Writes reject cycles. Current membership is `UserDepartment {userId PK, departmentId}` — exactly one per employee. Department manager is a `Policies targetType='department'` AR grant (AD-7), not a new edge type. Platform is the source of truth; the TimeTracker contract has no department concept. Seed CSV is flat: import departments as roots (`parentId` null); nesting and `isHr` are platform-administered under *manage departments*. PP HR-line walks the assigned PP's `direct` chain only while each ancestor's department has `isHr=true`; if none is marked, propagation is fail-closed to the assigned PP. Closes DEPARTMENT-EDGE design.
 
+### AD-15 — One Dashboard & Widget Engine [ADOPTED]
+
+- **Binds:** `dashboards` context; FE dashboard shell
+- **Prevents:** four divergent UM/DM/PM/PP page implementations (§4.4)
+- **Rule:** a single configurable engine — one composition model, not four pages. Role dashboards are presets over shared widgets. Visual arrangement is frontend-only; the backend does not persist grid coordinates.
+
+### AD-16 — Dashboard and Widget persistence [ADOPTED]
+
+- **Binds:** `dashboards` schema / Prisma models
+- **Prevents:** layout drift; coupling widget catalogue to migrations
+- **Rule:** `Dashboard {id uuidv7, title, icon, order int, createdBy, accessRole nullable}` and `Widget {id uuidv7, dashboardId FK, type string, config jsonb}`. `type` is never a DB/Prisma enum. No persisted `x`/`y`/`w`/`h`. `accessRole` is a preset association key only — not a stored access-tier (AD-6).
+
+### AD-17 — String widget registry [ADOPTED]
+
+- **Binds:** FE widget components; BE widget data providers
+- **Prevents:** schema migrations when UI/layout components expand
+- **Rule:** `type` maps through a code-side registry (FE component + BE data provider). Unknown types fail closed. New widgets = registry entry only.
+
+### AD-18 — Per-widget data fetch and dashboard APIs [ADOPTED]
+
+- **Binds:** `dashboards` HTTP surface
+- **Prevents:** monolithic dashboard payloads; layout coupled to data freshness
+- **Rule:** each widget calls `GET /api/widgets/:type/data` with its own config. Dashboard shell APIs are structure-only: `GET/POST /api/dashboards` (membership + config, no layout coordinates). All authorization via AccessControl (AD-9); widget payloads never widen the viewer's tier (§2.3).
+
+### AD-19 — Four role presets seeded [ADOPTED]
+
+- **Binds:** seed data; preset `accessRole` values
+- **Prevents:** hard-coded role pages; PM/DM widget fork
+- **Rule:** seed presets `unit-manager`, `delivery-manager`, `project-manager`, `people-partner` per §4.4 widget sets. PM reuses DM types with own-project scope. PP has no resourcing widgets. Custom dashboards (`POST`, `accessRole: null`) are allowed.
+
+### AD-20 — Temporary mock HR Admin for dashboards [ADOPTED]
+
+- **Binds:** auth adapter until User Management lands
+- **Prevents:** dashboard work blocked on UM; private auth bypasses that violate AD-9
+- **Rule:** mock the session principal as holding HR Admin FR so FE/BE can proceed. Mock must still satisfy AccessControl facade shapes. Remove when real auth ships — dashboard providers stay unchanged.
+
 ## Consistency Conventions
 
 | Concern | Convention |
@@ -434,6 +470,22 @@ erDiagram
     uuid id
     string key
     string description
+  }
+  User ||--o{ Dashboard : "createdBy"
+  Dashboard ||--o{ Widget : "dashboardId"
+  Dashboard {
+    uuid id
+    string title
+    string icon
+    int order
+    uuid createdBy
+    string accessRole
+  }
+  Widget {
+    uuid id
+    uuid dashboardId
+    string type
+    json config
   }
 ```
 
