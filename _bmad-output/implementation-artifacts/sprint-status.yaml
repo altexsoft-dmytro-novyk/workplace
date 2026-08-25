@@ -1,0 +1,60 @@
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created, ready for development
+#   - in-progress: Developer actively working on implementation
+#   - review: Implementation complete, ready for review
+#   - done: Story completed
+
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when its first story starts (via build's sprint sync)
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; the status view surfaces open ones
+generated: 08-22-2026 23:36
+last_updated: 08-22-2026 23:47
+project: people management
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+development_status:
+  epic-1: in-progress
+  1-1-hr-admin-registers-a-new-hire: in-progress
+  1-2-view-and-edit-an-employee-s-identity-card-fields: backlog
+  1-3-self-uploads-own-photo: backlog
+  1-4-hr-admin-deactivates-an-employee: backlog
+  1-5-list-employees-with-pagination-and-filters: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-request-a-magic-link-by-work-email: backlog
+  2-2-consume-a-magic-link-token-to-establish-a-session: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-system-auto-generates-career-timeline-events: backlog
+  3-2-pp-manager-line-manually-adds-a-backfill-entry: backlog
+  3-3-pp-manager-line-corrects-or-deletes-an-event: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-hr-admin-assigns-or-revokes-reports-to: backlog
+  4-2-hr-admin-pairs-or-unpairs-a-mentor-and-mentee: backlog
+  epic-4-retrospective: optional

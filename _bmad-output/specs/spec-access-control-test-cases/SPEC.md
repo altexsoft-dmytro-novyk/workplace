@@ -44,7 +44,7 @@ A mandate to meet: access-control correctness is the project's primary quality a
 - Assertions are API-level only (§3.3.4); "not visible" means the key is absent from the payload, never null or empty.
 - Denial convention: missing/invalid token `401`; valid token without feature permission `403`; write to a readable section `403`; anything touching a `—` cell `404` with a leak-free body.
 - Every file carries a trace line to a requirements § and/or AD-n; a scenario without a trace is invalid.
-- All files share the README's canonical persona fixture, the `Bearer <token:persona>` convention, and placeholder endpoint vocabulary (resource root `/users`, role management `/users/roles`); stage-2 binds them to real routes.
+- All files share the README's canonical persona fixture, the `Bearer <token:persona>` convention, and the canonical router-tree convention (resource root `/users`, role/permission catalog top-level `/roles`) — `docs/architecture/api-conventions.md` (spine AD-14), not placeholder vocabulary.
 - Path × section cross-product is not enumerated: paths are proven in TD-*, sections per audience in matrix-*, justified by the single-resolver design (AD-10); matrix files vary manager personas to spread path coverage.
 
 ## Non-goals

@@ -19,7 +19,7 @@ Both dimensions run on the same three tables (full schemas in [database-schema.m
 
 Rules that follow:
 
-- Managerial facts **are** policy attachments. "Y is DM of project X" is a policy row attached to Y — `Project` has no `pmUserId`/`dmUserId` columns and no member array.
+- Managerial facts **are** policy attachments. "Y is DM of project X" is a policy row attached to Y — `Project` has no `pmUserId`/`dmUserId` columns and no member array. HTTP surface: `POST/DELETE /users/:id/policies` is the one write path for every AR/FR attachment ([api-conventions.md](api-conventions.md), AD-14) — never a bespoke endpoint per assignable fact.
 - `type: 'FR'` policies are runtime-editable through the HR Admin UI. `type: 'AR'` policies are written once by the seed script and have **no** UI.
 - A new functional role never widens data access (§2.3): FR grants features; what data those features can touch is bounded by the holder's computed access tier.
 - `managedBy` provenance separates future sync-written rows from admin-written rows. When the timetracker sync lands it becomes the **sole writer** of `managedBy:'sync'` rows and replaces a user's rows transactionally (AD-13).
@@ -48,7 +48,9 @@ Forbidden everywhere: reading the policy tables directly from another context, `
 ## Tier resolution (AD-10)
 
 - One recursive SQL query (`WITH RECURSIVE`) per request resolves the viewer's tier — Self / Manager-line / PP / Colleague — against **all** requested employees in a single round trip. This is what makes the 500-record / 2-second NFR (§7) hold.
-- The walk treats reports-to edges and manages-project/department policy attachments as **one** transitive graph. Compound chains must resolve: A manages B (reports-to) and B is DM of project P ⇒ A is in the Manager line of everyone on P.
+- The walk treats reports-to edges and manages-**project** policy attachments as **one** transitive graph. Compound chains must resolve: A manages B (reports-to) and B is DM of project P ⇒ A is in the Manager line of everyone on P.
+- **Manages-department is not live yet.** `Policies.targetType:'department'` exists in the schema but the walk does not honor it — Department edge modeling is Deferred (`database-schema.md`). A `department`-targeted policy row contributes zero grants today, same fail-closed treatment as an unwired `mentorship` `Relationship` edge.
+- The `Relationship` join in this query filters `type = 'direct'` exclusively. `project` rows are read from `Policies`/project-membership joins, never from the recursive `Relationship` edge; `mentorship` rows are **never** read by this query at all, even though `mentorship` shares its `reportsToUserId` column with `direct` in storage (AD-11) — that's a storage-layout fact, not a walk-inclusion rule.
 - Section visibility = the tier map joined against the seeded tier→section mapping (the §3.2 matrix as data).
 - The profile page's single-target check is the same query with one target — not a second mechanism.
 - Derived access decisions are **never** persisted (§6: a stale permission cache is a data leak).
