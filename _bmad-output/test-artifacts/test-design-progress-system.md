@@ -53,7 +53,7 @@ Human approval granted for system-level test design and critical review. Authori
 ## Step 4: Coverage Plan Summary
 
 - ~57 proposed scenarios (P0: ~8, P1: ~31, P2: ~13, P3: ~5)
-- **45 stage-1 scenario files** on disk after updates (28 retained/reconciled + 17 new)
+- **46 stage-1 scenario files** on disk after updates (28 retained/reconciled + 17 new + 1 added by TEA per-file review: `um-ct-08`, plus `um-reg-nfr` renamed to `um-reg-13`)
 
 ## Propagation Complete
 

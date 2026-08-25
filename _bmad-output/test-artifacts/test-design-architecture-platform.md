@@ -19,7 +19,7 @@
 
 | Child | Status | Artifacts |
 | --- | --- | --- |
-| **User Management** | Approved 2026-08-25 | `test-design-architecture.md`, `test-design-qa.md`, `test-design/people-management-handoff.md`, 45 stage-1 scenarios |
+| **User Management** | Approved 2026-08-25 | `test-design-architecture.md`, `test-design-qa.md`, `test-design/people-management-handoff.md`, 46 stage-1 scenarios |
 | **Access Control** | Partial child — scenario suite + SPEC (draft) | 202 scenario files, `spec-access-control-test-cases/SPEC.md`; consolidation TEA optional |
 
 **Business context (§1, §7, §9):** Access-control correctness is the primary quality attribute. Platform serves 500+ employees. Iteration 2 requires real timetracker integration (not mock). Platform release is blocked until the access-control suite passes independently of feature workflows (§9).

@@ -1,4 +1,4 @@
-# UM-REG-NFR · Registration survives email transport failure
+# UM-REG-13 · Registration survives email transport failure
 
 **Trace:** [DEC-UM-008](../../../architecture/user-management-test-decisions.md) · NFR-3 · epics.md Story 1.1
 

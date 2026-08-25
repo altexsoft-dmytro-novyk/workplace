@@ -10,7 +10,7 @@
 
 **Then** the response is `200`, the row is hard-deleted, and Alice has no manager on a subsequent read.
 
-**Preconditions:** [fixture](../README.md#canonical-personas); active direct edge from prior setup or same-file Test 1.
+**Preconditions:** [fixture](../README.md#canonical-personas); active direct edge from Alice to Bob created via `um-rel-01`, whose response `id` is `<relationshipId>` here.
 
 ## Test
 

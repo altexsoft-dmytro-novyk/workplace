@@ -96,18 +96,29 @@ Manual backfill may use any documented `UserEvents` type, including `mentorship_
 
 ---
 
+## DEC-UM-012 — Deactivated-user magic-link request (extends DEC-UM-004)
+
+**Status:** Proposed 2026-08-25 by TEA per-file scenario review — not covered by the 2026-08-25 product approval that settled DEC-UM-001..011; treat as draft until explicitly confirmed.
+
+A deactivated user's `workEmail` is treated identically to an unknown email for `POST /auth/magic-link` purposes: `200` with the same generic response shape, **zero** email dispatch. The endpoint must not reveal deactivation status any more than it reveals account existence — DEC-UM-004's enumeration-safety principle extends to deactivated accounts, not just nonexistent ones.
+
+This closes the one case DEC-UM-004 left open (known-but-deactivated email) without weakening it: a caller who already knows an address is registered still learns nothing about whether it is active. It does not change the consume-side rule — a token issued before deactivation still fails at consume (`um-auth-06` Test 2), independent of this decision.
+
+---
+
 ## Traceability
 
 | Decision | Primary scenarios |
 | --- | --- |
 | DEC-UM-001 | `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06` |
-| DEC-UM-002 | `um-deact-03`, `um-reg-03` |
+| DEC-UM-002 | `um-deact-01`, `um-deact-03`, `um-reg-03` |
 | DEC-UM-003 | `um-reg-01` |
-| DEC-UM-004 | `um-auth-01`..`05` |
+| DEC-UM-004 | `um-auth-01`..`06` |
 | DEC-UM-005 | `um-rel-01`..`03` |
 | DEC-UM-006 | `um-reg-10` |
 | DEC-UM-007 | `um-reg-11` |
-| DEC-UM-008 | `um-reg-05`, `um-reg-nfr-dispatch-failure` |
+| DEC-UM-008 | `um-reg-05`, `um-reg-13` |
+| DEC-UM-012 (proposed) | `um-auth-06` |
 | DEC-UM-009 | `um-reg-12` |
 | DEC-UM-010 | All suites; `@concurrency` tags |
 | DEC-UM-011 | `um-ct-03` vs `um-rel-04`/`05` |

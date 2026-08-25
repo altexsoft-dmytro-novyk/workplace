@@ -47,7 +47,7 @@ baseline_commit: 'fe25da5233e1cb8c151bc0518b6800f14dabfc5d'
 ## Code Map
 
 - `services/backend/src/modules/users/**`, `test/users.e2e-spec.ts` -- DELETE, superseded
-- `services/backend/prisma/schema.prisma` -- replace `User` model (fields: `id` uuidv7, `firstName`, `lastName`, `photo?`, `position`, `country`, `city`, `workEmail` unique, `workPhone?`, `birthDate?`, `companyJoinDate`, `isActive` default true, `ttId?` unique, `customFields` jsonb, `createdAt`, `createdBy`)
+- `services/backend/prisma/schema.prisma` -- replace `User` model (fields: `id` uuidv7, `firstName`, `lastName`, `photo?`, `position`, `country`, `city`, `workEmail` unique, `workPhone?`, `birthDay?` int (1-31), `birthMonth?` int (1-12) — split fields, no year, per 2026-08-25 decision — `companyJoinDate`, `isActive` default true, `ttId?` unique, `customFields` jsonb, `createdAt`, `createdBy`)
 - `services/backend/prisma/migrations/` -- new migration, `prisma migrate dev`
 - `services/backend/prisma/seed.ts`, `package.json` (`prisma.seed` + `db:seed`) -- NEW: create first `User` row only
 - `services/backend/src/user-management/domain/entities/user.entity.ts` -- NEW

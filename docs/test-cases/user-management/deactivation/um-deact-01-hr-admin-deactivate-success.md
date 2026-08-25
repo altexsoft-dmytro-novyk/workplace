@@ -1,6 +1,6 @@
 # UM-DEACT-01 · HR Admin deactivates a user
 
-**Trace:** PRD Data Model — User.isActive ("soft delete — deactivating a user flips this rather than removing the row") · own assumption on actor, see SPEC assumptions
+**Trace:** PRD Data Model — User.isActive ("soft delete — deactivating a user flips this rather than removing the row") · [DEC-UM-002](../../../architecture/user-management-test-decisions.md) (HR Admin capability gates deactivation)
 
 ## Scenario
 

@@ -8,13 +8,13 @@ Spec contract: `_bmad-output/specs/spec-user-management-test-cases/SPEC.md`.
 
 ## Scope — read this before adding a file
 
-This suite tests **workflow and data correctness**, not **who is entitled**. Whether an actor is allowed to read/write a section is the access-control suite's job ([docs/test-cases/access-control/](../access-control/)) and is proven there — these files assume an already-entitled actor and assert what the feature actually does: does the record get created, does the constraint hold, does the derived event get written, does the correction leave the old entry intact-but-hidden.
+This suite tests **workflow and data correctness**, not **who is entitled**. Whether an actor is allowed to read/write a section is the access-control suite's job ([docs/test-cases/access-control/](../access-control/), spec'd in [SPEC-access-control-test-cases](../../../_bmad-output/specs/spec-access-control-test-cases/SPEC.md) but **not yet authored on disk as of 2026-08-25** — treat "proven there" below as the intended end state, not a completed dependency) — these files assume an already-entitled actor and assert what the feature actually does: does the record get created, does the constraint hold, does the derived event get written, does the correction leave the old entry intact-but-hidden.
 
 The `User` entity in this PRD carries only S1-identity-card fields (see [database-schema.md](../../architecture/database-schema.md)) plus `UserEvents`. This is deliberate, not an oversight: employment (S4), contacts (S2/S3), documents (S5), mentorship and feedback are planned as their own tables/contexts later. Scenarios here don't reach past that boundary — no S2/S3/S4/S5 field appears in any request or response body below.
 
 ## Conventions (apply to every file)
 
-- **Authorization header:** `"Bearer <token:persona>"` = a valid session token for that persona; `""` (empty) = unauthenticated. Every endpoint rejects a missing/invalid token with `401` — same global rule as [access-control's suite](../access-control/README.md).
+- **Authorization header:** `"Bearer <token:persona>"` = a valid session token for that persona; `""` (empty) = unauthenticated. Every endpoint rejects a missing/invalid token with `401` — same global rule stated in [docs/test-cases/README.md](../README.md); access-control's own suite would apply it per real route once authored (not yet, see the Scope note above).
 - **Denial convention:** valid token, no permission for the feature → `403`.
 - **Permission-negative probes (DEC-UM-002):** use **Ida** for generic feature-capability denials; use Bob only for manager-specific probes unrelated to the capability under test.
 - **Endpoints are bound to the canonical convention.** Resource root `/users`; auth root `/auth`; routes follow the router-tree convention in [api-conventions.md](../../architecture/api-conventions.md) (AD-14) — not placeholder vocabulary.
@@ -25,7 +25,7 @@ The `User` entity in this PRD carries only S1-identity-card fields (see [databas
 
 ## Canonical personas
 
-Reuses the cast seeded for [access-control's suite](../access-control/README.md#canonical-personas) so relationships stay consistent across both suites, plus two new hires for the registration story:
+Intended to reuse the cast seeded for access-control's suite so relationships stay consistent across both — but that suite doesn't exist on disk yet (see the Scope note above), so the table below is this suite's own working definition of each persona, not an import from an established fixture. Reconcile against access-control's fixture once it's authored. Plus two new hires for the registration story:
 
 | Persona | Role in this suite |
 | --- | --- |
@@ -42,21 +42,21 @@ Reuses the cast seeded for [access-control's suite](../access-control/README.md#
 
 | Folder | Covers | Files |
 | --- | --- | --- |
-| `registration/` | FR-3/FR-4/FR-5/FR-6: create, validation, uniqueness, normalization, rehire, dispatch durability | 13 |
+| `registration/` | FR-3/FR-4/FR-5/FR-6: create, validation, uniqueness, normalization, rehire, dispatch durability, birthday pairing | 15 |
 | `auth/` | FR-2/FR-7: magic-link request/consume, security edge cases | 6 |
 | `profile/` | FR-8: Manager-line edits, Self photo upload, uniqueness on PATCH | 4 |
 | `deactivation/` | FR-9: soft delete, active-list exclusion | 3 |
 | `list/` | FR-16: pagination and S1-field filters (Story 1.5) | 4 |
-| `career-timeline/` | FR-10..FR-13: system events and PP/direct-UM manual mechanics (DEC-UM-001) | 7 |
+| `career-timeline/` | FR-10..FR-13: system events, PP/direct-UM manual mechanics (DEC-UM-001), and edit-immutability | 8 |
 | `relationships/` | FR-14/FR-15: mentorship and reports-to (Epic 4) | 8 |
 
-**Total:** 45 stage-1 scenario files.
+**Total:** 48 stage-1 scenario files.
 
 File names state actor/behavior (`um-reg-01-hr-admin-create-success.md`), so a folder listing is its own index.
 
 ## Deliberately not covered here
 
-Whether an actor is entitled to perform an action (access-control's job, entirely). S2/S3/S4/S5 section content (no schema yet). Timetracker/PeopleForce sync-driven writes (AD-13, future integration). Seed-script bootstrap behavior (not an HTTP-driven scenario; access-control's `fc-03` already covers the bootstrap admin being an ordinary revocable FR). k6 NFR-2 load tests (planned in TEA QA design, not stage-1 prose scenarios).
+Whether an actor is entitled to perform an action (access-control's job, entirely). S2/S3/S4/S5 section content (no schema yet). Timetracker/PeopleForce sync-driven writes (AD-13, future integration). Seed-script bootstrap behavior (not an HTTP-driven scenario; access-control's `fc-03` is specified to cover the bootstrap admin being an ordinary revocable FR once that suite is authored — it is not yet, see the Scope note above). k6 NFR-2 load tests (planned in TEA QA design, not stage-1 prose scenarios).
 
 ## Normative decisions
 

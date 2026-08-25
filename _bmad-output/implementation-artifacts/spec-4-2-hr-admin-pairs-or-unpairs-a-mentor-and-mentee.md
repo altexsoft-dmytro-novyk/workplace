@@ -25,6 +25,7 @@ baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
 - `UserEvents` write happens synchronously, in the same DB transaction as the `Relationship` insert/delete, via an explicit call from this use-case's code (AD-11 binding constraint) — no event bus, no generic table-change listener, no `EventEmitterModule`-style pub/sub.
 - `domain/` imports nothing from Prisma, NestJS transport, or HTTP.
 - Every entitlement check is a single AccessControl-facade call (AD-9) — HR Admin functional role, same shape as Story 4.1's reports-to check.
+- ⚠️ **This HR-Admin-only gate is a TEMPORARY deviation from source (product decision 2026-08-25), not permanent.** §4.11 assigns pair/unpair authority to "manager and PP," and §2.2/§2.3 name "mentorship assignment"/"assign mentors" as a UM-holdable, independently grantable capability. It's HR-Admin-only here only because AD-7 (policies engine) and AD-10 (Manager-line walk) aren't wired together into `AccessControl` yet — reopen to grant UM/PP this capability, scoped to their own relationship to the mentee, once that lands.
 - Mentorship carries no one-at-a-time uniqueness constraint — do not add a `UNIQUE` index or an application-level check preventing a second concurrent mentorship edge for the same user.
 - `Relationship` rows are hard-deleted only, same as Story 4.1 — no soft delete.
 
@@ -32,9 +33,11 @@ baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
 - Whether the mentorship write capability reuses Story 4.1's HR-Admin capability constant for the relationships endpoint, or needs its own named one — confirm before implementing (mirrors spec-1-4's identical open question about the deactivation capability's naming).
 - Confirm Story 4.1's `Relationship` model and migration have actually landed on the branch this story builds on before extending it — do not assume it's merged.
 - The exact call site/interface for Epic 3's synchronous `UserEvents` write mechanism (Story 3.1) is not yet spec'd as of this story's authoring — confirm its shape with a human (or with Story 3.1's own spec, once it exists) before wiring the mentorship attach/detach handlers.
+- **What is the mandatory "final feedback" when a mentorship ends actually feedback *about*?** §4.11: *"final feedback on the mentorship is required to close it — a pair cannot be ended without it."* The actor is settled — a manager or PP performs the unpair (source; matches this story's actor) — so this isn't who submits it. Unresolved is the *subject*: the manager/PP's assessment of the mentorship's outcome, feedback on the mentor's performance, feedback on the mentee's experience/growth, or something else — each implies a different field shape. **Not implemented in this story pending clarification** (see Never list below). Confirm with a human before adding a feedback field to the unpair flow.
 
 **Never:**
 - No status tracking beyond active/ended, no notifications — future `mentorship` bounded context, explicitly out of scope.
+- Don't add a mandatory "final feedback on close" field to the unpair flow — §4.11 requires it, but what it's feedback *about* (mentorship outcome vs. mentor performance vs. mentee experience) is unresolved; see Ask First. Guessing the subject now risks a breaking rework later.
 - Don't add a test case asserting "a mentorship edge grants no access tier" — that negative assertion belongs to access-control's own suite (epics.md line 417), not duplicated here.
 - Don't add a one-mentor-at-a-time `UNIQUE` constraint — AD-11 explicitly leaves mentorship unconstrained.
 - Don't build a second `UserEvents` write mechanism, event bus, or listener — reuse Epic 3's synchronous same-transaction pattern exactly.
