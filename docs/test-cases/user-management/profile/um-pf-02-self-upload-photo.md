@@ -16,7 +16,7 @@
 
 - **Test 1 — the write**
   - **inputURL:** `PUT /users/<aliceId>/photo`
-  - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:Alice>" }, "body": { "photo": "<binary-or-uploaded-file-ref>" } }`
+  - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:Alice>", "content-type": "multipart/form-data" }, "body": { "photo": "<binary file upload>" } }` — real `multipart/form-data`, per `api-conventions.md`'s "the one field needing a distinct content type"; not a JSON string (corrected 2026-08-26 — see `spec-1-3-self-uploads-own-photo.md`)
   - **expectedResult:** `200`; body includes a non-null `photo` reference.
 - **Test 2 — observing the change**
   - **inputURL:** `GET /users/<aliceId>`

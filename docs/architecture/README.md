@@ -26,6 +26,8 @@ Every rule cites a spine decision ID (`AD-n`). To change a rule: change the spin
 
 1. No production code without a preceding approved scenario doc **and** a red E2E test (AD-1).
 2. Domain code imports nothing from application, infrastructure, NestJS transport, Prisma, or SDKs (AD-2).
-3. Authorization goes through the `AccessControl` facade only — no `isManager`-style flags, ever (AD-9).
-4. Access roles are computed, never assigned or stored; only functional roles are assigned (AD-6).
-5. Access control fails **closed**: missing data always means less access (AD-12).
+3. `application/actions/` never inject a port token directly — only `domain/services/` may; a port living in `domain/interfaces/` isn't itself a license to skip the domain service (AD-2, extended 2026-08-26).
+4. Cross-context consumption goes through the target's `application/` exports only — never its `domain/`/`infrastructure/`, bounded context or shared infra module alike (AD-2, AD-5).
+5. Authorization goes through the `AccessControl` facade only — no `isManager`-style flags, ever (AD-9).
+6. Access roles are computed, never assigned or stored; only functional roles are assigned (AD-6).
+7. Access control fails **closed**: missing data always means less access (AD-12).

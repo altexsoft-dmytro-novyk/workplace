@@ -2,7 +2,7 @@
 title: 'Story 1.2: View and Edit an Employee''s Identity-Card Fields'
 type: 'feature'
 created: '2026-08-24'
-status: 'ready-for-dev'
+status: 'in-review'
 review_loop_iteration: 0
 context: ['{project-root}/_bmad-output/implementation-artifacts/user-management/epic-1-context.md']
 baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
@@ -27,11 +27,13 @@ baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
 - Reuse Story 1.1's fake access-control port (extended, not replaced) rather than building a second fake or testing entitlement itself here.
 - Design the edit code path so a later epic's automatic change-logging can hook into it without rework (`epic-1-context.md` Cross-Story Dependencies) — one domain operation that produces the new state, not field-by-field mutation scattered across the action.
 
-**Ask First:**
-- Whether `GET /users/:id` (single-record read) belongs to this story. It isn't built yet, and isn't explicitly assigned to any story in `epic-1-context.md`'s Stories list — but `um-pf-01`'s acceptance criterion depends on a follow-up `GET /users/<aliceId>` reflecting the new values, and `api-conventions.md`'s S1 row pairs `GET /users/:id` with `PATCH /users/:id` as the same shape. This doc defaults to building it here **[inferred — not directly sourced, flagging for confirmation]**.
-- Exact `UpdateUserDto` field list: this doc assumes all S1 fields are PATCH-editable except `photo` (own endpoint, Story 1.3) and `isActive` (own endpoint, Story 1.4) — only `position`/`city`/`workEmail`/`ttId` are exercised by name in the sourced ACs (`epics.md` lines 176-189); confirm the full list before locking the DTO.
-- Shape of the target-scoped `AccessControlPort` addition (e.g. a new `isAllowedForTarget(feature, session, targetUserId)` method vs. a signature change to `isAllowed`) — this doc assumes an additive method so Story 1.1's `POST /users` call site is untouched, but the real shape belongs to the access-control context's owner.
-- Any change to `test/user-management/profile.e2e-spec.ts` beyond the `um-pf-01`/`03`/`04` describe blocks — the file is shared with Story 1.3 (`um-pf-02`); coordinate rather than unilaterally rewrite shared setup (including the shared `createUser` helper and `beforeAll`).
+**Resolved 2026-08-26 (this session, superseding the "Ask First" items below as originally written):**
+- `GET /users/:id` is in scope for this story — confirmed by the actually-committed `profile.e2e-spec.ts`, where all four scenarios (including Story 1.3's `um-pf-02`) depend on it.
+- `UpdateUserDto`: all S1 fields except `photo`/`isActive`/`id`/`createdAt`/`createdBy`, as originally assumed.
+- Target-scoped `AccessControlPort` addition: additive `isAllowedForTarget(userId, feature, targetUserId): Promise<boolean>` alongside Story 1.1's `isAllowed`.
+- `profile.e2e-spec.ts` is implemented as-is (shared `createUser`/`beforeAll`, `um-pf-01/03/04` this story, `um-pf-02` Story 1.3) — both stories land in the same session, no coordination gap.
+- The Story 1.1 skeleton it assumed (`DuplicateUserFieldError`, `mapKnownErrors`, `fake-access-control.adapter.ts`) was never actually merged from that stash — Story 1.1 was rebuilt fresh with a simpler shape (P2002 → `ConflictException` thrown directly in `UserRepository`; interim adapters named `InterimSessionResolverAdapter`/`InterimAccessControlAdapter`). This story extends *that* real code, not the stash's design — see Code Map below.
+- Per epic-1-context.md ("this suite covers workflow/data correctness only, not who is entitled") and confirmed by `profile.e2e-spec.ts` itself (no 401/403 case anywhere in `um-pf-01/03/04`), `isAllowedForTarget`'s interim implementation is permissive (any resolved session) — target-scoped denial is access-control's own suite's job, consistent with Story 1.1's renegotiation.
 
 **Never:**
 - No `updatedAt`/`updatedBy` column — omitted deliberately, no named consumer yet, don't add speculatively (`epic-1-context.md`).
@@ -75,21 +77,21 @@ Entitlement-boundary scenarios (unauthenticated, unauthorized, non-entitled acto
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Get `um-pf-01`, `um-pf-03`, `um-pf-04` approved -- AD-1 stage 1, real human checkpoint
-- [ ] Reconcile `test/user-management/profile.e2e-spec.ts`'s `um-pf-01`/`03`/`04` blocks against the approved scenario docs, including the missing persona-token/grant wiring noted in Code Map -- AD-1 stage 2, real human checkpoint; coordinate with whoever owns Story 1.3 since the file is shared
-- [ ] `domain/interfaces/user-repository.port.ts` + `infrastructure/user.repository.ts` -- extend with `findById`/`update`
-- [ ] `domain/entities/user.entity.ts` -- add `applyEdit`
-- [ ] `domain/services/edit-user.service.ts` -- NEW, mirrors `register-user.service.ts`'s invariant
-- [ ] `domain/interfaces/access-control.port.ts` + `infrastructure/fakes/fake-access-control.adapter.ts` -- add target-scoped check + grant
-- [ ] `application/dtos/update-user.dto.ts` -- NEW
-- [ ] `application/actions/edit-user.action.ts` (+ `get-user.action.ts` if `GET /users/:id` is confirmed in-scope) -- NEW
-- [ ] `application/controllers/users.controller.ts` -- add `GET /users/:id`, `PATCH /users/:id` handlers
-- [ ] `user-management.module.ts` -- wire new providers
+- [x] `um-pf-01`, `um-pf-03`, `um-pf-04` -- AD-1 stage 1 approved baseline (2026-08-25), stage 2 E2E blocks committed and verified against scenario docs
+- [x] `domain/interfaces/user.repository.port.ts` + `infrastructure/user.repository.ts` -- extended with `findById`/`update` (shared `mapKnownError` for P2002 on both create and update)
+- [x] **Removed 2026-08-26 (human-flagged):** `domain/services/edit-user.service.ts` was a pure identity pass-through (`applyEdit(patch) { return patch; }`) — no actual invariant to hold, same dead-abstraction problem already caught and fixed for `deactivate-user.service.ts`. `edit-user.action.ts` now calls `userRepository.update()` directly. `register-user.service.ts`/`NewUser` (Story 1.1) had the identical problem and were removed the same way. The future change-logging hook this was meant to anchor still has one clear call site — `userRepository.update()` itself — so nothing is lost.
+- [x] `domain/interfaces/access-control.port.ts` + `infrastructure/interim-access-control.adapter.ts` -- added `isAllowedForTarget`, interim-permissive (any resolved session) per the Resolved note above
+- [x] `application/dtos/update-user.dto.ts` -- NEW
+- [x] `application/actions/edit-user.action.ts` + `get-user.action.ts` -- NEW
+- [x] `application/controllers/users.controller.ts` -- added `GET /users/:id`, `PATCH /users/:id`
+- [x] `user-management.module.ts` -- wired new providers
+- [x] Run `npm run test:e2e -- profile` -- **3/3 green** for this story's scenarios (`um-pf-01/03/04`); `um-pf-02` (Story 1.3's photo upload) pending that story
+- [x] Fixed a real cross-file bug surfaced here: the interim session resolver's "Root" lookup only worked when a file created its own HR-Admin bootstrap row (registration.e2e-spec.ts does; profile.e2e-spec.ts doesn't) -- `interim-session-resolver.adapter.ts` now lazily provisions a stand-in HR-Admin row when none exists, preferring any real one first so `um-reg-01`'s exact-`createdBy` assertion still holds
 
 **Acceptance Criteria:**
-- Given the 3 E2E scenarios owned by this story (`um-pf-01/03/04`), when `npm run test:e2e` runs, then all pass with no real network calls
-- Given a duplicate `workEmail`/`ttId` PATCH, when the write is rejected, then the target record is provably unchanged on a follow-up `GET`
-- Given `ttId: null` on both the target and another row, when a PATCH omits or doesn't change `ttId`, then no `409` is raised on that basis
+- Given the 3 E2E scenarios owned by this story (`um-pf-01/03/04`), when `npm run test:e2e` runs, then all pass with no real network calls -- **met**
+- Given a duplicate `workEmail`/`ttId` PATCH, when the write is rejected, then the target record is provably unchanged on a follow-up `GET` -- **met**
+- Given `ttId: null` on both the target and another row, when a PATCH omits or doesn't change `ttId`, then no `409` is raised on that basis -- **met** (Postgres unique index treats nulls as distinct; no app-level special-casing needed)
 
 ## Design Notes
 

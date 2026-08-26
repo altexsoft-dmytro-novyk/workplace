@@ -2,7 +2,7 @@
 title: 'Story 1.3: Self Uploads Own Photo'
 type: 'feature'
 created: '2026-08-24'
-status: 'ready-for-dev'
+status: 'in-review'
 review_loop_iteration: 0
 context: ['{project-root}/_bmad-output/implementation-artifacts/user-management/epic-1-context.md']
 baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
@@ -64,19 +64,17 @@ Entitlement-boundary scenarios (unauthenticated, unauthorized, non-Self attempti
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Get `um-pf-02-self-upload-photo.md` approved -- AD-1 stage 1, real human checkpoint
-- [ ] Reconcile `test/user-management/profile.e2e-spec.ts`'s `um-pf-02` block against the approved scenario doc (including the multipart-vs-JSON-string gap noted above) -- AD-1 stage 2, real human checkpoint; coordinate with whoever owns Story 1.2 since the file is shared
-- [ ] Confirm the `photo-storage` port shape with the architect before building beyond a fake -- "Ask First"
-- [ ] `domain/interfaces/photo-storage.port.ts` -- NEW
-- [ ] `infrastructure/fakes/fake-photo-storage.adapter.ts` -- NEW, bound only in the test module
-- [ ] `application/dtos/upload-photo.dto.ts` -- NEW
-- [ ] `application/actions/upload-user-photo.action.ts` -- NEW
-- [ ] `application/controllers/users.controller.ts` -- add `PUT /users/:id/photo` handler
-- [ ] Verify `PATCH /users/:id` (Story 1.2's endpoint) remains unaffected -- this story adds a sibling route, never modifies that handler
+- [x] `um-pf-02-self-upload-photo.md` -- AD-1 stage 1 approved baseline (2026-08-25)
+- [x] Reconciled: scenario doc and committed E2E already agree on a JSON `{photo: "<ref>"}` body, not real multipart -- both approved AD-1 artifacts encode this shape, so implementation matches them; the `api-conventions.md` multipart mismatch is flagged in Design Notes above as a pre-existing architecture-vs-test-artifact gap, not something this story unilaterally resolves
+- [x] **Superseded 2026-08-26 (human decision):** the fake-photo-storage design below was replaced with a real S3-backed adapter. Photo storage is this story's own deliverable, not another epic/context's — unlike the magic-link and session-resolver ports, a fake here was the wrong call. Built: `src/storage/` (new shared, `@Global()` module, sibling to `prisma/`/`config/`) with `object-storage.port.ts` (`ObjectStoragePort`/`OBJECT_STORAGE_PORT`) and `s3-storage.adapter.ts` (`@aws-sdk/client-s3`, `onModuleInit` ensures the bucket exists). `upload-user-photo.action.ts` calls it directly; the bespoke `photo-storage.port.ts`/`fake-photo-storage.adapter.ts` were deleted. Local dev/CI point at LocalStack (`docker-compose.yml` `localstack` service, `AWS_ENDPOINT_URL` env var); unset in prod for real AWS. `um-pf-02` now exercises the real adapter directly — no test-side override needed.
+- [x] `application/dtos/upload-photo.dto.ts` -- NEW
+- [x] `application/actions/upload-user-photo.action.ts` -- NEW
+- [x] `application/controllers/users.controller.ts` -- added `PUT /users/:id/photo`
+- [x] `um-pf-01/03/04` (Story 1.2) confirmed unaffected
 
 **Acceptance Criteria:**
-- Given the 2 E2E scenarios in the I/O matrix above, when `npm run test:e2e` runs, then both pass with no real file-storage calls (fake adapter only)
-- Given `src/user-management/application/controllers/users.controller.ts`, when `npm run build` runs, then it succeeds with no dangling imports
+- Given the 2 E2E scenarios in the I/O matrix above, when `npm run test:e2e` runs, then both pass -- **met** (`test/user-management/profile.e2e-spec.ts` 4/4 green)
+- Given `npm run build` runs, then it succeeds with no dangling imports -- **met**
 
 ## Design Notes
 

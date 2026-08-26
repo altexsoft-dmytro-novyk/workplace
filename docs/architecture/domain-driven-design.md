@@ -17,12 +17,12 @@ Pending confirmation (do not create until the architect confirms): profile, reso
 ```text
 <context-name>/
   application/
-    actions/        # use cases; orchestrate domain services + ports
+    actions/        # use cases; orchestrate domain services — never ports directly
     controllers/    # inbound HTTP adapter (NestJS controllers)
     dtos/           # request/response boundary shapes
   domain/
     interfaces/     # ports — contracts bound to DI tokens
-    services/       # domain services
+    services/       # domain services — the ONLY holders of this context's ports
     entities/       # rich entities: data + behavior (e.g. user.assignFunctionalRole(...))
   infrastructure/
     *.repository.ts # persistence adapters (Prisma lives here, nowhere else)
@@ -31,10 +31,13 @@ Pending confirmation (do not create until the architect confirms): profile, reso
 
 ## Dependency rules (AD-2)
 
-- `application/` → may import `domain/`. Never `infrastructure/` directly — it reaches adapters only through ports (DI tokens).
+- `application/actions/` → may import `domain/` types and call `domain/services/`. **Never `@Inject` a port token directly, and never import `infrastructure/`** — an action's dependency graph must contain nothing infrastructure-shaped, even indirectly through a port type. Actions call a domain service; the domain service calls the port.
+- `domain/services/` → the only place in a context allowed to `@Inject` a port (DI token declared in `domain/interfaces/`) and call it. `@Injectable()`/`@Inject()` here are DI wiring, not a domain-purity violation — the class still never imports Prisma types, HTTP request/response types, an adapter class by name, or any NestJS transport (`@Controller`, routing decorators, `Logger`-driven side effects that belong to the caller).
 - `infrastructure/` → may import `domain/` (to implement its interfaces).
-- `domain/` → imports **nothing** outside itself: no NestJS transport, no Prisma, no SDKs, no other context.
-- Cross-context: only through the target context's application layer, or through the `AccessControl` facade. Never into another context's `domain/` or `infrastructure/`.
+- `domain/` → imports **nothing** outside itself beyond the DI decorators above: no Prisma, no HTTP/transport types, no SDKs, no other context.
+- **Cross-context — the entry point rule**: only through the target context's `application/` layer's exported providers (its public surface — e.g. `storage`'s `StoreObjectAction`), or through the `AccessControl` facade. Never into another context's `domain/` or `infrastructure/`, even to import just a type or a DI token symbol. A context's `application/` exports are the *only* thing another context is allowed to depend on; everything else stays private to the owning context, enforced the same way regardless of whether the dependency is a bounded context (`user-management`) or shared infrastructure laid out the same way (`storage`).
+
+**Clarified 2026-08-26** (human-flagged during Epic 1 implementation, caught in code review of `deactivate-user.action.ts`): the two bullets above tighten AD-2 — a repository/dispatcher port living in `domain/interfaces/` does not make it safe for `application/actions/` to inject directly. The prior wording ("reaches adapters only through ports") was read as permitting exactly that; it didn't. `domain/services/` is the mandatory seam even when a given operation has no business invariant to hold beyond forwarding the call — the seam's value is architectural (one place to swap the interim access-control/session-resolver adapters later, one place a future invariant gets added without touching every action), not proof the wrapper itself does something today.
 
 ## Entities
 

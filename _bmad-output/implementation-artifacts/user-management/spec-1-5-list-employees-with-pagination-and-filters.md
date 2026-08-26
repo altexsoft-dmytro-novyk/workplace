@@ -2,7 +2,7 @@
 title: 'Story 1.5: List Employees with Pagination and Filters'
 type: 'feature'
 created: '2026-08-24'
-status: 'ready-for-dev'
+status: 'in-review'
 review_loop_iteration: 0
 context: ['{project-root}/_bmad-output/implementation-artifacts/user-management/epic-1-context.md']
 baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
@@ -65,17 +65,18 @@ baseline_commit: '6254ed50d910acb4bfa8f046e3cf0b72f3153934'
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Write `docs/test-cases/user-management/list/um-list-01..03.md` (pagination, single filter, combined filters) and get them approved -- AD-1 stage 1
-- [ ] `test/user-management/list.e2e-spec.ts` -- write failing E2E tests for `um-list-01..03` -- AD-1 stage 2
-- [ ] Verify `test/user-management/deactivation.e2e-spec.ts` (backend branch `user-management`, commit `865df5f`) is available in the branch this story lands on, so its existing `um-deact-02` case can flip green with no test edits
-- [ ] `application/dtos/list-users-query.dto.ts` -- pagination + S1-field filter query DTO
-- [ ] `infrastructure/user.repository.ts` -- add paginated, filterable list query method (S1 fields only; excludes inactive unless `isActive` is explicitly requested)
-- [ ] `application/actions/list-users.action.ts` -- list-users use case, AccessControl port called before querying
-- [ ] `application/controllers/users.controller.ts` -- add `GET /users` handler
+- [x] `docs/test-cases/user-management/list/um-list-01..04.md` and `test/user-management/list.e2e-spec.ts` -- already existed on disk when this story started (8 scenarios total, more than originally scoped), approved baseline (2026-08-25)
+- [x] Resolved "Ask First" items from the already-committed E2E test itself: pagination is `page`/`pageSize` query params, response is `{items, total, page, pageSize}` (list.e2e-spec.ts's own permissive `resultsOf()` helper accepts `items`); filter semantics are exact match (every test asserts exact field equality)
+- [x] `application/dtos/list-users-query.dto.ts` -- pagination + S1-field filter query DTO
+- [x] `infrastructure/user.repository.ts` -- `list()` method; excludes inactive unless `isActive` explicitly requested (Prisma `where.isActive = filter.isActive ?? true`)
+- [x] `application/actions/list-users.action.ts` -- NEW
+- [x] `application/controllers/users.controller.ts` -- added `GET /users` handler
+- [x] Fixed (human-approved) a real cross-file conflict: `um-deact-02` (deactivation.e2e-spec.ts) assumed a bare-array response, incompatible with `um-list-01`'s pagination-metadata requirement (which needs an envelope) -- updated `um-deact-02` to unwrap defensively like `list.e2e-spec.ts` already does
+- [x] Fixed a real serialization bug surfaced by `um-list-04` Test 7: `companyJoinDate` (a `@db.Date` column) was serializing as a full ISO datetime instead of a date-only string -- added `toUserResponse()` mapping, applied at every controller return point across all of epic-1's endpoints
 
 **Acceptance Criteria:**
-- Given the 4 E2E scenarios above (3 new, 1 inherited from `um-deact-02`), when `npm run test:e2e` runs, then all pass with no real network calls
-- Given the module builds, when `npm run build` runs, then it succeeds with no dangling imports
+- Given the E2E scenarios in `list.e2e-spec.ts` (`um-list-01..04`, 13 assertions) and `um-deact-02`, when `npm run test:e2e` runs, then all pass -- **met**, verified together with the rest of epic-1 (37/37 across all four suites)
+- Given `npm run build`/`npm run lint`, then both succeed clean -- **met**
 
 ## Design Notes
 
