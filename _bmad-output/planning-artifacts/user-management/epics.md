@@ -13,9 +13,9 @@ inputDocuments:
 
 ## Overview
 
-This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
+This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
 
-Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../docs/architecture/api-conventions.md), [database-schema.md](../../../docs/architecture/database-schema.md), and the existing stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../docs/test-cases/user-management/README.md) (draft, pending developer approval).
+Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../../docs/architecture/api-conventions.md), [database-schema.md](../../../../docs/architecture/database-schema.md), and the existing stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../../docs/test-cases/user-management/README.md) (24 files, status: draft, pending developer approval).
 
 ## Requirements Inventory
 
@@ -23,18 +23,18 @@ Supporting sources folded in for precise, testable acceptance criteria (endpoint
 
 **Explicitly numbered in the PRD ("Functional Requirements — Account & Authentication"):**
 
-- FR-1: The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap) — not through any registration flow.
-- FR-2: Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism. No password is ever stored.
-- FR-3: First login after seed uses the magic-link flow (Epic 2). No registration endpoint exists.
+- FR-1: The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap) — not through the registration flow below.
+- FR-2: Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism (temporary, ahead of SSO). No password is ever stored.
+- FR-3: Completing the registration form does not log the user in directly — it triggers the same magic-link email used for every subsequent login. There is no separate "invite link" mechanism.
+- FR-4: HR Admin submits the registration form on the new hire's behalf (not self-registration). `isActive` alone is sufficient — no intermediate "not yet activated" state; HR-Admin-entered records go straight to `isActive: true` and the magic link (FR-3) is the activation-equivalent step.
 
-**Population and profile (§4.17):**
+**Derived from the PRD's Scope / Data Model prose (not literally numbered FR-n in the source, but stated as in-scope capability) and cross-checked against the existing test-case folders — sourced, not invented:**
 
-- FR-4a: The employee population is imported from the seeded timetracker list. No `POST /users` endpoint. No AD or SSO.
-- FR-5a: Import writes each employee with S1 identity-card fields and emits `joined_company` UserEvents at import time.
-- FR-6: `workEmail` and `ttId` are enforced unique at write time (import and profile edit).
+- FR-5 *[PRD Scope + Data Model — User entity table; test-cases/registration/]*: HR Admin can create a `User` record with the S1 identity-card fields (`firstName`, `lastName`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`, `photo`, `ttId`). Birthday is two separate fields (day 1-31, month 1-12), no year — §3.2 S1 content is literally "birthday (day and month)"; supersedes an earlier single-`birthDate`-with-year design (resolved 2026-08-25).
+- FR-6 *[PRD Data Model — `workEmail`/`ttId` notes; test-cases README "uniqueness constraints on write"]*: `workEmail` and `ttId` are enforced unique at write time (registration and profile edit).
 - FR-7 *[PRD FR-2 mechanics; test-cases/auth/]*: A user can request a magic link by `workEmail` and consume the returned token to establish a session.
-- FR-8: An entitled actor (Self / Reporting line / Project line / PP) can read and edit S1 identity-card fields via `GET`/`PATCH /users/:id`; Self writes `photo` via `PUT /users/:id/photo`.
-- FR-9: A holder of the deactivation capability can soft-deactivate a `User` (`DELETE /users/:id`), flipping `isActive` to `false`; the record is preserved and excluded from active-only views.
+- FR-8 *[PRD Data Model — "the one Self-writable identity-card field per §3.2"; test-cases/profile/]*: An entitled actor (Self / Manager-line / PP, per access-control) can read and edit S1 identity-card fields via `GET`/`PATCH /users/:id`; `photo` is the one field Self can write directly, via `PUT /users/:id/photo`.
+- FR-9 *[PRD Data Model — `User.isActive`; test-cases/deactivation/]*: HR Admin can deactivate a `User` (`DELETE /users/:id`), flipping `isActive` to `false`; the record is preserved and excluded from active-only views. **Note (resolved 2026-08-25):** project-requirements.md never describes a deactivation feature or an active/inactive status anywhere in §1-10 — `isActive` is a technical soft-delete necessity (`UserEvents`/`Relationship` rows reference `User` by FK and must stay valid after someone leaves), not a sourced business requirement, and is distinct from S4's sourced "employment status" field (unbuilt/deferred). Product decision: keep `isActive` as-is on that basis.
 - FR-10 *[PRD §4.9 + Data Model — UserEvents; test-cases/career-timeline/]*: The system automatically writes a `UserEvents` entry when a tracked change happens to a `User` — currently wired for `joined_company` and `position_change` only (the other six documented types have no triggering context yet, per the test-case suite's own scope note).
 - FR-11: Assigned PP and direct UM can manually add a `UserEvents` entry for historical backfill.
 - FR-12: Assigned PP and direct UM can correct a wrongly-inferred `UserEvents` entry by soft-deleting the wrong entry and appending a new corrected one — never an in-place edit.
@@ -44,13 +44,13 @@ Supporting sources folded in for precise, testable acceptance criteria (endpoint
 
 Project-relationship assignment (`type: 'project'`) stays separately and explicitly out of scope ("Department and Project administration — platform scope; project membership from timetracker sync (§5.1); department per §4.17").
 
-- FR-16 *[User decision 2026-08-22, closing a gap PRD scope left open; project-requirements.md §4.1 + NFR-2 + AD-14 route table]*: An entitled actor can list `User`s via `GET /users` with pagination and filters on **all** S1 identity-card fields (`firstName`, `lastName`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDate`, `companyJoinDate`, `ttId`, `isActive`). The full §4.1 "All Employees" feature set — dynamic custom-fields filtering, saved views, export, inline editing, colleague-mode whitelist columns — stays explicitly out of scope for this PRD; only enough of the list endpoint exists to satisfy NFR-2 and give AD-14's `GET /users` route a real implementation.
+- FR-16 *[User decision 2026-08-22, closing a gap PRD scope left open; project-requirements.md §4.1 + NFR-2 + AD-14 route table]*: An entitled actor can list `User`s via `GET /users` with pagination and filters on **all** S1 identity-card fields (`firstName`, `lastName`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`, `ttId`, `isActive`). The full §4.1 "All Employees" feature set — dynamic custom-fields filtering, saved views, export, inline editing, colleague-mode whitelist columns — stays explicitly out of scope for this PRD; only enough of the list endpoint exists to satisfy NFR-2 and give AD-14's `GET /users` route a real implementation.
 
 ### NonFunctional Requirements
 
 Drawn from `project-requirements.md` §7, filtered to what binds `user-management` specifically:
 
-- NFR-1 *[§7 "Personal data"]*: `User` holds personal data of real people (`photo`, `birthDate`, `workEmail`, `workPhone`, etc.) — pseudonymised data only in non-production environments; no real personal data in agent contexts, logs, screenshots, or the repository.
+- NFR-1 *[§7 "Personal data"]*: `User` holds personal data of real people (`photo`, `birthDay`/`birthMonth`, `workEmail`, `workPhone`, etc.) — pseudonymised data only in non-production environments; no real personal data in agent contexts, logs, screenshots, or the repository.
 - NFR-2 *[§7 "Performance"]*: The `GET /users` list endpoint responds within 2 seconds for 500+ records with arbitrary filters and derived fields, including permission resolution (joint responsibility with access-control's AD-10 tier walk).
 - NFR-3 *[§7 "Availability"]*: External integration failures (future timetracker/PeopleForce via `ttId`) degrade gracefully and never take down the application.
 - NFR-4 *[§7 "Access control correctness"]*: `user-management`'s endpoints must compose correctly with access-control's audience-filtering (§3.3.4) — response bodies are audience-filtered per viewer; enforcing this is access-control's job via the AccessControl facade (AD-9), but every user-management controller must call through it rather than bypass it.
@@ -138,27 +138,75 @@ So that all features operate over a fixed set of users without any creation, AD,
 **Acceptance Criteria:**
 
 **Given** a fresh, empty database
-**When** the seed/import script runs with the timetracker test-environment population
-**Then** all employees from the seed exist with S1 fields, `isActive: true`, and no password or credential stored (FR-4a, FR-5a)
-**And** exactly one bootstrap `User` is assigned the HR Admin functional role directly, not through any HTTP endpoint (FR-1, AD-12)
+**When** the seed script runs
+**Then** exactly one `User` row is created and assigned the HR Admin functional role directly, not through this story's endpoint
+**And** this bootstrap behavior's own acceptance test is specified to live in access-control's `fc-03` — not duplicated here (FR-1, AD-12). **Note (2026-08-25):** the access-control test-case suite is not yet authored on disk; until it exists, this bootstrap behavior has no approved scenario anywhere.
 
-**Given** the import completes for employee Nina
-**When** Nina's row is read from the datastore
-**Then** a `UserEvents` row exists with `type: "joined_company"`, `source: "system"`, `eventDate` matching her `companyJoinDate` (FR-10)
+**Given** Root holds the HR Admin functional role and no existing `User` has Nina's `workEmail`
+**When** Root submits `POST /users` with Nina's S1 fields
+**Then** the response is `201` with a new `id`, `isActive: true`, and the submitted fields
+**And** the body contains no password or credential field (FR-4, FR-5; traces `um-reg-01`)
 
-**Given** a deployed API surface
-**When** any client submits `POST /users`
-**Then** the response is `404` or `405` (FR-4a)
+**Given** Root creates Nina via `POST /users`
+**When** the creation succeeds
+**Then** the response contains no `accessToken`/`sessionToken`/`Set-Cookie`
+**And** a magic-link dispatch fires as a side effect, identical to Nina's future login flow (FR-3; traces `um-reg-05`). Implementation note: registration calls an outbound port for this dispatch — Epic 2 supplies the real adapter later; this story's own E2E test binds the port to a fixture-backed fake per AD-3, so it doesn't block on Epic 2.
 
-**Given** the seed population includes duplicate-safe identities
-**When** the import script is run a second time without `--force`
-**Then** the run is idempotent or fails safely — no duplicate rows for the same normalized `workEmail` (FR-6)
+**Given** no caller, or one with no valid session token
+**When** `POST /users` is requested
+**Then** the response is `401` and no row is created (traces `um-reg-02`)
+
+**Given** Ida, authenticated and holding the custom functional role *IT Campaigns* (only permission: *create form campaigns*) but not user creation
+**When** Ida attempts `POST /users`
+**Then** the response is `403` and no row is created (DEC-UM-002; traces `um-reg-03`)
+
+**Given** an existing `User` with `workEmail: alice@company.example`
+**When** Root submits `POST /users` reusing that `workEmail`
+**Then** the response is `409` and no new row is created (FR-6; traces `um-reg-04`)
+
+**Given** Root, entitled to create users
+**When** Root submits a payload missing one or more non-nullable S1 columns (`firstName`, `lastName`, `position`, `country`, `city`, `workEmail`, `companyJoinDate`)
+**Then** the response is `400` naming the missing fields, not a `500` from a database constraint (traces `um-reg-06`)
+
+**Given** Root, and Colin already holding `ttId: "tt-1042"`
+**When** Root submits a registration payload reusing that `ttId`
+**Then** the response is `409` and no new row is created; the constraint holds on create the same way `um-pf-04` proves it holds on edit (FR-6; traces `um-reg-07`)
+
+**Given** Root, and no existing user on Nina's `workEmail`
+**When** two `POST /users` requests for that address are submitted concurrently
+**Then** exactly one `201` and one `409` result, never two `201`s and never a `500` — the database constraint is the arbiter when both requests clear the application's uniqueness read together (FR-6, AD-5; traces `um-reg-08`)
+
+**Given** Root, entitled to create users
+**When** Root submits a payload with a malformed `workEmail` and every other field valid
+**Then** the response is `400` naming `workEmail` (traces `um-reg-09`)
+
+**Given** Root
+**When** Root submits a payload with a client-supplied `id`, `createdAt`, or `createdBy`
+**Then** the response is `400` — the server does not silently strip caller-supplied audit or identity fields (DEC-UM-006; traces `um-reg-10`)
+
+**Given** Colin exists with `workEmail: colin@company.example` (normalized storage)
+**When** Root submits a create or collision payload using whitespace or casing variants of that address
+**Then** normalization applies before validation, storage, lookup, and uniqueness — the variant resolves to `409`, not a second row (DEC-UM-007; traces `um-reg-11`)
+
+**Given** Colin was deactivated and retains his original `workEmail`
+**When** Root submits `POST /users` with the same normalized email, simulating a mistaken "new hire" registration for a returning employee
+**Then** no second `User` row is created for that normalized email — identity and history stay on Colin's original row (DEC-UM-009; traces `um-reg-12`)
+
+**Given** Root creates a new hire and the transaction commits the `User`, `joined_company` event, and durable dispatch intent
+**When** the outbound email transport throws after the transaction commits
+**Then** the response is still `201`, the `User` and `joined_company` event survive, and delivery state is observable as pending/failed and retryable — registration does not roll back (DEC-UM-008, NFR-3; traces `um-reg-13`)
+
+**Given** Root, entitled to create users
+**When** Root submits a payload with both `birthDay` and `birthMonth` set to valid values
+**Then** the response reflects both values exactly as submitted, with no year captured or invented (traces `um-reg-14`)
+
+**Given** Root, entitled to create users
+**When** Root submits a payload where `birthDay`/`birthMonth` are only partially supplied, or either value is out of its valid range (`birthDay` 1-31, `birthMonth` 1-12)
+**Then** the response is `400` naming the offending field, and no row is created (traces `um-reg-15`)
 
 ### Story 1.2: View and Edit an Employee's Identity-Card Fields
 
-As an entitled actor (Self / Reporting line / Project line / PP, per access-control),
-I want to read and edit an employee's S1 identity-card fields,
-So that identity data stays accurate as roles, locations, and contact details change.
+As an entitled actor —Manager-line or PP, holding `RW` on S1 per requirements §3.2— I want to read and edit an employee's S1 identity-card fields, so that identity data stays accurate as roles, locations, and contact details change. **Self holds `R (photo RW)` on S1 per §3.2**: Self reads their own S1 fields but does not have general PATCH-write access to them — Self's only direct write path is the `photo` field, covered separately by Story 1.3. (Corrected 2026-08-25: this story previously listed Self alongside Manager-line/PP as edit-entitled, which overstated Self's write access; the test suite under `profile/` already reflects the correct RW split by testing only Bob/Manager-line against `PATCH /users/:id`.)
 
 Entitlement itself is proven in access-control's suite — these ACs assume an already-entitled actor, per this suite's own stated scope boundary.
 
@@ -282,7 +330,7 @@ So that I get a working session I can use for authenticated requests.
 
 **Given** Colin is deactivated (`isActive: false`)
 **When** Colin requests a magic link for his `workEmail`
-**Then** no usable session is established — request and/or consume returns denial appropriate to the approved security rules (traces `um-auth-06`)
+**Then** no usable session is established — request and/or consume returns denial appropriate to the approved security rules (traces `um-auth-06`). **Note:** the request-side enumeration-safety half of this (a deactivated email gets the same generic response as an unknown one) is governed by DEC-UM-012, proposed 2026-08-25 and not part of the DEC-UM-001..011 set the product owner has approved — confirm it before treating it as settled. The consume-side half (a pre-deactivation token fails at consume) is not in question.
 
 First login uses the magic-link flow (FR-3) — import does not establish a session.
 
@@ -386,7 +434,11 @@ So that the org's management hierarchy reflects reality — no external sync exi
 
 As a holder of the change-organisational-relationships permission,
 I want to pair or unpair a mentor and a mentee,
-So that mentorship relationships are tracked and the pairing fires the right career-timeline events (FR-14).
+So that mentorship relationships are tracked and the pairing fires the right career-timeline events (FR-14). Status tracking beyond active/ended and notifications stay out of scope — future `mentorship` bounded context.
+
+> ⚠️ **TEMPORARY DEVIATION FROM SOURCE (product decision 2026-08-25) — reopen once policies/manager-relationship access is wired.** §4.11 explicitly assigns pair/unpair authority to *"manager and PP,"* and §2.2 lists *"mentorship assignment"* as a named Unit Manager feature, and §2.3 lists *"assign mentors"* as an independently grantable functional-role permission — none of that is HR-Admin-exclusive in the source. This story gates both actions to the HR Admin functional role only, as a **temporary** simplification, because the mechanisms that would let UM/PP hold this capability against their own access scope don't exist yet in this iteration: the AD-7 policies engine (FR grants + AR-scoped enforcement) and the `Relationship`-derived Manager-line walk (AD-10) aren't wired into `AccessControl` together yet. **Once both land, this must be reopened** to grant "assign mentors" to UM/PP per source, scoped to their own Manager-line/PP relationship to the mentee — not left as HR-Admin-only permanently.
+>
+> ⚠️ **OPEN QUESTION, not implemented this story — flag for future clarification.** §4.11 also states: *"final feedback on the mentorship is required to close it — a pair cannot be ended without it."* This story's unpair flow does **not** implement that requirement. The actor is settled — a manager or PP performs the unpair (source; matches this story's actor) — so the open question isn't who submits the feedback. It's the *subject*: is it the manager/PP's assessment of the mentorship's outcome, feedback on the mentor's performance, feedback on the mentee's experience/growth, or something else — each implies a different field shape, and guessing wrong would need to be unwound later. Do not add a feedback field to this story's `DELETE` flow until that's resolved with a human.
 
 **Acceptance Criteria:**
 

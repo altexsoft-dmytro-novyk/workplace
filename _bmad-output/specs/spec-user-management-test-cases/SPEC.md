@@ -7,19 +7,19 @@ sources:
   - ../../planning-artifacts/prds/prd-user-management-2026-08-20/prd.md
 ---
 
-> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The README companion indexes the **45** scenario files that carry the request-level assertions.
+> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The README companion indexes the **48** scenario files that carry the request-level assertions.
 
 # User-Management Test-Case Suite
 
 ## Why
 
-A mandate to meet: AD-1's three-stage quality gate requires an approved prose scenario per feature before any E2E test or production code exists. `user-management` is the first domain to go through the full PRD → architecture → test-cases pipeline (access-control skipped the PRD step, its scope was already fully NORMATIVE). This suite is that stage-1 artifact for the `User` entity's own lifecycle and workflow correctness — registration, magic-link auth, profile-field CRUD, deactivation, and the career-timeline event log — deliberately excluding the access-control dimension (who is entitled), which `docs/test-cases/access-control/` already owns in full.
+A mandate to meet: AD-1's three-stage quality gate requires an approved prose scenario per feature before any E2E test or production code exists. `user-management` is the first domain to go through the full PRD → architecture → test-cases pipeline (access-control skipped the PRD step, its scope was already fully NORMATIVE). This suite is that stage-1 artifact for the `User` entity's own lifecycle and workflow correctness — registration, magic-link auth, profile-field CRUD, deactivation, and the career-timeline event log — deliberately excluding the access-control dimension (who is entitled), which is specified to belong to `docs/test-cases/access-control/` in full — that suite is not yet authored on disk as of 2026-08-25, so this exclusion is an intended boundary, not a completed handoff.
 
 ## Capabilities
 
 - **CAP-1** Registration
   - **intent:** HR Admin creates a `User` on a new hire's behalf; the record is created with no credential stored, completing registration never establishes a session directly, and neither an invalid payload nor a duplicate identity value can produce a row.
-  - **success:** `registration/` UM-REG-01..12 pass without opening another document: success with server-set audit columns and `customFields: {}`, `401` unauthenticated, `403` for a functional-role holder lacking the user-creation permission (Ida), exact duplicate `workEmail`, no-session-on-create asserted on body *and* headers with exactly one email dispatch, missing non-nullable field, duplicate `ttId`, concurrent duplicate `workEmail` resolving to one row, malformed `workEmail`, server-owned fields rejected with `400`, normalized-email uniqueness, rehire identity preservation, and graceful dispatch failure after durable create.
+  - **success:** `registration/` UM-REG-01..15 pass without opening another document: success with server-set audit columns and `customFields: {}`, `401` unauthenticated, `403` for a functional-role holder lacking the user-creation permission (Ida), exact duplicate `workEmail`, no-session-on-create asserted on body *and* headers with exactly one email dispatch, missing non-nullable field, duplicate `ttId`, concurrent duplicate `workEmail` resolving to one row, malformed `workEmail`, server-owned fields rejected with `400`, normalized-email uniqueness, rehire identity preservation, graceful dispatch failure after durable create, `birthDay`/`birthMonth` persisting together as a valid pair, and a partial or out-of-range `birthDay`/`birthMonth` rejected with `400`.
 - **CAP-2** Magic-link authentication
   - **intent:** A user requests a magic link by `workEmail` and consumes the resulting one-time token to establish a session, replacing password auth ahead of SSO.
   - **success:** `auth/` UM-AUTH-01..06: known-email request, enumeration-safe unknown-email request, successful consume, expired-token denial, single-use replay denial, deactivated-user denial.
@@ -34,7 +34,7 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
   - **success:** `career-timeline/` UM-CT-01..02 prove `joined_company` on creation and `position_change` on a position edit — the only two of the eight documented types currently triggerable (see Assumptions).
 - **CAP-6** Career-timeline manual mechanics
   - **intent:** Assigned PP and direct UM can manually add backfill entries and correct wrongly-inferred ones; a correction is never an in-place edit. Full Manager line and PP may read per DEC-UM-001.
-  - **success:** `career-timeline/` UM-CT-03..07 cover PP add, direct UM add, PP correction (explicit soft-delete-then-append-then-observe sequence), UM delete, and the absence-not-null assertion on a deleted entry's read.
+  - **success:** `career-timeline/` UM-CT-03..08 cover PP add, direct UM add, PP correction (explicit soft-delete-then-append-then-observe sequence), UM delete, the absence-not-null assertion on a deleted entry's read, and a direct `PATCH` on an event being rejected (no in-place edit route exists).
 - **CAP-7** Employee list (Story 1.5)
   - **intent:** An entitled actor lists employees with pagination and S1-field filters; deactivated users are excluded from active-only views.
   - **success:** `list/` UM-LIST-01..04 cover pagination metadata, single filter, compound filters, and inactive filter.
@@ -44,7 +44,7 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
 
 ## Constraints
 
-- RBAC is explicitly out of scope: actors in every file are drawn from personas access-control's suite already proves entitled. These scenarios assert workflow/data correctness given an entitled actor, never who is entitled. The one exception is the registration denial case, which probes permission *granularity* on this endpoint (a role-holder lacking this permission) rather than re-deriving the access matrix.
+- RBAC is explicitly out of scope: actors in every file are drawn from personas access-control's suite is specified to prove entitled (not yet authored on disk — see Open Questions). These scenarios assert workflow/data correctness given an entitled actor, never who is entitled. The one exception is the registration denial case, which probes permission *granularity* on this endpoint (a role-holder lacking this permission) rather than re-deriving the access matrix.
 - One requirement per file, enforced strictly. Where a file probes one requirement from several angles it may carry several `Test N` blocks, but a second requirement is a second file — a present-but-invalid field is not an absent one, and a concurrent duplicate is not a sequential one.
 - `UserEvents`' immutable-fact model is asserted literally: a correction is shown as explicit steps — soft-delete the wrong entry, append the corrected one, then a read that observes both — never a single in-place PATCH.
 - Every file carries a trace line to a requirements §, a PRD FR-n, and/or an AD-n; a scenario without a trace is invalid. "PRD FR-n" means FR-1..FR-4 — the only numbered FRs the PRD defines. FR-5..FR-16 exist solely in `epics.md` as derived requirements, so a scenario cites their underlying source (`database-schema.md`, an AD, a requirements §) rather than the derived number.
@@ -70,7 +70,7 @@ A mandate to meet: AD-1's three-stage quality gate requires an approved prose sc
 - S2 (personal contacts), S3 (emergency contacts), S4 (employment), S5 (documents) section content — no schema exists yet; gated on the Profile bounded-context decision (architecture spine, Deferred).
 - Six of `UserEvents`' eight documented types — `grade_change`, `department_change`, `employment_type_change`, `extended_leave`, `mentorship_start`, `mentorship_end` — reference fields/contexts with no schema yet in this PRD.
 - Timetracker/PeopleForce sync-driven writes (AD-13) — future integration.
-- Seed-script bootstrap behavior itself — not an HTTP-driven scenario; access-control's `fc-03` already covers the bootstrap admin being an ordinary revocable FR.
+- Seed-script bootstrap behavior itself — not an HTTP-driven scenario; access-control's `fc-03` is specified to cover the bootstrap admin being an ordinary revocable FR, once that suite is authored (not yet, see Open Questions).
 - E2E test code itself — this suite is stage 1; stage 2 starts only after per-file developer approval.
 
 ## Success signal
@@ -80,10 +80,12 @@ A reviewer can map each of CAP-1..6's sourced behaviors to exactly one approved 
 ## Assumptions
 
 - Of `UserEvents`' 8 documented tracked types (§4.9), only `joined_company` and `position_change` are **automatically triggerable from User/profile mutations today** — the User entity has no `grade`, `department`, or `employmentType` field, and mentorship/leave live in contexts that don't exist yet. **`mentorship_start`/`mentorship_end` are triggerable from Epic 4 relationship attach/detach** (`um-rel-04`/`05`), distinct from manual backfill (`um-ct-03`, DEC-UM-011).
-- Nullable columns a create omits (`photo`, `workPhone`, `birthDate`, `ttId`) come back present-and-`null` for an entitled viewer. The suite's absence-is-absence rule governs audience filtering — a field hidden from this viewer — not a field that is genuinely empty for everyone.
+- Nullable columns a create omits (`photo`, `workPhone`, `birthDay`, `birthMonth`, `ttId`) come back present-and-`null` for an entitled viewer. The suite's absence-is-absence rule governs audience filtering — a field hidden from this viewer — not a field that is genuinely empty for everyone.
 
 ## Open Questions
 
 None for the approved decision set (DEC-UM-001..011). Reopen through architecture change control if product direction shifts.
+
+**Dependency gap (found 2026-08-25, business-analyst review):** `docs/test-cases/access-control/` — the suite this SPEC and the companion README repeatedly cite as already proving entitlement — does not exist on disk, though `SPEC-access-control-test-cases` fully specifies it (202 planned scenario files). Every "proven in access-control's suite" claim in this domain's docs is the intended end state, not a completed dependency, until that suite is authored.
 
 **Upstream drift (maintenance, not open product questions):** `epics.md` Story 1.1 AC count should stay aligned with the registration folder; Story 4.1 no longer treats reports-to reassignment as undecided.

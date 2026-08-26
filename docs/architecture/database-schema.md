@@ -38,9 +38,10 @@ User {
   city            string
   workEmail       string, unique
   workPhone       string, nullable
-  birthDate       date, nullable         // full date stored; §3.2 display shows day+month only for non-privileged audiences
+  birthDay        int, nullable          // 1-31. §3.2 S1 content is literally "birthday (day and month)" -- no year is ever captured or stored, for any audience. Replaces the earlier single full-date `birthDate` design (2026-08-25 product decision: that design invented an audience-based year-redaction rule the source never states)
+  birthMonth      int, nullable          // 1-12, paired with birthDay -- both null together or both set together
   companyJoinDate date
-  isActive        boolean, default true  // soft delete
+  isActive        boolean, default true  // soft delete. NOT a status modeled on anything in project-requirements.md -- the source never describes a deactivation feature or an active/inactive state. Exists purely as a technical necessity: UserEvents/Relationship rows reference User by FK and must stay valid after someone leaves, so the row is flagged inactive rather than removed. Distinct from S4's sourced "employment status" field (unbuilt/deferred) -- don't conflate the two (2026-08-25 product decision)
   ttId            string, nullable, unique
   customFields    jsonb, default '{}'   // interim, ahead of the dynamic custom-fields system (custom-fields.md); DEC-UM-003
   createdAt       timestamp

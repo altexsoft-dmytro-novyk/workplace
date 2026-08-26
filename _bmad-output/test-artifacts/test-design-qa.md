@@ -246,7 +246,7 @@ test('@P0 @API registration creates user without session @TD-UM-REG-01', async (
 | TD-UM-REG-10 | Server-owned create fields | E2E API | Supplying `id`, `createdAt`, or `createdBy` → `400`; no row created |
 | TD-UM-REG-11 | Email normalization | E2E API | Trim + lowercase on write/lookup; normalized duplicates → `409` |
 | TD-UM-REG-12 | Rehire identity preservation | E2E API | Registration path creates no second row for deactivated normalized email; explicit rehire reuses the same User id/history when that workflow lands |
-| TD-UM-CT-08 | No PATCH on events (immutability) | E2E API | G-14 |
+| TD-UM-CT-08 | No PATCH on events (immutability) | E2E API | G-14; um-ct-08 |
 | TD-UM-REL-08 | Concurrent reports-to assign | E2E API | `@concurrency` |
 | TD-UM-PF-05 | Self cannot PATCH others | E2E API | May live in access-control |
 | TD-UM-PF-02 | FR-8: Self photo upload | E2E API | Acceptable workaround; does not block identity/authentication |

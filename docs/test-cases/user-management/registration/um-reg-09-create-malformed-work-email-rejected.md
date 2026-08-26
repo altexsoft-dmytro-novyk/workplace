@@ -12,7 +12,7 @@
 
 Every other field is valid deliberately, so `400` can only be the answer to `workEmail`.
 
-**Preconditions:** [fixture](../README.md#canonical-personas); Root seeded with the HR Admin functional role; no user with `lastName: Volkova`.
+**Preconditions:** [fixture](../README.md#canonical-personas); Root seeded with the HR Admin functional role.
 
 ## Test
 

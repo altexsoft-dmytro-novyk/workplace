@@ -30,7 +30,8 @@ One `User` record per person. Field list extracted from §3.2 (S1 Identity card)
 | `country`, `city` | string | |
 | `workEmail` | string, unique | account identity — the magic-link login identity (FR-2) |
 | `workPhone` | string, nullable | |
-| `birthDate` | date, nullable | full date incl. year stored; §3.2 shows only day+month — year redaction for non-privileged audiences is an access-control/presentation concern, not a storage one |
+| `birthDay` | int, nullable (1-31) | §3.2 S1 content is literally "birthday (day and month)" — no year is ever captured or stored, for any audience. Supersedes this PRD's earlier full-`birthDate`-with-year-redaction design, which invented an audience-based redaction rule the source doesn't state (resolved 2026-08-25) |
+| `birthMonth` | int, nullable (1-12) | paired with `birthDay` — both null together (never captured) or both set together |
 | `companyJoinDate` | date | |
 | `isActive` | boolean, default `true` | soft delete — deactivating a user flips this rather than removing the row |
 | `ttId` | string, nullable, unique | external identity placeholder per AD-13 — column reserved now, timetracker sync itself out of scope |
@@ -66,10 +67,10 @@ No `updatedAt`/`updatedBy` — an event is an immutable fact, not a mutable reco
 
 ## Functional Requirements — Account & Authentication
 
-- **FR-1.** The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap).
-- **FR-2.** Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism. No password is ever stored.
-- **FR-3.** First login uses the same magic-link flow as every subsequent login. There is no registration endpoint (§4.17).
-- **FR-4.** The employee population is imported from the seeded timetracker list. No `POST /users` create path, no AD, no SSO.
+- **FR-1.** The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap) — not through the registration flow below.
+- **FR-2.** Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism (temporary, ahead of SSO). No password is ever stored.
+- **FR-3.** Completing the registration form does not log the user in directly — it triggers the same magic-link email used for every subsequent login. There is no separate "invite link" mechanism.
+- **FR-4.** Resolved: HR Admin submits the registration form on the new hire's behalf (not self-registration). `isActive` alone is sufficient — no intermediate "not yet activated" state is needed, since HR Admin-entered records go straight to `isActive: true` and the magic link (FR-3) is the activation-equivalent step. **Resolved 2026-08-25:** `isActive` is not a status modeled on anything in project-requirements.md — the source document never describes a deactivation feature or an active/inactive state anywhere in §1-10. It exists purely as a technical soft-delete mechanism: `UserEvents` and `Relationship` rows reference `User` by FK and must stay valid after someone leaves the company, so the row is flipped inactive rather than removed. Product decision: keep `isActive` as-is on this basis. It remains a distinct concept from S4's sourced "employment status" field (unrelated, narrower-access table, still unbuilt/deferred for this PRD) — don't conflate the two if/when S4 is eventually built.
 
 ## Open Questions
 
