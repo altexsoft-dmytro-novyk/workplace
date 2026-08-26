@@ -1,7 +1,7 @@
 # Test Assignment: People Management Platform — Iteration 2
 
-**Version:** 1.2
-**Supersedes:** Test Assignment: People Management & Resourcing MVP (Iteration 1)
+**Version:** 1.5
+**Supersedes:** v1.2 ([requirements-changelog-v1.2-to-v1.5.md](requirements-changelog-v1.2-to-v1.5.md))
 **Status:** Draft for review
 
 ---
@@ -12,8 +12,9 @@ This is the functional and technical scope for Iteration 2 of the AI-native SDLC
 
 Two differences from Iteration 1 matter most:
 
-1. **Mock data is no longer acceptable for integrations.** Iteration 1 stated "no external integrations, use seed/mock data." Iteration 2 requires a working integration with the internal timetracker, and candidate data pulled from PeopleForce where the API allows.
+1. **Mock data is no longer acceptable for integrations.** Iteration 1 stated "no external integrations, use seed/mock data." Iteration 2 requires a working integration with the internal timetracker over the **seeded population** (delivered 26 August). PeopleForce is **[GOOD TO HAVE]** — a single prefill button only (§5.2).
 2. **Access control is a first-class requirement, not a footnote.** The profile is decomposed into sections, and every section has an explicit access level per audience. Sections 2 and 3 are normative — teams do not get to redesign them.
+3. **No employee creation, no AD, no SSO.** The population is a seeded list you import; authentication is your own implementation over that population (§4.17, §10).
 
 Sections marked **[NORMATIVE]** must be implemented as specified. Sections marked **[DESIGN FREEDOM]** state the outcome required; how you get there is yours. Sections marked **[GOOD TO HAVE]** are not required for this iteration.
 
@@ -49,20 +50,24 @@ The system has **two independent role dimensions**. Do not collapse them into on
 | **Manager** | Arises from a relationship. If A manages B, then A holds the Manager role *with respect to B* and sees everything a manager is entitled to see about B. |
 | **People Partner** | Arises from assignment. If A is the assigned people partner of B, A holds the People Partner role with respect to B. |
 
-**Hierarchy resolution [NORMATIVE].** Manager access is the **transitive closure of two relations**:
+**Hierarchy resolution [NORMATIVE].** Manager access is the **transitive closure of three relations**:
 
 1. **Reports to** — B reports to A.
-2. **Is assigned to a project managed by** — B works on a project whose PM or DM is A.
+2. **Department management** — A manages a department; B belongs to that department or a sub-department. Every employee belongs to exactly one department (§4.17).
+3. **Is assigned to a project managed by** — B works on a project whose PM or DM is A.
 
 Consequences, all of which must hold:
 
-- A manager two or more levels up sees everything about every person nested anywhere beneath them, without needing an explicit grant.
-- A DM sees full information about every person on their projects, at the same level as that person's own unit manager. Project assignment grants managerial access.
-- A PM sees the people on their projects; the DM sits above the PM in the same chain and therefore sees everything the PM sees, plus the rest of their projects.
+- A manager two or more levels up in the **reporting line** sees everything about every person nested anywhere beneath them in that line, without needing an explicit grant.
+- **Reporting line** and **project line** are distinct audiences in the access matrix (§3.2). Project-derived PM/DM access is narrower — see §3.3.2.
 - Access is evaluated relationship-by-relationship. The same person can be a Manager with respect to one profile, a People Partner with respect to a second, and a plain colleague with respect to a third, within a single session.
 - When a project assignment ends, the derived access ends with it. Managerial access is not sticky.
+- **Revocation timing:** platform-owned relations (reports-to, department, people-partner assignment) take effect on the **next request**. Project-derived access must be withdrawn within **15 minutes** of assignment end (§5.1).
+- **The HR line** is the people partner's own manager chain inside HR, recursive without limit — not the employee's reporting chain.
 
-There is exactly one documented exception to "Manager sees everything": management notes visible to a PM (S7). See 3.3.
+**Organisational relationship changes [NORMATIVE].** Changing manager, people partner, department, or department manager is a distinct operation: dedicated permission, dedicated screen, **no self-assignment**, journaled (§3.4). Manager, people partner, and department are **not writable through S1** — they are access switches with their own permission and screen.
+
+There are exactly **two** documented exceptions to "a manager sees everything": the narrowed **project line** (§3.3.2), and the PM's flag-gated read of S7 (§3.3).
 
 ### 2.2 Functional roles — assigned
 
@@ -72,9 +77,11 @@ There is exactly one documented exception to "Manager sees everything": manageme
 | **Delivery Manager (DM)** | Delivery dashboard grouped by project. Resourcing: creates requests, reviews and approves or rejects proposed candidates, and sees the requests created by the PMs of their projects. Risks, action items, CDS records for their people. |
 | **Project Manager (PM)** | Same dashboard as the DM, scoped to their own projects. Resourcing: creates requests for their projects. Risks, action items, CDS records for their people. |
 | **People Partner (PP)** | People partner dashboard. All HR functionality: profiles, career timeline maintenance, CDS, feedback, campaigns, risks. **No resourcing functionality.** |
-| **HR Admin** | Everything a PP has, plus custom field definitions, system dictionaries, and management of functional roles and their permissions (2.3). |
+| **HR Admin** | **Configuration only:** custom field definitions, system dictionaries, departments, and management of functional roles and their permissions (2.3). **No data access by default.** |
 
-Functional roles never grant data access on their own. A DM sees the people on their projects because of the hierarchy rule in 2.1.
+Functional roles never grant data access on their own. A DM sees the people on their projects because of the hierarchy rule in 2.1. **Both dimensions must permit an operation:** the access matrix (§3.2) and the functional-role permission (§2.3) must both allow a write.
+
+There is no separate "unit" entity — *Unit Manager* is the role name for the manager of a department. S1 says "department".
 
 ### 2.3 Functional roles are extensible **[NORMATIVE]**
 
@@ -84,9 +91,19 @@ Requirements:
 
 - Functional roles and their permissions are **data, not code**. A new functional role can be created, named, and granted a set of feature permissions **through the UI**, by HR Admin, with no deploy and no schema change.
 - People are assigned to functional roles through the UI.
-- Feature permissions are granular. At minimum the following must be independently grantable: create form campaigns, create action items, create and edit risks, create resourcing requests, fulfil resourcing requests, assign mentors, maintain CDS records, manage custom fields, view a given dashboard.
+- Feature permissions are granular. At minimum the following must be independently grantable: create form campaigns, create action items, create and edit risks, create resourcing requests, fulfil resourcing requests, approve or reject candidates, close resourcing requests, assign mentors, maintain CDS records, manage custom fields, view a given dashboard, edit the career timeline, create feedback, record a departure, manage departments, change organisational relationships.
 - **Access roles (2.1) are not extensible this way.** A new functional role never widens what data its holders can see about a person; it only unlocks features. Where a feature needs data, it operates within the holder's existing access role. A newly created role that can send campaigns sees the audience through the colleague view unless it also holds a Manager or People Partner relationship.
 - Removing a permission from a role takes effect immediately for everyone holding it.
+
+### 2.4 Full profile access grant **[NORMATIVE]**
+
+Full profile access is a **separate grant**, distinct from HR Admin and from relationship-derived access:
+
+- Only an **existing holder** may grant it to another user — no self-assignment.
+- The **first holder is seeded at deployment**.
+- **Removing the last holder is blocked.**
+- Every grant and revocation is **journaled** (§3.4).
+- Holders with full profile access are the **backstop** for shared-link revocation when the relationship holder cannot revoke.
 
 ---
 
@@ -99,34 +116,39 @@ The employee profile is decomposed into **sections**. Access is granted per sect
 Audiences in the matrix below:
 
 - **Self** — the employee whose profile it is
-- **Manager line** — anyone holding the Manager access role with respect to this employee, per 2.1: their UM, the PM and DM of their projects, and everyone above any of those
-- **PP** — the assigned people partner and the HR line above them
+- **Reporting line** — anyone holding Manager access via reports-to or department management with respect to this employee, including transitive managers in that line
+- **Project line** — PM and DM (and their chain above) via **project assignment only** — a narrower audience; see §3.3.2
+- **PP** — the assigned people partner and the HR line above them (§2.1)
 - **Colleague** — any authenticated employee who holds none of the above roles with respect to this profile
-- **Shared link** — a viewer accessing via a generated link, see 4.8
-- **HR Admin** — full access to everything
+- **Shared link** — an **authenticated, named recipient** accessing via a generated link (§4.8) — not anonymous
+
+**HR Admin is not an audience column.** HR Admin is a functional configuration role (§2.2) with no default data access. Full profile access is a separate grant (§2.4).
 
 Legend: `RW` = read and write · `R` = read only · `—` = no access, section not rendered at all · `cfg` = off by default, can be enabled per link
 
 ### 3.2 Section access matrix
 
-| # | Section | Contents | Self | Manager line | PP | Colleague | Shared link |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| S1 | **Identity card** | Full name, photo, position, department/unit, country and city, work email, work phone, birthday (day and month), company start date, manager, people partner, mentor, current project(s) | R (photo RW) | RW | RW | **R** | on by default |
-| S2 | **Personal contacts** | Personal phone, personal email, messengers, residential address, current place of stay | **RW** | R | RW | — | cfg |
-| S3 | **Emergency contacts** | Contact person, relationship, phone | **RW** | R | RW | — | — |
-| S4 | **Employment** | Employee type (FTE / Subcontractor), grade, seniority, position history, English level, probation status, employment status, contract type | R | RW | RW | — | cfg |
-| S5 | **Documents** | Contract, W8, cooperation form, Diia City, CV, joining interview feedback, certificates | R (own) + upload certificates | R | RW | — | cfg |
-| S6 | **Risks** | Current level, trend, description, details, date, full history | **—** | RW | RW | — | cfg |
-| S7 | **Management notes** | Free-form notes by managers and PP, each with visibility flags | R — only records flagged *visible for employee* | RW. **PM exception: R, and only records flagged *visible for PM*** | RW | — | — |
-| S8 | **Feedbacks** | Structured feedback records, see 4.15 | R — only records flagged *shared with employee* | RW | RW | — | cfg |
-| S9 | **Career timeline** | System-generated event log, see 4.9 | R | RW | RW | — | cfg |
-| S10 | **Leaves and absences** | Vacation, sick leave, parental leave, extended leave — dates and types | R | R | R | **R, including type** | cfg |
-| S11 | **Projects** | Project, PM, DM, period | R | R | R | R (project name only) | cfg |
-| S12 | **CDS** | Skills matrix link, assessment log, results, final conclusion, IDP | R (+ complete own IDP) | RW | RW | — | cfg |
-| S13 | **Mentorship** | Open-to-mentor flag, assigned mentor, assigned mentees, ended pairs | RW (own flag), R (pairs) | RW | RW | — | — |
-| S14 | **Action items and tasks** | Tasks assigned to the person, including form tasks, see 4.5 | R (own) + mark complete | RW | RW | — | — |
-| S15 | **Request history** | Resourcing requests the person was proposed for: proposed → approved/rejected with feedback | — | R | R | — | cfg (a DM sees their own requests natively) |
-| S16 | **Custom fields** | See 4.1 | per field visibility | RW | RW | per field visibility | cfg |
+| # | Section | Contents | Self | Reporting line | Project line | PP | Colleague | Shared link |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| S1 | **Identity card** | Full name, photo, position, department, country and city, work email, work phone, birthday (day and month), company start date, manager, people partner, mentor, current project(s)¹ | R (photo RW) | RW² | RW² | RW | **R** | cfg (on by default) |
+| S2 | **Personal contacts** | Personal phone, personal email, messengers, residential address, current place of stay | **RW** | R | **—** | RW | — | cfg |
+| S3 | **Emergency contacts** | Contact person, relationship, phone | **RW** | R | **—** | RW | — | — |
+| S4 | **Employment** | Employee type (FTE / Subcontractor), grade, seniority, position history, English level, probation status, employment status, contract type | R | RW | RW | RW | — | cfg |
+| S5 | **Documents** | Contract, W8, cooperation form, Diia City, CV, certificates | R (own) + upload certificates | R | **R (CV and certificates only)** | RW | — | cfg |
+| S6 | **Risks** | Current level, trend, description, details, date, full history | **—** | RW | RW | RW | — | cfg |
+| S7 | **Management notes** | Free-form notes by managers and PP, each with visibility flags | R — only records flagged *visible for employee* | RW | RW. **PM exception: R, and only records flagged *visible for PM*** | RW | — | — |
+| S8 | **Feedbacks** | Structured feedback records, including joining interview feedback (§4.15), see 4.15 | R — only records flagged *shared with employee* | RW | RW | RW | — | cfg |
+| S9 | **Career timeline** | System-generated event log, see 4.9 | R | RW | RW | RW | — | cfg |
+| S10 | **Leaves and absences** | Vacation, sick leave, parental leave, extended leave — dates and types | R | R | R | R | **R (dates only — type hidden)** | cfg |
+| S11 | **Projects** | Project, PM, DM, period | R | R | R | R | R (project name only) | cfg |
+| S12 | **CDS** | Skills matrix link, assessment log, results, final conclusion, IDP | R (+ complete own IDP) | RW | RW | RW | — | cfg |
+| S13 | **Mentorship** | Open-to-mentor flag, assigned mentor, assigned mentees, ended pairs | RW (own flag), R (pairs) | RW | RW | RW | — | — |
+| S14 | **Action items and tasks** | Tasks assigned to the person, including form tasks, see 4.5 | R (own) + mark complete | RW | RW | RW | — | — |
+| S15 | **Request history** | Resourcing requests the person was proposed for: proposed → approved/rejected with feedback | — | R | R | R | — | cfg |
+| S16 | **Custom fields** | See 4.1 | per field visibility | RW | RW | RW | per field visibility | cfg |
+
+¹ Manager, people partner, and department on S1 are **read-only** — changes use the organisational-relationship screen (§2.1).  
+² Writable fields exclude manager, people partner, and department.
 
 ### 3.3 Rules that follow from the matrix
 
@@ -136,10 +158,16 @@ Legend: `RW` = read and write · `R` = read only · `—` = no access, section n
 2. **S7 defaults to invisible to the employee and to PMs.** Every management note carries two independent flags, both off by default:
    - *visible for employee* — when set, the employee can read that record. Only that record.
    - *visible for PM* — when set, PMs in this person's project chain can read that record, read-only.
-   UM, DM and PP can create, read and edit notes about the people they are responsible for, regardless of flags. This is the one documented exception to "a Manager sees everything" in 2.1: a PM is a Manager for every other section but a flag-gated reader for S7.
-3. **Colleague view is a whitelist, not a blacklist.** A colleague sees exactly S1, S10 including leave type, and the S11 project name. Everything else is absent. Do not implement this by hiding fields in the frontend — the API must not return them.
-4. **Access is evaluated server-side per section on every request.** A profile response is assembled from the sections the requester is entitled to, after resolving the requester's access role per 2.1.
-5. **Custom fields carry their own visibility.** When a custom field is created, its visibility level is set: *management* (default), *employee* (also visible to Self), or *colleague* (also visible to everyone). Filters and list columns respect it: a user filtering the All Employees list must not be able to infer a value they cannot see.
+   UM, DM and PP can create, read and edit notes about the people they are responsible for, regardless of flags. This is one of the two documented exceptions to "a manager sees everything" in 2.1: a PM in the **project line** is a flag-gated reader for S7.
+3. **§3.3.2 — Project line is narrower.** PM and DM via project assignment lose S2 and S3 entirely, and get S5 as **CV and certificates only**. All other project-line cells match reporting line unless this section states otherwise.
+4. **§3.3.4 — Colleague view is a whitelist, not a blacklist.** A colleague sees exactly S1, S10 (**dates only — leave type hidden**), and the S11 project name. Everything else is absent. Do not implement this by hiding fields in the frontend — the API must not return them.
+5. **Access is evaluated server-side per section on every request.** A profile response is assembled from the sections the requester is entitled to, after resolving the requester's access role per 2.1.
+6. **Custom fields carry their own visibility.** When a custom field is created, its visibility level is set: *management* (default), *employee* (also visible to Self), or *colleague* (also visible to everyone). Filters and list columns respect it: a user filtering the All Employees list must not be able to infer a value they cannot see.
+7. **§3.3.7 — Campaign author exception.** A campaign author sees name and completion status for their own campaign's recipients only. Nothing else from S14, nothing in any other section; access ends when the campaign closes.
+
+### 3.4 Relationship and access journal **[NORMATIVE]**
+
+A narrow journal (not a general audit log) records: manager, people partner, and department changes; department-manager changes; full-profile-access grants; and shared-link accesses.
 
 ---
 
@@ -176,7 +204,7 @@ An employee can:
 - see and edit personal contacts, residential address, place of stay, emergency contacts — without asking HR;
 - upload a photo;
 - see their own career timeline;
-- see their own leaves and balances, with a link to the timetracker page to manage them;
+- see their own leaves (dates and types) with a link to the timetracker to manage them — **leave balances are not shown in the platform**;
 - see their own projects;
 - see their own CDS section: the current skills matrix of their actual department, past assessments, and their IDP, which they can mark as complete;
 - see and manage their mentorship status;
@@ -234,9 +262,11 @@ Action items are the single task entity in the system. They appear on the employ
 
 Deliberately simple.
 
-**Per employee:** a risk record with level — `low`, `need attention`, `medium`, `high`, `leaver` — plus a description of the situation, details, and a date. Risk history is retained; the current level is the most recent record.
+**Per employee:** a risk record with level — `low`, `need attention`, `medium`, `high`, `leaver` — plus a description of the situation, details, and a date. Risk history is retained; the current level is the most recent record. **Fixed severity order:** `low` < `need attention` < `medium` < `high` < `leaver`. **Risks cannot be closed or resolved** — the level moves from any state to any state, including down to `low`. **`leaver` is a prediction**, not the fact of departure; the fact of departure is `dismissed` in employment status (§4.16).
 
 **Trend:** alongside the current level, show an arrow indicating whether the risk has gone up or down compared with the previous record. No arrow when the level is unchanged or when this is the first record.
+
+**"Active" risks** exclude `low` — dashboard counters ignore `low`.
 
 **Risk Dashboard** (separate page):
 
@@ -252,26 +282,30 @@ Never visible to the employee.
 
 Available to UM, DM and PM, and to any functional role granted the corresponding permission (2.3).
 
-**Request creation (DM, PM):** vacancy details and requirements, expected compensation level, duration, workload. A request **may** reference a project, but does not have to — requests are often created before the project exists in the system, and an unattached request is a normal state. A DM sees both their own requests and those created by the PMs of their projects.
+**Vacancy entity:** one vacancy record lives in the platform. PeopleForce vacancies are not used in either direction.
 
-**Request fulfilment (UM):** the UM sees incoming requests assigned to them and can
+**Request creation (DM, PM):** vacancy details and requirements, **headcount** (default 1), expected compensation level, duration, workload, and **department** (routes the request to the responsible unit manager). A request **may** reference a project; an unattached request is normal and appears in an **Unassigned** bucket on the dashboard.
 
-- select specialists from their unit;
-- **or** attach an external candidate from PeopleForce (5.2);
-- attach one or more candidates and submit for DM approval.
+**Request fulfilment (UM):** the UM sees incoming requests for their department and can propose internal specialists or external candidates. Store the PeopleForce **candidate ID** on every external candidate.
 
-**Request review (DM):** the DM sees proposed candidates. For an internal employee, the link leads to their profile — which the DM may not yet have access to, so profile sharing (4.8) applies. For an external candidate, the link leads to the candidate's data pulled from PeopleForce, or, where that integration is not implemented, simply to an external link to the candidate in PeopleForce. For each candidate, the DM approves the assignment or rejects it with a written reason.
+**Request review (DM):** the DM sees proposed candidates. On submission, a **shared link** is generated automatically for the reviewing DM (named recipient) and remains until the request is decided. Evaluation view: S1, S4, S11, S12, S5 as CV plus certificates; S6 optional; never S2, S3, S7, S8. Expected compensation level is visible to the request author, routed UM, and reviewing DM only — never on a profile, shared link, or export.
 
-**Request history:** every attempt (proposed → approved/rejected, with feedback) is recorded and appears both in Resourcing → Requests and in the employee's profile section S15. Approval does not create a project record here: the person is assigned to the project in the timetracker, and the project appears on their profile after the next sync.
+**Closing:** approving a candidate fills a headcount slot. **Only the DM's explicit close** ends a request — no auto-close.
+
+**Request history:** every attempt (proposed → approved/rejected, with feedback) is recorded in Resourcing → Requests and in S15. Approval does not create a project record here: assignment happens in the timetracker and appears on the profile after sync.
 
 ### 4.8 Profile sharing
 
 A manager generates a shareable view of an employee's profile for someone who does not hold Manager or People Partner access over that person — typically a DM evaluating a proposed candidate.
 
-- The manager selects which sections are included, per section, per the `cfg` column in 3.2.
-- Sensitive sections (S2, S5, S6, S8) are excluded by default and must be explicitly enabled each time. S3, S7 and S13 can never be shared.
-- The link expires. Default 24 hours, configurable at creation.
-- Every access via the link is logged: when, from where.
+- **Authenticated, named recipient only** — the creator explicitly names the recipient at link creation. There is no anonymous "anyone with the link" mode. The recipient must authenticate.
+- The manager selects which sections are included, per section, per the `cfg` column in 3.2. **All `cfg` sections are off by default; only S1 is on by default.**
+- **Never-share set:** {S3, S7, S13, S14} — these sections can never be shared.
+- Sensitive sections (S2, S5, S6, S8) are excluded by default and must be explicitly enabled each time.
+- The link expires. Default 24 hours, configurable at creation (resourcing auto-links may differ — see §4.7).
+- Every access via the link is logged: when, from where (§3.4 journal).
+- **The creator's access is re-checked on every view** — the link dies with the relationship.
+- **Revocation rights follow the current holder of the relationship**, not the creator. Full-profile-access holders are the backstop — there must never be a link nobody can revoke.
 - Revocable before expiry.
 - A shared link never grants write access.
 
@@ -283,7 +317,7 @@ Tracked events: joining the company, grade change, position change, department c
 
 **Manual override:** PP and UM can **edit, delete and manually add** timeline events. Manual entries are needed for historical backfill — the current data lives only in a separate Excel headcount change record — and to correct events the system inferred wrongly.
 
-**Read vs write audience [NORMATIVE, DEC-UM-001]:** §3.2 S9 grants the full Manager line and PP **read** access to the career timeline. **Manual** add/correct/delete is limited to the **assigned PP** and the employee's **direct Unit Manager** only — project-derived DM/PM and transitive managers are read-only for manual mutation.
+**Read vs write audience [NORMATIVE, DEC-UM-001]:** §3.2 S9 grants the reporting line, project line, and PP **read** access to the career timeline. **Manual** add/correct/delete is limited to the **assigned PP** and the employee's **direct Unit Manager** only.
 
 Presentation: a visual chronological timeline on the profile. Events are typed and categorised, and must be readable as a timeline in their own right.
 
@@ -314,14 +348,14 @@ Manager and PP can create assessment records, edit conclusions, and create or up
 
 **For manager and PP:**
 
-- A list of everyone who has flagged themselves as open to mentoring.
-- Clicking a willing mentor opens an assignment flow: pick a mentee from the list of employees available to that manager, and create the pair.
-- On creation of the first pair, the person's mentorship status changes from **open to mentoring** to **mentor**. This status is a filterable field on All Employees.
+- A **company-wide** pool lists everyone flagged open to mentoring (identity-card data plus the flag only — no S13 from other profiles).
+- Mentee selection is scoped to the assigner's own people.
+- On creation of the first pair, status changes from **open to mentoring** to **mentor** (filterable on All Employees).
 - A view of all mentor–mentee pairs, active and ended, with start date, end date and status.
 
-**Ending a mentorship:** a manager or PP ends a pair explicitly. The end date is recorded, and **final feedback on the mentorship is required to close it** — a pair cannot be ended without it. Ended pairs remain visible in history on both profiles, and an end event is written to the career timeline (4.9). If the mentor has no other active mentees, their status returns to *open to mentoring*.
+**Ending a mentorship:** a manager or PP ends a pair explicitly. A **closure note** on the pair record is required (readable by reporting line, project line, and PP only — not a feedback record). Ended pairs remain in history; an end event is written to the career timeline (4.9). A person may clear their open-to-mentoring flag while holding an active mentee; active pairs are untouched.
 
-**On any profile:** the mentor is displayed alongside the manager and the people partner in the profile header, visible to manager line and PP.
+**On any profile:** the mentor is displayed alongside the manager and the people partner in the profile header, visible to reporting line, project line, and PP.
 
 Not in scope for this iteration: mentoring goals, session logs, progress tracking.
 
@@ -358,29 +392,50 @@ Analytics does not reuse the All Employees filter engine (4.1), because it does 
 - A record contains: subject (the employee), author, date, context (project, event, period), and the feedback body.
 - Each record carries a visibility flag: **management only** (default) or **shared with employee**.
 - PP and managers can request feedback about a person from specific colleagues — implemented as a form campaign (4.12) targeted at named individuals.
-- Records are viewable over time, with comparison between periods.
+- Records are viewable over time, listed chronologically and filterable by period. **"Comparison between periods" is removed.**
 - Access per S8. A colleague cannot browse feedback about another person.
+
+### 4.16 Employment status and departure **[NORMATIVE]**
+
+**Employment status** is a time-bounded fact on the profile with values `active` / `dismissed`.
+
+**Departure** is recorded by an authorised actor with an effective date and a reason:
+
+- On the effective date: profile becomes read-only and is excluded from the default list but remains filterable.
+- Action items close as *cancelled — departed*.
+- Mentorship pairs auto-close with a system note, bypassing the closure-note gate (§4.11).
+- The account deactivates; **all access that person held ends immediately**.
+- **Departure is blocked** while the person still manages or partners anybody — re-parent first.
+- **Leaving is not a career-timeline event** — it is employment status (§4.9).
+
+### 4.17 Population and departments **[NORMATIVE]**
+
+**Population:** Creating employees is **out of scope**. No provisioning flow, no Active Directory, no SSO. The population is a **seeded list**, generated and imported into the timetracker test environment (delivered 26 August). Import it; that is who you work with. Do not import real employee data beyond the list you are given. Authentication is your own implementation over the seeded population.
+
+**Departments:** Every employee belongs to exactly one department. Departments nest. Department is a first-class entity — not a free-text field on S1. A department change emits a career-timeline event (§4.9). CDS skills-matrix mapping keys off the department entity (§4.10).
 
 ---
 
 ## 5. Integrations
 
-### 5.1 Internal timetracker — leaves and projects
+### 5.1 Internal timetracker — leaves and projects **[NORMATIVE — only required integration]**
 
 Two APIs are being provided by the timetracker architect:
 
-1. **Leaves** — vacation, sick leave, parental and other leave types, with dates and status.
+1. **Leaves** — vacation, sick leave, parental and other leave types, with dates and status. **Leave balances are not stored or displayed in the platform.**
 2. **Projects and people** — projects, the people working on them, PM and DM.
 
-The second one is load-bearing beyond display: project assignment is an input to the permission model (2.1), so a person's PM and DM derive their access from it.
+The second one is load-bearing beyond display: project assignment is an input to the permission model (2.1), so a person's PM and DM derive their access from it. Project-assignment correctness is a **security concern**. Establish from the documentation whether you receive **events** or only **state at sync time**.
 
-### 5.2 PeopleForce — recruiting
+**Outage behaviour:** serve last known data behind a visible banner, and **withdraw project-derived access after four hours** of failed sync. Project-derived access revocation must otherwise occur within **15 minutes** of assignment end (§2.1).
 
-PeopleForce is the recruiting system of record. The platform uses it to pull candidate information for external candidates proposed in resourcing (4.7), and as the source of truth for vacancies.
+### 5.2 PeopleForce — recruiting **[GOOD TO HAVE]**
 
-The API is documented at `https://developer.peopleforce.io`, including a machine-readable index at `https://developer.peopleforce.io/llms.txt` that is worth putting into the intelligent repository. Investigate authentication, the candidate and vacancy endpoints, custom fields, rate limits and webhooks yourselves, and record what you find as decisions in the repository.
+PeopleForce is **not required** for this iteration. If built, it is reduced to a **single prefill button**: prefill profile fields from a candidate record by candidate ID, with per-field preview and per-field confirmation — never silently overwriting a filled value.
 
-Where this integration cannot be completed in time, an external link to the candidate in PeopleForce is an acceptable fallback for this iteration.
+Fields that can **never** be prefilled: grade, seniority, employee type, department, manager, people partner, contract data, employment status, risk.
+
+Store the PeopleForce candidate ID on every external candidate in resourcing (§4.7), whether or not the integration is built. Where the integration cannot be completed, an external link to the candidate in PeopleForce remains an acceptable fallback.
 
 ---
 
@@ -390,7 +445,7 @@ Points where a naive model will not survive the requirements. Resolve these duri
 
 - **Custom fields and arbitrary filtering** (4.1). Any field, including fields that do not exist yet, must be filterable and sortable. A column-per-field schema will not survive this.
 - **The two-dimensional role model** (Section 2). Access roles are computed from relationships; functional roles and their permissions are stored data that changes at runtime. Storing "is a DM" as a permission is the wrong answer.
-- **Transitive access resolution over two graphs** — the reporting tree and project assignment — evaluated per request, per section, at acceptable cost. Cache carefully: a stale permission cache is a data leak.
+- **Transitive access resolution over three graphs** — reports-to, department management, and project assignment — evaluated per request, per section, at acceptable cost. Cache carefully: a stale permission cache is a data leak.
 - **Temporal data.** Grade, position, department and employment type all change over time and the history is required for the career timeline. Model these as time-bounded records, not as scalar fields with an audit log bolted on.
 - **Section-level access** (Section 3) is a property of the model, not a UI concern.
 - **Identity across systems.** A person exists as a PeopleForce candidate, then as an employee here, and separately as a timetracker user. Decide how identity is resolved and stored — email alone is not sufficient.
@@ -424,9 +479,11 @@ These are the rules the bootcamp is actually testing. They are not optional and 
 A module is done when:
 
 - functionality matches this document, including the role model in Section 2 and the access matrix in Section 3;
-- access control is covered by tests per audience, per relationship path and per section, including negative tests for every `—` cell, for unflagged S7 records against both the employee and a PM, and for the colleague whitelist;
+- access control is covered by tests per audience, per relationship path and per section, including negative tests for every `—` cell, for **project-line narrowed cells** (§3.3.2), for unflagged S7 records against both the employee and a PM, and for the colleague whitelist;
 - a new functional role can be created and granted permissions through the UI, without a deploy;
-- the timetracker integration runs against the real API;
+- organisational relationship changes are journaled and not self-assignable;
+- a shared link works only for its named authenticated recipient and can always be revoked;
+- the timetracker integration runs against the test environment over the **seeded population**;
 - the test architecture agreed in the foundation phase is actually applied — not an afterthought;
 - specs in the intelligent repository match the shipped behaviour;
 - the module is deployed and demonstrable, not running on someone's laptop.
@@ -435,8 +492,9 @@ A module is done when:
 
 ## 10. Out of scope
 
+- **Employee creation and provisioning.** No HR registration flow, no Active Directory, no SSO. Population is seeded (§4.17).
 - **Compensation and salary data.** There is no compensation section on the profile.
-- **Pre-onboarding.** Creating a person in the system before their first working day, and pulling their data from the ATS on offer acceptance, is deferred to a later iteration.
+- **Pre-onboarding.** Pulling ATS data on offer acceptance is deferred to a later iteration.
 - **Email template management** (eSender replacement). Deferred.
 - **Performing competency assessments.** The system links to matrices and records outcomes; assessment happens outside (4.10).
 - **Learning management.** LMS functionality is a separate track and must not be duplicated here.

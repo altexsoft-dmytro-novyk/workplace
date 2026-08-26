@@ -2,18 +2,18 @@
 title: User Management — PRD
 status: draft
 created: 2026-08-20
-updated: 2026-08-22
+updated: 2026-08-26
 ---
 
 # User Management — PRD
 
 ## Scope
 
-Covers the `user-management` bounded context (per [domain-driven-design.md](../../../../../docs/architecture/domain-driven-design.md)): the `User` entity, self-service profile CRUD, a temporary magic-link signup/login mechanism ahead of SSO, and the `UserEvents` career-timeline log (§4.9).
+Covers the `user-management` bounded context: the `User` entity, self-service profile CRUD, magic-link authentication, and the `UserEvents` career-timeline log (§4.9). Employee population is imported from the seeded timetracker list (§4.17) — no registration endpoint, no AD, no SSO.
 
 Explicitly out of scope for this PRD:
-- **Timetracker integration** — deferred (separate future integration; per project-requirements.md §5.1 it provides leave/vacation balances and reported working days only — no hierarchy data, so it has no bearing on reports-to; corrects an earlier draft of this PRD that conflated the two).
-- Department and Project creation/assignment — HR-Admin-gated, covered under access-control/policies.
+- **Timetracker integration** — separate bounded context; §5.1 provides leaves and project membership for display and access resolution.
+- **Department and Project administration** — platform scope; this PRD consumes department assignment facts per §4.17.
 - Access-role and functional-role resolution and enforcement — owned by `access-control`.
 - Mentorship **workflow** (status tracking beyond active/ended, notifications) — future `mentorship` bounded context. The pairing *fact* itself is in scope: `Relationship.type='mentorship'`, assigned/revoked through the generic attachment endpoint (`POST`/`DELETE /users/:id/relationships`, architecture spine AD-11/AD-14) the same way project membership is — see Data Model note below. Attach/detach fires the `mentorship_start`/`mentorship_end` `UserEvents`.
 
@@ -40,9 +40,9 @@ One `User` record per person. Field list extracted from §3.2 (S1 Identity card)
 `updatedAt`/`updatedBy` deliberately dropped — no concrete consumer named for them here. Real change-history is a separate, deliberately-scoped feature, not a default add-on (see [database-schema.md](../../../../../docs/architecture/database-schema.md) Conventions).
 
 **Deliberately not stored on `User`** (conflicts with AD-11/AD-7's "no access-derived field" rule):
-- **Manager** and **current project(s)** — derived from `Relationship` rows (existing `reportsTo`/`project` edges). No external sync feeds reports-to (see Scope note above) — assignment is a manual HR-Admin operation, in scope for this PRD: `POST`/`DELETE /users/:id/relationships` (`type: 'direct'`), the same generic attachment mechanism as mentorship pairing below.
-- **People Partner** — an access role per §2.1, "arises from assignment" the same way Manager access does; a policy attachment under AD-7, not a `User` column.
-- **Department** — deferred to policies/department-edge work (pending architect decision).
+- **Manager** and **current project(s)** — derived from `Relationship` rows. Reports-to is assigned via the change-organisational-relationships permission (`POST`/`DELETE /users/:id/relationships`, `type: 'direct'`), same mechanism as mentorship.
+- **People Partner** — policy attachment under AD-7, not a `User` column.
+- **Department** — every employee belongs to one department (§4.17); stored as org fact, not a free-text S1 field.
 - **Mentor** — not a scalar field: `Relationship.type='mentorship'` (architecture spine AD-11), the same treatment as Manager/current-project. Start/end are not new columns — they're the existing `UserEvents.mentorship_start`/`mentorship_end`, fired on attach/detach. Status beyond active/ended awaits the future `mentorship` context.
 
 ## Data Model — UserEvents (career timeline, §4.9)
@@ -66,13 +66,13 @@ No `updatedAt`/`updatedBy` — an event is an immutable fact, not a mutable reco
 
 ## Functional Requirements — Account & Authentication
 
-- **FR-1.** The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap) — not through the registration flow below.
-- **FR-2.** Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism (temporary, ahead of SSO). No password is ever stored.
-- **FR-3.** Completing the registration form does not log the user in directly — it triggers the same magic-link email used for every subsequent login. There is no separate "invite link" mechanism.
-- **FR-4.** Resolved: HR Admin submits the registration form on the new hire's behalf (not self-registration). `isActive` alone is sufficient — no intermediate "not yet activated" state is needed, since HR Admin-entered records go straight to `isActive: true` and the magic link (FR-3) is the activation-equivalent step. Note: an invited/active/deactivated-style status is **not** in the requirements doc — that was my own speculation about a possible consequence, not a sourced requirement. The real S4/S6/S10/S13 statuses (employment, risk, leave, mentorship) are unrelated, different tables.
+- **FR-1.** The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap).
+- **FR-2.** Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism. No password is ever stored.
+- **FR-3.** First login uses the same magic-link flow as every subsequent login. There is no registration endpoint (§4.17).
+- **FR-4.** The employee population is imported from the seeded timetracker list. No `POST /users` create path, no AD, no SSO.
 
 ## Open Questions
 
-1. ~~Account provisioning~~ — resolved (FR-1..FR-4).
-2. ~~Department & Project CRUD~~ — **closed**: out of scope for this PRD, confirmed HR-Admin/policy work.
-3. ~~Reports-to hierarchy scope~~ — resolved: not tied to timetracker (earlier draft conflated the two, corrected 2026-08-22). No external sync exists; manual HR-Admin assignment via the generic relationship endpoint (`type: 'direct'`) is in scope, same treatment as mentorship pairing.
+1. Account provisioning — resolved via seed import (FR-4, §4.17).
+2. Department & Project CRUD — out of scope for this PRD; department entity per §4.17.
+3. Reports-to hierarchy — no external sync; assignment via change-organisational-relationships permission and `POST`/`DELETE /users/:id/relationships` (`type: 'direct'`).
