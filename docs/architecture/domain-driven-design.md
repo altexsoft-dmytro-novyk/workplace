@@ -1,6 +1,6 @@
 # Domain-Driven Design & Hexagonal Structure
 
-Binding rules for how backend code is organized. Spine: AD-2, AD-5, AD-6.
+Binding rules for how backend code is organized. Spine: AD-2, AD-5, AD-6, AD-15.
 
 ## Bounded contexts (AD-5)
 
@@ -47,6 +47,16 @@ Entities are behavior-rich classes, not data bags. State changes go through inte
 
 - The **only** role-mutation methods in the codebase: `assignFunctionalRole`, `revokeFunctionalRole`. They operate on functional roles exclusively.
 - **Forbidden anywhere**: methods, flags, or columns that grant, revoke, or store an *access* role (`grantManagerAccess`, `isManager`, `role: 'manager'` on a user row, etc.). Access roles (Self / Manager-line / PP / Colleague) exist only as the computed output of tier resolution — see [access-control.md](access-control.md).
+
+## Fakes, mocks, and stubs — scope test (AD-15)
+
+**Before adding any `Fake`/`Mock`/`Stub`/interim adapter anywhere, say out loud which story, epic, or bounded context owns building the real thing.**
+
+- **Owned by the story/epic you are building right now → build it for real.** Faking your own acceptance criterion doesn't finish the story, it disguises an unfinished one behind a green test. This is not a judgment call to weigh against schedule pressure — it already went wrong once (a `FakePhotoStorageAdapter` was built for Story 1.3, whose entire deliverable *is* photo storage) and is now a hard rule. Building it for real means following the pattern above end to end — a port in `domain/interfaces/`, a real adapter in `infrastructure/`, wired through `domain/services/` — even if the real thing means standing up a brand-new module. Reference precedent: `src/storage/` (`ObjectStoragePort` + real `S3StorageAdapter`, LocalStack for local/CI, real S3 in prod). There is **no adapter-level fake for storage anywhere in the codebase** — production never runs the test suite, so a fake would exist only to hide unfinished work.
+- **The real implementation needs a technology choice nobody has made yet → stop and ask.** Don't default to "whatever's easiest to fake" and don't silently pick a provider. Flag it to the architect/user, get the answer, then build the real module against it. A Deferred item in the spine is exactly this situation — it means "not decided," not "free to assume."
+- **Owned by a different, not-yet-built story/epic/context → a fake here is correct, not a shortcut.** This is AD-3's E2E-fake category. Reference precedent: `MagicLinkDispatcherFake` — Story 1.1 triggers a magic-link dispatch as a side effect of registration, but the real email-sending adapter is Epic 2's job, so Story 1.1 fakes that one port and is still genuinely, fully done.
+
+**A story or PR is not done if any of its own acceptance criteria is satisfied by a fake.** "The tests are green" is not evidence of completion when a fake is what turned them green — check what's standing behind every port a story's tests exercise before calling it finished.
 
 ## Naming conventions
 
