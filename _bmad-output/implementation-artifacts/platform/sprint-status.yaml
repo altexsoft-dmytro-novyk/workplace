@@ -1,0 +1,36 @@
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created, ready for development
+#   - in-progress: Developer actively working on implementation
+#   - review: Implementation complete, ready for review
+#   - done: Story completed
+
+# SOURCE:
+#   Sprint Change Proposal 2026-08-27 — Platform Spec v1.5 Alignment
+#   Epic file: _bmad-output/planning-artifacts/platform/epics.md
+
+generated: 08-27-2026 16:16
+last_updated: 08-27-2026 16:16
+project: people management
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts/platform
+development_status:
+  epic-platform-spec-v1-5-alignment: backlog
+  p-1-changelog-traceability-matrix: backlog
+  p-2-platform-prd-addendum-drift-close: backlog
+  p-3-access-control-spec-suite-alignment: backlog
+  p-4-architecture-binding-updates: backlog
+  p-5-dashboards-v1-5-fixed-facts: backlog
+  p-6-platform-test-design-refresh: backlog
+  p-7-um-planning-residual: backlog
+  p-8-doc-pass-create-path-removal: backlog
+  p-9-register-epic-in-platform-sprint-status: done
+  epic-platform-spec-v1-5-alignment-retrospective: optional

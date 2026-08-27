@@ -2,7 +2,7 @@
 title: User Management — PRD
 status: draft
 created: 2026-08-20
-updated: 2026-08-26
+updated: 2026-08-27
 ---
 
 # User Management — PRD
@@ -67,13 +67,13 @@ No `updatedAt`/`updatedBy` — an event is an immutable fact, not a mutable reco
 
 ## Functional Requirements — Account & Authentication
 
-- **FR-1.** The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap) — not through the registration flow below.
-- **FR-2.** Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism (temporary, ahead of SSO). No password is ever stored.
-- **FR-3.** Completing the registration form does not log the user in directly — it triggers the same magic-link email used for every subsequent login. There is no separate "invite link" mechanism.
-- **FR-4.** Resolved: HR Admin submits the registration form on the new hire's behalf (not self-registration). `isActive` alone is sufficient — no intermediate "not yet activated" state is needed, since HR Admin-entered records go straight to `isActive: true` and the magic link (FR-3) is the activation-equivalent step. **Resolved 2026-08-25:** `isActive` is not a status modeled on anything in project-requirements.md — the source document never describes a deactivation feature or an active/inactive state anywhere in §1-10. It exists purely as a technical soft-delete mechanism: `UserEvents` and `Relationship` rows reference `User` by FK and must stay valid after someone leaves the company, so the row is flipped inactive rather than removed. Product decision: keep `isActive` as-is on this basis. It remains a distinct concept from S4's sourced "employment status" field (unrelated, narrower-access table, still unbuilt/deferred for this PRD) — don't conflate the two if/when S4 is eventually built.
+- **FR-1.** The very first `User` in the system is created by the population seed/import script and assigned the HR Admin functional role directly (AD-12 bootstrap). There is no HTTP user-creation / registration flow (§4.17).
+- **FR-2.** Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism for the seeded population. No password is ever stored. No SSO and no Active Directory in scope (§4.17, §10).
+- **FR-3.** First and subsequent logins use the same magic-link request/consume flow. Completing seed/import does not establish a session. There is no separate invite-link or registration-form login path.
+- **FR-4.** Employee population is imported from the seeded timetracker list only (§4.17). Creating employees via API or UI is out of scope. **Resolved 2026-08-25 (retained):** `isActive` is not a status modeled on anything in project-requirements.md — the source document never describes a deactivation feature or an active/inactive state anywhere in §1-10. It exists purely as a technical soft-delete mechanism: `UserEvents` and `Relationship` rows reference `User` by FK and must stay valid after someone leaves the company, so the row is flipped inactive rather than removed. Product decision: keep `isActive` as-is on this basis. It remains a distinct concept from S4's sourced "employment status" field (unrelated, narrower-access table, still unbuilt/deferred for this PRD) — don't conflate the two if/when S4 is eventually built.
 
 ## Open Questions
 
-1. Account provisioning — resolved via seed import (FR-4, §4.17).
+1. Account provisioning — resolved via seed import (FR-4 / FR-4a, §4.17). HTTP registration retired.
 2. Department & Project CRUD — out of scope for this PRD; department entity per §4.17.
 3. Reports-to hierarchy — no external sync; assignment via change-organisational-relationships permission and `POST`/`DELETE /users/:id/relationships` (`type: 'direct'`).

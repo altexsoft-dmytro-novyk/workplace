@@ -25,13 +25,13 @@ The `User` entity in this PRD carries only S1-identity-card fields (see [databas
 
 ## Canonical personas
 
-Intended to reuse the cast seeded for access-control's suite so relationships stay consistent across both — but that suite doesn't exist on disk yet (see the Scope note above), so the table below is this suite's own working definition of each persona, not an import from an established fixture. Reconcile against access-control's fixture once it's authored. Plus two new hires for the registration story:
+Intended to reuse the cast seeded for access-control's suite so relationships stay consistent across both — but that suite doesn't exist on disk yet (see the Scope note above), so the table below is this suite's own working definition of each persona, not an import from an established fixture. Reconcile against access-control's fixture once it's authored. Personas are expected from the **seeded population** (Story 1.1 / `um-seed-*`). CAP-1 HTTP registration (`um-reg-01`..`15`) is **retired / superseded** (spec v1.5).
 
 | Persona | Role in this suite |
 | --- | --- |
-| **Root** | HR Admin functional role. Creates users, deactivates users, manages relationships. |
-| **Nina** | New hire. Does not exist until `registration/um-reg-01` creates her — her target id is the response of that call, not a seeded fixture. |
-| **Tomas** | Second new hire, created only by `registration/um-reg-05`. Kept distinct from Nina so the no-session case does not collide with the success case over one `workEmail`. |
+| **Root** | HR Admin functional role (seed bootstrap). Deactivates users, manages relationships. Does **not** create employees via `POST /users`. |
+| **Nina** | Seeded employee used where scenarios previously assumed a registration create target. Identity comes from seed/import, not `um-reg-01`. |
+| **Tomas** | Second seeded employee (formerly registration-only fixture). Prefer distinct seeded rows over HTTP create. |
 | **Alice** | Existing employee (reports to Bob, PP Paula). Subject of profile-edit, auth, career-timeline, and relationship scenarios. |
 | **Bob** | Alice's **direct** unit manager. Edits Alice's identity fields; manually adds/corrects her career-timeline entries under DEC-UM-001 (assigned PP + direct UM write). |
 | **Paula** | Alice's assigned people partner. Manually adds/corrects career-timeline entries. |
@@ -42,7 +42,8 @@ Intended to reuse the cast seeded for access-control's suite so relationships st
 
 | Folder | Covers | Files |
 | --- | --- | --- |
-| `registration/` | FR-3/FR-4/FR-5/FR-6: create, validation, uniqueness, normalization, rehire, dispatch durability, birthday pairing | 15 |
+| `registration/` | **RETIRED / SUPERSEDED (v1.5)** — former CAP-1 `um-reg-01`..`15` HTTP create. Do not translate to stage-2 for product create. Replaced by Story 1.1 seed scenarios (`um-seed-01`..`03`, folder TBD under `seed/`). | 15 (archived) |
+| `seed/` | FR-1/FR-4a/FR-5a: population import, no `POST /users`, bootstrap HR Admin (Story 1.1) | 0 (to author) |
 | `auth/` | FR-2/FR-7: magic-link request/consume, security edge cases | 6 |
 | `profile/` | FR-8: Manager-line edits, Self photo upload, uniqueness on PATCH | 4 |
 | `deactivation/` | FR-9: soft delete, active-list exclusion | 3 |

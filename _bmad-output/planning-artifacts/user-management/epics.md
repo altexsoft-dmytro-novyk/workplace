@@ -15,7 +15,7 @@ inputDocuments:
 
 This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
 
-Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../../docs/architecture/api-conventions.md), [database-schema.md](../../../../docs/architecture/database-schema.md), and the existing stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../../docs/test-cases/user-management/README.md) (24 files, status: draft, pending developer approval).
+Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../../docs/architecture/api-conventions.md), [database-schema.md](../../../../docs/architecture/database-schema.md), and the stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../../docs/test-cases/user-management/README.md). **Note (2026-08-27):** CAP-1 `registration/um-reg-*` retired per spec v1.5; Story 1.1 uses `um-seed-*`.
 
 ## Requirements Inventory
 
@@ -23,15 +23,15 @@ Supporting sources folded in for precise, testable acceptance criteria (endpoint
 
 **Explicitly numbered in the PRD ("Functional Requirements — Account & Authentication"):**
 
-- FR-1: The very first `User` in the system is created by a seed script and assigned the HR Admin functional role directly (AD-12 bootstrap) — not through the registration flow below.
-- FR-2: Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism (temporary, ahead of SSO). No password is ever stored.
-- FR-3: Completing the registration form does not log the user in directly — it triggers the same magic-link email used for every subsequent login. There is no separate "invite link" mechanism.
-- FR-4: HR Admin submits the registration form on the new hire's behalf (not self-registration). `isActive` alone is sufficient — no intermediate "not yet activated" state; HR-Admin-entered records go straight to `isActive: true` and the magic link (FR-3) is the activation-equivalent step.
+- FR-1: The very first `User` in the system is created by the population seed/import script and assigned the HR Admin functional role directly (AD-12 bootstrap). There is no HTTP user-creation / registration flow (§4.17).
+- FR-2: Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism for the seeded population. No password is ever stored. No SSO and no Active Directory in scope (§4.17, §10).
+- FR-3: First and subsequent logins use the same magic-link request/consume flow. Completing seed/import does not establish a session. There is no separate invite-link or registration-form login path.
+- FR-4 / FR-4a: Employee population is imported from the seeded timetracker list only (§4.17). Creating employees via API or UI is out of scope. `isActive` remains a technical soft-delete flag (not S4 employment status).
 
 **Derived from the PRD's Scope / Data Model prose (not literally numbered FR-n in the source, but stated as in-scope capability) and cross-checked against the existing test-case folders — sourced, not invented:**
 
-- FR-5 *[PRD Scope + Data Model — User entity table; test-cases/registration/]*: HR Admin can create a `User` record with the S1 identity-card fields (`firstName`, `lastName`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`, `photo`, `ttId`). Birthday is two separate fields (day 1-31, month 1-12), no year — §3.2 S1 content is literally "birthday (day and month)"; supersedes an earlier single-`birthDate`-with-year design (resolved 2026-08-25).
-- FR-6 *[PRD Data Model — `workEmail`/`ttId` notes; test-cases README "uniqueness constraints on write"]*: `workEmail` and `ttId` are enforced unique at write time (registration and profile edit).
+- FR-5a *[PRD Scope + Data Model — User entity table; Story 1.1 seed]*: Seed/import populates `User` rows with S1 identity-card fields (`firstName`, `lastName`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`, `photo`, `ttId`). Birthday is two separate fields (day 1-31, month 1-12), no year — §3.2 S1 content is literally "birthday (day and month)". HTTP `POST /users` create is retired (v1.5 / AD-14).
+- FR-6 *[PRD Data Model — `workEmail`/`ttId` notes; test-cases README "uniqueness constraints on write"]*: `workEmail` and `ttId` are enforced unique at write time (seed/import integrity and profile edit).
 - FR-7 *[PRD FR-2 mechanics; test-cases/auth/]*: A user can request a magic link by `workEmail` and consume the returned token to establish a session.
 - FR-8 *[PRD Data Model — "the one Self-writable identity-card field per §3.2"; test-cases/profile/]*: An entitled actor (Self / Manager-line / PP, per access-control) can read and edit S1 identity-card fields via `GET`/`PATCH /users/:id`; `photo` is the one field Self can write directly, via `PUT /users/:id/photo`.
 - FR-9 *[PRD Data Model — `User.isActive`; test-cases/deactivation/]*: HR Admin can deactivate a `User` (`DELETE /users/:id`), flipping `isActive` to `false`; the record is preserved and excluded from active-only views. **Note (resolved 2026-08-25):** project-requirements.md never describes a deactivation feature or an active/inactive status anywhere in §1-10 — `isActive` is a technical soft-delete necessity (`UserEvents`/`Relationship` rows reference `User` by FK and must stay valid after someone leaves), not a sourced business requirement, and is distinct from S4's sourced "employment status" field (unbuilt/deferred). Product decision: keep `isActive` as-is on that basis.
@@ -84,7 +84,7 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 | FR-9 | Epic 1 — deactivation capability soft-deletes a `User` |
 | FR-16 | Epic 1 — `GET /users` list with pagination + base filters |
 | FR-2 | Epic 2 — passwordless magic-link is the sole login mechanism |
-| FR-3 | Epic 2 — first login uses magic-link (no registration auto-login) |
+| FR-3 | Epic 2 — magic-link login; import does not establish a session |
 | FR-7 | Epic 2 — request magic link, consume token, establish session |
 | FR-10 | Epic 3 — system auto-writes `UserEvents` on tracked change |
 | FR-11 | Epic 3 — assigned PP / direct UM manually add timeline entry |
@@ -135,74 +135,25 @@ As the system operator,
 I want the employee population imported from the seeded timetracker list,
 So that all features operate over a fixed set of users without any creation, AD, or SSO provisioning flow.
 
+**Stage-1 sub-deliverables (AD-1):** `um-seed-01` import success; `um-seed-02` no `POST /users` create path; `um-seed-03` bootstrap HR Admin present. Author under `docs/test-cases/user-management/seed/` (or equivalent). CAP-1 `um-reg-01`..`um-reg-15` are **retired / superseded** — do not translate to stage-2 for product create.
+
 **Acceptance Criteria:**
 
 **Given** a fresh, empty database
-**When** the seed script runs
-**Then** exactly one `User` row is created and assigned the HR Admin functional role directly, not through this story's endpoint
-**And** this bootstrap behavior's own acceptance test is specified to live in access-control's `fc-03` — not duplicated here (FR-1, AD-12). **Note (2026-08-25):** the access-control test-case suite is not yet authored on disk; until it exists, this bootstrap behavior has no approved scenario anywhere.
+**When** the population seed/import script runs against the delivered seeded timetracker list (§4.17)
+**Then** one `User` row exists per seeded employee with S1 identity fields populated from the list
+**And** `workEmail` and `ttId` (where present) are unique across imported rows (FR-5a, FR-6)
+**And** no HTTP `POST /users` path is required or used for this outcome (AD-14, §4.17)
+**And** exactly one bootstrap `User` holds the HR Admin functional role via seed (FR-1, AD-12); bootstrap entitlement proof remains owned by access-control's `fc-03` when that suite exists — not duplicated here (traces `um-seed-01`, `um-seed-03`)
 
-**Given** Root holds the HR Admin functional role and no existing `User` has Nina's `workEmail`
-**When** Root submits `POST /users` with Nina's S1 fields
-**Then** the response is `201` with a new `id`, `isActive: true`, and the submitted fields
-**And** the body contains no password or credential field (FR-4, FR-5; traces `um-reg-01`)
+**Given** the seed/import completed successfully
+**When** an entitled actor lists or reads users (Stories 1.2 / 1.5 surfaces)
+**Then** every seeded employee is addressable as an existing `User` (`isActive: true` unless the seed marks otherwise)
+**And** each imported `User` has a system `UserEvents` `joined_company` entry dated from seed data / import (FR-5a / FR-10 wiring for import — not via registration)
 
-**Given** Root creates Nina via `POST /users`
-**When** the creation succeeds
-**Then** the response contains no `accessToken`/`sessionToken`/`Set-Cookie`
-**And** a magic-link dispatch fires as a side effect, identical to Nina's future login flow (FR-3; traces `um-reg-05`). Implementation note: registration calls an outbound port for this dispatch — Epic 2 supplies the real adapter later; this story's own E2E test binds the port to a fixture-backed fake per AD-3, so it doesn't block on Epic 2.
-
-**Given** no caller, or one with no valid session token
-**When** `POST /users` is requested
-**Then** the response is `401` and no row is created (traces `um-reg-02`)
-
-**Given** Ida, authenticated and holding the custom functional role *IT Campaigns* (only permission: *create form campaigns*) but not user creation
-**When** Ida attempts `POST /users`
-**Then** the response is `403` and no row is created (DEC-UM-002; traces `um-reg-03`)
-
-**Given** an existing `User` with `workEmail: alice@company.example`
-**When** Root submits `POST /users` reusing that `workEmail`
-**Then** the response is `409` and no new row is created (FR-6; traces `um-reg-04`)
-
-**Given** Root, entitled to create users
-**When** Root submits a payload missing one or more non-nullable S1 columns (`firstName`, `lastName`, `position`, `country`, `city`, `workEmail`, `companyJoinDate`)
-**Then** the response is `400` naming the missing fields, not a `500` from a database constraint (traces `um-reg-06`)
-
-**Given** Root, and Colin already holding `ttId: "tt-1042"`
-**When** Root submits a registration payload reusing that `ttId`
-**Then** the response is `409` and no new row is created; the constraint holds on create the same way `um-pf-04` proves it holds on edit (FR-6; traces `um-reg-07`)
-
-**Given** Root, and no existing user on Nina's `workEmail`
-**When** two `POST /users` requests for that address are submitted concurrently
-**Then** exactly one `201` and one `409` result, never two `201`s and never a `500` — the database constraint is the arbiter when both requests clear the application's uniqueness read together (FR-6, AD-5; traces `um-reg-08`)
-
-**Given** Root, entitled to create users
-**When** Root submits a payload with a malformed `workEmail` and every other field valid
-**Then** the response is `400` naming `workEmail` (traces `um-reg-09`)
-
-**Given** Root
-**When** Root submits a payload with a client-supplied `id`, `createdAt`, or `createdBy`
-**Then** the response is `400` — the server does not silently strip caller-supplied audit or identity fields (DEC-UM-006; traces `um-reg-10`)
-
-**Given** Colin exists with `workEmail: colin@company.example` (normalized storage)
-**When** Root submits a create or collision payload using whitespace or casing variants of that address
-**Then** normalization applies before validation, storage, lookup, and uniqueness — the variant resolves to `409`, not a second row (DEC-UM-007; traces `um-reg-11`)
-
-**Given** Colin was deactivated and retains his original `workEmail`
-**When** Root submits `POST /users` with the same normalized email, simulating a mistaken "new hire" registration for a returning employee
-**Then** no second `User` row is created for that normalized email — identity and history stay on Colin's original row (DEC-UM-009; traces `um-reg-12`)
-
-**Given** Root creates a new hire and the transaction commits the `User`, `joined_company` event, and durable dispatch intent
-**When** the outbound email transport throws after the transaction commits
-**Then** the response is still `201`, the `User` and `joined_company` event survive, and delivery state is observable as pending/failed and retryable — registration does not roll back (DEC-UM-008, NFR-3; traces `um-reg-13`)
-
-**Given** Root, entitled to create users
-**When** Root submits a payload with both `birthDay` and `birthMonth` set to valid values
-**Then** the response reflects both values exactly as submitted, with no year captured or invented (traces `um-reg-14`)
-
-**Given** Root, entitled to create users
-**When** Root submits a payload where `birthDay`/`birthMonth` are only partially supplied, or either value is out of its valid range (`birthDay` 1-31, `birthMonth` 1-12)
-**Then** the response is `400` naming the offending field, and no row is created (traces `um-reg-15`)
+**Given** the application is running after seed
+**When** any client calls `POST /users`
+**Then** the route is absent or permanently rejected (no create capability) — product create-path is out of scope; CAP-1 HTTP registration is retired (traces `um-seed-02`)
 
 ### Story 1.2: View and Edit an Employee's Identity-Card Fields
 
