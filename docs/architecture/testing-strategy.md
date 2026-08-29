@@ -1,6 +1,6 @@
 # Testing Strategy — the Three-Stage Gate
 
-Binding rules for how every feature is built. Spine: AD-1, AD-3, AD-4, AD-15.
+Binding rules for how every feature is built. Spine: AD-1, AD-3, AD-4, AD-15, AD-19, AD-20.
 
 ## The gate (AD-1) — no exceptions, no reordering
 
@@ -8,7 +8,7 @@ Every feature, every developer, in this order:
 
 1. **Scenario document** in `/docs/test-cases/`, written line-by-line:
    *actor (who, with which relationships/roles) → request (endpoint, payload) → expected outcome (status, body shape, what is absent)*.
-   Every scenario cites the requirements section it implements (e.g. `§3.2 S6 / Manager line`, `§2.3 removing a permission`).
+   Every scenario cites the requirements section it implements (e.g. `§3.2 S6 / Project line`, `§2.3 removing a permission`).
    The authoring pattern — folder structure, file skeleton (`inputURL` / `inputRequest` / `expectedResult`), granularity and status-code conventions — is defined in [/docs/test-cases/README.md](../test-cases/README.md); [access-control/](../test-cases/access-control/) is the reference implementation.
    → **Approved by a developer** before anything else is written.
 2. **E2E test** translated from the approved scenario — the scenario is the script, the test follows it line by line.
@@ -29,6 +29,10 @@ A story's tests passing is not proof the story is finished if a fake is what mad
 
 Negative cases are first-class: every `—` cell of the §3.2 access matrix, unflagged S7 records against both the employee and a PM, the colleague whitelist — each is its own scenario (§9 Definition of Done requires them).
 
+The narrowed Project-line cells (S2/S3 denied, S5 CV/certificates only), named-recipient share links, organisational self-assignment denial/journaling, runtime role creation, and departure revocation require explicit regression scenarios. If good-to-have notifications are built, automate negative content checks per notification type and audience; delivery totals are not a privacy oracle.
+
+For AD-19/AD-20, stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario still stops for its own human approval before stage 2.
+
 ## What "E2E" means here (AD-3)
 
 Real HTTP request → real NestJS router → real access resolution → **real test database** (PostgreSQL, migrated schema, seeded fixtures).
@@ -36,6 +40,8 @@ Real HTTP request → real NestJS router → real access resolution → **real t
 Faked: the outbound integration ports (timetracker, PeopleForce) — rebound to fixture-backed fakes via their DI tokens in the test module (see [nestjs-di-tokens.md](nestjs-di-tokens.md)). **Live third-party calls in the E2E suite are forbidden.**
 
 Not faked: the database, the router, authentication, the AccessControl facade, tier resolution. If the test doesn't assert what the API actually returns, it isn't a gate test.
+
+Separately from deterministic E2E automation, release validation must exercise the real timetracker test environment over the provided seeded population (§9). That manual/integration smoke evidence is required for completion and does not weaken the no-live-calls E2E rule.
 
 ## Test data isolation (DEC-UM-010)
 

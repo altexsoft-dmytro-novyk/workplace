@@ -1,16 +1,20 @@
 # Domain-Driven Design & Hexagonal Structure
 
-Binding rules for how backend code is organized. Spine: AD-2, AD-5, AD-6, AD-15.
+Binding rules for how backend code is organized. Spine: AD-2, AD-5, AD-6, AD-15…AD-21.
 
 ## Bounded contexts (AD-5)
 
 The backend is a set of bounded contexts under `src/`. Confirmed so far:
 
-- `user-management` — org facts: users, relationships (reports-to, project membership, mentor pairing — `Relationship.type='mentorship'`, [database-schema.md](database-schema.md)), projects, departments; also owns the `UserEvents` career-timeline log (§4.9: joining, grade/position/department change, employment-type transition, extended leave, mentorship pair start/end) — see [prd-user-management](../../_bmad-output/planning-artifacts/prds/prd-user-management-2026-08-20/prd.md). **Placement is provisional**: `UserEvents` writes are triggered by an automated mechanism reacting to changes across other contexts (grade/department/mentorship), which is cross-cutting by nature. **The mechanism itself is pinned** (spine AD-11): synchronous, in the same transaction as the domain mutation that causes it, via an explicit call from that use-case — no event bus, no generic table-change listener, in iteration 1. Every feature owner wiring a new tracked change (e.g. a future `grade_change`) follows this one pattern, not their own. Kept here because (a) AD-2 bars direct joins/queries into another context's tables — splitting it out would forbid the plain `User` ⋈ `UserEvents` read the profile page needs — and (b) nothing reads it outside that one page today. Revisit as its own context only if a design emerges that avoids needing that join.
+- `user-management` — seeded users, org facts (reports-to, People Partner, and project membership), projects, departments, time-bounded employment status, durable Departure commands, and the `UserEvents` career-timeline log. Users are imported from the provided seeded population; there is no employee-registration/create capability (AD-16). PP assignment follows AD-19. `UserEvents` writes are synchronous in the same transaction as the causing use case — no event bus or generic table-change listener in this iteration.
 - `access-control` — the policies engine; covers **both** role dimensions (access roles and functional roles)
 - `dashboards` — dashboard engine (design pending, see [dashboards.md](dashboards.md))
 
-Pending confirmation (do not create until the architect confirms): profile, resourcing, cds, mentorship, risk, feedback, campaigns.
+Pending context-boundary confirmation: profile, resourcing, cds, mentorship, risk, feedback, campaigns. Their v1.5 feature semantics are already fixed and must be recorded in scenario contracts before the context design is approved (AD-18). In particular, mentorship requires durable pair records with closure notes (AD-17), and resourcing requests route by department.
+
+The AD-20 executor is a user-management application orchestrator. It calls exported application services of action-items, mentorship, access-control, and other owning contexts under one shared PostgreSQL unit of work; it never reaches into their domain or infrastructure folders. No event bus or generic table listener substitutes for this explicit cross-context transaction.
+
+The shared lifecycle unit of work is an application-level contract backed by one Prisma/PostgreSQL transaction. Participating application services expose `applyDepartureEffects({departureId, leaseToken, tx})`-shaped operations, accept the same transaction scope, and must not open independent nested transactions. The Departure row is locked and its current token is verified before any effect; effect records/events use a unique departure mutation key where the owning table can otherwise duplicate an outcome. A stale executor returns ownership-lost/no-op and cannot update retry state.
 
 ## Internal layout — identical in every context (AD-2, AD-5)
 
@@ -46,7 +50,7 @@ Entities are behavior-rich classes, not data bags. State changes go through inte
 ## Vocabulary invariant (AD-6) — enforced in review
 
 - The **only** role-mutation methods in the codebase: `assignFunctionalRole`, `revokeFunctionalRole`. They operate on functional roles exclusively.
-- **Forbidden anywhere**: methods, flags, or columns that grant, revoke, or store an *access* role (`grantManagerAccess`, `isManager`, `role: 'manager'` on a user row, etc.). Access roles (Self / Manager-line / PP / Colleague) exist only as the computed output of tier resolution — see [access-control.md](access-control.md).
+- **Forbidden anywhere**: methods, flags, or columns that grant, revoke, or store an *access* role (`grantManagerAccess`, `isManager`, `role: 'manager'` on a user row, etc.). Access audiences (Self / Reporting line / Project line / PP / Colleague) exist only as computed output of audience resolution — see [access-control.md](access-control.md).
 
 ## Fakes, mocks, and stubs — scope test (AD-15)
 
@@ -54,7 +58,7 @@ Entities are behavior-rich classes, not data bags. State changes go through inte
 
 - **Owned by the story/epic you are building right now → build it for real.** Faking your own acceptance criterion doesn't finish the story, it disguises an unfinished one behind a green test. This is not a judgment call to weigh against schedule pressure — it already went wrong once (a `FakePhotoStorageAdapter` was built for Story 1.3, whose entire deliverable *is* photo storage) and is now a hard rule. Building it for real means following the pattern above end to end — a port in `domain/interfaces/`, a real adapter in `infrastructure/`, wired through `domain/services/` — even if the real thing means standing up a brand-new module. Reference precedent: `src/storage/` (`ObjectStoragePort` + real `S3StorageAdapter`, LocalStack for local/CI, real S3 in prod). There is **no adapter-level fake for storage anywhere in the codebase** — production never runs the test suite, so a fake would exist only to hide unfinished work.
 - **The real implementation needs a technology choice nobody has made yet → stop and ask.** Don't default to "whatever's easiest to fake" and don't silently pick a provider. Flag it to the architect/user, get the answer, then build the real module against it. A Deferred item in the spine is exactly this situation — it means "not decided," not "free to assume."
-- **Owned by a different, not-yet-built story/epic/context → a fake here is correct, not a shortcut.** This is AD-3's E2E-fake category. Reference precedent: `MagicLinkDispatcherFake` — Story 1.1 triggers a magic-link dispatch as a side effect of registration, but the real email-sending adapter is Epic 2's job, so Story 1.1 fakes that one port and is still genuinely, fully done.
+- **Owned by a different, not-yet-built story/epic/context → a fake here is correct, not a shortcut.** This is AD-3's E2E-fake category. Authentication may fake an out-of-scope delivery adapter in E2E, but no fake may stand in for the required seeded-population import or timetracker integration.
 
 **A story or PR is not done if any of its own acceptance criteria is satisfied by a fake.** "The tests are green" is not evidence of completion when a fake is what turned them green — check what's standing behind every port a story's tests exercise before calling it finished.
 
