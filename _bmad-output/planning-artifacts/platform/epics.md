@@ -133,3 +133,23 @@ So that Alignment work is visible for the weekend build.
 
 - `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` lists this epic and P-1…P-9.
 - No Platform stories nested under UM `epic-1`…`epic-4` keys.
+
+## Epic: Access Control Foundation
+
+Deliver a narrow, reusable audience-resolution boundary without taking ownership of User Management routes, profile projection, or UI. This is a two-day technical foundation; it does not replace the full Access Control facade program or its complete Stage-1 suite.
+
+### Story ACF-1: Resolve Phase-0 Audiences
+
+As a consuming bounded context,
+I want a fail-closed Access Control facade that resolves Phase-0 relationship audiences for one or more employee targets,
+So that User Management can later replace its interim target-access adapter without re-implementing relationship logic.
+
+**Implementation gate:** The dedicated `spec-access-control-audience-foundation` Stage-1 scenarios must receive independent human AD-1 approval, then be translated to independently approved red E2E before production code begins.
+
+**Acceptance Criteria:**
+
+- `resolveAudiences(viewerId, employeeIds)` returns only Self, Reporting line, direct People Partner, or Colleague for every requested target; Self is exclusive of other audiences.
+- Reporting line follows only live `Relationship type='direct'` edges; direct People Partner follows only the target's assigned `people_partner` edge.
+- Empty input returns an empty result without database queries; broken or orphaned relationship data reduces access and never grants it.
+- No User Management controller, guard, adapter, or frontend file changes are included.
+- No Project, Department, PP HR-line, shared-link, full-profile, functional-permission, or section-matrix decision is enabled by this story.
