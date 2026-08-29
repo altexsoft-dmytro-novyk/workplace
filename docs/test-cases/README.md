@@ -2,7 +2,7 @@
 
 **Binding for every feature area.** This is stage 1 of the three-stage quality gate ([testing-strategy.md](../architecture/testing-strategy.md), AD-1): scenario doc → developer approval → E2E translated from it line by line (committed red) → production code. No production code without an approved scenario file behind it.
 
-`access-control/` was meant to be the reference implementation to copy — its shape is fully specified in [SPEC-access-control-test-cases](../../_bmad-output/specs/spec-access-control-test-cases/SPEC.md), but as of 2026-08-25 the directory and its scenario files have not actually been authored yet. Until it lands, [`user-management/`](user-management/) is the closest thing to a worked example on disk; treat any "proven in access-control's suite" claim you find elsewhere as pending, not settled.
+`access-control/` is the reference implementation — v1.5 Phase 1 scenarios live in [access-control/](access-control/) (167 draft files, 2026-08-29). Contract: [SPEC-access-control-test-cases](../../_bmad-output/specs/spec-access-control-test-cases/SPEC.md). [`user-management/`](user-management/) remains the approved worked example for workflow scenarios; treat "proven in access-control's suite" as **draft until AD-1 per-file approval**.
 
 ## Structure
 

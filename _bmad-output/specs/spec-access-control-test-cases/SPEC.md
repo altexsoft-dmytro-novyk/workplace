@@ -2,76 +2,80 @@
 id: SPEC-access-control-test-cases
 companions:
   - ../../../docs/test-cases/access-control/README.md
+  - ../spec-access-control-facade-audience-resolution/facade-contract.md
   - ../../../docs/architecture/access-control.md
+  - ../../implementation-artifacts/access-control/deferred-work.md
 sources: []
 ---
 
-> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The README companion indexes the 202 scenario files that carry the request-level assertions.
+> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. **171 Phase 1 scenario files are drafted** under `docs/test-cases/access-control/` — pending per-file AD-1 approval before stage-2 E2E.
 
-# Access-Control Test-Case Suite
+# Access-Control Test-Case Suite (Phase 1)
 
 ## Why
 
-A mandate to meet: access-control correctness is the project's primary quality attribute (§7) and any leak is a critical defect (§3.3.1); the Definition of Done (§9) demands tests per audience, per relationship path and per section, with named negatives. The team's own quality gate (AD-1) requires an approved prose scenario per feature before any E2E test or production code exists. This suite is that stage-1 artifact for the entire access-control surface — misunderstandings get caught in prose, the cheapest stage.
+A mandate to meet: access-control correctness is the project's primary quality attribute (§7) and any leak is a critical defect (§3.3.1); the Definition of Done (§9) demands tests per audience, per relationship path, and per section, with named negatives. AD-1 requires an approved prose scenario per feature before any E2E test or production code exists. The facade spec (`spec-access-control-facade-audience-resolution`) blocks implementation until this suite exists — but the prior contract indexed 202 withdrawn pre-v1.5 files that merged Reporting and Project into one "Manager line." This spec is the refreshed v1.5 stage-1 contract aligned to the facade's Phase 1 gates.
 
 ## Capabilities
 
-- **CAP-1** Tier derivation scenarios
-  - **intent:** Every §2.1 relationship path that yields or revokes an access tier is specified as a runnable scenario.
-  - **success:** `tier-derivation/` holds one file each for Self, Colleague, direct, transitive, PM, DM, compound chain, PP, HR-line-above-PP, per-target evaluation in one session, and both revocation paths (project end, edge removal); each translates to a red E2E without extra context.
-- **CAP-2** Matrix cell scenarios
-  - **intent:** Every §3.2 cell for Self / Manager line / PP / Colleague is asserted per action, including flag-gated records and field-level rules.
-  - **success:** One file per cell **per read/write action** under `matrix/sNN-*/` (148 files); negative files exist for every `—` cell (read and write paths separately); unflagged S7 is tested against both the employee and a PM; S16 covers all three visibility levels; HR Admin covered in `matrix/hr-admin/`.
-- **CAP-3** Functional-role scenarios
-  - **intent:** Every §2.3 bullet — runtime extensibility, UI assignment, granular independent permissions, immediate revocation, no data-widening, AR non-extensibility — plus the 401/403/success decomposition of role management is specified.
-  - **success:** `users/roles/` UR-01..12 map onto the §2.3 requirements; UR-01/02/03 decompose role creation by auth state; UR-11 proves a permission-holding role still sees the colleague view.
-- **CAP-4** Shared-link scenarios
-  - **intent:** Every §4.8 rule — per-section selection, never-shareable set, sensitive defaults, expiry, revocation, logging, read-only, creator authorization — is specified.
-  - **success:** `shared-link/` SL-01..12; SL-02 also covers the S14 `—` cell of the shared-link column; SL-12 covers unauthenticated creation.
-- **CAP-7** Authentication scenarios
-  - **intent:** Every endpoint family rejects missing or invalid credentials before any access-tier reasoning applies.
-  - **success:** 401 scenarios exist per endpoint family (`matrix/au-01..03`, `users/roles` UR-01, SL-12, SF-07/08) and the README states the global 401 rule stage 2 applies to each real route.
+- **CAP-1** Phase 1 audience derivation
+  - **intent:** Every Self, Reporting line, PP, and Colleague resolution path — and every Phase 1 gate negative from `facade-contract.md` — is specified as a runnable scenario.
+  - **success:** `audience-derivation/` holds one file each for Self exclusivity, recursive direct Reporting, direct-PP-only, Colleague fallback, empty bulk, broken reports-to edge, orphan policy, Project withheld (PM with no other relation), no cross-kind inheritance (reports-to manager of a DM), Department policy contributing nothing, PP HR-line withheld, and each AD-20 departure position; each translates to a red E2E without extra context.
+- **CAP-2** Phase 1 matrix cell scenarios
+  - **intent:** Every §3.2 cell for Self, Reporting line, PP, and Colleague is asserted per read/write action, including flag-gated S7/S8 records and S16 visibility levels; Project line positives stay gated.
+  - **success:** Under `matrix/`, one read and one write file per applicable cell for `self/`, `reporting-line/`, `pp/`, and `colleague/`; Self §3.3/§4.3 write exceptions (S5 certificate upload, S12 IDP complete, S13 mentorship flag, S14 mark-complete) have dedicated allow + deny files; negative files exist for every `—` cell (read and write paths separately); `project-line-gate/` holds Phase 1 withhold negatives; unflagged S7 is tested against both the employee and a Reporting-line manager; S16 covers all three visibility levels for Phase 1 audiences; matrix assertions bind concrete payload fields — no stage-2 shape deferrals.
+- **CAP-3** Functional-permission boundary
+  - **intent:** The FR dimension is proven separate from audience resolution — dual gate, FR-without-audience denial, bootstrap admin ordinariness — without re-specifying the full role-catalog UI.
+  - **success:** `functional-permission/` covers: `isAllowed` true with no target audience still yields section `404`; matrix write without feature permission yields `403`; bootstrap HR Admin is an ordinary revocable FR (cross-ref `fail-closed/fc-03`). Full role-management UR scenarios belong to the deferred FR-catalog dispatch.
 - **CAP-5** Fail-closed scenarios
   - **intent:** Missing or orphaned data yields less access, never more, and no power derives from data shape (AD-11/12).
-  - **success:** `fail-closed/` FC-01..03: empty reportsTo, orphaned policy row, bootstrap admin as ordinary revocable FR.
-- **CAP-6** Cross-surface leak scenarios
-  - **intent:** No forbidden data escapes through any surface: list, export, filters, inline edit, direct requests, error responses (§3.3.1, §3.3.3, §3.3.5).
-  - **success:** `surfaces/` SF-01..06, incl. whitelist set-equality (SF-01) and indistinguishable 404s for hidden vs nonexistent sections (SF-06).
+  - **success:** `fail-closed/` FC-01..03: empty reportsTo (TopLee denial), orphaned policy row (live-grant baseline then orphan denial — sole project-line positive exception), bootstrap admin as ordinary revocable FR.
+- **CAP-7** Authentication scenarios
+  - **intent:** Representative endpoint families reject missing or invalid credentials before any access-tier reasoning applies.
+  - **success:** `auth/` holds per-family 401 scenarios for profile read, section read, and section write; the README states the global 401 rule that stage 2 applies to each real route.
 
 ## Constraints
 
-- One test case per file, written as an explicit request spec: `inputURL`, `inputRequest` (headers with `authorization`, body), `expectedResult` with HTTP status. Read and write are separate files; multiple `Test N` blocks are allowed only as probes of the same single requirement.
+- One test case per file, written as an explicit request spec: `inputURL`, `inputRequest` (headers with `authorization`, body), `expectedResult` with HTTP status. Read and write are separate files; multiple `Test N` blocks are allowed only as probes of the same single requirement or its cause→effect sequence.
 - Assertions are API-level only (§3.3.4); "not visible" means the key is absent from the payload, never null or empty.
 - Denial convention: missing/invalid token `401`; valid token without feature permission `403`; write to a readable section `403`; anything touching a `—` cell `404` with a leak-free body.
-- Every file carries a trace line to a requirements § and/or AD-n; a scenario without a trace is invalid.
+- Every file carries a trace line to a requirements § and/or AD-n; a scenario without a trace is invalid. Expected results bind HTTP status and concrete payload keys — AD-1 reviewers must be able to approve without stage-2 deferrals.
 - All files share the README's canonical persona fixture, the `Bearer <token:persona>` convention, and the canonical router-tree convention (resource root `/users`, role/permission catalog top-level `/roles`) — `docs/architecture/api-conventions.md` (spine AD-14), not placeholder vocabulary.
-- Path × section cross-product is not enumerated: paths are proven in TD-*, sections per audience in matrix-*, justified by the single-resolver design (AD-10); matrix files vary manager personas to spread path coverage.
+- Phase 1 scope is binding: Reporting line walks only `Relationship type='direct'`; PP resolves only the directly assigned endpoint; Project, Department, and PP HR-line contribute **no audience** until their contracts and AD-1 suites are approved — positives for those paths are out of scope; withhold negatives are in scope under `audience-derivation/` and `matrix/project-line-gate/`.
+- Reporting line and Project line are **separate** matrix columns and graph passes — never merge PM/DM project reach into Reporting-line scenarios.
+- Path × section cross-product is not enumerated: relationship paths are proven in `audience-derivation/`, sections per audience in `matrix/`; composition is guaranteed by the single-resolver design (AD-10).
 
 ## Non-goals
 
+- **CAP-4 (retired ID):** Shared-link scenarios (§4.8) — deferred to the separate shared-link dispatch in `deferred-work.md`; OQ2 is decided (auth required) but scenarios are not in this suite.
+- **CAP-6 (retired ID):** Cross-surface leak scenarios (list, export, filter, inline edit) — deferred to Profile Projection and list/filter/export projection specs; the facade's base section decision is the assertion surface here.
 - Performance testing of permission resolution (§7 2-second NFR) — separate work.
-- Notifications (§4.13) and analytics (§4.14) — out of scope for this iteration.
+- Notifications (§4.13) and analytics (§4.14).
 - UI rendering/hiding behavior — the API contract is the whole assertion surface.
-- Feature-workflow tests for resourcing, CDS, campaigns, mentorship beyond their access boundaries.
+- HR Admin as a data-access audience or `matrix/hr-admin/` full-profile scenarios — v1.5 makes HR Admin configuration-only (§2.2); full-profile overlay is a separate §2.4 grant, product-blocked.
+- Functional-role catalog management UI/API (`users/roles/` UR suite) — deferred FR-catalog dispatch.
+- Project-line **positive** matrix cells and timetracker sync behavior — gated on the approved assignment/freshness contract.
+- Department-walk positives and PP HR-line propagation positives — gated on the Department contract.
 - E2E test code itself — this suite is stage 1; stage 2 starts only after per-file developer approval.
 
 ## Success signal
 
-A reviewer can map every §3.2 cell, every §2.1 path, and every §9-named negative (each `—` cell, unflagged S7 vs employee and PM, colleague whitelist) to exactly one approved file; a stage-2 author picks any file and writes its red E2E without opening another document.
+When authored and AD-1 approved, a reviewer can map every Phase 1 §3.2 cell (Self, Reporting line, PP, Colleague), every Phase 1 gate row in `facade-contract.md`, and every §9-named negative (each `—` cell, unflagged S7 vs employee and Reporting-line manager, colleague whitelist via matrix colleague files) to exactly one approved file; a stage-2 author picks any file and writes its red E2E without opening another document.
 
 ## Assumptions
 
-- S1's derived subfields (manager, PP, mentor, current projects) are read-only for all audiences; the Manager-line RW cell applies to directly stored identity fields.
+- S1's derived subfields (manager, PP, mentor, current projects) are read-only for all audiences; Reporting-line and Project-line RW cells apply to directly stored identity fields only (once Project line is enabled).
 - S10/S11 `R` cells mean no write path for any audience — the data is owned by the timetracker sync.
-- The shared-link viewer is modeled as an authenticated employee without Manager/PP relation to the target (the §4.7 DM-candidate case).
-- TD-13 (department-manager tier) follows the architecture spine's Departments extension, which is not in the requirements doc — marked provisional, not for E2E translation yet.
-- S16 visibility levels grant read only; writes remain Manager/PP regardless of level.
+- DEC-UM-001 limits S9 **manual** writes to assigned PP and direct UM; Reporting-line and Project-line actors may appear in S9 **read** scenarios; write scenarios use Bob or Paula only.
+- Self write exceptions (§3.2 footnotes + §4.3): S5 certificate upload, S12 own IDP completion, S13 own mentorship flag, S14 own action-item completion — each proven separately from broader mutation denials.
+- S7/S8 record flags filter within allowed sections: employee sees only flagged records; unflagged/private records are absent.
+- Colleague S10/S11 projections are dates-only and project-name-only respectively — forbidden fields must be absent, not null.
+- Never-shareable overlay set (deferred shared-link suite): **{S3, S7, S13, S14}**; S1 default-on; all cfg sections default-off; sensitive sections require explicit re-enablement per link.
+- HR Admin (Root) holds configuration FR only — profile scenarios without a relationship-derived audience follow Colleague or denial rules, not blanket full access.
 
 ## Open Questions
 
-- OQ1: Can a user hold a project (and its people) without being manager/PP — the info-sec training case? (Already open in the architecture memlog; answer expected ~2026-08-20; may add tier scenarios.)
-- OQ2: Does opening a shared link require authentication, or is the token bearer-access?
-- OQ3: §3.1 gives HR Admin full data access while §2.3 says a functional role never widens data access — what is the sanctioned mechanism? (Behavior is asserted in `matrix/hr-admin-full-access.md`; mechanism is the architect's call.)
-- OQ4: Departments as a resource level above projects — confirmed by the requirements owner? (Gates TD-13.)
-- OQ5: §3.2 gives the whole Manager line RW on S9, but §4.9 names only "PP and UM" for manual timeline overrides — may a DM/PM edit timeline events?
-- OQ6: §4.8 never-shareable list omits S14 though the matrix marks it `—` for shared links — SL-02 follows the matrix; confirm.
+- OQ2: Which §3.2 column(s) does full-profile access equate to, and how does the overlay interact with Self? Blocks `full-profile/` scenarios.
+- OQ3 (implementation open): Nested Department membership representation, indexed department traversal plan, and event/state sync details — **fixed v1.5 behavior:** department management is a Reporting-line relation; PP HR-line propagates within the HR boundary once the Department contract is approved.
+- OQ4 (implementation open): Timetracker assignment representation, freshness query seam, and partial/intermittent-sync semantics — **fixed v1.5 behavior:** project-derived access withdraws within 15 minutes of assignment end and after four hours of failed sync.
+- OQ6: Can a user hold a project (and its people) without being manager/PP — the info-sec training case? **Resolved for Phase 1:** project membership without PM/DM policy grants no Project audience; positives deferred until product decides.

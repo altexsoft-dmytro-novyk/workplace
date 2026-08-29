@@ -1,0 +1,76 @@
+- id: "1"
+  title: Align v1.5 access-control seed fixture
+  description: >-
+    Extend the backend seed so canonical personas (Alice, Bob, Carol, Paula,
+    Pete, Dave, Frank, Hana, Colin, Root, Ida, Eve, Morgan, DueDan, DueBob,
+    DueMid, TopLee) and static graph edges match
+    docs/test-cases/access-control/README.md — shared project membership,
+    S7/S16 seed rows, and AD-20 due-departure variants included.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Scope: services/backend seed/import only. Do not implement AccessControl
+    or translate E2E yet. Seed must satisfy Preconditions in audience-derivation
+    and fail-closed scenarios without per-test HTTP relationship setup where
+    the README declares static fixture state.
+
+- id: "2"
+  title: AD-1 approve foundation scenarios
+  description: >-
+    Human peer-review and approve all draft files under audience-derivation/
+    (18), fail-closed/ (3), auth/ (3), and functional-permission/ (3).
+    Covers CAP-1 gates, CAP-3, CAP-5, CAP-7, and facade-contract.md edge rows
+    not duplicated in matrix/.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Review-only dispatch: walk each file in the four folders; confirm Scenario
+    prose, trace line, denial convention, and v1.5 vocabulary (Reporting line /
+    Project line split). Mark approved in PR; do not write production code or E2E.
+
+- id: "3"
+  title: AD-1 approve matrix — Self column
+  description: >-
+    Human approve all 38 draft files in matrix/self/, including S1 photo RW,
+    S6 Self dash cell, and S16 employee-visibility reads. CAP-2 Self slice.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Review-only. Verify each file maps to the correct §3.2 Self cell and
+    api-conventions route; split read/write files where matrix distinguishes R vs RW.
+
+- id: "4"
+  title: AD-1 approve matrix — Reporting line column
+  description: >-
+    Human approve all 36 draft files in matrix/reporting-line/, including S7 DoD
+    unflagged-note pair, S1 derived-field write denial, S16 management visibility,
+    and DEC-UM-001 S9 write actors (Bob only). CAP-2 Reporting line slice.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Review-only. Challenge any merged Manager-line language; confirm transitive
+    Carol scenarios use direct edges only.
+
+- id: "5"
+  title: AD-1 approve matrix — PP column
+  description: >-
+    Human approve all 32 draft files in matrix/pp/. CAP-2 PP slice; Phase 1
+    direct assigned PP only — no HR-line propagation positives.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    Review-only. Paula is the write actor for S9 manual paths; Hana scenarios
+    belong in audience-derivation gate negatives, not PP matrix positives.
+
+- id: "6"
+  title: AD-1 approve matrix — Colleague and project-line gate
+  description: >-
+    Human approve matrix/colleague/ (34) and matrix/project-line-gate/ (4).
+    Colleague whitelist and Phase 1 Project withhold negatives. Final stage-1 batch.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Review-only. When complete, all 171 stage-1 files are AD-1 approved and
+    README file counts match disk. Handoff: stage-2 E2E translation is
+    dispatched from spec-access-control-facade-audience-resolution/stories.yaml
+    (stories 1–2 there). This spec's scope ends here — prose only, no E2E.
