@@ -1,6 +1,6 @@
 # Database Schema — Core Tables
 
-Binding shapes for the org-fact and access-control tables. Spine: AD-7, AD-11. Prisma models must match these shapes; deviations go through the architect.
+Binding shapes for the org-fact, lifecycle, mentorship, and access-control tables. Spine: AD-7, AD-11, AD-16, AD-17, AD-19, AD-20. Prisma models must match these shapes; deviations go through the architect.
 
 ## Conventions
 
@@ -19,6 +19,10 @@ erDiagram
   User ||--o{ UserPolicies : ""
   Policies ||--o{ UserPolicies : ""
   User ||--o{ UserEvents : "userId"
+  User ||--o{ EmploymentStatus : "userId"
+  User ||--o{ Departure : "userId"
+  User ||--o{ MentorshipPair : "mentorUserId"
+  User ||--o{ MentorshipPair : "menteeUserId"
 ```
 
 ## Tables
@@ -41,9 +45,9 @@ User {
   birthDay        int, nullable          // 1-31. §3.2 S1 content is literally "birthday (day and month)" -- no year is ever captured or stored, for any audience. Replaces the earlier single full-date `birthDate` design (2026-08-25 product decision: that design invented an audience-based year-redaction rule the source never states)
   birthMonth      int, nullable          // 1-12, paired with birthDay -- both null together or both set together
   companyJoinDate date
-  isActive        boolean, default true  // soft delete. NOT a status modeled on anything in project-requirements.md -- the source never describes a deactivation feature or an active/inactive state. Exists purely as a technical necessity: UserEvents/Relationship rows reference User by FK and must stay valid after someone leaves, so the row is flagged inactive rather than removed. Distinct from S4's sourced "employment status" field (unbuilt/deferred) -- don't conflate the two (2026-08-25 product decision)
+  isActive        boolean, default true  // technical account/row-retention flag; never employment status (AD-16)
   ttId            string, nullable, unique
-  customFields    jsonb, default '{}'   // interim, ahead of the dynamic custom-fields system (custom-fields.md); DEC-UM-003
+  customFields    jsonb, default '{}'   // interim only; final storage remains open in custom-fields.md
   createdAt       timestamp
   createdBy       FK -> User
 }
@@ -51,7 +55,61 @@ User {
 
 No `updatedAt`/`updatedBy` — see Conventions above; nothing here consumes a last-touch marker.
 
-Derived, not stored: current manager and project(s) read through `Relationship` (below); people partner is a policy attachment (AD-7) — an access role per §2.1, same treatment as manager; department reads through the pending Department/Policy edge model; mentor reads through the future `mentorship` context's pair records.
+Derived, not stored: current manager, project(s), and People Partner read through `Relationship` (below); department reads through the pending Department/Policy edge model; mentor reads through `MentorshipPair`.
+
+Users are loaded only by the idempotent seeded-population import (AD-16). No request-level employee-creation API owns this table.
+
+### EmploymentStatus (AD-16)
+
+Employment status is a temporal S4 fact, not `User.isActive` and not a career-timeline event:
+
+```text
+EmploymentStatus {
+  id              uuidv7 PK
+  userId          FK -> User
+  status          'active' | 'dismissed'
+  validFrom       date
+  validTo         date, nullable
+  departureReason string, nullable
+  sourceDepartureId FK -> Departure, nullable, unique
+}
+UNIQUE: at most one row per user with validTo IS NULL
+CHECK: (status='active' AND sourceDepartureId IS NULL AND departureReason IS NULL)
+    OR (status='dismissed' AND sourceDepartureId IS NOT NULL AND departureReason IS NOT NULL)
+```
+
+Intervals are half-open `[validFrom, validTo)`: applying departure closes the current `active` row at `effectiveDate` and inserts `dismissed` from that same date. `sourceDepartureId` makes the materialized fact idempotent. There is deliberately no `departure`/`leaving` `UserEvents` type.
+
+### Departure (AD-20)
+
+The scheduled command and worker state are separate from the applied employment fact:
+
+```text
+Departure {
+  id                 uuidv7 PK
+  userId             FK -> User
+  effectiveDate      date
+  effectiveTimeZone string
+  dueAt              timestamptz
+  reason             string
+  state              'scheduled' | 'processing' | 'retry_wait' | 'applied'
+  idempotencyKey     uuid, unique
+  requestHash        string
+  attempts           int, default 0
+  lastError          string, nullable
+  nextAttemptAt      timestamptz, nullable
+  leaseUntil         timestamptz, nullable
+  leaseToken         uuid, nullable
+  appliedAt          timestamptz, nullable
+  createdAt          timestamptz
+  createdBy          FK -> User
+}
+UNIQUE: one non-applied Departure per user
+```
+
+At creation, the required startup-validated IANA setting `BUSINESS_TIME_ZONE` is snapshotted to `effectiveTimeZone` and `dueAt` is resolved once for `00:00`; every guard/worker compares stored `dueAt` with PostgreSQL time and never falls back to host/runtime local time. `requestHash` canonically includes endpoint version, user id, normalized ISO effective date, normalized reason, and creator id; replay rechecks current authorization before returning the original result. Key reuse with a different hash is `409`. The partial non-applied uniqueness and state machine use raw-SQL constraints where Prisma cannot express them. Workers claim eligible rows in stable `effectiveDate,id` order with skip-locked selection and a fresh `leaseToken`; apply/fail/reclaim locks the row and predicates on that token, so an expired/reclaimed worker cannot commit stale work. There is no terminal abandoned state.
+
+The apply transaction closes/inserts `EmploymentStatus`, deactivates the account/profile, cancels open action items, system-closes mentorship pairs, ends persisted access held by the actor, and marks the Departure applied. Every effect is keyed or constrained by `Departure.id` so uncertain-commit retries cannot duplicate it. Recording is blocked by any active v1.5 manager or PP responsibility; after scheduling, new such assignments are rejected or quarantined. Legacy blockers produce an authorized remediation incident but never delay effective access cutoff. Cancellation/rescheduling are not defined.
 
 ### UserEvents
 
@@ -73,7 +131,7 @@ UserEvents {
 }
 ```
 
-`department_change`'s payload fields will reference Department ids from a context that doesn't exist yet — reserved, unpopulated until it lands (same treatment as `User.ttId`). `mentorship_start`/`mentorship_end` now have a home: fired by `Relationship.type='mentorship'` attach/detach (see `Relationship` below) — no longer waiting on a future context.
+`department_change`'s payload fields reference Department ids once the Department edge contract lands. `mentorship_start`/`mentorship_end` are fired by `MentorshipPair` transitions (AD-17).
 
 ### Relationship (AD-11)
 
@@ -83,29 +141,50 @@ The org-fact edge table — the input the tier-resolution walk recurses over.
 Relationship {
   id            uuidv7 PK
   userId        FK -> User        // who this edge is about
-  type          'direct' | 'project' | 'mentorship'
-  reportsToUserId FK -> User, nullable    // set iff type = 'direct' (reports-to) or 'mentorship'
+  type          'direct' | 'project' | 'people_partner'
+  reportsToUserId FK -> User, nullable    // set iff type = 'direct' or 'people_partner'
   projectId     FK -> Project, nullable // set iff type = 'project'
 }
 CHECK: (type='direct' AND reportsToUserId IS NOT NULL AND projectId IS NULL)
     OR (type='project' AND projectId IS NOT NULL AND reportsToUserId IS NULL)
-    OR (type='mentorship' AND reportsToUserId IS NOT NULL AND projectId IS NULL)
-UNIQUE: one active reportsTo edge per userId (type='direct' only — the reporting relation is a tree; NOT extended to 'mentorship', no sourced one-mentor-at-a-time rule)
+    OR (type='people_partner' AND reportsToUserId IS NOT NULL AND projectId IS NULL)
+CHECK: userId <> reportsToUserId
+UNIQUE: one reportsTo edge per userId (type='direct' only — the reporting relation is a tree)
+UNIQUE: one People Partner edge per userId (type='people_partner' only)
 -- "active" means the row exists: Relationship rows are hard-deleted (see Rules), no deletedAt/isActive column
 ```
 
 Rules:
 
-- Edge types share the table but **never** a target column keyed by target *table* — `direct` and `mentorship` share `reportsToUserId` (kept, not renamed, precisely because both are the same directional shape: `userId` points "up" to `reportsToUserId` — the manager, or the mentor) because both point at `User`; `project` gets its own FK because it points at a different table. This single-table-no-per-type-column layout is what makes the table AD-10's tier walk can index cheaply — **but the walk itself still only reads `type='direct'` rows** (`access-control.md`); sharing a column is a storage fact, not a signal that `mentorship` participates in the recursive query.
+- Edge types share the table but never a polymorphic target column: `direct` and `people_partner` point to `User` through `reportsToUserId`; `project` points to `Project` through `projectId`. This keeps AD-10's audience walks indexable.
 - No `roleOnProject` field — managerial semantics live in policy attachments (AD-7).
 - Project membership derives **solely** from these rows. `Project` holds no member array; a project's members are `SELECT userId FROM Relationship WHERE projectId = :id`.
-- `type='mentorship'` carries no start/end columns of its own — attach/detach (`POST`/`DELETE /users/:id/relationships`, [api-conventions.md](api-conventions.md)) fires the matching `UserEvents.mentorship_start`/`mentorship_end` row (already reserved below), which is where that history lives. `userId` is the mentee, `reportsToUserId` is the mentor — same directional reading as `direct`. A `mentorship` edge grants no access tier unless/until explicitly wired into the AD-10 walk (fail-closed default, AD-12).
-- **`DELETE` is a hard delete**, for every type. No `deletedAt`/`isActive` column here, unlike `User`/`UserEvents` above — a revoked reports-to/project/mentorship edge is simply gone, and no `manager_change` `UserEvents` type exists to recover that history (no concrete consumer named today, unlike grade/position/department/mentorship — see Conventions: don't add one speculatively). If reports-to history is ever needed, that's a new, separately-scoped feature.
-- **Migration note (verified against Prisma 7.9.1, 2026-08-22):** neither the 3-armed `CHECK` above nor the partial `UNIQUE...WHERE type='direct'` has a plain `schema.prisma` representation — Prisma has no `@@check` attribute in any 7.x release, and native partial-index `where` support is a preview-only feature (`partialIndexes`, landed 7.4) not enabled in this repo's `generator` block. Both need to be hand-authored as raw SQL in the migration (`prisma migrate dev --create-only`, then edit `migration.sql`) — `prisma db pull`/Prisma Client won't model or enforce either one afterward; Postgres does. Do this once, document it in the migration, don't rediscover it per-context.
+- **`DELETE` is a hard delete**, for all types. The §3.4 narrow journal, not this table, retains required organisational-change evidence. Mentorship is not stored here (AD-17).
+- `people_partner` uses atomic expected-current `PUT`/`DELETE` semantics (AD-19); generic second-create behavior is not its replacement contract.
+- **Migration note (rechecked 2026-08-29):** Prisma 7 can express partial indexes only through the `partialIndexes` Preview feature, which this repository does not enable; PostgreSQL `CHECK` constraints remain database-enforced. Keep this project on explicit raw SQL for these constraints unless a separate reviewed decision enables that Preview feature.
 
 ### Project / Department
 
-Plain records. `Department` sits above `Project` in the resource hierarchy (groups projects; manager-of-manager sees all nested). No `pmUserId`, no `dmUserId`, no `users[]` — all of that is policy attachments and relationship rows. Exact Department edge modeling is **pending** (see spine Deferred) — do not extend without the architect. `Policies.targetType:'department'` below exists as a schema value but is **not yet honored** by the AD-10 tier walk ([access-control.md](access-control.md)) — don't wire a department-manager feature against it until this Deferred item resolves.
+Plain records. `Department` is a first-class nested entity; every employee has exactly one current department. It routes resourcing requests, keys CDS matrix lookup together with position, and a membership change writes `department_change` to `UserEvents`. No separate Unit entity exists. Projects have no `pmUserId`, `dmUserId`, or `users[]`; managerial facts are policy attachments and membership is `Relationship`.
+
+Exact indexed Department membership/parent/manager edge shapes remain an explicit follow-up contract (spine Deferred). `Policies.targetType:'department'` is not honored by AD-10 until that contract is approved; the interim is fail-closed.
+
+### MentorshipPair (AD-17)
+
+```text
+MentorshipPair {
+  id           uuidv7 PK
+  mentorUserId FK -> User
+  menteeUserId FK -> User
+  status       'active' | 'ended'
+  startDate    date
+  endDate      date, nullable
+  closureNote  string, nullable
+  closedBy     FK -> User, nullable
+}
+```
+
+Normal transition to `ended` requires `closureNote`; departure auto-close writes a system note and bypasses that manual gate. Ended rows are retained. Start/end writes `mentorship_start`/`mentorship_end` `UserEvents` in the same transaction. Pair rows never participate in access resolution. The open-to-mentoring flag is a separate unresolved profile fact; clearing it must not alter active rows.
 
 ### Policies (AD-7)
 
@@ -150,4 +229,4 @@ Attachment join — one policy row shareable across many users.
 
 - Any stored access-role/tier/permission result (AD-10: derived access is never persisted).
 - Custom-field tables — storage model not yet decided ([custom-fields.md](custom-fields.md)).
-- Profile-section tables — pending the Profile bounded-context decision (spine Deferred).
+- Other profile-section tables — pending the Profile bounded-context decision (spine Deferred).
