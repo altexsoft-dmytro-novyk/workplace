@@ -191,7 +191,7 @@ Normal transition to `ended` requires `closureNote`; departure auto-close writes
 ```text
 Policies {
   id         uuidv7 PK
-  operator   '==' | 'IN'          // '!=' barred from AR rules, see access-control.md
+  operator   '=='                 // policy-level IN deferred; do not add a set representation yet
   targetType 'project' | 'department' | 'user' | ...
   targetId   uuid                  // polymorphic — NO db-level FK, by design
   targetRole string                // e.g. 'ac-manager', 'project-manager'

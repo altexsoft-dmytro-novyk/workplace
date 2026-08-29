@@ -1,0 +1,30 @@
+- id: "1"
+  title: Stage-2 E2E — translate foundation scenarios (committed red)
+  description: >-
+    Prerequisite: spec-access-control-test-cases story 6 complete (all 171
+    stage-1 prose files AD-1 approved). Translate approved files from
+    audience-derivation/, fail-closed/, auth/, and functional-permission/ into
+    Jest + supertest E2E under services/backend/test/ — real PostgreSQL, persona tokens,
+    routes per api-conventions.md. Commit red; human approves tests.
+  spec_checkpoint: true
+  done_checkpoint: false
+  invoke_dev_with: >-
+    services/backend only. One E2E test per approved scenario file in the four
+    foundation folders under docs/test-cases/access-control/. Cite AC-* id in
+    test title. Use seed from test-cases spec story 1; no mocked AccessControl.
+    Source prose: spec-access-control-test-cases (stage-1 only).
+
+- id: "2"
+  title: Stage-2 E2E — translate matrix scenarios (committed red)
+  description: >-
+    Prerequisite: facade spec story 1 complete. Translate approved matrix/
+    scenarios (self, reporting-line, pp, colleague, project-line-gate) into
+    Jest + supertest E2E, committed red. Completes AD-1 stage-2 before AccessControl
+    implementation stories may dispatch.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Mirror matrix/ folder structure in the E2E suite;
+    npm run test:e2e -- access-control must fail until facade implementation
+    lands. After human approval and red commit, dispatch facade production work
+    (implementation-constraints.md).

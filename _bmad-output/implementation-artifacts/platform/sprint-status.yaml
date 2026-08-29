@@ -14,10 +14,11 @@
 
 # SOURCE:
 #   Sprint Change Proposal 2026-08-27 — Platform Spec v1.5 Alignment
+#   Sprint Change Proposal 2026-08-29 — Two-Day Access Control Foundation
 #   Epic file: _bmad-output/planning-artifacts/platform/epics.md
 
 generated: 08-27-2026 16:16
-last_updated: 08-27-2026 16:16
+last_updated: 08-30-2026 00:20
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -34,3 +35,8 @@ development_status:
   p-8-doc-pass-create-path-removal: backlog
   p-9-register-epic-in-platform-sprint-status: done
   epic-platform-spec-v1-5-alignment-retrospective: optional
+  epic-access-control-foundation: backlog
+  # Blocked 2026-08-30 on the User Management integration contract (AD-3):
+  # _bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md
+  acf-1-resolve-phase-0-audiences: backlog
+  epic-access-control-foundation-retrospective: optional

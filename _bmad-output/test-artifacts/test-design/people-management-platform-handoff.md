@@ -1,186 +1,189 @@
 ---
 title: 'TEA Platform Test Design → BMAD Handoff Document'
-version: '1.3'
+version: '1.5'
 workflowType: 'testarch-test-design-handoff'
 sourceWorkflow: 'testarch-test-design'
 generatedBy: 'TEA Master Test Architect'
-generatedAt: '2026-08-25'
+generatedAt: '2026-08-29'
 projectName: 'people-management-platform'
-status: 'approved'
-approvedAt: '2026-08-25'
+status: 'draft — refreshed v1.5 Create run; human review pending'
 ---
 
-# TEA → BMAD Integration Handoff (Platform Level)
+# TEA → BMAD Integration Handoff (System Level)
 
-## Purpose
+## Purpose and Status
 
-Bridges the **platform-level** test design with BMAD epic/story decomposition across all bounded contexts. User Management child TEA is **approved and unchanged** — this handoff adds platform rollup, coverage-map status, delta-review rules, and sequencing for remaining domains.
+This system-level handoff translates the refreshed platform architecture and QA test designs into BMAD epic/story planning guidance. It carries requirements, risks, blockers, ownership boundaries, trace IDs, and phase gates forward without generating test cases or prescribing implementation.
 
-**Approved 2026-08-25** as the **platform planning baseline** for BMAD epic/story decomposition, coverage mapping, and release-gate planning. Runtime evidence (PG-01..PG-07) and PR-B contract resolution remain implementation-owned.
+**Status:** draft — refreshed v1.5 Create run; human review pending.
 
-**Human decisions applied 2026-08-25:** PG-07 (release gate), OQ2 (auth required), PR-005 (canonical User ID), PR-B-04 scope (PF read-only candidates + vacancies), PR-B scope rule (does not block UM/AC).
+This Create run is **not validated or approved**. `_bmad-output/test-artifacts/test-design-validation-report-platform.md` validated the superseded 2026-08-25 v1.2 artifact set and is historical only; it is not current evidence for this handoff.
 
----
+## Authority and Artifact Inventory
 
-## TEA Artifacts Inventory
+### v1.5 authority order
 
-| Artifact | Path | Scope | BMAD integration |
-| --- | --- | --- | --- |
-| Platform architecture test design | `_bmad-output/test-artifacts/test-design-architecture-platform.md` | Cross-cutting risks, PR-B blockers, NFR gates | Foundation stories, integration ADRs |
-| Platform QA test design | `_bmad-output/test-artifacts/test-design-qa-platform.md` | Coverage map, Appendix C trace, delta-review | Epic prioritization, waiver tracking |
-| Platform validation report | `_bmad-output/test-artifacts/test-design-validation-report-platform.md` | Validation + edit delta | Re-validation gate |
-| **Child: UM architecture** | `_bmad-output/test-artifacts/test-design-architecture.md` | user-management | Epics 1–4 gates — **approved, do not redo** |
-| **Child: UM QA** | `_bmad-output/test-artifacts/test-design-qa.md` | user-management | Story AC, TD-UM-* IDs — **approved** |
-| **Child: UM handoff** | `_bmad-output/test-artifacts/test-design/people-management-handoff.md` | user-management | UM workflow sequence — **approved** |
-| **Child: UM progress** | `_bmad-output/test-artifacts/test-design-progress-system.md` | user-management | UM workflow checkpoint (not platform) |
-| Access Control partial child | `docs/test-cases/access-control/` (202 files) + SPEC | access-control | Stage-1 draft; delta-TEA optional |
-| Progress (platform) | `_bmad-output/test-artifacts/test-design-progress-platform.md` | platform | Workflow state |
+1. `docs/project-requirements.md` v1.5 is the normative product authority.
+2. `_bmad-output/planning-artifacts/prds/prd-people-management-2026-08-24/prd.md` plus `addendum.md` provide current product context without weakening v1.5.
+3. `_bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` (updated 2026-08-29, AD-1–AD-21) binds architecture.
+4. The two refreshed platform test designs below are the current TEA planning authorities.
+5. Approved User Management child artifacts remain authoritative inside their child scope; this platform run references rather than redoes them.
 
----
-
-## Delta-Review Protocol (Future Epics)
-
-**Baseline (stable):** Platform coverage map, Appendix C trace (`TR-*` IDs), PG-01..PG-07 gates, PR-* / PR-B-* registers. **User Management child TEA approved — never redo.**
-
-| Trigger | Required action |
-| --- | --- |
-| New bounded context confirmed (AD-5) | **Delta child doc** only — new rows, context risks; map stories to `TR-*` IDs |
-| access-control implementation | Optional consolidation TEA; per-file AD-1 approval → stage-2 P0; **no platform re-run** |
-| §4.9 remaining auto-events | Delta scenarios when PR-B-05 + PR-B-07 resolve; **not** UM child scope today |
-| §2 / §3 / §7 / §9 normative change | **Full platform TEA re-run** |
-| Story acceptance criteria | Must cite `TR-*` or platform map row + `docs/project-requirements.md` § |
-
----
-
-## Platform Quality Gates (Release — §9)
-
-| Gate | Criterion | Owner context |
+| Artifact | Actual path | Authority / BMAD integration point |
 | --- | --- | --- |
-| **PG-01** | access-control P0 gate E2E 100% green — every `—` cell, unflagged S7 vs employee and PM, colleague whitelist | access-control |
-| **PG-02** | User Management child P0 100% green | user-management |
-| **PG-03** | Timetracker real API integration (or documented waiver) | integration |
-| **PG-04** | Extensible FR via UI without deploy (UR-01..03) | access-control |
-| **PG-05** | No open PR-001..PR-006 without mitigation/waiver | platform |
-| **PG-06** | Trace: each in-scope §4 feature → scenario or waiver (Appendix C) | platform QA |
-| **PG-07** | List perf ≤2 s @ 500+ — **release gate**; waiver only temporary and documented | Product + Platform |
+| Refreshed platform architecture test design | `_bmad-output/test-artifacts/test-design-architecture-platform.md` | Cross-cutting architecture risks, blockers, NFR testability, engineering constraints |
+| Refreshed platform QA test design | `_bmad-output/test-artifacts/test-design-qa-platform.md` | Normative `TR-*` coverage map, planning states, execution dependencies, release/design gates |
+| User Management architecture child | `_bmad-output/test-artifacts/test-design-architecture.md` | **Approved 2026-08-25; authoritative child baseline; do not redo** |
+| User Management QA child | `_bmad-output/test-artifacts/test-design-qa.md` | **Approved 2026-08-25; authoritative child baseline; do not redo** |
+| User Management handoff child | `_bmad-output/test-artifacts/test-design/people-management-handoff.md` | Approved UM epic/story guidance; remains child-owned |
+| Access Control Phase-1 suite | `docs/test-cases/access-control/README.md` and 171 scenario files under `docs/test-cases/access-control/` | v1.5 Stage-1 drafts dated 2026-08-29; every file awaits independent human AD-1 approval |
+| Access Control specification | `_bmad-output/specs/spec-access-control-test-cases/SPEC.md` | Phase-1 design contract; does not turn drafts into approved coverage |
+| Historical platform validation | `_bmad-output/test-artifacts/test-design-validation-report-platform.md` | **Superseded v1.2 validation; historical only; not current validation** |
 
----
+**User Management ownership:** its approved child architecture, QA design, and handoff are not regenerated by this platform run. The child still owns its approved scope, risks, and scenarios. v1.5 seed-import, registration/deactivation drift, and scheduled departure require targeted child follow-up rather than a redo. Scheduled-departure Stage-1 design/review may proceed now against requirements plus AD-20; E2E/implementation waits for **PR-S-02 / CC-06** formal Product Owner/Architect sign-off and normal AD-1 approvals.
 
-## Epic-Level Integration Guidance (Platform — Non-UM)
+**Access Control inventory:** exactly **171 v1.5 Phase-1 Stage-1 drafts** are present (plus `README.md`). Phase 1 covers Self, Reporting line, direct PP, Colleague, withhold negatives, functional boundaries, fail-closed behavior, and authentication. Deferred slices are shared links, list/filter/export/search projection surfaces, runtime role catalog, full-profile overlay, positive Project-line cells, Department positives, and PP HR-line propagation.
 
-| Epic / domain | P0 gate | Status | Blocker |
+## Planning-State Boundaries
+
+### READY NOW
+
+BMAD may create feature-owned stories using the cited stable trace IDs, subject to a normal AD-1 Stage-1 review:
+
+- Feature-role boundaries (`TR-2.2-01`), action items (`TR-4.5-01..02`), risk workflow/dashboard (`TR-4.6-01..02`).
+- Platform-owned vacancy and candidate proposal workflow (`TR-4.7-01`, `TR-4.7-03`, `TR-4.7-05`); PeopleForce candidate ID/link storage is required, but PeopleForce is **not** the vacancy source.
+- CDS core (`TR-4.10-01..02`), mentorship core (`TR-4.11-01`, `TR-4.11-03`), campaign activation/status (`TR-4.12-02`), and feedback core (`TR-4.15-01`).
+- Process/privacy evidence (`TR-7-02`, `TR-8-01..05`) and repository trace governance.
+- Review of each of the 171 AC drafts may begin now, one file at a time, including direct-PP audience drafts.
+
+READY NOW means design intent is sufficiently defined. It does not mean a scenario, test, implementation, or release outcome is approved.
+
+### READY FOR FORMAL SIGN-OFF
+
+These packages are specified sufficiently for Stage-1 design/review now. They are not approved for E2E or implementation:
+
+| Sign-off package | Specified solution | May proceed now | Still waits |
 | --- | --- | --- | --- |
-| **Access Control** | Tier + surfaces + matrix `—` + S7/colleague negatives | Scenarios drafted | Per-file AD-1 before stage-2 |
-| **Profile / All Employees** | TR-4.1-* + TR-4.2-* | Not started | PR-B-01, PR-B-05 |
-| **Dashboards** | TR-4.4-*; widget data bounded by tier | Not started | PR-B-02 |
-| **Timetracker integration** | TR-5.1-*; TD-11 revocation + real API smoke | Not started | PR-B-03 |
-| **PeopleForce integration** | TR-5.2-* candidates + vacancies (read-only) | Not started | PR-B-04 **contract** (scope decided) |
-| **Resourcing workflow** | TR-4.7-* | Not started | PR-B-05; PF scope fixed per PR-B-04 |
-| **Risks — access** | TR-4.6-01 (S6 matrix) | AC draft | — |
-| **Risks — dashboard** | TR-4.6-02, TR-4.6-03 | Not started | PR-B-05 |
-| **CDS** | TR-4.10-* | Not started | PR-B-05 |
-| **Campaigns / Action items** | TR-4.5-*, TR-4.12-* | Not started | PR-B-05 |
-| **Feedback** | TR-4.15-* | Not started | PR-B-05 |
-| **Mentorship hub** | TR-4.11-* (hub); TR-4.11-06 pairing in UM | UM pairing approved | PR-B-05 for hub |
-| **Career timeline — remaining auto-events** | TR-4.9-03..06 | Not started | PR-B-05, PR-B-07 |
+| **PR-S-01 / CC-04** | Requirements + AD-19: one PP per employee; atomic optimistic create/replace/delete; next-request revocation; concurrency and journal direction | Direct-PP audience and PP-mutation Stage-1 design/review | Explicit Product Owner/Architect sign-off, normal AD-1 approvals, and PR-B-07 / CC-07 where journal details apply before E2E/implementation |
+| **PR-S-02 / CC-06** | Requirements + AD-20: effective date/reason; relationship blockers and outcomes; durable retrying fail-closed executor | Scheduled-departure Stage-1 design/review | Explicit Product Owner/Architect sign-off and normal AD-1 approvals before E2E/implementation; PR-B-09 separately gates operational/release evidence |
 
-**User Management epics 1–4:** see approved `people-management-handoff.md` — unchanged. Platform note: UM child covers **partial** §4.9 only (TR-4.9-01, 02, 07, 08).
+AD-19 and AD-20 are binding architecture directions for formal sign-off, not substitutes for sign-off. CC-04 and CC-06 are specified solution packages, not discovery blockers.
 
----
+### PRODUCT/ARCH BLOCKED
 
-## Story-Level Guidance (Platform Blockers → Stories)
+Nine product/architecture blockers remain genuinely open. Do not design through an unresolved decision:
 
-**Scope rule:** PR-B-01, PR-B-02, PR-B-03, PR-B-05, PR-B-06, PR-B-07 do **not** block UM or Access Control stories. Proceed with UM ATDD and AC stage-2 independently.
-
-| Blocker | Stories must NOT start until | Required artifact | Does not block |
+| Blocker | Exact decision required | Blocks | Explicit non-blocking boundary |
 | --- | --- | --- | --- |
-| PR-B-01 | TR-4.1-05..08 (custom fields, views, export columns) | Storage model AD + admin UI spec | UM, AC |
-| PR-B-02 | TR-4.4-* (any dashboard widget) | Dashboard engine DESIGN.md | UM, AC |
-| PR-B-03 | TR-4.3-05, TR-5.1-*, TR-4.7-06 | Timetracker port interface doc | UM, AC tier drafts |
-| PR-B-04 | TR-5.2-*, TR-4.7-03 PF paths | PeopleForce port contract (scope decided: read-only candidates + vacancies; link fallback only) | UM, AC |
-| PR-B-05 | Any pending-context HTTP routes / workflows | AD-5 context confirmation | UM, AC |
-| PR-B-06 | TD-13 department manager final E2E | Department modeling AD | UM, AC tier drafts |
-| PR-B-07 | TR-4.9-03..06, TR-6-01 | Temporal employment model AD | UM partial §4.9, AC |
-| ~~OQ2~~ | — | **Decided:** auth required for share-link viewer | — |
-| ~~PG-07~~ | — | **Decided:** release gate; temporary waiver only | — |
+| **PR-B-01 / OQ-114** | EAV vs JSONB custom-field storage and indexed visibility-safe filter/sort plan; column-per-field excluded | Runtime S16, arbitrary fields, full directory, saved views, exports (`TR-3.3-03`, `TR-4.1-02/04`, `TR-6-01`) | Does not block approved UM child; AC Phase-1 base audience draft review; feature work unrelated to runtime fields/query surfaces |
+| **PR-B-02 / OQ-115** | One dashboard engine's widget authorization, aggregation, and counter projection contract | UM/DM/PM/PP dashboard wave (`TR-4.4-01..04`) | Does not block standalone risk workflow or its feature-owned dashboard (`TR-4.6-01..02`); approved UM child remains unchanged |
+| **PR-B-03 / OQ-116** | Non-manager project-assignment semantics and resulting policy target roles | Department/project policy model, positive Project-line, Department walk, PP HR-line (`TR-2.1-03..06`, `TR-2.1-PROJ/DEPT/PPHR`, `TR-4.17-02`) | Does not block AC Self/Reporting/direct-PP/Colleague and withhold-negative draft review; does not redo UM |
+| **PR-B-04 / OQ-117** | Profile bounded-context boundary and ownership of S1–S16 projections | Profile assembly and list/profile contracts (`TR-4.2-01` and dependent consumers) | Does not block AC entitlement-boundary review or feature-owned domain workflows that do not claim profile projection evidence |
+| **PR-B-05 / OQ-105** | Who may grant/revoke HR Admin; remaining default role-permission assignments | Admin delegation/bootstrap lifecycle (`TR-2.3-04`) | Does not grant HR Admin employee-data access; does not block base AC proof that HR Admin is configuration-only; approved UM child unchanged |
+| **PR-B-06 / CC-05** | Self versus full-profile overlay precedence and effective section mapping | Full-profile Stage 1 (`TR-2.4-01`, `TR-2.4-AC`) | Does not block base audience Phase-1 draft review or non-full-profile feature workflows |
+| **PR-B-07 / CC-07** | Immutable relationship/access journal schema, snapshots, reader authorization, and transaction enrollment | Journal-backed PP, full-access, and organisational mutations (`TR-2.1-06`, `TR-3.4-01`, `TR-9-04`) | Does not block PR-S-01 Stage-1 design/review; non-journal work may proceed. Journal-dependent E2E/implementation still waits for CC-07 |
+| **PR-B-08** | Timetracker API/auth/identity/error contract; events vs state-at-sync; partial/intermittent success semantics | Adapter Stage 1, positive Project-line, S10/S11 freshness, sync/revocation evidence (`TR-2.1-04/07`, `TR-5.1-01..03`) | Does not block platform-owned resourcing state machine, required candidate-ID storage, AC non-project Phase-1 review, or contract-independent feature planning |
+| **PR-B-09** | Hosting, environment topology, secrets, backup/restore, monitoring, alert ownership, rollback envelope | Deployed/demonstrable DoD and production NFR evidence (`TR-9-08`) | Does not decide scheduled-departure product behavior; does not block local Stage-1 design outside other gates, per-file AC review, or feature planning |
 
----
+**Boundary:** PR-B-07 now means CC-07 only. PR-S-01/CC-04 and PR-S-02/CC-06 are sign-off-ready, not open blockers. CC-05, OQ-105/114/115/116/117, the timetracker contract, CC-07, and PR-B-09 remain open within their stated scopes.
 
-## Risk-to-Epic Mapping (Platform PR-*)
+### E2E DEPENDENCY
 
-| Risk ID | Category | P×I | Epic / domain | Test level |
-| --- | --- | --- | --- | --- |
-| PR-001 | SEC | 9 | access-control surfaces + matrix | E2E API |
-| PR-002 | SEC | 6 | access-control tier engine | E2E API + arch review |
-| PR-003 | PERF | 6 | All Employees list + AC tier | k6 + E2E API |
-| PR-004 | TECH | 6 | Timetracker sync | E2E API + integration | **Blocked** |
-| PR-005 | DATA | 6 | Identity bootstrap | E2E API | **Decided** — canonical User ID |
-| PR-006 | SEC | 6 | access-control roles | E2E API |
-| PR-007 | TECH | 4 | resourcing → user-management seam | E2E API | **Blocked** |
-| PR-008 | DATA | 4 | UserEvents hooks + PR-B-07 events | E2E API | **Blocked partial** |
-| PR-009 | BUS | 4 | resourcing PeopleForce | Manual + E2E | **Blocked** |
-| PR-010 | OPS | 4 | Platform CI/deploy | Infra | **TBD** |
+These requirements are defined but cannot claim executable evidence until their named dependency exists:
 
-**Child UM risks R-001..R-014:** see `people-management-handoff.md`.
+- **AD-1 approvals:** no AC Stage-2 work before the corresponding Stage-1 file is independently approved; no production code before an independently approved red E2E. **PG-01 is unschedulable** while 171 files await per-file approval and deferred DoD slices lack approved Stage-1 artifacts.
+- **Consumer surfaces:** profile, list, search, filter, export, errors, shared links, dashboards, resourcing, campaigns, feedback, CDS, mentorship, timeline, and lifecycle owners must prove workflow/projection outcomes. An AC boundary response is not substitute evidence.
+- **Timetracker:** PR-B-08 and provider test-environment access are required for leaves, projects/people, identity, ≤15-minute change, and four-hour withdrawal evidence.
+- **Scheduled departure sign-off:** PR-S-02 / CC-06 Stage-1 design/review may proceed against requirements plus AD-20. E2E/implementation waits for explicit Product Owner/Architect sign-off and normal AD-1 approvals; PR-B-09 separately gates operational/release evidence.
+- **PP sign-off and journals:** PR-S-01 / CC-04 allows Access Control's direct-PP audience review and User Management-owned PP-mutation Stage-1 design/review against requirements plus AD-19. E2E/implementation waits for explicit sign-off and normal AD-1 approvals; journal-dependent execution also waits for PR-B-07 / CC-07.
+- **Cross-context contracts:** campaign→action item→feedback, resourcing→shared link→S15→timetracker, mentorship/lifecycle→timeline, and departure→auth/AC/tasks/mentorship need approved consumer contracts.
+- **Environment/evidence:** migrated isolated PostgreSQL, synthetic personas, controllable time, contract-faithful fakes, XLSX tooling, accessibility tooling, 500+ performance data, and PR-B-09 release topology are prerequisites for their respective evidence.
 
----
+## Epic and Domain Integration Guidance
+
+| Epic / domain | Stable trace IDs to place in stories | Planning state and BMAD guidance |
+| --- | --- | --- |
+| User Management child | Child `TD-UM-*`; platform follow-up `TR-4.17-01`, `TR-4.16-01..03` | Approved child remains authoritative and is not redone. Seed-import follow-up is E2E-dependent; User Management-owned PP-mutation Stage-1 is READY FOR FORMAL SIGN-OFF under PR-S-01 / CC-04, and scheduled-departure Stage-1 is READY FOR FORMAL SIGN-OFF under PR-S-02 / CC-06. |
+| Access Control foundation | `TR-2.1-01..02`, `TR-2.1-05`, `TR-2.1-05A`, `TR-2.1-06`, `TR-2.3-03`, `TR-3.2-S01..S16`, `TR-3.3-02`, `TR-7-01` | 171 Phase-1 Stage-1 drafts pending per-file approval; never label them coverage. Direct-PP audience review is READY FOR FORMAL SIGN-OFF under PR-S-01 / CC-04; Access Control does not own PP mutation. Transitive PP HR-line still needs PR-B-03 and the Department/HR-boundary contract. |
+| Role catalog and full profile | `TR-2.3-01..04`, `TR-2.4-01`, `TR-2.3-AC`, `TR-2.4-AC` | Role-catalog consumer is E2E-dependent; HR Admin delegation blocked by PR-B-05; full-profile is blocked by PR-B-06 and PR-B-07's CC-07 journal contract only—CC-04 is PP-specific. |
+| Profile and All Employees | `TR-3.1-01`, `TR-3.3-01/03`, `TR-4.1-01..08`, `TR-4.2-01`, `TR-4.3-01..02` | PR-B-01/04 block dynamic query and profile ownership; remaining projection evidence waits for consumers. |
+| Dashboards | `TR-4.4-01..04` | Blocked by PR-B-02. Do not infer optional widgets as acceptance requirements. |
+| Action items, campaigns, feedback | `TR-4.5-01..03`, `TR-4.12-01..03`, `TR-4.15-01..02` | Core feature slices are READY NOW; cross-context and projection outcomes remain E2E dependencies. |
+| Risk | `TR-3.2-S06`, `TR-4.6-01..02` | Feature workflow is READY NOW; S6 authorization drafts remain unapproved and profile projection is separate. |
+| Resourcing and shared links | `TR-4.7-01..06`, `TR-4.8-01`, `TR-4.8-AC`, `TR-3.2-S15` | Platform owns vacancy; no PeopleForce vacancy source. Core state machine is READY NOW; sharing, S15, compensation projection, and timetracker confirmation are dependencies. |
+| Timeline and employment lifecycle | `TR-4.9-01..03`, `TR-4.16-01..03` | `TR-4.16-01..03` are READY FOR FORMAL SIGN-OFF under PR-S-02 / CC-06. Stage-1 design/review proceeds now; E2E/implementation waits for sign-off and AD-1, while PR-B-09 separately gates operational/release evidence. |
+| CDS and mentorship | `TR-4.10-01..03`, `TR-4.11-01..04` | Core domain stories are READY NOW; directory, projection, and timeline interworking are dependencies; departure-triggered Stage-1 design may proceed under PR-S-02, with E2E/implementation awaiting sign-off and AD-1. |
+| Timetracker integration | `TR-2.1-07`, `TR-5.1-01..03`, `TR-7-04`, `TR-9-06` | PR-B-08 must resolve before adapter Stage 1; live evidence uses test environment and seeded population. |
+| Data, privacy, performance, deployment | `TR-6-01..04`, `TR-7-02..05`, `TR-9-01..08` | Preserve unknown thresholds as unknown. PR-B-01 blocks runtime query model; PR-B-09 blocks deployed evidence; DoD requires all child evidence. |
+
+Good-to-have notifications, analytics, and PeopleForce API prefill remain out of scope unless explicitly promoted. Required PeopleForce behavior is candidate ID/link storage for external proposals; preview/per-field prefill is optional and must not write prohibited fields. Resourcing vacancies remain platform-owned.
+
+## Story-Level Mapping Rules
+
+Every platform story must:
+
+1. Cite at least one stable `TR-*` row from the refreshed QA coverage map and the applicable v1.5 section; child UM stories keep their approved child IDs.
+2. Record exactly one planning state: **READY NOW**, **READY FOR FORMAL SIGN-OFF**, **PRODUCT/ARCH BLOCKED**, or **E2E DEPENDENCY**. `AC STAGE-1 DRAFT` is inventory metadata, not coverage.
+3. Link applicable `PR-*` risks, `PR-B-*` blockers, and `PR-S-*` sign-off packages without renumbering child UM `R-*` risks.
+4. State the owning domain and any consumer/integration evidence owner; do not assign feature-workflow proof to Access Control.
+5. Preserve omitted/narrowed/flag-gated data across API, UI, list, filter, export, search, errors, shared links, and selected optional notifications.
+6. Avoid invented thresholds, provider behavior, role grants, APIs, or business rules.
+
+Critical acceptance intent to carry into stories, without generating cases:
+
+- Restricted values are absent, not `null`, and cannot be inferred through another surface (`TR-3.3-01..03`).
+- Functional capability never widens data audience; mutation needs both gates (`TR-2.3-03`).
+- Platform-owned relationship revocation is next request; project-derived change is ≤15 minutes and withdrawn after four failed hours (`TR-2.1-06..07`, `TR-5.1-03`).
+- Direct-PP audience and PP-mutation Stage-1 design/review may use requirements plus AD-19 now. E2E/implementation waits for PR-S-01 / CC-04 formal sign-off and AD-1; journal-dependent execution also waits for PR-B-07 / CC-07 (`TR-2.1-05`, `TR-2.1-05A`, `TR-2.1-06`, `TR-3.4-01`).
+- Scheduled-departure Stage-1 design/review may use requirements plus AD-20 now. E2E/implementation waits for PR-S-02 / CC-06 formal sign-off and AD-1 (`TR-4.16-01..03`); PR-B-09 remains the distinct operational evidence gate.
+- HR Admin is configuration-only and has no blanket employee-data audience (`TR-2.2-01`, `TR-2.3-04`).
+- Timetracker is the required live integration; PeopleForce vacancy synchronization is not a requirement (`TR-5.1-01..03`, `TR-5.2-01..02`).
+
+## Risk-to-Domain Mapping
+
+| Risk ID | Cat | P×I | Recommended epic/domain | Story linkage / evidence boundary |
+| --- | --- | ---: | --- | --- |
+| **PR-001** | SEC | 9 | Access Control plus every projection consumer | Link all audience/section/surface stories; requires approved boundary and consumer projection evidence |
+| **PR-002** | SEC | 9 | Access Control, Timetracker, lifecycle | Link graph mutation, sync freshness, outage, and departure stories |
+| **PR-003** | DATA | 9 | PP relationship administration, full access, journal | PR-S-01 / CC-04 is sign-off-ready for PP; PR-B-07 / CC-07 remains open for journal-backed execution. Require sign-off, AD-1, and atomic fact+journal evidence as applicable |
+| **PR-004** | SEC | 9 | Full-profile access and profile projection | PR-B-06 blocks overlay stories; require approved Self precedence |
+| **PR-005** | TECH | 9 | Timetracker and Project-line access | PR-B-08 blocks adapter/positive Project scope; require provider-contract and live test-env evidence |
+| **PR-006** | PERF | 6 | All Employees, custom fields, AccessControl bulk resolution | PR-B-01 blocks query design; release evidence is ≤2 seconds at 500+ including permission resolution |
+| **PR-007** | DATA | 6 | Dashboards, resourcing, campaigns | Use canonical facts and typed projections; PR-B-02/04 block affected composition/ownership |
+| **PR-008** | OPS | 6 | Departure sign-off, lifecycle worker, and platform operations | PR-S-02 / CC-06 is sign-off-ready; E2E/implementation waits for sign-off and AD-1, while PR-B-09 separately blocks operational/release evidence |
+| **PR-009** | OPS | 6 | Access Control governance and repository trace | Draft files must never count as coverage; record per-file AD-1 state |
+| **PR-010** | DATA | 6 | Seed import, Timetracker identity, external candidate identity | Durable IDs, fail-closed collisions, synthetic-only data, and log/repository privacy checks |
+
+All ten risks remain open until their listed evidence is reviewed. A design artifact alone is not mitigation completion; residual acceptance requires a named approver and expiry outside this handoff.
 
 ## Recommended BMAD → TEA Workflow Sequence
 
-1. ~~**Human approval**~~ — **Approved 2026-08-25** as platform planning baseline
-2. **User Management ATDD** — approved child; proceed without redo
-3. **Access Control ATDD** — delta-review optional; P0 tier + surfaces after per-file AD-1 approval
-4. **Architect resolves PR-B-01..07 contracts** — unblocks delta child TEA for affected domains (does not block UM/AC)
-5. **Delta child TEA** per confirmed context — map to Appendix C `TR-*` IDs
-6. **Platform trace** — `/bmad-testarch-trace` against Appendix C
-7. **nfr-assess** — after evidence exists; PG-07 enforced as release gate
+1. **Human review of refreshed Create artifacts** — review the architecture design, QA design, and this handoff; do not reuse the stale v1.2 validation verdict.
+2. **BMAD epic/story decomposition** — preserve approved UM child ownership; map platform stories to stable `TR-*`, `PR-*`, and exact blocker/dependency states.
+3. **Progress sign-off-ready Stage-1 design** — direct-PP/PP-mutation work proceeds under PR-S-01 with AD-19; scheduled departure proceeds under PR-S-02 with AD-20. Obtain formal Product Owner/Architect sign-off before E2E/implementation.
+4. **Resolve slice-specific open blockers** — keep CC-05, OQ-105/114/115/116/117, PR-B-07/CC-07, PR-B-08 timetracker, and PR-B-09 operational work open only within their stated boundaries.
+5. **TEA ATDD as a separate explicit workflow** — only after that story/file has independent human AD-1 approval; produce red E2E and obtain independent approval before implementation.
+6. **BMAD implementation** — implement only against approved red evidence and current architecture contracts.
+7. **TEA Automate / integration evidence** — add stable regression, consumer, contract, performance, and operational evidence when dependencies exist.
+8. **TEA Trace and NFR assessment** — verify every required v1.5 row and assess sourced NFR evidence; do not infer final status from planning.
+9. **Release gate review** — apply PG-01..06 and record any explicit waiver/accepted residual risk.
 
----
+## Phase Transition Gates
 
-## Phase Transition Quality Gates
-
-| From | To | Gate |
+| From | To | Gate criteria |
 | --- | --- | --- |
-| Platform test design | Human approval | **Approved 2026-08-25** — planning baseline |
-| Edit pass | Re-validation | C-01..C-05 documentation fixes applied |
-| Approval | UM ATDD | Child already approved — no re-review |
-| Approval | AC ATDD | AC SPEC + tier/surfaces scenarios approved per file (AD-1) |
-| PR-B resolution | Delta child TEA | Decision recorded in architecture spine |
-| Delta child TEA | Implementation | Red E2E per context P0 |
-| Implementation | Platform release | PG-01..PG-07 (PG-07 = release gate; temporary waiver only) |
+| Refreshed Create run | Human review | Current v1.5 authorities and inventory reconciled; superseded planning assumptions removed; this draft still carries no approval |
+| Human review | BMAD epic/story creation | Review accepts handoff use; every story cites stable trace/risk IDs and one planning state; approved UM child remains unchanged |
+| Epic/story creation | Stage-1 design | Exact blocker for the slice resolved or story is READY NOW; owner and evidence boundary named |
+| PR-S-01 / CC-04 package | PP Stage-1 design/review | May proceed now against requirements plus AD-19; no E2E/implementation authorization implied |
+| PR-S-02 / CC-06 package | Scheduled-departure Stage-1 design/review | May proceed now against requirements plus AD-20; no E2E/implementation authorization implied |
+| PP or departure Stage-1 | Stage-2 red E2E | Explicit PR-S-01/02 Product Owner/Architect sign-off as applicable plus independent AD-1 approval; PP journal execution also requires PR-B-07 / CC-07 |
+| AC Stage-1 draft | AC Stage-2 red E2E | Corresponding one of 171 files has independent human AD-1 approval, all feature-specific product/architecture blockers are resolved, and deferred slices have their own approved Stage-1 artifacts |
+| Any approved Stage-1 | Implementation | Independently approved red E2E exists; no production code precedes it |
+| Implementation | Automated/integration evidence | Feature acceptance behavior is green; consumer and provider contracts are available; synthetic data only |
+| Evidence collection | Trace / NFR assessment | Required v1.5 rows have current evidence or explicit blocker/dependency; NFR thresholds are sourced, not guessed |
+| Trace / NFR assessment | Release | **PG-01:** AC gate is schedulable and approved scope is 100% green; **PG-02:** required live Timetracker evidence; **PG-03:** PR-S-01/02 sign-off and AD-1 approvals precede PP/departure E2E, with zero unresolved restricted-data leak/stale-access/self-assignment/due-departure cutoff defect; CC-07 and PR-B-09 evidence apply separately; **PG-04:** All Employees ≤2 seconds at 500+ including permission resolution; **PG-05:** all required v1.5 trace rows accepted; **PG-06:** after PR-B-09, deployed demonstrable product and current AD-1/process evidence |
 
----
+## Handoff Boundary
 
-## Follow-up Actions
-
-### Documentation / process (complete in edit pass)
-
-- C-01..C-05 and W-01..W-10 addressed in platform artifacts — see validation report edit delta.
-
-### Human-owned (remaining — post planning approval)
-
-1. **PR-B-01, PR-B-02, PR-B-03, PR-B-05, PR-B-06, PR-B-07** — architecture/integration decisions (do **not** block UM or AC).
-2. **PR-B-04 contract** — PF API endpoints/auth after scope decision (read-only candidates + vacancies).
-
-### Decided 2026-08-25 (recorded in platform docs)
-
-| ID | Decision |
-| --- | --- |
-| PG-07 | List ≤2 s @ 500+ = **release gate**; waiver temporary + documented |
-| OQ2 | Shared links require **authentication** in Iteration 2 |
-| PR-005 | Internal User ID canonical; external IDs explicit; email hint only |
-| PR-B-04 scope | PF read-only: candidates + vacancies; external link fallback only |
-| PR-B scope | PR-B-01/02/03/05/06/07 do **not** block UM or Access Control |
-
-### Implementation-owned (evidence deferred to build / CI)
-
-1. PG-01..PG-06 green E2E evidence (AC + UM stage-2 suites).
-2. PG-03 timetracker real API smoke (post PR-B-03 contract).
-3. k6 baseline for TR-7-01 — **PG-07 release gate** (TD-UM-NFR-PERF-01 partial today).
-4. PR-001..PR-006 mitigation implementation evidence or waivers.
-5. Deployed demonstrable environment (PR-010 / §9 DoD).
-6. Per-file developer approval of 202 AC + 45 UM stage-1 scenarios before stage-2 E2E.
-
----
-
-**Status:** Approved 2026-08-25 as platform planning baseline. UM ATDD + AC stage-2 authorized.
+This document provides planning integration only. It does not create scenarios, test cases, automation, implementation tasks, validation approval, or release approval. Manual review remains necessary for architecture/product decisions, per-file AD-1 approvals, accessibility/responsive behavior, live Timetracker operation, deployment rehearsal, and residual-risk acceptance. Automation candidates remain stable approved authorization regression, feature state machines, projection negatives, contract-failure paths, XLSX entitlement checks, performance thresholds, privacy scans, and trace-state validation.
