@@ -21,9 +21,11 @@ Rules that follow:
 
 ## Operators (AD-8)
 
-- Allowed now: `==`, `IN`.
+- The initial facade slice supports **only** the equality operator, `==`.
+- Policy-level `IN` is explicitly deferred. `Policies.targetId` is a single UUID today, so there is no approved representation for a target set. Do not add an enum value, seed data, evaluator branch, or application-side set-membership fallback until a separate design defines the product use case, valid target types, cardinality, set storage and mutation rules, and an indexed query plan.
+- A SQL `WHERE ... IN (...)` used internally to fetch a requested bulk list is not the policy operator and does not enable policy-level `IN`.
 - `!=` is **barred from AR/tier-granting rules** — negation is satisfied by missing data, which inverts fail-closed (a user on no projects would match every `!=` condition). If ever introduced, `!=` is FR-scoping/deny-only.
-- Any operator not expressible as an **indexed SQL join** is barred from tier resolution entirely. Both `==` and `IN` must compile to indexed joins on the hot path — no full-table scans or application-side set membership.
+- Any approved operator must be expressible as an **indexed SQL join** on the hot path; full-table scans and application-side policy set membership are barred from tier resolution.
 
 ## The two dimensions (AD-6)
 
@@ -37,15 +39,24 @@ Collapsing these into one list of roles is the canonical mistake (§2). The voca
 The **only** authorization entry point, in every context:
 
 ```ts
+type SectionAccess = 'none' | 'read' | 'write'
+
 // FR capability check — global, no target:
 accessControl.isAllowed(userId, feature)
 
 // AR audience/section check — ALWAYS scoped to target employee(s):
 accessControl.resolveAudiences(viewerId, employeeIds)   // bulk map: reporting / project / pp / self / colleague per target
-accessControl.canAccessSection(viewerId, section, targetEmployeeId)
+accessControl.canAccessSection(viewerId, section, targetEmployeeId): SectionAccess
 ```
 
 Forbidden everywhere: reading the policy tables directly from another context, `isManager || isPP`-style flags, caching an audience result across requests without graph-change invalidation.
+
+`canAccessSection` returns only the base section decision. It does not serialize
+fields or decide record-specific visibility: S5's CV/certificate subset, S7/S8
+record flags, S10/S11 colleague field subsets, S16 custom-field metadata, and
+workflow-specific views need an approved owning-context projection contract. That
+contract calls this facade and may only narrow its result; it never reads policy
+tables or infers an audience itself.
 
 ### Dual-dimension gate (§2.2)
 
@@ -204,7 +215,7 @@ Do not hard-code until explicitly decided:
 | Full-profile overlay column mapping | §2.4 grant mechanics vs §3.1 no profile-level permission — which §3.2 column(s) does the overlay apply? |
 | Full-profile + Self precedence | When a full-profile holder views their own profile, which wins per section — Self column or overlay? |
 | Partial timetracker sync | §5.1 defines failed-sync withdrawal only; no rule for intermittent partial success. |
-| `IN` operator shape | AD-8 requires indexed joins; valid `targetType` values, set cardinality, and join shape are not specified in requirements. |
+| Policy-level `IN` operator | Deferred from the initial facade slice. It needs a concrete product use case plus approved target-set storage, valid `targetType` values, cardinality/mutation rules, and indexed query plan. |
 
 ### Bulk, live, never stored
 

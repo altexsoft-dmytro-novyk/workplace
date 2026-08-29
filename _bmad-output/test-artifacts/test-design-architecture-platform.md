@@ -1,254 +1,203 @@
 # Test Design for Architecture: People Management Platform
 
-**Purpose:** Platform-level architectural testability contract. Defines cross-cutting risks, NFR gates, integration testability, and blockers that child bounded-context test designs must inherit. Does **not** replace or redo child artifacts.
+**Purpose:** System-level architectural testability contract for Architecture, Backend, DevOps, and Security. It identifies what must exist before reliable platform evidence can be produced; it does not replace child test designs or prescribe QA execution.
 
-**Date:** 2026-08-25  
-**Author:** TEA (bmad-testarch-test-design)  
-**Status:** Approved 2026-08-25 — platform planning baseline  
+**Date:** 2026-08-29  
+**Author:** TEA (bmad-testarch-test-design, Create mode)  
+**Status:** Draft — refreshed v1.5 Create run; human review pending  
 **Project:** People Management Platform — Iteration 2  
-**PRD Reference:** `docs/project-requirements.md` v1.2  
-**ADR Reference:** `_bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` (AD-1..AD-14)
+**PRD Reference:** `docs/project-requirements.md` v1.5 (normative), current People Management PRD plus addendum  
+**ADR Reference:** `_bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` (AD-1–AD-21)
 
 ---
 
 ## Executive Summary
 
-**Scope:** System-level test architecture for the full People Management Platform — all normative features (§2–§5, §7, §9), confirmed and pending bounded contexts, and both required integrations (timetracker, PeopleForce).
+**Scope:** Cross-cutting architecture for access control, User Management interworking, profile/list projection, dashboards, resourcing, integrations, employment lifecycle, NFRs, and the v1.5 Definition of Done.
 
-**Child test designs (do not redo):**
+**Business context:** The platform serves 500+ employees. Access-control correctness is the primary quality attribute; a closed section leaking through an API, list, filter, export, error, shared link, or optional notification is critical. Timetracker leaves and project/people sync are required against its test environment. PeopleForce is good-to-have profile prefill by candidate ID; resourcing requests are platform-owned and vacancies are not synchronized.
 
-| Child | Status | Artifacts |
-| --- | --- | --- |
-| **User Management** | Approved 2026-08-25 | `test-design-architecture.md`, `test-design-qa.md`, `test-design/people-management-handoff.md`, 46 stage-1 scenarios |
-| **Access Control** | Partial child — scenario suite + SPEC (draft) | 202 scenario files, `spec-access-control-test-cases/SPEC.md`; consolidation TEA optional |
+**Architecture:** Hexagonal bounded contexts; AccessControl facade is the sole authorization entry; audiences are resolved live and in bulk; Reporting, Project, PP, Self, and Colleague remain distinct; platform-owned revocation is next-request, project-derived revocation is within 15 minutes. Requirements plus AD-19 and AD-20 effectively specify the PP and scheduled-departure solutions; both are ready for formal Product Owner/Architect sign-off rather than further design discovery.
 
-**Business context (§1, §7, §9):** Access-control correctness is the primary quality attribute. Platform serves 500+ employees. Iteration 2 requires real timetracker integration (not mock). Platform release is blocked until the access-control suite passes independently of feature workflows (§9).
+**Ownership boundary:**
 
-**Architecture bindings:** AD-1 three-stage gate · AD-3 real HTTP + PostgreSQL, faked outbound ports · AD-9 AccessControl facade only · AD-10 bulk tier resolution · AD-13 integration identity · AD-14 four router shapes.
+| Child / input | Current authority |
+| --- | --- |
+| User Management architecture + QA test designs | **Approved 2026-08-25; authoritative child baseline. Do not redo here.** Its own scope, risks, and approved scenarios remain child-owned. |
+| Access Control Phase-1 suite | **171 v1.5 Stage-1 scenario drafts**, aligned 2026-08-29; each still requires independent human AD-1 approval. This is design inventory, **not approved coverage** and not permission to write Stage-2 E2E. |
+| Deferred AC slices | Shared links, projection surfaces, role catalog, full-profile overlay, Project-line positives, Department positives, and integration-driven access remain outside the 171-file Phase-1 slice. |
 
-**Risk summary:** 12 platform risks identified (6 high ≥6, 4 medium, 2 low). Child UM risks R-001..R-014 remain authoritative within `user-management`; platform risks use **PR-** prefix.
+**Risk summary:** 10 platform risks, all high (P×I ≥6): 5 critical score 9 and 5 score 6. Platform `PR-*` does not renumber child UM `R-*`.
 
 ---
 
 ## Quick Guide
 
-### 🚨 BLOCKERS — Feature / Integration Domains (Do Not Block UM or Access Control)
+### Ready Now
 
-**Scope rule (decided 2026-08-25):** PR-B-01, PR-B-02, PR-B-03, PR-B-05, PR-B-06, and PR-B-07 are scoped architecture/integration decisions. They block **downstream feature domains and delta child TEA** only — **not** User Management child ATDD or Access Control stage-1/stage-2 gate E2E.
+1. Apply AD-1 per feature: independently approve a scenario, then independently approve its red E2E, then implement. No agent or author may self-certify a stage.
+2. Continue the approved User Management child according to its own artifacts; this platform refresh does not change its ownership.
+3. Review and approve the 171 Access Control Phase-1 files one by one. Their implemented scope is limited to Self, Reporting line, direct PP, Colleague, withhold negatives, functional boundaries, fail-closed behavior, and authentication.
+4. Build against established seams: real HTTP + PostgreSQL for E2E, outbound ports behind DI, AccessControl facade only, live bulk audience resolution, and synthetic seeded identities.
 
-1. **PR-B-01: Custom-field storage model** — §4.1/§3.3.5/§6 require arbitrary filter/sort on fields that do not exist yet. EAV vs JSONB undecided (ARCHITECTURE-SPINE Deferred). **Blocks:** All Employees saved views, export with custom columns, S16 **runtime** field definitions — **not** AC matrix S16 draft scenarios. Owner: Architect. **TBD.**
+### 🚨 Explicit Product / Architecture Blockers
 
-2. **PR-B-02: Dashboard engine & widget access model** — §4.4 requires one engine, four configurations; design not settled (`docs/architecture/dashboards.md`). **Blocks:** all dashboard E2E, widget-scoped access tests, PP/UM/DM/PM counter scenarios. Owner: Architect. **TBD.**
+| ID | Decision required | Blocks | Owner | Required by / status |
+| --- | --- | --- | --- | --- |
+| **PR-B-01 / OQ-114** | EAV vs JSONB custom-field storage and indexed visibility-safe filter/sort plan; column-per-field is excluded | Runtime S16, full directory, saved views, exports | Architect | Before directory wave — **Open** |
+| **PR-B-02 / OQ-115** | One dashboard engine's widget authorization, aggregation, and counter projection contract | UM/DM/PM/PP dashboard wave | Architect | Before dashboard wave — **Open** |
+| **PR-B-03 / OQ-116** | Non-manager project-assignment semantics and resulting policy target roles | Final Department/project policy model and positive Project-line scope | Product + Security + Architect | Before affected AC/integration design — **Open** |
+| **PR-B-04 / OQ-117** | Profile bounded-context boundary and ownership of S1–S16 projections | Profile/list child design and cross-context contracts | Architect | Before profile wave — **Open** |
+| **PR-B-05 / OQ-105** | Who may grant/revoke the HR Admin functional role; confirm remaining default role-permission assignments | Admin delegation and bootstrap lifecycle | Product Owner + Security | Before role-admin implementation — **Open** |
+| **PR-B-06 / CC-05** | Self versus full-profile overlay precedence and effective section mapping | Full-profile projection and its AC scenarios | Product Owner + Architect | Before full-profile Stage 1 — **Open** |
+| **PR-B-07 / CC-07** | Immutable relationship/access journal schema, snapshots, reader authorization, and transaction enrollment | Journal-backed PP/full-access/organisational mutations | Architect + Security + Backend | Before affected Stage 2/implementation — **Open** |
+| **PR-B-08** | Timetracker API/auth/identity/error contract; events vs state-at-sync; partial/intermittent success semantics | Project-line positives, S10/S11, sync/revocation evidence | Integration + Architect + Security | Before adapter Stage 1 — **Open** |
+| **PR-B-09** | Hosting, environment topology, secrets, backup/restore, monitoring, alert ownership, and rollback envelope | Deployed/demonstrable DoD and production NFR evidence | DevOps + Architect + Security | Before first release — **Open** |
 
-3. **PR-B-03: Timetracker integration contract** — §5.1 leaves/projects APIs are load-bearing for tier resolution (§2.1 relation 2) and S10/S11 display. API shapes, auth, sync semantics, and failure modes not documented. **Blocks:** project-derived Manager sync tests, leaves read path, resourcing approval→project sync — **not** AC tier-derivation draft scenarios (TD-*). Owner: Integration + Architect. **TBD.**
+### Ready for Formal Sign-off
 
-4. **PR-B-04: PeopleForce integration contract** — **Scope decided:** read-only integration covers **candidates and vacancies**; external link is **fallback only** when PF API unavailable. Endpoint/auth/rate-limit contract still undecided. **Blocks:** resourcing PF E2E and port-fake contract — **not** UM or AC. Owner: Integration. **Contract TBD.**
+| ID | Sign-off package | Design status | What may proceed now | What still waits |
+| --- | --- | --- | --- | --- |
+| **PR-S-01 / CC-04** | Requirements + AD-19: one PP per employee; atomic optimistic create/replace/delete; next-request revocation; concurrency handling; journal direction | **READY FOR FORMAL PO/ARCHITECT SIGN-OFF** — solution specified | Access Control-owned direct-PP audience review and User Management-owned PP-mutation Stage-1 design/review | E2E/implementation require explicit sign-off, normal AD-1 approvals, and CC-07 where journal detail is required |
+| **PR-S-02 / CC-06** | Requirements + AD-20: effective date/reason; relationship blockers and outcomes; durable, retrying, fail-closed executor | **READY FOR FORMAL PO/ARCHITECT SIGN-OFF** — solution specified | Employment-lifecycle Stage-1 design and review | E2E/implementation require explicit sign-off and normal AD-1 approvals; release operations also require PR-B-09 |
 
-5. **PR-B-05: Pending bounded-context confirmation** — AD-5 lists `profile`, `resourcing`, `cds`, `mentorship`, `risk`, `feedback`, `campaigns` as pending. Router shapes exist (AD-14) but owning contexts are not confirmed. **Blocks:** child TEA runs for those domains — **not** UM or AC. Owner: Architect. **TBD.**
+**Boundary:** CC-04 and CC-06 are not discovery/design gaps. AD-19 and AD-20 are the binding architecture directions for formal sign-off. CC-07 remains a separate open architecture dependency for immutable journal schema, readers, and transaction enrollment; PR-B-09 remains the separate operational envelope.
 
-6. **PR-B-06: Department edge modeling** — TD-13 is provisional; `Policies.targetType:'department'` is syntactic only (AD-10). Non-manager project assignment semantics still with stakeholders. **Blocks:** department-manager tier path **final** E2E beyond draft scenario — **not** AC tier-derivation draft suite. Owner: Product + Architect. **TBD.**
+### AC Stage-1 / E2E Dependencies
 
-7. **PR-B-07: Temporal employment model** — §6 requires grade, position, department, and employment type as time-bounded records (career timeline history depends on this). Storage shape undecided. **Blocks:** §4.9 auto-events for grade/department/FTE/extended-leave; employment section (S4) workflow tests — **not** UM partial §4.9 child scope. Owner: Architect. **TBD.**
+- The 171 Phase-1 files may be reviewed now, but remain draft until each receives explicit human approval.
+- Direct-PP Stage-1 files are reviewable within that draft scope; E2E/implementation waits for PR-S-01 sign-off, per-file AD-1 approvals, and PR-B-07/CC-07 where journal detail applies.
+- Stage-2 E2E for any file starts only after that file's approval and must stop again for independent red-test approval before production code.
+- Project-line positive cells require PR-B-08; Department positives and transitive PP HR-line require an approved Department/HR-boundary contract plus OQ-116 resolution.
+- Shared-link, list/filter/export/search leakage, full-profile, and runtime role-catalog slices require separate Stage-1 artifacts; the 171 files do not cover them.
+- Feature workflows remain owned by their feature children; an AC matrix response is not evidence that dashboards, resourcing, lifecycle, or profile workflows work.
 
-### ⚠️ HIGH PRIORITY — Validate Before Platform Release
+### 📋 Established Architecture Constraints
 
-1. **PR-001 (SEC, 9):** §3.3.1 leak through any surface — API, export, list columns, filters, errors, notifications (if built). Mitigation: access-control `surfaces/` + matrix suite; extend when new surfaces ship. Owner: access-control feature owner.
-
-2. **PR-002 (SEC, 6):** Stale or cached tier resolution (§6, AD-10). Mitigation: no persisted tiers; graph-change invalidation tests when caching is proposed. Owner: access-control + Platform.
-
-3. **PR-003 (PERF, 6):** §7 NFR — All Employees ≤2 s @ 500+ rows including permission resolution. Mitigation: k6 on composed list endpoint; joint ownership access-control + list owner. Owner: Platform.
-
-4. **PR-004 (TECH, 6):** Timetracker sync as sole writer of `managedBy:'sync'` rows (AD-13) — old+new coexistence window would violate non-sticky access (§2.1). Mitigation: transactional replace tests once sync exists. Owner: Integration. **Blocked on PR-B-03.**
-
-5. **PR-005 (DATA, 6):** Identity resolution across PeopleForce candidate → platform User → timetracker user (§6). **Decided:** internal User ID is canonical; external system IDs stored explicitly; email is matching hint only. Mitigation: mapping contract tests + bootstrap E2E. Owner: Architect + Integration.
-
-6. **PR-006 (SEC, 6):** Extensible functional roles never widen data access (§2.3). Partially covered by access-control UR-11; must re-run when each new FR permission ships. Owner: access-control.
-
-### 📋 INFO ONLY — Platform-Wide Testing Conventions (Inherited by All Children)
-
-1. **Gate model (AD-1):** scenario doc → red E2E → production code; negative `—` cells are first-class (§9).
-2. **E2E definition (AD-3):** real HTTP, real PostgreSQL, outbound ports faked via DI tokens; no live third-party calls in gate suite.
-3. **Isolation (DEC-UM-010, platform infra):** one worker + UUID-owned slices initially; schema-per-worker before parallel workers.
-4. **Personas:** access-control canonical cast (Alice, Bob, Carol, Pete, Dave, Frank, Paula, Hana, Colin, Root, Ida, Eve) is the platform fixture baseline.
-5. **Release gate (§9):** PG-01..PG-07 — **PG-07 decided:** list ≤2 s @ 500+ is a **release gate**; waiver only temporary and documented (see QA platform doc).
-6. **Share links (OQ2, decided):** Shared links require **authentication** in Iteration 2 — anonymous viewer path out of scope.
-7. **Delta-review (platform):** Future bounded contexts extend the platform coverage map; full platform TEA re-run only if §2/§3/§7/§9 change (see handoff).
+- HR Admin is configuration-only and grants no employee-data audience. Full-profile access is separate.
+- Both dimensions must permit mutation: functional capability plus target-scoped section write; dedicated relationship operations remain separate.
+- PeopleForce stores/uses candidate ID and may optionally prefill candidate facts after preview and per-field confirmation. It is not a vacancy source of truth.
+- Resourcing owns vacancies, headcount, Unassigned requests, candidate review, compensation visibility, and request-bound profile links.
+- Notifications and analytics are good-to-have; if selected, their privacy/source-of-truth rules become binding before design.
 
 ---
 
-## Platform Risk Register
+## Platform Risk Assessment
 
-**Legend:** P×I scoring 1–3 each. Categories: TECH · SEC · PERF · DATA · BUS · OPS.
+**Scoring:** Probability 1 unlikely, 2 possible, 3 likely; Impact 1 minor, 2 degraded, 3 critical. Score = P×I. Evidence is v1.5 requirements, current PRD/addendum, architecture spine, and the present artifact status.
 
-### High-Priority (Score ≥6)
+| Risk ID | Cat | Evidence-backed risk and consequence | P | I | Score | Architecture mitigation | Owner | Timeline | Status | Verification |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| **PR-001** | SEC | Distinct audiences, narrowed fields, flags, exports and filters create many leak paths; a leak exposes restricted employee data | 3 | 3 | **9** | Central facade plus projection contracts that only narrow; server-side omission on every surface | Security + AC + feature backend leads | Before each surface ships | Open; Phase-1 draft only | Approved Stage-1/2 evidence for matrix and each projection surface; security review |
+| **PR-002** | SEC | Stale graph state can retain access after org change, sync delay, outage, or due departure | 3 | 3 | **9** | No persisted audiences; atomic graph writes; AD-20 request cutoff; 15m/4h sync controls | AC + Integration + Backend | Before access-bearing release | In progress by design; evidence absent | Clock-controlled revocation evidence, outage telemetry, transaction review |
+| **PR-003** | DATA | Implementing the specified PP contract before formal sign-off, or without CC-07 journal detail, can create governance or audit inconsistency | 3 | 3 | **9** | Sign off PR-S-01; approve CC-07; enroll the PP fact and immutable journal write in one transaction with stable snapshots | Product + Architect + Security + Backend | Before PP E2E/implementation | **Sign-off ready; PR-B-07 open** | Sign-off trace, schema/authorization review, and rollback/concurrency evidence |
+| **PR-004** | SEC | Unresolved full-profile precedence can expose Self-denied sections or create inconsistent grants | 3 | 3 | **9** | Product-approved overlay mapping and Self precedence; preserve separate grant lifecycle and last-holder guard | Product + Architect + Security | Before full-profile Stage 1 | **Blocked PR-B-06** | Decision trace and approved positive/negative projection evidence |
+| **PR-005** | TECH | Unknown timetracker contract can create stale or mixed project policies; project assignment directly changes data access | 3 | 3 | **9** | Publish provider contract; sync sole-writer transactional replacement; define partial-success behavior and provenance | Integration + Architect + Security | Before adapter Stage 1 | **Blocked PR-B-08** | Contract review, deterministic adapter evidence, real test-environment demonstration |
+| **PR-006** | PERF | Arbitrary visible fields plus live bulk graph resolution may breach ≤2s at 500+ rows | 2 | 3 | **6** | Approve indexed custom-field/query plan; one bulk resolution plan; representative seeded dataset and query observability | Architect + Profile Backend + DBA/DevOps | Before directory release | **Blocked PR-B-01** | Versioned report for 500+ rows showing ≤2s including permission resolution |
+| **PR-007** | DATA | Dashboard/resourcing/campaign aggregates can diverge from projection rules and lifecycle facts, producing wrong decisions or leaks | 2 | 3 | **6** | Typed read models consume AccessControl and canonical facts; request/task transitions and counters update transactionally/idempotently | Dashboard + Resourcing + Campaign Backend leads | Before affected waves ship | **Blocked PR-B-02/04** | Contract review and cross-context invariant evidence |
+| **PR-008** | OPS | Implementing the specified departure contract before formal sign-off, or operating it without the AD-20 deployment controls, can produce governance drift or delayed cutoff | 2 | 3 | **6** | Sign off PR-S-02; then use one validated business timezone/database plus worker lag/retry/lease/cutoff telemetry, alert owner, and retry surface | Product + Architect + DevOps + Backend + Security | Before lifecycle E2E/implementation and first release | **Sign-off ready; PR-B-09 open** | Sign-off trace plus deployment rehearsal, health/alert evidence, delayed-worker and rollback demonstration |
+| **PR-009** | OPS | Treating 171 draft AC files as coverage bypasses human gates and creates false release confidence | 2 | 3 | **6** | Machine-readable approval/trace state per file; CI must distinguish draft, approved scenario, approved red E2E, and green code | Engineering leads + Repository maintainers | Before AC implementation | Open | Independent approval records and trace audit; no draft counted as coverage |
+| **PR-010** | DATA | Seed/platform/timetracker/candidate identity mismatch or real PII use can attach access to the wrong person or expose client data | 2 | 3 | **6** | `ttId` and candidate ID are durable external keys; email is not sole key; synthetic seed-only controls and log redaction | Integration + Backend + Security/DevOps | Before imports/integrations | Partial design support | Reconciliation report, collision/fail-closed evidence, repository/log data scan |
 
-| Risk ID | Cat | Description | P | I | Score | Mitigation | Owner | Timeline |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| **PR-001** | SEC | Data leak via non-profile surfaces (export, filter inference, errors) | 3 | 3 | **9** | `surfaces/` SF-01..06; extend per new surface | access-control | Pre-release |
-| **PR-002** | SEC | Stale permission cache / persisted tier | 2 | 3 | **6** | Ban caching without invalidation; add tests if proposed | Platform | Pre-release |
-| **PR-003** | PERF | List SLA with bulk tier walk | 2 | 3 | **6** | k6 @ 500+ rows; TD-UM-NFR-PERF-01 is partial | Platform | Story list + AC tier |
-| **PR-004** | TECH | Timetracker sync transactional replace | 2 | 3 | **6** | Integration tests post PR-B-03 | Integration | **Blocked** |
-| **PR-005** | DATA | Cross-system identity mismatch | 2 | 3 | **6** | Canonical User ID + explicit external IDs; email hint only | Architect + Integration | Pre-release |
-| **PR-006** | SEC | New FR permission widens colleague view | 2 | 3 | **6** | UR-11 pattern per new permission | access-control | Ongoing |
-
-### Medium-Priority (Score 3–5)
-
-| Risk ID | Cat | Description | P | I | Score | Mitigation | Owner |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| PR-007 | TECH | Resourcing writes `Relationship` outside user-management application layer (AD-2) | 2 | 2 | 4 | Seam test once resourcing confirmed | resourcing + UM |
-| PR-008 | DATA | Career timeline event missed on cross-context mutation | 2 | 2 | 4 | AD-11 same-transaction pattern per hook; blocked on PR-B-07 for non-UM event types | Feature owners |
-| PR-009 | BUS | PeopleForce fallback hides integration defects | 2 | 2 | 4 | Fallback is emergency-only; gate suite must exercise read-only PF port | Integration |
-| PR-010 | OPS | Operational envelope undeployed (§9 DoD) | 2 | 2 | 4 | Deployed demo env for gate E2E | Platform |
-
-### Low-Priority (Score 1–2)
-
-| Risk ID | Cat | Description | Score | Action |
-| --- | --- | --- | --- | --- |
-| PR-011 | BUS | GOOD TO HAVE notifications leak matrix data (§4.13) | 2 | Out of scope; if built, matrix-aware tests |
-| PR-012 | OPS | Real PII in non-prod (§7) | 2 | NFR-1 CI grep platform-wide |
+**Residual-risk rule:** A mitigation is not complete because a design exists. Status changes only when the listed verification evidence is reviewed; accepted residual risk requires a named approver and expiry outside this planning document.
 
 ---
 
-## NFR Testability Requirements (Platform)
+## NFR Testability Requirements
 
-| NFR | Requirement (§7) | Design Support | Gap / Blocker | Planned Evidence |
+| Category | Source threshold / requirement | Current support | Architecture gap | Planned evidence |
 | --- | --- | --- | --- | --- |
-| Security | Access-control correctness primary | access-control suite + facade (AD-9) | Feature endpoints must compose | Full AC E2E green |
-| Security | §3.3 strict matrix | Matrix + surfaces scenarios drafted | Implementation not started | Per-cell API assertions |
-| Performance | List ≤2 s @ 500+ | AD-10 bulk SQL | k6 harness partial (UM) | k6 JSON report — **PG-07 release gate** |
-| Performance | **Accessibility** responsive list/profile/dashboard | **Unknown** | No thresholds in §7 | **TBD — manual + axe/Lighthouse when UI exists** |
-| Reliability | Integration failure graceful (NFR-3) | Port + fake pattern (AD-3) | Timetracker/PF contracts missing | Throwing-fake E2E per port |
-| Data privacy | Pseudonymised non-prod (NFR-1) | Persona convention | Automated scan partial | CI grep report |
-| Maintainability | AD-1 traceability | Supported | Pending contexts lack scenarios | Trace matrix post-children |
+| Security | No unauthorized section fact through any surface; access correctness primary | AD-9/10/12 and v1.5 matrix | Deferred projections and unapproved AC drafts | Approved authorization evidence plus security review |
+| Revocation | Owned relations: next request; project changes: ≤15m; failed sync: withdraw project access after 4h; due departure: request-time cutoff | AD-10/19/20 | Partial-sync contract and operational telemetry | Timestamped sync/cutoff traces and delayed-worker evidence |
+| Performance | All Employees ≤2s with 500+ rows, arbitrary filters, permission resolution | Bulk-resolution direction | OQ-114 plan and representative environment | Versioned load/query report |
+| Reliability | External integration failure must not take down core; last-known timetracker data is visibly stale | Ports/adapters and fixed stale rules | Timeout/retry/circuit thresholds **UNKNOWN**; partial-success behavior open | Deterministic failure evidence and operational metrics |
+| Accessibility / responsive | List, profile, dashboard must be accessible and responsive | Requirement only | Standard, viewport set, and measurable thresholds **UNKNOWN** | Accessibility assessment and responsive evidence after criteria approval |
+| Privacy | Delivered seeded population only; no real employee data in code, agents, logs, screenshots, or repository | Seed strategy and persona fixtures | Enforcement across environments/logs incomplete | Data-source attestation and automated/manual scans |
+| Availability / recovery | Core degrades gracefully; AD-20 must converge without restoring access | Durable worker design | Availability %, RTO, RPO, backup frequency, restore and rollback thresholds **UNKNOWN** | Approved SLO/DR decision, restore and deployment rehearsal |
+| Maintainability / process | AD-1 approved scenario → approved red E2E → production code; specs match shipped behavior | Strong documented rule | Per-file approval state and cross-child traceability | Repository trace/approval audit |
+| Deployability | Module deployed and demonstrable; AD-20 migration before worker, same timezone and DB | AD-20 constraints | Hosting/topology/rollback envelope open | Environment inventory and deployment demonstration |
 
-**Unknown thresholds:** Accessibility targets, notification delivery SLAs, analytics export limits — not in §7; do not invent.
-
-**Assessment boundary:** Final PASS/CONCERNS/FAIL via `nfr-assess` after implementation evidence.
+**Assessment boundary:** These are requirements for later evidence. Final PASS/CONCERNS/FAIL belongs to `nfr-assess`, not this document.
 
 ---
 
 ## Testability Concerns and Architectural Gaps
 
-### 🚨 ACTIONABLE CONCERNS
+### 🚨 Blockers to Fast Feedback
 
-| Concern | Impact | Architecture Must Provide | Owner | Timeline |
+| Concern | Impact | Architecture must provide | Owner | Timeline |
 | --- | --- | --- | --- | --- |
-| No test seed API | Slow parallel feature development | Fixture-backed seed scripts or documented Prisma seed contracts per context | Platform | Foundation |
-| Profile context undecided | Duplicate or missing S2–S16 assembly tests | Confirm profile vs user-management split (AD-5 open question) | Architect | **TBD** |
-| Timetracker fake contract | Cannot test tier revocation on project end | Port interface + deterministic fake matching real API shape | Integration | **Blocked PR-B-03** |
-| Custom fields runtime | Cannot test §4.1 filter/column/export | Storage model + admin UI seam | Architect | **Blocked PR-B-01** |
-| Share-link viewer auth (OQ2) | **Resolved** — auth required Iteration 2 | SL stage-2 asserts authenticated viewer; unauthenticated → 401 | access-control | **Decided 2026-08-25** |
+| Projection ownership unresolved | No stable seam for S1–S16, directory, exports, or workflow-specific narrowing | Resolve OQ-117; version field/record projection contracts around AccessControl | Architect | Before profile/list wave |
+| Dynamic query model unresolved | Hidden-value inference and performance cannot be proven reliably | Resolve OQ-114 with indexed authorization-aware query design | Architect + DBA | Foundation close / before directory |
+| Provider contract absent | Fakes may encode the wrong security behavior; live sync cannot be explained historically | Resolve PR-B-08 against actual timetracker documentation | Integration + Security | Before integration Stage 1 |
+| Journal contract detail absent | Journal-backed PP and grant changes cannot yet prove immutable snapshots, reader scope, or transaction enrollment | Approve CC-07 without reopening AD-19's specified PP behavior | Architect + Security + Backend | Before affected E2E/implementation |
+| Operational environment undefined | Lifecycle cutoff, worker recovery, alerts, and DoD deployment remain unprovable | Resolve PR-B-09 without weakening AD-20 | DevOps + Architect | Before first release |
+| Approval state not machine-visible | Draft scenarios may be mistaken for tested behavior | Per-file AD-1 metadata/trace contract | Engineering leads | Before AC Stage 2 |
+
+### Architectural Improvements Needed
+
+1. **Projection adapters per surface:** centralize field/record narrowing for profile, list/filter/export/search, shared links, dashboards, and optional notifications; direct policy reads remain forbidden.
+2. **Controllable state and time:** provide synthetic idempotent seed/reset contracts, transaction-safe fixtures, and injected clock/timezone seams for 15-minute, four-hour, expiry, and departure boundaries.
+3. **Observable security decisions:** emit correlation IDs and sanitized decision/sync/worker metrics without recording restricted values; exact retention and broader profile-read audit remain **UNKNOWN**.
+4. **Cross-context consistency:** route resourcing, campaigns, mentorship, timeline, and lifecycle mutations through owning application layers with idempotency and explicit transaction boundaries.
 
 ### Testability Assessment Summary
 
 **What works well**
 
-- AD-1 gate and scenario corpus discipline already applied to user-management and access-control.
-- AccessControl facade (AD-9) gives a single authorization seam for negative testing.
-- Canonical personas and router tree (AD-14) reduce per-feature invention.
+- Hexagonal ports and AD-3 isolate external failure while preserving real HTTP/database behavior.
+- AD-9/10 provide one live, bulk authorization seam suitable for profile, list, and dashboard consumers.
+- Requirements plus AD-19/20 specify PP concurrency and fail-closed departure execution sufficiently for Stage-1 design; formal PR-S-01/02 sign-off remains before E2E/implementation.
+- The approved User Management child preserves bounded ownership and can progress independently within its contract.
 
-**Accepted trade-offs (Iteration 2)**
+**Accepted scope boundaries**
 
-- PeopleForce read-only integration (candidates + vacancies) is in scope; external link is **fallback only** when PF API unavailable — gate suite must cover PF port fake, not waive to link-only.
-- Notifications (§4.13) and analytics (§4.14) out of scope — no platform test plan entries unless scope changes.
-- Department manager path (TD-13) remains provisional until PR-B-06 resolves.
-
----
-
-## Risk Mitigation Plans (High-Priority)
-
-### PR-001: Cross-Surface Data Leak (Score: 9)
-
-1. Complete access-control stage-2 E2E for `surfaces/` and matrix negatives before feature UI ships.
-2. Require each new list/export/filter endpoint to cite an existing SF scenario or add one before merge.
-3. Platform release gate: zero open P0 on SF-01..06 and matrix `—` cells.
-
-**Owner:** access-control lead · **Verification:** green gate E2E + manual spot-check export xlsx column set.
-
-### PR-003: List Performance SLA (Score: 6)
-
-1. Shared 500+ row seed owned by Platform.
-2. k6 script against composed `GET /users` (or All Employees route when defined) with tier resolution enabled.
-3. Nightly run; PR gate on regression threshold once baseline captured.
-
-**Owner:** Platform · **Verification:** k6 summary JSON · **Partial child:** TD-UM-NFR-PERF-01 covers UM list only.
-
-### PR-004: Timetracker Sync Atomicity (Score: 6) — BLOCKED
-
-1. Document single-writer transactional replace (AD-13).
-2. Fake port simulates partial failure and concurrent sync.
-3. Assert project-unassignment revokes Manager access immediately (TD-11 pattern).
-
-**Owner:** Integration · **Blocked on:** PR-B-03.
-
-### PR-005: Cross-System Identity (Score: 6)
-
-1. **Canonical model:** platform internal User ID is source of truth; PeopleForce and timetracker IDs stored as explicit external-ID fields.
-2. Email used only as matching hint during bootstrap — never sole join key in tests or production assertions.
-3. E2E: candidate import → User create → timetracker link asserts all three IDs present and resolvable.
-4. Negative: email collision without explicit ID mapping must fail closed.
-
-**Owner:** Architect + Integration · **Verification:** identity bootstrap E2E + schema contract review.
-
-### PR-002: Stale Tier Cache (Score: 6)
-
-1. No persisted tier rows without invalidation contract (AD-10).
-2. If caching proposed: graph-change invalidation tests required before merge.
-3. Regression: project unassignment revokes Manager access immediately (TD-11 pattern).
-
-**Owner:** Platform + access-control · **Verification:** arch review + E2E when caching lands.
-
-### PR-006: FR Permission Widening (Score: 6)
-
-1. UR-11 pattern mandatory for every new FR permission before merge.
-2. Each permission: assert colleague view unchanged for non-entitled fields.
-
-**Owner:** access-control · **Verification:** UR-11 green + per-permission negative.
+- The 171 AC Phase-1 drafts deliberately exclude major slices; this is staged design, not a waiver.
+- PeopleForce API prefill, notifications, and analytics are optional; candidate ID storage remains required for external candidates.
+- No employee provisioning, AD/SSO, compensation profile data, leave balances, LMS, or project allocation percentages are added.
 
 ---
 
-## Human Decisions Log
+## Risk Mitigation Plans
 
-| ID | Decision (2026-08-25) | Test impact |
-| --- | --- | --- |
-| **PG-07** | List ≤2 s @ 500+ is a **release gate**; waiver only temporary and documented | k6 TR-7-01 promoted to P0; nightly + pre-release |
-| **OQ2** | Shared links require **authentication** in Iteration 2 | TR-4.8-01; SL stage-2 asserts auth; no anonymous viewer |
-| **PR-005** | Internal User ID canonical; external IDs explicit; email hint only | TR-6-02 scenarios unblocked at design level |
-| **PR-B-04 scope** | PF read-only: candidates + vacancies; external link fallback only | TR-5.2-01/02 scope fixed; contract still PR-B-04 |
-| **PR-B scope rule** | PR-B-01/02/03/05/06/07 do **not** block UM or Access Control | UM ATDD + AC stage-2 authorized independently |
+| Risks | Required engineering actions | Owner / timeline | Status / verification |
+| --- | --- | --- | --- |
+| PR-001, PR-004 | Approve projection/overlay contracts; enforce facade and server-side omission; add a security review checkpoint per new surface | Security + Architect + feature backend; before surface Stage 2 | Open / reviewed contracts and authorized evidence |
+| PR-002, PR-005 | Keep decisions live; make sync replacement atomic; enforce AD-20 cutoff before authorization; expose stale/lag/cutoff telemetry | AC + Integration + Backend; before access-bearing release | PR-005 blocked / deterministic and live-environment evidence |
+| PR-003, PR-007 | Formally sign off PR-S-01, approve CC-07, then make journal and org mutation atomic and use canonical facts/idempotent cross-context commands | Product + Architect + Backend/Security leads; before dependent E2E/implementation | Sign-off ready; CC-07 open / approval trace, concurrency, rollback, and invariant evidence |
+| PR-006 | Approve OQ-114; index graph/custom-field paths; instrument query plans and the composed directory endpoint | Architect + DBA/DevOps; before directory release | Blocked / 500+ row ≤2s report |
+| PR-008 | Formally sign off PR-S-02; separately resolve the operational envelope, then deploy worker and app against one configured timezone/database with demonstrated alert/remediation ownership | Product + Architect, then DevOps + Backend + Security; before lifecycle E2E/implementation / first release | Sign-off ready; blocked by PR-B-09 for operations / sign-off trace plus deployment and failure rehearsal |
+| PR-009 | Record independent approval at each AD-1 stage and prevent CI/reporting from counting drafts as coverage | Engineering leads; before AC implementation | Open / trace audit |
+| PR-010 | Enforce durable external IDs, fail closed on ambiguous matches, prohibit real PII, and redact operational output | Integration + Security; before import/integration | Partial / reconciliation and data scans |
 
 ---
 
 ## Assumptions and Dependencies
 
-### Assumptions
+### Architectural Assumptions
 
-1. Child User Management TEA remains approved baseline; platform doc references it without modification.
-2. access-control stage-1 scenarios (202 files) are the authoritative AC test design until a formal TEA doc is run.
-3. Stack per ARCHITECTURE-SPINE: NestJS 11, Prisma 7, PostgreSQL, TypeScript LTS.
-4. Iteration 2 grading weights process (§8) — test architecture documentation is a scored deliverable.
+1. `docs/project-requirements.md` v1.5 overrides stale v1.2 planning claims; the current People Management PRD/addendum and spine refine it without weakening normative rules.
+2. Stack remains TypeScript/Node LTS, NestJS 11.x, Prisma 7.x, and PostgreSQL.
+3. Full-profile access, HR Admin, functional roles, and relationship-derived audiences remain four distinct concepts.
+4. No unspecified latency, availability, recovery, accessibility, retention, retry, or rate-limit target is inferred.
 
 ### Dependencies
 
-1. **Architect decisions** on PR-B-01, PR-B-02, PR-B-05, PR-B-07 — required before **delta child TEA** for affected domains; **not** required for UM ATDD or AC stage-2.
-2. **Timetracker API package** — required before PR-004 mitigation and S10/S11 integration tests (PR-B-03).
-3. **PeopleForce API contract** — required before resourcing PF E2E; scope decided (candidates + vacancies read-only); fallback link is emergency-only (PR-B-04).
-4. **User Management ATDD + Access Control stage-2** — authorized independently of PR-B-01..07 resolution per human decision 2026-08-25.
+1. OQ-114/115/116/117 and OQ-105 decisions before their named waves.
+2. CC-05 remains open before full-profile scenarios; PR-S-01 and PR-S-02 require formal sign-off before PP/departure E2E or implementation, while their Stage-1 design/review may proceed now; CC-07 / PR-B-07 remains open before journal-dependent E2E/implementation.
+3. Actual timetracker contract before project-positive and sync scenarios; PeopleForce contract only if optional prefill is selected.
+4. Approved operational envelope before deployed/demonstrable DoD evidence.
+5. Per-file AD-1 approval before any of the 171 AC drafts can become Stage-2 work or counted coverage.
 
-### Risks to Plan
+### Risks to This Plan
 
-- **Parallel teams blocked on same architect decisions** — Impact: violates §8.2 · Contingency: time-box TBD domains; ship access-control + user-management first.
-
----
-
-**Next steps for Architecture:** Resolve PR-B-01..07 in priority order. Confirm bounded-context list. Publish timetracker port contract.
-
-**Next steps for QA:** See `test-design-qa-platform.md` for platform coverage map, §4 requirements trace appendix, and delta-review protocol. Access-control: delta-TEA optional; PG-01 requires per-file AD-1 approval then stage-2 P0 green.
-
-**Child references:** `test-design-architecture.md` (UM) · `test-design-qa.md` (UM) · `docs/test-cases/access-control/README.md`
+- **Architecture decisions land after feature work starts:** contracts and evidence will churn. Contingency: progress only ready slices and keep blocked contexts fail-closed.
+- **Child/platform drift:** platform summaries could overwrite child decisions. Contingency: child artifacts remain authoritative within their scope; reconcile by references, not copied scenario detail.
+- **Optional scope becomes implicit commitment:** capacity and security review are diluted. Contingency: require explicit scope approval before PeopleForce prefill, notifications, or analytics enter design.
 
 ---
 
-**Generated by:** BMad TEA Agent — Test Architect Module  
-**Workflow:** `bmad-testarch-test-design` (system-level, platform scope)  
-**Version:** 4.0 (BMad v6)
+**Architecture action:** Resolve PR-B-01–09, obtain PR-S-01/02 formal sign-off, and assign owners/dates to PR-001–010.  
+**QA boundary:** Platform execution detail and coverage are in the refreshed companion `_bmad-output/test-artifacts/test-design-qa-platform.md`; approved child artifacts remain authoritative within their scope.
+
+**Child references:** `_bmad-output/test-artifacts/test-design-architecture.md` · `_bmad-output/test-artifacts/test-design-qa.md` · `docs/test-cases/access-control/README.md`
