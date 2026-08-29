@@ -2,7 +2,7 @@
 title: People Management Platform
 status: draft
 created: 2026-08-24
-updated: 2026-08-26
+updated: 2026-08-29
 ---
 
 # PRD: People Management Platform
@@ -26,7 +26,7 @@ This PRD defines the **People Management Platform** for an internal engineering 
 
 Technical implementation choices belong in `addendum.md` and downstream architecture — not in this document.
 
-**Spec conflicts:** Where this PRD references `DEC-106`–`DEC-108`, those decisions clarify v1.5 requirements where the platform PRD was drafted earlier.
+**Source authority:** `docs/project-requirements.md` v1.5 is normative. Earlier decisions remain valid only where they do not contradict v1.5. The approved CC-02 Option 1 decision additionally defines how multiple simultaneously applicable access audiences combine; unresolved CC decisions remain explicit implementation gates in §11.
 
 ---
 
@@ -64,7 +64,7 @@ The machine-readable access matrix and its negative test catalogue are **deliver
 
 **Managers (Unit Manager, Delivery Manager, Project Manager)**
 
-- See the people I am responsible for — directly or via project assignment — with the full managerial view of their profiles.
+- See the people I am responsible for with the correct audience-specific view: Reporting line for reports-to and department management, and the narrower Project line for project-derived responsibility.
 - Track risks, action items, and resourcing for my unit or projects from a dashboard suited to how I organise work (by people or by project).
 - Propose candidates, share limited profile views for evaluation, and record management notes with appropriate visibility.
 
@@ -120,7 +120,9 @@ Dmytro opens the risk dashboard scoped to people in his reporting line, filters 
 | **Section (S1–S16)** | Atomic profile partition with its own access matrix cell per audience. |
 | **Reporting line** | Transitive closure of reports-to and department-management relationships (§2.1). |
 | **Project line** | Access from project assignment only — narrower §3.2 cells (§3.3.2). |
-| **Direct unit manager** | Employee's immediate reports-to manager; with assigned PP, may manually write S9. |
+| **Full-profile access** | Separate §2.4 grant that permits reading every profile section; it is not a functional role and grants no blanket write authority. |
+| **Relationship and grant journal** | Narrow security journal for changes that alter who can see what, plus shared-link accesses (§3.4). |
+| **Employment status** | Time-bounded `active` or `dismissed` fact; the sole source for whether a person has departed (§4.16). |
 | **Tier** | Resolved access role of a viewer with respect to a specific target employee. |
 | **Policy attachment** | Data record linking a user to a managerial or functional capability scope. [ASSUMPTION: implementation uses unified policy model per architecture spine — see addendum.] |
 | **Action item** | Single task entity: manual or campaign-generated; lifecycle open → completed (or cancelled by author). |
@@ -152,9 +154,11 @@ The system maintains **access roles** (derived) and **functional roles** (assign
 Manager access arises from (a) reports-to, (b) department management, and (c) project assignment where the viewer is PM or DM of a project the subject works on. Reporting line and project line are distinct matrix audiences.
 
 **Consequences (testable):**
-- When project assignment ends, derived access ends immediately (**DEC-102**).
-- DM sees all people on their projects at same data level as subject's unit manager for those projects.
+- Platform-owned relationship changes — manager, People Partner, employee department, and department manager — affect access on the next request.
+- Project-assignment changes affect access within 15 minutes. During timetracker failure, last-known project data is served behind a visible stale-data banner and all project-derived access is withdrawn after four hours.
+- DM and PM see project members through the narrower Project-line matrix column, not at the same data level as the subject's Reporting line.
 - PM sees project members; DM above PM sees PM's project scope plus remaining projects.
+- People Partner access extends recursively through the assigned PP's own reports-to chain inside HR, never through the employee's delivery chain.
 
 #### FR-3: Section-level access matrix
 
@@ -165,6 +169,7 @@ For each profile section S1–S16, the system enforces the normative matrix (Sel
 - S7 management notes default invisible to employee and PM; PM reads only notes flagged visible-for-PM; employee reads only notes flagged visible-for-employee.
 - Colleague view returns exactly S1, S10 (dates only), S11 (project name only) — enforced server-side.
 - HR Admin is not a matrix audience; full profile access is a separate grant (§2.4).
+- When more than one relationship-derived audience applies, effective access uses the strongest applicable permission per section (`RW` > `R` > `—`), as approved in CC-02 Option 1. This rule never manufactures a functional permission and never bypasses a dedicated mutation gate.
 
 #### FR-4: Server-side assembly on every request
 
@@ -188,7 +193,7 @@ Custom fields carry visibility level: management (default), employee, or colleag
 
 #### FR-6: Runtime role and permission CRUD
 
-HR Admin can create, name, and configure functional roles; grant or revoke granular permissions including: create form campaigns, create action items, create/edit risks, create resourcing requests, fulfil resourcing requests, assign mentors, maintain CDS records, manage custom fields, view each dashboard type.
+HR Admin can create, name, and configure functional roles; grant or revoke granular permissions including: create form campaigns, create action items, create/edit risks, create resourcing requests, fulfil resourcing requests, approve or reject proposed candidates, close resourcing requests, assign and end mentorships, maintain CDS records, edit the career timeline, create feedback, record a departure, manage custom fields, manage departments, change organisational relationships, and view each dashboard type.
 
 **Consequences (testable):**
 - New role creation and permission change require no code deploy.
@@ -200,11 +205,19 @@ HR Admin can create, name, and configure functional roles; grant or revoke granu
 
 HR Admin assigns and revokes **functional roles** for users via UI.
 
-**People Partner relationships** are assigned or revoked by: (a) the employee's direct manager, (b) HR Admin, or (c) a more senior People Partner (Q&A Aug 19).
+Four organisational facts are access switches: an employee's manager, People Partner, and department, plus a department's manager. They are changed on a dedicated organisational-relationships screen by an actor holding the *change organisational relationships* permission. They are not writable through S1 or inline directory editing.
 
 **Consequences (testable):**
 - User with custom "IT Security" role and create-campaign permission can target audience within their own access scope only.
-- PP assignment by unauthorized roles is rejected.
+- Every organisational relationship change rejects unauthorized actors and self-assignment, is journaled atomically, and affects access on the next request.
+
+#### FR-39: Full-profile access grant lifecycle
+
+Full-profile access is granted and revoked separately from functional roles. Only a current holder may grant it; self-assignment is forbidden; the first holder is seeded; removing the last holder is blocked; every grant and revocation is journaled. The grant provides read access to every section and does not bypass functional permissions, no-self-assignment rules, or dedicated write operations.
+
+#### FR-40: Relationship and grant journal
+
+The platform records manager, People Partner, employee-department, department-manager, and full-profile-access changes, plus every shared-link access. Each record contains actor, subject, before and after values, and timestamp. It is readable by full-profile holders and by the subject's current manager and People Partner.
 
 ---
 
@@ -267,11 +280,11 @@ Mentor, people partner, and direct manager are platform-managed. Current project
 
 #### FR-15: Unit Manager dashboard
 
-Grouped by people: headcount, risk counts by level, open/overdue action items, active resourcing requests, open campaigns; subordinate table with risk, project, leave status; manager's own action items; navigation shortcuts.
+Grouped by people: headcount, **active** risk counts by level (where active means above `low`), open/overdue action items, active resourcing requests, open campaigns; people table with risk and trend, project, leave status; manager's own action items; navigation shortcuts.
 
 #### FR-16: Delivery Manager dashboard
 
-Grouped by project: one table per project (people, risk, leave); top counters across all DM projects; project selector filters entire page and recalculates counters; shows own and PM-created resourcing requests.
+Grouped by project: one table per project (people, risk, leave); top counters across all DM projects; project selector filters the entire page and recalculates counters; shows own and PM-created resourcing requests. Requests without a project appear in an explicit **Unassigned** bucket and are included in All-project counters.
 
 #### FR-17: Project Manager dashboard
 
@@ -303,6 +316,7 @@ Author creates campaign (title, description, purpose, external form URL, due dat
 **Consequences (testable):**
 - People joining after activation are not added to frozen campaign audience.
 - External form content is never read or verified by the platform.
+- The campaign author sees only recipient name and that campaign's action-item status; no other S14 data or profile section is widened, and the exception ends when the campaign closes.
 
 ---
 
@@ -314,54 +328,59 @@ Author creates campaign (title, description, purpose, external form URL, due dat
 
 #### FR-21: Risk record and trend
 
-Risk levels: low, need attention, medium, high, leaver. History retained; current = latest. Trend arrow when level changed vs previous record.
+Risk levels have the fixed ascending order `low` < `need attention` < `medium` < `high` < `leaver`. History is retained and current = latest. A risk has no close/resolved state; it can move between any levels, including down to `low`. A trend arrow appears only when the level differs from the previous record. `leaver` is a prediction and must never be conflated with `dismissed` employment status.
 
 #### FR-22: Risk dashboard
 
-Counts by level (medium/high/leaver emphasised); sortable/filterable table; drill-through to profile S6; scoped to viewer's reporting line and PP assignments.
+Counts include only active risks (levels above `low`, with medium/high/leaver emphasised); sortable/filterable table; drill-through to profile S6; scoped to people over whom the viewer holds Manager or People Partner access.
 
 ---
 
 ### 4.8 Resourcing
 
-**Description:** DM/PM create requests; UM fulfils with internal or PeopleForce external candidates; DM approves/rejects. Realizes UJ-1. **Department entity confirmed (DEC-107); routing below.**
+**Description:** DM/PM create platform-owned resourcing requests; UM fulfils with internal or external candidates; DM approves/rejects candidates and explicitly closes requests. There is no PeopleForce vacancy entity or vacancy synchronisation. Realizes UJ-1.
 
 **Functional Requirements:**
 
 #### FR-23: Request creation
 
-DM/PM create resourcing requests with vacancy details, compensation level expectation, duration, workload; project reference optional. DM sees own and PM requests on their projects.
+DM/PM create resourcing requests with vacancy details and requirements, expected compensation level, duration, workload, **headcount** (default 1), and a required department. Project reference is optional; an unattached request is a normal state. The department routes the request to its responsible Unit Manager. A DM sees their own requests and those created by PMs of their projects.
 
-**UM routing:** Once Department entity is implemented, DM selects UM from department-matched list. **Interim (until Department live):** DM manually selects UM from visible manager list (Q&A Aug 19).
+Expected compensation is visible only to the request author, routed UM, and reviewing DM. It never appears on a profile, in S15, in a shared link, or in an export.
 
 #### FR-24: Request fulfilment
 
-UM sees assigned requests; proposes internal unit members from their unit and/or external PeopleForce candidates; submits for DM review. Department membership determines eligible internal candidates once **DEC-107** is implemented.
+UM sees requests routed to their department; proposes internal department members and/or external candidates; stores the PeopleForce candidate ID and link for every external candidate; and submits one or more candidates for DM review.
+
+Submitting an internal employee automatically creates a request-bound shared link naming the reviewing DM as recipient. The evaluation view contains S1, S4, S11, S12, S5 limited to CV and certificates, and optionally S6; it never contains S2, S3, S7, or S8.
 
 #### FR-25: Request review and rejection loop
 
-DM approves or rejects each candidate with written reason. Rejected requests may receive new proposals until DM closes successfully or unsuccessfully (**DEC-105**). Approval does not create project record — assignment happens in timetracker; profile projects update on next sync.
+DM approves or rejects each candidate with written reason. Each approval fills one headcount slot and the request shows filled and remaining slots. Filling the last slot does not auto-close the request: only the DM's explicit successful or unsuccessful close ends it. Rejected requests may receive new proposals until that close. Approval does not create a project record — assignment happens in timetracker and the profile updates on a later sync.
 
 #### FR-26: Request history on profile
 
-S15 records proposed → approved/rejected history for internal employees; visible to reporting line, project line, and PP per matrix.
+S15 records proposed → approved/rejected history and written feedback for internal employees; visible to Reporting line, Project line, and PP per matrix. Expected compensation is excluded.
 
 ---
 
 ### 4.9 Profile Sharing
 
-**Description:** Manager generates read-only shared view for authenticated users evaluating candidates. **DEC-101** applies.
+**Description:** A Manager generates a read-only shared view for an authenticated, explicitly named recipient who otherwise lacks the required access. Resourcing also creates request-bound links automatically.
 
 **Functional Requirements:**
 
 #### FR-27: Shared link creation and constraints
 
-Manager selects cfg-eligible sections per matrix; S2/S5/S6/S8 excluded by default; S3/S7/S13 never shareable; **S14 (Action Items) never shareable** — matrix cell is `—` for Shared link audience; default expiry 24h (configurable); revocable; access logged (timestamp, origin).
+Only S1 is enabled by default; every `cfg` section is off until deliberately selected for that link. S2/S5/S6/S8 require explicit re-enabling on every link. `{S3, S7, S13, S14}` is the never-share set. Default expiry is 24 hours and is configurable; resourcing-generated links live until the request is decided.
 
 **Consequences (testable):**
-- Viewer must be authenticated platform user.
+- Viewer must be the authenticated named recipient; there is no anonymous or anyone-with-link mode.
 - Shared link never grants write access.
 - S14 absent from shared-link API payload and UI.
+- Creator access is re-checked on every view; the link dies immediately when the creator's relationship ends.
+- Any current Manager or People Partner of the subject can revoke the link and inspect its accesses; full-profile holders are the backstop, so no link is orphaned.
+- Every access through the link is written to the relationship and grant journal.
 
 ---
 
@@ -377,11 +396,11 @@ System writes events on: join, grade change, position change, department change,
 
 #### FR-29: Manual timeline maintenance
 
-PP and the **direct unit manager** may add, edit, and delete timeline events for backfill and correction. Project-line managers receive S9 as **R only** for manual write (§4.9, DEC-106).
+An actor may add, edit, and delete timeline events for backfill and correction only when both dimensions allow the operation: the actor has applicable S9 write access and holds the runtime *edit the career timeline* permission. Departure is not a timeline event.
 
 **Consequences (testable):**
-- DM/PM with project-line access only cannot POST/PATCH/DELETE S9 events.
-- Direct UM and PP can mutate S9 per matrix.
+- S9 `RW` without the functional permission is insufficient.
+- The functional permission without applicable S9 access is insufficient.
 
 ---
 
@@ -403,21 +422,23 @@ All Employees supports date-of-last-assessment filters (before/after/between; ne
 
 ### 4.12 Mentorship
 
-**Description:** Pair formation, visibility, and closure with required feedback — no session tracking.
+**Description:** Pair formation, availability, visibility, and durable closure with a required pair closure note — no session tracking.
 
 **Functional Requirements:**
 
 #### FR-32: Self-service mentorship status
 
-Employee marks open-to-mentoring; sees assigned mentor/mentees.
+Employee marks themselves open to mentoring and sees assigned mentor/mentees. Clearing the flag removes the employee from the future mentor pool but does not alter any active pair; status remains `mentor` while an active mentee exists.
 
 #### FR-33: Mentorship assignment and closure
 
-Manager/PP assigns pairs from willing mentors; status transitions open-to-mentoring → mentor on first pair; ending pair requires final feedback; ended pairs remain in history; timeline event on end; mentor returns to open-to-mentoring when no active mentees.
+An actor with the *assign and end mentorships* permission selects a mentor from the company-wide willing pool and a mentee from people within the actor's access scope. Status transitions open-to-mentoring → mentor on first active pair. Ending a pair requires a closure note stored on the pair record, not as feedback. Ended pairs remain in history and create timeline events. When no active mentees remain, the mentor returns to open-to-mentoring unless they cleared the flag.
+
+Closure notes are readable by Reporting line, Project line, and PP only; they are never exposed to mentor, mentee, or colleagues through the Self pair view. Departure auto-closes active pairs with a system note and bypasses the manual-note gate.
 
 #### FR-34: Mentorship hub views
 
-List of willing mentors; assignment flow; active and ended pairs with dates and status; filterable mentorship status on All Employees.
+Company-wide willing-mentor pool showing S1 identity data plus availability, without exposing S13; scoped mentee assignment flow; active and ended pairs with dates and status; filterable mentorship status on All Employees.
 
 ---
 
@@ -427,7 +448,7 @@ List of willing mentors; assignment flow; active and ended pairs with dates and 
 
 #### FR-35: Feedback records on profile
 
-Managers and PP add feedback (subject, author, date, context, body) with visibility management-only (default) or shared-with-employee. Colleagues cannot browse others' feedback. Feedback requests implemented as targeted form campaigns.
+Actors with applicable S8 access and the *create feedback* permission add feedback (subject, author, date, context, body) with visibility management-only (default) or shared-with-employee. Joining interview feedback is an S8 feedback record, never an S5 document. Requested feedback uses a targeted form campaign as its only distribution path; the campaign tracks responses and the requester enters received feedback manually. Records are chronological and period-filterable, with no comparison-between-periods feature.
 
 ---
 
@@ -446,14 +467,40 @@ Pull leave types, dates, and status for S10 display and self-service link-out to
 Pull projects, assignments, PM, and DM mappings. Project assignment feeds project-line resolution (§2.1). Sync is sole writer of sync-managed policy rows.
 
 **Consequences (testable):**
-- Integration failure degrades gracefully — app remains available; stale project data fails closed on access (no widened grants).
+- Project assignment changes affect access within 15 minutes.
+- During outage, the app remains available and serves last-known data behind a visible stale-data banner; after four hours of failed sync, all project-derived access is withdrawn.
+- Before implementation, the provider contract must establish whether assignment history arrives as events or only current state at sync time.
 - Prod timetracker project duplication is an operations concern, not a bootcamp blocker.
 
 #### FR-38: PeopleForce — optional prefill
 
-**Good-to-have** per §5.2 — not required for this iteration. If built: a single prefill button loads candidate fields by PeopleForce candidate ID with per-field preview and confirmation. External resourcing may store candidate ID and link out to PeopleForce when integration is absent.
+**Good-to-have** per §5.2 — not required for this iteration. If built, a single profile button loads candidate fields by PeopleForce candidate ID, shows incoming/current values side by side, and requires per-field acceptance. Existing values are never silently overwritten. Candidate-side mapping is configuration, writes still pass normal section authorization, and repeating the same confirmed operation is idempotent.
+
+Grade, seniority, employee type, department, manager, People Partner, contract data, employment status, and risk can never be prefilled. External resourcing stores the PeopleForce candidate ID and link even when the API integration is absent.
 
 **Identity resolution:** PeopleForce candidate ID is the durable cross-system key for external candidates — not email alone. Platform users reconcile via `ttId` and stored candidate IDs (requirements §6).
+
+---
+
+### 4.15 Employment Lifecycle
+
+**Description:** Employment status is a time-bounded business fact and the single source for whether an employee has departed. It is distinct from technical row/account retention and from the predictive `leaver` risk level.
+
+#### FR-41: Employment status and departure
+
+Employment status values are `active` and `dismissed`. An authorized HR actor records a departure with an effective date and reason under the *record a departure* permission. Recording is blocked while the person still manages a reporting line or department, manages a project, or is assigned as anybody's People Partner; the UI prompts the actor to re-parent those relationships first.
+
+On the effective date, the profile becomes read-only and leaves the default employee list while remaining filterable; open action items become `cancelled — departed`; active mentorship pairs auto-close with a system note; the account deactivates; and every access held by the departed person ends immediately. Departure is never written as a career-timeline event.
+
+---
+
+### 4.16 Departments
+
+**Description:** Department is the sole organisational grouping entity behind the Unit Manager role, Reporting-line access, resourcing routing, CDS mapping, and department-change history.
+
+#### FR-42: Nested department management
+
+Every employee belongs to exactly one department and departments may nest. Managing a department grants Reporting-line access to everyone in it and its sub-departments. Department maintenance requires the *manage departments* permission; changing employee membership or a department manager additionally follows FR-7's organisational-relationship rules. A department change writes a career-timeline event, and the CDS matrix lookup keys on department entity plus position.
 
 ---
 
@@ -480,7 +527,7 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 - Notification content is assembled **after live tier resolution** — same server-side rule as FR-4.
 - An employee **never** receives a notification derived from S6 (risk), unflagged S7 (management notes), or any `—` matrix cell for the Self audience (including S15 where applicable).
 - A PM **never** receives a notification derived from an S7 note not flagged *visible-for-PM*.
-- Colleague-tier recipients receive no notification content outside the Colleague whitelist (S1, S10 with leave type, S11 project name only).
+- Colleague-tier recipients receive no notification content outside the Colleague whitelist (S1, S10 (dates only), S11 project name only).
 
 ---
 
@@ -494,7 +541,8 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 - All §4 required features: directory, profiles, self-service, four dashboards, action items, campaigns, risks, resourcing, sharing, timeline, CDS, mentorship, feedback.
 - Real timetracker integration (leaves + projects/people) over the seeded population — required.
 - PeopleForce optional prefill button (§5.2) — good-to-have; candidate ID storage and external link acceptable without integration.
-- **Department entity** — confirmed Q&A Aug 19 (**DEC-107**); formal requirements v1.3 amendment pending from Vitaliy.
+- **Department entity** — normative in SoT §4.17 (v1.5), including nesting, exactly-one employee membership, Reporting-line access, and resourcing routing. Schema detail remains an architecture concern (addendum).
+- Temporal employment status and the departure workflow (FR-41); effective-date executor implementation remains blocked on CC-06.
 - Bootcamp engineering process requirements (BMAD, foundation phase, parallel decomposition, intelligent repository, three-stage quality gate).
 - Deployed demonstrable environment — not laptop-only.
 
@@ -536,12 +584,12 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 | ID | Requirement |
 |----|-------------|
 | NFR-1 | Access-control correctness is the primary quality attribute; leaks are critical defects. |
-| NFR-2 | Personal data: pseudonymised data in all non-production environments; no real PII in agent contexts, logs, or repository. |
+| NFR-2 | Personal data: use only the delivered seeded test population; import no real employee data and place no real PII in agent contexts, logs, screenshots, or repository. |
 | NFR-3 | All Employees list: ≤2s response at 500+ rows with permission resolution. |
 | NFR-4 | External integration failures degrade gracefully; never take down core application. |
 | NFR-5 | Responsive layout and accessibility for list, profile, and dashboard pages. |
 | NFR-6 | English UI only (**DEC-104**). |
-| NFR-7 | Permission revocation is immediate on relationship or role change (**DEC-102**). |
+| NFR-7 | Functional-permission revocation is immediate; platform-owned relationship changes apply on the next request; project-derived access changes within 15 minutes and is withdrawn after four hours of failed sync. |
 
 ---
 
@@ -562,32 +610,32 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 ## 10. Data Governance and Constraints
 
 - **Classification:** Employee personal data (S2, S3), management-only notes (S7), risks (S6), and unshared feedback are restricted tiers.
-- **Retention:** No explicit policy in test assignment. HR stakeholder (Vitaliy Barkatov) to provide retention rules **before production deployment**. Architect to implement configurable retention hooks during foundation phase as a forward-compatible placeholder. Until then, follow organisation default when provided (**A-7**).
+- **Retention:** No retention policy is specified by v1.5. Treat production retention as an unresolved governance input; this PRD does not invent a placeholder implementation requirement.
 - **Audit:** Shared-link access logged (FR-27). [ASSUMPTION: broader audit trail for profile reads not required in v1 unless HR specifies.]
-- **Environments:** Production-like structure with pseudonymised identities in lower environments (NFR-2).
+- **Environments:** Use the delivered seeded test population and no additional real employee data (NFR-2).
 
 ---
 
 ## 11. Open Questions
 
-Active gaps not resolved by Q&A Aug 19 or DEC-106–108. Resolved items removed; see Decision Log.
+Only unresolved product and architecture gates are listed here. Closed v1.5 questions are removed from the active table; historical resolutions remain in the Decision Log.
 
 | ID | Question | Impact | Escalation |
 |----|----------|--------|------------|
-| OQ-105 | HR Admin grant/revoke chain for HR Admin role | Admin UX | Vitaliy — bootstrap + delegate pattern per Q&A |
-| OQ-109 | Pre-onboarding profile state | Out of scope if pre-onboarding deferred | Closed by scope — pre-onboarding out |
-| OQ-110 | Auth mechanism for v1 | Foundation-phase auth | **Closed by v1.5:** magic-link only; no AD/SSO provisioning |
-| OQ-111 | Cross-system identity reconciliation | Identity sync | Resolved via durable IDs (`ttId`, PeopleForce candidate ID) per requirements §6; population via seed import (§4.17) |
+| OQ-105 | HR Admin grant/revoke chain for the HR Admin functional role | Admin UX | Product Owner |
 | OQ-114 | Custom-field storage (EAV vs JSONB) | FR-8 — **blocks Wave 1 directory kickoff** | Architect (Dmytro Novyk): record AD by **foundation-phase close**. **Column-per-field excluded** (`docs/project-requirements.md` §6) |
 | OQ-115 | Dashboard widget access model | FR-15–18 — **blocks dashboard Wave kickoff** | Architect (Dmytro Novyk): record AD by **foundation-phase close** |
 | OQ-116 | Non-manager project assignment (info-sec case) | Policy targetRole values | Stakeholders |
 | OQ-117 | Profile bounded context boundary | Repo structure | Architect |
 | OQ-121 | Token usage tracking for bootcamp | Process measurement | Bootcamp organizers |
 | OQ-122 | Agent rule-loading for architecture docs | Dev experience | Architect |
+| CC-04 | People Partner assignment storage and write contract | Blocks PP relationship implementation and journal schema | Product Owner + Architect |
+| CC-05 | Self versus full-profile access precedence | Blocks full-profile projection scenarios | Product Owner + Architect |
+| CC-06 | Representable scheduled departure state and effective-date executor | Blocks FR-41 implementation | Product Owner + Architect |
 
-**Recently resolved (see Decision Log):** OQ-101 → DEC-107; OQ-102; OQ-103; OQ-104/OQ-118 → DEC-108; OQ-106 → DEC-106; OQ-108; OQ-112; OQ-113; OQ-119.
+**Recently resolved (see Decision Log and Correct Course records):** OQ-101–OQ-104, OQ-106, OQ-108–OQ-113, OQ-118–OQ-119; CC-02 Option 1; CC-03 Option 1; CC-11 Option 1; M8 Option 1.
 
-Resolved decisions incorporated: **DEC-101** through **DEC-108**.
+Resolved decisions are incorporated only where they remain consistent with normative v1.5.
 
 ### Pre-sprint conditions (GO — parallel with foundation phase)
 
@@ -597,7 +645,8 @@ These must land **before the named wave starts**, not before foundation phase be
 |-----------|-------|--------|
 | OQ-114 resolved: custom-field storage pattern confirmed (column-per-field excluded) | Architect (Dmytro Novyk) | FR-8, Wave 1 directory |
 | OQ-115 resolved: dashboard widget access model confirmed | Architect (Dmytro Novyk) | FR-15–18, dashboard Wave |
-| OQ-110 resolved: magic-link auth over seeded population (no AD/SSO) | UM bounded context | Foundation-phase auth implementation |
+| CC-04 resolved: PP assignment storage and lifecycle approved | Product Owner + Architect | FR-7, FR-40, PP implementation |
+| CC-06 resolved: scheduled departure state/executor approved | Product Owner + Architect | FR-41, UM Epic 5 implementation |
 
 ---
 
@@ -605,4 +654,4 @@ These must land **before the named wave starts**, not before foundation phase be
 
 - **A-1:** Authoritative scope is `docs/project-requirements.md` v1.5.
 - **A-2:** Policy-attachment access engine per architecture spine implements FR-1–FR-4 without PRD-level mechanism detail (see addendum).
-- **A-7:** No explicit data-retention policy until HR stakeholder (Vitaliy Barkatov) provides one **before production deployment**. Architect implements configurable retention hooks during foundation phase; pseudonymisation in non-prod applies until then.
+- **A-7:** Production retention remains an unresolved governance input. No retention mechanism is added to MVP scope without an approved requirement.
