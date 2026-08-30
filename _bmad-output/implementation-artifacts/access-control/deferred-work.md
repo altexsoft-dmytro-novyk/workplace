@@ -30,3 +30,46 @@ independently shippable deliverable; none is authorized by the current spec.
 - source_spec: none
   summary: List, filter, export, and search projection — apply section and field-level access rules to every non-profile surface.
   evidence: Split from the Access Control build intent. §3.3.1 projection is a separate cross-cutting surface with its own leak-negative suite and the §7 2-second / 500-record budget; it consumes the facade rather than defining it.
+
+## Open findings — checkpoint review of ACF-1, 2026-08-30
+
+A `bmad-checkpoint-preview` walkthrough of the ACF-1 implementation raised seven
+findings. One was fixed in place (the transaction claimed a no-torn-reads
+guarantee that READ COMMITTED does not provide; the adapter now uses the
+interactive form at REPEATABLE READ, which is the only form this driver adapter
+honours). Two were dispatched to a separate build run and are listed here only
+so the record is complete. The remaining four are unresolved and belong to
+nobody yet.
+
+The systemic gaps — missing AD-1 approval, the provisional HTTP mapping, and the
+dormant module — are recorded separately as `gate_status: FAIL` in
+`_bmad-output/test-artifacts/gate-decision.json`. These entries are the specific
+technical ones underneath that verdict.
+
+- source_spec: none
+  status: needs an ownership decision before it can be scheduled
+  summary: A deactivated viewer keeps the Reporting audience over their live reports.
+  evidence: In `prisma-relationship-graph.adapter.ts` the `isActive` join constrains `r."userId"` — the person being walked to — in both the base and recursive terms. No predicate anywhere tests the viewer. Nothing upstream compensates: the interim session resolver returns `{ userId: persona }` for any string without an existence or activity check. Scenario ACF-FC-01 passes only because its deactivated user sits in the middle of the chain; move that user to the top and the same filter does nothing. AD-20 names the actor position first. The open question is ownership, not mechanism — refusing a switched-off account may belong to session validation, which is a User Management file this context must not edit (AD-2). If it belongs to the resolver instead, AD-1 requires a scenario before the code.
+
+- source_spec: none
+  status: unresolved
+  summary: A deactivated target silently drops to Colleague instead of the dismissed-target projection.
+  evidence: The same `isActive` join that blocks the bridge also blocks the target, so a manager loses a deactivated report entirely. `access-control.md` (AD-20) says the current manager or PP may still resolve the read-only dismissed-target projection. The behaviour is fail-closed and therefore safe, and departure handling is out of Phase-0 scope — but it is a rule no approved scenario states, and it was decided by the placement of a join rather than by a decision.
+
+- source_spec: none
+  status: unresolved
+  summary: ACF-FC-01 cannot distinguish a blocked bridge from a blocked target.
+  evidence: The fixture exercises the deactivated user in one position only — intermediate. The scenario claims the walk terminates at a broken node, but the same green would appear if the implementation merely refused deactivated targets. Two further cases separate them: a deactivated user at the top of the chain (the viewer), and a deactivated target with a live manager. This is why the finding above went unnoticed until the checkpoint.
+
+- source_spec: none
+  status: unresolved
+  summary: The access-control e2e suite imports User Management domain internals.
+  evidence: `test/access-control/audience-resolution.e2e-spec.ts` pulls `ACCESS_CONTROL_PORT` and the `AccessControlPort` type from `src/user-management/domain/interfaces/`. `domain-driven-design.md` forbids reaching into another context's `domain/`, "even to import just a type or a DI token symbol." No file of User Management was edited, but Access Control now depends on its domain surface from tests — and answer 2 of the integration contract request explicitly contemplates changing that port's signature, which would break this suite. There may be no way to write this test without the import; establishing that either way is the work.
+
+- source_spec: dispatched to a separate build run, 2026-08-30
+  summary: The facade returns one audience label per target where a viewer may hold several.
+  evidence: `Map<string, Audience>` cannot express a viewer who is both manager and People Partner; the resolver prefers `reporting`. Harmless only while both audiences grant identically — §3.2's multi-audience merge and DEC-UM-001's PP-only S9 write rights end that as soon as the section matrix lands. This is the cross-context contract other bounded contexts will build against, so widening it is cheapest before adoption.
+
+- source_spec: dispatched to a separate build run, 2026-08-30
+  summary: The reporting walk descends from the viewer, so cost scales with the org, not the request.
+  evidence: The recursive CTE expands every descendant of the viewer and only then filters `WHERE id IN (targets)`. A viewer near the top of the tree walks the whole company to open one profile. `access-control.md` bars full scans from the tier-resolution hot path and §7 requires 500 records within 2 seconds. Walking upward from each target bounds the cost to chain depth. The 9-person fixture cannot show the difference, so any fix needs a measurement, not an assertion.
