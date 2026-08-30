@@ -2,6 +2,8 @@
 
 **Trace:** §3.2 Self · AD-10 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** Alice is an authenticated employee and the target of the request is Alice herself.

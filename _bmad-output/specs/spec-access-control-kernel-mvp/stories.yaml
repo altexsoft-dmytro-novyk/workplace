@@ -1,0 +1,481 @@
+- id: "ACM-9-baseline"
+  title: "ACM-9 — 500-target PostgreSQL baseline gate"
+  description: >-
+    Depends only on ACF-1 and executes before ACM-8. Pass or fail CAP-7 against
+    real migrated PostgreSQL without changing resolver behavior.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Measurement and evidence only. Follow the operational sequence in
+    docs/architecture/testing-strategy.md with Reporting, direct PP, Colleague,
+    and mixed fixtures under ACM9-MVP-v1. Reserve the append-only baseline
+    artifact, then finalize it to
+    PASS/FAIL/INCOMPLETE with protocol, fixture, and environment hashes under
+    ACM9-MANIFEST-v1; a finalization failure leaves the reserved INCOMPLETE
+    artifact and exits nonzero. Reserve BEFORE every fallible step — fixture
+    construction, database connection, and manifest hashing included — writing
+    hashes in as computed, so a failure while probing still leaves an auditable
+    artifact with its stop_reason. Finalize a connection failure, query error,
+    or fixture-setup failure as INCOMPLETE with an error_class: never PASS and
+    never FAIL. Stop immediately on the first warm-p95/worst
+    value over two seconds or statement timeout; a recorded breach or timeout is
+    FAIL regardless of any manifest mismatch. Only a PASS baseline satisfies
+    the baseline dependency: a FAIL or INCOMPLETE baseline halts dispatch of
+    ACM-8 and ACM-9-final and opens separately AD-1-gated remediation, and a
+    rerun that omits the failing shape does not supersede it.
+
+- id: "ACM-3-scenarios"
+  title: "ACM-3 Stage 1 — inactive and missing identity scenario prose"
+  description: >-
+    Depends on ACF-1. Author only CAP-1 scenarios for inactive or missing
+    viewers, targets, Reporting bridges, and PP endpoints, including mixed,
+    duplicate-target, and empty bulk input.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Scenario prose only. Cite SPEC CAP-1, architecture AD-1, the Access Control
+    spine AD-1, docs/architecture/access-control.md, and
+    docs/architecture/testing-strategy.md in every scenario dispatch. Prove that
+    viewer identity validation precedes ALL audience derivation including Self,
+    and that Self is exclusive only after both viewer and target are confirmed
+    present and active; define one result per distinct target
+    with duplicates collapsing to one key; and cover an empty target list
+    returning an empty map with no relationship-graph read, preserving the
+    inherited Phase-0 short-circuit. Prove path-local visited state and
+    shared-ancestor validity, and prove that reaching the viewer is provisional
+    and does not by itself grant Reporting: cover a repeated node before viewer
+    proof and a repeated node after it, including a viewer that is itself inside
+    a cycle, and show each denies Reporting for that target only while valid
+    Self and direct PP paths remain. Separate the two termination cases
+    explicitly: an ABSENT manager edge is a clean end, while an edge whose
+    ENDPOINT IS INACTIVE is unusable and treated as absent — denying Reporting
+    before viewer proof and granting it after viewer proof, with nothing above
+    the dead node reachable. Call out explicitly that the after-viewer-proof
+    GRANT is a behavior CHANGE, not a restatement: the current recursive CTE
+    joins users.isActive in both terms and stops at an inactive node, so it
+    would deny that case today. The scenario must state the before/after, so a
+    reviewer approves a widening knowingly rather than reading it as existing
+    behavior. Do NOT author a missing-endpoint-row scenario: it
+    is unreachable under relationships_shape_check plus the ON DELETE RESTRICT
+    endpoint foreign key, so record it as a defensive invariant instead. Do NOT
+    author soft-deleted User or bridge scenarios: User has no soft-delete
+    column. Due behavior is deferred; stop before tests.
+
+- id: "ACM-3-red-tests"
+  title: "ACM-3 Stage 2 — inactive identity red integration tests"
+  description: >-
+    Depends on human approval of ACM-3 Stage 1. Translate only those approved
+    scenarios into committed-red direct-facade PostgreSQL integration tests.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Use the real AccessControlFacade, AccessControlModule, Prisma adapters, and
+    migrated PostgreSQL. Include the empty-target-list regression asserted at
+    the relationship-graph port, both cycle positions relative to viewer proof,
+    both termination cases (absent edge versus inactive endpoint, before and
+    after viewer proof), identity validation preceding Self,
+    and infrastructure-error propagation without converting it to an empty map.
+    Show the red tests and stop for explicit human approval; do not change
+    production code.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-3-production"
+  title: "ACM-3 Stage 3 — inactive identity production behavior"
+  description: >-
+    Depends on human approval of the committed-red ACM-3 Stage-2 tests.
+    Implement only CAP-1 audience-resolution behavior and make the approved
+    tests pass.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Production implementation only. Do not add canAccessSection behavior,
+    due/departure behavior, dismissed-target projection, User Management
+    changes, or new tests.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-4-scenarios"
+  title: "ACM-4 validation 1 — approved scenario coverage audit"
+  description: >-
+    Depends on ACF-1. Audit scenario coverage required by CAP-2 for
+    multi-audience retention, Self exclusivity, Colleague floor, deduplication,
+    FR separation, and representative PostgreSQL fixture classes.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Validation only. Cite SPEC CAP-2, architecture AD-1/AD-3, the Access Control
+    spine, docs/architecture/access-control.md, and testing-strategy.md. Report
+    coverage and gaps with exact evidence, then stop; do not write scenarios,
+    tests, or production code. HALT TRIGGER: any MISSING APPROVED SCENARIO
+    COVERAGE or concrete unmet behavior halts Stage 2 onward — ACM-4-red-tests,
+    ACM-4-production, and ACM-5 do not run — opens a separately approved AD-1
+    sequence, and requires a Story Breakdown re-run before the package resumes.
+    A coverage gap is a halt in its own right, not merely a note.
+
+- id: "ACM-4-red-tests"
+  title: "ACM-4 validation 2 — real PostgreSQL facade characterization evidence"
+  description: >-
+    Depends on human acceptance of the coverage audit, and on that audit
+    reporting no gap. Obtain real migrated-PostgreSQL facade evidence against
+    CAP-2 under the validation-only exception; this entry writes no red test.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Validation only. Exercise Reporting, direct PP, Colleague, and mixed
+    fixtures through AccessControlFacade, real AccessControlModule, Prisma
+    adapters, and migrated PostgreSQL. You are authorized to add and commit
+    reproducible integration test files inside that Stage-2 boundary; throwaway
+    or unreproducible evidence does not satisfy this story. Despite this entry's
+    historical id, it authors NO committed-red test: it runs under the named
+    validation-only evidence exception in docs/architecture/testing-strategy.md,
+    so characterization tests over already-shipped behavior may be committed
+    green. That evidence is never a Stage-2 gate for any production change.
+    Preserve ACF-1 history and stop for human review; do not change production
+    code. Any missing approved scenario coverage or concrete unmet behavior
+    halts ACM-4-production and ACM-5 and opens a separately approved AD-1
+    sequence — with a real committed-red test — plus a Story Breakdown re-run.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-4-production"
+  title: "ACM-4 validation 3 — CAP-2 disposition"
+  description: >-
+    Depends on human acceptance of the facade evidence audit. Record the CAP-2
+    disposition; a concrete unmet behavior requires a separate AD-1 sequence.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Validation and disposition only. RESERVE the disposition file with
+    `disposition: pending` before validation begins, mirroring ACM-9's
+    reservation rule, so a crash mid-validation leaves an auditable `pending`
+    rather than an absent file that blocks ACM-5 with no diagnostic. Then write
+    the machine-checkable disposition to
+    _bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml
+    with field `disposition` set to exactly `no-gap` or `gap`. Record `no-gap`
+    only when neither validation entry found a missing approved scenario
+    coverage or behavior gap; otherwise record `gap`, stop, and leave ACM-5
+    blocked pending the separately approved AD-1 sequence and Story Breakdown
+    re-run. ACM-5 dispatch reads that exact path and field. Do not treat unit
+    evidence as sufficient, edit production code, add section/FR behavior, or
+    rewrite ACF-1 history.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-0-scenarios"
+  title: "ACM-0 Stage 1 — root User prerequisite scenario prose"
+  description: >-
+    Depends on the approved FR architecture and runs before ACM-1. Author only
+    CAP-8 scenarios for DEC-UM-007 normalization, canonical storage, and
+    exact-one active root eligibility at the real seed entrypoint.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Scenario prose only. Cite SPEC CAP-8, AD-1, spine AD-4, FR-AMD-1, DEC-UM-007
+    in docs/architecture/user-management-test-decisions.md, and
+    testing-strategy.md. The subject is services/backend/prisma/seed.ts invoked
+    by `npm run db:seed`, which CREATES and validates the root User so a fresh
+    migrated database is satisfiable with no unnamed prerequisite. Cover
+    trim/lowercase normalization, STORING the normalized value so storage is
+    canonical, matching on the normalized value, and exactly one active User
+    whose normalized workEmail equals the normalized ROOT_WORK_EMAIL, including
+    a database that already holds unrelated active employees. Cover the ORDER
+    explicitly: count ALL normalized matches first and check active state only
+    afterwards, so a count other than one fails as unmatched or ambiguous before
+    isActive is consulted — include two rows differing only in case with one
+    inactive. Cover blank, unmatched, ambiguous, and inactive root identity
+    failing with actionable diagnostics; a normalized match that is not the
+    intended root being neither adopted, mutated, nor reactivated; and
+    concurrent runs converging through the users_workEmail_key unique violation,
+    a re-read, and re-validation with no partial state. Author no permission, policy, grant, or attachment scenario, no
+    User Management API/CRUD scenario, and nothing from User Management Story
+    1.1's population import. Stop before tests or code.
+
+- id: "ACM-0-red-tests"
+  title: "ACM-0 Stage 2 — root User prerequisite red integration tests"
+  description: >-
+    Depends on human approval of ACM-0 Stage 1. Translate only those approved
+    scenarios into committed-red migrated-PostgreSQL integration tests.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Use migrated real PostgreSQL and the approved kernel test boundary, and
+    INVOKE THE REAL ENTRYPOINT — `npm run db:seed` / prisma/seed.ts — rather than
+    re-implementing its logic inline; inline re-implementation proves the test,
+    not the deployed path, and does not satisfy this story. Prove canonical
+    storage of the normalized value, normalized matching, the count-all-matches
+    before active-state ordering, exact-one active eligibility against a
+    population that contains other active employees, concurrent convergence, and
+    each failure diagnostic. Show the complete red tests and stop for explicit
+    human approval; do not alter production code, including the seed, the Prisma
+    schema, or migrations.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-0-production"
+  title: "ACM-0 Stage 3 — root User prerequisite seed normalization"
+  description: >-
+    Depends on human approval of the committed-red ACM-0 Stage-2 tests.
+    Implement only the CAP-8 normalization and eligibility check in the
+    deploy-time step.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Production implementation only, limited to the deploy-time root User step in
+    services/backend/prisma/seed.ts. Normalize ROOT_WORK_EMAIL by trim and
+    lowercase, STORE the normalized value so storage is canonical, count all
+    normalized matches before checking active state, and require exactly one
+    active match. Fail with actionable diagnostics on blank, unmatched,
+    ambiguous, or inactive identity, never adopting or mutating a non-root
+    match, and converge concurrent runs through the unique violation. NOTE a
+    deliberate behavior change: the current seed WARNS AND SKIPS when
+    ROOT_WORK_EMAIL is unset. CAP-8 replaces that with an actionable failure, so
+    a deployment can no longer silently come up with no root identity. Add no FR
+    permission, policy, grant, or attachment, no route, no runtime role
+    management, no User Management file change, and no new tests. Do not add a
+    migration: database-enforced normalized uniqueness is deferred work outside
+    CAP-8. Correct the seed's own stale header comment as an acceptance item:
+    it currently says the HR Admin functional role is not assigned because
+    Policies/UserPolicies "don't exist yet", which ACM-1 makes false; state
+    instead that FR bootstrap is ACM-1's separate entrypoint.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-1-scenarios"
+  title: "ACM-1 Stage 1 — FR schema, migration, and seed scenario prose"
+  description: >-
+    Depends on completed ACM-0. FR-AMD-1 is approved and resolves the former
+    architecture blockers; author only CAP-3 scenarios for FR-only grants,
+    canonical policy values, ordered atomic bootstrap, owned-record drift,
+    concurrent seeds, and non-destructive reruns.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Cite SPEC CAP-3, AD-1, spine AD-4, FR-AMD-1, database-schema.md, and
+    testing-strategy.md. Treat the CAP-8 root User as an existing precondition
+    rather than ACM-1 work. The subject entrypoint is
+    src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts via
+    `npm run db:bootstrap:access-control`, run after `npm run db:seed`. Cover
+    DEC-UM-007 normalization, the common advisory lock and
+    AccessControlBootstrap singleton, first-run/differing-root concurrency,
+    post-bootstrap email drift without transfer/duplication, later admin
+    attachments, rollback, an allowed fourth permission, and database rejection
+    of AR-policy grants. Cover the ABSENT-SINGLETON cases explicitly: adopting
+    an existing FR hr-admin policy by natural key after verifying operator,
+    managedBy, and null targets; adopting an existing attachment ONLY when it
+    already belongs to the located root; creating the root's own attachment and
+    preserving — never adopting or transferring — attachments belonging to
+    anyone else; and adopting a changed configured root because no provenance
+    was recorded. Cover CROSS-TYPE COLLISION: an AR policy carrying
+    targetRole='hr-admin' is legal under the partial FR unique index and is a
+    different object, never adopted, mutated, counted, or reported as drift.
+    Cover ALL THIRTEEN CAP-3 invariants enumerated in database-schema.md,
+    including row shapes, the partial FR unique key, Permissions.key uniqueness,
+    the permission-first index, UserPolicies integrity, and ON DELETE RESTRICT
+    delete behavior. Follow the FR-AMD-1 field-by-field drift
+    table for restore, preserve, and fail behavior. Show the prose and stop
+    before tests or code.
+
+- id: "ACM-1-red-tests"
+  title: "ACM-1 Stage 2 — FR foundation red integration tests"
+  description: >-
+    Depends on human approval of ACM-1 Stage 1. Translate only the approved
+    schema, FR-only link, atomicity, normalization, concurrency, ownership,
+    drift, and idempotency scenarios into committed-red PostgreSQL tests.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Use migrated real PostgreSQL and the approved kernel test boundary, and
+    invoke the real bootstrap entrypoint rather than re-implementing it inline.
+    Prove ALL THIRTEEN CAP-3 invariants from database-schema.md: non-null FR/AR
+    policy type; the FR/AR row-shape CHECK; the partial unique FR role key; the
+    Policies(id, type) support key; Permissions.key uniqueness and immutability;
+    PolicyPermissions pair uniqueness; the policyType discriminator and its
+    restrictive composite foreign key rejecting an AR grant; the restrictive
+    Permissions foreign key; the permission-first (permissionId, policyId) index
+    asserted by querying pg_indexes; UserPolicies integrity including rejected
+    bad-user, bad-policy, and duplicate attachments; the AccessControlBootstrap
+    singleton constraints; and ON DELETE RESTRICT on all four
+    functional-role-side foreign keys. Also prove common lock/singleton
+    provenance, every absent-singleton adoption case, cross-type AR hr-admin
+    preservation, absent-row and conflicting-email concurrency, per-field drift
+    restore/preserve/fail behavior, and atomic rollback. Show
+    the complete red tests and stop; do not alter Prisma, migrations, seeds, or
+    production code.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-1-production"
+  title: "ACM-1 Stage 3 — FR schema, migration, and bootstrap seed"
+  description: >-
+    Depends on human approval of the committed-red ACM-1 Stage-2 tests.
+    Implement only the AD-4/FR-AMD-1 schema, reviewed migration, and atomic
+    idempotent bootstrap required by CAP-3.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Production implementation only, at
+    src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts with
+    its scripts/bootstrap-access-control.ts wrapper and a
+    `db:bootstrap:access-control` npm script. Seed exactly the approved bootstrap
+    identities and grants without deleting later administrator state; add no
+    routes, user creation/activation, runtime role management, User Management
+    changes, additional defaults, or new tests.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-2-scenarios"
+  title: "ACM-2 Stage 1 — live type-separated isAllowed scenario prose"
+  description: >-
+    Depends on completed ACM-1. Author only CAP-4 scenarios for live grants and
+    revocations, reachable deny cases, FR-only reads, case sensitivity,
+    infrastructure errors, and no audience widening or decision persistence.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Cite SPEC CAP-4, AD-1, spine AD-4, FR-AMD-1, access-control.md,
+    database-schema.md, and testing-strategy.md. Do not require physically
+    orphaned rows or deferred due behavior. Stop for approval before tests/code.
+
+- id: "ACM-2-red-tests"
+  title: "ACM-2 Stage 2 — isAllowed red integration tests"
+  description: >-
+    Depends on human approval of ACM-2 Stage 1. Translate only those approved
+    scenarios into committed-red direct-facade PostgreSQL integration tests.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Prove live type='FR' evaluation through AccessControlFacade and migrated
+    PostgreSQL, including wrong-type/nonmatching joins, no audience reads or
+    cached decision, and propagated timeout/connection/query errors. Show the
+    red tests and stop for human approval; do not change production.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-2-production"
+  title: "ACM-2 Stage 3 — live type-separated isAllowed"
+  description: >-
+    Depends on human approval of the committed-red ACM-2 Stage-2 tests.
+    Implement only the Access Control-owned evaluator and facade delegation
+    required by CAP-4.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Production implementation only. Do not branch on role or permission names,
+    read audiences, cache decisions, widen section access, rebind User
+    Management, or add tests.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-5-scenarios"
+  title: "ACM-5 Stage 1 — S1/S10/S11 section-access scenario prose"
+  description: >-
+    Depends on a completed ACM-4 that recorded no gap. Author only CAP-5
+    scenarios for the three supported sections, absent and empty inputs,
+    unsupported sections, and write-over-read-over-none audience merging
+    through the exact typed facade contract.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Use canAccessSection(viewerId: string, section: string, targetEmployeeId:
+    string): Promise<SectionAccess> with none|read|write. Cite SPEC CAP-5,
+    AD-1/AD-3, the Access Control spine, access-control.md, and
+    testing-strategy.md. Distinguish unsupported input returning none from
+    infrastructure errors rejecting; stop for review. PRECONDITION (check
+    before starting): _bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml exists and its `disposition` field
+    equals exactly `no-gap`. If the file is absent or the value is `gap`, do not
+    start.
+
+- id: "ACM-5-red-tests"
+  title: "ACM-5 Stage 2 — S1/S10/S11 red integration tests"
+  description: >-
+    Depends on human approval of ACM-5 Stage 1. Translate only those approved
+    scenarios into committed-red direct-facade PostgreSQL integration tests.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Exercise canAccessSection through the approved real kernel boundary. Show
+    the complete red tests and stop for explicit human approval; do not change
+    production code. PRECONDITION (check before starting): _bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml
+    exists and its `disposition` field equals exactly `no-gap`.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-5-production"
+  title: "ACM-5 Stage 3 — S1/S10/S11 section-access implementation"
+  description: >-
+    Depends on human approval of the committed-red ACM-5 Stage-2 tests.
+    Implement only the base section evaluator required by CAP-5.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Production implementation only. Do not add field/record projection, photo
+    commands, isAllowed coupling, unsupported sections, User Management
+    changes, or new tests. PRECONDITION (check before starting): _bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml
+    exists and its `disposition` field equals exactly `no-gap`.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-8-scenarios"
+  title: "ACM-8 Stage 1 — production-container composition scenario prose"
+  description: >-
+    Depends on completed ACM-2, ACM-3, and ACM-5 and on a PASS ACM-9 baseline.
+    Author only CAP-6 scenarios proving AppModule composition, facade
+    resolution, and unchanged User Management binding and behavior.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Scenario prose only. Cite SPEC CAP-6, AD-1/AD-3, the Access Control spine,
+    the sprint proposal, and testing-strategy.md. Include correction of the
+    stale AccessControlModule composition comment as an ACM-8 acceptance item;
+    stop before tests or AppModule changes. PRECONDITION (check before
+    starting): the ACM-9 baseline artifact exists and its `status` field equals
+    exactly `PASS`, AND its protocol version equals the protocol this run uses; a PASS baseline recorded under a different protocol version is not comparable and does not satisfy the gate. Do not start on a FAIL, INCOMPLETE,
+    absent, or protocol-incomparable baseline.
+
+- id: "ACM-8-red-tests"
+  title: "ACM-8 Stage 2 — production-container red integration tests"
+  description: >-
+    Depends on human approval of ACM-8 Stage 1. Translate only those approved
+    scenarios into committed-red real application-container integration tests.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Prove AccessControlFacade resolution and the unchanged interim User
+    Management binding without provider overrides or an artificial endpoint.
+    Show the red tests and stop for human approval; do not change production.
+    PRECONDITION (check before starting): the ACM-9 baseline artifact exists and
+    its `status` field equals exactly `PASS`, AND its protocol version equals the protocol this run uses; a PASS baseline recorded under a different protocol version is not comparable and does not satisfy the gate.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-8-production"
+  title: "ACM-8 Stage 3 — import AccessControlModule into AppModule"
+  description: >-
+    Depends on human approval of the committed-red ACM-8 Stage-2 tests.
+    Implement only the AppModule composition required by CAP-6.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Production implementation only. Import AccessControlModule and correct its
+    stale comment that equates importing the module with User Management
+    rebinding. Do not modify User Management files/bindings, change /users
+    behavior, add an endpoint, or add tests. PRECONDITION (check before
+    starting): the ACM-9 baseline artifact exists and its `status` field equals
+    exactly `PASS`, AND its protocol version equals the protocol this run uses; a PASS baseline recorded under a different protocol version is not comparable and does not satisfy the gate.
+    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+
+- id: "ACM-9-final"
+  title: "ACM-9 — post-composition 500-target PostgreSQL gate"
+  description: >-
+    Depends on completed ACM-8 and a PASS ACM-9 baseline. Rerun the same
+    operational measurement protocol and fixtures through the composed
+    production container and apply the same absolute pass/fail threshold.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Measurement and evidence only. Follow testing-strategy.md, reserve the
+    append-only final artifact before every fallible step, and finalize a
+    separate ACM9-MVP-v1 record referencing the PASS baseline run id; protocol,
+    fixture, and environment hashes must match under ACM9-MANIFEST-v1, and a
+    mismatch is INCOMPLETE. A finalization failure leaves the reserved
+    INCOMPLETE artifact and exits nonzero. Reserve BEFORE every fallible step —
+    fixture construction, database connection, and manifest hashing included.
+    Finalize a connection failure, query error, or fixture-setup failure as
+    INCOMPLETE with an error_class: never PASS and never FAIL. Stop immediately
+    on any warm-p95 or worst value over two seconds or statement timeout.
+    PRECEDENCE: a recorded breach or timeout finalizes FAIL REGARDLESS of a
+    manifest mismatch, because the gate is absolute rather than comparative; a
+    mismatch sets comparability=mismatched and suppresses only the slowdown
+    comparison, and a mismatched run with no breach finalizes INCOMPLETE. A
+    mismatch never upgrades a run to PASS and never erases a breach.
+    PRECONDITION (check before starting): the ACM-9 baseline artifact exists and
+    its `status` field equals exactly `PASS`, AND its protocol version equals the protocol this run uses; a PASS baseline recorded under a different protocol version is not comparable and does not satisfy the gate. Record but do not fail an
+    in-limit slowdown; do not optimize, change behavior, or claim /users NFR.

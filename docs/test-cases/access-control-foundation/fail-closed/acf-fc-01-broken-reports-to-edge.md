@@ -2,6 +2,8 @@
 
 **Trace:** §3.2 Reporting line · AD-11 · AD-12 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** Erin reports to InactiveMgr through a `direct` row, InactiveMgr is deactivated (`isActive = false`), and Frank is InactiveMgr's own manager through a live `direct` row.

@@ -4,20 +4,119 @@ Binding rules for all authorization. Spine: AD-6, AD-7, AD-8, AD-9, AD-10, AD-11
 
 ## One engine, AWS-style policy attachments (AD-7)
 
-Both dimensions run on the same three tables (full schemas in [database-schema.md](database-schema.md)):
+Both dimensions share four access-control structures (full schemas in
+[database-schema.md](database-schema.md)):
 
 - `Policies` — a rule: `{operator, targetType, targetId, targetRole, type: 'AR'|'FR', managedBy: 'sync'|'admin'}`. Attachment examples: [database-schema.md](database-schema.md).
-- `Permissions` — the full granular feature list in §2.3, including approve/reject candidates, close resourcing requests, edit career timeline, create feedback, record departure, manage departments/custom fields, and change organisational relationships. Each is independently grantable. The changelog's team-drafted/PO-confirmed defaults are a process follow-up absent from the normative SoT; do not hard-code defaults until that confirmation is recorded.
+- `Permissions` — canonical immutable feature keys. The normative product catalog remains the full granular list in §2.3, with each permission independently grantable. The changelog's team-drafted/PO-confirmed defaults are a process follow-up absent from the normative SoT; do not hard-code defaults until that confirmation is recorded.
+- `PolicyPermissions` — normalized FR role-to-permission grants.
 - `UserPolicies` — attachment join: which users hold which policies. One policy row can be shared by many users.
 
 Rules that follow:
 
 - Project/department managerial grants are policy attachments. "Y is DM of project X" is a policy row attached to Y — `Project` has no `pmUserId`/`dmUserId` columns and no member array. People Partner is different: `Relationship type='people_partner'` is the organisational fact; policy/matrix evaluation controls what the derived PP audience may do (AD-19). HTTP surfaces are fixed in [api-conventions.md](api-conventions.md).
-- `type: 'FR'` policies are runtime-editable through the HR Admin UI. `type: 'AR'` policies are written once by the seed script and have **no** UI.
+- Normative product direction: `type: 'FR'` policies are runtime-editable through the HR Admin UI. `type: 'AR'` policies are written once by the seed script and have **no** UI.
 - A new functional role never widens data access (§2.3): FR grants features; what data those features can touch is bounded by the holder's computed access audiences. Feature permissions operate **within** the holder's resolved audiences only — a campaign creator without a manager relationship sees recipients through the colleague view (§2.3, §3.3.7).
 - Policy evaluation is **type-separated**: FR checks never enter the AR tier-resolution hot path, and vice versa.
-- A policy attachment grants access only when joined to a **live** relationship row of the matching type — a PM policy with no `type='project'` membership for that project yields zero grant (fail-closed).
+- An AR policy attachment grants access only when joined to a **live** relationship row of the matching type — a PM policy with no `type='project'` membership for that project yields zero grant (fail-closed). FR evaluation never reads relationship rows.
 - `managedBy` provenance separates future sync-written rows from admin-written rows. When the timetracker integration is deployed, it becomes the **sole writer** of `managedBy:'sync'` rows and replaces a user's rows transactionally (AD-13).
+
+### Functional-role Kernel MVP (AD-4)
+
+`Policies.id` is the FR `roleId`. FR rows require a non-null `targetRole` role
+key and carry `targetType=NULL` and `targetId=NULL`; AR rows require both target
+values. Reviewed custom PostgreSQL migration SQL enforces that type-specific
+shape and unique FR role keys.
+`PolicyPermissions(policyId, permissionId, policyType)` stores the role's
+permission set and rejects duplicate pairs. Custom PostgreSQL migration SQL
+fixes `policyType` to `FR` and enforces a restrictive composite foreign key
+from `(policyId, policyType)` to unique `Policies(id, type)`, so an AR policy
+cannot receive a permission grant.
+
+The functional-role slice in `access-control` implements the live,
+data-driven `isAllowed` service and repository port. `AccessControlFacade`
+only delegates to and exposes it. The evaluator joins the active user,
+`UserPolicies`, `Policies type='FR'`, `PolicyPermissions`, and the canonical
+`Permissions.key`. The public permission key is an open, case-sensitive string
+constrained by lowercase `context:action` syntax, not a closed union of the
+MVP values. Permission keys are append-only identities; no writer updates one
+in place or bypasses the Access Control-owned mutation boundary. The evaluator
+branches on no permission key and never compares `targetRole`, a role name, or
+`User.position`; unknown, differently-cased, or nonmatching data denies.
+Kernel MVP runtime eligibility includes `User.isActive`. AD-20 request-time
+due/departure enforcement is deferred from ACM-1/ACM-2 until the Departure
+persistence seam exists. In particular, `position === 'HR Admin'` is
+prohibited as an authorization rule or fallback.
+
+The seed contains exactly one `hr-admin` role, exactly these three permission
+rows, exactly the corresponding three grants, and one attachment to the active
+user matching `ROOT_WORK_EMAIL` after DEC-UM-007 normalization:
+
+- `user-management:create`
+- `user-management:deactivate`
+- `user-management:list`
+
+There are no other seed-owned default grants. On a fresh database those are
+the exact FR rows. Reruns non-destructively ensure the bootstrap identities,
+fail atomically on conflicting seed-owned drift, and never delete or rewrite
+later non-bootstrap catalog state. **MVP reduction:** this deploy-time catalog
+is seed/migration-owned and has no HTTP mutation surface; no `/roles` HTTP
+surface ships in the Kernel MVP. Runtime role administration and the complete
+§2.3 permission catalog remain future normative product work.
+
+Before ACM-1, the deploy-time root User step **creates and validates** the root
+identity so a fresh migrated database is satisfiable without an unnamed external
+prerequisite. It normalizes `ROOT_WORK_EMAIL` under DEC-UM-007, **stores the
+normalized value** so storage is canonical, and ensures exactly one active User
+whose normalized `workEmail` equals it; unrelated active employees never affect
+that count. Exact-one eligibility counts **all** normalized matches first and
+checks active state only afterwards, so a count other than one fails as
+unmatched or ambiguous before `isActive` is consulted. A normalized match that
+is not the intended root is never adopted, mutated, or reactivated, and
+concurrent runs converge through the unique violation on `users_workEmail_key`
+followed by a re-read and re-validation. Normalized uniqueness is **not**
+database-enforced — `users_workEmail_key` indexes the raw stored value — so the
+guarantee is writer-side and the database-enforced fix is separately gated
+deferred work. The Kernel SPEC tracks this step as CAP-8 and dispatches it as
+ACM-0, whose production entrypoint is `services/backend/prisma/seed.ts`
+(`npm run db:seed`). ACM-1's entrypoint is
+`services/backend/src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts`
+wrapped by `services/backend/scripts/bootstrap-access-control.ts`
+(`npm run db:bootstrap:access-control`); deployment order is `db:deploy` →
+`db:seed` → `db:bootstrap:access-control` → `start:prod`. ACM-1 begins one
+transaction and first acquires the common transaction-scoped PostgreSQL
+advisory lock derived from `access-control:bootstrap:root-hr-admin`. It then
+locks the root User, the `AccessControlBootstrap` singleton, and its recorded
+attachment and revalidates exact-one active eligibility and identity before
+writes and before commit. The singleton keyed `root-hr-admin` durably stores
+normalized root email, root User id, and policy id; later administrator-created
+attachments are not bootstrap state. A normalized email change after bootstrap
+is conflicting drift: fail atomically with actionable diagnostics; never
+transfer the attachment or create another root attachment. This prerequisite
+authorizes no User Management API, CRUD, runtime role management, or other User
+Management feature work.
+
+With **no** `AccessControlBootstrap` singleton recorded, ACM-1 adopts an existing
+FR `hr-admin` policy by natural key and adopts an existing `hr-admin` attachment
+only when that attachment already belongs to the located root, then writes the
+singleton; attachments belonging to anyone else stay non-bootstrap administrator
+state and are neither adopted nor transferred. A changed configured root with no
+singleton has no recorded provenance and therefore no drift to detect. With the
+singleton **present**, a changed normalized root is conflicting drift. The
+asymmetry is deliberate: absent singleton permits adoption, present singleton
+forbids transfer.
+
+FR role-key uniqueness is the **partial** index `UNIQUE targetRole WHERE
+type='FR'`, so an **AR** policy carrying `targetRole='hr-admin'` is legal and is
+a different object. ACM-1's lookup and ACM-2's evaluation always filter
+`type='FR'`; that AR row is never adopted, mutated, counted, or reported as
+drift, is preserved, can hold no grant, and any `UserPolicies` row attaching to
+it is never bootstrap state.
+
+Any future FR user attachment command references an existing
+`Policies.id`/`roleId`; the current inline FR body in `api-conventions.md` is
+superseded for FR and must be synchronized before that User Management-owned
+story enters Stage 1.
 
 ## Operators (AD-8)
 
@@ -41,8 +140,8 @@ The **only** authorization entry point, in every context:
 ```ts
 type SectionAccess = 'none' | 'read' | 'write'
 
-// FR capability check — global, no target:
-accessControl.isAllowed(userId, feature)
+// FR capability check — global, no target; permissionKey is context:action:
+accessControl.isAllowed(userId, permissionKey)
 
 // AR audience/section check — ALWAYS scoped to target employee(s):
 accessControl.resolveAudiences(viewerId, employeeIds)   // bulk map: reporting / project / pp / self / colleague per target
@@ -50,6 +149,9 @@ accessControl.canAccessSection(viewerId, section, targetEmployeeId): SectionAcce
 ```
 
 Forbidden everywhere: reading the policy tables directly from another context, `isManager || isPP`-style flags, caching an audience result across requests without graph-change invalidation.
+
+`AccessControlFacade.isAllowed` is an exposure boundary, not a second
+implementation: it delegates to the functional-role slice's domain service.
 
 `canAccessSection` returns only the base section decision. It does not serialize
 fields or decide record-specific visibility: S5's CV/certificate subset, S7/S8
@@ -88,7 +190,7 @@ The §3.2 matrix has distinct audience columns — not one merged "Manager line.
 
 | Column | Resolution inputs | Notes |
 | --- | --- | --- |
-| **Self** | `viewerId === targetEmployeeId` | Evaluated **first**; Self column applies before any manager column (unique cells per §3.2 — e.g. S2/S3 RW, S6 no access, S1 photo RW). A viewer in their own reporting chain does not also inherit manager cells for their own profile. |
+| **Self** | `viewerId === targetEmployeeId`, **after** both viewer and target are confirmed present and active | Identity validation runs **before** any audience derivation, Self included; Self is exclusive only once that confirmation holds (where target = viewer, one confirmation settles both). An unconfirmed viewer or target yields an empty audience `Set` — never Self, never the Colleague floor. Once confirmed, Self applies before any manager column (unique cells per §3.2 — e.g. S2/S3 RW, S6 no access, S1 photo RW). A viewer in their own reporting chain does not also inherit manager cells for their own profile. |
 | **Reporting line** | Reports-to + department management (transitive) | Separate graph from project |
 | **Project line** | PM/DM via shared project assignment + project-management chain only | Narrower cells per §3.3.2; evaluated **per shared project** before column merge |
 | **PP** | `Relationship type='people_partner'` + the assigned PP's `direct` HR line above (§2.1, AD-19) | Not the employee's reporting chain; section rights still come from matrix/policy projection |
@@ -221,7 +323,23 @@ Do not hard-code until explicitly decided:
 
 - One round trip per graph—or one combined query plan—resolves all requested targets — this is what makes the 500-record / 2-second NFR (§7) hold.
 - Profile single-target is the degenerate case.
-- The reporting walk filters `Relationship type='direct'` exclusively. A broken `reportsToUserId` edge (missing or soft-deleted user) is treated as **no edge** — walk terminates fail-closed, no transitive continuation through the orphan.
+- The reporting walk filters `Relationship type='direct'` exclusively. An **absent** manager edge is a clean chain end. An edge whose **endpoint is inactive** is treated as **no edge** — the walk terminates fail-closed there, with no transitive continuation past the dead node. An edge whose **endpoint row is missing** cannot exist in supported operation: `relationships_shape_check` requires a non-null `reportsToUserId` on `direct` and `people_partner` rows and the endpoint foreign key is `ON DELETE RESTRICT`. `User` carries no soft-delete column, so no soft-deleted user or bridge state participates here.
+- Reporting visited state is path-local to each requested target; shared
+  ancestors across target walks are not repeats. Reaching the viewer proves the
+  viewer sits on that target's chain but is **provisional** — it does not by
+  itself grant Reporting. The walk continues to chain termination, and
+  Reporting is granted only when that target's whole walked chain terminates
+  without repeating a node. A repeated node anywhere in the chain, **before or
+  after viewer proof**, denies Reporting for that target only and stops the
+  walk; a viewer inside a cycle is therefore denied rather than proven. Self and
+  direct PP are evaluated independently of that denial; Colleague still applies
+  only when no stronger valid audience remains.
+- Chain termination is the absence of a further usable manager edge. An absent
+  edge is a clean end. An edge whose endpoint is **inactive** is unusable and is
+  treated as absent for traversal: **before** viewer proof the viewer is
+  unproven and Reporting is denied; **after** viewer proof the chain has already
+  terminated without a repeat, so Reporting is granted while nothing above the
+  dead node becomes reachable.
 - Project line reads `type='project'` rows and project policies.
 - Mentorship pairs never participate in either walk (AD-17).
 - Section visibility = resolved audiences joined against the seeded tier→section mapping (Reporting, Project, PP, Self, and Colleague columns).
@@ -230,6 +348,15 @@ Do not hard-code until explicitly decided:
 - Polymorphic lookups are allowed for feature and audience resolution but barred from the tier-resolution hot path.
 
 ### Effective-departure cutoff (AD-20)
+
+**Kernel MVP deferral:** ACM-1/ACM-2 do not implement this section because the
+current backend has no Departure persistence seam. The rules below remain the
+binding future target, including the dismissed-target projection; this
+deferral does not redefine them. This is the local AD-4 scoped amendment to
+inherited AD-20 for the entire Kernel MVP, explicitly ACM-0 through ACM-5;
+ACM-8 only composes and ACM-9 only measures. The future seam does not itself
+authorize implementation; later lifecycle/full-facade work requires its own
+AD-1 gate.
 
 Before any feature or audience decision, authentication/session validation and `AccessControl` check whether the actor has a due Departure under the configured business timezone. Due means inactive even in `scheduled`, `processing`, or `retry_wait`; do not cache this result across requests. Worker failure can delay materialized cleanup but can never restore access. Once a future departure is scheduled, platform relationship commands reject new direct-report, department-manager, or PP responsibility for that actor, and timetracker sync quarantines a new PM/DM grant with an operational incident.
 

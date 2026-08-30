@@ -2,6 +2,8 @@
 
 **Trace:** §7 · AD-10 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** an authenticated viewer and an empty list of target employee IDs.

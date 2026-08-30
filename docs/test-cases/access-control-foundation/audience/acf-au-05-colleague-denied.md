@@ -2,6 +2,8 @@
 
 **Trace:** §3.2 Colleague · §3.3.4 · AD-10 · AD-11 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** Colin is an authenticated employee who is not Alice, does not manage her directly or transitively, and is not her People Partner.

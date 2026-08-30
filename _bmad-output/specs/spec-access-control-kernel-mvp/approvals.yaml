@@ -1,0 +1,46 @@
+# AD-1 stage-approval ledger — Access Control Kernel MVP
+#
+# Append-only. A superseding decision is APPENDED; no entry is ever edited or
+# removed. This file is the persisted, independently verifiable form of the
+# AD-1 gate: a claim in a report that "a human approved this" is not an
+# approval, this record is.
+#
+# Schema — every entry carries all eight fields:
+#
+#   - story_id:      dispatch entry id from stories.yaml (e.g. "ACM-0-scenarios")
+#     stage:         stage-1-scenarios | stage-2-tests | stage-3-production
+#     repo:          workspace | services/backend
+#     artifact_path: path to the artifact, relative to THAT repo's root
+#     commit:        revision in THAT repo at which the artifact was read
+#     author:        who produced the artifact
+#     approver:      who approved it
+#     decision:      approved | rejected
+#     timestamp:     ISO-8601, e.g. 2026-09-01T14:03:00Z
+#
+# `repo` exists because this workspace spans two git repositories: planning
+# artifacts live here, while tests and production code live in the
+# `services/backend` submodule. A bare revision cannot say which one it belongs
+# to, and an approval nobody can resolve is not verifiable — the exact failure
+# this ledger was introduced to prevent.
+#
+# Two rules make the record enforceable rather than decorative:
+#
+#   1. author != approver. This is the persisted form of the
+#      no-self-certification rule in docs/architecture/testing-strategy.md.
+#   2. A dispatch may not start until the PRIOR stage's record exists and
+#      VERIFIES — `commit` resolves and `artifact_path` is present at that
+#      revision. An unverifiable record blocks the next stage exactly as a
+#      missing one does.
+#
+# Verify a record before relying on it — `repo` selects the working directory,
+# so the check is unambiguous:
+#   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
+#   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
+# A record whose commit does not resolve, or whose artifact_path is absent at
+# that commit, blocks the next stage exactly as a missing record does.
+#
+# Status: EMPTY BY DESIGN. The Kernel MVP package is in-review and
+# implementation is not authorized, so no stage approval exists yet. The P2
+# repair created this ledger and recorded nothing in it.
+
+approvals: []

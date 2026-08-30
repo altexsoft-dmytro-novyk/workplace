@@ -31,6 +31,11 @@ independently shippable deliverable; none is authorized by the current spec.
   summary: List, filter, export, and search projection — apply section and field-level access rules to every non-profile surface.
   evidence: Split from the Access Control build intent. §3.3.1 projection is a separate cross-cutting surface with its own leak-negative suite and the §7 2-second / 500-record budget; it consumes the facade rather than defining it.
 
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md`
+  status: named residual risk of the 2026-08-30 Kernel MVP P2 repair; requires a separately gated story
+  summary: Database-enforced normalized `workEmail` uniqueness — today the guarantee is writer-side only.
+  evidence: `users_workEmail_key` (`20260810130423_init/migration.sql`) is a plain unique index on the **raw** stored `workEmail`. `create-user.dto.ts` and `update-user.dto.ts` normalize with `trim().toLowerCase()` on write, so API-created rows are canonical, but nothing in the database enforces that — and `prisma/seed.ts` currently stores `ROOT_WORK_EMAIL` verbatim. DEC-UM-007 states "uniqueness is enforced on the normalized value", which is not true of the schema. The Kernel MVP closes the seed half of this through ACM-0 (canonical storage on write) and fails closed when more than one normalized match exists, but it deliberately does **not** add the database constraint: a unique functional index over `lower(btrim("workEmail"))` is a migration on the `users` table, past CAP-8's stated "no User Management feature work" boundary. The follow-up must choose the index shape, decide how to remediate any pre-existing non-normalized rows it would reject, define the failure mode for concurrent inserts under the new constraint, and reconcile DEC-UM-007's wording with whatever ships.
+
 ## Open findings — checkpoint review of ACF-1, 2026-08-30
 
 A `bmad-checkpoint-preview` walkthrough of the ACF-1 implementation raised seven
@@ -73,3 +78,8 @@ technical ones underneath that verdict.
 - source_spec: dispatched to a separate build run, 2026-08-30
   summary: The reporting walk descends from the viewer, so cost scales with the org, not the request.
   evidence: The recursive CTE expands every descendant of the viewer and only then filters `WHERE id IN (targets)`. A viewer near the top of the tree walks the whole company to open one profile. `access-control.md` bars full scans from the tier-resolution hot path and §7 requires 500 records within 2 seconds. Walking upward from each target bounds the cost to chain depth. The 9-person fixture cannot show the difference, so any fix needs a measurement, not an assertion.
+
+- source_spec: `_bmad-output/test-artifacts/performance/p6-resolve-audiences-postgresql.md`
+  status: accepted P6 finding; requires a separate follow-up story
+  summary: Add database timeout headroom below the outer two-second request budget and define PostgreSQL `statement_timeout` error classification.
+  evidence: The approved P6 PostgreSQL measurement found no valid acyclic shape over budget: 500 balanced targets had a warm p95 of 41.790 ms, and the valid depth-499 chain had a warm p95 of 161.165 ms. The separate timeout probe showed the outer budget firing first at 2001.103 ms; PostgreSQL cancellation arrived later at 2006.536 ms (database-only probe: 2054.437 ms, SQLSTATE 57014). The follow-up must choose explicit headroom, preserve fail-closed behavior, distinguish database cancellation from outer request timeout, and add error-classification coverage. P6 must not change Access Control production behavior; its opt-in benchmark and Markdown/JSON reports remain the reproducible baseline.

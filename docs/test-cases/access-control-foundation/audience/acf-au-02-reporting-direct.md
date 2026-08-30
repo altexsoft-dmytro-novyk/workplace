@@ -2,6 +2,8 @@
 
 **Trace:** §2.1 relation 1 · §3.2 Reporting line · AD-10 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** Bob is Alice's direct unit manager through a live `Relationship type='direct'` row (Alice → Bob).

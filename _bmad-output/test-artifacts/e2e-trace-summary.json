@@ -1,12 +1,15 @@
 {
   "schema_version": "0.2.0",
-  "snapshot_at": "2026-08-30T01:31:00+03:00",
+  "snapshot_at": "2026-08-30T18:33:20+03:00",
+  "supersedes": "2026-08-30T01:31:00+03:00",
   "repo": "people management",
   "collection_mode": "contract_static",
   "collection_status": "COLLECTED",
   "inventory_basis": "acceptance_criteria",
   "gate_basis": "priority_thresholds",
-  "source_sha": "d23428209b359e7bd2cb0742e6c1bb2fcb1bb729",
+  "source_sha": "3b1880cfabf0676c1e02e5eb7a31e04be5d3424e",
+  "workspace_sha": "5bdaf5e61ae9a05d26235adf0bc80b6f6624fb02",
+  "working_tree_note": "services/backend carries one uncommitted, non-behavioural modification: the round-2 approval comment at the head of the e2e suite.",
   "target": {
     "type": "story",
     "id": "ACF-1",
@@ -23,105 +26,70 @@
       "_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md"
     ],
     "external_pointer_status": "not_used",
-    "synthetic": false
+    "synthetic": false,
+    "human_approved": true
   },
   "gate_status": "FAIL",
   "base_coverage_status": "PASS",
   "coverage": {
     "inventory": {
-      "covered": 8,
-      "total": 8,
+      "covered": 9,
+      "total": 9,
       "pct": 100
     },
     "priority_breakdown": {
-      "P0": {
-        "total": 8,
-        "covered": 8,
-        "pct": 100
-      },
-      "P1": {
-        "total": 0,
-        "covered": 0,
-        "pct": 100
-      },
-      "P2": {
-        "total": 0,
-        "covered": 0,
-        "pct": 100
-      },
-      "P3": {
-        "total": 0,
-        "covered": 0,
-        "pct": 100
-      }
+      "P0": { "total": 9, "covered": 9, "pct": 100 },
+      "P1": { "total": 0, "covered": 0, "pct": 100 },
+      "P2": { "total": 0, "covered": 0, "pct": 100 },
+      "P3": { "total": 0, "covered": 0, "pct": 100 }
     },
     "by_level": {
-      "e2e": {
-        "tests": 8,
-        "criteria_covered": 8
-      },
-      "api": {
-        "tests": 0,
-        "criteria_covered": 0
-      },
-      "component": {
-        "tests": 0,
-        "criteria_covered": 0
-      },
-      "unit": {
-        "tests": 8,
-        "criteria_covered": 8
-      },
-      "live": {
-        "tests": 0,
-        "criteria_covered": 0
-      },
-      "other": {
-        "tests": 0,
-        "criteria_covered": 0
-      }
+      "e2e": { "tests": 10, "criteria_covered": 9 },
+      "api": { "tests": 0, "criteria_covered": 0 },
+      "component": { "tests": 0, "criteria_covered": 0 },
+      "unit": { "tests": 13, "criteria_covered": 9 },
+      "live": { "tests": 0, "criteria_covered": 0 },
+      "other": { "tests": 0, "criteria_covered": 0 }
     }
   },
   "tests": {
-    "files": 2,
-    "cases": 16,
+    "files": 3,
+    "cases": 23,
     "skipped_cases": 0,
     "fixme_cases": 0,
     "pending_cases": 0
   },
   "execution_evidence": {
+    "runtime": "Node v24.18.0, PostgreSQL 18 container (healthy)",
     "unit_command": "npm test",
     "unit_result": {
-      "acf_relevant_passed": 11,
+      "suites": 2,
       "total_passed": 13,
       "failed": 0,
       "skipped": 0,
-      "duration_seconds": 0.306
+      "duration_seconds": 0.312
     },
     "e2e_command": "npm run test:e2e -- access-control",
     "e2e_result": {
-      "acf_relevant_passed": 9,
-      "total_passed": 9,
+      "suites": 1,
+      "total_passed": 10,
       "failed": 0,
       "skipped": 0,
-      "duration_seconds": 0.746
+      "duration_seconds": 0.652
     },
-    "acf_relevant_total_passed": 20,
+    "acf_relevant_total_passed": 23,
+    "note": "The tenth e2e case asserts that nothing derived is persisted — a SPEC constraint rather than an oracle item. Counted as a test, not as coverage.",
     "historical_diagnostics": {
-      "colleague_to_reporting_mutation_killed": [
-        "ACF-AU-05",
-        "ACF-FC-01",
-        "ACF-FC-02"
-      ],
-      "remove_active_user_join_mutation_killed": [
-        "ACF-FC-01"
-      ],
+      "measured_at_sha": "d23428209b359e7bd2cb0742e6c1bb2fcb1bb729",
+      "re_measured_this_run": false,
+      "colleague_to_reporting_mutation_killed": ["ACF-AU-05", "ACF-FC-01", "ACF-FC-02"],
+      "remove_active_user_join_mutation_killed": ["ACF-FC-01"],
       "database_constraint_violation_probes_rejected": 6,
       "counted_as_runnable_tests": false
     }
   },
   "risk_summary": {
-    "critical_open": 3,
+    "critical_open": 2,
     "high_open": 0,
     "medium_open": 0,
     "low_open": 0
@@ -138,7 +106,7 @@
     "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
     "freshness": "not_present",
     "recorded_source_sha": "",
-    "current_source_sha": "d23428209b359e7bd2cb0742e6c1bb2fcb1bb729",
+    "current_source_sha": "3b1880cfabf0676c1e02e5eb7a31e04be5d3424e",
     "producer": "",
     "counted": 0,
     "stale": 0,
@@ -163,69 +131,50 @@
     "overall_coverage_actual": "100%",
     "overall_status": "MET"
   },
-  "blockers": [
+  "resolved": [
     {
       "id": "ACF-GOV-01",
-      "severity": "critical",
-      "reason": "No independent human AD-1 approval exists for any of the agent-authored ACF-1 scenarios or translated tests.",
-      "test_file": "docs/test-cases/access-control-foundation/",
-      "test_title": "ACF-1 scenario and test approval"
-    },
+      "resolved_at": "2026-08-30",
+      "reason": "Both AD-1 rounds recorded with named approver, date and basis. Round 1 per-file markers in docs/test-cases/access-control-foundation/; round 2 comment at the head of the e2e suite. Basis is recorded in gate-decision.json under approval_provenance rather than asserted as an unqualified sign-off."
+    }
+  ],
+  "blockers": [
     {
       "id": "ACF-CONTRACT-01",
       "severity": "critical",
-      "reason": "The E2E rule self/reporting/pp allow and colleague deny is a provisional Access Control assumption pending answer 3 of um-integration-contract-request.md.",
+      "reason": "The rule self/reporting/pp allow and colleague deny remains a provisional Access Control assumption pending answer 3 of um-integration-contract-request.md. Approval of the scenarios encodes the assumption; it does not settle it.",
       "test_file": "_bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md",
       "test_title": "User Management feature-to-audience mapping"
     },
     {
       "id": "ACF-WIRING-01",
       "severity": "critical",
-      "reason": "AccessControlModule is absent from AppModule. The E2E suite uses a test-only provider override, while production GET /users/:id remains bound to the interim allow-all adapter.",
+      "reason": "AccessControlModule is absent from AppModule. The e2e suite uses a test-only provider override, while production GET /users/:id remains bound to the interim allow-all adapter.",
       "test_file": "services/backend/src/app.module.ts",
       "test_title": "Production access-control composition"
     }
   ],
-  "recommendations": [
+  "accepted_at_approval": [
     {
-      "priority": "URGENT",
-      "action": "Obtain independent per-file AD-1 approval for the eight scenarios and their translated tests.",
-      "requirements": [
-        "ACF-AU-01",
-        "ACF-AU-02",
-        "ACF-AU-03",
-        "ACF-AU-04",
-        "ACF-AU-05",
-        "ACF-FC-01",
-        "ACF-FC-02",
-        "ACF-FC-03"
-      ]
+      "id": "ACF-FC-01-DEPTH",
+      "severity": "medium",
+      "reason": "The fixture places the deactivated user only in the mid-chain position, so the case passes for a weaker reason than the scenario claims. Two further cases separate a blocked bridge from a blocked target.",
+      "accepted_by": "Anna Pikula",
+      "accepted_at": "2026-08-30"
     },
     {
-      "priority": "URGENT",
-      "action": "Resolve User Management integration-contract answer 3 and update expectations if the approved mapping differs.",
-      "requirements": [
-        "ACF-AU-01",
-        "ACF-AU-02",
-        "ACF-AU-03",
-        "ACF-AU-04",
-        "ACF-AU-05",
-        "ACF-FC-01",
-        "ACF-FC-02"
-      ]
+      "id": "ACF-AU-05-WHITELIST",
+      "severity": "medium",
+      "reason": "Colleague is denied outright while §3.3.4 entitles them to S1, S10 dates and the S11 project name. Correct only while the endpoint returns the whole row; must change when profile projection lands.",
+      "accepted_by": "Anna Pikula",
+      "accepted_at": "2026-08-30"
     },
     {
-      "priority": "URGENT",
-      "action": "Complete the User Management-owned production wiring and rerun the E2E without a test-only provider override.",
-      "requirements": [
-        "ACF-AU-01",
-        "ACF-AU-02",
-        "ACF-AU-03",
-        "ACF-AU-04",
-        "ACF-AU-05",
-        "ACF-FC-01",
-        "ACF-FC-02"
-      ]
+      "id": "ACF-DDD-IMPORT",
+      "severity": "medium",
+      "reason": "The suite imports ACCESS_CONTROL_PORT from src/user-management/domain/, which domain-driven-design.md forbids across context boundaries, and which the integration contract contemplates changing.",
+      "accepted_by": "Anna Pikula",
+      "accepted_at": "2026-08-30"
     }
   ],
   "out_of_scope_gap": {
@@ -237,7 +186,7 @@
   "excluded_failures": {
     "suite": "test/user-management/**",
     "failures": 31,
-    "basis": "Reported identical before and after at aca387b; causes are missing endpoints and unavailable LocalStack.",
+    "basis": "Reported identical before and after aca387b; causes are missing endpoints and unavailable LocalStack. Not re-measured this run — only the access-control selector was executed.",
     "attributed_to_acf_1": false
   },
   "links": {

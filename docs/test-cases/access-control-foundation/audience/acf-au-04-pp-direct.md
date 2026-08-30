@@ -2,6 +2,8 @@
 
 **Trace:** §2.1 · §3.2 PP · AD-19 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** Paula is Alice's assigned People Partner through a `Relationship type='people_partner'` row, and Paula is nowhere in Alice's reporting chain.
