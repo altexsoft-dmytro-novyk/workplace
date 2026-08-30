@@ -39,8 +39,38 @@
 # A record whose commit does not resolve, or whose artifact_path is absent at
 # that commit, blocks the next stage exactly as a missing record does.
 #
-# Status: EMPTY BY DESIGN. The Kernel MVP package is in-review and
-# implementation is not authorized, so no stage approval exists yet. The P2
-# repair created this ledger and recorded nothing in it.
+# Status: ACM-3-scenarios stage-1-scenarios recorded below (2026-08-30). No
+# other story has an approval yet, and no Stage-2 or Stage-3 record exists for
+# ACM-3 — the next ACM-3 dispatch (ACM-3-red-tests) may proceed only after
+# independently verifying the three records below.
 
-approvals: []
+approvals:
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-01-inactive-viewer-chain-top.md"
+    commit: "512dce5d73c56969a96ec4776ba032d087fe2eb4"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-30T22:04:19Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-02-inactive-bridge-stops-traversal.md"
+    commit: "512dce5d73c56969a96ec4776ba032d087fe2eb4"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-30T22:04:19Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-03-inactive-target-below-active-manager.md"
+    commit: "512dce5d73c56969a96ec4776ba032d087fe2eb4"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-30T22:04:19Z"
