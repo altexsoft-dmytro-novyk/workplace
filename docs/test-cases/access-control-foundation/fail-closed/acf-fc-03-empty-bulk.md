@@ -17,4 +17,8 @@
 > **Facade-level case.** This one is asserted at the facade, not over HTTP: `GET /users/:id` always carries exactly one target, so an empty request list cannot be expressed as a route call. The deviation from the `inputURL` skeleton in [../../README.md](../../README.md) is deliberate and limited to this file.
 
 - **facadeCall:** `accessControl.resolveAudiences(<colin-id>, [])`
-- **expectedResult:** an empty map; the query counter observed around the call reports `0` statements.
+- **expectedResult:** an empty map; the relationship-graph port is never called, so nothing reaches the database.
+
+> The assertion observes the port rather than a statement counter: Prisma emits query events only when the client is
+> constructed with event-based logging, which this service does not do — a counter written against it would report `0`
+> whatever the code did, and pass vacuously.
