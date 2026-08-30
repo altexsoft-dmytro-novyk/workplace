@@ -42,16 +42,16 @@ Intended to reuse the cast seeded for access-control's suite so relationships st
 
 | Folder | Covers | Files |
 | --- | --- | --- |
-| `registration/` | **RETIRED / SUPERSEDED (v1.5)** — former CAP-1 `um-reg-01`..`15` HTTP create. Do not translate to stage-2 for product create. Replaced by Story 1.1 seed scenarios (`um-seed-01`..`03`, folder TBD under `seed/`). | 15 (archived) |
-| `seed/` | FR-1/FR-4a/FR-5a: population import, no `POST /users`, bootstrap HR Admin (Story 1.1) | 0 (to author) |
-| `auth/` | FR-2/FR-7: magic-link request/consume, security edge cases | 6 |
-| `profile/` | FR-8: Manager-line edits, Self photo upload, uniqueness on PATCH | 4 |
-| `deactivation/` | FR-9: soft delete, active-list exclusion | 3 |
-| `list/` | FR-16: pagination and S1-field filters (Story 1.5) | 4 |
-| `career-timeline/` | FR-10..FR-13: system events, PP/direct-UM manual mechanics (DEC-UM-001), and edit-immutability | 8 |
-| `relationships/` | FR-14/FR-15: mentorship and reports-to (Epic 4) | 8 |
+| `registration/` | **DEAD (2026-08-30 audit) — RETIRED / SUPERSEDED (v1.5).** Former CAP-1 `um-reg-01`..`15` HTTP create. Not cited by current epics.md; do not translate to stage-2. | 15 (dead) |
+| `seed/` | FR-1/FR-4a/FR-5a: population import, no `POST /users`, bootstrap HR Admin (Story 1.1) | 3 (`um-seed-01`..`03`, authored 2026-08-30) |
+| `auth/` | FR-2/FR-7: magic-link request/consume, security edge cases | 6 — alive, cited by epics.md Story 2.1/2.2 |
+| `profile/` | FR-8: Manager-line edits, Self photo upload, uniqueness on PATCH | 4 total; `um-pf-01`..`03` alive (Story 1.2/1.3), `um-pf-04` (ttId uniqueness) dead — uncited |
+| `deactivation/` | **DEAD (2026-08-30 audit).** Epic 5 is now a two-step Departure lifecycle (spine AD-15/16/17), not generic deactivation; zero citations in current epics.md. | 3 (dead) |
+| `list/` | FR-16: pagination and S1-field filters (Story 1.5) | 4 — unconfirmed: zero id citations in epics.md despite Story 1.5 existing; verify content against Story 1.5's ACs before reuse, don't assume alive |
+| `career-timeline/` | FR-10..FR-13: system events, PP/direct-UM manual mechanics (DEC-UM-001), and edit-immutability | 8 total; `um-ct-01,02,03,05,06,07` alive (Story 3.1/3.2/3.3), `um-ct-04`/`um-ct-08` dead — uncited |
+| `relationships/` | **DEAD (2026-08-30 audit).** Epic 4 was rebuilt around manager/PP/department changes with self-assignment rejection + atomic journaling (spine AD-5..AD-8); mentorship-pair scenarios (`um-rel-04`..`06`) are doubly dead since mentorship moved to its own future epic (epics.md "Mentorship Handoff"). Zero citations in current epics.md. | 8 (dead) |
 
-**Total:** 48 stage-1 scenario files.
+**Total:** 51 stage-1 scenario files (18 alive/reusable, 26 dead, 4 unconfirmed, 3 newly authored). See the 2026-08-30 architecture-reset audit for the full alive/dead/missing breakdown.
 
 File names state actor/behavior (`um-reg-01-hr-admin-create-success.md`), so a folder listing is its own index.
 
