@@ -47,11 +47,11 @@ Intended to reuse the cast seeded for access-control's suite so relationships st
 | `auth/` | FR-2/FR-7: magic-link request/consume, security edge cases | 6 — alive, cited by epics.md Story 2.1/2.2 |
 | `profile/` | FR-8: Manager-line edits, Self photo upload, uniqueness on PATCH | 4 total; `um-pf-01`..`03` alive (Story 1.2/1.3), `um-pf-04` (ttId uniqueness) dead — uncited |
 | `deactivation/` | **DEAD (2026-08-30 audit).** Epic 5 is now a two-step Departure lifecycle (spine AD-15/16/17), not generic deactivation; zero citations in current epics.md. | 3 (dead) |
-| `list/` | FR-16: pagination and S1-field filters (Story 1.5) | 4 — unconfirmed: zero id citations in epics.md despite Story 1.5 existing; verify content against Story 1.5's ACs before reuse, don't assume alive |
+| `list/` | FR-16: pagination and S1-field filters (Story 1.5) | 5 — `um-list-01`..`04` verified alive against Story 1.5's ACs (2026-08-30); `um-list-05` newly authored to close a real gap `um-list-04` left (it delegated dismissed-employee-filter coverage to now-dead `deactivation/um-deact-02`) |
 | `career-timeline/` | FR-10..FR-13: system events, PP/direct-UM manual mechanics (DEC-UM-001), and edit-immutability | 8 total; `um-ct-01,02,03,05,06,07` alive (Story 3.1/3.2/3.3), `um-ct-04`/`um-ct-08` dead — uncited |
 | `relationships/` | **DEAD (2026-08-30 audit).** Epic 4 was rebuilt around manager/PP/department changes with self-assignment rejection + atomic journaling (spine AD-5..AD-8); mentorship-pair scenarios (`um-rel-04`..`06`) are doubly dead since mentorship moved to its own future epic (epics.md "Mentorship Handoff"). Zero citations in current epics.md. | 8 (dead) |
 
-**Total:** 51 stage-1 scenario files (18 alive/reusable, 26 dead, 4 unconfirmed, 3 newly authored). See the 2026-08-30 architecture-reset audit for the full alive/dead/missing breakdown.
+**Total:** 52 stage-1 scenario files (23 alive/reusable, 26 dead, 4 newly authored). See the 2026-08-30 architecture-reset audit for the full alive/dead/missing breakdown.
 
 File names state actor/behavior (`um-reg-01-hr-admin-create-success.md`), so a folder listing is its own index.
 
