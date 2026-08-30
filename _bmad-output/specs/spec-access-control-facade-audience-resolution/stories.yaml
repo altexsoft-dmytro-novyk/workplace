@@ -7,12 +7,13 @@
     Jest + supertest E2E under services/backend/test/ — real PostgreSQL, persona tokens,
     routes per api-conventions.md. Commit red; human approves tests.
   spec_checkpoint: true
-  done_checkpoint: false
+  done_checkpoint: true
   invoke_dev_with: >-
     services/backend only. One E2E test per approved scenario file in the four
     foundation folders under docs/test-cases/access-control/. Cite AC-* id in
     test title. Use seed from test-cases spec story 1; no mocked AccessControl.
     Source prose: spec-access-control-test-cases (stage-1 only).
+  status: "done (2026-08-30) — all 171 scenarios translated to 181 E2E tests, services/backend commit dafb2c0. Human checkpoint waived per the 2026-08-30 architecture-reset exception (see project memory), not skipped silently."
 
 - id: "2"
   title: Stage-2 E2E — translate matrix scenarios (committed red)
@@ -28,3 +29,4 @@
     npm run test:e2e -- access-control must fail until facade implementation
     lands. After human approval and red commit, dispatch facade production work
     (implementation-constraints.md).
+  status: "done (2026-08-30) — facade implemented (services/backend commits 82bfb1b/f3d0dc1/071ddab/20bd4af), 181/181 access-control E2E green, independently re-verified. implementation-constraints.md was removed in the architecture reset; production work followed architecture-people-management-2026-08-30/ARCHITECTURE-SPINE.md instead."

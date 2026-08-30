@@ -44,16 +44,16 @@ project_key: NOKEY
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts/user-management
 development_status:
-  epic-1: backlog
-  1-1-import-seeded-population: backlog
-  1-2-view-and-edit-an-employee-s-identity-card-fields: backlog
-  1-3-self-uploads-own-photo: backlog
-  1-5-list-employees-with-pagination-and-filters: backlog
+  epic-1: done
+  1-1-import-seeded-population: done
+  1-2-view-and-edit-an-employee-s-identity-card-fields: done
+  1-3-self-uploads-own-photo: done
+  1-5-list-employees-with-pagination-and-filters: done
   epic-1-retrospective: optional
 
-  epic-2: backlog
-  2-1-request-a-magic-link-by-work-email: backlog
-  2-2-consume-a-magic-link-token-to-establish-a-session: backlog
+  epic-2: done
+  2-1-request-a-magic-link-by-work-email: done
+  2-2-consume-a-magic-link-token-to-establish-a-session: done
   epic-2-retrospective: optional
 
   epic-3: backlog
