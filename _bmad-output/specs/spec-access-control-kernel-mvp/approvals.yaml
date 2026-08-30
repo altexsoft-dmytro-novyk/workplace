@@ -39,10 +39,11 @@
 # A record whose commit does not resolve, or whose artifact_path is absent at
 # that commit, blocks the next stage exactly as a missing record does.
 #
-# Status: ACM-3-scenarios stage-1-scenarios recorded below (2026-08-30). No
-# other story has an approval yet, and no Stage-2 or Stage-3 record exists for
-# ACM-3 — the next ACM-3 dispatch (ACM-3-red-tests) may proceed only after
-# independently verifying the three records below.
+# Status: ACM-3-scenarios and ACM-1-scenarios stage-1-scenarios recorded
+# below. No other story has an approval yet, and no Stage-2 or Stage-3 record
+# exists for either — the next dispatch for each (ACM-3-red-tests /
+# ACM-1-red-tests) may proceed only after independently verifying its own
+# records below.
 
 approvals:
   - story_id: "ACM-3-scenarios"
@@ -74,3 +75,93 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-30T22:04:19Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-04-exactly-one-root-attachment.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-05-rerun-seed-no-duplicates.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-06-no-other-role-attachment-or-grant.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-07-fr-policy-has-no-target.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-08-ar-fr-shape-violations-rejected.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-09-duplicate-keys-and-joins-rejected.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
