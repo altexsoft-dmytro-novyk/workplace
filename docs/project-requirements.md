@@ -472,7 +472,7 @@ Analytics does not reuse the All Employees filter engine (4.1), because it does 
 - **People — current state.** Headcount by country, department, grade, position, employee type, gender, join year. Load per people partner and per manager.
 - **Events — what happened in a period.** Joiners, departures, grade changes, department changes, risk changes, mentorship starts and ends. The data already exists as typed, dated events in the career timeline (4.9), risk history (4.6) and employment status (4.16) — reuse it rather than inventing a parallel store.
 
-**One definition of a departure.** Analytics counts departures from employment status (4.16) and defines nothing of its own. Two definitions produce two different numbers for the same quarter, both "correct" by their own criterion.
+**One definition of a departure.**   (4.16) and defines nothing of its own. Two definitions produce two different numbers for the same quarter, both "correct" by their own criterion.
 
 **[DESIGN FREEDOM]** Suggested shape: one report page with a subject selector, a period picker for event-based subjects, a group-by dimension, and a chart plus a table. Every report exports to `.xlsx`. Adding a new report should mean registering a new subject and its dimensions, not building another page.
 

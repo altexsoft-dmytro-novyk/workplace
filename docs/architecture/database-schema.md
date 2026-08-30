@@ -141,7 +141,7 @@ The org-fact edge table — the input the tier-resolution walk recurses over.
 Relationship {
   id            uuidv7 PK
   userId        FK -> User        // who this edge is about
-  type          'direct' | 'project' | 'people_partner'
+  type          'direct' | 'project' | 'people_partner' | 'mentor'
   reportsToUserId FK -> User, nullable    // set iff type = 'direct' or 'people_partner'
   projectId     FK -> Project, nullable // set iff type = 'project'
 }
