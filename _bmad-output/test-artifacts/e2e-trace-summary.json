@@ -1,0 +1,249 @@
+{
+  "schema_version": "0.2.0",
+  "snapshot_at": "2026-08-30T01:31:00+03:00",
+  "repo": "people management",
+  "collection_mode": "contract_static",
+  "collection_status": "COLLECTED",
+  "inventory_basis": "acceptance_criteria",
+  "gate_basis": "priority_thresholds",
+  "source_sha": "d23428209b359e7bd2cb0742e6c1bb2fcb1bb729",
+  "target": {
+    "type": "story",
+    "id": "ACF-1",
+    "label": "Resolve Phase-0 Audiences"
+  },
+  "decision_mode": "deterministic",
+  "evaluator": "TEA Agent",
+  "confidence": "high",
+  "oracle": {
+    "resolution_mode": "formal_requirements",
+    "confidence": "high",
+    "sources": [
+      "docs/test-cases/access-control-foundation/",
+      "_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md"
+    ],
+    "external_pointer_status": "not_used",
+    "synthetic": false
+  },
+  "gate_status": "FAIL",
+  "base_coverage_status": "PASS",
+  "coverage": {
+    "inventory": {
+      "covered": 8,
+      "total": 8,
+      "pct": 100
+    },
+    "priority_breakdown": {
+      "P0": {
+        "total": 8,
+        "covered": 8,
+        "pct": 100
+      },
+      "P1": {
+        "total": 0,
+        "covered": 0,
+        "pct": 100
+      },
+      "P2": {
+        "total": 0,
+        "covered": 0,
+        "pct": 100
+      },
+      "P3": {
+        "total": 0,
+        "covered": 0,
+        "pct": 100
+      }
+    },
+    "by_level": {
+      "e2e": {
+        "tests": 8,
+        "criteria_covered": 8
+      },
+      "api": {
+        "tests": 0,
+        "criteria_covered": 0
+      },
+      "component": {
+        "tests": 0,
+        "criteria_covered": 0
+      },
+      "unit": {
+        "tests": 8,
+        "criteria_covered": 8
+      },
+      "live": {
+        "tests": 0,
+        "criteria_covered": 0
+      },
+      "other": {
+        "tests": 0,
+        "criteria_covered": 0
+      }
+    }
+  },
+  "tests": {
+    "files": 2,
+    "cases": 16,
+    "skipped_cases": 0,
+    "fixme_cases": 0,
+    "pending_cases": 0
+  },
+  "execution_evidence": {
+    "unit_command": "npm test",
+    "unit_result": {
+      "acf_relevant_passed": 11,
+      "total_passed": 13,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.306
+    },
+    "e2e_command": "npm run test:e2e -- access-control",
+    "e2e_result": {
+      "acf_relevant_passed": 9,
+      "total_passed": 9,
+      "failed": 0,
+      "skipped": 0,
+      "duration_seconds": 0.746
+    },
+    "acf_relevant_total_passed": 20,
+    "historical_diagnostics": {
+      "colleague_to_reporting_mutation_killed": [
+        "ACF-AU-05",
+        "ACF-FC-01",
+        "ACF-FC-02"
+      ],
+      "remove_active_user_join_mutation_killed": [
+        "ACF-FC-01"
+      ],
+      "database_constraint_violation_probes_rejected": 6,
+      "counted_as_runnable_tests": false
+    }
+  },
+  "risk_summary": {
+    "critical_open": 3,
+    "high_open": 0,
+    "medium_open": 0,
+    "low_open": 0
+  },
+  "heuristics": {
+    "endpoint_gaps": 0,
+    "auth_negative_path_status": "present",
+    "error_path_status": "present",
+    "ui_journey_status": "not_applicable",
+    "ui_state_status": "not_applicable"
+  },
+  "live_evidence": {
+    "present": false,
+    "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
+    "freshness": "not_present",
+    "recorded_source_sha": "",
+    "current_source_sha": "d23428209b359e7bd2cb0742e6c1bb2fcb1bb729",
+    "producer": "",
+    "counted": 0,
+    "stale": 0,
+    "unverifiable": 0,
+    "failed": 0,
+    "contradicted": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "unmatched": 0,
+    "invalid": 0,
+    "requirements_live_only": 0
+  },
+  "gate_criteria": {
+    "p0_coverage_required": "100%",
+    "p0_coverage_actual": "100%",
+    "p0_status": "MET",
+    "p1_coverage_target": "90%",
+    "p1_coverage_minimum": "80%",
+    "p1_coverage_actual": "100%",
+    "p1_status": "MET",
+    "overall_coverage_minimum": "80%",
+    "overall_coverage_actual": "100%",
+    "overall_status": "MET"
+  },
+  "blockers": [
+    {
+      "id": "ACF-GOV-01",
+      "severity": "critical",
+      "reason": "No independent human AD-1 approval exists for any of the agent-authored ACF-1 scenarios or translated tests.",
+      "test_file": "docs/test-cases/access-control-foundation/",
+      "test_title": "ACF-1 scenario and test approval"
+    },
+    {
+      "id": "ACF-CONTRACT-01",
+      "severity": "critical",
+      "reason": "The E2E rule self/reporting/pp allow and colleague deny is a provisional Access Control assumption pending answer 3 of um-integration-contract-request.md.",
+      "test_file": "_bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md",
+      "test_title": "User Management feature-to-audience mapping"
+    },
+    {
+      "id": "ACF-WIRING-01",
+      "severity": "critical",
+      "reason": "AccessControlModule is absent from AppModule. The E2E suite uses a test-only provider override, while production GET /users/:id remains bound to the interim allow-all adapter.",
+      "test_file": "services/backend/src/app.module.ts",
+      "test_title": "Production access-control composition"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "URGENT",
+      "action": "Obtain independent per-file AD-1 approval for the eight scenarios and their translated tests.",
+      "requirements": [
+        "ACF-AU-01",
+        "ACF-AU-02",
+        "ACF-AU-03",
+        "ACF-AU-04",
+        "ACF-AU-05",
+        "ACF-FC-01",
+        "ACF-FC-02",
+        "ACF-FC-03"
+      ]
+    },
+    {
+      "priority": "URGENT",
+      "action": "Resolve User Management integration-contract answer 3 and update expectations if the approved mapping differs.",
+      "requirements": [
+        "ACF-AU-01",
+        "ACF-AU-02",
+        "ACF-AU-03",
+        "ACF-AU-04",
+        "ACF-AU-05",
+        "ACF-FC-01",
+        "ACF-FC-02"
+      ]
+    },
+    {
+      "priority": "URGENT",
+      "action": "Complete the User Management-owned production wiring and rerun the E2E without a test-only provider override.",
+      "requirements": [
+        "ACF-AU-01",
+        "ACF-AU-02",
+        "ACF-AU-03",
+        "ACF-AU-04",
+        "ACF-AU-05",
+        "ACF-FC-01",
+        "ACF-FC-02"
+      ]
+    }
+  ],
+  "out_of_scope_gap": {
+    "suite": "docs/test-cases/access-control/",
+    "draft_files": 171,
+    "scenarios_targeting_nonexistent_endpoints": 146,
+    "included_in_acf_1_gate": false
+  },
+  "excluded_failures": {
+    "suite": "test/user-management/**",
+    "failures": 31,
+    "basis": "Reported identical before and after at aca387b; causes are missing endpoints and unavailable LocalStack.",
+    "attributed_to_acf_1": false
+  },
+  "links": {
+    "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",
+    "trace_report_url": "",
+    "artifact_url": "",
+    "journey_evidence_url": ""
+  }
+}

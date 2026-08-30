@@ -1,0 +1,25 @@
+{
+  "schema_version": "0.1.0",
+  "evaluated_at": "2026-08-30T01:31:00+03:00",
+  "repo": "people management",
+  "target": {
+    "type": "story",
+    "id": "ACF-1",
+    "label": "Resolve Phase-0 Audiences"
+  },
+  "collection_status": "COLLECTED",
+  "gate_basis": "priority_thresholds",
+  "base_coverage_status": "PASS",
+  "gate_status": "FAIL",
+  "rationale": "Coverage thresholds are met: 8/8 P0 oracle items are FULL and all 20 ACF-relevant Jest/supertest tests passed. The final ACF-1 gate is FAIL because the evidence is not independently approved under AD-1, the HTTP allow/deny mapping remains a provisional Access Control assumption pending User Management contract answer 3, and the production module is dormant: AppModule does not import AccessControlModule, so GET /users/:id remains on the interim allow-all adapter. The first two conditions independently prevent PASS; the production wiring gap confirms that the passing override-based E2E is not production protection.",
+  "p0_status": "MET",
+  "p1_status": "MET",
+  "overall_status": "MET",
+  "critical_open": 3,
+  "links": {
+    "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",
+    "trace_report_url": "",
+    "artifact_url": "",
+    "journey_evidence_url": ""
+  }
+}

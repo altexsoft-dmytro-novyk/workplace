@@ -18,7 +18,7 @@
 #   Epic file: _bmad-output/planning-artifacts/platform/epics.md
 
 generated: 08-27-2026 16:16
-last_updated: 08-30-2026 00:20
+last_updated: 08-30-2026 01:05
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -35,8 +35,16 @@ development_status:
   p-8-doc-pass-create-path-removal: backlog
   p-9-register-epic-in-platform-sprint-status: done
   epic-platform-spec-v1-5-alignment-retrospective: optional
-  epic-access-control-foundation: backlog
-  # Blocked 2026-08-30 on the User Management integration contract (AD-3):
-  # _bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md
-  acf-1-resolve-phase-0-audiences: backlog
+  epic-access-control-foundation: in-progress
+  # ACF-1 implemented 2026-08-30 in services/backend (commits 8ff0e13, a063ca2,
+  # local only). Green on real PostgreSQL: 9/9 e2e, 13/13 unit.
+  #
+  # Not done, and neither gap is a bookkeeping detail:
+  # - AD-1 approvals were never obtained. One agent authored the scenarios, the
+  #   red tests and the implementation consecutively under a continuous-execution
+  #   instruction. A checkpoint walkthrough ran 2026-08-30 and raised 7 findings.
+  # - The facade is not wired into production. ACCESS_CONTROL_PORT still binds
+  #   InterimAccessControlAdapter, and the User Management integration contract
+  #   is unanswered: implementation-artifacts/access-control/um-integration-contract-request.md
+  acf-1-resolve-phase-0-audiences: review
   epic-access-control-foundation-retrospective: optional
