@@ -1,19 +1,13 @@
 ---
 id: SPEC-access-control-facade-audience-resolution
 companions:
-  - facade-contract.md
-  - implementation-constraints.md
-  - ../../implementation-artifacts/access-control/deferred-work.md
-  - ../../../docs/architecture/access-control.md
-  - ../../../docs/architecture/database-schema.md
-  - ../../../docs/architecture/domain-driven-design.md
-  - ../../../docs/architecture/nestjs-di-tokens.md
+  - ../../planning-artifacts/architecture/architecture-people-management-2026-08-30/ARCHITECTURE-SPINE.md
   - ../../../docs/architecture/testing-strategy.md
 sources:
   - ../../implementation-artifacts/access-control/spec-access-control-facade-audience-resolution.md
 ---
 
-> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The source is retained for audit; downstream work consumes this contract.
+> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. The source is retained for audit; downstream work consumes this contract. **2026-08-30 note:** `facade-contract.md`, `implementation-constraints.md`, and `docs/architecture/access-control.md` were removed in the architecture reset; the design they held is re-derived in the linked spine (AD-4 through AD-14, AD-24, AD-27).
 
 # AccessControl Facade and Phase 1 Audience Resolution
 

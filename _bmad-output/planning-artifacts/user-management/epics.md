@@ -104,7 +104,7 @@ Any employee in the imported population can request a magic link and log in, est
 ### Epic 3: Career Timeline
 The system logs every required career event through the owning context, while authorized actors can manually add, edit, or delete events only when both access and functional permission allow it.
 
-**Binding implementation constraint (AD-11):** system-triggered `UserEvents` writes happen synchronously, in the same transaction as the domain mutation that causes them, via an explicit call from that use-case's code — no event bus, no generic table-change listener, no `EventEmitterModule`-style pub/sub, even though NestJS makes that pattern easy to reach for. Every story in this epic that wires a new tracked-change hook follows this same one pattern.
+**Binding implementation constraint (2026-08-30 spine AD-19):** system-triggered `UserEvents` writes happen synchronously, in the same transaction as the domain mutation that causes them, via an explicit call from that use-case's code — no event bus, no generic table-change listener, no `EventEmitterModule`-style pub/sub, even though NestJS makes that pattern easy to reach for. Every story in this epic that wires a new tracked-change hook follows this same one pattern. Manual add/edit/delete is further restricted to the target's assigned PP and direct Unit Manager only (spine AD-26 / DEC-UM-001).
 
 **FRs covered:** FR-11, FR-12, FR-13
 
@@ -273,7 +273,7 @@ First login uses the magic-link flow (FR-3) — import does not establish a sess
 
 The system records every v1.5 career event through the owning context. Manual add/edit/delete requires both applicable S9 access and the *edit the career timeline* permission. **FRs covered:** FR-11, FR-12, FR-13.
 
-**Binding implementation constraint (AD-11):** system-triggered writes happen synchronously, in the same transaction as the domain mutation that causes them, via an explicit call from that use-case's code — no event bus, no generic table-change listener, no `EventEmitterModule`-style pub/sub. Every story below that wires a new tracked-change hook follows this same pattern.
+**Binding implementation constraint (2026-08-30 spine AD-19):** system-triggered writes happen synchronously, in the same transaction as the domain mutation that causes them, via an explicit call from that use-case's code — no event bus, no generic table-change listener, no `EventEmitterModule`-style pub/sub. Every story below that wires a new tracked-change hook follows this same pattern.
 
 ### Story 3.1: System Auto-Generates Career Timeline Events
 
@@ -370,7 +370,7 @@ As a holder of the *change organisational relationships* permission,
 I want to change an employee's People Partner,
 So that PP access and the HR-line chain reflect the current assignment.
 
-**Implementation gate:** CC-04 must approve persistence/cardinality and the write contract before stage-2 or production work.
+**Implementation gate resolved (2026-08-30 spine AD-5):** People Partner is a `Relationship` edge (`type='people_partner'`), the same shape as reports-to, with the same CAS write contract — one active edge per subject via a partial unique index, DELETE-then-POST reassignment, conflicting concurrent write returns `409`. Stage-2 and production work may proceed against this contract.
 
 **Acceptance Criteria:**
 
@@ -414,7 +414,7 @@ As an actor with the *record a departure* permission,
 I want to record an employee's effective departure date and reason,
 So that the lifecycle change is scheduled without changing current status early.
 
-**Implementation gate:** CC-06 must define the scheduled state and executor before stage-2 or production work.
+**Implementation gate resolved (2026-08-30 spine AD-15/AD-16/AD-17):** a `Departure` record (separate from `EmploymentStatus`) is written on record-departure; a `SELECT ... FOR UPDATE SKIP LOCKED`-based scheduled task applies the full effective-date side-effect bundle exactly once, idempotent via `appliedAt`, with conditional per-statement updates so it never blind-overwrites a concurrent human write. AccessControl's live checks treat the actor/target as departed once `effectiveDate <= now()`, independent of `appliedAt`. Stage-2 and production work may proceed against this contract.
 
 **Acceptance Criteria:**
 

@@ -1,14 +1,13 @@
 ---
 id: SPEC-access-control-audience-foundation
 companions:
-  - ../../../docs/architecture/access-control.md
-  - ../../../docs/architecture/domain-driven-design.md
+  - ../../planning-artifacts/architecture/architecture-people-management-2026-08-30/ARCHITECTURE-SPINE.md
   - ../../../docs/architecture/testing-strategy.md
 sources:
   - ../../planning-artifacts/sprint-change-proposal-2026-08-29-access-control-foundation.md
 ---
 
-> **Canonical contract.** This SPEC and the files in `companions:` define the complete two-day Access Control foundation contract. Production code remains blocked by the AD-1 scenario and E2E gates.
+> **Canonical contract.** This SPEC and the files in `companions:` define the complete two-day Access Control foundation contract. Production code remains blocked by the AD-1 scenario and E2E gates. **2026-08-30 note:** `docs/architecture/access-control.md` was removed in the architecture reset and this Phase-0 slice is superseded by the fuller facade-audience-resolution SPEC; the design is re-derived in the linked spine.
 
 # Access Control Audience Foundation
 

@@ -1,8 +1,8 @@
 # Testing Strategy — the Three-Stage Gate
 
-Binding rules for how every feature is built. Spine: AD-1, AD-3, AD-4, AD-15, AD-19, AD-20.
+Binding rules for how every feature is built, across every bounded context — this document is process policy, not tied to any one domain's architecture spine, so it cites no `AD-n` numbers of its own (a domain spine's AD numbering is free to change without this file going stale). Kept as-is through the 2026-08-30 user-management/access-control architecture reset; still in force for all new work.
 
-## The gate (AD-1) — no exceptions, no reordering
+## The gate — no exceptions, no reordering
 
 Every feature, every developer, in this order:
 
@@ -21,19 +21,19 @@ This already went wrong once: a single agent dispatch wrote the scenario doc, th
 
 - **"Approved by a developer" means a human sees the actual artifact and says so.** An agent's review of its own prior output is never a substitute, no matter how the report phrases it ("reviewed," "validated," "confirmed against spec," etc.).
 - **No single dispatch may span more than one stage.** Write the scenario doc, then stop. Surface the full scenario text and wait for an explicit human approval. Write the E2E test, then stop. Surface the actual test file content and wait for explicit human approval. Only then write production code.
-- This holds under time or token pressure, and even when the workflow you're following doesn't itself force a pause between steps — AD-1 overrides the default cadence of any generic build workflow, every time, for every feature.
+- This holds under time or token pressure, and even when the workflow you're following doesn't itself force a pause between steps — this gate overrides the default cadence of any generic build workflow, every time, for every feature.
 
-### Done means built for real, not merely green (AD-15)
+### Done means built for real, not merely green
 
-A story's tests passing is not proof the story is finished if a fake is what made them pass. Before marking any story complete, check every port its own acceptance criteria exercise: if the port's real adapter is this story's job, it must be real (see [domain-driven-design.md's fakes/mocks scope rule](domain-driven-design.md#fakes-mocks-and-stubs--scope-test-ad-15)); a fake is only legitimate standing in for a different, not-yet-built story/epic/context's dependency.
+A story's tests passing is not proof the story is finished if a fake is what made them pass. Before marking any story complete, check every port its own acceptance criteria exercise: if the port's real adapter is this story's job, it must be real. **Fakes/mocks/stubs are scoped to a different, not-yet-built story/epic/context's dependency — never this unit's own deliverable.** If the current story or epic owns building the real thing, build it for real, following the hexagonal pattern, even if that means a new shared module. If the real implementation needs a technology choice nobody has made yet, stop and ask — don't guess, don't fake around it. A story is not done if any of its own acceptance criteria is satisfied by a fake.
 
 Negative cases are first-class: every `—` cell of the §3.2 access matrix, unflagged S7 records against both the employee and a PM, the colleague whitelist — each is its own scenario (§9 Definition of Done requires them).
 
 The narrowed Project-line cells (S2/S3 denied, S5 CV/certificates only), named-recipient share links, organisational self-assignment denial/journaling, runtime role creation, and departure revocation require explicit regression scenarios. If good-to-have notifications are built, automate negative content checks per notification type and audience; delivery totals are not a privacy oracle.
 
-For AD-19/AD-20, stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario still stops for its own human approval before stage 2.
+For the People Partner relationship and the departure/employment-lifecycle work (`docs/architecture/architecture-people-management-2026-08-30/ARCHITECTURE-SPINE.md` AD-5, AD-15, AD-16, AD-17, AD-26, AD-27), stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario still stops for its own human approval before stage 2.
 
-## What "E2E" means here (AD-3)
+## What "E2E" means here
 
 Real HTTP request → real NestJS router → real access resolution → **real test database** (PostgreSQL, migrated schema, seeded fixtures).
 
@@ -52,6 +52,6 @@ Gate E2E for `user-management` follows an approved two-phase progression:
 
 Parallel developers never share mutable test state across workers. This is platform infrastructure — feature owners do not invent ad-hoc isolation per story.
 
-## Ownership (AD-4)
+## Ownership
 
 The feature owner drives their own scenario → test → code sequence. Approvals are asynchronous peer reviews — there is no dedicated test-author role, and nobody's stage 1 blocks anybody else's stage 3. One person waiting on another is a process defect (§8.2).
