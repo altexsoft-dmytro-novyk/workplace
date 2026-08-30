@@ -28,7 +28,14 @@
 # - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
-# 2026-08-30: reset to backlog across the board. All prior services/backend
+# 2026-08-30: all 5 epics implemented and green (233/233 E2E, independently
+# verified) against the 2026-08-30 architecture spine. One known, documented
+# simplification: Epic 4's self-assignment rejection is unconditional for
+# department-manager changes, stricter than §2.1's literal "not already
+# entitled to manage" carve-out — no test currently exercises the narrower
+# positive case (already-entitled self-assign succeeding); low priority.
+#
+# 2026-08-30 (earlier): reset to backlog across the board. All prior services/backend
 # user-management implementation, migrations, and seed were deleted in the
 # 2026-08-30 architecture reset (commit 64c7a38 in the backend submodule);
 # nothing here reflects real progress against the new architecture spine
@@ -56,19 +63,19 @@ development_status:
   2-2-consume-a-magic-link-token-to-establish-a-session: done
   epic-2-retrospective: optional
 
-  epic-3: backlog
-  3-1-system-auto-generates-career-timeline-events: backlog
-  3-2-authorized-actor-manually-adds-a-backfill-entry: backlog
-  3-3-authorized-actor-edits-or-deletes-an-event: backlog
+  epic-3: done
+  3-1-system-auto-generates-career-timeline-events: done
+  3-2-authorized-actor-manually-adds-a-backfill-entry: done
+  3-3-authorized-actor-edits-or-deletes-an-event: done
   epic-3-retrospective: optional
 
-  epic-4: backlog
-  4-1-change-an-employees-manager: backlog
-  4-2-change-an-employees-people-partner: backlog
-  4-3-change-employee-department-or-department-manager: backlog
+  epic-4: done
+  4-1-change-an-employees-manager: done
+  4-2-change-an-employees-people-partner: done
+  4-3-change-employee-department-or-department-manager: done
   epic-4-retrospective: optional
 
-  epic-5: backlog
-  5-1-record-a-departure: backlog
-  5-2-apply-an-effective-departure: backlog
+  epic-5: done
+  5-1-record-a-departure: done
+  5-2-apply-an-effective-departure: done
   epic-5-retrospective: optional
