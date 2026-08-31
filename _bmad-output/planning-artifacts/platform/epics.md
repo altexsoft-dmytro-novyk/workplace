@@ -22,12 +22,12 @@ Cross-cutting planning/test/architecture alignment to spec **v1.5** after resear
 
 **Weekend MVP gate:** Platform stories below agreed before platform-wide matrix engine / dashboard engine implementation. UM continues on seeded population.
 
-## Epic: Platform Spec v1.5 Alignment
+## Epic 1: Platform Spec v1.5 Alignment
 
 **Status:** backlog  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
-### Story P-1: Changelog Traceability Matrix
+### Story 1.1: Changelog Traceability Matrix
 
 As a planner,
 I want every v1.2→v1.5 changelog row traced to artifact status,
@@ -39,7 +39,7 @@ So that weekend work knows what is done, gap, or N/A.
 - Each Breaking + Roles/Departments/Profile/Risks/Resourcing/Sharing/Lifecycle/Integrations/DoD item maps to PRD / SPEC / architecture / test-design status: `done` | `gap` | `N/A`.
 - Output lives under `_bmad-output/planning-artifacts/platform/` (or linked from this epic).
 
-### Story P-2: Platform PRD + Addendum Drift Close
+### Story 1.2: Platform PRD + Addendum Drift Close
 
 As a product owner,
 I want the people-management PRD addendum and memlog aligned to v1.5,
@@ -51,7 +51,7 @@ So that DEC/v1.3 “pending” language does not contradict the SoT.
 - Pattern E states timetracker **required**, PeopleForce **good-to-have** prefill only.
 - Memlog assumptions that still cite v1.2 as authoritative are corrected or struck.
 
-### Story P-3: Access-Control SPEC + Stage-1 Suite Alignment
+### Story 1.3: Access-Control SPEC + Stage-1 Suite Alignment
 
 As a QA/architect partner,
 I want access-control SPEC and scenarios to match v1.5 audiences and rules,
@@ -64,7 +64,7 @@ So that stage-2 E2E does not encode a single Manager line or HR Admin full matri
 - Never-share set `{S3, S7, S13, S14}`; cfg defaults per §4.8.
 - Close or rewrite OQ2/OQ3/OQ4/OQ6 where v1.5 answers them; department-manager tier no longer “provisional-only because not in requirements.”
 
-### Story P-4: Architecture Binding Updates
+### Story 1.4: Architecture Binding Updates
 
 As an architect,
 I want spine AD-10 and `docs/architecture/access-control.md` to describe three manager relations and split lines,
@@ -76,7 +76,7 @@ So that implementers do not build one transitive Manager-line graph as the v1.5 
 - Department management as a manager-access relation is specified (even if implementation phasing is staged).
 - Full-profile grant and journal scope are noted; revocation timing (platform next-request vs project 15m / 4h outage) referenced from SoT.
 
-### Story P-5: Dashboards + §4.4 v1.5 Fixed Facts
+### Story 1.5: Dashboards + §4.4 v1.5 Fixed Facts
 
 As an architect,
 I want `docs/architecture/dashboards.md` “already fixed” section to include v1.5 deltas,
@@ -87,7 +87,7 @@ So that engine design (when decided) does not miss Unassigned bucket / risk-acti
 - Document Unassigned bucket, risk “active” ≠ `low`, and project-line counter implications as fixed product facts.
 - Engine/widget model remains **TBD** — no improvised implementation.
 
-### Story P-6: Platform Test-Design Refresh (v1.2 → v1.5)
+### Story 1.6: Platform Test-Design Refresh (v1.2 → v1.5)
 
 As a TEA owner,
 I want platform test-design artifacts updated off PRD v1.2 assumptions,
@@ -99,7 +99,7 @@ So that PF vacancies SoT and dual-required integrations are not planned as manda
 - PeopleForce = optional prefill; no PF vacancies SoT as required.
 - Timetracker is the only required integration; DoD negatives for narrowed project-line noted; PR-B-04 re-gated.
 
-### Story P-7: UM Planning Residual (Non–Epic-2–4 Scope)
+### Story 1.7: UM Planning Residual (Non–Epic-2–4 Scope)
 
 As a UM planner,
 I want SPEC/README CAP-1 retirement confirmed against Story 1.1,
@@ -111,7 +111,7 @@ So that test contracts do not still mandate HTTP registration.
 - Registration folder disposition matches Story 1.1 (retired pointer).
 - Does **not** change UM Epics 2–4 feature scope.
 
-### Story P-8: Doc Pass — Create-Path Removal from Binding Docs
+### Story 1.8: Doc Pass — Create-Path Removal from Binding Docs
 
 As a platform doc owner,
 I want binding docs to stop listing `POST /users` create,
@@ -123,7 +123,7 @@ So that AD-14 and api-conventions agree with v1.5.
 - `docs/architecture/user-management-test-decisions.md`: retire/rewrite DEC-UM-003/006/008/009 (and um-reg traces); keep DEC-UM-001/002/004/005/007 as applicable.
 - Code removal of `POST /users` remains **implementation handoff** (not this story’s deliverable).
 
-### Story P-9: Register Epic in Platform Sprint Status
+### Story 1.9: Register Epic in Platform Sprint Status
 
 As a delivery lead,
 I want platform stories tracked outside user-management sprint keys,
@@ -134,11 +134,11 @@ So that Alignment work is visible for the weekend build.
 - `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` lists this epic and P-1…P-9.
 - No Platform stories nested under UM `epic-1`…`epic-4` keys.
 
-## Epic: Access Control Foundation
+## Epic 2: Access Control Foundation
 
 Deliver a narrow, reusable audience-resolution boundary without taking ownership of User Management routes, profile projection, or UI. This is a two-day technical foundation; it does not replace the full Access Control facade program or its complete Stage-1 suite.
 
-### Story ACF-1: Resolve Phase-0 Audiences
+### Story 2.1: Resolve Phase-0 Audiences (ACF-1)
 
 As a consuming bounded context,
 I want a fail-closed Access Control facade that resolves Phase-0 relationship audiences for one or more employee targets,
@@ -154,7 +154,7 @@ So that User Management can later replace its interim target-access adapter with
 - No User Management controller, guard, adapter, or frontend file changes are included.
 - No Project, Department, PP HR-line, shared-link, full-profile, functional-permission, or section-matrix decision is enabled by this story.
 
-## Epic: Access Control Kernel MVP
+## Epic 3: Access Control Kernel MVP
 
 Deliver a deployable, headless Access Control kernel without changing User
 Management or frontend code. The kernel is imported into `AppModule` and proven
@@ -166,7 +166,7 @@ No canonical ACM definitions existed in Git before the approved
 `sprint-change-proposal-2026-08-30-access-control-kernel-mvp.md`; the definitions
 below adopt the human-provided workboard IDs and must not be reassigned.
 
-### Story ACM-3: Inactive Viewer, Bridge, and Target Fail-Closed Behavior
+### Story 3.1: Inactive Viewer, Bridge, and Target Fail-Closed Behavior (ACM-3)
 
 As a kernel consumer,
 I want inactive identities to reduce audience resolution deterministically,
@@ -206,7 +206,7 @@ So that deactivation cannot create or preserve an authorization path.
 - This story ends at the audience-resolution result. It owns no
   `canAccessSection` behavior and no dismissed-target projection.
 
-### Story ACM-4: Multi-Audience Merge
+### Story 3.2: Multi-Audience Merge (ACM-4)
 
 As a kernel consumer,
 I want every applicable audience retained for an active viewer and target,
@@ -230,7 +230,7 @@ So that a later section evaluator can combine the applicable matrix columns.
   opens a separately approved AD-1 sequence, and requires a Story Breakdown
   re-run before the package resumes.
 
-### Story ACM-0: Deploy-Time Root User Prerequisite
+### Story 3.3: Deploy-Time Root User Prerequisite (ACM-0)
 
 As a deployer,
 I want the normalized root User to exist and be unambiguously identified before
@@ -275,7 +275,7 @@ an assumed one.
 - Stage-2 evidence invokes this exact production entrypoint against migrated
   PostgreSQL; re-implementing the logic inline in a test does not satisfy it.
 
-### Story ACM-1: Minimal Functional-Role Data Foundation
+### Story 3.4: Minimal Functional-Role Data Foundation (ACM-1)
 
 As the Access Control kernel,
 I want its minimum functional-role permissions and bootstrap attachment stored
@@ -323,7 +323,7 @@ wrapped by `services/backend/scripts/bootstrap-access-control.ts` and invoked by
 - Create no `/roles` or `/users` route and no other role, permission,
   attachment, or default grant.
 
-### Story ACM-2: Evaluate `isAllowed`
+### Story 3.5: Evaluate `isAllowed` (ACM-2)
 
 As a consuming context,
 I want a live functional-permission decision through the Access Control facade,
@@ -340,7 +340,7 @@ So that feature checks use persisted FR data without widening profile access.
 - Evaluation reads no audience data, persists/caches no decision, and grants no
   profile audience or section access by itself.
 
-### Story ACM-5: Base Section Access for S1, S10, and S11
+### Story 3.6: Base Section Access for S1, S10, and S11 (ACM-5)
 
 As a consuming context,
 I want a narrow base section decision over the Phase-0 audiences,
@@ -361,7 +361,7 @@ field `disposition`).
 - S1 photo mutation and the S10/S11 colleague field subsets remain owning-
   consumer projection/command rules.
 
-### Story ACM-8: Compose the Deployable Kernel
+### Story 3.7: Compose the Deployable Kernel (ACM-8)
 
 As the backend application,
 I want the complete kernel available in the production dependency graph,
@@ -379,7 +379,7 @@ whose `status` field is `PASS`.
 - No `/users` behavior changes and no Access Control HTTP, test-only, or debug
   endpoint is introduced.
 
-### Story ACM-9: PostgreSQL 500-Target Performance Evidence
+### Story 3.8: PostgreSQL 500-Target Performance Evidence (ACM-9)
 
 As a delivery team,
 I want measured PostgreSQL evidence for the resolver's 500-target workload,

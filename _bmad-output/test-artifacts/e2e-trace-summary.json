@@ -1,95 +1,94 @@
 {
   "schema_version": "0.2.0",
-  "snapshot_at": "2026-08-30T18:33:20+03:00",
-  "supersedes": "2026-08-30T01:31:00+03:00",
+  "snapshot_at": "2026-08-31T14:04:52.886179Z",
   "repo": "people management",
   "collection_mode": "contract_static",
   "collection_status": "COLLECTED",
   "inventory_basis": "acceptance_criteria",
   "gate_basis": "priority_thresholds",
-  "source_sha": "3b1880cfabf0676c1e02e5eb7a31e04be5d3424e",
-  "workspace_sha": "5bdaf5e61ae9a05d26235adf0bc80b6f6624fb02",
-  "working_tree_note": "services/backend carries one uncommitted, non-behavioural modification: the round-2 approval comment at the head of the e2e suite.",
+  "source_sha": "d3f4e8657a7a28832311f973b894ff587c025967",
   "target": {
-    "type": "story",
-    "id": "ACF-1",
-    "label": "Resolve Phase-0 Audiences"
+    "type": "epic",
+    "id": "access-control-kernel-mvp",
+    "label": "Access Control Kernel MVP (ACM-0..ACM-9)"
   },
   "decision_mode": "deterministic",
-  "evaluator": "TEA Agent",
+  "evaluator": "TEA Agent (bmad-testarch-trace)",
   "confidence": "high",
   "oracle": {
     "resolution_mode": "formal_requirements",
     "confidence": "high",
     "sources": [
-      "docs/test-cases/access-control-foundation/",
-      "_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md"
+      "_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md",
+      "docs/test-cases/access-control-kernel/"
     ],
     "external_pointer_status": "not_used",
-    "synthetic": false,
-    "human_approved": true
+    "synthetic": false
   },
-  "gate_status": "FAIL",
-  "base_coverage_status": "PASS",
   "coverage": {
     "inventory": {
-      "covered": 9,
-      "total": 9,
-      "pct": 100
+      "covered": 78,
+      "total": 81,
+      "pct": 96
     },
     "priority_breakdown": {
-      "P0": { "total": 9, "covered": 9, "pct": 100 },
-      "P1": { "total": 0, "covered": 0, "pct": null },
-      "P2": { "total": 0, "covered": 0, "pct": null },
-      "P3": { "total": 0, "covered": 0, "pct": null }
+      "P0": {
+        "total": 64,
+        "covered": 61,
+        "pct": 95
+      },
+      "P1": {
+        "total": 17,
+        "covered": 17,
+        "pct": 100
+      },
+      "P2": {
+        "total": 0,
+        "covered": 0,
+        "pct": 100
+      },
+      "P3": {
+        "total": 0,
+        "covered": 0,
+        "pct": 100
+      }
     },
     "by_level": {
-      "e2e": { "tests": 10, "criteria_covered": 9 },
-      "api": { "tests": 0, "criteria_covered": 0 },
-      "component": { "tests": 0, "criteria_covered": 0 },
-      "unit": { "tests": 13, "criteria_covered": 9 },
-      "live": { "tests": 0, "criteria_covered": 0 },
-      "other": { "tests": 0, "criteria_covered": 0 }
+      "e2e": {
+        "tests": 79,
+        "criteria_covered": 79
+      },
+      "api": {
+        "tests": 0,
+        "criteria_covered": 0
+      },
+      "component": {
+        "tests": 0,
+        "criteria_covered": 0
+      },
+      "unit": {
+        "tests": 0,
+        "criteria_covered": 0
+      },
+      "live": {
+        "tests": 0,
+        "criteria_covered": 0
+      },
+      "other": {
+        "tests": 2,
+        "criteria_covered": 2
+      }
     }
   },
   "tests": {
-    "files": 3,
-    "cases": 23,
+    "files": 14,
+    "cases": 99,
     "skipped_cases": 0,
     "fixme_cases": 0,
     "pending_cases": 0
   },
-  "execution_evidence": {
-    "runtime": "Node v24.18.0, PostgreSQL 18 container (healthy)",
-    "unit_command": "npm test",
-    "unit_result": {
-      "suites": 2,
-      "total_passed": 13,
-      "failed": 0,
-      "skipped": 0,
-      "duration_seconds": 0.312
-    },
-    "e2e_command": "npm run test:e2e -- access-control",
-    "e2e_result": {
-      "suites": 1,
-      "total_passed": 10,
-      "failed": 0,
-      "skipped": 0,
-      "duration_seconds": 0.652
-    },
-    "acf_relevant_total_passed": 23,
-    "note": "The tenth e2e case asserts that nothing derived is persisted — a SPEC constraint rather than an oracle item. Counted as a test, not as coverage.",
-    "historical_diagnostics": {
-      "measured_at_sha": "d23428209b359e7bd2cb0742e6c1bb2fcb1bb729",
-      "re_measured_this_run": false,
-      "colleague_to_reporting_mutation_killed": ["ACF-AU-05", "ACF-FC-01", "ACF-FC-02"],
-      "remove_active_user_join_mutation_killed": ["ACF-FC-01"],
-      "database_constraint_violation_probes_rejected": 6,
-      "counted_as_runnable_tests": false
-    }
-  },
   "risk_summary": {
-    "critical_open": 2,
+    "critical_open": 1,
     "high_open": 0,
     "medium_open": 0,
     "low_open": 0
@@ -103,10 +102,10 @@
   },
   "live_evidence": {
     "present": false,
-    "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
+    "results_file": "",
     "freshness": "not_present",
     "recorded_source_sha": "",
-    "current_source_sha": "3b1880cfabf0676c1e02e5eb7a31e04be5d3424e",
+    "current_source_sha": "d3f4e8657a7a28832311f973b894ff587c025967",
     "producer": "",
     "counted": 0,
     "stale": 0,
@@ -119,75 +118,49 @@
     "invalid": 0,
     "requirements_live_only": 0
   },
+  "blockers": [
+    {
+      "id": "ACM3-II-06",
+      "severity": "high",
+      "reason": "No test exists for 'repeated node before viewer proof, viewer off-chain, falls to Colleague'; a comment in acm3-termination-taxonomy.e2e-spec.ts falsely claims coverage in acm3-cycle-acyclicity.e2e-spec.ts",
+      "test_file": "",
+      "test_title": "ACM3-II-06"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "URGENT",
+      "action": "Add a committed-red-then-green Stage-2 test for ACM3-II-06 (repeated node before viewer proof, viewer off-chain) and correct the stale cross-reference comment in acm3-termination-taxonomy.e2e-spec.ts",
+      "requirements": [
+        "ACM3-II-06"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Complete coverage for 2 partially/cross-mapped requirements: add a canonical ACM-3 Stage-2 test for II-04 (or formally adopt ACF-FC-03 as its Stage-2 evidence in approvals.yaml) and extend the ACM4R-MA-04 test (or add a new one) to cover a duplicated viewer-self id alongside a duplicated target in one bulk call for II-05",
+      "requirements": [
+        "ACM3-II-04",
+        "ACM3-II-05"
+      ]
+    },
+    {
+      "priority": "LOW",
+      "action": "Run bmad-testarch-test-review to assess test quality",
+      "requirements": []
+    }
+  ],
+  "gate_status": "FAIL",
   "gate_criteria": {
     "p0_coverage_required": "100%",
-    "p0_coverage_actual": "100%",
-    "p0_status": "MET",
+    "p0_coverage_actual": "95%",
+    "p0_status": "NOT_MET",
     "p1_coverage_target": "90%",
     "p1_coverage_minimum": "80%",
     "p1_coverage_actual": "100%",
     "p1_status": "MET",
     "overall_coverage_minimum": "80%",
-    "overall_coverage_actual": "100%",
+    "overall_coverage_actual": "96%",
     "overall_status": "MET"
-  },
-  "resolved": [
-    {
-      "id": "ACF-GOV-01",
-      "resolved_at": "2026-08-30",
-      "reason": "Both AD-1 rounds recorded with named approver, date and basis. Round 1 per-file markers in docs/test-cases/access-control-foundation/; round 2 comment at the head of the e2e suite. Basis is recorded in gate-decision.json under approval_provenance rather than asserted as an unqualified sign-off."
-    }
-  ],
-  "blockers": [
-    {
-      "id": "ACF-CONTRACT-01",
-      "severity": "critical",
-      "reason": "The rule self/reporting/pp allow and colleague deny remains a provisional Access Control assumption pending answer 3 of um-integration-contract-request.md. Approval of the scenarios encodes the assumption; it does not settle it.",
-      "test_file": "_bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md",
-      "test_title": "User Management feature-to-audience mapping"
-    },
-    {
-      "id": "ACF-WIRING-01",
-      "severity": "critical",
-      "reason": "AccessControlModule is absent from AppModule. The e2e suite uses a test-only provider override, while production GET /users/:id remains bound to the interim allow-all adapter.",
-      "test_file": "services/backend/src/app.module.ts",
-      "test_title": "Production access-control composition"
-    }
-  ],
-  "accepted_at_approval": [
-    {
-      "id": "ACF-FC-01-DEPTH",
-      "severity": "medium",
-      "reason": "The fixture places the deactivated user only in the mid-chain position, so the case passes for a weaker reason than the scenario claims. Two further cases separate a blocked bridge from a blocked target.",
-      "accepted_by": "Anna Pikula",
-      "accepted_at": "2026-08-30"
-    },
-    {
-      "id": "ACF-AU-05-WHITELIST",
-      "severity": "medium",
-      "reason": "Colleague is denied outright while §3.3.4 entitles them to S1, S10 dates and the S11 project name. Correct only while the endpoint returns the whole row; must change when profile projection lands.",
-      "accepted_by": "Anna Pikula",
-      "accepted_at": "2026-08-30"
-    },
-    {
-      "id": "ACF-DDD-IMPORT",
-      "severity": "medium",
-      "reason": "The suite imports ACCESS_CONTROL_PORT from src/user-management/domain/, which domain-driven-design.md forbids across context boundaries, and which the integration contract contemplates changing.",
-      "accepted_by": "Anna Pikula",
-      "accepted_at": "2026-08-30"
-    }
-  ],
-  "out_of_scope_gap": {
-    "suite": "docs/test-cases/access-control/",
-    "draft_files": 171,
-    "scenarios_targeting_nonexistent_endpoints": 146,
-    "included_in_acf_1_gate": false
-  },
-  "excluded_failures": {
-    "suite": "test/user-management/**",
-    "failures": 31,
-    "basis": "Reported identical before and after aca387b; causes are missing endpoints and unavailable LocalStack. Not re-measured this run — only the access-control selector was executed.",
-    "attributed_to_acf_1": false
   },
   "links": {
     "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",

@@ -1,44 +1,20 @@
 {
   "schema_version": "0.1.0",
-  "evaluated_at": "2026-08-30T18:33:20+03:00",
-  "supersedes": "2026-08-30T01:31:00+03:00",
+  "evaluated_at": "2026-08-31T14:04:52.886179Z",
   "repo": "people management",
   "target": {
-    "type": "story",
-    "id": "ACF-1",
-    "label": "Resolve Phase-0 Audiences"
+    "type": "epic",
+    "id": "access-control-kernel-mvp",
+    "label": "Access Control Kernel MVP (ACM-0..ACM-9)"
   },
   "collection_status": "COLLECTED",
   "gate_basis": "priority_thresholds",
-  "base_coverage_status": "PASS",
   "gate_status": "FAIL",
-  "rationale": "Coverage thresholds are met: 9/9 P0 oracle items are FULL, and all 23 tests pass against a live PostgreSQL container (13 unit, 10 e2e). ACF-GOV-01 is resolved: both AD-1 rounds now carry a named approver, date and recorded basis. The gate remains FAIL on the two blockers that are not about evidence. The HTTP allow/deny mapping is still an Access Control assumption pending answer 3 of the User Management integration contract, and the production module is dormant — AppModule does not import AccessControlModule, so GET /users/:id remains on the interim allow-all adapter while the suite reaches the real facade through a test-only provider override. Either condition independently prevents PASS; together they mean the story's evidence is genuine but demonstrates a component that is not in the request path.",
-  "p0_status": "MET",
-  "p1_status": "NOT_APPLICABLE",
+  "rationale": "P0 coverage is 95% (required: 100%). 1 critical requirement(s) uncovered: ACM3-II-06.",
+  "p0_status": "NOT_MET",
+  "p1_status": "MET",
   "overall_status": "MET",
-  "critical_open": 2,
-  "critical_resolved_this_run": ["ACF-GOV-01"],
-  "approval_provenance": {
-    "ad1_round_1": {
-      "artifact": "docs/test-cases/access-control-foundation/ (9 scenario files)",
-      "approver": "Anna Pikula",
-      "date": "2026-08-30",
-      "basis": "Suite README read, then each scenario's behaviour restated in plain language before approval. Per-file markers written under each **Trace:** line.",
-      "independent_of_authoring_agent": true
-    },
-    "ad1_round_2": {
-      "artifact": "services/backend/test/access-control/audience-resolution.e2e-spec.ts",
-      "approver": "Anna Pikula",
-      "date": "2026-08-30",
-      "basis": "Walkthrough of the fixture, the ten requests and what each asserts. Not a line read.",
-      "independent_of_authoring_agent": true,
-      "known_weaknesses_accepted_at_approval": [
-        "ACF-FC-01 exercises the deactivated user only in the mid-chain position",
-        "ACF-AU-05 denies the colleague outright while §3.3.4 entitles them to S1, S10 dates and the S11 project name",
-        "the suite imports ACCESS_CONTROL_PORT from src/user-management/domain/"
-      ]
-    }
-  },
+  "critical_open": 1,
   "links": {
     "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",
     "trace_report_url": "",
