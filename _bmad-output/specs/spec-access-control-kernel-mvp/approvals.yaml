@@ -640,3 +640,22 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T07:22:59Z"
+
+  # ACM-3 Stage 2, third increment. Covers the ACM3-II-09 / ACM3-II-10
+  # termination-taxonomy pair (paired controls for the CAP-1
+  # chain-termination rule: an absent edge is a clean end, and so is a
+  # chain that ends at an inactive endpoint above a proven viewer). Both
+  # scenarios were already green against production before this suite was
+  # written — they are controls, not red tests — per the scenario docs'
+  # own "current vs required" framing. Remaining approved scenarios with no
+  # Stage-2 record of their own: ACM3-II-04, 05, 06, 11, 12, 13, 14.
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-termination-taxonomy.e2e-spec.ts"
+    commit: "568ffcda60769e67075b90f9d4b708ee395fabcf"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:42:30Z"
