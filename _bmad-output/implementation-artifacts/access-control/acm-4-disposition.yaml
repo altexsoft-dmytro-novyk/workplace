@@ -1,9 +1,58 @@
 ---
 title: "ACM-4 CAP-2 disposition"
 date: "2026-08-31"
+status: "no-gap"
 spec: "SPEC-access-control-kernel-mvp"
 story: "ACM-4R-disposition"
-disposition: pending
----
+disposition: "no-gap"
+acm_5: "unblocked"
 
-# Reserved before finalization analysis, as required by ACM-4R-disposition.
+approval_and_execution_evidence:
+  approved_stage_2_tests:
+    story_id: "ACM-4R-tests"
+    commit: "8b342ca28fc44fed860ac191240e17cbbf6c39dc"
+    artifact_path: "test/access-control/acm4r-multi-audience.e2e-spec.ts"
+    artifact_present_at_commit: true
+    current_artifact_unchanged_from_approved_commit: true
+  stage_3_production:
+    record_present: false
+    required: false
+    reason: "Fresh Stage-2 evidence is green and identifies no behavior gap requiring a production change."
+  fresh_e2e:
+    command: "npm run test:e2e -- acm4r-multi-audience.e2e-spec.ts"
+    database: "migrated PostgreSQL"
+    facade: "real AccessControlFacade via AppModule and AccessControlModule"
+    fakes_or_provider_overrides: false
+    result: "1 suite passed; 8 tests passed"
+
+required_coverage_and_evidence:
+  - contract: "ACM4R-MA-01"
+    contract_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-01-reporting-and-pp-retained.md"
+    item: "Multi-audience retention"
+    status: "covered"
+    evidence: "Real direct and people_partner rows produce exactly Set {'reporting', 'pp'} for one target."
+  - contract: "ACM4R-MA-02"
+    contract_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md"
+    item: "Self exclusivity"
+    status: "covered"
+    evidence: "The same confirmed active user as viewer and target produces exactly Set {'self'}."
+  - contract: "ACM4R-MA-03"
+    contract_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-03-colleague-is-floor.md"
+    item: "Colleague floor"
+    status: "covered"
+    evidence: "Real relationship fixtures assert Reporting-only, PP-only, and unrelated Colleague-only results."
+  - contract: "ACM4R-MA-04"
+    contract_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-04-duplicate-target-does-not-duplicate-audiences.md"
+    item: "Deduplication"
+    status: "covered"
+    evidence: "A repeated target produces one map entry with the two distinct retained audiences."
+  - contract: "ACM4R-MA-05"
+    contract_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-05-fr-permission-excluded-from-audiences.md"
+    item: "FR separation"
+    status: "covered"
+    evidence: "Real FR permission, policy, grant, and user-policy attachment leave the unrelated target exactly Set {'colleague'}."
+  - contract: "ACM4R-MA-06"
+    contract_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-06-mixed-postgresql-fixture.md"
+    item: "Representative PostgreSQL fixture classes"
+    status: "covered"
+    evidence: "One bulk facade call covers direct+PP, direct-only, PP-only, and no-relationship targets with all exact sets passing."
