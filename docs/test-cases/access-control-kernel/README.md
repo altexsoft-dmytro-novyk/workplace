@@ -24,6 +24,19 @@ The nine `ACM5-SA-01`..`ACM5-SA-09` CAP-5 `canAccessSection` scenarios in
 human approval. They authorize neither an ACM-5 Stage-2 test nor production
 work.
 
+The five `ACM8-KC-01`..`ACM8-KC-05` CAP-6 kernel-composition scenarios in
+[`kernel-composition/`](kernel-composition/) are draft Stage-1 prose pending
+independent human approval. They authorize neither an ACM-8 Stage-2 test nor
+any `app.module.ts`/`access-control.module.ts` change.
+
+**ACM-8 non-goals:** rebinding `ACCESS_CONTROL_PORT` away from
+`InterimAccessControlAdapter` in `user-management.module.ts` (User
+Management's own, separately-gated AD-2 story); any change to
+`UserManagementModule` or any other User Management file; any new route or
+controller; and any change to `isAllowed`/`canAccessSection`/`resolveAudiences`
+behavior itself — that behavior is already shipped (ACM-2/ACM-3/ACM-5) and out
+of scope here. This dispatch is composition only.
+
 **ACM-2 non-goals:** AD-20 due/departure evaluation; any
 `resolveAudiences`/audience interaction; decision caching or persistence;
 role- or permission-name branching; and `canAccessSection`/ACM-5 section
@@ -133,6 +146,34 @@ criteria state "CAP-8 has already ensured the normalized active root User."
   covered by `ACM1R-FB-20`..`ACM1R-FB-26`.
 - `isAllowed` evaluation behavior (CAP-4/ACM-2) — this suite proves only that
   the data exists in the right shape, never that it is correctly evaluated.
+
+## CAP-6 (ACM-8) — Deployable kernel composition
+
+This story proves **CAP-6 — deployable kernel composition**: that `AppModule`
+imports `AccessControlModule` so `AccessControlFacade` is resolvable from the
+real production application container, while `ACCESS_CONTROL_PORT` stays
+bound to `InterimAccessControlAdapter` in `user-management.module.ts` and no
+User Management file, `/users` behavior, or Access Control HTTP/debug
+endpoint changes. Per the scoped headless-facade gate (local AD-3), Stage-2
+evidence for this story resolves `AccessControlFacade` and
+`ACCESS_CONTROL_PORT` from the real bootstrapped `AppModule` — not a
+standalone `AccessControlModule` test module — with real Prisma adapters and
+migrated PostgreSQL, no repository fake, and no provider override.
+
+**Precondition this suite depends on:** ACM-2, ACM-3, and ACM-5 are each
+production-approved in
+`_bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml`, and the
+ACM-9 baseline evidence artifact (the most recent run under
+`_bmad-output/test-artifacts/performance/acm9-baseline-*.json`) has
+`status: PASS` under protocol `ACM9-MVP-v1`, matching the protocol this MVP
+uses, per the architecture spine's conditional-dependency rule (AD-3) and the
+`ACM-8-scenarios` precondition in `stories.yaml`.
+
+**Explicitly out of scope here (do not author under these IDs):** rebinding
+`ACCESS_CONTROL_PORT` away from `InterimAccessControlAdapter`; any change to
+`UserManagementModule` or any other User Management file; any new route or
+controller; and any change to `isAllowed`/`canAccessSection`/`resolveAudiences`
+behavior itself.
 
 ## Kernel fixture (this suite)
 
@@ -290,6 +331,11 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM5-SA-07` | [section-access/acm5-sa-07-missing-target-returns-none.md](section-access/acm5-sa-07-missing-target-returns-none.md) | A missing target returns `none` successfully. |
 | `ACM5-SA-08` | [section-access/acm5-sa-08-empty-audiences-return-none.md](section-access/acm5-sa-08-empty-audiences-return-none.md) | An empty Phase-0 audience set returns `none` for S1, S10, and S11. |
 | `ACM5-SA-09` | [section-access/acm5-sa-09-audience-resolution-error-propagates.md](section-access/acm5-sa-09-audience-resolution-error-propagates.md) | An audience-resolution infrastructure error rejects instead of silently returning `none`. |
+| `ACM8-KC-01` | [kernel-composition/acm8-kc-01-facade-resolves-from-real-container.md](kernel-composition/acm8-kc-01-facade-resolves-from-real-container.md) | `AccessControlFacade` resolves from the real bootstrapped `AppModule` and returns a live decision backed by the real Prisma adapters. |
+| `ACM8-KC-02` | [kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md](kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md) | `ACCESS_CONTROL_PORT` still resolves to `InterimAccessControlAdapter` in the same composed container — composition does not silently rebind it. |
+| `ACM8-KC-03` | [kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md](kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md) | `GET /users/:id` and every other existing route return byte-for-byte identical responses before and after composition. |
+| `ACM8-KC-04` | [kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md](kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md) | No new route appears in the composed application's route table — `AccessControlModule` stays headless. |
+| `ACM8-KC-05` | [kernel-composition/acm8-kc-05-corrected-module-header-comment.md](kernel-composition/acm8-kc-05-corrected-module-header-comment.md) | The `AccessControlModule` header comment is corrected to stop conflating DI-graph visibility with the separate, not-yet-authorized `ACCESS_CONTROL_PORT` rebinding decision. |
 | `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the three canonical `Permissions` rows — no more, no fewer, no other key. |
 | `ACM1-FB-02` | [fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md](fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md) | A fresh database ends up with exactly one FR `Policies` row, `targetRole='hr-admin'`. |
 | `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the three seeded permissions through `PolicyPermissions`, one grant per key. |
