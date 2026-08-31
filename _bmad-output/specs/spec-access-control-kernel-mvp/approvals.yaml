@@ -1034,3 +1034,22 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T10:05:00Z"
+
+  # ACM-8 Stage 3 — explicit chat approval of the CAP-6 kernel-composition
+  # production change: AppModule imports AccessControlModule and the stale
+  # header comment is corrected. All 5 ACM8-KC tests in the approved Stage-2
+  # suite go green (was 2 red / 3 green). Regression check: full
+  # test/user-management + test/access-control run compared before/after via
+  # stash — 33 failed/5 suites before, 31 failed/4 suites after, exactly the
+  # 2 ACM-8 tests flipping; the remaining 31 pre-existing failures
+  # (unrelated, not-yet-built /users/:id/relationships route) are identical
+  # in both runs. No User Management file, route, or test changed.
+  - story_id: "ACM-8-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/app.module.ts"
+    commit: "d2335907a33ece9452dff9a6663ec85d75cf71a9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T10:25:00Z"
