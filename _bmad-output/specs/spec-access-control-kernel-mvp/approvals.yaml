@@ -1017,3 +1017,20 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T09:45:00Z"
+
+  # ACM-8 Stage 2 — explicit chat approval of the CAP-6 kernel-composition red
+  # integration suite, run against real migrated PostgreSQL before approval:
+  # ACM8-KC-01 and ACM8-KC-05 fail for the expected reason (AccessControlFacade
+  # not yet resolvable from the real AppModule container; stale header comment
+  # not yet corrected). ACM8-KC-02/03/04 are already-green regression controls
+  # in the same file, proving ACCESS_CONTROL_PORT, GET /users/:id, and the
+  # route surface are unaffected. No production code changed.
+  - story_id: "ACM-8-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm8-kernel-composition.e2e-spec.ts"
+    commit: "7f545f8a27bfd9948be1099c3e955a17babbaba9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T10:05:00Z"
