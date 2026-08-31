@@ -235,3 +235,13 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T02:17:05Z"
+
+  - story_id: "ACM-0-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/root-user-prerequisite/acm0-ru-root-user-prerequisite.md"
+    commit: "09edd8ccf7ea6fa38a753d71fddacb7bec23c22b"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:29:10Z"
