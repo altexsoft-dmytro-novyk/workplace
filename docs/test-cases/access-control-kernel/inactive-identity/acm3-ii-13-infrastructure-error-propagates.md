@@ -33,21 +33,14 @@ induced failure rather than to the fixture.
 
 **Inducing the failure without a fake.** The scoped gate forbids faking the
 Access Control repository and overriding a User Management provider, so the
-failure must come from real PostgreSQL. Stage 2 may use either, and must
-restore the database in a `finally` block:
-
-1. **Preferred — make the relation unreadable.** In a separate session, rename
-   `relationships` out of the way, issue the facade call, and rename it back.
-   The adapter's `$queryRaw` fails with an undefined-relation error, which is a
-   genuine adapter-level failure on a real connection. Safe under
-   `test:e2e`'s `--runInBand`, which is how this suite already runs.
-2. **Alternative — exhaust the statement timeout.** Hold an `ACCESS EXCLUSIVE`
-   lock on `relationships` from a second session so the adapter's transaction
-   blocks past its own `SET LOCAL statement_timeout = '2s'`. This exercises the
-   documented timeout path specifically, at the cost of ~2 seconds per run.
-
-Neither introduces a test double: the module, the adapter, the Prisma client,
-and the database are all the production ones.
+failure comes from real PostgreSQL. A separate transaction holds an
+`ACCESS EXCLUSIVE` lock on `relationships`; the adapter validates identities,
+sets its own `SET LOCAL statement_timeout = '2s'`, then times out on the real
+graph read. The lock is transaction-scoped, so PostgreSQL releases it on
+success, rejection, connection loss, or process termination. The canonical
+table name never changes, and the test asserts that it remains visible while
+the failure is induced. The module, adapter, Prisma client, and database are
+all the production ones.
 
 **Not a behavior change — regression guard.** Today's adapter propagates:
 `$queryRaw` rejects, `$transaction` rejects, `loadAudienceFacts` rejects, and

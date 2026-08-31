@@ -669,6 +669,10 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T07:46:06Z"
+    # Provenance correction: ACM3-II-13 is an already-green propagation guard.
+    # ACM3-II-14 was added after identity production commit 9e69682 and is
+    # therefore post-hoc regression evidence, not committed-red evidence. The
+    # stable story_id/stage identify the dispatch; they do not rewrite history.
 
   # ACM-3 Stage 2, fourth increment. Approves the ACM3-II-12 path-local
   # visited-state integration coverage in the services/backend submodule.
@@ -691,6 +695,9 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T07:47:04Z"
+    # Provenance correction: ACM3-II-11 was added after identity production
+    # commit 9e69682, so this is post-hoc regression evidence rather than a
+    # committed-red gate. The stable dispatch identifiers remain unchanged.
 
   # ACM-4R Stage 2 — all six approved ACM4R-MA-01..06 contracts translated
   # into one direct-facade PostgreSQL suite; 8/8 assertions pass green (a
@@ -719,6 +726,127 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T08:16:41Z"
+
+  # ACM-2 Stage 1 — explicit chat approval of all CAP-4 scenario contracts.
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-01-live-fr-grant-allows.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm2-is-allowed.e2e-spec.ts"
+    commit: "b53c03d"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:17:18Z"
+
+  - story_id: "ACM-2-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/access-control/application/access-control.facade.ts"
+    commit: "b20a238"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:19:36Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-02-revocation-is-immediate.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-03-inactive-user-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-04-missing-user-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-05-unknown-key-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-06-case-variant-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-07-ar-policy-never-grants.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-08-nonmatching-join-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-09-infrastructure-error-propagates.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-10-empty-key-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
 
   # ACM-5 Stage 1 — explicit human approval of all CAP-5 section-access contracts.
   - story_id: "ACM-5-scenarios"

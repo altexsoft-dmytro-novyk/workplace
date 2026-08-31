@@ -36,13 +36,10 @@ viewer proof** half plus the "nothing above the dead node" clause, on a fixture
 that contains both positions at once — Klara is below Milo, Nika is above it.
 The two together are the complete termination-case-2 pair the SPEC requires.
 
-**Current vs required — this is NOT a widening, and the dispatch instruction
-that says it is, is wrong.** `stories.yaml` `ACM-3-scenarios` instructs the
-author to "call out explicitly that the after-viewer-proof GRANT is a behavior
-CHANGE, not a restatement", on the stated ground that "the current recursive
-CTE joins `users.isActive` in both terms and stops at an inactive node, so it
-would deny that case today". That ground is factually wrong, and the scenario
-records the verified behavior rather than the instructed one:
+**Current vs required — this is a regression guard, not a widening.** The
+2026-08-31 review repair corrected `stories.yaml` after the original dispatch
+incorrectly described the after-viewer-proof GRANT as a behavior change. The
+scenario records the verified behavior:
 
 - The CTE's two `users.isActive` joins do different jobs. The **base** term
   gates the *target*'s own active state; the **recursive** term gates
@@ -64,12 +61,10 @@ the new "walk to termination" rule that treats an inactive endpoint as a fault
 rather than as a clean end would silently *remove* Reporting that ships today.
 That is what Test 1 guards.
 
-**This contradiction is not resolved here.** `stories.yaml` and
-`reviews/review-p2-repair.md` finding F-6 both still assert the widening.
-Correcting an approved dispatch instruction is a planning decision, not a
-scenario-authoring one, so it is raised for the approver alongside this file
-rather than edited in. SPEC CAP-1 itself needs no correction: it states the
-required behavior and never claims the behavior is new.
+**Planning resolution.** The review repair resolves F-6 in favor of this
+code-verified baseline and `stories.yaml` now describes the case as an
+already-shipped regression guard. SPEC CAP-1 needed no correction: it states
+the required behavior and never claims the behavior is new.
 
 ## Test 1 — inactive endpoint above the proven viewer is a clean end
 

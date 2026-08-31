@@ -2,3 +2,4 @@
 # Ніколи не комітити. Шаблон без значень: .tt-keys.env.example
 .tt-keys.env
 .worktrees/
+**/.DS_Store

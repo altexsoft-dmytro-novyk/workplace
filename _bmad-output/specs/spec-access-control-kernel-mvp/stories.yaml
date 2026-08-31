@@ -50,12 +50,11 @@
     explicitly: an ABSENT manager edge is a clean end, while an edge whose
     ENDPOINT IS INACTIVE is unusable and treated as absent — denying Reporting
     before viewer proof and granting it after viewer proof, with nothing above
-    the dead node reachable. Call out explicitly that the after-viewer-proof
-    GRANT is a behavior CHANGE, not a restatement: the current recursive CTE
-    joins users.isActive in both terms and stops at an inactive node, so it
-    would deny that case today. The scenario must state the before/after, so a
-    reviewer approves a widening knowingly rather than reading it as existing
-    behavior. Do NOT author a missing-endpoint-row scenario: it
+    the dead node reachable. Record the code-verified baseline explicitly: the
+    after-viewer-proof GRANT is already-shipped behavior, not a widening. The
+    recursive CTE emits the viewer row before the inactive endpoint stops any
+    further climb, so Stage 2 carries this case as a regression guard for the
+    termination rewrite. Do NOT author a missing-endpoint-row scenario: it
     is unreachable under relationships_shape_check plus the ON DELETE RESTRICT
     endpoint foreign key, so record it as a defensive invariant instead. Do NOT
     author soft-deleted User or bridge scenarios: User has no soft-delete
