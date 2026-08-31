@@ -20,7 +20,7 @@
 #   Epic file: _bmad-output/planning-artifacts/platform/epics.md
 
 generated: 08-27-2026 16:16
-last_updated: 08-30-2026 23:55
+last_updated: 08-31-2026 04:55
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -56,7 +56,7 @@ development_status:
   #   not the running system.
   acf-1-resolve-phase-0-audiences: review
   epic-access-control-foundation-retrospective: optional
-  epic-access-control-kernel-mvp: backlog
+  epic-access-control-kernel-mvp: in-progress
   # Planning only. No scenario, test, migration, production, User Management,
   # frontend, or /users-enforcement dispatch is authorized by registration.
   fr-architecture-amendment-oq-3-4-6-7-11: backlog
@@ -66,9 +66,15 @@ development_status:
   # services/backend/prisma/seed.ts, invoked by `npm run db:seed`. It precedes
   # ACM-1 in the dependency graph and authorizes no User Management feature work.
   acm-0-deploy-time-root-user-prerequisite: backlog
-  acm-3-inactive-viewer-bridge-target-fail-closed: backlog
+  # ACM-3 Stage 1 is approved in the package ledger and all three recorded
+  # scenario artifacts verify at their recorded commit. The aggregate story
+  # remains in progress: no Stage-2 test or Stage-3 production approval exists.
+  acm-3-inactive-viewer-bridge-target-fail-closed: in-progress
   acm-4-multi-audience-merge: backlog
-  acm-1-minimal-functional-role-data-foundation: backlog
+  # ACM-1 Stage 1 is approved in the package ledger and all nine recorded
+  # scenario artifacts verify at their recorded commit. The aggregate story
+  # remains in progress: no Stage-2 test or Stage-3 production approval exists.
+  acm-1-minimal-functional-role-data-foundation: in-progress
   acm-2-is-allowed: backlog
   acm-5-section-access-s1-s10-s11: backlog
   acm-8-compose-deployable-kernel: backlog
