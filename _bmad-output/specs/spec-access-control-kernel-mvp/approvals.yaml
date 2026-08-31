@@ -660,6 +660,16 @@ approvals:
     decision: "approved"
     timestamp: "2026-08-31T07:42:30Z"
 
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-fail-closed-identity.e2e-spec.ts"
+    commit: "366e483a0a22fb5c4a87347b432571f43a528ef8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:46:06Z"
+
   # ACM-3 Stage 2, fourth increment. Approves the ACM3-II-12 path-local
   # visited-state integration coverage in the services/backend submodule.
   - story_id: "ACM-3-red-tests"
@@ -671,3 +681,30 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T07:47:13Z"
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-inactive-pp-endpoint.e2e-spec.ts"
+    commit: "e04a09c2410099b798da86ad4e11d8dbd3c7f160"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:47:04Z"
+
+  # ACM-4R Stage 2 — all six approved ACM4R-MA-01..06 contracts translated
+  # into one direct-facade PostgreSQL suite; 8/8 assertions pass green (a
+  # characterization result, no production code changed). Artifact commit
+  # 8b342ca is the final state (c5999b2 plus two doc-only review patches:
+  # Noah6 fixture-intent comment and per-describe contract-path links; no
+  # test logic changed between the two). This record unblocks
+  # ACM-4R-disposition.
+  - story_id: "ACM-4R-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm4r-multi-audience.e2e-spec.ts"
+    commit: "8b342ca28fc44fed860ac191240e17cbbf6c39dc"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:51:49Z"
