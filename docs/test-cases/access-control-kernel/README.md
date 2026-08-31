@@ -15,6 +15,15 @@ covers only the three approved scenarios; no Stage-2 test or production code
 exists for `ACM3-II-04`..`ACM3-II-14` or for ACM-4R, and none may be written
 until those Stage-1 approvals are recorded.
 
+The ten `ACM2-IA-01`..`ACM2-IA-10` CAP-4 `isAllowed` scenarios in
+[`is-allowed/`](is-allowed/) are draft Stage-1 prose pending independent human
+approval. They authorize neither an ACM-2 Stage-2 test nor production work.
+
+**ACM-2 non-goals:** AD-20 due/departure evaluation; any
+`resolveAudiences`/audience interaction; decision caching or persistence;
+role- or permission-name branching; and `canAccessSection`/ACM-5 section
+behavior are outside this dispatch.
+
 **Scope of this dispatch.** `ACM-3-scenarios` is now complete against CAP-1:
 `ACM3-II-04`..`ACM3-II-14` close the gaps this section previously listed as
 unwritten — the empty-bulk short-circuit, duplicate-target collapse, both
@@ -240,7 +249,7 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM3-II-07` | [inactive-identity/acm3-ii-07-repeat-after-viewer-proof.md](inactive-identity/acm3-ii-07-repeat-after-viewer-proof.md) | Viewer proof is provisional: a repeat above a proven viewer denies Reporting for that target, while direct PP and Self resolve independently. **Narrowing** — today's resolver grants Reporting here. |
 | `ACM3-II-08` | [inactive-identity/acm3-ii-08-viewer-inside-the-cycle.md](inactive-identity/acm3-ii-08-viewer-inside-the-cycle.md) | A viewer who is herself a member of the cycle is denied rather than proven, and the target itself counts as a visited node. **Narrowing.** |
 | `ACM3-II-09` | [inactive-identity/acm3-ii-09-absent-edge-is-a-clean-end.md](inactive-identity/acm3-ii-09-absent-edge-is-a-clean-end.md) | Termination case 1: an absent manager edge is a clean end, so the provisional proof becomes a Reporting grant. The positive control that stops the cycle group from being satisfiable by denying everything. |
-| `ACM3-II-10` | [inactive-identity/acm3-ii-10-inactive-endpoint-after-viewer-proof.md](inactive-identity/acm3-ii-10-inactive-endpoint-after-viewer-proof.md) | Termination case 2: an inactive endpoint above a proven viewer is a clean end and Reporting is granted, while nothing above the dead node is reachable. **Records a code-verified contradiction:** `stories.yaml` and review F-6 call this a widening; it is not — today's resolver already grants it. |
+| `ACM3-II-10` | [inactive-identity/acm3-ii-10-inactive-endpoint-after-viewer-proof.md](inactive-identity/acm3-ii-10-inactive-endpoint-after-viewer-proof.md) | Termination case 2: an inactive endpoint above a proven viewer is a clean end and Reporting is granted, while nothing above the dead node is reachable. The 2026-08-31 review repair resolved F-6: this is verified already-shipped behavior and a regression guard, not a widening. |
 | `ACM3-II-11` | [inactive-identity/acm3-ii-11-inactive-pp-endpoint.md](inactive-identity/acm3-ii-11-inactive-pp-endpoint.md) | A deactivated assigned PP derives no PP audience over anyone, and a deactivated target of a live PP assignment gets an empty `Set` rather than the Colleague floor. **Narrowing on both halves.** |
 | `ACM3-II-12` | [inactive-identity/acm3-ii-12-path-local-visited-state.md](inactive-identity/acm3-ii-12-path-local-visited-state.md) | Visited state is path-local: two targets sharing every ancestor both keep Reporting, while a cyclic target in the same call is denied. Guards against the one-visited-set-per-request implementation of the acyclicity rule. |
 | `ACM3-II-13` | [inactive-identity/acm3-ii-13-infrastructure-error-propagates.md](inactive-identity/acm3-ii-13-infrastructure-error-propagates.md) | An unreadable relationship graph rejects the call instead of resolving to an empty or partial map. Authority is the Stage-2 dispatch text, not CAP-1 `success` — rejectable on its own without affecting the group. |
@@ -251,6 +260,16 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM4R-MA-04` | [multi-audience/acm4r-ma-04-duplicate-target-does-not-duplicate-audiences.md](multi-audience/acm4r-ma-04-duplicate-target-does-not-duplicate-audiences.md) | A repeated target input produces one map key and one each of the Reporting and PP labels — no key or audience duplication. |
 | `ACM4R-MA-05` | [multi-audience/acm4r-ma-05-fr-permission-excluded-from-audiences.md](multi-audience/acm4r-ma-05-fr-permission-excluded-from-audiences.md) | A real FR permission attached to the viewer is never converted into an audience or used to widen the audience result. |
 | `ACM4R-MA-06` | [multi-audience/acm4r-ma-06-mixed-postgresql-fixture.md](multi-audience/acm4r-ma-06-mixed-postgresql-fixture.md) | One real PostgreSQL fixture concurrently exercises Reporting, PP, Colleague, mixed Reporting+PP, and FR separation through the public facade. |
+| `ACM2-IA-01` | [is-allowed/acm2-ia-01-live-fr-grant-allows.md](is-allowed/acm2-ia-01-live-fr-grant-allows.md) | An active User with the exact live FR attachment/grant/key chain receives `true`. |
+| `ACM2-IA-02` | [is-allowed/acm2-ia-02-revocation-is-immediate.md](is-allowed/acm2-ia-02-revocation-is-immediate.md) | Removing an attachment or the reachable policy makes the next identical call return `false`; no stale positive is permitted. |
+| `ACM2-IA-03` | [is-allowed/acm2-ia-03-inactive-user-denies.md](is-allowed/acm2-ia-03-inactive-user-denies.md) | An inactive User is denied despite an otherwise-valid FR grant. |
+| `ACM2-IA-04` | [is-allowed/acm2-ia-04-missing-user-denies.md](is-allowed/acm2-ia-04-missing-user-denies.md) | A nonexistent `userId` returns `false`, not an application error. |
+| `ACM2-IA-05` | [is-allowed/acm2-ia-05-unknown-key-denies.md](is-allowed/acm2-ia-05-unknown-key-denies.md) | A key absent from the catalog is denied. |
+| `ACM2-IA-06` | [is-allowed/acm2-ia-06-case-variant-denies.md](is-allowed/acm2-ia-06-case-variant-denies.md) | A case-only variant of a granted key is denied. |
+| `ACM2-IA-07` | [is-allowed/acm2-ia-07-ar-policy-never-grants.md](is-allowed/acm2-ia-07-ar-policy-never-grants.md) | A valid attached AR `targetRole` collision never leaks the separate FR permission. |
+| `ACM2-IA-08` | [is-allowed/acm2-ia-08-nonmatching-join-denies.md](is-allowed/acm2-ia-08-nonmatching-join-denies.md) | An existing permission does not allow unless its FR grant is reachable through the caller's attachment. |
+| `ACM2-IA-09` | [is-allowed/acm2-ia-09-infrastructure-error-propagates.md](is-allowed/acm2-ia-09-infrastructure-error-propagates.md) | A database connection/query failure rejects; it never becomes `false`. |
+| `ACM2-IA-10` | [is-allowed/acm2-ia-10-empty-key-denies.md](is-allowed/acm2-ia-10-empty-key-denies.md) | An empty key is denied, with no invented no-round-trip requirement. |
 | `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the three canonical `Permissions` rows — no more, no fewer, no other key. |
 | `ACM1-FB-02` | [fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md](fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md) | A fresh database ends up with exactly one FR `Policies` row, `targetRole='hr-admin'`. |
 | `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the three seeded permissions through `PolicyPermissions`, one grant per key. |
