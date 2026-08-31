@@ -958,3 +958,62 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T09:15:31Z"
+
+  # ACM-8 Stage 1 — explicit chat approval of all five CAP-6 kernel-composition
+  # scenario contracts. Preconditions independently verified before dispatch:
+  # ACM-2-production, ACM-3-production, and ACM-5-production above are each
+  # approved and their commits resolve in services/backend; the most recent
+  # ACM-9 baseline evidence artifact
+  # (_bmad-output/test-artifacts/performance/acm9-baseline-acm9-1788145155301-b3e8f5a72e3f.json)
+  # has status: PASS under protocol_version ACM9-MVP-v1, matching the protocol
+  # this MVP uses.
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-01-facade-resolves-from-real-container.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-05-corrected-module-header-comment.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
