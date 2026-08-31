@@ -708,3 +708,14 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T07:51:49Z"
+
+  # ACM-4R final disposition — explicit chat approval after independent Stage-2 evidence verification.
+  - story_id: "ACM-4R-disposition"
+    stage: "stage-4-disposition"
+    repo: "workspace"
+    artifact_path: "_bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml"
+    commit: "91715fa3b92937de5c15a72242dd9e208770587b"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:16:41Z"
