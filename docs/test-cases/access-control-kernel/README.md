@@ -5,28 +5,31 @@ the team-wide authoring pattern in [../README.md](../README.md) and the scoped
 headless-facade variant of it defined in
 [../../architecture/testing-strategy.md](../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp).
 
-**Status:** draft, pending per-file human AD-1 Stage-1 approval. No file in
-this suite has a Stage-2 test or production code behind it yet — see
-`_bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml`, which is
-empty by design until the first approval lands.
+**Status:** mixed. The recorded ACM-3 and ACM-1 Stage-1 approvals are in
+`_bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml`; the six
+ACM-4R CAP-2 repair scenarios below are draft and pending their own independent
+AD-1 Stage-1 approval. No ACM-4R Stage-2 test or production code exists.
 
-**Scope of this partial dispatch.** This suite currently contains **only**
-the three CAP-1 (ACM-3) scenarios and the nine CAP-3 (ACM-1) scenarios listed
-under [Layout](#layout) below. It is not the complete scenario set for either
-story as described in
-`_bmad-output/specs/spec-access-control-kernel-mvp/stories.yaml` —
+**Scope of this partial dispatch.** This suite contains the three CAP-1
+(ACM-3) scenarios, the nine CAP-3 (ACM-1) scenarios, and the six CAP-2
+coverage-repair (ACM-4R) scenarios listed under [Layout](#layout) below. It is
+not the complete scenario set for the older ACM-3 and ACM-1 stories as
+described in `_bmad-output/specs/spec-access-control-kernel-mvp/stories.yaml` —
 for `ACM-3-scenarios`: duplicate-target collapse, the empty-bulk
 short-circuit, both cycle positions relative to viewer proof, the direct-PP
 inactive-endpoint variants, and the after-viewer-proof chain-termination
 **grant** are still unwritten; for `ACM-1-scenarios`: the absent-singleton
 adoption cases, post-bootstrap drift and rollback, concurrency, the
 cross-type `hr-admin` collision, an allowed fourth permission, and the
-`pg_indexes` permission-first-index assertion are still unwritten. None of
-this may be inferred from what is here.
+`pg_indexes` permission-first-index assertion are still unwritten. The six
+ACM-4R documents deliberately repair only the CAP-2 coverage gap recorded in
+the adopted audit; none authorizes a test or production dispatch. None of this
+may be inferred from what is here.
 
 ## Contract and boundary
 
-This suite proves only **CAP-1 — fail-closed audience resolution** against the
+This suite proves **CAP-1 — fail-closed audience resolution** and the scoped
+**CAP-2 — multi-audience input merge** against the
 public `AccessControlFacade.resolveAudiences(viewerId, employeeIds): Promise<Map<string, Set<Audience>>>`
 method, per the scoped headless-facade gate (local AD-3): real
 `AccessControlModule`, real Prisma adapters, migrated PostgreSQL, no
@@ -43,12 +46,11 @@ mid-chain Reporting bridge, and for the target, per CAP-1's success criteria in
 
 **Explicitly out of scope here (do not author under these IDs):**
 
-- `isAllowed` / functional-role (FR) behavior — that is CAP-4, dispatched
-  separately as `ACM-2-scenarios`, and depends on `ACM-1` (the FR schema and
-  bootstrap) being complete. Mixing a CAP-4 scenario into this CAP-1 suite
-  would misfile it against the wrong `story_id` in `approvals.yaml` and
-  violates the local AD-3 rule that "ACM-3 and ACM-4 end at audience-resolution
-  outputs."
+- `isAllowed` / functional-role (FR) **evaluation** — that is CAP-4, dispatched
+  separately as `ACM-2-scenarios`. ACM4R-MA-05/06 use a real FR fixture solely
+  to prove it never enters the audience result; they never call `isAllowed` or
+  assert an FR authorization decision. This preserves the local AD-3 rule that
+  ACM-3 and ACM-4 end at audience-resolution outputs.
 - AD-20 due/departure evaluation and the dismissed-target **projection** — both
   are deferred for the entire Kernel MVP (ACM-0 through ACM-5) per the local
   AD-4 scoped amendment. `ACM3-II-03` below tests `isActive = false`, not a
@@ -116,6 +118,30 @@ No PP relationship exists for any persona above unless a scenario states one;
 absence of a PP edge is itself part of each fixture (it rules out PP as an
 alternate source of the audience under test).
 
+## CAP-2 (ACM-4R) — multi-audience coverage-repair fixture
+
+All named users below are active. These are independent, UUID-scoped PostgreSQL
+fixtures for the eventual direct-facade suite; names may be reused only when a
+scenario explicitly declares the exact edge facts.
+
+| Persona | Relationship facts | Used by |
+| --- | --- | --- |
+| **Marta** | Viewer, direct manager and assigned PP of Alice | `ACM4R-MA-01`, `ACM4R-MA-04` |
+| **Alice** | `direct` and `people_partner` edges both point to Marta | `ACM4R-MA-01`, `ACM4R-MA-04` |
+| **Zara** | Viewer, direct manager of Daria only | `ACM4R-MA-03` |
+| **Paula** | Viewer, assigned PP of Daria only | `ACM4R-MA-03` |
+| **Colin** | Active, unrelated viewer | `ACM4R-MA-03`, `ACM4R-MA-05` |
+| **Mara** | Mixed-fixture viewer; has an FR attachment but no audience persistence | `ACM4R-MA-06` |
+| **Taylor** | Direct report and PP assignment to Mara | `ACM4R-MA-06` |
+| **Reese** | Direct report of Mara only | `ACM4R-MA-06` |
+| **Carmen** | PP assignment to Mara only | `ACM4R-MA-06` |
+| **Noah** | Active, unrelated to Mara | `ACM4R-MA-06` |
+
+The ACM4R-MA-05 and ACM4R-MA-06 FR facts require completed ACM-1 production:
+a real `type='FR'` permission/policy/attachment is fixture data only. It must
+not be translated into an `Audience`, and the scenario never invokes
+`isAllowed`.
+
 ## Layout
 
 | ID | File | Proves |
@@ -123,6 +149,12 @@ alternate source of the audience under test).
 | `ACM3-II-01` | [inactive-identity/acm3-ii-01-inactive-viewer-chain-top.md](inactive-identity/acm3-ii-01-inactive-viewer-chain-top.md) | An inactive viewer at the top of an otherwise-live reporting chain gets an empty audience `Set` for every requested target, self included — the viewer-identity gate runs before any derivation and is global to the call. |
 | `ACM3-II-02` | [inactive-identity/acm3-ii-02-inactive-bridge-stops-traversal.md](inactive-identity/acm3-ii-02-inactive-bridge-stops-traversal.md) | An inactive node mid-chain is an unusable bridge: the active viewer above it never gets proven, Reporting is denied for that target only, and Colleague is the floor — viewer and target identity are both fine, only the path is broken. |
 | `ACM3-II-03` | [inactive-identity/acm3-ii-03-inactive-target-below-active-manager.md](inactive-identity/acm3-ii-03-inactive-target-below-active-manager.md) | An inactive target under a live, active manager gets an empty audience `Set` — not Reporting, not the Colleague floor — fail-closed for the Kernel MVP until the deferred dismissed-target projection exists; a sibling active target in the same bulk call is unaffected, proving the failure is local to that one target. |
+| `ACM4R-MA-01` | [multi-audience/acm4r-ma-01-reporting-and-pp-retained.md](multi-audience/acm4r-ma-01-reporting-and-pp-retained.md) | Reporting and direct PP are retained together for one viewer×target pair; neither is replaced by Colleague. |
+| `ACM4R-MA-02` | [multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md](multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md) | A confirmed active identity receives exactly `self`, never Reporting, PP, or Colleague. |
+| `ACM4R-MA-03` | [multi-audience/acm4r-ma-03-colleague-is-floor.md](multi-audience/acm4r-ma-03-colleague-is-floor.md) | Colleague is the fallback only: it appears for an unrelated active viewer and is absent for Reporting and direct-PP viewers. |
+| `ACM4R-MA-04` | [multi-audience/acm4r-ma-04-duplicate-target-does-not-duplicate-audiences.md](multi-audience/acm4r-ma-04-duplicate-target-does-not-duplicate-audiences.md) | A repeated target input produces one map key and one each of the Reporting and PP labels — no key or audience duplication. |
+| `ACM4R-MA-05` | [multi-audience/acm4r-ma-05-fr-permission-excluded-from-audiences.md](multi-audience/acm4r-ma-05-fr-permission-excluded-from-audiences.md) | A real FR permission attached to the viewer is never converted into an audience or used to widen the audience result. |
+| `ACM4R-MA-06` | [multi-audience/acm4r-ma-06-mixed-postgresql-fixture.md](multi-audience/acm4r-ma-06-mixed-postgresql-fixture.md) | One real PostgreSQL fixture concurrently exercises Reporting, PP, Colleague, mixed Reporting+PP, and FR separation through the public facade. |
 | `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the three canonical `Permissions` rows — no more, no fewer, no other key. |
 | `ACM1-FB-02` | [fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md](fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md) | A fresh database ends up with exactly one FR `Policies` row, `targetRole='hr-admin'`. |
 | `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the three seeded permissions through `PolicyPermissions`, one grant per key. |

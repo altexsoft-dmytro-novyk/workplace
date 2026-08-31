@@ -12,6 +12,7 @@ companions:
   - ../../../docs/architecture/database-schema.md
   - ../../../docs/architecture/testing-strategy.md
   - ../../../docs/architecture/user-management-test-decisions.md
+  - ../../implementation-artifacts/access-control/acm-4-coverage-audit.md
 sources: []
 ---
 
@@ -71,9 +72,13 @@ misrepresenting kernel evidence as production enforcement.
     direct PP, Colleague, and mixed fixtures; proves Reporting/direct PP coexist
     without duplicates, Self is exclusive once viewer and target are confirmed
     present and active, Colleague appears only with no stronger audience, and FR
-    permissions never enter the result. Any missing approved scenario coverage
-    **or** concrete behavior gap halts Stage 2 onward and starts a separate AD-1
-    sequence.
+    permissions never enter the result. The 2026-08-31 ACM-4 audit found all
+    six required coverage classes missing and is persisted as an adopted
+    companion. Its HALT remains in force until the separately approved
+    `ACM-4R` repair sequence adds and independently approves the scenario
+    contracts, then establishes the real-facade evidence and disposition. Any
+    missing approved scenario coverage **or** concrete behavior gap halts Stage
+    2 onward and starts a separate AD-1 sequence.
 
 - **CAP-3 — Functional-role data foundation (ACM-1)**
   - **intent:** The kernel stores type-separated functional roles, permissions,
@@ -218,7 +223,19 @@ misrepresenting kernel evidence as production enforcement.
   **Any missing approved scenario coverage or concrete behavior gap** halts
   Stage 2 onward — ACM-4-red-tests, ACM-4-production, and ACM-5 — starts a
   separately approved AD-1 sequence, and requires re-running Story Breakdown
-  before the package resumes.
+  before the package resumes. The persisted 2026-08-31 audit has found that
+  coverage gap, so those original dispatches are not eligible to run.
+  `ACM-4R-scenarios` is the required separate Stage-1 repair and must author
+  all six missing CAP-2 contracts: multi-audience retention, confirmed-active
+  Self exclusivity, Colleague as a no-stronger-audience floor, Reporting plus
+  direct-PP coexistence without duplicates, FR-permission separation, and a
+  representative mixed PostgreSQL fixture. Only after its independent approval
+  may `ACM-4R-tests` run real facade evidence. Green characterization is
+  allowed only when it proves already-shipped behavior and authorizes no
+  production change; a behavior gap instead requires a real committed-red test
+  and an independently approved `ACM-4R-production` dispatch. The original
+  CAP-2 disposition path remains the sole ACM-5 gate and may be written only
+  by `ACM-4R-disposition` after the repair reaches `no-gap`.
 - Every code slice follows AD-1 as three distinct dispatches: scenario prose,
   explicit human approval, committed-red Stage-2 evidence, explicit human
   approval, then production implementation. No automated workflow or agent may

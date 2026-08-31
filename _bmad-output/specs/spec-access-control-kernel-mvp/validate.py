@@ -36,6 +36,8 @@ STORY_IDS = [
     "ACM-9-baseline",
     "ACM-3-scenarios", "ACM-3-red-tests", "ACM-3-production",
     "ACM-4-scenarios", "ACM-4-red-tests", "ACM-4-production",
+    "ACM-4R-scenarios", "ACM-4R-tests", "ACM-4R-production",
+    "ACM-4R-disposition",
     "ACM-0-scenarios", "ACM-0-red-tests", "ACM-0-production",
     "ACM-1-scenarios", "ACM-1-red-tests", "ACM-1-production",
     "ACM-2-scenarios", "ACM-2-red-tests", "ACM-2-production",
@@ -50,6 +52,7 @@ ALLOWED_STORY_FIELDS = {
 }
 
 DISPOSITION = "_bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml"
+ACM4_AUDIT = "../../implementation-artifacts/access-control/acm-4-coverage-audit.md"
 
 # Repair item -> (file, one substring that must be present)
 REPAIR_LANDINGS = {
@@ -155,7 +158,7 @@ def main() -> int:
     # --- Stories --------------------------------------------------------
     r.check("stories.yaml is a list", isinstance(stories, list))
     ids = [e["id"] for e in stories]
-    r.check("story count is 23", len(stories) == 23, f"got {len(stories)}")
+    r.check("story count is 27", len(stories) == 27, f"got {len(stories)}")
     r.check("story ids unchanged and in order", ids == STORY_IDS,
             f"got {ids}")
     r.check("story ids unique", len(ids) == len(set(ids)))
@@ -186,6 +189,10 @@ def main() -> int:
                                          idx["ACM-5-production"]))
     r.check("ACM-9-final follows ACM-8",
             idx["ACM-9-final"] > idx["ACM-8-production"])
+    r.check("ACM-4R follows the halted original ACM-4 validation",
+            idx["ACM-4R-scenarios"] > idx["ACM-4-production"])
+    r.check("ACM-4R disposition follows its recovery work",
+            idx["ACM-4R-disposition"] > idx["ACM-4R-production"])
 
     by_id = {e["id"]: e for e in stories}
 
@@ -205,12 +212,35 @@ def main() -> int:
         txt = by_id[sid]["invoke_dev_with"]
         r.check(f"{sid} requires baseline status", "`status`" in txt)
         r.check(f"{sid} requires PASS", "`PASS`" in txt)
-    r.check("ACM-4-production writes the disposition artifact",
-            DISPOSITION in by_id["ACM-4-production"]["invoke_dev_with"])
+    r.check("ACM-4 original test dispatch is explicitly halted",
+            "DO NOT DISPATCH" in by_id["ACM-4-red-tests"]["invoke_dev_with"])
+    r.check("ACM-4 original production dispatch is explicitly halted",
+            "DO NOT DISPATCH" in by_id["ACM-4-production"]["invoke_dev_with"])
+    r.check("ACM-4R scenario dispatch cites the persisted audit",
+            "acm-4-coverage-audit.md" in by_id["ACM-4R-scenarios"]["invoke_dev_with"])
+    r.check("ACM-4R tests wait for ACM-1 production",
+            "ACM-1-production" in by_id["ACM-4R-tests"]["invoke_dev_with"])
+    r.check("ACM-4R disposition writes the disposition artifact",
+            DISPOSITION in by_id["ACM-4R-disposition"]["invoke_dev_with"])
+    r.check("ACM-4R disposition names no-gap",
+            "disposition: no-gap" in by_id["ACM-4R-disposition"]["invoke_dev_with"])
+
+    audit_path = (SPEC_DIR / ACM4_AUDIT).resolve()
+    r.check("ACM-4 coverage audit exists", audit_path.exists(), str(audit_path))
+    if audit_path.exists():
+        audit = audit_path.read_text(encoding="utf-8")
+        r.check("ACM-4 coverage audit records gap status", "status: \"gap\"" in audit)
+        r.check("ACM-4 coverage audit names all six gaps",
+                all(needle in audit for needle in (
+                    "Multi-audience retention", "Self exclusivity",
+                    "Colleague floor", "Deduplication", "FR separation",
+                    "Representative PostgreSQL fixture classes")))
 
     # --- R10 ledger referenced by every stage-2/stage-3 dispatch --------
     for sid in [i for i in ids
-                if i.endswith("-red-tests") or i.endswith("-production")]:
+                if (i.endswith("-red-tests") or i.endswith("-tests")
+                    or i.endswith("-production"))
+                and i not in ("ACM-4-red-tests", "ACM-4-production")]:
         r.check(f"{sid} references approvals ledger",
                 "approvals.yaml" in by_id[sid]["invoke_dev_with"])
     ledger = SPEC_DIR / "approvals.yaml"

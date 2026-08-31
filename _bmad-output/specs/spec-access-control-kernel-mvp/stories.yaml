@@ -112,51 +112,115 @@
     A coverage gap is a halt in its own right, not merely a note.
 
 - id: "ACM-4-red-tests"
-  title: "ACM-4 validation 2 — real PostgreSQL facade characterization evidence"
+  title: "ACM-4 validation 2 — HALTED after coverage audit"
   description: >-
-    Depends on human acceptance of the coverage audit, and on that audit
-    reporting no gap. Obtain real migrated-PostgreSQL facade evidence against
-    CAP-2 under the validation-only exception; this entry writes no red test.
+    The 2026-08-31 coverage audit reported a gap, so this original validation
+    entry is superseded and must not be dispatched. ACM-4R owns the recovery.
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
-    Validation only. Exercise Reporting, direct PP, Colleague, and mixed
-    fixtures through AccessControlFacade, real AccessControlModule, Prisma
-    adapters, and migrated PostgreSQL. You are authorized to add and commit
-    reproducible integration test files inside that Stage-2 boundary; throwaway
-    or unreproducible evidence does not satisfy this story. Despite this entry's
-    historical id, it authors NO committed-red test: it runs under the named
-    validation-only evidence exception in docs/architecture/testing-strategy.md,
-    so characterization tests over already-shipped behavior may be committed
-    green. That evidence is never a Stage-2 gate for any production change.
-    Preserve ACF-1 history and stop for human review; do not change production
-    code. Any missing approved scenario coverage or concrete unmet behavior
-    halts ACM-4-production and ACM-5 and opens a separately approved AD-1
-    sequence — with a real committed-red test — plus a Story Breakdown re-run.
-    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+    DO NOT DISPATCH. The persisted audit at
+    _bmad-output/implementation-artifacts/access-control/acm-4-coverage-audit.md
+    has `status: gap`, which is a hard halt under SPEC CAP-2 and
+    docs/architecture/testing-strategy.md. Do not write tests, code, a
+    disposition, or an approval record from this superseded path. Begin only
+    with ACM-4R-scenarios after its own Stage-1 approval.
 
 - id: "ACM-4-production"
-  title: "ACM-4 validation 3 — CAP-2 disposition"
+  title: "ACM-4 validation 3 — HALTED after coverage audit"
   description: >-
-    Depends on human acceptance of the facade evidence audit. Record the CAP-2
-    disposition; a concrete unmet behavior requires a separate AD-1 sequence.
+    The 2026-08-31 coverage audit reported a gap, so this original disposition
+    entry is superseded and must not be dispatched. ACM-4R owns the recovery.
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
-    Validation and disposition only. RESERVE the disposition file with
-    `disposition: pending` before validation begins, mirroring ACM-9's
-    reservation rule, so a crash mid-validation leaves an auditable `pending`
-    rather than an absent file that blocks ACM-5 with no diagnostic. Then write
-    the machine-checkable disposition to
+    DO NOT DISPATCH. Do not reserve or write
     _bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml
-    with field `disposition` set to exactly `no-gap` or `gap`. Record `no-gap`
-    only when neither validation entry found a missing approved scenario
-    coverage or behavior gap; otherwise record `gap`, stop, and leave ACM-5
-    blocked pending the separately approved AD-1 sequence and Story Breakdown
-    re-run. ACM-5 dispatch reads that exact path and field. Do not treat unit
-    evidence as sufficient, edit production code, add section/FR behavior, or
-    rewrite ACF-1 history.
-    Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
+    from this superseded path. The audit's coverage gap must first pass the
+    separately approved ACM-4R AD-1 recovery; only ACM-4R-disposition can
+    record `disposition: no-gap` and release ACM-5.
+
+- id: "ACM-4R-scenarios"
+  title: "ACM-4R Stage 1 — CAP-2 coverage-repair scenarios"
+  description: >-
+    Depends on the persisted ACM-4 coverage-gap audit. Author the six missing
+    CAP-2 scenario contracts only; no test or production work is permitted.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Scenario prose only. Cite SPEC CAP-2, architecture AD-1/AD-3, the Access
+    Control spine, docs/architecture/access-control.md,
+    docs/architecture/testing-strategy.md, and the persisted audit at
+    _bmad-output/implementation-artifacts/access-control/acm-4-coverage-audit.md.
+    Create independently reviewable scenario contracts for all six missing
+    items: (1) retained multi-audience output, (2) Self as exactly `Set{'self'}`
+    only after confirmed active viewer and target identity, with Reporting and
+    direct PP absent, (3) Colleague present only when neither Reporting nor
+    direct PP applies, (4) one result retaining Reporting plus direct PP with
+    no duplicate audience, (5) a fixture carrying an FR permission which never
+    enters `resolveAudiences`, and (6) a representative mixed PostgreSQL graph
+    containing Reporting, direct PP, Colleague, and the FR-separation fixture.
+    Specify public-facade inputs and exact `Map<string, Set<Audience>>` outputs;
+    do not write tests, production code, a disposition, or an approval record.
+    Stop for independent Stage-1 approval in approvals.yaml before ACM-4R-tests.
+
+- id: "ACM-4R-tests"
+  title: "ACM-4R Stage 2 — real PostgreSQL CAP-2 evidence"
+  description: >-
+    Depends on independently approved ACM-4R scenarios and completed ACM-1
+    functional-role foundation. Translate all six approved contracts through
+    the real facade and report whether a concrete behavior gap exists.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Stage-2 evidence only. Before starting, verify the Stage-1 approval record
+    for ACM-4R-scenarios and the completed ACM-1-production prerequisite in
+    _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml. Use the
+    public AccessControlFacade in a real Nest module importing
+    AccessControlModule, real Prisma adapters, migrated PostgreSQL, and the
+    approved mixed fixture; no fake repository, provider override, artificial
+    HTTP route, direct resolver call, or unit-only proof. Commit the test
+    artifact and stop for human review. Characterization may be green only if it
+    proves already-shipped behavior and changes no production code. If any
+    approved assertion is red, preserve the committed-red evidence, record the
+    concrete behavior gap, and stop: ACM-4R-production may start only after its
+    separate human Stage-2 approval. Do not write production code or a final
+    disposition in this dispatch.
+
+- id: "ACM-4R-production"
+  title: "ACM-4R Stage 3 — conditional CAP-2 remediation"
+  description: >-
+    Runs only if ACM-4R-tests found a concrete behavior gap and its committed
+    red evidence received independent approval; otherwise it is not dispatched.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Conditional production dispatch. Verify the approved ACM-4R-tests Stage-2
+    record in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml
+    and confirm that its committed evidence names a concrete behavior gap. Make
+    only the production change required by that approved red test, then run the
+    full ACM-4R PostgreSQL suite green. Do not broaden to section access, User
+    Management, or unrelated FR behavior. If ACM-4R-tests was wholly green,
+    DO NOT DISPATCH this story; proceed to ACM-4R-disposition after the Stage-2
+    review instead.
+
+- id: "ACM-4R-disposition"
+  title: "ACM-4R disposition — release CAP-2 only on no-gap evidence"
+  description: >-
+    After approved repair evidence, reserve and finalize the machine-checkable
+    CAP-2 disposition that is the sole release gate for ACM-5.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Validation and disposition only. Verify the independently approved
+    ACM-4R-tests record in approvals.yaml; if Stage 3 ran, verify its approval
+    record and green evidence too. Reserve
+    _bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml
+    with `disposition: pending` before finalization. Set `disposition: no-gap`
+    only when all six approved contracts have real migrated-PostgreSQL facade
+    evidence and no behavior gap remains; otherwise set `disposition: gap` and
+    leave ACM-5 blocked. Do not edit production code, reclassify missing
+    coverage, or rewrite ACF-1 history.
 
 - id: "ACM-0-scenarios"
   title: "ACM-0 Stage 1 — root User prerequisite scenario prose"
