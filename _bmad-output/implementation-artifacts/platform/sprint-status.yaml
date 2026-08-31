@@ -83,9 +83,18 @@ development_status:
   # it cannot prove all thirteen while translating only approved scenarios.
   # ACM-1R-scenarios (19 contracts, ACM1R-FB-10..28) and ACM-1R-tests are
   # registered as the repair; ACM-1-production is unchanged in scope and now
-  # gated on the ACM-1R Stage-2 record. The 19 contracts are authored and
-  # PENDING independent Stage-1 approval — no approvals.yaml entry exists.
-  acm-1-minimal-functional-role-data-foundation: in-progress
+  # gated on the ACM-1R Stage-2 record. ACM-1R-scenarios Stage-1 APPROVED by
+  # Anna Pikula at workspace 6c77ad1 (19 records, verified). Next eligible
+  # ACM-1 / CAP-3 COMPLETE 2026-08-31. ACM-1R-tests re-approved at
+  # services/backend 5b26e04 (39/39 PASSING, real PostgreSQL — two assertion
+  # defects found after the production code went green were fixed and
+  # re-approved, neither was a production defect). ACM-1-production approved
+  # at services/backend 436f3c6: prisma/schema.prisma, migration
+  # 20260831070000_access_control_functional_roles, access-control-bootstrap.ts,
+  # npm run db:bootstrap:access-control. Full e2e isolated via git stash showed
+  # zero regressions attributable to this change. ACM-2 and ACM-4R-tests are
+  # now unblocked.
+  acm-1-minimal-functional-role-data-foundation: done
   acm-2-is-allowed: backlog
   acm-5-section-access-s1-s10-s11: backlog
   acm-8-compose-deployable-kernel: backlog
