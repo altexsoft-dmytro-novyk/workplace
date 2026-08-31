@@ -810,3 +810,13 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm5-section-access.e2e-spec.ts"
+    commit: "d94d8d7c4b4e93b38a7b35a17031d75621ab6261"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:44:56Z"
