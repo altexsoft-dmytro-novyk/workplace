@@ -19,10 +19,21 @@ The ten `ACM2-IA-01`..`ACM2-IA-10` CAP-4 `isAllowed` scenarios in
 [`is-allowed/`](is-allowed/) are draft Stage-1 prose pending independent human
 approval. They authorize neither an ACM-2 Stage-2 test nor production work.
 
+The nine `ACM5-SA-01`..`ACM5-SA-09` CAP-5 `canAccessSection` scenarios in
+[`section-access/`](section-access/) are draft Stage-1 prose pending independent
+human approval. They authorize neither an ACM-5 Stage-2 test nor production
+work.
+
 **ACM-2 non-goals:** AD-20 due/departure evaluation; any
 `resolveAudiences`/audience interaction; decision caching or persistence;
 role- or permission-name branching; and `canAccessSection`/ACM-5 section
 behavior are outside this dispatch.
+
+**ACM-5 non-goals:** field/record-level projection — including the S5 CV subset,
+S7/S8 record flags, and S16 custom-field visibility — is an owning-context
+projection contract that may only narrow the facade's base decision. Project-line
+audiences/access; `isAllowed`/CAP-4 coupling; HR Admin and shared-link overlays;
+and every section other than S1, S10, and S11 are outside this dispatch.
 
 **Scope of this dispatch.** `ACM-3-scenarios` is now complete against CAP-1:
 `ACM3-II-04`..`ACM3-II-14` close the gaps this section previously listed as
@@ -270,6 +281,15 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM2-IA-08` | [is-allowed/acm2-ia-08-nonmatching-join-denies.md](is-allowed/acm2-ia-08-nonmatching-join-denies.md) | An existing permission does not allow unless its FR grant is reachable through the caller's attachment. |
 | `ACM2-IA-09` | [is-allowed/acm2-ia-09-infrastructure-error-propagates.md](is-allowed/acm2-ia-09-infrastructure-error-propagates.md) | A database connection/query failure rejects; it never becomes `false`. |
 | `ACM2-IA-10` | [is-allowed/acm2-ia-10-empty-key-denies.md](is-allowed/acm2-ia-10-empty-key-denies.md) | An empty key is denied, with no invented no-round-trip requirement. |
+| `ACM5-SA-01` | [section-access/acm5-sa-01-s1-self-or-colleague-read.md](section-access/acm5-sa-01-s1-self-or-colleague-read.md) | S1 returns `read` for exactly Self or Colleague, with no stronger audience present. |
+| `ACM5-SA-02` | [section-access/acm5-sa-02-s1-reporting-or-pp-write.md](section-access/acm5-sa-02-s1-reporting-or-pp-write.md) | S1 returns `write` for Reporting or direct PP. |
+| `ACM5-SA-03` | [section-access/acm5-sa-03-s10-all-phase-zero-audiences-read.md](section-access/acm5-sa-03-s10-all-phase-zero-audiences-read.md) | S10 returns `read`, never `write` or `none`, for every confirmed Phase-0 audience. |
+| `ACM5-SA-04` | [section-access/acm5-sa-04-s11-all-phase-zero-audiences-read.md](section-access/acm5-sa-04-s11-all-phase-zero-audiences-read.md) | S11 returns `read`, never `write` or `none`, for every confirmed Phase-0 audience. |
+| `ACM5-SA-05` | [section-access/acm5-sa-05-strongest-merged-audience-wins.md](section-access/acm5-sa-05-strongest-merged-audience-wins.md) | A merged Reporting+PP set receives the strongest applicable decision, `write > read > none`. |
+| `ACM5-SA-06` | [section-access/acm5-sa-06-unsupported-section-returns-none.md](section-access/acm5-sa-06-unsupported-section-returns-none.md) | Any unsupported section string returns `none` successfully. |
+| `ACM5-SA-07` | [section-access/acm5-sa-07-missing-target-returns-none.md](section-access/acm5-sa-07-missing-target-returns-none.md) | A missing target returns `none` successfully. |
+| `ACM5-SA-08` | [section-access/acm5-sa-08-empty-audiences-return-none.md](section-access/acm5-sa-08-empty-audiences-return-none.md) | An empty Phase-0 audience set returns `none` for S1, S10, and S11. |
+| `ACM5-SA-09` | [section-access/acm5-sa-09-audience-resolution-error-propagates.md](section-access/acm5-sa-09-audience-resolution-error-propagates.md) | An audience-resolution infrastructure error rejects instead of silently returning `none`. |
 | `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the three canonical `Permissions` rows — no more, no fewer, no other key. |
 | `ACM1-FB-02` | [fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md](fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md) | A fresh database ends up with exactly one FR `Policies` row, `targetRole='hr-admin'`. |
 | `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the three seeded permissions through `PolicyPermissions`, one grant per key. |
