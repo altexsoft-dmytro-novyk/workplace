@@ -22,6 +22,7 @@ of a defect — and never treat a PASS as a substitute for the human review gate
 from __future__ import annotations
 
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -113,8 +114,39 @@ class Report:
             self.failures.append(f"{label}{': ' + detail if detail else ''}")
 
 
+def artifact_resolves(repo: str, commit: str, artifact_path: str) -> bool:
+    """True if `artifact_path` exists at `commit` in the named repo checkout."""
+    repo_dir = REPO if repo == "workspace" else REPO / "services" / "backend"
+    result = subprocess.run(
+        ["git", "-C", str(repo_dir), "cat-file", "-e", f"{commit}:{artifact_path}"],
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
 def main() -> int:
     r = Report()
+    try:
+        _run_checks(r)
+    except Exception as e:
+        print(f"checks run: {r.ran}")
+        print(f"failures:   {len(r.failures) + 1}")
+        for f in r.failures:
+            print(f"  FAIL  {f}")
+        print(f"  FAIL  unhandled error: {e}")
+        print("verdict:    FAIL")
+        return 1
+
+    print(f"checks run: {r.ran}")
+    print(f"failures:   {len(r.failures)}")
+    for f in r.failures:
+        print(f"  FAIL  {f}")
+    verdict = "PASS" if not r.failures else "FAIL"
+    print(f"verdict:    {verdict}")
+    return 0 if not r.failures else 1
+
+
+def _run_checks(r: Report) -> None:
     spec = (SPEC_DIR / "SPEC.md").read_text(encoding="utf-8")
     stories_raw = (SPEC_DIR / "stories.yaml").read_text(encoding="utf-8")
     stories = yaml.safe_load(stories_raw)
@@ -307,9 +339,13 @@ def main() -> int:
                     for e in entries),
                 "a stage approval is missing fields, names no repo, or was "
                 "self-approved")
-        r.check("no stage approval predates its artifact",
+        r.check("approval story ids are known",
                 all(e.get("story_id") in STORY_IDS for e in entries),
                 "an approval names a story that does not exist")
+        r.check("every approval's commit+artifact_path resolves in its repo",
+                all(artifact_resolves(e["repo"], e["commit"], e["artifact_path"])
+                    for e in entries),
+                "an approval names a commit/artifact_path that does not resolve")
 
     # --- R4 no invented soft-delete behavior ---------------------------
     # `User` has no soft-delete column, so the retired taxonomy that treated a
@@ -336,15 +372,6 @@ def main() -> int:
         if path.exists():
             r.check(f"landing content for {label}",
                     needle in path.read_text(encoding="utf-8"))
-
-    # --- Report ---------------------------------------------------------
-    print(f"checks run: {r.ran}")
-    print(f"failures:   {len(r.failures)}")
-    for f in r.failures:
-        print(f"  FAIL  {f}")
-    verdict = "PASS" if not r.failures else "FAIL"
-    print(f"verdict:    {verdict}")
-    return 0 if not r.failures else 1
 
 
 if __name__ == "__main__":

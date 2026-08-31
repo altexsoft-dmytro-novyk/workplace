@@ -339,3 +339,10 @@ sources explicitly.
 **Date:** 2026-08-30  
 **Conditions:** architecture-only update; no code, Prisma schema, migration,
 seed, or test changes.
+
+**Decision:** approved (package gate — supersedes the condition above)  
+**Approver:** user  
+**Date:** 2026-08-31  
+**Conditions:** per FR-AMD-1, authorizes Stage-1 dispatch only
+(`implementation_status: stage-1-authorized`); Stage-2 and Stage-3 each still
+require their own per-stage approval recorded in `approvals.yaml`.

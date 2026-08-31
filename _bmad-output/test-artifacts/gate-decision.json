@@ -14,7 +14,7 @@
   "gate_status": "FAIL",
   "rationale": "Coverage thresholds are met: 9/9 P0 oracle items are FULL, and all 23 tests pass against a live PostgreSQL container (13 unit, 10 e2e). ACF-GOV-01 is resolved: both AD-1 rounds now carry a named approver, date and recorded basis. The gate remains FAIL on the two blockers that are not about evidence. The HTTP allow/deny mapping is still an Access Control assumption pending answer 3 of the User Management integration contract, and the production module is dormant — AppModule does not import AccessControlModule, so GET /users/:id remains on the interim allow-all adapter while the suite reaches the real facade through a test-only provider override. Either condition independently prevents PASS; together they mean the story's evidence is genuine but demonstrates a component that is not in the request path.",
   "p0_status": "MET",
-  "p1_status": "MET",
+  "p1_status": "NOT_APPLICABLE",
   "overall_status": "MET",
   "critical_open": 2,
   "critical_resolved_this_run": ["ACF-GOV-01"],

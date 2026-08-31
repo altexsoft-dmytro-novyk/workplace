@@ -1,6 +1,6 @@
 ---
 id: SPEC-functional-roles-catalog
-status: approved
+status: draft
 companions:
   - implementation-constraints.md
   - ../../implementation-artifacts/access-control/deferred-work.md

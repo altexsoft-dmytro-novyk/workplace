@@ -39,9 +39,9 @@
     },
     "priority_breakdown": {
       "P0": { "total": 9, "covered": 9, "pct": 100 },
-      "P1": { "total": 0, "covered": 0, "pct": 100 },
-      "P2": { "total": 0, "covered": 0, "pct": 100 },
-      "P3": { "total": 0, "covered": 0, "pct": 100 }
+      "P1": { "total": 0, "covered": 0, "pct": null },
+      "P2": { "total": 0, "covered": 0, "pct": null },
+      "P3": { "total": 0, "covered": 0, "pct": null }
     },
     "by_level": {
       "e2e": { "tests": 10, "criteria_covered": 9 },

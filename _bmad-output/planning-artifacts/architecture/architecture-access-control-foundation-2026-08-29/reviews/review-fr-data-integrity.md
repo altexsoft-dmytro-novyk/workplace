@@ -1,5 +1,16 @@
 # AD-4 security and data-integrity architecture review
 
+## Final authority re-review — 2026-08-30
+
+**Resolution:** Finding 1 below (High — AD-20 due-departure cutoff) is
+**superseded**. `ARCHITECTURE-SPINE.md` AD-4 formally defers AD-20
+request-time due/departure enforcement for the entire Kernel MVP — explicitly
+ACM-0 through ACM-5, with ACM-8 composing only and ACM-9 measuring only — and
+relies on `User.isActive` alone for the duration of this MVP. This does not
+weaken `User.isActive` or retire the documented future dismissed-target
+projection; it is a named, deliberate scope reduction, not an oversight this
+finding needs to keep flagging.
+
 **Verdict: CONDITIONAL PASS — no conflicting authorization or catalog decision was found, but the active-user rule and AD-4's reliance on companion documents must be made explicit at the ACM-1 gate.**
 
 ## Scope and evidence

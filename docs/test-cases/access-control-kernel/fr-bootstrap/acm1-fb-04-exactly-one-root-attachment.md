@@ -32,7 +32,7 @@ active, and is the only User matching normalized `ROOT_WORK_EMAIL`;
 - **entrypoint:** `npm run db:bootstrap:access-control`
 - **preconditionState:**
   ```sql
-  SELECT count(*) FROM "User"
+  SELECT count(*) FROM "users"
   WHERE normalized("workEmail") = normalized(:ROOT_WORK_EMAIL) AND "isActive"; -- 1
   SELECT count(*) FROM "UserPolicies"; -- 0
   SELECT count(*) FROM "AccessControlBootstrap"; -- 0
