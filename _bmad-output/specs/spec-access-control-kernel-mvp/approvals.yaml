@@ -245,3 +245,13 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T02:29:10Z"
+
+  - story_id: "ACM-0-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm0-root-user-prerequisite.e2e-spec.ts"
+    commit: "66bb98910b4cf6939c04b9f75d091b1dc2b674da"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:40:25Z"
