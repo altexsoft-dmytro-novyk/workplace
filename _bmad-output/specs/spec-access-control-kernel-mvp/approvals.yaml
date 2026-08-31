@@ -600,3 +600,23 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T07:11:39Z"
+
+  # ACM-3-production, second increment. The earlier ACM-3-production would
+  # have been the identity-validation change (9e69682); it was never recorded
+  # here because the memlog shows no stage-3-production record was written for
+  # it either. This is the reporting-walk change gated by the ACM-3-red-tests
+  # record immediately above (services/backend f6bbda3), making the cycle
+  # suite's 6 tests green: viewer proof is now provisional, and Reporting is
+  # denied for a target whose walked chain repeats a node, before or after
+  # that proof. Nine of fourteen approved CAP-1 scenarios still have no
+  # Stage-2 record of their own (see the memlog constraint at 108ca2e).
+
+  - story_id: "ACM-3-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/access-control/infrastructure/prisma-relationship-graph.adapter.ts"
+    commit: "5bdbc7580ffcc6a40bad7d2972f58ae7bb90ddef"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:21:20Z"
