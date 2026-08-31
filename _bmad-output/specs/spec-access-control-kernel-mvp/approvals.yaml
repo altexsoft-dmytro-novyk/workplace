@@ -659,3 +659,15 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T07:42:30Z"
+
+  # ACM-3 Stage 2, fourth increment. Approves the ACM3-II-12 path-local
+  # visited-state integration coverage in the services/backend submodule.
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-path-local-visited-state.e2e-spec.ts"
+    commit: "e04a09c2410099b798da86ad4e11d8dbd3c7f160"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:47:13Z"
