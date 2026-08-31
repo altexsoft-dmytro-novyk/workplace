@@ -820,3 +820,13 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T08:44:56Z"
+
+  - story_id: "ACM-5-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/access-control/application/access-control.facade.ts"
+    commit: "e594cbe5645b0aa824c38ce8287f56e7d10428de"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:15:31Z"
