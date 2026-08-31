@@ -20,7 +20,7 @@
 #   Epic file: _bmad-output/planning-artifacts/platform/epics.md
 
 generated: 08-27-2026 16:16
-last_updated: 08-31-2026 04:55
+last_updated: 08-31-2026 06:20
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -74,6 +74,17 @@ development_status:
   # ACM-1 Stage 1 is approved in the package ledger and all nine recorded
   # scenario artifacts verify at their recorded commit. The aggregate story
   # remains in progress: no Stage-2 test or Stage-3 production approval exists.
+  #
+  # 2026-08-31: that Stage 1 is measured INCOMPLETE. The persisted audit at
+  # implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md finds
+  # the nine approved contracts cover 3 of the 13 CAP-3 invariants fully, 3
+  # partially, and 7 not at all, against database-schema.md's rule that partial
+  # coverage is not a passing ACM-1. ACM-1-red-tests is HALTED in stories.yaml:
+  # it cannot prove all thirteen while translating only approved scenarios.
+  # ACM-1R-scenarios (19 contracts, ACM1R-FB-10..28) and ACM-1R-tests are
+  # registered as the repair; ACM-1-production is unchanged in scope and now
+  # gated on the ACM-1R Stage-2 record. The 19 contracts are authored and
+  # PENDING independent Stage-1 approval — no approvals.yaml entry exists.
   acm-1-minimal-functional-role-data-foundation: in-progress
   acm-2-is-allowed: backlog
   acm-5-section-access-s1-s10-s11: backlog

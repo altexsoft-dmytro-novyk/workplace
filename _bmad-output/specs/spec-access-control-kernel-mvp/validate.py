@@ -39,7 +39,9 @@ STORY_IDS = [
     "ACM-4R-scenarios", "ACM-4R-tests", "ACM-4R-production",
     "ACM-4R-disposition",
     "ACM-0-scenarios", "ACM-0-red-tests", "ACM-0-production",
-    "ACM-1-scenarios", "ACM-1-red-tests", "ACM-1-production",
+    "ACM-1-scenarios", "ACM-1-red-tests",
+    "ACM-1R-scenarios", "ACM-1R-tests",
+    "ACM-1-production",
     "ACM-2-scenarios", "ACM-2-red-tests", "ACM-2-production",
     "ACM-5-scenarios", "ACM-5-red-tests", "ACM-5-production",
     "ACM-8-scenarios", "ACM-8-red-tests", "ACM-8-production",
@@ -53,6 +55,8 @@ ALLOWED_STORY_FIELDS = {
 
 DISPOSITION = "_bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml"
 ACM4_AUDIT = "../../implementation-artifacts/access-control/acm-4-coverage-audit.md"
+ACM1_AUDIT = ("../../implementation-artifacts/access-control/"
+              "acm-1-stage1-coverage-audit.md")
 
 # Repair item -> (file, one substring that must be present)
 REPAIR_LANDINGS = {
@@ -158,7 +162,7 @@ def main() -> int:
     # --- Stories --------------------------------------------------------
     r.check("stories.yaml is a list", isinstance(stories, list))
     ids = [e["id"] for e in stories]
-    r.check("story count is 27", len(stories) == 27, f"got {len(stories)}")
+    r.check("story count is 29", len(stories) == 29, f"got {len(stories)}")
     r.check("story ids unchanged and in order", ids == STORY_IDS,
             f"got {ids}")
     r.check("story ids unique", len(ids) == len(set(ids)))
@@ -193,6 +197,15 @@ def main() -> int:
             idx["ACM-4R-scenarios"] > idx["ACM-4-production"])
     r.check("ACM-4R disposition follows its recovery work",
             idx["ACM-4R-disposition"] > idx["ACM-4R-production"])
+    # ACM-1R is dependency-ordered in place: the repair sits between the halted
+    # original Stage 2 and the Stage 3 it now gates, so reading the file top to
+    # bottom is reading the order the stages may actually run in.
+    r.check("ACM-1R follows the halted original ACM-1 Stage 2",
+            idx["ACM-1R-scenarios"] > idx["ACM-1-red-tests"])
+    r.check("ACM-1R tests follow ACM-1R scenarios",
+            idx["ACM-1R-tests"] > idx["ACM-1R-scenarios"])
+    r.check("ACM-1 production follows the ACM-1R repair",
+            idx["ACM-1-production"] > idx["ACM-1R-tests"])
 
     by_id = {e["id"]: e for e in stories}
 
@@ -224,6 +237,22 @@ def main() -> int:
             DISPOSITION in by_id["ACM-4R-disposition"]["invoke_dev_with"])
     r.check("ACM-4R disposition names no-gap",
             "disposition: no-gap" in by_id["ACM-4R-disposition"]["invoke_dev_with"])
+    r.check("ACM-1 original Stage-2 dispatch is explicitly halted",
+            "DO NOT DISPATCH" in by_id["ACM-1-red-tests"]["invoke_dev_with"])
+    r.check("ACM-1 halt cites the persisted Stage-1 audit",
+            "acm-1-stage1-coverage-audit.md"
+            in by_id["ACM-1-red-tests"]["invoke_dev_with"])
+    r.check("ACM-1R scenario dispatch cites the persisted audit",
+            "acm-1-stage1-coverage-audit.md"
+            in by_id["ACM-1R-scenarios"]["invoke_dev_with"])
+    r.check("ACM-1R tests require BOTH Stage-1 approvals",
+            all(n in by_id["ACM-1R-tests"]["invoke_dev_with"]
+                for n in ("ACM-1-scenarios", "ACM-1R-scenarios")))
+    r.check("ACM-1R tests invoke the real bootstrap entrypoint",
+            "db:bootstrap:access-control"
+            in by_id["ACM-1R-tests"]["invoke_dev_with"])
+    r.check("ACM-1 production names ACM-1R-tests as its prior stage",
+            "ACM-1R-tests" in by_id["ACM-1-production"]["invoke_dev_with"])
 
     audit_path = (SPEC_DIR / ACM4_AUDIT).resolve()
     r.check("ACM-4 coverage audit exists", audit_path.exists(), str(audit_path))
@@ -236,11 +265,27 @@ def main() -> int:
                     "Colleague floor", "Deduplication", "FR separation",
                     "Representative PostgreSQL fixture classes")))
 
+    acm1_audit_path = (SPEC_DIR / ACM1_AUDIT).resolve()
+    r.check("ACM-1 Stage-1 coverage audit exists", acm1_audit_path.exists(),
+            str(acm1_audit_path))
+    if acm1_audit_path.exists():
+        a1 = acm1_audit_path.read_text(encoding="utf-8")
+        r.check("ACM-1 Stage-1 audit records gap status",
+                'status: "gap"' in a1)
+        r.check("ACM-1 Stage-1 audit scores every one of the thirteen "
+                "invariants",
+                all(f"| {n} |" in a1 for n in range(1, 14)))
+        r.check("ACM-1 Stage-1 audit records the coverage score",
+                "3 of 13 fully covered" in a1)
+        r.check("ACM-1 Stage-1 audit halts both downstream dispatches",
+                "ACM-1-red-tests" in a1 and "ACM-1-production" in a1)
+
     # --- R10 ledger referenced by every stage-2/stage-3 dispatch --------
     for sid in [i for i in ids
                 if (i.endswith("-red-tests") or i.endswith("-tests")
                     or i.endswith("-production"))
-                and i not in ("ACM-4-red-tests", "ACM-4-production")]:
+                and i not in ("ACM-4-red-tests", "ACM-4-production",
+                              "ACM-1-red-tests")]:
         r.check(f"{sid} references approvals ledger",
                 "approvals.yaml" in by_id[sid]["invoke_dev_with"])
     ledger = SPEC_DIR / "approvals.yaml"

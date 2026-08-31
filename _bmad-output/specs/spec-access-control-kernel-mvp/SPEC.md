@@ -13,6 +13,7 @@ companions:
   - ../../../docs/architecture/testing-strategy.md
   - ../../../docs/architecture/user-management-test-decisions.md
   - ../../implementation-artifacts/access-control/acm-4-coverage-audit.md
+  - ../../implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md
 sources: []
 ---
 
@@ -109,7 +110,15 @@ misrepresenting kernel evidence as production enforcement.
     carrying `targetRole='hr-admin'` is a different object: never adopted,
     mutated, counted, or reported as drift. Any conflicting drift, lock timeout,
     or failure rolls back the transaction, and later administrator attachments
-    remain distinct.
+    remain distinct. The 2026-08-31 ACM-1 Stage-1 coverage audit
+    found the approved `ACM1-FB-01 .. ACM1-FB-09` contracts cover three of the
+    thirteen invariants fully, three partially, and seven not at all, and is
+    persisted as an adopted companion. Its HALT remains in force until the
+    separately approved `ACM-1R` repair sequence adds and independently approves
+    the missing scenario contracts and produces one committed-red Stage-2 suite
+    over their union with the original nine. Partial coverage is not a passing
+    ACM-1: a Stage-2 record covering only the original nine does not authorize
+    `ACM-1-production`.
 
 - **CAP-4 — Live type-separated permission decision (ACM-2)**
   - **intent:** Consumers ask `AccessControlFacade.isAllowed(userId,
@@ -236,6 +245,23 @@ misrepresenting kernel evidence as production enforcement.
   and an independently approved `ACM-4R-production` dispatch. The original
   CAP-2 disposition path remains the sole ACM-5 gate and may be written only
   by `ACM-4R-disposition` after the repair reaches `no-gap`.
+- ACM-1's Stage 1 was dispatched partially. The nine approved `ACM1-FB`
+  contracts are valid and are not reopened, but they do not satisfy CAP-3's
+  own rule that Stage 1 and Stage 2 **each** cover all thirteen invariants, nor
+  `database-schema.md`'s "partial coverage is not a passing ACM-1". The original
+  `ACM-1-red-tests` dispatch is therefore halted rather than reinterpreted: it
+  requires proving all thirteen while translating only approved scenarios, and
+  seven have no approved scenario, so no dispatch can satisfy both halves.
+  Closing that gap by authoring the missing contracts in test form is a Stage-1
+  act inside a Stage-2 dispatch and is prohibited. `ACM-1R-scenarios` is the
+  required separate Stage-1 repair; `ACM-1R-tests` then produces a single
+  committed-red suite over the union of the original nine and the repair
+  contracts, because the thirteen invariants are properties of one migration and
+  no split Stage-2 record could be read as CAP-3 proven. `ACM-1-production` is
+  unchanged in subject and scope and becomes eligible only on that record.
+  ACM-3's approved partial Stage 2 is not a counter-precedent: a partial Stage 2
+  is a legitimate increment that leaves its story `in-progress`, and ACM-3 has
+  no Stage-3 approval either.
 - Every code slice follows AD-1 as three distinct dispatches: scenario prose,
   explicit human approval, committed-red Stage-2 evidence, explicit human
   approval, then production implementation. No automated workflow or agent may
