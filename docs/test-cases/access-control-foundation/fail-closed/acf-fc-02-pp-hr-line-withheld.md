@@ -2,6 +2,8 @@
 
 **Trace:** §2.1 · §3.2 PP · AD-19 · AD-12 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** Paula is Alice's assigned People Partner and Paula herself reports to Hana through a live `direct` row, while Hana holds no relationship of her own to Alice.

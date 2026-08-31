@@ -1,0 +1,72 @@
+# UNAPPROVED DRAFT — no story here may be dispatched.
+# SPEC.md is unreviewed, and stories 1-3 are blocked on open questions
+# recorded there. This file records the AD-1 sequence, not a ready queue.
+# The approved 2026-08-30 Kernel MVP plan reserves minimal FR schema/seed and
+# isAllowed ownership for ACM-1/ACM-2, still blocked on approved FR-AMD-1.
+# Catalog work consumes those artifacts and must not duplicate them.
+
+- id: "0"
+  title: Resolve the four blocking open questions (not a dev dispatch)
+  description: >-
+    Human/product decisions, not implementation. OQ-3 role->permission storage
+    (database-schema.md defines no join between Policies and Permissions, yet
+    PATCH /roles/:roleId/permissions presumes one); OQ-4 the shape of an FR
+    Policies row and whether roleId is Policies.id; OQ-5 which permission gates
+    the /roles surface, given that §2.3's list contains no "manage functional
+    roles" entry and a name check on "HR Admin" would contradict §2.3 and AD-6;
+    FR-AMD-1 resolves OQ-3, OQ-4, OQ-6, OQ-7 and OQ-11 before ACM-1, while
+    OQ-5 still blocks the /roles guard. Story 1 cannot start before the
+    architecture amendment and catalog-specific OQ-5 decision are approved.
+  spec_checkpoint: true
+  done_checkpoint: true
+
+- id: "1"
+  title: Stage-1 — author the functional-roles catalog scenario document
+  description: >-
+    Prerequisite: story 0 complete. Author the AD-1 stage-1 scenario document
+    that establishes the catalog's HTTP request/response shapes, which
+    api-conventions.md line 30 leaves deliberately unspecified. Covers
+    GET/POST /roles, PATCH /roles/:roleId/permissions, DELETE /roles/:roleId
+    only — the top-level catalog, never a /users-nested route (AD-2, OQ-1).
+    Follow the authoring pattern in docs/test-cases/README.md and the
+    conventions in docs/test-cases/access-control/README.md, using the canonical
+    personas. Stay consistent with the three existing draft files in
+    functional-permission/ and do not duplicate them. Human approves each file;
+    the authoring agent may not self-approve.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Scenario prose only — no code, no schema, no migration. Write, then stop.
+    Attachment scenarios are out of scope until OQ-1 is decided.
+
+- id: "2"
+  title: Stage-2 E2E — translate the catalog scenarios (committed red)
+  description: >-
+    Prerequisite: story 1 complete and every file human-approved. Translate the
+    approved scenarios into Jest + supertest E2E under services/backend/test/ —
+    real PostgreSQL, persona tokens, routes per api-conventions.md. Commit red;
+    a human approves the tests before any production code.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. One E2E per approved scenario file, citing its id in
+    the test title. No mocked AccessControl. Write the tests, then stop.
+
+- id: "3"
+  title: Production — runtime FR catalog over the approved kernel foundation
+  description: >-
+    Prerequisite: story 2 committed red and human-approved, FR-AMD-1 approved,
+    and ACM-1/ACM-2 complete. Implement only the runtime catalog behavior per
+    implementation-constraints.md by consuming the kernel-owned FR schema,
+    seed, and isAllowed evaluator. Do not create a second migration, bootstrap
+    attachment, or evaluator. The §2.3 defaults gate holds until PO
+    confirmation is recorded and is not part of this slice. On completion,
+    update
+    _bmad-output/implementation-artifacts/access-control/deferred-work.md:
+    the first entry's source_spec changes from `none` to this SPEC.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Do not touch services/frontend. Do not add or alter
+    any /users-nested route (AD-2). Consume ACM-1/ACM-2; do not recreate their
+    tables, seed, bootstrap attachment, ports, or evaluator.

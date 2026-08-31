@@ -27,6 +27,8 @@ Every file follows this skeleton exactly:
 
 **Trace:** §<requirements section> · <AD-n when architectural>
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** <who the actor is and the relationship/state that matters>.
@@ -52,6 +54,7 @@ Every file follows this skeleton exactly:
 
 - **ID:** `<AREA>-<GROUP>-NN` (e.g. `AC-UR-01`). Stable and unique — never reused, never renumbered; E2E tests cite it.
 - **Trace:** mandatory. A scenario that cites no requirement is invalid.
+- **Approved:** the AD-1 stage-1 record, written directly under **Trace:**. It is **absent until a human has read that file and said so** — an agent's review of its own prior output is never a substitute ([testing-strategy.md](../architecture/testing-strategy.md)). Approval is per file, so a suite is routinely part-approved; the area README summarises, the files are the source of truth. The E2E test translated from the file carries its own second-round approval.
 - **Scenario section is mandatory.** Plain language, Given/When/Then: who the actor is and their relationship, what they do, what must happen and why. A reviewer must understand the case from this paragraph alone, without decoding the request spec — the request spec below it is the machine-precise version of the same story.
 - **Preconditions hold static seeded state only** (fixture personas, existing records, role memberships). A state **transition** the scenario depends on is never a precondition — it is shown as explicit steps, so the reader sees cause and effect:
   1. baseline request proving the state before,

@@ -30,3 +30,76 @@ independently shippable deliverable; none is authorized by the current spec.
 - source_spec: none
   summary: List, filter, export, and search projection — apply section and field-level access rules to every non-profile surface.
   evidence: Split from the Access Control build intent. §3.3.1 projection is a separate cross-cutting surface with its own leak-negative suite and the §7 2-second / 500-record budget; it consumes the facade rather than defining it.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md`
+  status: named residual risk of the 2026-08-30 Kernel MVP P2 repair; requires a separately gated story
+  summary: Database-enforced normalized `workEmail` uniqueness — today the guarantee is writer-side only.
+  evidence: `users_workEmail_key` (`20260810130423_init/migration.sql`) is a plain unique index on the **raw** stored `workEmail`. `create-user.dto.ts` and `update-user.dto.ts` normalize with `trim().toLowerCase()` on write, so API-created rows are canonical, but nothing in the database enforces that — and `prisma/seed.ts` currently stores `ROOT_WORK_EMAIL` verbatim. DEC-UM-007 states "uniqueness is enforced on the normalized value", which is not true of the schema. The Kernel MVP closes the seed half of this through ACM-0 (canonical storage on write) and fails closed when more than one normalized match exists, but it deliberately does **not** add the database constraint: a unique functional index over `lower(btrim("workEmail"))` is a migration on the `users` table, past CAP-8's stated "no User Management feature work" boundary. The follow-up must choose the index shape, decide how to remediate any pre-existing non-normalized rows it would reject, define the failure mode for concurrent inserts under the new constraint, and reconcile DEC-UM-007's wording with whatever ships.
+
+## Open findings — checkpoint review of ACF-1, 2026-08-30
+
+A `bmad-checkpoint-preview` walkthrough of the ACF-1 implementation raised seven
+findings. One was fixed in place (the transaction claimed a no-torn-reads
+guarantee that READ COMMITTED does not provide; the adapter now uses the
+interactive form at REPEATABLE READ, which is the only form this driver adapter
+honours). Two were dispatched to a separate build run and are listed here only
+so the record is complete. The remaining four are unresolved and belong to
+nobody yet.
+
+The systemic gaps — missing AD-1 approval, the provisional HTTP mapping, and the
+dormant module — are recorded separately as `gate_status: FAIL` in
+`_bmad-output/test-artifacts/gate-decision.json`. These entries are the specific
+technical ones underneath that verdict.
+
+- source_spec: none
+  status: resolved by production commit 9e69682 (services/backend, on branch feature/access-control)
+  summary: A deactivated viewer keeps the Reporting audience over their live reports.
+  evidence: In `prisma-relationship-graph.adapter.ts` the `isActive` join constrains `r."userId"` — the person being walked to — in both the base and recursive terms. No predicate anywhere tests the viewer. Nothing upstream compensates: the interim session resolver returns `{ userId: persona }` for any string without an existence or activity check. Scenario ACF-FC-01 passes only because its deactivated user sits in the middle of the chain; move that user to the top and the same filter does nothing. AD-20 names the actor position first. The open question is ownership, not mechanism — refusing a switched-off account may belong to session validation, which is a User Management file this context must not edit (AD-2). If it belongs to the resolver instead, AD-1 requires a scenario before the code.
+  resolution: Investigated 2026-08-31 and confirmed already shipped. The ownership question resolved in favor of the access-control resolver, not User Management session validation: `AudienceResolverService.resolve()` (`src/access-control/domain/services/audience-resolver.service.ts`) now confirms the viewer is present and active — via `IdentityPort.findActiveUserIds`, one lookup covering the viewer and every target — before any graph walk or Self check runs, per commit `9e69682` ("validate viewer and target identity before audience derivation"). This lives entirely inside access-control's own domain service and never touches a User Management file, consistent with AD-2. Verified against real PostgreSQL: 13/13 e2e suites, 114/114 tests pass in `test/access-control/`.
+
+- source_spec: none
+  status: resolved by production commit 9e69682 (services/backend, on branch feature/access-control) — with a scope boundary
+  summary: A deactivated target silently drops to Colleague instead of the dismissed-target projection.
+  evidence: The same `isActive` join that blocks the bridge also blocks the target, so a manager loses a deactivated report entirely. `access-control.md` (AD-20) says the current manager or PP may still resolve the read-only dismissed-target projection. The behaviour is fail-closed and therefore safe, and departure handling is out of Phase-0 scope — but it is a rule no approved scenario states, and it was decided by the placement of a join rather than by a decision.
+  resolution: Investigated 2026-08-31. The same viewer/target identity gate from commit `9e69682` now returns an empty `Set` for an unconfirmed/deactivated target, never the Colleague floor — so the *silent, undocumented* leak is closed. The full dismissed-target read-only projection named in AD-20 is not implemented: it requires a `Departure`/`EmploymentStatus` persistence seam that does not exist in `prisma/schema.prisma`, and building it now would be inventing an undocumented contract. Fail-closed is the explicitly sanctioned Kernel MVP default until that seam lands (tracked separately, not a new gap). Verified against real PostgreSQL alongside the finding above.
+
+- source_spec: none
+  status: resolved
+  summary: ACF-FC-01 cannot distinguish a blocked bridge from a blocked target.
+  evidence: The fixture exercises the deactivated user in one position only — intermediate. The scenario claims the walk terminates at a broken node, but the same green would appear if the implementation merely refused deactivated targets. Two further cases separate them: a deactivated user at the top of the chain (the viewer), and a deactivated target with a live manager. This is why the finding above went unnoticed until the checkpoint.
+  resolution: Investigated 2026-08-31. Two new scenarios now separate the positions: `docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-01-inactive-viewer-chain-top.md` (deactivated viewer) and `acm3-ii-03-inactive-target-below-active-manager.md` (deactivated target with a live manager), both backed by real-Postgres e2e coverage in `services/backend/test/access-control/acm3-inactive-identity.e2e-spec.ts`. Both are recorded `approved` (Stage-1) in `approvals.yaml`. One residual ledger gap noted in passing, not itself blocking: the `9e69682` production commit that implements this is referenced only in an `approvals.yaml` comment (near the ACM-3-production second-increment entry), not as its own formal stage-3-production record — worth a formal entry for completeness, but the commit is real, on-branch, and independently verified against real PostgreSQL.
+
+- source_spec: none
+  status: irreducible — established, not fixable within this context's boundary
+  summary: The access-control e2e suite imports User Management domain internals.
+  evidence: Confirmed wider than originally scoped — both `test/access-control/audience-resolution.e2e-spec.ts` and `test/access-control/acm8-kernel-composition.e2e-spec.ts` import `ACCESS_CONTROL_PORT`/`AccessControlPort` from `src/user-management/domain/interfaces/access-control.port.ts`; the latter also imports the concrete `InterimAccessControlAdapter` class from `src/user-management/infrastructure/` to assert `acm8-kernel-composition.e2e-spec.ts` did not rebind it. `domain-driven-design.md` forbids reaching into another context's `domain/`, "even to import just a type or a DI token symbol."
+  resolution: Investigated 2026-08-31. `ACCESS_CONTROL_PORT` is `Symbol('ACCESS_CONTROL_PORT')`, defined once in User Management and bound in `user-management.module.ts`; NestJS's `overrideProvider`/`get` match by object identity, not by name, so a same-named token redeclared elsewhere is a *different* token that silently fails to resolve the real binding. Getting the identical token requires importing the literal export — which correctly lives in User Management, since it owns the port and its production binding. This exactly mirrors what `um-integration-contract-request.md` answer 2 already says about the production adapter: an Access Control-owned adapter would also have to import backwards across the boundary, which is why the E2E declares its adapter inside the test file rather than in `src/`. Same seam, exercised from a test instead of production code. This resolves only when User Management rebinds `ACCESS_CONTROL_PORT` to a real facade-backed adapter (answer 6 of the integration contract request); until then the import is irreducible from this side of the boundary. No User Management file was edited to reach this conclusion. Both e2e files now carry an inline comment pointing back to this entry.
+
+- source_spec: dispatched to a separate build run, 2026-08-30
+  summary: The facade returns one audience label per target where a viewer may hold several.
+  evidence: `Map<string, Audience>` cannot express a viewer who is both manager and People Partner; the resolver prefers `reporting`. Harmless only while both audiences grant identically — §3.2's multi-audience merge and DEC-UM-001's PP-only S9 write rights end that as soon as the section matrix lands. This is the cross-context contract other bounded contexts will build against, so widening it is cheapest before adoption.
+
+- source_spec: dispatched to a separate build run, 2026-08-30
+  summary: The reporting walk descends from the viewer, so cost scales with the org, not the request.
+  evidence: The recursive CTE expands every descendant of the viewer and only then filters `WHERE id IN (targets)`. A viewer near the top of the tree walks the whole company to open one profile. `access-control.md` bars full scans from the tier-resolution hot path and §7 requires 500 records within 2 seconds. Walking upward from each target bounds the cost to chain depth. The 9-person fixture cannot show the difference, so any fix needs a measurement, not an assertion.
+
+- source_spec: `_bmad-output/test-artifacts/performance/p6-resolve-audiences-postgresql.md`
+  status: accepted P6 finding; requires a separate follow-up story
+  summary: Add database timeout headroom below the outer two-second request budget and define PostgreSQL `statement_timeout` error classification.
+  evidence: The approved P6 PostgreSQL measurement found no valid acyclic shape over budget: 500 balanced targets had a warm p95 of 41.790 ms, and the valid depth-499 chain had a warm p95 of 161.165 ms. The separate timeout probe showed the outer budget firing first at 2001.103 ms; PostgreSQL cancellation arrived later at 2006.536 ms (database-only probe: 2054.437 ms, SQLSTATE 57014). The follow-up must choose explicit headroom, preserve fail-closed behavior, distinguish database cancellation from outer request timeout, and add error-classification coverage. P6 must not change Access Control production behavior; its opt-in benchmark and Markdown/JSON reports remain the reproducible baseline.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: CAP-2 multi-audience resolution has no Stage-1/Stage-2 evidence for an inactive viewer or inactive target inside `resolveAudiences` — only the ACM-3 reporting-chain identity path covers inactive personas, not audience derivation.
+  evidence: Both the blind-hunter and edge-case-hunter review layers on the ACM4R-MA-01..06 e2e suite independently flagged that every fixture persona defaults `isActive: true` and no scenario exercises the inactive branch; real behavior (error vs empty vs Colleague floor) is unverified against Postgres.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: `AccessControlFacade.resolveAudiences` has no committed evidence for a non-existent viewer id or target id — the error-vs-empty-map contract for unknown ids is unspecified and untested.
+  evidence: Blind-hunter review of the ACM4R-MA-01..06 suite found no scenario for unknown/missing ids; the six approved Stage-1 contracts don't cover it either, so it needs its own scenario approval before a test can be written.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: FR-separation (ACM4R-MA-05/06) only proves one active FR-type policy/permission/grant doesn't leak into audience resolution; other policy types or a revoked/expired grant are unproven.
+  evidence: Blind-hunter review noted the suite covers exactly one FR shape (active FR policy via UserPolicy); no scenario exists for AR-type policies or an expired/revoked grant reaching resolveAudiences.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: The shared e2e fixture/cleanup pattern (used by acm3-inactive-identity.e2e-spec.ts and now acm4r-multi-audience.e2e-spec.ts) hardcodes fixture fields (country/city/position) and does not wrap `afterAll` teardown in try/catch or `Promise.allSettled`, so a mid-teardown failure silently skips later cleanup steps.
+  evidence: Blind-hunter review flagged this on the new file, but it is an inherited convention already present in the pre-existing ACM-3 pattern this story was instructed to follow, not a defect introduced by this dispatch — a shared test-infra hardening candidate.

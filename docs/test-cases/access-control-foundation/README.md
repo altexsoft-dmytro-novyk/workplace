@@ -2,7 +2,7 @@
 
 Stage-1 scenario documents (AD-1) for story **ACF-1: Resolve Phase-0 Audiences**, following the pattern in [../README.md](../README.md). Contract: [SPEC-access-control-audience-foundation](../../../_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md).
 
-> **Approval status — read first.** These 8 files were **authored by an agent on 2026-08-30 and have NOT received human AD-1 approval.** The user instructed continuous execution instead of stopping at the gate; that instruction waives the pause, not the review. Nothing here is approved evidence until a human says so per file.
+> **Approval status — read first.** All 9 Stage-1 scenarios received AD-1 approval from Anna Pikula on 2026-08-30; each file carries its own `**Approved:**` marker. The translated E2E suite received round-2 approval the same day, on a walkthrough of its fixture, requests and assertions rather than a line read; the marker is at the top of `services/backend/test/access-control/audience-resolution.e2e-spec.ts`. Expected results still rest on the provisional mapping `self|reporting|pp → allow; colleague → deny` and change if User Management answers differently ([contract request](../../../_bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md)).
 
 ## Scope
 
@@ -54,10 +54,11 @@ This is an Access Control assumption, not an approved contract. If User Manageme
 | **Erin** | employee whose manager row points at a deactivated user |
 | **InactiveMgr** | Erin's manager, `isActive = false` — the broken edge |
 | **Frank** | InactiveMgr's manager (`direct`: InactiveMgr → Frank) — must not reach Erin through the broken node |
+| **CycleA / CycleB** | a reporting cycle the schema still accepts (`direct`: A → B and B → A) — resolution must terminate, not hang |
 
 ## Layout
 
 | Folder | Cases |
 | --- | --- |
 | [audience/](audience/) | ACF-AU-01..05 — Self, direct Reporting, transitive Reporting, direct PP, Colleague denial |
-| [fail-closed/](fail-closed/) | ACF-FC-01..03 — broken reports-to edge, PP HR-line withheld, empty bulk |
+| [fail-closed/](fail-closed/) | ACF-FC-01..04 — broken reports-to edge, PP HR-line withheld, empty bulk, cyclic reporting chain |

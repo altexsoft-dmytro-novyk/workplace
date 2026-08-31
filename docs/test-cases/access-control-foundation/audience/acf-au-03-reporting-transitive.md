@@ -2,6 +2,8 @@
 
 **Trace:** §2.1 relation 1 · §3.2 Reporting line · AD-10 · ACF-1
 
+**Approved:** Anna Pikula, 2026-08-30
+
 ## Scenario
 
 **Given** Alice reports to Bob and Bob reports to Carol, both through `Relationship type='direct'` rows, and Carol holds no direct edge to Alice.

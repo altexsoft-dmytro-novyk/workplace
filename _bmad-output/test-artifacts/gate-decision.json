@@ -1,0 +1,24 @@
+{
+  "schema_version": "0.1.0",
+  "evaluated_at": "2026-08-31T14:04:52.886179Z",
+  "repo": "people management",
+  "target": {
+    "type": "epic",
+    "id": "access-control-kernel-mvp",
+    "label": "Access Control Kernel MVP (ACM-0..ACM-9)"
+  },
+  "collection_status": "COLLECTED",
+  "gate_basis": "priority_thresholds",
+  "gate_status": "FAIL",
+  "rationale": "P0 coverage is 95% (required: 100%). 1 critical requirement(s) uncovered: ACM3-II-06.",
+  "p0_status": "NOT_MET",
+  "p1_status": "MET",
+  "overall_status": "MET",
+  "critical_open": 1,
+  "links": {
+    "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",
+    "trace_report_url": "",
+    "artifact_url": "",
+    "journey_evidence_url": ""
+  }
+}

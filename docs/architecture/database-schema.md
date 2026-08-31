@@ -18,6 +18,8 @@ erDiagram
   Department ||--o{ Project : "groups"
   User ||--o{ UserPolicies : ""
   Policies ||--o{ UserPolicies : ""
+  Policies ||--o{ PolicyPermissions : ""
+  Permissions ||--o{ PolicyPermissions : ""
   User ||--o{ UserEvents : "userId"
   User ||--o{ EmploymentStatus : "userId"
   User ||--o{ Departure : "userId"
@@ -192,27 +194,81 @@ Normal transition to `ended` requires `closureNote`; departure auto-close writes
 Policies {
   id         uuidv7 PK
   operator   '=='                 // policy-level IN deferred; do not add a set representation yet
-  targetType 'project' | 'department' | 'user' | ...
-  targetId   uuid                  // polymorphic — NO db-level FK, by design
+  targetType 'project' | 'department' | 'user' | ..., nullable
+  targetId   uuid, nullable        // polymorphic — NO db-level FK, by design
   targetRole string                // e.g. 'ac-manager', 'project-manager'
-  type       'AR' | 'FR'
+  type       'AR' | 'FR' NOT NULL
   managedBy  'sync' | 'admin'      // provenance; sync rows owned by integration only
 }
+CHECK: (type='FR' AND targetRole IS NOT NULL
+                  AND targetType IS NULL AND targetId IS NULL)
+    OR (type='AR' AND targetType IS NOT NULL AND targetId IS NOT NULL)
+UNIQUE: targetRole WHERE type='FR'
 ```
 
-- `targetId` has no FK because `targetType` selects the table. Consequences are accepted and handled: dangling ids fail closed on the AR path (zero joined members → zero grants); a periodic consistency sweep removes orphans; any resolution spanning the policy query plus a per-`targetType` lookup runs in **one transaction** (AD-10).
+- For FR rows, `Policies.id` is the stable `roleId`; the Kernel MVP seeds
+  exactly one FR role with `targetRole='hr-admin'`. `targetRole` identifies the
+  catalog row but is never an authorization predicate: evaluators join by ids.
+- FR rows are global and therefore carry no target sentinel. AR rows require
+  both target columns, with the database `CHECK` above enforcing the split.
+- The `CHECK` and partial FR role-key uniqueness use reviewed custom PostgreSQL
+  migration SQL, matching the repository's established raw-SQL constraint
+  pattern; the Prisma model alone does not express these guarantees.
+- For AR rows, `targetId` has no FK because `targetType` selects the table.
+  Consequences are accepted and handled: dangling ids fail closed on the AR
+  path (zero joined members → zero grants); a periodic consistency sweep
+  removes orphans; any resolution spanning the policy query plus a
+  per-`targetType` lookup runs in **one transaction** (AD-10).
 
 ### Permissions
 
 ```text
 Permissions {
   id          uuidv7 PK
-  title       string   // e.g. 'create-resourcing-requests', 'assign-mentors'
+  key         string UNIQUE   // immutable lowercase context:action
   description string
 }
 ```
 
-The granular feature list of §2.3 — each independently grantable.
+`key` is the canonical, case-sensitive `isAllowed` input. The public method
+accepts an open string constrained by lowercase `context:action` syntax, not a
+closed union of the MVP values. Keys are append-only identities: no writer may
+update one in place or bypass the Access Control-owned catalog mutation
+boundary. Unknown or differently-cased keys deny. The evaluator branches on
+no key.
+
+**MVP reduction:** the deploy-time permission catalog is seed/migration-owned,
+has no HTTP mutation surface, and contains exactly:
+
+- `user-management:create`
+- `user-management:deactivate`
+- `user-management:list`
+
+This three-row set does not replace or close the normative §2.3 catalog.
+
+### PolicyPermissions
+
+```text
+PolicyPermissions {
+  policyId     uuid
+  policyType   'FR' NOT NULL DEFAULT 'FR'
+  permissionId FK -> Permissions
+}
+PRIMARY KEY: (policyId, permissionId)
+INDEX: (permissionId, policyId)
+CHECK: policyType = 'FR'
+SUPPORT KEY: UNIQUE Policies(id, type)
+FOREIGN KEY: (policyId, policyType) -> Policies(id, type) ON DELETE RESTRICT
+ON DELETE: RESTRICT for the Permissions foreign key in the Kernel MVP
+```
+
+Normalized FR role-to-permission grants. The composite primary key prevents
+duplicate grants. The stored discriminator plus composite foreign key makes an
+AR-policy grant impossible at the database boundary; application validation is
+not the integrity mechanism. The discriminator `CHECK`, support key, and
+composite foreign key use reviewed custom PostgreSQL migration SQL. Restricting
+deletes avoids silently deciding the later role and permission deletion
+contract.
 
 ### UserPolicies
 
@@ -221,9 +277,136 @@ UserPolicies {
   userId   FK -> User
   policyId FK -> Policies
 }
+PRIMARY KEY: (userId, policyId)
 ```
 
 Attachment join — one policy row shareable across many users.
+
+### AccessControlBootstrap
+
+```text
+AccessControlBootstrap {
+  key                 string PK          // exactly 'root-hr-admin'
+  normalizedRootEmail string UNIQUE
+  rootUserId          FK -> User UNIQUE ON DELETE RESTRICT
+  policyId            FK -> Policies UNIQUE ON DELETE RESTRICT
+}
+CHECK: key = 'root-hr-admin'
+```
+
+Access Control owns this singleton as durable bootstrap provenance. It
+identifies the one seed-owned root attachment without classifying later
+administrator-created `hr-admin` attachments as bootstrap state.
+
+### Kernel MVP seed contract
+
+Before ACM-1, the deploy-time root User step **creates and validates** the root
+identity, so a fresh migrated database is satisfiable without an unnamed
+external prerequisite. It normalizes `ROOT_WORK_EMAIL` according to DEC-UM-007,
+**stores the normalized value** so storage is canonical, and ensures exactly one
+active User whose normalized `workEmail` equals it; unrelated active employees
+never affect that count. Exact-one eligibility counts **all** normalized matches
+first and checks active state only afterwards. The Kernel SPEC tracks it as
+CAP-8 and dispatches it as ACM-0, whose production entrypoint is
+`services/backend/prisma/seed.ts` (`npm run db:seed`); ACM-1's is
+`services/backend/src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts`
+wrapped by `services/backend/scripts/bootstrap-access-control.ts`
+(`npm run db:bootstrap:access-control`). Deployment order is `db:deploy` →
+`db:seed` → `db:bootstrap:access-control` → `start:prod`.
+
+> **Normalized uniqueness is writer-side, not database-enforced.**
+> `users_workEmail_key` is a plain unique index on the **raw** stored
+> `workEmail`. Canonical storage is what makes normalized uniqueness hold, so
+> every writer must store the normalized form. Pre-existing non-normalized rows
+> can still yield more than one normalized match; ACM-0 fails closed and never
+> repairs them. A unique functional index over the normalized value is a
+> migration on `users`, outside CAP-8's boundary, and is separately gated
+> deferred work.
+
+On a fresh database the ACM-1 seed is atomic and idempotent: exactly
+the three permission rows above, exactly one `hr-admin` FR policy, exactly its
+three `PolicyPermissions` grants, and exactly one `UserPolicies` attachment to
+that normalized root User. There are no other seed-owned default grants.
+Missing, blank, unmatched, ambiguous, inactive, or drifted root identity fails
+clearly and atomically; `position='HR Admin'`, first-user selection, and any
+other fallback are prohibited authorization rules.
+
+ACM-1 begins one database transaction and first acquires a transaction-scoped
+PostgreSQL advisory lock derived from
+`access-control:bootstrap:root-hr-admin`. While holding that common lock, it
+locks the singleton (if present), candidate User, and recorded attachment, then
+revalidates normalized email, exact-one active eligibility, singleton identity,
+and attachment identity before any bootstrap write and again before commit.
+The advisory lock covers first creation when no singleton/attachment row
+exists. Lock timeout fails atomically with actionable diagnostics.
+
+If normalized `ROOT_WORK_EMAIL` changes after bootstrap, the singleton proves
+conflicting bootstrap drift: the transaction fails and neither transfers nor
+duplicates the root attachment. Later administrator-created `hr-admin`
+attachments remain non-bootstrap state and are preserved.
+
+With **no** singleton row recorded, there is no provenance to contradict. ACM-1
+adopts an existing FR `hr-admin` policy by natural key (`targetRole='hr-admin'
+AND type='FR'`, after verifying `operator='=='`, `managedBy='admin'`, and null
+`targetType`/`targetId`), and adopts an existing `hr-admin` attachment **only
+when that attachment already belongs to the located root**, then writes the
+singleton. Attachments belonging to anyone else are neither adopted nor
+transferred; the located root receives its own attachment and the others remain
+non-bootstrap administrator state. A changed configured root in this state is
+adopted rather than rejected, because nothing recorded it before. More than one
+candidate root attachment is impossible — `UserPolicies` is keyed
+`(userId, policyId)`. The asymmetry is deliberate: **singleton absent permits
+adoption; singleton present forbids transfer.**
+
+FR role-key uniqueness is the **partial** index `UNIQUE targetRole WHERE
+type='FR'`, so an **AR** policy row carrying `targetRole='hr-admin'` is legal
+and is a different object. ACM-1's lookup and ACM-2's evaluation always filter
+`type='FR'`; that row is never adopted, mutated, counted toward cardinality, or
+reported as drift, and it is preserved. It can hold no grant — `PolicyPermissions`
+fixes `policyType='FR'` by `CHECK` and references `Policies(id, type)`
+compositely — and a `UserPolicies` row attaching a user to it is not an
+`hr-admin` functional-role attachment and is never bootstrap state.
+
+Reruns non-destructively ensure the bootstrap identities and exact bootstrap
+grants. Conflicting seed-owned drift fails before writes. The seed never
+deletes or rewrites non-bootstrap permissions, roles, grants, or attachments
+created under a later approved catalog contract.
+
+AD-20 due/departure eligibility is deferred from this Kernel MVP because the
+Departure persistence seam does not exist. The future dismissed-target
+projection remains unchanged. The narrow User prerequisite above authorizes no
+User Management API, CRUD, runtime role management, or other User Management
+feature work.
+
+**MVP reduction:** the Kernel MVP adds no `/roles` HTTP surface or permission
+mutation port. Runtime role administration and the complete §2.3 permission
+catalog remain future normative product work.
+
+### CAP-3 invariant coverage checklist
+
+ACM-1 Stage-1 scenarios and Stage-2 evidence must each cover **every** invariant
+below. Partial coverage is not a passing ACM-1.
+
+| # | Invariant | Observable rejection / assertion |
+| --- | --- | --- |
+| 1 | `Policies.type` non-null, restricted to `FR\|AR` | insert with null or a third value is rejected |
+| 2 | FR/AR row-shape `CHECK` | FR row with a target, or AR row without one, is rejected |
+| 3 | Partial unique index `targetRole WHERE type='FR'` | a second FR `hr-admin` row is rejected; an AR row with the same `targetRole` is accepted |
+| 4 | Unique support key `Policies(id, type)` | present, and referenced by the composite foreign key below |
+| 5 | `Permissions.key` unique and immutable | duplicate key rejected; in-place key update refused at the owned mutation boundary |
+| 6 | `PolicyPermissions` PK `(policyId, permissionId)` | duplicate grant rejected |
+| 7 | `policyType` non-null, default `FR`, `CHECK (policyType = 'FR')` | any other value rejected |
+| 8 | Restrictive composite FK `(policyId, policyType) → Policies(id, type)` | **AR-policy grant rejected at the database boundary** |
+| 9 | Restrictive FK `permissionId → Permissions.id` | grant referencing an unknown permission rejected |
+| 10 | Permission-first index `(permissionId, policyId)` | asserted by querying `pg_indexes` against the migrated database |
+| 11 | `UserPolicies` integrity — PK `(userId, policyId)`, FKs to `User` and `Policies` | attachment to an unknown user or policy rejected; duplicate attachment rejected |
+| 12 | `AccessControlBootstrap` — PK `key`, `CHECK (key = 'root-hr-admin')`, unique `normalizedRootEmail`, unique restricted `rootUserId`, unique restricted `policyId` | a second singleton, a wrong key, or a duplicate reference is rejected |
+| 13 | `ON DELETE RESTRICT` on all four functional-role-side foreign keys | deleting a granted permission, a granted policy, an attached user, or a singleton-referenced row is rejected |
+
+Invariant 10 is index **existence**, not a behavior the facade can return.
+Asserting it against `pg_indexes` on the migrated database is legitimate
+Stage-2 evidence, and is named here so the story cannot stall on how to observe
+an index.
 
 ## What is deliberately absent
 

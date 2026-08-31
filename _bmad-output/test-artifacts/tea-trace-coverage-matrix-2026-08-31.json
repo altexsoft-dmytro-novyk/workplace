@@ -1,0 +1,1676 @@
+{
+  "phase": "PHASE_1_COMPLETE",
+  "generated_at": "2026-08-31T14:03:51.104593Z",
+  "trace_target": {
+    "type": "epic",
+    "id": "access-control-kernel-mvp",
+    "label": "Access Control Kernel MVP (ACM-0..ACM-9)"
+  },
+  "collection_mode": "contract_static",
+  "collection_status": "COLLECTED",
+  "allow_gate": true,
+  "coverage_basis": "acceptance_criteria",
+  "summary_confidence": "high",
+  "oracle": {
+    "resolution_mode": "formal_requirements",
+    "confidence": "high",
+    "sources": [
+      "_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md",
+      "docs/test-cases/access-control-kernel/"
+    ],
+    "external_pointer_status": "not_used",
+    "synthetic": false
+  },
+  "requirements": [
+    {
+      "id": "ACM0-RU-01",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Fresh deploy creates one canonically stored active root",
+      "tests": [
+        {
+          "id": "ACM0-RU-01",
+          "file": "services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts",
+          "line": 100,
+          "title": "Fresh deploy creates one canonically stored active root",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM0-RU-02",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Unrelated active employees do not affect root eligibility",
+      "tests": [
+        {
+          "id": "ACM0-RU-02",
+          "file": "services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts",
+          "line": 114,
+          "title": "Unrelated active employees do not affect root eligibility",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM0-RU-03",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Blank root configuration fails before database mutation",
+      "tests": [
+        {
+          "id": "ACM0-RU-03",
+          "file": "services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts",
+          "line": 138,
+          "title": "Blank root configuration fails before database mutation",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM0-RU-04",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Unmatched configured identity fails without fallback adoption",
+      "tests": [
+        {
+          "id": "ACM0-RU-04",
+          "file": "services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts",
+          "line": 149,
+          "title": "Unmatched configured identity fails without fallback adoption",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM0-RU-05",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "All normalized matches counted before active state",
+      "tests": [
+        {
+          "id": "ACM0-RU-05",
+          "file": "services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts",
+          "line": 173,
+          "title": "All normalized matches counted before active state",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM0-RU-06",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Single inactive normalized match rejected, not reactivated",
+      "tests": [
+        {
+          "id": "ACM0-RU-06",
+          "file": "services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts",
+          "line": 202,
+          "title": "Single inactive normalized match rejected, not reactivated",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM0-RU-07",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Concurrent fresh-deployment seeds converge on one root User",
+      "tests": [
+        {
+          "id": "ACM0-RU-07",
+          "file": "services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts",
+          "line": 221,
+          "title": "Concurrent fresh-deployment seeds converge on one root User",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-01",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Seeds exactly the three canonical permission keys",
+      "tests": [
+        {
+          "id": "ACM1-FB-01",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 319,
+          "title": "Seeds exactly the three canonical permission keys",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-02",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Seeds one FR hr-admin policy carrying no target",
+      "tests": [
+        {
+          "id": "ACM1-FB-02",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 333,
+          "title": "Seeds one FR hr-admin policy carrying no target",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-03",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Grants exactly the three seeded permissions to the role",
+      "tests": [
+        {
+          "id": "ACM1-FB-03",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 360,
+          "title": "Grants exactly the three seeded permissions to the role",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-04",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Attaches the one root User and records provenance",
+      "tests": [
+        {
+          "id": "ACM1-FB-04",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 379,
+          "title": "Attaches the one root User and records provenance",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-05",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "A rerun over an undrifted database changes nothing",
+      "tests": [
+        {
+          "id": "ACM1-FB-05",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 400,
+          "title": "A rerun over an undrifted database changes nothing",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-06",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Creates no other role, attachment, or default grant",
+      "tests": [
+        {
+          "id": "ACM1-FB-06",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 422,
+          "title": "Creates no other role, attachment, or default grant",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-07",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "FR policy carries no target (paired with FB-02)",
+      "tests": [
+        {
+          "id": "ACM1-FB-07",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 333,
+          "title": "FR policy carries no target (paired with FB-02)",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-08",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Rejects malformed row shapes, null type, third type value",
+      "tests": [
+        {
+          "id": "ACM1-FB-08",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 441,
+          "title": "Rejects malformed row shapes, null type, third type value",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1-FB-09",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Rejects duplicate permission key, grant pair, attachment",
+      "tests": [
+        {
+          "id": "ACM1-FB-09",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 593,
+          "title": "Rejects duplicate permission key, grant pair, attachment",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-10",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Rejects 2nd FR hr-admin row; accepts AR row with same targetRole",
+      "tests": [
+        {
+          "id": "ACM1R-FB-10",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 484,
+          "title": "Rejects 2nd FR hr-admin row; accepts AR row with same targetRole",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-11",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Policies(id,type) support key + composite FK boundary",
+      "tests": [
+        {
+          "id": "ACM1R-FB-11",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 512,
+          "title": "Policies(id,type) support key + composite FK boundary",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-12",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Rejects grant to unknown permission; exposes permission-first index",
+      "tests": [
+        {
+          "id": "ACM1R-FB-12",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 634,
+          "title": "Rejects grant to unknown permission; exposes permission-first index",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-13",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Rejects attachment naming unknown user or unknown policy",
+      "tests": [
+        {
+          "id": "ACM1R-FB-13",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 662,
+          "title": "Rejects attachment naming unknown user or unknown policy",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-14",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "AccessControlBootstrap singleton constraints",
+      "tests": [
+        {
+          "id": "ACM1R-FB-14",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 692,
+          "title": "AccessControlBootstrap singleton constraints",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-15",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "ON DELETE RESTRICT on all four FR-side foreign keys",
+      "tests": [
+        {
+          "id": "ACM1R-FB-15",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 740,
+          "title": "ON DELETE RESTRICT on all four FR-side foreign keys",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-16",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Renamed canonical key: restore + preserve, no in-place update",
+      "tests": [
+        {
+          "id": "ACM1R-FB-16",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 784,
+          "title": "Renamed canonical key: restore + preserve, no in-place update",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-17",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "DEC-UM-007 normalization at lookup",
+      "tests": [
+        {
+          "id": "ACM1R-FB-17",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 826,
+          "title": "DEC-UM-007 normalization at lookup",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-18",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Common advisory lock blocks and times out",
+      "tests": [
+        {
+          "id": "ACM1R-FB-18",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 852,
+          "title": "Common advisory lock blocks and times out",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-19",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Rollback on deactivation inside the transaction window",
+      "tests": [
+        {
+          "id": "ACM1R-FB-19",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 899,
+          "title": "Rollback on deactivation inside the transaction window",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-20",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Absent-singleton adopts existing FR policy by natural key / refuses on drift",
+      "tests": [
+        {
+          "id": "ACM1R-FB-20",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 955,
+          "title": "Absent-singleton adopts existing FR policy by natural key / refuses on drift",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-21",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Absent-singleton adopts own attachment / never adopts others'",
+      "tests": [
+        {
+          "id": "ACM1R-FB-21",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1004,
+          "title": "Absent-singleton adopts own attachment / never adopts others'",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-22",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Absent-singleton adopts changed root when nothing recorded provenance",
+      "tests": [
+        {
+          "id": "ACM1R-FB-22",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1061,
+          "title": "Absent-singleton adopts changed root when nothing recorded provenance",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-23",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Singleton present + email drift fails atomically",
+      "tests": [
+        {
+          "id": "ACM1R-FB-23",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1094,
+          "title": "Singleton present + email drift fails atomically",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-24",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "AR hr-admin policy invisible to bootstrap",
+      "tests": [
+        {
+          "id": "ACM1R-FB-24",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1129,
+          "title": "AR hr-admin policy invisible to bootstrap",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-25",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Concurrent identical runs converge / concurrent conflicting runs fail atomically",
+      "tests": [
+        {
+          "id": "ACM1R-FB-25",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1182,
+          "title": "Concurrent identical runs converge / concurrent conflicting runs fail atomically",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-26",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Per-field drift: restore/preserve/fail per canonical field",
+      "tests": [
+        {
+          "id": "ACM1R-FB-26",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1234,
+          "title": "Per-field drift: restore/preserve/fail per canonical field",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-27",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Mid-transaction kill leaves no partial state",
+      "tests": [
+        {
+          "id": "ACM1R-FB-27",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1362,
+          "title": "Mid-transaction kill leaves no partial state",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM1R-FB-28",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "4th permission and later attachment survive rerun",
+      "tests": [
+        {
+          "id": "ACM1R-FB-28",
+          "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+          "line": 1430,
+          "title": "4th permission and later attachment survive rerun",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-01",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Inactive viewer at top of active chain -> empty set",
+      "tests": [
+        {
+          "id": "ACM3-II-01",
+          "file": "services/backend/test/access-control/acm3-inactive-identity.e2e-spec.ts",
+          "line": 146,
+          "title": "Inactive viewer at top of active chain -> empty set",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-02",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Inactive bridge stops traversal",
+      "tests": [
+        {
+          "id": "ACM3-II-02",
+          "file": "services/backend/test/access-control/acm3-inactive-identity.e2e-spec.ts",
+          "line": 164,
+          "title": "Inactive bridge stops traversal",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-03",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Inactive target below active manager -> empty set",
+      "tests": [
+        {
+          "id": "ACM3-II-03",
+          "file": "services/backend/test/access-control/acm3-inactive-identity.e2e-spec.ts",
+          "line": 182,
+          "title": "Inactive target below active manager -> empty set",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-07",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Repeat after viewer proof denies Reporting",
+      "tests": [
+        {
+          "id": "ACM3-II-07",
+          "file": "services/backend/test/access-control/acm3-cycle-acyclicity.e2e-spec.ts",
+          "line": 176,
+          "title": "Repeat after viewer proof denies Reporting",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-08",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Viewer herself inside the cycle is denied",
+      "tests": [
+        {
+          "id": "ACM3-II-08",
+          "file": "services/backend/test/access-control/acm3-cycle-acyclicity.e2e-spec.ts",
+          "line": 208,
+          "title": "Viewer herself inside the cycle is denied",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-09",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Absent manager edge is a clean end -> Reporting granted",
+      "tests": [
+        {
+          "id": "ACM3-II-09",
+          "file": "services/backend/test/access-control/acm3-termination-taxonomy.e2e-spec.ts",
+          "line": 142,
+          "title": "Absent manager edge is a clean end -> Reporting granted",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-10",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Inactive endpoint above proven viewer is a clean end",
+      "tests": [
+        {
+          "id": "ACM3-II-10",
+          "file": "services/backend/test/access-control/acm3-termination-taxonomy.e2e-spec.ts",
+          "line": 160,
+          "title": "Inactive endpoint above proven viewer is a clean end",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-11",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Inactive PP endpoint -> no direct-PP audience",
+      "tests": [
+        {
+          "id": "ACM3-II-11",
+          "file": "services/backend/test/access-control/acm3-inactive-pp-endpoint.e2e-spec.ts",
+          "line": 119,
+          "title": "Inactive PP endpoint -> no direct-PP audience",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-12",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Path-local visited state; shared ancestors not repeats",
+      "tests": [
+        {
+          "id": "ACM3-II-12",
+          "file": "services/backend/test/access-control/acm3-path-local-visited-state.e2e-spec.ts",
+          "line": 135,
+          "title": "Path-local visited state; shared ancestors not repeats",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-13",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Real infra failure propagates as thrown error",
+      "tests": [
+        {
+          "id": "ACM3-II-13",
+          "file": "services/backend/test/access-control/acm3-fail-closed-identity.e2e-spec.ts",
+          "line": 124,
+          "title": "Real infra failure propagates as thrown error",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-14",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Missing viewer/target id -> empty set, never Self/Colleague",
+      "tests": [
+        {
+          "id": "ACM3-II-14",
+          "file": "services/backend/test/access-control/acm3-fail-closed-identity.e2e-spec.ts",
+          "line": 165,
+          "title": "Missing viewer/target id -> empty set, never Self/Colleague",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-04",
+      "priority": "P0",
+      "coverage": "PARTIAL",
+      "criterion": "Empty target list -> empty map, zero relationship-graph-port calls",
+      "tests": [
+        {
+          "id": "ACF-FC-03",
+          "file": "services/backend/test/access-control/audience-resolution.e2e-spec.ts",
+          "line": 288,
+          "title": "Empty bulk resolves without touching the database (cross-mapped, pre-epic Phase-0 test id)",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-05",
+      "priority": "P0",
+      "coverage": "PARTIAL",
+      "criterion": "Duplicate targets AND duplicated viewer id collapse correctly; viewer id never reaches the graph port",
+      "tests": [
+        {
+          "id": "ACM4R-MA-04",
+          "file": "services/backend/test/access-control/acm4r-multi-audience.e2e-spec.ts",
+          "line": 296,
+          "title": "Duplicate TARGET id collapses to one key (cross-mapped; does not test a duplicated viewer-self id in the same call)",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM3-II-06",
+      "priority": "P0",
+      "coverage": "NONE",
+      "criterion": "A repeated node reached before viewer proof denies Reporting and falls to Colleague (TRACE-1: no test exists; a comment in acm3-termination-taxonomy.e2e-spec.ts incorrectly claims this is covered in acm3-cycle-acyclicity.e2e-spec.ts, which itself scopes to II-07/II-08 only)",
+      "tests": []
+    },
+    {
+      "id": "ACM4R-MA-01",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Reporting + direct PP both retained",
+      "tests": [
+        {
+          "id": "ACM4R-MA-01",
+          "file": "services/backend/test/access-control/acm4r-multi-audience.e2e-spec.ts",
+          "line": 252,
+          "title": "Reporting + direct PP both retained",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM4R-MA-02",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Confirmed active Self is exactly {self}",
+      "tests": [
+        {
+          "id": "ACM4R-MA-02",
+          "file": "services/backend/test/access-control/acm4r-multi-audience.e2e-spec.ts",
+          "line": 262,
+          "title": "Confirmed active Self is exactly {self}",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM4R-MA-03",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Colleague only when no stronger audience applies",
+      "tests": [
+        {
+          "id": "ACM4R-MA-03",
+          "file": "services/backend/test/access-control/acm4r-multi-audience.e2e-spec.ts",
+          "line": 274,
+          "title": "Colleague only when no stronger audience applies",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM4R-MA-04",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Duplicate target collapses to one key, cardinality preserved",
+      "tests": [
+        {
+          "id": "ACM4R-MA-04",
+          "file": "services/backend/test/access-control/acm4r-multi-audience.e2e-spec.ts",
+          "line": 297,
+          "title": "Duplicate target collapses to one key, cardinality preserved",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM4R-MA-05",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "FR permission never enters audience resolution",
+      "tests": [
+        {
+          "id": "ACM4R-MA-05",
+          "file": "services/backend/test/access-control/acm4r-multi-audience.e2e-spec.ts",
+          "line": 311,
+          "title": "FR permission never enters audience resolution",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM4R-MA-06",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "One mixed PostgreSQL fixture covers every CAP-2 audience class",
+      "tests": [
+        {
+          "id": "ACM4R-MA-06",
+          "file": "services/backend/test/access-control/acm4r-multi-audience.e2e-spec.ts",
+          "line": 322,
+          "title": "One mixed PostgreSQL fixture covers every CAP-2 audience class",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-01",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Live active FR grant for exact key -> true",
+      "tests": [
+        {
+          "id": "ACM2-IA-01",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 154,
+          "title": "Live active FR grant for exact key -> true",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-02",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Revocation is immediate",
+      "tests": [
+        {
+          "id": "ACM2-IA-02",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 159,
+          "title": "Revocation is immediate",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-03",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Inactive user denies",
+      "tests": [
+        {
+          "id": "ACM2-IA-03",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 172,
+          "title": "Inactive user denies",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-04",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Missing user -> false, not an error",
+      "tests": [
+        {
+          "id": "ACM2-IA-04",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 177,
+          "title": "Missing user -> false, not an error",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-05",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Unknown catalog key denies",
+      "tests": [
+        {
+          "id": "ACM2-IA-05",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 182,
+          "title": "Unknown catalog key denies",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-06",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Case-variant key denies",
+      "tests": [
+        {
+          "id": "ACM2-IA-06",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 187,
+          "title": "Case-variant key denies",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-07",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "AR cross-type collision never grants",
+      "tests": [
+        {
+          "id": "ACM2-IA-07",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 197,
+          "title": "AR cross-type collision never grants",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-08",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Nonmatching join denies",
+      "tests": [
+        {
+          "id": "ACM2-IA-08",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 202,
+          "title": "Nonmatching join denies",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-09",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "DB failure propagates, not false",
+      "tests": [
+        {
+          "id": "ACM2-IA-09",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 207,
+          "title": "DB failure propagates, not false",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM2-IA-10",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Empty key denies without invented short-circuit",
+      "tests": [
+        {
+          "id": "ACM2-IA-10",
+          "file": "services/backend/test/access-control/acm2-is-allowed.e2e-spec.ts",
+          "line": 192,
+          "title": "Empty key denies without invented short-circuit",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-01",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "S1 read for Self/Colleague only",
+      "tests": [
+        {
+          "id": "ACM5-SA-01",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 143,
+          "title": "S1 read for Self/Colleague only",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-02",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "S1 write for Reporting/PP",
+      "tests": [
+        {
+          "id": "ACM5-SA-02",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 151,
+          "title": "S1 write for Reporting/PP",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-03",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "S10 read for every Phase-0 audience",
+      "tests": [
+        {
+          "id": "ACM5-SA-03",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 161,
+          "title": "S10 read for every Phase-0 audience",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-04",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "S11 read for every Phase-0 audience",
+      "tests": [
+        {
+          "id": "ACM5-SA-04",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 175,
+          "title": "S11 read for every Phase-0 audience",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-05",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Merge precedence write > read > none",
+      "tests": [
+        {
+          "id": "ACM5-SA-05",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 189,
+          "title": "Merge precedence write > read > none",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-06",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Unsupported section -> none",
+      "tests": [
+        {
+          "id": "ACM5-SA-06",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 196,
+          "title": "Unsupported section -> none",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-07",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Missing target -> none",
+      "tests": [
+        {
+          "id": "ACM5-SA-07",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 203,
+          "title": "Missing target -> none",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-08",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Empty audience set -> none",
+      "tests": [
+        {
+          "id": "ACM5-SA-08",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 218,
+          "title": "Empty audience set -> none",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM5-SA-09",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Underlying DB error propagates",
+      "tests": [
+        {
+          "id": "ACM5-SA-09",
+          "file": "services/backend/test/access-control/acm5-section-access.e2e-spec.ts",
+          "line": 231,
+          "title": "Underlying DB error propagates",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM8-KC-01",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Facade resolves from real AppModule container",
+      "tests": [
+        {
+          "id": "ACM8-KC-01",
+          "file": "services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts",
+          "line": 63,
+          "title": "Facade resolves from real AppModule container",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM8-KC-02",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "ACCESS_CONTROL_PORT stays bound to InterimAccessControlAdapter",
+      "tests": [
+        {
+          "id": "ACM8-KC-02",
+          "file": "services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts",
+          "line": 77,
+          "title": "ACCESS_CONTROL_PORT stays bound to InterimAccessControlAdapter",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM8-KC-03",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "GET /users/:id behavior unchanged",
+      "tests": [
+        {
+          "id": "ACM8-KC-03",
+          "file": "services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts",
+          "line": 84,
+          "title": "GET /users/:id behavior unchanged",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM8-KC-04",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "No new HTTP/debug endpoint",
+      "tests": [
+        {
+          "id": "ACM8-KC-04",
+          "file": "services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts",
+          "line": 109,
+          "title": "No new HTTP/debug endpoint",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM8-KC-05",
+      "priority": "P0",
+      "coverage": "FULL",
+      "criterion": "Header comment corrected",
+      "tests": [
+        {
+          "id": "ACM8-KC-05",
+          "file": "services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts",
+          "line": 115,
+          "title": "Header comment corrected",
+          "level": "e2e",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM9-BASELINE",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Baseline PASS under ACM9-MVP-v1",
+      "tests": [
+        {
+          "id": "ACM9-BASELINE",
+          "file": "services/backend/test/measurement/acm9/acm9-baseline.measurement-spec.ts",
+          "line": null,
+          "title": "Baseline PASS under ACM9-MVP-v1 (artifact: _bmad-output/test-artifacts/performance/acm9-baseline-acm9-1788173258311-697e946d9f11.json)",
+          "level": "other",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    },
+    {
+      "id": "ACM9-FINAL",
+      "priority": "P1",
+      "coverage": "FULL",
+      "criterion": "Post-composition final PASS, comparable, no breach",
+      "tests": [
+        {
+          "id": "ACM9-FINAL",
+          "file": "services/backend/test/measurement/acm9/acm9-baseline.measurement-spec.ts",
+          "line": null,
+          "title": "Post-composition final PASS, comparable, no breach (artifact: _bmad-output/test-artifacts/performance/acm9-final-acm9-1788173458416-ff94a3e685d1.json)",
+          "level": "other",
+          "status": "active",
+          "skipped": false,
+          "pending": false,
+          "fixme": false
+        }
+      ]
+    }
+  ],
+  "coverage_statistics": {
+    "total_requirements": 81,
+    "fully_covered": 78,
+    "partially_covered": 2,
+    "uncovered": 1,
+    "overall_coverage_percentage": 96,
+    "priority_breakdown": {
+      "P0": {
+        "total": 64,
+        "covered": 61,
+        "percentage": 95
+      },
+      "P1": {
+        "total": 17,
+        "covered": 17,
+        "percentage": 100
+      },
+      "P2": {
+        "total": 0,
+        "covered": 0,
+        "percentage": 100
+      },
+      "P3": {
+        "total": 0,
+        "covered": 0,
+        "percentage": 100
+      }
+    }
+  },
+  "gap_analysis": {
+    "critical_gaps": [
+      {
+        "id": "ACM3-II-06",
+        "priority": "P0"
+      }
+    ],
+    "high_gaps": [],
+    "medium_gaps": [],
+    "low_gaps": [],
+    "partial_coverage_items": [
+      {
+        "id": "ACM3-II-04"
+      },
+      {
+        "id": "ACM3-II-05"
+      }
+    ],
+    "unit_only_items": []
+  },
+  "coverage_heuristics": {
+    "endpoint_gaps": [],
+    "auth_negative_path_gaps": [],
+    "happy_path_only_gaps": [],
+    "ui_journey_gaps": [],
+    "ui_state_gaps": [],
+    "counts": {
+      "endpoints_without_tests": 0,
+      "auth_missing_negative_paths": 0,
+      "happy_path_only_criteria": 0,
+      "ui_journeys_without_e2e": 0,
+      "ui_states_missing_coverage": 0
+    }
+  },
+  "live_evidence": {
+    "present": false,
+    "results_file": "",
+    "freshness": "not_present",
+    "recorded_source_sha": "",
+    "current_source_sha": "d3f4e8657a7a28832311f973b894ff587c025967",
+    "producer": "",
+    "counted": 0,
+    "stale": 0,
+    "unverifiable": 0,
+    "failed": 0,
+    "contradicted": 0,
+    "blocked": 0,
+    "skipped": 0,
+    "unmatched": 0,
+    "invalid": 0,
+    "requirements_live_only": 0
+  },
+  "live_records": [],
+  "test_inventory": {
+    "summary": {
+      "files": 14,
+      "cases": 99,
+      "skipped_cases": 0,
+      "fixme_cases": 0,
+      "pending_cases": 0
+    },
+    "note": "99 `it` cases across 13 e2e spec files plus 1 measurement spec file (run under two roles)."
+  },
+  "blockers": [
+    {
+      "id": "ACM3-II-06",
+      "severity": "high",
+      "reason": "No test exists for 'repeated node before viewer proof, viewer off-chain, falls to Colleague'; a comment in acm3-termination-taxonomy.e2e-spec.ts falsely claims coverage in acm3-cycle-acyclicity.e2e-spec.ts",
+      "test_file": "",
+      "test_title": "ACM3-II-06"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": "URGENT",
+      "action": "Add a committed-red-then-green Stage-2 test for ACM3-II-06 (repeated node before viewer proof, viewer off-chain) and correct the stale cross-reference comment in acm3-termination-taxonomy.e2e-spec.ts",
+      "requirements": [
+        "ACM3-II-06"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Complete coverage for 2 partially/cross-mapped requirements: add a canonical ACM-3 Stage-2 test for II-04 (or formally adopt ACF-FC-03 as its Stage-2 evidence in approvals.yaml) and extend the ACM4R-MA-04 test (or add a new one) to cover a duplicated viewer-self id alongside a duplicated target in one bulk call for II-05",
+      "requirements": [
+        "ACM3-II-04",
+        "ACM3-II-05"
+      ]
+    },
+    {
+      "priority": "LOW",
+      "action": "Run bmad-testarch-test-review to assess test quality",
+      "requirements": []
+    }
+  ]
+}

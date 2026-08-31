@@ -1,0 +1,1055 @@
+# AD-1 stage-approval ledger — Access Control Kernel MVP
+#
+# Append-only. A superseding decision is APPENDED; no entry is ever edited or
+# removed. This file is the persisted, independently verifiable form of the
+# AD-1 gate: a claim in a report that "a human approved this" is not an
+# approval, this record is.
+#
+# Schema — every entry carries all eight fields:
+#
+#   - story_id:      dispatch entry id from stories.yaml (e.g. "ACM-0-scenarios")
+#     stage:         stage-1-scenarios | stage-2-tests | stage-3-production
+#     repo:          workspace | services/backend
+#     artifact_path: path to the artifact, relative to THAT repo's root
+#     commit:        revision in THAT repo at which the artifact was read
+#     author:        who produced the artifact
+#     approver:      who approved it
+#     decision:      approved | rejected
+#     timestamp:     ISO-8601, e.g. 2026-09-01T14:03:00Z
+#
+# `repo` exists because this workspace spans two git repositories: planning
+# artifacts live here, while tests and production code live in the
+# `services/backend` submodule. A bare revision cannot say which one it belongs
+# to, and an approval nobody can resolve is not verifiable — the exact failure
+# this ledger was introduced to prevent.
+#
+# Two rules make the record enforceable rather than decorative:
+#
+#   1. author != approver. This is the persisted form of the
+#      no-self-certification rule in docs/architecture/testing-strategy.md.
+#   2. A dispatch may not start until the PRIOR stage's record exists and
+#      VERIFIES — `commit` resolves and `artifact_path` is present at that
+#      revision. An unverifiable record blocks the next stage exactly as a
+#      missing one does.
+#
+# Verify a record before relying on it — `repo` selects the working directory,
+# so the check is unambiguous:
+#   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
+#   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
+# A record whose commit does not resolve, or whose artifact_path is absent at
+# that commit, blocks the next stage exactly as a missing record does.
+#
+# Status: ACM-3-scenarios and ACM-1-scenarios stage-1-scenarios recorded
+# below. No other story has an approval yet, and no Stage-2 or Stage-3 record
+# exists for either — the next dispatch for each (ACM-3-red-tests /
+# ACM-1-red-tests) may proceed only after independently verifying its own
+# records below.
+
+approvals:
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-01-inactive-viewer-chain-top.md"
+    commit: "512dce5d73c56969a96ec4776ba032d087fe2eb4"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-30T22:04:19Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-02-inactive-bridge-stops-traversal.md"
+    commit: "512dce5d73c56969a96ec4776ba032d087fe2eb4"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-30T22:04:19Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-03-inactive-target-below-active-manager.md"
+    commit: "512dce5d73c56969a96ec4776ba032d087fe2eb4"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-30T22:04:19Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-04-exactly-one-root-attachment.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-05-rerun-seed-no-duplicates.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-06-no-other-role-attachment-or-grant.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-07-fr-policy-has-no-target.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-08-ar-fr-shape-violations-rejected.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-09-duplicate-keys-and-joins-rejected.md"
+    commit: "9c3b450"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T00:00:00Z"
+
+  - story_id: "ACM-4R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-01-reporting-and-pp-retained.md"
+    commit: "eed43516394775e6245c963e64c182742488ddc8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:14:16Z"
+
+  - story_id: "ACM-4R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md"
+    commit: "eed43516394775e6245c963e64c182742488ddc8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:14:16Z"
+
+  - story_id: "ACM-4R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-03-colleague-is-floor.md"
+    commit: "eed43516394775e6245c963e64c182742488ddc8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:14:16Z"
+
+  - story_id: "ACM-4R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-04-duplicate-target-does-not-duplicate-audiences.md"
+    commit: "eed43516394775e6245c963e64c182742488ddc8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:14:16Z"
+
+  - story_id: "ACM-4R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-05-fr-permission-excluded-from-audiences.md"
+    commit: "eed43516394775e6245c963e64c182742488ddc8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:14:16Z"
+
+  - story_id: "ACM-4R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-06-mixed-postgresql-fixture.md"
+    commit: "eed43516394775e6245c963e64c182742488ddc8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:14:16Z"
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-inactive-identity.e2e-spec.ts"
+    commit: "32a10bf7ce5412b7a16f317c9b54a10a994b9e0a"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:17:05Z"
+
+  - story_id: "ACM-0-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/root-user-prerequisite/acm0-ru-root-user-prerequisite.md"
+    commit: "09edd8ccf7ea6fa38a753d71fddacb7bec23c22b"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:29:10Z"
+
+  - story_id: "ACM-0-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm0-root-user-prerequisite.e2e-spec.ts"
+    commit: "66bb98910b4cf6939c04b9f75d091b1dc2b674da"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:40:25Z"
+
+  - story_id: "ACM-0-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "prisma/seed.ts"
+    commit: "60c548396fb5c8f576ae1e6477bde3a9bd1f712c"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:59:12Z"
+
+  # ACM-3 Stage-1 completion — ACM3-II-04 .. ACM3-II-14. These eleven records
+  # complete CAP-1 Stage-1 coverage alongside the three ACM3-II-01..03 records
+  # above. Two findings raised with these artifacts remain OPEN and are not
+  # settled by this decision: the stories.yaml / review F-6 claim that the
+  # after-viewer-proof grant is a widening (code-verified as false), and
+  # whether ACM3-II-13 belongs to CAP-1 at all. See the spec memlog.
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-04-empty-bulk-short-circuit.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-05-duplicate-targets-collapse-to-one-key.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-06-repeat-before-viewer-proof.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-07-repeat-after-viewer-proof.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-08-viewer-inside-the-cycle.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-09-absent-edge-is-a-clean-end.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-10-inactive-endpoint-after-viewer-proof.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-11-inactive-pp-endpoint.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-12-path-local-visited-state.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-13-infrastructure-error-propagates.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-3-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-14-missing-viewer-and-target.md"
+    commit: "e42fd2d111ecab7e4cbddb9680c47ecdfbc2edc9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:29:23Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-10-partial-fr-role-key.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-11-grant-type-separation-boundary.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-12-permission-fk-and-permission-first-index.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-13-userpolicies-referential-integrity.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-14-bootstrap-singleton-constraints.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-15-on-delete-restrict-four-foreign-keys.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-16-permission-key-immutability.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-17-dec-um-007-normalization-at-lookup.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-18-advisory-lock-and-timeout.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-19-revalidate-before-writes-and-before-commit.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-20-absent-singleton-adopts-existing-fr-policy.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-21-absent-singleton-attachment-adoption-and-preservation.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-22-absent-singleton-adopts-changed-root.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-23-singleton-present-email-drift-fails.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-24-cross-type-ar-hr-admin-preserved.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-25-concurrent-runs.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-26-per-field-drift-restore-preserve-fail.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-27-atomic-rollback-no-partial-state.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md"
+    commit: "6c77ad1"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:36:27Z"
+
+  - story_id: "ACM-1R-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm1r-fr-foundation.e2e-spec.ts"
+    commit: "506f7f8"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T03:55:29Z"
+
+  # ACM-3 Stage 2, second increment. The earlier ACM-3-red-tests record at
+  # 32a10bf approves acm3-inactive-identity.e2e-spec.ts and covers
+  # ACM3-II-01..03 only; it is not superseded. This record approves a separate
+  # suite covering ACM3-II-07 and ACM3-II-08, committed red at 6 of 6 failing.
+  # Together the two records are the Stage-2 basis for ACM-3-production. The
+  # remaining approved scenarios — ACM3-II-04, 05, 06, 09, 10, 11, 12, 13, 14 —
+  # still have NO Stage-2 record of their own.
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-cycle-acyclicity.e2e-spec.ts"
+    commit: "f6bbda375087b107a332a753c729c4a8dfc1399f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:11:39Z"
+
+  # ACM-3-production, second increment. The earlier ACM-3-production would
+  # have been the identity-validation change (9e69682); it was never recorded
+  # here because the memlog shows no stage-3-production record was written for
+  # it either. This is the reporting-walk change gated by the ACM-3-red-tests
+  # record immediately above (services/backend f6bbda3), making the cycle
+  # suite's 6 tests green: viewer proof is now provisional, and Reporting is
+  # denied for a target whose walked chain repeats a node, before or after
+  # that proof. Nine of fourteen approved CAP-1 scenarios still have no
+  # Stage-2 record of their own (see the memlog constraint at 108ca2e).
+
+  - story_id: "ACM-3-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/access-control/infrastructure/prisma-relationship-graph.adapter.ts"
+    commit: "5bdbc7580ffcc6a40bad7d2972f58ae7bb90ddef"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:21:20Z"
+
+  - story_id: "ACM-1R-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm1r-fr-foundation.e2e-spec.ts"
+    commit: "5b26e04"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:22:59Z"
+
+  - story_id: "ACM-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts"
+    commit: "436f3c6"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:22:59Z"
+
+  # ACM-3 Stage 2, third increment. Covers the ACM3-II-09 / ACM3-II-10
+  # termination-taxonomy pair (paired controls for the CAP-1
+  # chain-termination rule: an absent edge is a clean end, and so is a
+  # chain that ends at an inactive endpoint above a proven viewer). Both
+  # scenarios were already green against production before this suite was
+  # written — they are controls, not red tests — per the scenario docs'
+  # own "current vs required" framing. Remaining approved scenarios with no
+  # Stage-2 record of their own: ACM3-II-04, 05, 06, 11, 12, 13, 14.
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-termination-taxonomy.e2e-spec.ts"
+    commit: "568ffcda60769e67075b90f9d4b708ee395fabcf"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:42:30Z"
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-fail-closed-identity.e2e-spec.ts"
+    commit: "366e483a0a22fb5c4a87347b432571f43a528ef8"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:46:06Z"
+    # Provenance correction: ACM3-II-13 is an already-green propagation guard.
+    # ACM3-II-14 was added after identity production commit 9e69682 and is
+    # therefore post-hoc regression evidence, not committed-red evidence. The
+    # stable story_id/stage identify the dispatch; they do not rewrite history.
+
+  # ACM-3 Stage 2, fourth increment. Approves the ACM3-II-12 path-local
+  # visited-state integration coverage in the services/backend submodule.
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-path-local-visited-state.e2e-spec.ts"
+    commit: "e04a09c2410099b798da86ad4e11d8dbd3c7f160"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:47:13Z"
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-inactive-pp-endpoint.e2e-spec.ts"
+    commit: "e04a09c2410099b798da86ad4e11d8dbd3c7f160"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:47:04Z"
+    # Provenance correction: ACM3-II-11 was added after identity production
+    # commit 9e69682, so this is post-hoc regression evidence rather than a
+    # committed-red gate. The stable dispatch identifiers remain unchanged.
+
+  # ACM-4R Stage 2 — all six approved ACM4R-MA-01..06 contracts translated
+  # into one direct-facade PostgreSQL suite; 8/8 assertions pass green (a
+  # characterization result, no production code changed). Artifact commit
+  # 8b342ca is the final state (c5999b2 plus two doc-only review patches:
+  # Noah6 fixture-intent comment and per-describe contract-path links; no
+  # test logic changed between the two). This record unblocks
+  # ACM-4R-disposition.
+  - story_id: "ACM-4R-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm4r-multi-audience.e2e-spec.ts"
+    commit: "8b342ca28fc44fed860ac191240e17cbbf6c39dc"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T07:51:49Z"
+
+  # ACM-4R final disposition — explicit chat approval after independent Stage-2 evidence verification.
+  - story_id: "ACM-4R-disposition"
+    stage: "stage-4-disposition"
+    repo: "workspace"
+    artifact_path: "_bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml"
+    commit: "91715fa3b92937de5c15a72242dd9e208770587b"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:16:41Z"
+
+  # ACM-2 Stage 1 — explicit chat approval of all CAP-4 scenario contracts.
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-01-live-fr-grant-allows.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm2-is-allowed.e2e-spec.ts"
+    commit: "b53c03d"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:17:18Z"
+
+  - story_id: "ACM-2-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/access-control/application/access-control.facade.ts"
+    commit: "b20a238"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:19:36Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-02-revocation-is-immediate.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-03-inactive-user-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-04-missing-user-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-05-unknown-key-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-06-case-variant-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-07-ar-policy-never-grants.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-08-nonmatching-join-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-09-infrastructure-error-propagates.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  - story_id: "ACM-2-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-10-empty-key-denies.md"
+    commit: "d7c4041"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:11:31Z"
+
+  # ACM-5 Stage 1 — explicit human approval of all CAP-5 section-access contracts.
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-01-s1-self-or-colleague-read.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-02-s1-reporting-or-pp-write.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-03-s10-all-phase-zero-audiences-read.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-04-s11-all-phase-zero-audiences-read.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-05-strongest-merged-audience-wins.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-06-unsupported-section-returns-none.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-07-missing-target-returns-none.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-08-empty-audiences-return-none.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/section-access/acm5-sa-09-audience-resolution-error-propagates.md"
+    commit: "76fd7ccfd89588803d2cb2c5c084af438d0e64b3"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:28:48Z"
+
+  - story_id: "ACM-5-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm5-section-access.e2e-spec.ts"
+    commit: "d94d8d7c4b4e93b38a7b35a17031d75621ab6261"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T08:44:56Z"
+
+  - story_id: "ACM-5-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/access-control/application/access-control.facade.ts"
+    commit: "e594cbe5645b0aa824c38ce8287f56e7d10428de"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:15:31Z"
+
+  # ACM-8 Stage 1 — explicit chat approval of all five CAP-6 kernel-composition
+  # scenario contracts. Preconditions independently verified before dispatch:
+  # ACM-2-production, ACM-3-production, and ACM-5-production above are each
+  # approved and their commits resolve in services/backend; the most recent
+  # ACM-9 baseline evidence artifact
+  # (_bmad-output/test-artifacts/performance/acm9-baseline-acm9-1788145155301-b3e8f5a72e3f.json)
+  # has status: PASS under protocol_version ACM9-MVP-v1, matching the protocol
+  # this MVP uses.
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-01-facade-resolves-from-real-container.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  - story_id: "ACM-8-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-05-corrected-module-header-comment.md"
+    commit: "350050b6919311859c33c8acfe85b7699378b00f"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T09:45:00Z"
+
+  # ACM-8 Stage 2 — explicit chat approval of the CAP-6 kernel-composition red
+  # integration suite, run against real migrated PostgreSQL before approval:
+  # ACM8-KC-01 and ACM8-KC-05 fail for the expected reason (AccessControlFacade
+  # not yet resolvable from the real AppModule container; stale header comment
+  # not yet corrected). ACM8-KC-02/03/04 are already-green regression controls
+  # in the same file, proving ACCESS_CONTROL_PORT, GET /users/:id, and the
+  # route surface are unaffected. No production code changed.
+  - story_id: "ACM-8-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm8-kernel-composition.e2e-spec.ts"
+    commit: "7f545f8a27bfd9948be1099c3e955a17babbaba9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T10:05:00Z"
+
+  # ACM-8 Stage 3 — explicit chat approval of the CAP-6 kernel-composition
+  # production change: AppModule imports AccessControlModule and the stale
+  # header comment is corrected. All 5 ACM8-KC tests in the approved Stage-2
+  # suite go green (was 2 red / 3 green). Regression check: full
+  # test/user-management + test/access-control run compared before/after via
+  # stash — 33 failed/5 suites before, 31 failed/4 suites after, exactly the
+  # 2 ACM-8 tests flipping; the remaining 31 pre-existing failures
+  # (unrelated, not-yet-built /users/:id/relationships route) are identical
+  # in both runs. No User Management file, route, or test changed.
+  - story_id: "ACM-8-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/app.module.ts"
+    commit: "d2335907a33ece9452dff9a6663ec85d75cf71a9"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T10:25:00Z"
