@@ -83,3 +83,19 @@ technical ones underneath that verdict.
   status: accepted P6 finding; requires a separate follow-up story
   summary: Add database timeout headroom below the outer two-second request budget and define PostgreSQL `statement_timeout` error classification.
   evidence: The approved P6 PostgreSQL measurement found no valid acyclic shape over budget: 500 balanced targets had a warm p95 of 41.790 ms, and the valid depth-499 chain had a warm p95 of 161.165 ms. The separate timeout probe showed the outer budget firing first at 2001.103 ms; PostgreSQL cancellation arrived later at 2006.536 ms (database-only probe: 2054.437 ms, SQLSTATE 57014). The follow-up must choose explicit headroom, preserve fail-closed behavior, distinguish database cancellation from outer request timeout, and add error-classification coverage. P6 must not change Access Control production behavior; its opt-in benchmark and Markdown/JSON reports remain the reproducible baseline.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: CAP-2 multi-audience resolution has no Stage-1/Stage-2 evidence for an inactive viewer or inactive target inside `resolveAudiences` — only the ACM-3 reporting-chain identity path covers inactive personas, not audience derivation.
+  evidence: Both the blind-hunter and edge-case-hunter review layers on the ACM4R-MA-01..06 e2e suite independently flagged that every fixture persona defaults `isActive: true` and no scenario exercises the inactive branch; real behavior (error vs empty vs Colleague floor) is unverified against Postgres.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: `AccessControlFacade.resolveAudiences` has no committed evidence for a non-existent viewer id or target id — the error-vs-empty-map contract for unknown ids is unspecified and untested.
+  evidence: Blind-hunter review of the ACM4R-MA-01..06 suite found no scenario for unknown/missing ids; the six approved Stage-1 contracts don't cover it either, so it needs its own scenario approval before a test can be written.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: FR-separation (ACM4R-MA-05/06) only proves one active FR-type policy/permission/grant doesn't leak into audience resolution; other policy types or a revoked/expired grant are unproven.
+  evidence: Blind-hunter review noted the suite covers exactly one FR shape (active FR policy via UserPolicy); no scenario exists for AR-type policies or an expired/revoked grant reaching resolveAudiences.
+
+- source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/stories/ACM-4R-tests-stage-2-real-postgresql-cap-2-evidence.md`
+  summary: The shared e2e fixture/cleanup pattern (used by acm3-inactive-identity.e2e-spec.ts and now acm4r-multi-audience.e2e-spec.ts) hardcodes fixture fields (country/city/position) and does not wrap `afterAll` teardown in try/catch or `Promise.allSettled`, so a mid-teardown failure silently skips later cleanup steps.
+  evidence: Blind-hunter review flagged this on the new file, but it is an inherited convention already present in the pre-existing ACM-3 pattern this story was instructed to follow, not a defect introduced by this dispatch — a shared test-infra hardening candidate.
