@@ -47,4 +47,5 @@ Once User Management supplies the integration contract, independently approved H
 ## Open Questions
 
 - Which User Management-owned endpoint and exact response contract will consume the facade for the required HTTP E2E scenarios?
-  Asked of the owner on 2026-08-30 as six answerable rows in `../../implementation-artifacts/access-control/um-integration-contract-request.md`; this foundation stays at design-ready until they are answered.
+  Asked of the owner on 2026-08-30 as six answerable rows in `../../implementation-artifacts/access-control/um-integration-contract-request.md`.
+  **Resolved 2026-08-31:** answered in `../../implementation-artifacts/access-control/um-integration-contract-response.md`. The consuming routes are `GET /users/:id`, `PATCH /users/:id`, and `PUT /users/:id/photo` (unchanged), the seam is the `ACCESS_CONTROL_PORT` binding in `user-management.module.ts`, and the response body stays the whole `User` row (audience-gated, not field-gated) until the separate Profile Projection story lands. Production rebind, per-route mapping, and the real-consumer HTTP E2E are owned by `../spec-user-management-access-control-adoption/`. This foundation and `spec-access-control-facade-audience-resolution` still require their own independently approved Stage-1 scenarios and Stage-2 red E2E before production code.

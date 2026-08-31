@@ -1,10 +1,24 @@
 # Epic 2 Context: Magic-Link Authentication
 
-<!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
+<!-- Regenerated 2026-09-01 from epics.md v1.5 — supersedes the pre-v1.5 version; NOT an AD-1 approval. -->
+<!-- Compiled planning context for a future story-authoring / dev pass. NOT an AD-1 stage-1 scenario doc. -->
 
 ## Goal
 
-Any employee created in Epic 1 can request a magic link sent to their work email and consume it to log in, establishing the session every other epic's protected endpoints rely on. This is its own resource — an `/auth` root plus a distinct token entity/service — with no file overlap with Epic 1's `User` resource. Per the Epic Sequencing section of `epics.md` (NORMATIVE, project-requirements.md §8.2: "a situation where one person waits for another is unacceptable"), Epic 1 and Epic 2 can be built in parallel by two different developers: Epic 2's flow needs a `User` row to exist, not Epic 1's `POST /users` controller working end to end.
+Any active employee in the imported population can request a magic link sent to
+their `workEmail` and consume it to establish the session every other epic's
+protected endpoints rely on. Own resource — `/auth` root, distinct token
+entity/service, no file overlap with Epic 1's `/users` resource. Epic 1 and
+Epic 2 build in parallel: Epic 2's flow needs a `User` row to exist, seeded
+directly via Prisma or the import script (AD-3), not Epic 1's HTTP surface.
+
+**New in v1.5 scope:** Epic 2 also **owns retiring the interim session
+resolver** (`interim-session-resolver.adapter.ts`) — it supplies the real
+session issuance/resolution adapter behind `session-resolver.port.ts`. Epic 0
+(Access Control adoption) keeps the interim resolver and uses its
+`Bearer <token:<seeded-uuid>>` convention for fixtures; AD-21's clause about the
+interim adapter authorizing target access refers to the *access-control*
+adapter, retired by Epic 0 — not the session resolver.
 
 ## Stories
 
@@ -13,34 +27,79 @@ Any employee created in Epic 1 can request a magic link sent to their work email
 
 ## Requirements & Constraints
 
-- No password is ever requested or stored (FR-2) — the magic link is the sole login mechanism. Neither `/auth` endpoint's request or response body ever carries a password/credential field.
-- `POST /auth/magic-link` must return the identical `200` body shape (e.g. `{ sent: true }`) whether or not the submitted email matches a `User` row — an account-enumeration guard. For a non-matching email, no email is actually dispatched, which must be asserted against the email-adapter fake at stage 2, not just inferred from the response body.
-- `POST /auth/magic-link/consume`: a valid, unexpired token returns `200` with a session/access token scoped to that user, and that session must succeed on a genuine follow-up authenticated request (e.g. `GET /users/<id>`). An expired token, or a token already consumed once (by anyone), returns `401` with no session token anywhere in the body — consumed tokens are not replayable.
-- Registration's "does not auto-login" contract (Story 1.1 AC3) and this epic's consume flow together complete the account lifecycle: creation and login are separate acts, and neither may imply the other.
-- Domain code imports nothing from Prisma, NestJS transport, or HTTP (AD-2/AD-5) — same rule as Epic 1.
-- Every entitlement check goes through the shared `AccessControl` facade, never inline role/policy logic. Both `/auth` endpoints are unauthenticated-by-design, so this mostly binds the *follow-up* authenticated request in `um-auth-03` (which must resolve through real access resolution, not a fake — testing-strategy.md), not the two `/auth` endpoints' own bodies.
-- NFR-3 (external integration failures degrade gracefully) applies to the email-dispatch adapter: a delivery failure must not crash the request or leak an account-existence signal.
-- NFR-1: pseudonymised data only — no real personal data in fixtures, logs, or the repo.
-- **Parallel-build clause**, restated because it is binding on how this epic's own tests are built: Epic 2's test module seeds its precondition `User` row directly via Prisma, not through Epic 1's `POST /users` controller (AD-3: stage-2 E2E tests bind against fixture-seeded data in the real test DB, not another epic's live HTTP endpoint). See "Existing E2E test file" under Cross-Story Dependencies below — the test file that already exists does not currently follow this.
+- No password is ever requested, stored, or returned (FR-2) — the magic link is
+  the sole login mechanism. No SSO, no AD (§4.17, §10).
+- `POST /auth/magic-link` returns the identical `200` body shape (e.g.
+  `{ sent: true }`) whether or not the email matches a `User` — account-
+  enumeration guard. For a non-matching email, **zero** dispatch, asserted
+  against the email-adapter fake at stage 2 (DEC-UM-004).
+- **DEC-UM-012 (proposed, treat as draft):** a deactivated user's `workEmail` is
+  treated identically to an unknown email — `200`, same shape, zero dispatch.
+- `POST /auth/magic-link/consume`: a valid, unexpired, unconsumed token → `200`
+  with a session token scoped to the user, and that session succeeds on a real
+  follow-up authenticated request (`GET /users/:id`, resolved through **real**
+  access resolution — Epic 0's adapter — not a fake). Expired or
+  already-consumed token → `401`, no session token in the body (DEC-UM-004,
+  single-use).
+- **Departure interaction (FR-6):** once a departure effective date has passed
+  and the account is inactive, no usable session is established — the request
+  stays enumeration-safe and a pre-departure token fails at consume
+  (`um-auth-06`).
+- First login uses the same magic-link flow (FR-3) — completing seed/import does
+  **not** establish a session, and there is no separate invite/registration
+  path.
+- Domain code imports nothing from Prisma, NestJS transport, or HTTP (AD-2/AD-5).
+- Every entitlement check goes through the `AccessControl` facade; the two
+  `/auth` endpoints are unauthenticated-by-design, so this mostly binds the
+  follow-up authenticated request in `um-auth-03`.
+- NFR-1 pseudonymised data only; NFR-3 email-dispatch failure must not crash the
+  request or leak an account-existence signal.
 
 ## Technical Decisions
 
-- Router shape: own `/auth` root — `POST /auth/magic-link`, `POST /auth/magic-link/consume`. No shared files with Epic 1's `/users` resource.
-- **A distinct token entity/service, not yet defined in the schema.** No `MagicLinkToken`-shaped model exists today in `services/backend/prisma/schema.prisma` or in `docs/architecture/database-schema.md` — this epic introduces it. Proposed shape, following the project's own audit-column discipline (no speculative fields, `database-schema.md` Conventions): `id` (uuidv7 PK), `userId` (FK -> `User`), `token` (unique), `expiresAt`, `consumedAt` (nullable — presence marks the token spent, giving single-use for free without a separate boolean), `createdAt`. This needs architect confirmation before or during Story 2.1's stage 1 (see Ask First below) since it isn't in `database-schema.md` yet.
-- Hexagonal layout mirrors Epic 1: `application/` (actions, controllers, DTOs), `domain/` (interfaces, services, entities), `infrastructure/` (Prisma repository, email adapter). Domain imports nothing from Prisma, NestJS transport, or HTTP.
-- Email dispatch goes through an outbound port. Story 1.1 already defined this port's shape and bound only a fixture-backed fake to it (`services/backend/src/user-management/domain/interfaces/magic-link-dispatcher.port.ts`, per `epic-1-context.md` Cross-Story Dependencies) — this epic supplies the real adapter behind that same port, and both epics' own E2E suites keep rebinding it to a fixture-backed fake per AD-3/`nestjs-di-tokens.md`.
-- Session issuance: Story 1.1 also defined and faked a `session-resolver.port.ts`, explicitly deferring "real session issuance" to this epic (`spec-1-1-hr-admin-registers-a-new-hire.md`'s Boundaries & Constraints, Never list). This epic is where that port's real adapter is expected to land.
+- Router: own `/auth` root — `POST /auth/magic-link`,
+  `POST /auth/magic-link/consume`. No shared files with `/users`.
+- **A distinct token entity/service, not yet in the schema.** No
+  `MagicLinkToken`-shaped model exists in `prisma/schema.prisma` or
+  `database-schema.md`. Proposed shape (audit-column discipline): `id`
+  (uuidv7 PK), `userId` (FK → `User`), `token` (unique), `expiresAt`,
+  `consumedAt` (nullable — presence marks the token spent), `createdAt`.
+  **Ask First:** confirm/add this shape to `database-schema.md` before Story
+  2.1's stage 1 (its own rule: deviations go through the architect).
+- Email dispatch goes through an outbound port (`magic-link-dispatcher.port.ts`,
+  defined by Story 1.1's era but now owned here for the real adapter — AD-15:
+  email delivery is a legitimately-faked *external* integration in E2E, but the
+  **real adapter is Epic 2's own deliverable**, pointed at real local infra via
+  env, not a dev-infra container).
+- Session issuance: the real adapter behind `session-resolver.port.ts` lands
+  here, replacing `interim-session-resolver.adapter.ts` in the same cutover
+  (AD-21).
 
 ## Ask First
 
-- **Bounded-context placement of `/auth`/magic-link code is unresolved — do not decide unilaterally.** `docs/architecture/domain-driven-design.md`'s "Confirmed so far" list is `user-management`, `access-control`, `dashboards`; its "Pending confirmation" list is `profile`, `resourcing`, `cds`, `mentorship`, `risk`, `feedback`, `campaigns`. Neither list names an `auth` context at all — the document simply does not resolve this. Two signals point toward placing this epic's code inside `user-management` alongside Epic 1 rather than as a new context: the existing (test-only) E2E file lives at `test/user-management/auth.e2e-spec.ts`, and the scenario docs live under `docs/test-cases/user-management/auth/`. But a file-path convention is not the same as an architectural confirmation, and `epics.md`'s "Own resource (`/auth` root, distinct token entity/service) — no file overlap with Epic 1" is compatible with either "its own subtree inside `user-management`" or "its own bounded context." Confirm with the architect before Story 2.1's stage 1 lands, and update `domain-driven-design.md`'s context list either way once resolved — don't invent a new context (or silently assume `user-management`) without that confirmation.
-- **No token entity is defined anywhere in `docs/architecture/database-schema.md`.** The Technical Decisions section above proposes a shape; get it confirmed/added to `database-schema.md` (its own stated rule: "deviations go through the architect") rather than finalizing it silently during implementation.
+- **Bounded-context placement of `/auth` code is unresolved.**
+  `domain-driven-design.md` names no `auth` context. File-path convention
+  (`test/user-management/auth.e2e-spec.ts`,
+  `docs/test-cases/user-management/auth/`) points toward `user-management`, but
+  that is not an architectural confirmation. Confirm with the architect before
+  Story 2.1's stage 1 and update `domain-driven-design.md` either way.
+- Token entity shape — confirm/add to `database-schema.md`.
 
 ## Cross-Story Dependencies
 
-- Story 2.2 depends on Story 2.1 only in the ordinary sense that a token must be issued (2.1's endpoint) before it can be consumed (2.2's endpoint) — there is no shared file/module boundary concern, since both live under the same `/auth` root and token entity/service regardless of which bounded context that ends up being.
-- Story 2.2's success case (`um-auth-03`) is the other half of Story 1.1's "registration does not auto-login" contract (AC3) — call out that pairing in Story 2.2's own Intent, not only here.
-- **Existing E2E test file found on the backend submodule's separate git branch `user-management` (commit `865df5f`), NOT in the current working tree.** `test/user-management/auth.e2e-spec.ts` covers `um-auth-01..05` (`01`/`02` → Story 2.1; `03`/`04`/`05` → Story 2.2) and its `createUser` helper does chain a real `POST /users` request for the precondition user. It exists ahead of any production code (this is a stage-2-only commit — no `src/user-management/**` implementation exists on that branch yet) and should be **reconciled/extended, not recreated**. Reading it closely surfaced three things to fix while doing so — see each story's own Code Map for exact locations:
-  1. Its `createUser` helper creates the precondition `User` row via a real `POST /users` HTTP call (Epic 1's controller, gated behind `Bearer <token:Root>`), not `prisma.user.create(...)` directly. This re-couples Epic 2's suite to Epic 1's live controller, contrary to this epic's own parallel-build clause above. `registration.e2e-spec.ts`'s own bootstrap-user creation (a direct `prisma.user.create` call, self-referencing `createdBy`) is the pattern to match instead. This is not blocked on the `/auth`-bounded-context question above — it's a fix to the test's setup helper either way.
-  2. `um-auth-02`'s test block only asserts `body.sent === true`; it is missing the assertion against the email-adapter fake that zero dispatch calls occurred for the unmatched address, even though both `docs/test-cases/user-management/auth/um-auth-02-request-magic-link-unknown-email.md` and `epics.md`'s AC for Story 2.1 require it ("no email is actually dispatched, asserted against the email-adapter fake").
-  3. `um-auth-03/04/05` never call `POST /auth/magic-link` to mint a real token for the user each block creates — they submit a bare literal placeholder straight to `/consume`. Per the backend branch's own `.claude/rules/nest-e2e.md` precondition rule: a precondition producible through an in-suite endpoint must be produced by a real request, and only the resulting *value* — if genuinely HTTP-unobservable — stays a literal placeholder, and only "until that seam exists (e.g. a fake email adapter in a later stage)." That seam (the email-adapter fake) is exactly what Story 2.1 already needs to bind for its own `um-auth-02` assertion (point 2 above), so it is available by the time Story 2.2 is implemented — the fake can capture and expose the token it was asked to send, or the test can read the minted row back via the `prisma` handle already injected in the test class (the same direct-DB-read pattern `registration.e2e-spec.ts` uses for its own assertions). `um-auth-04`'s scenario doc additionally calls for an explicit **stateChange** step (backdating a real issued token's `expiresAt`) that the current test performs nowhere. This is genuinely different from `um-reg-05`'s placeholder precedent, which only proves a port was *called*, never consumes the value it returns — Story 2.2's tests need to consume the value to complete the flow under test.
+- Story 2.2 depends on Story 2.1 only in that a token must be minted before it
+  can be consumed.
+- Story 2.2's `um-auth-03` is the other half of Story 1.1's "seed/import does not
+  auto-login" contract.
+- An existing stage-2-only E2E file (`test/user-management/auth.e2e-spec.ts`,
+  audited at submodule branch `dn-um-2` HEAD `e9d80ec` — see
+  `_bmad-output/test-artifacts/e2e-actual-state-audit-2026-09-01.md`) covers
+  `um-auth-01..06` but **404s today** because the `POST /auth/magic-link`
+  routes are not built. It should be **reconciled/extended, not recreated**.
+  Known fixes to make while doing so: (1) its `createUser` helper chains a real
+  `POST /users` (a now-retired route) — replace with a direct `prisma.user.create`
+  / import-script seed; (2) `um-auth-02` is missing the zero-dispatch assertion
+  against the email-adapter fake; (3) `um-auth-03/04/05` never mint a real token
+  — they must
+  call `POST /auth/magic-link` (or read the minted row via the injected
+  `prisma` handle), and `um-auth-04` needs an explicit backdate of `expiresAt`.

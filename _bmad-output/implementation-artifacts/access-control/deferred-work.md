@@ -31,6 +31,10 @@ independently shippable deliverable; none is authorized by the current spec.
   summary: List, filter, export, and search projection — apply section and field-level access rules to every non-profile surface.
   evidence: Split from the Access Control build intent. §3.3.1 projection is a separate cross-cutting surface with its own leak-negative suite and the §7 2-second / 500-record budget; it consumes the facade rather than defining it.
 
+- source_spec: docs/architecture/mentorship.md
+  summary: S13 `canAccessSection` support — extend `AccessControlFacade.canAccessSection` to answer `section='S13'` for the §3.2 S13 matrix cells (Self `R (pairs)` / `RW (own flag)`; Reporting line, Project line, PP `RW`; Colleague `—`).
+  evidence: ACM-5 shipped `'S1'`/`'S10'`/`'S11'` only; every other string returns `'none'`. The `mentorship` context (`docs/architecture/mentorship.md` §5.3, Decision 3) needs the S13 base read decision for the inline profile summary (FR-M17), the `GET /mentorship-pairs[/:id]` row visibility, and as the base the FR-M10 closure-note projection narrows. This is the same class of gap as the S9 career-timeline `canAccessSection` gap. Recommended: a new three-stage AD-1 increment in the Access Control package adds `'S13'`; the closure-note narrowing stays mentorship-owned via `resolveAudiences` (a projection contract that only narrows, never reads policy tables). Interim alternative: mentorship runs a `resolveAudiences`-derived rule with a `// INTERIM` comment and the expiry trigger "replace with `canAccessSection('S13', …)` when this increment reaches stage-3-production." This belongs to Access Control (it owns the matrix→section projection), not a mentorship-owned spec — mentorship must not read the tier→section mapping itself. Blocks mentorship Story 1.4 (closure-note projection) and Story 1.5 (S13 inline narrowing) stage-2.
+
 - source_spec: `_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md`
   status: named residual risk of the 2026-08-30 Kernel MVP P2 repair; requires a separately gated story
   summary: Database-enforced normalized `workEmail` uniqueness — today the guarantee is writer-side only.

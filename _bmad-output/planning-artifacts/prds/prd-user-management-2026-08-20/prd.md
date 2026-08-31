@@ -2,14 +2,25 @@
 title: User Management — PRD
 status: draft
 created: 2026-08-20
-updated: 2026-08-29
+updated: 2026-09-01
 ---
 
 # User Management — PRD
 
+> **Reconciled 2026-09-01** (sprint-change-proposal-2026-09-01-user-management-access-control-alignment).
+> The v1.5 BA alignment of this PRD was applied by the 2026-08-29 correct course
+> and is not re-litigated here. This pass folds in two deltas only: (a) the
+> **Access Control adoption** contract now that the Kernel MVP is built but
+> headless, and (b) **kernel-reality constraints** on the seed/import and S1
+> write paths (ACM-0/DEC-UM-007 canonical-at-write, DEC-UM-009, the §2.2 dual
+> gate, the CC-07 journal gate). Nothing here is approved; regenerated
+> downstream artifacts are `draft`.
+
 ## Scope
 
 Covers the `user-management` bounded context: the `User` identity record, seeded-population import, self-service S1 operations, magic-link authentication, organisational facts, the `UserEvents` career-timeline log (§4.9), and temporal employment status/departure (§4.16). There is no registration endpoint, AD, SSO, or generic employee-deactivation product operation.
+
+**Access Control adoption seam.** Every `user-management` controller authorizes through the real `AccessControlFacade` via the `ACCESS_CONTROL_PORT` binding in `user-management.module.ts` — never a direct policy-table read or role flag (AD-9). The Kernel MVP composes `AccessControlModule` into `AppModule` (ACM-8) but the port is still bound to `InterimAccessControlAdapter`; replacing it with a real facade-backed adapter in `src/user-management/infrastructure/` and deleting the interim adapter in the same cutover (AD-21) is a User Management-owned slice — see FR-7 and the authoritative contract `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md`.
 
 Explicitly out of scope for this PRD:
 - **Timetracker integration** — separate bounded context; §5.1 provides leaves and project membership for display and access resolution.
@@ -18,6 +29,10 @@ Explicitly out of scope for this PRD:
 - Mentorship workflow and pair persistence — future `mentorship` bounded context. It owns durable active/ended pairs, closure notes, availability, and departure auto-close. User Management receives only the resulting `mentorship_start`/`mentorship_end` career events through an approved cross-context application boundary.
 
 ## Data Model — User entity
+
+**Identity is canonical at write (DEC-UM-007, reconciled to kernel reality).** `workEmail` is trimmed and lowercased before validation, storage, lookup, and uniqueness comparison. The value is **stored normalized** so storage itself is canonical; the DB `users_workEmail_key` index is on the raw stored value, so normalized uniqueness is a **writer-side** guarantee and a database-enforced functional unique index is separately gated deferred work (`_bmad-output/implementation-artifacts/access-control/deferred-work.md`). The seed/import writer, not just the lookup path, applies this normalization (previously the seed stored `ROOT_WORK_EMAIL` verbatim).
+
+**Root User already exists before import (ACM-0 / DEC-UM-009).** `npm run db:seed` (the ACM-0 deploy-time step) creates exactly one active root `User` whose normalized `workEmail` equals the normalized `ROOT_WORK_EMAIL`, before the Access Control bootstrap and before Story 1.1's population import run. An import that covers the root person **reuses that existing root `User` id** — no writer inserts a second row for a normalized email that already exists, active or inactive (DEC-UM-009). Deployment order is `db:deploy` → `db:seed` → `db:bootstrap:access-control` → `start:prod`.
 
 One `User` record per person. Field list extracted from §3.2 (S1 Identity card) of [project-requirements.md](../../../../../docs/project-requirements.md), adjusted through discussion:
 
@@ -48,7 +63,7 @@ One `User` record per person. Field list extracted from §3.2 (S1 Identity card)
 
 ## Data Model — UserEvents (career timeline, §4.9)
 
-System-generated event log: the system writes an entry whenever a tracked change happens. An actor may manually add, edit, or delete an event for historical backfill/correction only when they hold both applicable S9 write access and the runtime *edit the career timeline* permission. The persistence mechanism for correction belongs to architecture and must not narrow v1.5's allowed operations at BA level.
+System-generated event log: the system writes an entry whenever a tracked change happens. An actor may manually add, edit, or delete an event for historical backfill/correction only when they hold both applicable S9 write access and the runtime *edit the career timeline* permission. **S9 manual-mutation write access is narrower than S9 read (DEC-UM-001):** the full reporting line, project line, and PP may *read* the timeline, but **manual add / correct / delete is limited to the assigned People Partner and the employee's direct Unit Manager** — project-derived DM/PM and transitive managers are read-only for manual mutation (§4.9 is the more specific workflow rule; §3.2 S9 governs the broader read). This is the §2.2 dual gate plus a §3.3 matrix exception: both the *edit the career timeline* permission and the narrowed S9 write audience must hold. The persistence mechanism for correction belongs to architecture and must not narrow v1.5's allowed operations at BA level.
 
 | Field | Type | Notes |
 |---|---|---|
@@ -71,14 +86,19 @@ Employment status is a time-bounded business fact with values `active` and `dism
 
 ## Functional Requirements
 
-- **FR-1.** The very first `User` in the system is created by the population seed/import script and assigned the HR Admin functional role directly (AD-12 bootstrap). There is no HTTP user-creation / registration flow (§4.17).
+- **FR-1.** The very first `User` in the system is created by the ACM-0 deploy-time seed (`npm run db:seed`) as a single active row with a **normalized-stored** `workEmail` (DEC-UM-007 canonical-at-write); the Access Control bootstrap (ACM-1, `db:bootstrap:access-control`) then attaches the seeded `hr-admin` FR policy to it (AD-12 bootstrap). Story 1.1's population import runs after both and **reuses the root `User` id** for the root person rather than inserting a second row (DEC-UM-009). There is no HTTP user-creation / registration flow (§4.17); `POST /users` is retired (AD-14/AD-16/AD-21).
 - **FR-2.** Authentication is passwordless: a magic link sent to `workEmail` is the sole login mechanism for the seeded population. No password is ever stored. No SSO and no Active Directory in scope (§4.17, §10).
 - **FR-3.** First and subsequent logins use the same magic-link request/consume flow. Completing seed/import does not establish a session. There is no separate invite-link or registration-form login path.
 - **FR-4.** Employee population is imported from the delivered seeded timetracker list only (§4.17). Creating employees via API or UI is out of scope. `isActive` may retain the account row internally but is not a public lifecycle field or a substitute for S4 employment status.
 - **FR-5.** Automatic career events cover joining, grade, position, department, FTE/subcontractor transition, extended leave, and mentorship pair start/end. Departure is excluded. Manual add/edit/delete requires applicable S9 access plus the runtime permission.
 - **FR-6.** An authorized actor records departure with effective date and reason. The command is blocked while the person still manages or partners anybody. On the effective date the profile becomes read-only, open tasks are cancelled as departed, mentorships auto-close with a system note, the account deactivates, and all access held by the departed person ends immediately. CC-06 blocks implementation until scheduled state/execution is approved.
+- **FR-16 (Access Control adoption).** Every `user-management` controller authorizes target-scoped `/users/:id` access through the real `AccessControlFacade` via `ACCESS_CONTROL_PORT`; the interim adapter (`interim-access-control.adapter.ts`) is removed in the same cutover (AD-21, no dual-running). `isAllowed(userId, feature)` for the three no-target features already in use (`user-management:create`, `user-management:deactivate`, `user-management:list` — exactly the ACM-1 seeded keys) delegates straight to the facade, so those routes keep working for the seeded HR-Admin session and fail closed otherwise. `GET /users/:id` is **allowed** for Self, reporting line, and assigned People Partner; a **colleague is denied the whole-profile read** until field-level projection exists (a two-state rule — see FR-17; the temporary deny is `403`, not a settled convention). Makes the aspirational NFR-4 concrete and testable. Authoritative per-route contract: `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md`.
+- **FR-17 (Profile Projection).** Building the audience-narrowed `GET /users/:id` response body — S1 identity-card fields, S10 dates-only, inline S11 project name for a colleague; S1 derived-field immutability; S7/S8 record flags; S16 visibility — is its own deliverable (split out in `_bmad-output/implementation-artifacts/access-control/deferred-work.md`). It calls the facade and only narrows the base section result; it never reads policy tables or derives audiences. Until it reaches production, an *allowed* `GET /users/:id` still returns every `User` field (`toUserResponse` spreads the whole row) — the route is audience-gated, not field-gated. Profile Projection reaching `stage-3-production` is the trigger that flips FR-16's colleague decision from deny to allow-narrowed.
+- **FR-9 refinement (S1 write dual gate).** *(FR-9 is the epics.md derived requirement; refined here.)* `PATCH /users/:id` and `PUT /users/:id/photo` require **both** the functional permission **and** `write` S1 section access over the target (§2.2 dual gate, `access-control.md`). Photo write is **Self-only** unless Product widens it (open decision). Manager, People Partner, and department are **not writable through S1** for any audience (§3.2 fn 1, cross-ref) — those change only through Epic 4's dedicated organisational-relationship screen; `EditUserAction`/`UpdateUserDto` reject them explicitly. The dual gate for `PATCH`/`PUT photo` cannot be completed today: no `user-management:edit` (and no photo) permission is seeded — see Open Questions.
 
 ## Open Questions
 
 1. **CC-04:** People Partner assignment persistence and write contract; business behavior is fixed, storage is not.
 2. **CC-06:** scheduled-departure representation, effective-date executor, retries, and idempotency.
+3. **CC-07 (AD-19 Journal gate):** the immutable relationship/access-journal schema, snapshot payload, reader authorization, and transaction-enrolment contract. The **PP write path (Epic 4 Story 4.2) and the atomic-journal half of Stories 4.1 / 4.3 are blocked on CC-04 AND CC-07** — not CC-04 alone. `UserEvents` is not a journal substitute. The facade *reading* `Relationship type='people_partner'` to resolve the PP audience is not blocked.
+4. **Missing `user-management:edit` permission (adoption open decision 1).** The seeded FR catalog is exactly `user-management:create/deactivate/list` (ACM-1). There is no `user-management:edit` and no photo permission, so the FR-9 dual gate for writes cannot pass under the real facade. Option (a, recommended): Access Control adds the permission(s) via a new three-stage AD-1 seed sequence in the kernel package, and the adoption write path consumes it. Option (b): adopt `READ` now, keep `EDIT`/`UPLOAD_PHOTO` on a narrow `// INTERIM` rule in the real adapter with a recorded expiry trigger. Final call is the human's — see the consolidated proposal §7.

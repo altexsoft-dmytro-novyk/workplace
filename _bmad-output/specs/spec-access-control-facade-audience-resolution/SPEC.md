@@ -50,6 +50,7 @@ A mandate to meet: access-control correctness is the platform's primary quality 
 - Denials are leak-safe: missing/invalid token `401`; missing feature permission or write against readable data `403`; no-access cell or hidden field `404`. Absent payload data means a missing key, never `null`.
 - Bulk resolution uses one indexed query plan per graph within the platform's 500-record, 2-second response budget; empty input performs zero queries, and related policy/target reads share one transaction.
 - Code obeys the dependency and DI boundaries in `implementation-constraints.md`; implementation belongs in `services/backend`, never the workspace root.
+- **Resolved-pointer (2026-08-31):** the User Management consumer contract this slice's HTTP E2E depends on — including the production `ACCESS_CONTROL_PORT` rebind and the deletion of `interim-access-control.adapter.ts` named in `implementation-constraints.md` — is answered in `../../implementation-artifacts/access-control/um-integration-contract-response.md` and owned by `../spec-user-management-access-control-adoption/`. This slice stays gated behind its own approved Stage-1 scenario suite and Stage-2 red E2E, but is no longer blocked on an *unanswered* contract.
 
 ## Non-goals
 

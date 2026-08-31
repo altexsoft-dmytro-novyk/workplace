@@ -1,0 +1,57 @@
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created, ready for development
+#   - in-progress: Developer actively working on implementation
+#   - review: Implementation complete, ready for review
+#   - done: Story completed
+
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when its first story starts (via build's sprint sync)
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; the status view surfaces open ones
+generated: 09-01-2026 00:00
+last_updated: 09-01-2026 00:00
+project: people management
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts/mentorship
+development_status:
+  # Epic 1 — Mentorship Hub. Decomposes prd-mentorship-2026-09-01 FR-M1..FR-M17
+  # (People Management PRD FR-32/33/34, requirements §4.11). Planning artifacts
+  # are `draft` — nothing approved. Every story's AD-1 stage-1 scenario prose may
+  # proceed; stage-2 is gated:
+  #   G-CTX  — architect MentorshipPair schema + availability-flag owning
+  #            aggregate/endpoint (spine Deferred) — all stories
+  #   G-PERM — *assign and end mentorships* FR permission is unseeded
+  #            (kernel seeds only user-management:create/deactivate/list) — 1.2/1.3/1.4
+  #   G-S13  — canAccessSection supports S1/S10/S11 only; S13 is a pending
+  #            Access Control increment — 1.4 (closure-note projection) / 1.5
+  #   G-CT   — UM Epic 3 Story 3.1 career-event application boundary — 1.3/1.4
+  #   G-DEP  — AD-20 departure executor / CC-06 — 1.6 (scenario prose only)
+  epic-1: backlog
+  1-1-open-to-mentoring-flag: backlog
+  1-2-the-willing-mentor-pool: backlog
+  1-3-create-a-mentorship-pair: backlog
+  1-4-end-a-mentorship-pair: backlog
+  1-5-s13-projection-profile-header-mentor-directory-filter: backlog
+  1-6-departure-auto-close: backlog
+  epic-1-retrospective: optional

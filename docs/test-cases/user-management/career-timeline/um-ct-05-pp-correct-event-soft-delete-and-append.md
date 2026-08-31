@@ -1,6 +1,9 @@
 # UM-CT-05 · PP corrects a wrongly-inferred event
 
-**Trace:** PRD Data Model — UserEvents ("An event is an immutable fact — a correction soft-deletes the wrong entry and appends a new one, never an in-place edit") · requirements §4.9 ("to correct events the system inferred wrongly")
+**Trace:** PRD Data Model — UserEvents (immutable-fact correction) · requirements §4.9 · PRD FR-12, FR-13 · epics.md Story 3.3 (Authorized Actor Edits or Deletes an Event) · [DEC-UM-001](../../../architecture/user-management-test-decisions.md) · access-control.md §2.2 dual gate + §3.3
+
+> Same §2.2 dual gate and pending-S9-`canAccessSection` stage-2 block as
+> `um-ct-03`. Paula qualifies as the assigned PP.
 
 ## Scenario
 

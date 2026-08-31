@@ -1,6 +1,13 @@
 # UM-PF-02 · Self photo upload persists
 
-**Trace:** requirements §3.2 S1 ("R (photo RW)") · §4.3 ("upload a photo")
+**Trace:** requirements §3.2 S1 ("R (photo RW)") · §4.3 ("upload a photo") · epics.md Story 1.3
+
+> **Scope (v1.5).** Entitlement (photo write is **Self-only** — viewer id ==
+> target id) is Epic 0's (`access-control-adoption/umac-09`, Open Decision v).
+> This file asserts **data correctness**: the upload persists and reflects on a
+> follow-up read, given an entitled (Self) actor. Alice is a **seeded** employee
+> (Story 1.1); stage 2 resolves `<aliceId>` from the seeded fixture id table,
+> never a hardcoded literal.
 
 ## Scenario
 

@@ -1,6 +1,13 @@
 # UM-PF-03 · Editing workEmail to an address already in use is rejected
 
-**Trace:** database-schema.md `User.workEmail` (unique) · requirements §3.2 S1 (Manager line: RW)
+**Trace:** database-schema.md `User.workEmail` (unique) · requirements §3.2 S1 (Reporting line: RW) · [DEC-UM-007](../../../architecture/user-management-test-decisions.md) · epics.md Story 1.2 (second AC)
+
+> **Scope (v1.5).** Entitlement (who may `PATCH /users/:id`) is Epic 0's
+> (`access-control-adoption/`). This file asserts **data correctness**: the write
+> is rejected wholesale on the uniqueness conflict (`409`) and the row is
+> unchanged. `workEmail` comparison is against the **normalized** value
+> (DEC-UM-007 — the DTO already trims+lowercases on write). Alice/Colin are
+> **seeded** (Story 1.1); stage 2 resolves ids from the seeded fixture id table.
 
 ## Scenario
 

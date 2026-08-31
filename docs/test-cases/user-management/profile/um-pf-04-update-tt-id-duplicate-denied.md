@@ -1,6 +1,12 @@
 # UM-PF-04 · Setting ttId to a value already in use is rejected
 
-**Trace:** database-schema.md `User.ttId` (unique) · AD-13 (external identity field)
+**Trace:** database-schema.md `User.ttId` (unique) · AD-13 (external identity field) · epics.md Story 1.2 (second AC)
+
+> **Scope (v1.5).** Entitlement is Epic 0's (`access-control-adoption/`). This
+> file asserts **data correctness**: the `ttId` write is rejected on the
+> uniqueness conflict (`409`) and the row is unchanged. Alice/Colin are
+> **seeded** (Story 1.1); stage 2 resolves ids from the seeded fixture id table,
+> never a hardcoded literal.
 
 ## Scenario
 

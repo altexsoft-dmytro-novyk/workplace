@@ -1,49 +1,110 @@
 # Epic 4 Context: Organizational Relationships
 
-<!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
+<!-- Regenerated 2026-09-01 from epics.md v1.5 — supersedes the pre-v1.5 version; NOT an AD-1 approval. -->
+<!-- Compiled planning context for a future story-authoring / dev pass. NOT an AD-1 stage-1 scenario doc. -->
 
 ## Goal
 
-This epic delivers the org-structure facts that access-control's tier resolution and dashboards read downstream: who reports to whom, and which mentor is paired with which mentee. Both facts live on one generic `Relationship` edge table (`type: 'direct' | 'project' | 'mentorship'`, AD-11) attached/detached through one generic endpoint (`POST`/`DELETE /users/:id/relationships`, AD-14 shape 4) — not two bespoke resources. `type: 'project'` is out of scope for this epic (owned separately, per the architecture spine's Deferred list). **FRs covered:** FR-14 (mentor pairing), FR-15 (reports-to assignment).
-
-**Blocking dependency — read before starting either story.** Per epics.md's Epic Sequencing section (lines 117-125): *"Epic 4 is a genuine sequence point on Epic 3 — mentorship attach/detach fires `UserEvents` rows, so it needs Epic 3's write path first."* Concretely: Story 4.2's mentorship attach/detach must call Epic 3's synchronous, same-transaction `UserEvents` write mechanism (AD-11 binding constraint — no event bus, no `EventEmitterModule` pub/sub); that mechanism doesn't exist until Epic 3's Story 3.1 builds it. Story 4.1 (reports-to) has no such dependency — it fires no `UserEvents` — but shares this epic's `Relationship` model/migration, so in practice Story 4.1 goes first anyway to stand the model up. Net ordering: `Epic 3` → `Story 4.1` → `Story 4.2`.
-
-**This entire epic starts from a blank page.** Per epics.md line 362: *"No scenario docs exist yet for either story — both FRs are new to this session (reports-to's scope was resolved, mentorship pairing was never drafted in the original 24-file suite). Their author starts stage 1 from a blank page."* Unlike Epic 1, there is no `docs/test-cases/user-management/relationships/` folder yet, and no draft scenario docs pending approval. Confirmed independently (read-only checks against the backend submodule, not checked out): `git -C services/backend show user-management --stat` lists only `auth`, `career-timeline`, `deactivation`, `profile`, and `registration` E2E spec files — no relationships spec; `git -C services/backend ls-tree -r user-management --name-only | grep -i relation` returns nothing. Both stories' Code Maps list AD-1 stage 1 (scenario docs) and stage 2 (E2E tests) as their own first, unchecked tasks, ahead of any stage-3 implementation task.
+Holders of the dedicated **`change organisational relationships`** permission
+change the **four** organisational facts that alter access — a person's manager,
+their People Partner, their department, and a department's manager — on a
+**dedicated screen**, never through S1 `PATCH` (§2.1, §3.2 fn 1). Every change
+**rejects self-assignment**, is **journaled atomically** (§3.4), and affects
+platform-owned access **on the next request**. **Mentorship is not an
+organisational access edge** (AD-17) — the pre-v1.5 mentorship Story 4.2 is
+retired to a future Mentorship context. **FRs covered:** FR-10.
 
 ## Stories
 
-- Story 4.1: HR Admin Assigns or Revokes Reports-To
-- Story 4.2: HR Admin Pairs or Unpairs a Mentor and Mentee
+- Story 4.1: Change an Employee's Manager
+- Story 4.2: Change an Employee's People Partner
+- Story 4.3: Change Employee Department or Department Manager
 
-## Requirements & Constraints
+*(v1.5 story set. Retired: "HR Admin Assigns or Revokes Reports-To" → regenerated
+as 4.1; "HR Admin Pairs or Unpairs a Mentor and Mentee" → SUPERSEDED pointer,
+handed to Mentorship. New: 4.3.)*
 
-- One `Relationship` resource, one generic attachment endpoint: `POST/DELETE /users/:id/relationships` (AD-14) handles both `type: 'direct'` (Story 4.1) and `type: 'mentorship'` (Story 4.2) — one controller/handler shape, not two separate endpoints per type.
-- `Relationship` rows are **hard-deleted**, never soft-deleted — the opposite of this domain's usual convention (`User.isActive`, `UserEvents.deletedAt`). No `deletedAt`/`isActive` column on `Relationship`. Get this right; it is easy to default to the domain's more common soft-delete pattern by habit.
-- Reports-to (`type: 'direct'`) is a tree, not a graph: at most one active edge per `userId`, enforced at the DB level via a partial `UNIQUE` index. Mentorship (`type: 'mentorship'`) carries no such constraint — explicitly left unconstrained (AD-11, "no sourced one-mentor-at-a-time rule"). Do not generalize the reports-to uniqueness rule to mentorship.
-- A `mentorship` edge grants no access tier unless/until explicitly wired into access-control's tier walk (fail-closed default, AD-11/AD-12). That negative assertion belongs to access-control's own test suite — neither story here should add a test case for it.
-- No external sync populates either fact: no timetracker/HRIS integration provides hierarchy or mentorship data (FR-15). Both are HR-Admin-driven manual writes.
-- Every entitlement check goes through the shared AccessControl facade (AD-9) — HR Admin functional role required for both stories' write paths, never a direct role-flag or policy-table read inside a user-management controller.
-- ⚠️ **For Story 4.2 (mentorship) specifically, HR-Admin-only gating is a TEMPORARY deviation from the source (product decision 2026-08-25), not a permanent design.** §4.11 assigns pair/unpair authority to "manager and PP," and §2.2/§2.3 name "mentorship assignment"/"assign mentors" as a UM-holdable, independently grantable capability — not HR-Admin-exclusive. It's gated to HR Admin only here because the AD-7 policies engine and the AD-10 Manager-line walk aren't wired together into `AccessControl` yet this iteration; **reopen once they are**, to grant this to UM/PP scoped to their own relationship to the mentee, per source. Story 4.1 (reports-to) has no such caveat — the source never names an actor for that assignment, so HR-Admin-only is not a deviation there.
-- Domain code imports nothing from Prisma, NestJS transport, or HTTP (AD-2/AD-5 hexagonal layout).
-- NFR-1: `Relationship` rows reference real employees — pseudonymised data only outside production; never real personal data in logs, fixtures, or the repo.
-- Quality gate (AD-1): an approved scenario document must exist before an E2E test is written, and an E2E test must exist and be red before production code is written. Both stories in this epic start stage 1 from a blank page (see Goal) — neither may skip ahead to stage 3.
+## Requirements & Constraints — GATES FIRST
+
+- **AD-19 Journal gate (CC-07).** Every story writes the §3.4 journal in the same
+  transaction as the fact change. CC-07 owns the immutable journal schema,
+  snapshot payload, reader authorization, and transaction-enrolment contract.
+  **Scenario prose (AD-1 stage 1) may proceed; the stage-2 E2E and production
+  (journal-writing) stages of Stories 4.1, 4.2, and 4.3 are blocked until CC-07
+  is an approved architecture decision.** `UserEvents` is **not** a journal
+  substitute.
+- **CC-04** (Story 4.2 only, additional): People Partner persistence, cardinality
+  (zero-or-one per employee, `Relationship type='people_partner'`), and the
+  atomic `PUT /users/:employeeId/relationships/people-partner` write contract
+  (AD-19). Story 4.2 is blocked on **CC-04 AND CC-07**.
+- **AD-19 Department-boundary gate.** Assigned-PP resolution may use the edge
+  immediately, but transitive HR-line propagation stays **fail-closed to the
+  directly assigned PP** until the Department contract identifies the HR
+  root/membership and binds the recursive boundary predicate. Stage 2 for
+  HR-line inheritance is blocked until that contract and its boundary-negative
+  scenarios are approved.
+- **Department edge contract** (Story 4.3): the nested-department entity,
+  exactly-one membership, department-manager access, resourcing routing,
+  timeline event, and CDS key are fixed by §2.1/§4.7/§4.9/§4.10/§4.17 and AD-18,
+  but the indexed edge schema remains pending (spine Deferred). Until it lands,
+  `department`-targeted policy rows contribute nothing to tier resolution
+  (fail-closed, AD-12).
+
+## Requirements & Constraints — behaviour
+
+- One dedicated screen invoking the approved attachment/fixed-cardinality
+  relationship commands (AD-14 shape 4): generic `POST/DELETE
+  /users/:id/relationships` for `direct`; atomic `PUT/DELETE
+  /users/:id/relationships/people-partner` for the zero-or-one PP edge (AD-19);
+  `POST/DELETE /users/:id/policies` and department attachment for department
+  management. **No bespoke `/users/:id/manager` endpoint.**
+- Every action requires the `change organisational relationships` permission
+  (through the facade — never inline role logic), rejects self-assignment, and
+  journals in the same transaction as the fact write.
+- `Relationship` rows are **hard-deleted**, never soft-deleted — no
+  `deletedAt`/`isActive` column (AD-11). At most one active `direct` and at most
+  one `people_partner` edge per employee, enforced by separate partial unique
+  indexes; self-targeting edges rejected.
+- **DEC-UM-005** (Story 4.1): reports-to reassignment is explicit `DELETE` then
+  `POST`; a second `POST` while a `direct` edge exists returns `409`, not
+  implicit replace. Enforced by the DB partial `UNIQUE` (`type='direct'`), not
+  an app-level pre-check.
+- Story 4.3 department change appends a `department_change` `UserEvents` row
+  through Epic 3's synchronous same-transaction mechanism (AD-11).
+- Access changes on the **next request** for platform-owned relations; the
+  15-minute window is project-derived only.
+- NFR-1 pseudonymised data only.
 
 ## Technical Decisions
 
-- **AD-11 schema migration hazard — binding, document once here, do not rediscover per story.** `Relationship`'s 3-armed `CHECK` constraint and its partial `UNIQUE` (`type='direct'` only) have **no plain `schema.prisma` representation** in Prisma 7.x (verified against the installed `7.9.1`, per epics.md line 65 and `docs/architecture/database-schema.md` lines 89-103): Prisma has no `@@check` schema attribute in any 7.x release, and native partial-index `where` support is preview-only (`partialIndexes`, not enabled in this repo's `generator` block). Both must be **hand-authored as raw SQL in the migration**: run `prisma migrate dev --create-only`, then edit the generated `migration.sql` by hand to add the `CHECK` clause and a `CREATE UNIQUE INDEX ... WHERE type = 'direct'` statement. `prisma db pull`/Prisma Client will not model or enforce either afterward — Postgres does. **Story 4.1 owns writing this migration** (it's the first story and needs the `Relationship` model to exist); **Story 4.2 reuses it as-is** — no second migration, no schema changes for mentorship.
-- `Relationship` fields (per `docs/architecture/database-schema.md` AD-11 section — do not add fields beyond this list): `id` (uuidv7 PK), `userId` (FK → `User`, who the edge is about), `type` (`'direct' | 'project' | 'mentorship'`), `reportsToUserId` (FK → `User`, nullable, set iff `type='direct'` or `type='mentorship'`), `projectId` (FK → `Project`, nullable, set iff `type='project'`). No `createdAt`/`createdBy`/`deletedAt` — unlike `User` and `UserEvents` in this same schema, `Relationship` carries none of the usual audit columns.
-- `CHECK` constraint (3-armed `OR`, exact logic to hand-author): `(type='direct' AND reportsToUserId IS NOT NULL AND projectId IS NULL) OR (type='project' AND projectId IS NOT NULL AND reportsToUserId IS NULL) OR (type='mentorship' AND reportsToUserId IS NOT NULL AND projectId IS NULL)`.
-- Directional column convention: `direct` and `mentorship` share `reportsToUserId` (not renamed per type) because both are the same directional shape — `userId` points "up" to `reportsToUserId` (the manager, or the mentor). This is a storage-layout fact only; it does not mean `mentorship` participates in access-control's tier-resolution walk (that walk reads `type='direct'` rows exclusively).
-- Router: AD-14 shape 4, generic attachment endpoint — `POST /users/:id/relationships {type, targetId}` / `DELETE /users/:id/relationships/:relationshipId`. Reused by Story 4.1 (`type:'direct'`) and Story 4.2 (`type:'mentorship'`) as one handler, not duplicated per type.
-- Reject-then-retry on reports-to reassignment relies on the DB-level partial `UNIQUE` constraint surfacing as a conflict, not an application-level pre-check — see Story 4.1's Design Notes for why (concurrency safety).
-- Mentorship's `UserEvents` writes (`mentorship_start`/`mentorship_end`) must go through Epic 3's existing synchronous, same-transaction write-hook pattern (AD-11) — an explicit call from the attach/detach use-case, in the same transaction as the `Relationship` write. No event bus, no generic table-change listener, no `EventEmitterModule`-style pub/sub, even though NestJS makes that pattern easy to reach for.
+- **AD-11 schema migration hazard.** `Relationship`'s multi-armed `CHECK`
+  constraint and its partial `UNIQUE` indexes have **no plain `schema.prisma`
+  representation** in Prisma 7.x — hand-author them as raw SQL in the migration
+  (`prisma migrate dev --create-only`, then edit `migration.sql`). Story 4.1
+  owns writing the `Relationship` model + migration for the epic; 4.2/4.3 reuse
+  it (4.2 adds the `people_partner` partial unique index if not already
+  present).
+- `Relationship` fields (`database-schema.md`, AD-11): `id` (uuidv7 PK),
+  `userId` (FK → `User`), `type` (`'direct' | 'project' | 'people_partner'`),
+  `reportsToUserId` (FK → `User`, nullable, set for `direct`/`people_partner`),
+  `projectId` (FK → `Project`, nullable, `project` only). No
+  `createdAt`/`createdBy`/`deletedAt`. *(Note: v1.5 replaces the pre-v1.5
+  `'mentorship'` arm with `'people_partner'` — mentorship is a durable
+  `MentorshipPair` in its own context, AD-17.)*
+- `PUT /users/:employeeId/relationships/people-partner {targetId,
+  expectedCurrentTargetId}` creates or atomically replaces the edge and writes
+  one old→new journal record in the same transaction; a stale predicate or
+  losing unique conflict → `409` (AD-19).
+- Standard hexagonal layout; domain imports nothing from Prisma/NestJS/HTTP.
+- A `mentorship` edge grants no access tier — that negative assertion belongs to
+  access-control's own suite, not here.
 
-## Open Questions
+## Cross-Story / Cross-Epic Dependencies
 
-- **What is the mandatory "final feedback" when a mentorship ends actually feedback *about*?** §4.11: *"final feedback on the mentorship is required to close it — a pair cannot be ended without it."* The actor is settled — a manager or PP performs the unpair (source; matches this story's actor), so this isn't about who submits the field. What's unresolved is the *subject*: is it the manager/PP's assessment of the mentorship's outcome, feedback on the mentor's performance, feedback on the mentee's experience/growth, or something else — each implies a different field shape (one free-text note vs. two, and possibly a different S8 Feedback-record tie-in vs. a standalone note on the `Relationship` unpair). **Story 4.2 does not implement this requirement** pending that clarification — its `DELETE /users/:id/relationships/:id` unpair flow carries no feedback field. Do not guess at the subject and build it silently; get this confirmed by a human before adding it.
-
-## Cross-Story Dependencies
-
-- Story 4.1 authors the `Relationship` Prisma model and its hand-authored migration (CHECK + partial UNIQUE). Story 4.2 depends on that model and migration existing on the branch it builds from, and must not re-author or duplicate either — it only adds the `type:'mentorship'` branch to the shared endpoint/handler Story 4.1 stands up.
-- Story 4.2 additionally depends on Epic 3's Story 3.1 (system auto-writes `UserEvents`) for the synchronous write mechanism its mentorship attach/detach calls into. This is a cross-epic dependency, not a cross-story one within Epic 4, but it gates Story 4.2's code stage regardless of whether Story 4.1 has landed.
-- Both stories independently run the full AD-1 gate (scenario doc → E2E → code) from a blank page — neither inherits an approved scenario doc or a red E2E test from the other, unlike Epic 1's Stories 1.1-1.4 which shared pending drafts.
+- Story 4.1 stands up the `Relationship` model + migration; 4.2/4.3 build on it.
+- Story 4.3's `department_change` event → Epic 3 Story 3.1's write mechanism.
+- This epic starts stage 1 from a blank page — no
+  `docs/test-cases/user-management/relationships/` folder exists yet; confirm
+  the folder/naming convention (`um-rel-*`) before drafting.
+- Whole epic's journal-writing stages wait on CC-07; Story 4.2 also on CC-04;
+  Story 4.3 department access also on the Department edge contract.

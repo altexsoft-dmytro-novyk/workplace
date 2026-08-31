@@ -1,0 +1,204 @@
+# AD-1 three-stage dispatch entries for the User Management Access Control
+# adoption package. Field set mirrors
+# _bmad-output/specs/spec-access-control-kernel-mvp/stories.yaml exactly:
+# id, title, description, spec_checkpoint, done_checkpoint, invoke_dev_with.
+# No entry is authorized. Each stage is one dispatch; author != approver;
+# every approval is recorded in this package's approvals.yaml (created on the
+# first approval — it does not exist yet, so nothing here has a prior record).
+#
+# UMAC-1 rebinds the port and adopts the READ route (CAP-1 + CAP-2 read half +
+# CAP-4 read E2E). UMAC-2 adds the write dual gate (CAP-2 write half) and is
+# CONDITIONAL on the missing-edit-permission decision in SPEC.md Open
+# decisions. UMAC-3 flips the colleague decision when Profile Projection lands.
+
+- id: "UMAC-1-scenarios"
+  title: "UMAC-1 Stage 1 — port rebind + READ route adoption scenario prose"
+  description: >-
+    Depends on human acceptance of um-integration-contract-response.md and this
+    SPEC. Author only scenario prose for CAP-1 (real facade-backed
+    ACCESS_CONTROL_PORT adapter in src/user-management/infrastructure/,
+    interim adapter deleted) and the READ half of CAP-2 (GET /users/:id
+    feature -> audience mapping), plus the CAP-3 boundary statement.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Scenario prose only — no test, no production code,
+    stop for independent human approval. Cite this SPEC, AD-2 and AD-21 in
+    architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md, AD-3 in
+    architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md,
+    docs/architecture/access-control.md (denial conventions, matrix exceptions,
+    §3.3.4 colleague whitelist), docs/architecture/nestjs-di-tokens.md (guards
+    are the only sanctioned port consumer; actions never inject ports),
+    docs/architecture/testing-strategy.md, and um-integration-contract-response.md
+    Q1/Q2/Q4/Q5/Q6. Write line-by-line actor -> request -> expected outcome
+    scenarios for: GET /users/:id as Self (200, whole row); as a reporting-line
+    viewer with a direct Relationship edge to the target (200, whole row); as
+    the target's assigned people_partner (200, whole row); as an unrelated
+    active session / colleague (403, leak-free body) recorded EXPLICITLY as the
+    temporary two-state outcome with the Profile Projection story named as the
+    trigger that flips it to 200-narrowed; as a session whose userId does not
+    resolve to an active User (403, empty audience). Include: isAllowed for
+    user-management:create / :deactivate / :list still allows the seeded
+    HR-Admin root and denies others (delegated straight to
+    AccessControlFacade.isAllowed); interim-access-control.adapter.ts is
+    deleted, not left beside the real one (AD-21). State the CAP-3 boundary in
+    the scenario doc: an allowed GET /users/:id still returns every User field;
+    the route is audience-gated, not field-gated; toUserResponse spreads the
+    whole row. Do NOT author write-path (PATCH / PUT photo) scenarios here —
+    those are UMAC-2. Do NOT author scenarios that touch Access Control files,
+    prisma schema, migrations, or seed.
+
+- id: "UMAC-1-red-tests"
+  title: "UMAC-1 Stage 2 — real-consumer HTTP READ E2E (committed red)"
+  description: >-
+    Depends on independent human approval of UMAC-1 Stage 1. Translate only the
+    approved scenarios into a committed-red real-consumer HTTP E2E suite under
+    services/backend/test/user-management/, exercising real router, session
+    guard, AccessControlGuard, real AccessControlFacade, real Prisma, migrated
+    PostgreSQL — no provider overrides (AD-3 consumer rule).
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Stage-2 test code only — commit red, stop for
+    independent human approval, change no production code. Before starting,
+    record and verify the UMAC-1-scenarios Stage-1 approval in this package's
+    approvals.yaml (story_id, stage, repo, artifact_path, commit, author,
+    approver, decision, timestamp; author != approver; commit resolves and
+    artifact present). Seed real User rows and real Relationship rows (a direct
+    edge for the reporting case, a people_partner edge for the PP case, viewer
+    id == target id for Self, an unrelated active user for the colleague-deny
+    case) and issue Bearer <token:<seeded-uuid>> headers, which
+    InterimSessionResolverAdapter accepts unchanged — do NOT use literal
+    persona placeholders for the cases that need a real audience. One test per
+    approved scenario, scenario id in the test title. Assert the colleague case
+    as 403 today with an inline comment that it becomes 200-narrowed when the
+    Profile Projection story lands. The suite must FAIL until UMAC-1-production
+    rebinds the port (the interim adapter returns Boolean(userId), so the
+    colleague-deny and unresolved-session-deny assertions are red). Follow
+    .claude/rules/nest-e2e.md. Note whether the four existing
+    profile.e2e-spec.ts cases (um-pf-01..04) need real personas or a tightened
+    scope note, and surface that for human decision — do not silently rewrite
+    that suite beyond keeping it green.
+
+- id: "UMAC-1-production"
+  title: "UMAC-1 Stage 3 — rebind ACCESS_CONTROL_PORT to the real adapter"
+  description: >-
+    Depends on independent human approval of the committed-red UMAC-1 Stage-2
+    suite. Implement only the CAP-1 adapter + rebind and the READ half of
+    CAP-2; make the approved tests pass.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Production code only. Before starting, record and
+    verify the UMAC-1-red-tests Stage-2 approval in this package's
+    approvals.yaml (author != approver; commit resolves; artifact present).
+    Create src/user-management/infrastructure/access-control-facade.adapter.ts:
+    @Injectable(), injects AccessControlFacade, implements AccessControlPort.
+    isAllowed(userId, feature) delegates directly to
+    AccessControlFacade.isAllowed(userId, feature). isAllowedForTarget(userId,
+    feature, targetUserId) for feature 'user-management:read': call
+    AccessControlFacade.resolveAudiences(userId, [targetUserId]) and allow when
+    the target's audience set contains 'self', 'reporting', or 'pp'; deny for a
+    set that is empty or contains only 'colleague'. Rebind
+    ACCESS_CONTROL_PORT in user-management.module.ts to the new adapter and
+    DELETE interim-access-control.adapter.ts (AD-21 — no dual-running). Do NOT
+    add a route, change AccessControlPort's signatures, change
+    AccessControlGuard, inject the facade anywhere except this adapter, touch
+    any Access Control file, or touch prisma schema/migrations/seed. Do NOT
+    implement PATCH / PUT photo behaviour (UMAC-2). Run npm run lint,
+    npx tsc --noEmit, and the user-management + access-control e2e suites;
+    the pre-existing not-yet-built /users/:id/relationships failures are
+    unrelated and must be identical before and after.
+
+- id: "UMAC-2-write-path-scenarios"
+  title: "UMAC-2 Stage 1 — PATCH / PUT photo dual-gate scenario prose (CONDITIONAL)"
+  description: >-
+    CONDITIONAL on the SPEC Open-decision 1 outcome. If option (a): depends on
+    the new Access Control kernel seed story that adds user-management:edit
+    (and any photo permission) reaching stage-3-production. If option (b):
+    author the interim write rule with its recorded expiry trigger instead.
+    Author only scenario prose for the CAP-2 write half.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Scenario prose only — stop for independent human
+    approval. Cite this SPEC, access-control.md §2.2 dual gate and §3.2 fn 1,
+    FR-9 in _bmad-output/planning-artifacts/user-management/epics.md, and
+    um-integration-contract-response.md Q3. PRECONDITION: confirm which Open-
+    decision-1 option the human chose and, for option (a), verify the Access
+    Control kernel seed story's stage-3-production approval so
+    user-management:edit exists as a real permission key. Scenarios: PATCH
+    /users/:id succeeds only when AccessControlFacade.isAllowed(viewer,
+    <edit permission key>) is true AND
+    AccessControlFacade.canAccessSection(viewer, 'S1', target) === 'write'
+    (viewer resolves reporting or pp); denied (403) when either half fails;
+    manager / people-partner / department fields in the PATCH body are rejected
+    regardless of audience (§3.2 fn 1) and no relationship changes; PUT
+    /users/:id/photo is Self-only (viewer id == target id) unless Product
+    widened it. For option (b), the scenario records the interim rule
+    explicitly AS interim with the trigger 'replace with the dual gate when
+    user-management:edit is seeded'. Do NOT touch Access Control files or
+    prisma schema/migrations/seed.
+
+- id: "UMAC-2-write-path-red-tests"
+  title: "UMAC-2 Stage 2 — PATCH / PUT photo dual-gate E2E (committed red)"
+  description: >-
+    Depends on independent human approval of UMAC-2 Stage 1. Translate the
+    approved scenarios into a committed-red real-consumer HTTP E2E suite under
+    services/backend/test/user-management/ — no provider overrides.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Stage-2 test code only — commit red, stop for
+    independent human approval, no production code. Record and verify the
+    UMAC-2-write-path-scenarios Stage-1 approval in approvals.yaml first
+    (author != approver; commit resolves; artifact present). Seed real Users,
+    real Relationship rows (direct / people_partner), and — for option (a) —
+    the seeded user-management:edit grant on the actor's FR policy. One test
+    per approved scenario. Follow .claude/rules/nest-e2e.md and the
+    seeded-UUID Bearer token convention. The suite must FAIL until
+    UMAC-2-write-path-production lands.
+
+- id: "UMAC-2-write-path-production"
+  title: "UMAC-2 Stage 3 — PATCH / PUT photo dual-gate implementation"
+  description: >-
+    Depends on independent human approval of the committed-red UMAC-2 Stage-2
+    suite. Implement only the CAP-2 write half; make the approved tests pass.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Production code only. Record and verify the
+    UMAC-2-write-path-red-tests Stage-2 approval in approvals.yaml first.
+    In access-control-facade.adapter.ts, extend isAllowedForTarget: for
+    'user-management:edit' require isAllowed(viewer, 'user-management:edit')
+    AND canAccessSection(viewer, 'S1', target) === 'write'; for
+    'user-management:upload-photo' require viewer id == target id (Self) unless
+    Product widened it. Add / confirm the §3.2 fn 1 rejection of manager /
+    people-partner / department fields in EditUserAction or UpdateUserDto with
+    a test. Do NOT change AccessControlGuard, add routes, inject the facade
+    outside the adapter, or touch Access Control files or prisma
+    schema/migrations/seed. Under option (b) implement the interim rule with
+    the // INTERIM comment and expiry trigger exactly as the approved scenario
+    records it.
+
+- id: "UMAC-3-colleague-narrowing-flip"
+  title: "UMAC-3 — flip colleague from deny to allow-narrowed (TRIGGERED)"
+  description: >-
+    TRIGGERED, not scheduled. Runs only when the separate UM-owned Profile
+    Projection story (deferred-work.md) reaches stage-3-production and
+    toUserResponse no longer spreads the whole row. Three AD-1 stages of its
+    own — scenario, red-tests, production — to change the CAP-2 READ decision
+    for a colleague from 403 to 200 with the §3.3.4-narrowed body, and to
+    update the CAP-2 colleague scenarios that were recorded as temporary.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    services/backend only. Do not dispatch until the Profile Projection story's
+    stage-3-production approval is recorded and verified. Then run the ordinary
+    three-stage AD-1 sequence (each stage its own dispatch, author != approver,
+    recorded in approvals.yaml): scenario prose flipping the colleague READ
+    outcome to 200-narrowed and citing the projection story; committed-red E2E
+    asserting the narrowed body for a colleague viewer; production change to
+    the adapter's READ branch (allow when the set contains 'colleague') and to
+    the projection wiring. Cite access-control.md §3.3.4 and
+    um-integration-contract-response.md Q3/Q4.

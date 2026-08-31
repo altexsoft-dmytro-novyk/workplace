@@ -1,6 +1,8 @@
 # UM-CT-06 · Unit Manager soft-deletes an event
 
-**Trace:** requirements §4.9 ("PP and UM can edit, delete and manually add timeline events")
+**Trace:** requirements §4.9 · PRD FR-12, FR-13 · epics.md Story 3.3 · [DEC-UM-001](../../../architecture/user-management-test-decisions.md) (assigned PP + direct Unit Manager only) · access-control.md §2.2 dual gate + §3.3
+
+> Same §2.2 dual gate and pending-S9-`canAccessSection` stage-2 block as `um-ct-03`.
 
 ## Scenario
 

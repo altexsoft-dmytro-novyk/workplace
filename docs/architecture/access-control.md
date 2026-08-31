@@ -160,6 +160,14 @@ workflow-specific views need an approved owning-context projection contract. Tha
 contract calls this facade and may only narrow its result; it never reads policy
 tables or infers an audience itself.
 
+**`canAccessSection` S13 support is a pending increment** that the `mentorship`
+context depends on (`docs/architecture/mentorship.md` §5.3, Decision 3) — same
+class as the S9 career-timeline gap. ACM-5 ships `'S1'`/`'S10'`/`'S11'` only;
+every other string returns `'none'`. Until an increment adds `'S13'`, mentorship
+runs an interim rule derived from `resolveAudiences` with a recorded expiry
+trigger. Tracked in
+`_bmad-output/implementation-artifacts/access-control/deferred-work.md`.
+
 ### Dual-dimension gate (§2.2)
 
 **Both dimensions must permit a mutating operation.** A write requires `isAllowed(viewerId, feature)` **and** matrix write access for that section on the target (via `canAccessSection` and §3.3 exceptions). Matrix-only or feature-only checks are insufficient.
@@ -177,6 +185,28 @@ Profile sections are not the only authorization surface. Every list column, filt
 ### Denial conventions
 
 Per [test-cases/README.md](../test-cases/README.md): missing/invalid token → `401`; valid token without feature permission or write to a readable section → `403`; valid token touching a `—` cell or hidden field → `404` with a leak-free body. HR Admin (configuration FR only, §2.2) has **no default data access** — profile reads without a relationship-derived audience or full-profile grant follow the same denial rules.
+
+### User Management adoption seam
+
+The facade is headless: the Kernel MVP composes `AccessControlModule` into
+`AppModule` (ACM-8) but User Management still binds `ACCESS_CONTROL_PORT` to
+its interim adapter. Adopting the real facade for `/users/:id` is a
+User Management-owned slice, not an Access Control change (AD-2). The seam is
+the single `ACCESS_CONTROL_PORT` provider binding in
+`services/backend/src/user-management/user-management.module.ts`; a real
+adapter in `src/user-management/infrastructure/` injects the facade forwards
+across the boundary and replaces the interim adapter wholesale (AD-21). One
+binding answers three routes at once — `GET /users/:id`, `PATCH /users/:id`,
+`PUT /users/:id/photo` — so behaviour is chosen per feature, not per route.
+The per-route feature → audience/section mapping, the two-state colleague
+rule (deny the whole-profile read until field-level projection lands, then
+allow narrowed to the §3.3.4 whitelist), and the §2.2 dual gate for the write
+routes are specified in
+`_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md`,
+answering `_bmad-output/implementation-artifacts/access-control/um-integration-contract-response.md`.
+The "consumer contract" deferral elsewhere in the Access Control planning set
+is now **pointed at that package**, not open-ended; the product gate stays
+open until it and the separate Profile Projection story land.
 
 ### Bulk short-circuit
 
@@ -237,6 +267,7 @@ Section access from the matrix is **necessary but not sufficient**:
 | §3.3.6 Custom fields (S16) | Per-field visibility: *management* (default), *employee* (+ Self), *colleague* (+ everyone). List filters and columns must not leak hidden values. |
 | §3.3.7 Campaign author | See **Campaign-author scoped access** below — not general profile or S14 access. |
 | DEC-UM-001 S9 write | Reporting line, project line, and PP may **read** S9; **manual** add/correct/delete limited to assigned PP and direct Unit Manager only. |
+| S13 mentorship-pair closure note (FR-M10, DEC-UM-001 pattern) | The closure note on a `MentorshipPair` is readable **only** by the mentee's **Reporting line**, **Project line**, and **PP** — **never** the mentor, the mentee (Self), or a colleague. **Narrower** than the S13 `RW`/`R (pairs)` cell (which would otherwise let Self read it). `mentorship`'s projection narrows the facade result via `resolveAudiences` ∩ `{reporting, project, pp}`; it reads no policy tables and derives no audience. Pairs never feed audience resolution (AD-17). `docs/architecture/mentorship.md` §5.3. |
 | §3.3.2 S7 PM exception | PM project-line S7 is read-only and flag-gated (*visible for PM*). UM/DM/PP write paths unaffected by flag. |
 | §3.3 S7/S8 record flags | S7: employee sees only records flagged *visible for employee*. S8: employee sees only records flagged *shared with employee*. Flag filtering applies within an allowed section. |
 

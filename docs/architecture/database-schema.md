@@ -25,6 +25,7 @@ erDiagram
   User ||--o{ Departure : "userId"
   User ||--o{ MentorshipPair : "mentorUserId"
   User ||--o{ MentorshipPair : "menteeUserId"
+  User ||--o| MentorshipAvailability : "userId"
 ```
 
 ## Tables
@@ -173,20 +174,85 @@ Exact indexed Department membership/parent/manager edge shapes remain an explici
 
 ### MentorshipPair (AD-17)
 
+Owned by the `mentorship` context ([mentorship.md](mentorship.md) §2.1). Updated 2026-09-01 by the mentorship technical design.
+
 ```text
 MentorshipPair {
-  id           uuidv7 PK
-  mentorUserId FK -> User
-  menteeUserId FK -> User
-  status       'active' | 'ended'
-  startDate    date
-  endDate      date, nullable
-  closureNote  string, nullable
-  closedBy     FK -> User, nullable
+  id                 uuidv7 PK
+  mentorUserId       FK -> User
+  menteeUserId       FK -> User
+  status             'active' | 'ended'   // single source of truth for lifecycle
+  startedAt          date
+  endedAt            date, nullable        // null iff status='active'
+  closureNote        string, nullable      // manual note (FR-M9) or system template (FR-M14)
+  endedByDepartureId uuid, nullable        // NO db FK -- accepted Policies.targetId trade-off
 }
+CHECK: (status='active' AND endedAt IS NULL AND closureNote IS NULL
+                         AND endedByDepartureId IS NULL)
+    OR (status='ended'  AND endedAt IS NOT NULL AND closureNote IS NOT NULL)
+CHECK: mentorUserId <> menteeUserId
+INDEX: (mentorUserId, status)      -- active-pairs-as-mentor (status query, mentor-side S13)
+INDEX: (menteeUserId, status)      -- mentee-side S13, departure participant lookup
+INDEX: (status)                    -- GET /mentorship-pairs, ?status= filter, departure sweep
+PARTIAL UNIQUE: (mentorUserId, menteeUserId) WHERE status='active'   -- one active pair per pair; recurrence after end allowed (mentorship.md Decision 4)
+PARTIAL INDEX:  (endedByDepartureId) WHERE endedByDepartureId IS NOT NULL   -- AD-20 idempotency re-scan
+-- flagged (mentorship.md Decision 5): PARTIAL UNIQUE (menteeUserId) WHERE status='active' -- one active mentor per mentee
 ```
 
-Normal transition to `ended` requires `closureNote`; departure auto-close writes a system note and bypasses that manual gate. Ended rows are retained. Start/end writes `mentorship_start`/`mentorship_end` `UserEvents` in the same transaction. Pair rows never participate in access resolution. The open-to-mentoring flag is a separate unresolved profile fact; clearing it must not alter active rows.
+- `status` is the source of truth; `endedAt`/`closureNote`/`endedByDepartureId`
+  are populated *by* the `active → ended` transition, never independently.
+- **Normal close** (FR-M9): `closureNote` from the human, `endedByDepartureId`
+  NULL. The mandatory-note gate is an application invariant in
+  `EndMentorshipPairAction`; the DB `CHECK` guarantees no ended pair is noteless.
+- **Departure auto-close** (FR-M14, AD-20): `closureNote` = the fixed system
+  template, `endedByDepartureId` set; `EndMentorshipPairAction`'s gate is not on
+  this path. `systemClosed` in any projection = `endedByDepartureId IS NOT NULL`.
+  Idempotency: `UPDATE … WHERE id=:id AND status='active'` (predicate = mutation
+  key) + per-career-event idempotency key.
+- **No `closedBy`** — the earlier shape carried `closedBy FK -> User, nullable`;
+  no scenario consumes "who ended it" (Conventions / no speculative columns).
+  See [mentorship.md](mentorship.md) Decision 8.
+- Ended rows retained. Start/end writes `mentorship_start`/`mentorship_end`
+  `UserEvents` in the **same transaction** via `user-management`'s exported
+  career-event boundary (AD-11) — mentorship never writes `UserEvents` directly.
+- Pair rows **never** participate in access resolution (AD-17).
+- The `CHECK` and partial indexes use reviewed custom PostgreSQL migration SQL,
+  matching the repo's raw-SQL constraint pattern (Prisma 7 without the
+  `partialIndexes` Preview feature cannot express them).
+
+### MentorshipAvailability (AD-17)
+
+The open-to-mentoring flag — a per-employee fact **independent of any pair**
+(spine Deferred "S13 flag endpoint", resolved 2026-09-01). Owned by `mentorship`
+([mentorship.md](mentorship.md) §2.2). **Not** a `Relationship` row, **not** a
+`MentorshipPair` field.
+
+```text
+MentorshipAvailability {
+  userId          uuidv7 PK, FK -> User    // 1:1 with User
+  openToMentoring  boolean NOT NULL DEFAULT false
+}
+PARTIAL INDEX: (userId) WHERE openToMentoring   -- company-wide pool scan (FR-M4), directory filter (FR-M15)
+```
+
+- One row per user; a missing row means `false` (fail-closed — never in the pool).
+- No `updatedAt`/`updatedBy` — no named consumer (Conventions). §4.9's tracked
+  events are pair start/end only; the §3.4 journal does not cover mentorship.
+- Written by `SetMentorshipAvailabilityAction` via
+  `PATCH /users/:id/mentorship-availability` (Self-only). Never reads or writes
+  `MentorshipPair` (AD-17 — clearing the flag never mutates an active pair).
+- Mentorship status (`open to mentoring` / `mentor`) is **derived, never stored**
+  from this row + the active-pair-as-mentor count.
+
+### Mentorship — additive-migration ordering
+
+Both tables land in **one additive migration** with their indexes and `CHECK`
+constraints (AD-21). `endedByDepartureId` is a plain nullable `uuid` with **no
+DB FK**, so the migration does **not** depend on the `Departure` table (CC-06)
+landing first. There is no mentorship worker; the only ordering constraint is
+that the tables precede any mentorship route or the AD-20 executor seam. The
+`mentorship:assign` permission row + grant (if Decision 1 option (a)) land
+through the Access Control kernel seed sequence, not a mentorship migration.
 
 ### Policies (AD-7)
 

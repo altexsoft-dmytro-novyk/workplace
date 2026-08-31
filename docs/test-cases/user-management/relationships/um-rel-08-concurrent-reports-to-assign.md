@@ -1,6 +1,6 @@
 # UM-REL-08 · Concurrent reports-to assign resolves to one edge
 
-**Trace:** epics.md Story 4.1 · AD-11 · [DEC-UM-010](../../../architecture/user-management-test-decisions.md)
+**Trace:** epics.md Story 4.1 (Change an Employee's Manager) · PRD FR-10 · AD-11 · [DEC-UM-010](../../../architecture/user-management-test-decisions.md)
 
 **Tag:** `@concurrency`
 

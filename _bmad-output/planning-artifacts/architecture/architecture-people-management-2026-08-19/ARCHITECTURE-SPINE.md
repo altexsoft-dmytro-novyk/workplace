@@ -84,7 +84,8 @@ Dependency rule: `application` and `infrastructure` depend on `domain`; `domain`
 
 - **Binds:** repo structure, team decomposition
 - **Prevents:** contexts inventing incompatible layouts; parallel teams colliding in one module
-- **Rule:** every context uses the `application/domain/infrastructure` layout from the Design Paradigm. Confirmed contexts: `user-management` (org facts: users, relationships, projects, departments), `access-control` (policies engine, both role dimensions), `dashboards`. Others (profile, resourcing, cds, mentorship, risk, feedback, campaigns, career-timeline) pending confirmation — see Deferred.
+- **Rule:** every context uses the `application/domain/infrastructure` layout from the Design Paradigm. Confirmed contexts: `user-management` (org facts: users, relationships, projects, departments), `access-control` (policies engine, both role dimensions), `dashboards`, `mentorship`. Others (profile, resourcing, cds, risk, feedback, campaigns, career-timeline) pending confirmation — see Deferred.
+- **Amended 2026-09-01** (mentorship technical design): `mentorship` is a **confirmed** `src/mentorship/` bounded context with the standard layout — the willing-mentor pool, the `MentorshipAvailability` open-to-mentoring aggregate, the durable `MentorshipPair` record, mandatory-note closure, the S13 read projection, the profile-header mentor field, and departure auto-close. Binding design: `docs/architecture/mentorship.md`. It consumes `user-management`'s career-event application boundary and the `AccessControl` facade; it exposes read models to the profile assembler and `applyDepartureEffects` to the AD-20 executor.
 
 ### AD-6 — Two role dimensions never collapse (vocabulary invariant)
 
@@ -170,6 +171,7 @@ Dependency rule: `application` and `infrastructure` depend on `domain`; `domain`
 - **Binds:** mentorship, user-management relationship schema, profile S13, career timeline
 - **Prevents:** losing ended-pair history or the mandatory closure note through hard deletion; accidentally granting an access audience from mentorship
 - **Rule:** A `MentorshipPair` is a persistent record with mentor, mentee, start/end dates, status, and closure note. Normal closure requires a note stored on the pair; departure auto-closure stores a system note and bypasses the manual-note gate. Ended pairs remain queryable. Pair start/end writes the corresponding career-timeline event in the same transaction. Pairing never participates in audience resolution. The open-to-mentoring flag is independent: clearing it never mutates an active pair.
+- **Refined 2026-09-01** (mentorship technical design, `docs/architecture/mentorship.md`): `status ('active'|'ended')` is the single source of truth for lifecycle — `endedAt`/`closureNote` are derived-consistent companions, never independent truth. The system-closed marker is `endedByDepartureId` (nullable `uuid`, **no DB FK** — the accepted `Policies.targetId` trade-off, so the migration does not depend on the `Departure` table); `systemClosed` in every projection = `endedByDepartureId IS NOT NULL`, and the `status='active'` UPDATE predicate is the AD-20 idempotency key. The open-to-mentoring flag is its **own aggregate** — `MentorshipAvailability {userId PK, openToMentoring bool}`, one row per user, in `src/mentorship/` — reached by `PATCH /users/:id/mentorship-availability` (AD-14 shape 3, Self-only), **not** a `Relationship` patch. Mentorship status (`open to mentoring` / `mentor`) is **derived, never stored** — a function of the availability row and the active-pair-as-mentor count.
 
 ### AD-18 — Requirement-fixed facts bind deferred feature designs
 
@@ -198,6 +200,7 @@ Dependency rule: `application` and `infrastructure` depend on `domain`; `domain`
 - **Binds:** current backend user-management implementation, migrations, affected stage-1/2 scenarios and story specs
 - **Prevents:** legacy registration/deactivation routes or interim authorization running beside the v1.5 import/departure/access contracts
 - **Rule:** the product scope is greenfield, but the repository is not: the current backend contains superseded `POST /users`, generic `DELETE /users/:id`, legacy registration/deactivation tests/actions, and an interim target-authorization adapter. Affected regenerated stories must name these as removals/replacements. No dual-running or compatibility alias is permitted: retire the old routes/actions/tests in the same cutover that introduces their v1.5 replacement, apply additive schema migrations before enabling workers, and do not mark PP/departure/profile work done while the interim adapter can authorize target access. Existing test data is re-imported through the approved seeded-population path; no production-data migration is inferred.
+- **Amended 2026-08-31** (Access Control Kernel MVP shipped headless; adoption planned): retirement of the interim target-authorization adapter (`services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts`) and its `ACCESS_CONTROL_PORT` rebind to a real facade-backed adapter in `src/user-management/infrastructure/` are owned by the new adoption slice `_bmad-output/specs/spec-user-management-access-control-adoption/` (CAP-1). The interim adapter is deleted in the same cutover that binds the real one — no dual-running. The interim **session** resolver (`interim-session-resolver.adapter.ts`) is a separate retirement owned by UM Epic 2 (Magic-Link Authentication), not by the adoption slice; this AD-21 clause about the interim adapter authorizing target access refers to the access-control adapter. The write path (`PATCH /users/:id`, `PUT /users/:id/photo`) cannot be fully dual-gated until a `user-management:edit` functional permission exists — see the adoption SPEC's Open decisions; option (a) triggers a new Access Control kernel seed AD-1 sequence.
 
 ## Consistency Conventions
 
@@ -232,6 +235,9 @@ erDiagram
   User ||--o{ UserEvents : "userId"
   User ||--o{ EmploymentStatus : "userId"
   User ||--o{ Departure : "userId"
+  User ||--o{ MentorshipPair : "mentorUserId"
+  User ||--o{ MentorshipPair : "menteeUserId"
+  User ||--o| MentorshipAvailability : "userId"
   User {
     uuid id
     string ttId
@@ -248,7 +254,14 @@ erDiagram
     uuid mentorUserId
     uuid menteeUserId
     string status
+    date startedAt
+    date endedAt
     string closureNote
+    uuid endedByDepartureId
+  }
+  MentorshipAvailability {
+    uuid userId
+    boolean openToMentoring
   }
   UserEvents {
     uuid id
@@ -295,8 +308,8 @@ erDiagram
 - **Department edge modeling detail** — the nested department entity, exactly-one membership, department-manager access, resourcing routing, timeline event, and CDS key are fixed by §2.1/§4.7/§4.9/§4.10/§4.17 and AD-18. Exact indexed edge schema remains pending the non-manager-assignment answer. Until resolved, department-derived access is fail-closed.
 - **Timetracker & PeopleForce integration design** — API drafts are not present in the repository. Before adapter scenarios or code, obtain/inspect the timetracker contract and record whether project assignment is events or state-at-sync; do not assume. Only `ttId`, the single-writer rule (AD-13), outage/revocation rules (AD-10), and AD-18 discovery gate are fixed. Partial/intermittent success remains DEC-03.
 - **Agent rule-loading guarantee** — how `docs/architecture/` is force-loaded into every agent session (candidate: `project-context.md` / AGENTS.md wiring via bmad-project-context).
-- **S13 mentorship self-visibility flag's exact endpoint** — the open-to-mentoring flag is independent of `MentorshipPair` (AD-17), but its owning aggregate and endpoint remain unresolved. Do not infer it as a relationship patch.
-- **S10 leaves / S15 request-history write paths** — no scenario in either test suite exercises a write; only the read route (`GET /users/:id/leaves`, `GET /users/:id/request-history`, AD-14) is fixed. Mentorship context boundaries and endpoint details remain pending, but durable pair semantics are fixed by AD-17.
+- **S13 mentorship self-visibility flag's exact endpoint** — **Resolved 2026-09-01** (`docs/architecture/mentorship.md` §2.2/§4): the flag is its own aggregate `MentorshipAvailability {userId PK, openToMentoring bool}` in `src/mentorship/`, written by `PATCH /users/:id/mentorship-availability` (AD-14 shape 3, Self-only), independent of `MentorshipPair` (AD-17). Not a relationship patch.
+- **S10 leaves / S15 request-history write paths** — no scenario in either test suite exercises a write; only the read route (`GET /users/:id/leaves`, `GET /users/:id/request-history`, AD-14) is fixed. *(Updated 2026-09-01: the mentorship context boundary and endpoints are now fixed by `docs/architecture/mentorship.md` — `GET/POST /mentorship-pairs`, `GET /mentorship-pairs/:id`, `POST /mentorship-pairs/:id/end`, `GET /mentorship-pool`, `GET/PATCH /users/:id/mentorship-availability`; durable pair semantics remain as AD-17.)*
 - **`resourcing` context's write path into `Relationship`** — once `resourcing` is confirmed (AD-5), its "request fulfilled → add user to project" flow must go through `user-management`'s application layer (AD-2), never write `Relationship` rows directly. AD-2 already makes this safe if followed; worth an explicit note on that specific seam once `resourcing` lands.
 - **`/roles` catalog surface** — AD-14 fixes attachment (`/users/:id/policies`) and now `GET/POST/DELETE /roles` + `PATCH /roles/:roleId/permissions`, but full request/response shapes aren't specified; low risk, AD-1's gate forces this out per-feature when `users/roles/` scenarios are actually built.
 - **Departure cancellation/rescheduling** — AD-20 fixes create, observe, execute, retry, and convergence only. No `PATCH`/`DELETE`, cancel, or reschedule behavior may be inferred without a product decision.

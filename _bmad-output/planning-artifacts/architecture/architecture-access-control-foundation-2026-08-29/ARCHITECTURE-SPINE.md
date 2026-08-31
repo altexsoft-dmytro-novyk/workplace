@@ -148,6 +148,7 @@ flowchart LR
 | **Named residual risk** | Normalized `workEmail` uniqueness | Not database-enforced. ACM-0 fails closed on multiple normalized matches; the functional unique index is separately gated deferred work. |
 | **Blocks each new production behavior** | AD-1 sequence | Independent Stage-1 approval, separate approved red kernel integration evidence, then production; one dispatch per stage. |
 | **Does not block the kernel** | User Management consumer contract and HTTP mapping | Defer to the separate User Management-owned integration story; it keeps the product gate open. |
+| **Pointed 2026-08-31** | User Management consumer contract and HTTP mapping | The six `um-integration-contract-request.md` questions are answered in `../../../implementation-artifacts/access-control/um-integration-contract-response.md`; production `ACCESS_CONTROL_PORT` rebind, per-route mapping, projection boundary, and real-consumer HTTP E2E are owned by `../../../specs/spec-user-management-access-control-adoption/`. The product gate stays open until that package and the separate Profile Projection story land. |
 
 ## Deferred
 

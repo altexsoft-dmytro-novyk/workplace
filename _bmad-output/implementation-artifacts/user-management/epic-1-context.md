@@ -1,44 +1,109 @@
-# Epic 1 Context: Employee Record Lifecycle
+# Epic 1 Context: Employee Record Management
 
-<!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
+<!-- Regenerated 2026-09-01 from epics.md v1.5 — supersedes the pre-v1.5 version; NOT an AD-1 approval. -->
+<!-- Compiled planning context for a future story-authoring / dev pass. NOT an AD-1 stage-1 scenario doc (those live in docs/test-cases/user-management/ and are the TEA phase's job). -->
 
 ## Goal
 
-This epic delivers the `User` entity's full lifecycle: HR Admin onboards a new hire, any entitled actor (Self / Manager-line / People Partner) can read and edit that person's identity-card fields, the employee can upload their own photo, HR Admin can deactivate someone who has left, and any entitled actor can page through the employee directory with filters. All five stories share one `User` entity, controller, and migration, so they're grouped as one epic rather than split. This is the foundational surface every other domain epic depends on: Epic 2's login needs a `User` row to exist, and Epic 3's automatic career-timeline events hook directly into this epic's create/update handlers.
+Entitled actors manage identity data over the **seeded, imported** population
+(§4.17): the `User` identity record, S1 identity-card read/edit, Self photo
+upload, and a paginated permission-safe public listing. There is **no employee
+creation** — no `POST /users`, no AD, no SSO. Generic deactivation is gone;
+`isActive` is an internal account/row-retention flag only, and the v1.5
+lifecycle (departure) lives in Epic 5. Epic 1 is the foundational `User` surface
+Epic 2's login and Epic 3's automatic events depend on.
 
 ## Stories
 
-- Story 1.1: HR Admin Registers a New Hire
+- Story 1.1: Import Seeded Population
 - Story 1.2: View and Edit an Employee's Identity-Card Fields
 - Story 1.3: Self Uploads Own Photo
-- Story 1.4: HR Admin Deactivates an Employee
 - Story 1.5: List Employees with Pagination and Filters
+
+*(There is no Story 1.4. The pre-v1.5 "HR Admin Deactivates an Employee" is
+retired — see `spec-1-4-hr-admin-deactivates-an-employee.md`, a SUPERSEDED
+pointer.)*
 
 ## Requirements & Constraints
 
-- The very first `User` is created by a seed script with the HR Admin role assigned directly — not through the registration endpoint. That bootstrap behavior has its own acceptance test elsewhere; this epic doesn't re-test it.
-- Registration is HR-Admin-driven on the new hire's behalf, not self-service. There is no intermediate "invited/pending" status: a registered record is `isActive: true` immediately, and dispatching a magic-link email is the activation-equivalent step. No password or credential is ever stored or returned.
-- `workEmail` and `ttId` must be unique at write time, enforced on both create and edit — a conflicting write is rejected wholesale (no partial update), leaving the existing record unchanged.
-- `photo` is the only identity-card field an employee can write on themselves, via a dedicated full-replace upload endpoint (distinct from the general field-edit endpoint).
-- Deactivation is a soft delete: it flips `isActive` to `false` but the record stays fully readable by id (never 404s) — only list-style views exclude inactive records by default.
-- This suite covers workflow/data correctness only, not who is entitled to do it — entitlement logic itself is proven in access-control's own test suite. Every controller must still route entitlement checks through the shared facade rather than reimplement checks locally.
-- The list endpoint's filters cover only the fields that live on the `User` row (name, position, location, contact fields, dates, `ttId`, `isActive`); dynamic custom-field filtering, saved views, export, and inline editing are explicitly out of scope for this epic.
-- The list endpoint must stay performant at 500+ records with arbitrary filters, including permission resolution — a joint budget shared with access-control's tier resolution.
-- `User` carries real personal data (photo, birth date, work email/phone) — use only pseudonymised data outside production; never real personal data in logs, fixtures, or the repo.
-- Failures in future external integrations (e.g. timetracker, which will eventually populate/consult `ttId`) must never take the application down.
+- **No `POST /users`.** The population is an idempotent seeded import keyed by
+  external timetracker identity (`ttId`). Creating employees via API or UI is
+  out of scope (AD-14, AD-16, §4.17). `POST /users` and generic
+  `DELETE /users/:id` are **retired in the v1.5 cutover** (AD-21) — a
+  regenerated Story 1.1/1.2 must name them as removals, not extend them.
+- **Kernel-reality constraints on the seed/import writer (2026-09-01):**
+  - **DEC-UM-007 canonical at write** — the writer trims + lowercases
+    `workEmail` and **stores the normalized value**. The DB `users_workEmail_key`
+    index is on the raw value, so normalized uniqueness is a writer-side
+    guarantee; a DB-enforced functional unique index is deferred work
+    (`deferred-work.md`).
+  - **DEC-UM-009 / ACM-0** — `npm run db:seed` has already created the single
+    active root `User` (normalized `workEmail`) before import runs (order:
+    `db:deploy` → `db:seed` → `db:bootstrap:access-control` → `start:prod`). An
+    import covering the root person **reuses the ACM-0 root `User` id**; no
+    writer inserts a second row for a normalized email that already exists.
+  - Each imported `User` gets a system `joined_company` `UserEvents` row written
+    synchronously in the same transaction as the row insert (AD-11 / Epic 3
+    pattern) — not via an HTTP create.
+- **Authorization is Epic 0's, not Epic 1's.** This suite covers workflow / data
+  correctness only. `PATCH`/`GET /users/:id` entitlement — Self / reporting / PP
+  allowed, colleague denied, the §2.2 dual gate — is asserted by Epic 0 against
+  the real `AccessControlFacade`. Do not duplicate entitlement scenarios here;
+  do not harden the interim-permissive `isAllowedForTarget`.
+- **FR-9 (S1 write).** Self can directly write only the photo (Story 1.3).
+  Manager, People Partner, and department are shown in S1 but changed only
+  through Epic 4's dedicated screen — `UpdateUserDto` has no such properties and
+  `EditUserAction` rejects them (tested).
+- **`workEmail`/`ttId` unique at write** — on the seed/import writer and on
+  authorized identity `PATCH`; a conflicting write is rejected wholesale
+  (`409`), leaving the target row unchanged. `ttId` null-vs-null is not a
+  duplicate.
+- **List scope (Story 1.5).** Filters cover permission-safe S1 fields on the
+  `User` row plus employment status. Technical `ttId`/`isActive` are never
+  public filters. A `dismissed` employee is absent from the default list but
+  findable through an authorized employment-status filter. Dynamic custom
+  fields, saved views, export, and inline editing are platform directory scope.
+- **NFR-1** pseudonymised data only. **NFR-2** `GET /users` within 2 s for 500+
+  records with arbitrary filters incl. permission resolution (joint budget with
+  access-control). **NFR-3** future integration failures degrade gracefully.
+  **NFR-4** every controller calls through the facade — made concrete by Epic 0
+  (FR-16).
 
 ## Technical Decisions
 
-- Standard hexagonal layout: `application/` (actions, controllers, DTOs), `domain/` (interfaces, services, entities), `infrastructure/` (Prisma repositories, adapters). Domain code must import nothing from Prisma, NestJS transport, or HTTP.
-- Fixed router shapes for the `User` resource: `POST /users`, `GET /users` (list/filter), `GET /users/export` (out of this epic's scope, but must be declared *before* `:id` routes so it isn't swallowed by a param route — the ordering rule applies to any sibling literal route this epic adds), `GET /users/:id`, `PATCH /users/:id` (partial update), `DELETE /users/:id` (soft-delete, not a real row delete), `PUT /users/:id/photo` (full-replace multipart — deliberately `PUT`, not `PATCH`).
-- Every entitlement check goes through one shared AccessControl facade — either a no-target capability check or a target-scoped tier check — never a direct role-flag or policy-table read inside a user-management controller.
-- `User` fields: `id` (uuidv7), `firstName`, `lastName`, `photo` (nullable), `position`, `country`, `city`, `workEmail` (unique), `workPhone` (nullable), `birthDay` (nullable int, 1-31) + `birthMonth` (nullable int, 1-12) — two separate fields, no year captured or stored for any audience; §3.2 S1 content is literally "birthday (day and month)", and the earlier single full-`birthDate` design invented an audience-based year-redaction rule the source doesn't state (resolved 2026-08-25) — `companyJoinDate`, `isActive` (default `true` — soft delete; not a status modeled on project-requirements.md, which never describes a deactivation feature; exists because `UserEvents`/`Relationship` rows reference `User` by FK and must stay valid after someone leaves; distinct from S4's sourced "employment status" field, still unbuilt), `ttId` (nullable, unique, reserved for a future timetracker integration), `customFields` (jsonb, interim only — don't build persistence assuming this shape survives), `createdAt`, `createdBy` (FK to `User`). No `updatedAt`/`updatedBy` — omitted deliberately, no named consumer yet; don't add speculatively.
-- Manager, current project(s), people partner, department, and mentor are deliberately never columns on `User` — they're derived from a separate relationships/policy mechanism owned by other epics. Don't reintroduce them here even as convenience fields.
-- Quality gate: an approved scenario document must exist before an E2E test is written, and an E2E test must exist and be red before production code is written — no story skips the middle stage. Stories 1.1–1.4 already have draft scenario docs pending approval under `docs/test-cases/user-management/` (registration, profile, deactivation folders) — reuse and get them approved rather than rewriting from scratch. Story 1.5 (the list endpoint) has no scenario doc yet; its owner starts from a blank page.
-- E2E tests hit the real HTTP → router → DB stack, but any outbound integration (e.g. the magic-link dispatch triggered by registration) is rebound to a fixture-backed fake in the test module — no live third-party calls in tests.
+- Standard hexagonal layout: `application/` (actions, controllers, DTOs),
+  `domain/` (interfaces, services, entities), `infrastructure/` (Prisma
+  repositories, adapters). Domain imports nothing from Prisma, NestJS transport,
+  or HTTP.
+- Router shapes (AD-14, `api-conventions.md` shape 1): `GET /users`,
+  `GET /users/export` (declared **before** `:id`), `GET /users/:id`,
+  `PATCH /users/:id`, `PUT /users/:id/photo` (multipart, full-replace).
+  **No `POST /users`, no generic `DELETE`.**
+- `User` fields per `database-schema.md`: `id` (uuidv7), `firstName`,
+  `lastName`, `photo` (nullable), `position`, `country`, `city`, `workEmail`
+  (unique, normalized-stored), `workPhone` (nullable), `birthDay` (1-31) +
+  `birthMonth` (1-12) — two fields, no year — `companyJoinDate`, `isActive`
+  (default `true`, internal row-retention only), `ttId` (nullable, unique),
+  `customFields` (jsonb, interim), `createdAt`, `createdBy`. No
+  `updatedAt`/`updatedBy` (no named consumer). Manager / project / people
+  partner / department / mentor are **never** columns on `User`.
+- Photo storage (Story 1.3) needs a real `ObjectStoragePort` + real adapter
+  (AD-15: photo storage is Story 1.3's own deliverable — no fake at the adapter
+  level; the `src/storage/` `S3StorageAdapter` + LocalStack precedent applies).
+  A fixture fake standing in for photo storage does **not** make Story 1.3 done.
+- `EmploymentStatus` (`active`/`dismissed`, time-bounded) is distinct from
+  `isActive` and from the predictive `leaver` risk level. Story 1.5's default-
+  list exclusion reads it; the write path is Epic 5.
 
-## Cross-Story Dependencies
+## Cross-Story / Cross-Epic Dependencies
 
-- Story 1.1's registration flow triggers a magic-link dispatch as a side effect, but only through an outbound port — the real email-sending adapter belongs to the (separately built) authentication epic. Story 1.1's own tests bind that port to a fake, so it isn't blocked waiting on that other epic.
-- Story 1.4 (deactivate) deliberately does not implement "deactivated users are excluded from the list" — that behavior belongs to Story 1.5.
-- Story 1.2's edit handler is the same code path a later epic's automatic change-logging will hook into; no action needed now, but avoid designing the handler in a way that would make adding that hook awkward later.
+- Story 1.2's authorization ACs are satisfied by **Epic 0**.
+- Story 1.1's `joined_company` write and Story 1.2's `position_change` write are
+  the hooks **Epic 3 Story 3.1** attaches to — those handlers must exist as real
+  code before Epic 3 Story 3.1 can wire in.
+- Epic 2 seeds its precondition `User` row directly via Prisma or the import
+  script, not through any Epic 1 HTTP surface (AD-3).
+- The pre-v1.5 backend (`register-user.action.ts`, `deactivate-user.action.ts`,
+  `POST /users` + `DELETE /users/:id` in `users.controller.ts`) is **retired**
+  in the same cutover that introduces the v1.5 import/departure contracts
+  (AD-21). Existing test data is re-imported through the seeded-population path.

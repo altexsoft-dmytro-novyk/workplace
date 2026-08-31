@@ -1,11 +1,11 @@
 # User Management — Approved Test & Product Decisions
 
-**Status:** NORMATIVE (approved 2026-08-25)  
+**Status:** NORMATIVE (approved 2026-08-25); **create-path decisions reframed 2026-09-01** for v1.5 (no `POST /users`) and kernel reality — see the per-decision notes and the consolidated proposal `sprint-change-proposal-2026-09-01-user-management-access-control-alignment.md`.
 **Source:** System-level TEA test design + critical review, human-approved by product owner  
-**Applies to:** `user-management` bounded context — Epics 1–4, stage-1 scenarios, implementation  
+**Applies to:** `user-management` bounded context — Epics 0–5, stage-1 scenarios, implementation  
 **Supersedes:** Prior "assumption" and "open question" entries in `spec-user-management-test-cases/SPEC.md` for the items below
 
-These decisions are binding for scenario documents, E2E tests, and implementation unless explicitly reopened through the architecture change process.
+These decisions are binding for scenario documents, E2E tests, and implementation unless explicitly reopened through the architecture change process. The 2026-09-01 reframe is editorial-to-v1.5, not a reopening: it renames "registration / `POST /users`" to "seed/import writer" where the behaviour still holds, and marks the rest RETIRED. This file is a companion of `spec-user-management-test-cases`; the TEA phase realigns that SPEC — this file is left internally consistent for that pass.
 
 ---
 
@@ -17,19 +17,21 @@ These decisions are binding for scenario documents, E2E tests, and implementatio
 
 **Rationale:** §4.9 is the more specific workflow rule for manual backfill; §3.2 S9 governs read access for the broader Manager line.
 
+**v1.5 mapping (2026-09-01):** this is Epic 3 Stories 3.2 (manual add) and 3.3 (edit/delete). It is the §2.2 dual gate plus a §3.3 matrix exception — the actor needs **both** the runtime *edit the career timeline* permission **and** the narrowed S9 write audience (assigned PP or direct Unit Manager). "Unit Manager" = the manager of the employee's department (§4.17); there is no separate "unit" entity.
+
 ---
 
 ## DEC-UM-002 — Deactivation authorization (B-02 / A-02)
 
-Deactivation is gated by a **no-target AccessControl feature capability** held by the HR Admin role. Controllers must not hard-code role names.
+**v1.5 note (2026-09-01):** generic product deactivation is retired (AD-16 — `isActive` is an internal row-retention flag only; the v1.5 lifecycle is the Epic 5 departure workflow). The **principle carries**: any capability check — including the Epic 0 adoption adapter and the departure command — is a **no-target AccessControl feature capability** check through the facade; **no controller, action, domain service, or adapter hard-codes a role name or `User.position`** (`access-control.md`, AD-4 prohibits `position === 'HR Admin'` as an authorization rule). The interim adapter's `actor.position === 'HR Admin'` check is exactly what Epic 0 CAP-1 deletes.
 
-**Test convention:** Use **Ida** (holds an unrelated functional permission) for generic feature-permission denial probes. Use Bob only when testing a distinct manager-specific denial unrelated to the deactivation capability.
+**Test convention:** Use **Ida** (holds an unrelated functional permission) for generic feature-permission denial probes. Use Bob only when testing a distinct manager-specific denial unrelated to the capability under test.
 
 ---
 
-## DEC-UM-003 — `customFields` on registration (B-05 / A-03)
+## DEC-UM-003 — `customFields` at seed/import (B-05 / A-03) — REFRAMED (v1.5 — no `POST /users`)
 
-The `User.customFields` column defaults to `{}` at the database level. Registration payloads omit `customFields`; the created row persists `{}`.
+The `User.customFields` column defaults to `{}` at the database level. The **seed/import writer** omits `customFields`; the created row persists `{}`. (The original wording was about a registration payload; there is no registration payload in v1.5. The DB-default behaviour is unchanged and still worth a seed/import assertion — trace `um-seed-*`.)
 
 ---
 
@@ -53,29 +55,31 @@ At most one active `direct` reports-to edge per employee (AD-11 UNIQUE). Reassig
 
 **Accepted residual:** A failed `POST` after successful `DELETE` may temporarily leave the employee without a manager under the reject-then-retry workflow.
 
----
-
-## DEC-UM-006 — Server-owned create fields (OQ1)
-
-Client-supplied `id`, `createdAt`, or `createdBy` in a `POST /users` payload returns **`400`**. The server does not silently strip caller-supplied audit or identity fields.
+**v1.5 mapping (2026-09-01):** still valid for Epic 4 Story 4.1 (change an employee's manager). The write goes through the dedicated `change organisational relationships` permission and the organisational-relationship screen, rejects self-assignment, and journals atomically (§3.4) — the journal-writing stage is blocked on CC-07 (AD-19 Journal gate).
 
 ---
 
-## DEC-UM-007 — `workEmail` normalization (OQ2)
+## DEC-UM-006 — Server-owned create fields (OQ1) — RETIRED (v1.5 — no `POST /users`)
 
-Trim outer whitespace and lowercase before validation, storage, lookup, and uniqueness comparison. Uniqueness is enforced on the normalized value.
-
----
-
-## DEC-UM-008 — Registration dispatch durability (OQ3 / B-04)
-
-Registration commits the `User`, `joined_company` `UserEvents` row, and **durable magic-link dispatch intent**, then returns **`201`**. A downstream email transport failure does **not** roll back the employee. Failure is observable (pending/failed) and retryable. Retry count and backoff are operational configuration.
+There is no `POST /users` create payload in v1.5, so "client-supplied `id`/`createdAt`/`createdBy` returns `400`" has no surface. The seed/import writer owns all audit/identity fields by construction (it is the writer, not a request handler). No equivalent is needed. See Story 1.1 (`um-seed-*`). If a future operator batch-import transport is specified (AD-14/AD-16 follow-up), its own AD-1 scenario decides how it treats operator-supplied identity fields.
 
 ---
 
-## DEC-UM-009 — Rehire identity (OQ4)
+## DEC-UM-007 — `workEmail` normalization (OQ2) — KEPT, reconciled to kernel reality
 
-A deactivated employee retains the same `User` identity and history. `POST /users` must never create a second row for a normalized email that already exists (active or inactive). A dedicated rehire/reactivation endpoint is out of scope for this decision; when it lands, it must reuse the existing `User` id.
+Trim outer whitespace and lowercase before validation, storage, lookup, and uniqueness comparison. **Identity is canonical *at write*:** the **seed/import writer** stores the normalized value (previously the seed stored `ROOT_WORK_EMAIL` verbatim; the API DTOs already normalized on write). The database `users_workEmail_key` index is on the **raw stored value**, so normalized uniqueness is a **writer-side** guarantee — the earlier wording "uniqueness is enforced on the normalized value" is corrected to **"writer-side canonical; a DB-enforced functional unique index over the normalized value is deferred work"** (`_bmad-output/implementation-artifacts/access-control/deferred-work.md`). ACM-0 (`npm run db:seed`) applies this for the root row; Story 1.1's import applies it for every imported row. Exact-one eligibility counts **all** normalized matches first, checks active state only afterwards.
+
+---
+
+## DEC-UM-008 — Registration dispatch durability (OQ3 / B-04) — RETIRED (v1.5 — no registration)
+
+There is no registration transaction in v1.5. Seed/import does **not** dispatch a magic link (FR-3: completing seed/import does not establish a session, and there is no separate invite path). The `joined_company` `UserEvents` row is still written at import — synchronously, same transaction as the row insert (AD-11 / Epic 3 pattern) — trace `um-seed-*` / `um-ct-01`. Magic-link dispatch durability now belongs entirely to Epic 2 Story 2.1 (`POST /auth/magic-link`) and its own DEC-UM-004 rules; there is no create-time dispatch to make durable.
+
+---
+
+## DEC-UM-009 — Rehire identity (OQ4) — KEPT, reframed to the seed/import writer
+
+A deactivated employee retains the same `User` identity and history. **No writer — seed, import, or any future rehire endpoint — creates a second row for a normalized email that already exists (active or inactive).** Concretely for v1.5: ACM-0 (`npm run db:seed`) creates the single active root `User` before Story 1.1's import; an import covering the root person **reuses the ACM-0 root `User` id** rather than inserting a second row (Kernel MVP SPEC constraint; DEC-UM-007 canonical-at-write makes the normalized-match check reliable). A dedicated rehire/reactivation endpoint stays out of scope; when it lands it must reuse the existing `User` id. Trace `um-seed-*`.
 
 ---
 
@@ -108,17 +112,19 @@ This closes the one case DEC-UM-004 left open (known-but-deactivated email) with
 
 ## Traceability
 
+`um-reg-*` rows are dropped — the registration suite is retired with `POST /users` (v1.5). `um-seed-*` is Story 1.1's seed/import suite; its exact case ids are the TEA phase's to fix (`docs/test-cases/user-management/seed/`).
+
 | Decision | Primary scenarios |
 | --- | --- |
-| DEC-UM-001 | `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06` |
-| DEC-UM-002 | `um-deact-01`, `um-deact-03`, `um-reg-03` |
-| DEC-UM-003 | `um-reg-01` |
+| DEC-UM-001 | `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06` (Epic 3 Stories 3.2/3.3) |
+| DEC-UM-002 | `um-seed-*` (capability-denial probe), Epic 0 adoption `isAllowed` cases, Epic 5 departure-permission denial |
+| DEC-UM-003 | `um-seed-*` (imported row persists `customFields: {}`) |
 | DEC-UM-004 | `um-auth-01`..`06` |
-| DEC-UM-005 | `um-rel-01`..`03` |
-| DEC-UM-006 | `um-reg-10` |
-| DEC-UM-007 | `um-reg-11` |
-| DEC-UM-008 | `um-reg-05`, `um-reg-13` |
+| DEC-UM-005 | `um-rel-*` (Epic 4 Story 4.1 reports-to reassignment) |
+| DEC-UM-006 | RETIRED — no `POST /users` payload in v1.5 |
+| DEC-UM-007 | `um-seed-*` (writer stores normalized `workEmail`); ACM-0 covers the root row |
+| DEC-UM-008 | RETIRED — no registration-time dispatch; `joined_company` at import traces `um-seed-*` / `um-ct-01` |
 | DEC-UM-012 (proposed) | `um-auth-06` |
-| DEC-UM-009 | `um-reg-12` |
+| DEC-UM-009 | `um-seed-*` (import reuses the ACM-0 root `User` id; no second row for an existing normalized email) |
 | DEC-UM-010 | All suites; `@concurrency` tags |
 | DEC-UM-011 | `um-ct-03` vs `um-rel-04`/`05` |
