@@ -255,3 +255,13 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-08-31T02:40:25Z"
+
+  - story_id: "ACM-0-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "prisma/seed.ts"
+    commit: "60c548396fb5c8f576ae1e6477bde3a9bd1f712c"
+    author: "Codex (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-08-31T02:59:12Z"
