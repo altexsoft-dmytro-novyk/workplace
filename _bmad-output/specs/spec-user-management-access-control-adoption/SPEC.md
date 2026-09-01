@@ -1,7 +1,8 @@
 ---
 id: SPEC-user-management-access-control-adoption
-status: draft
-implementation_status: not-authorized
+status: approved
+implementation_status: stage-1-authorized
+authorized_by: 'Dmytro Novyk (Product Owner / Architect) — 2026-09-01'
 companions:
   - stories.yaml
   - .memlog.md
@@ -25,11 +26,14 @@ sources:
 ---
 
 > **Canonical contract.** This SPEC and its companions define the User
-> Management adoption of the Access Control facade. It authorizes no
-> scenario, test, or production code: every capability below still runs the
-> full AD-1 three-stage gate with independent human approval, recorded in
-> this package's own `approvals.yaml` when it exists. Nothing here is
-> approved.
+> Management adoption of the Access Control facade. The SPEC itself and its
+> Open Decisions are approved (Dmytro Novyk, Product Owner / Architect,
+> 2026-09-01 — see the alignment proposal §8): decision (i) = option (a),
+> (iii) = dedicated Epic 0, (iv) = Epic 2 owns the session resolver, (v) =
+> photo Self-only, (vi) = no separate photo permission. Stage-1 scenario
+> authoring is authorized. This still authorizes **no** test or production
+> code: every capability below runs the full AD-1 three-stage gate with
+> independent human approval, recorded in this package's own `approvals.yaml`.
 
 # User Management — Access Control Adoption
 
@@ -278,32 +282,29 @@ approval in this package's `approvals.yaml`. The read leak
 FR-17 field/record narrowing and the broader access program remain
 explicitly deferred.
 
-## Open decisions (for the human / Product Manager — not defaulted here)
+## Open decisions — TAKEN 2026-09-01 (Dmytro Novyk, Product Owner / Architect)
 
-1. **Missing edit/photo permission — option (a) or (b).**
-   (a) Access Control adds `user-management:edit` (± a photo permission) to
-   the bootstrap catalog and grant, via a new three-stage AD-1 sequence in
-   the kernel package; the adoption slice's write path then blocks on it.
-   (b) Adopt `READ` now; keep `EDIT`/`UPLOAD_PHOTO` on a narrow interim rule
-   in the real adapter with a `// INTERIM` comment and an explicit expiry
-   trigger. Response doc recommends (a); the call is the human's.
-2. **Is photo a distinct permission or covered by `user-management:edit`?**
-   §2.3 catalog does not name a photo permission. Recommendation: not
-   separate — photo is Self-only by FR-9, so the functional half is "editing
-   your own row." Confirm.
-3. **May a manager (reporting / PP) replace a report's photo, or is photo
-   strictly Self-only?** FR-9 says "Self can directly write only the photo."
-   Recommendation: Self-only. Confirm before the CAP-2 photo scenario is
-   authored.
+All five are decided; recorded here and in the alignment proposal §8.
+
+1. **Missing edit/photo permission — RESOLVED: option (a).** Access Control
+   adds `user-management:edit` to the bootstrap catalog and grant via a new
+   three-stage AD-1 sequence in the kernel package; the adoption slice's write
+   path (CAP-2 write / Story 0.2) blocks on that sequence reaching
+   `stage-3-production`. The read path (Story 0.1) is unaffected and proceeds
+   now.
+2. **Photo permission — RESOLVED: not separate.** Photo is covered by
+   `user-management:edit`; §2.3 catalog names no distinct photo permission and
+   none is added.
+3. **Manager-writable photo — RESOLVED: Self-only.** A reporting-line manager
+   or PP may not replace a report's photo (FR-9).
 4. **RESOLVED 2026-09-01 — colleague gets the S1 card in Story 0.1.** The
    colleague `GET /users/:id` read is `200` with the S1 identity card from
-   Story 0.1 (§3.2 S1 = `R` for Colleague). What the FR-17 Profile Projection
-   story still owns for a colleague is narrower: the S10 dates-only view (its
-   own route `GET /users/:id/leaves`), the S11 project-name-only view, and
-   S16 per-field custom-field visibility. Confirm those three remain FR-17's.
-5. **Sequencing against UM Epic 1 / Epic 4.** This slice touches the same
-   controller as Story 1.2 (`PATCH /users/:id`) and depends on `Relationship`
-   `direct` / `people_partner` rows existing as fixtures — the PP write path
-   is blocked by CC-07 (journal schema) per AD-19, but PP *read/resolution*
-   is not. Confirm where the adoption epic sequences relative to Epic 1
-   Story 1.2 and Epic 4.
+   Story 0.1 (§3.2 S1 = `R` for Colleague). The FR-17 Profile Projection story
+   still owns the narrower colleague views: the S10 dates-only view (its own
+   route `GET /users/:id/leaves`), the S11 project-name-only view, and S16
+   per-field custom-field visibility — these remain FR-17's.
+5. **Sequencing against UM Epic 1 / Epic 4 — RESOLVED.** Dedicated Epic 0,
+   sequenced before Epic 1's write paths; its read path (Story 0.1) starts now.
+   Story 1.2's authorization ACs are satisfied by Epic 0 (Story 1.2 asserts
+   data correctness only). PP *read/resolution* is available now; the PP write
+   path stays blocked by CC-07 (journal schema) per AD-19.

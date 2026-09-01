@@ -1,7 +1,7 @@
 ---
 title: Sprint Change Proposal — User Management ↔ Access Control Alignment
 date: 2026-09-01
-status: proposed
+status: approved
 mode: batch
 scope: user-management-planning-artifacts-and-companion-docs-only
 normativeSoT: docs/project-requirements.md
@@ -10,17 +10,20 @@ builds_on:
   - sprint-change-proposal-2026-08-30-access-control-kernel-mvp.md
   - sprint-change-proposal-2026-08-30-kernel-mvp-p2-repair.md
 architect_handoff: _bmad-output/implementation-artifacts/access-control/architect-handoff-phase-b.md
-approved_by:
+approved_by: 'Dmytro Novyk (Product Owner / Architect) — 2026-09-01'
 ---
 
-> **Status boundary.** `status: proposed` — nothing here is approved. Regenerated
-> story specs are `status: draft`; no `_bmad-output/specs/*/approvals.yaml` is
-> touched; the Approval block (§8) is an unsigned template. This proposal changes
-> planning artifacts and `docs/architecture/` companion docs only — **no
-> application code, Prisma schema, migration, seed, or test file**, and nothing
-> under `services/backend/`. The v1.5 alignment of the PRD and `epics.md` was
-> done by the approved 2026-08-29 correct course and is **not** re-litigated;
-> this is the delta.
+> **Status boundary.** `status: approved` — the planning-artifact and
+> `docs/architecture/` companion-doc changes in §4 are approved (Dmytro Novyk,
+> Product Owner / Architect, 2026-09-01), and the §7 Open Decisions are taken
+> per §8. This approval touches **no** `_bmad-output/specs/*/approvals.yaml`:
+> regenerated story specs stay `status: draft` and each still runs its three
+> AD-1 stages with independent human approval. This proposal changed planning
+> artifacts and `docs/architecture/` companion docs only — **no application
+> code, Prisma schema, migration, seed, or test file**, and nothing under
+> `services/backend/`. The v1.5 alignment of the PRD and `epics.md` was done by
+> the approved 2026-08-29 correct course and is **not** re-litigated; this is
+> the delta.
 
 ---
 
@@ -470,27 +473,45 @@ Mentorship context (prd-mentorship-2026-09-01 / mentorship/epics.md — §4.8):
 
 ## 8. Approval
 
-*(Unsigned template — nothing in this document is approved. Fill at review time.)*
+**Approved by Dmytro Novyk (Product Owner / Architect), 2026-09-01.** Every Open
+Decision below is taken at the architect's recommended option.
 
 - Overall proposal (Direct Adjustment, Epic 0 added, compiled artifacts
-  regenerated as `draft`): ______________________  (approver / date)
-- Open Decision (i) — missing `user-management:edit` permission: option ____
-  (a / b): ______________________
+  regenerated as `draft`): **APPROVED** — Dmytro Novyk / 2026-09-01
+- Open Decision (i) — missing `user-management:edit` permission: **option (a)** —
+  Access Control adds `user-management:edit` to the bootstrap catalog + grant via
+  a new three-stage AD-1 kernel-seed sequence; Epic 0 Story 0.2 then consumes it.
 - Open Decision (ii) — two-state colleague rule + §3.3.4 whitelist scope:
   **RESOLVED 2026-09-01 — colleague `GET /users/:id` returns the S1 identity card
   in Story 0.1; two-state rule and `UMAC-3` removed; empty audience → `404`.**
-- Open Decision (iii) — Epic 0 vs Story 1.0: ______________________
+- Open Decision (iii) — Epic 0 vs Story 1.0: **dedicated Epic 0.**
 - Open Decision (iv) — interim session resolver owner (Epic 0 / Epic 2):
-  ______________________
-- Open Decision (v) — photo Self-only vs manager-writable: ______________________
-- Open Decision (vi) — photo a distinct permission (yes / no): ______________
-- Open Decision (vii) — mentorship `mentorship:assign` permission: option ____
-  (a / b): ______________________
-- Open Decision (viii) — mentorship S13 `canAccessSection` increment: option ____
-  (a / b): ______________________
-- Open Decision (ix) — mentorship product decisions 4–7 (recurring pair /
-  one-mentor-per-mentee / both-profiles event / end-pair audience):
-  ______________________
+  **Epic 2** (Magic-Link Authentication) owns retiring
+  `interim-session-resolver.adapter.ts`; Epic 0 keeps it with the
+  `Bearer <token:<seeded-uuid>>` fixture convention.
+- Open Decision (v) — photo Self-only vs manager-writable: **Self-only** — a
+  reporting-line manager or PP may not replace a report's photo.
+- Open Decision (vi) — photo a distinct permission (yes / no): **no** — covered
+  by `user-management:edit`.
+- Open Decision (vii) — mentorship `mentorship:assign` permission: **option (a)** —
+  added to the bootstrap catalog + grant via a new three-stage AD-1 kernel-seed
+  sequence.
+- Open Decision (viii) — mentorship S13 `canAccessSection` increment: **option
+  (a)** — a new Access Control increment adds `canAccessSection('S13', …)`; the
+  closure-note narrowing stays mentorship-owned via `resolveAudiences`.
+- Open Decision (ix) — mentorship product decisions 4–7: **all at the
+  recommended option** — recurring pair after ending allowed (bar a second
+  *active* pair per pair); one active mentor per mentee (partial unique index);
+  career event on **both** participants' timelines; end-pair authorization
+  audience = reporting + PP write, project line read-only (DEC-UM-001 S9
+  pattern).
+
+Per the closing paragraph below, this approval authorizes the §4
+planning-artifact and companion-doc changes only. It authorizes **no** scenario,
+test, migration, seed, production code, or `services/backend/` change, and it
+does not approve any regenerated story spec — each still runs its three AD-1
+stages with independent human approval recorded in its own package's
+`approvals.yaml`.
 
 Approval of this proposal authorizes applying the planning-artifact and
 `docs/architecture/` companion-doc changes in §4. It authorizes **no** scenario,

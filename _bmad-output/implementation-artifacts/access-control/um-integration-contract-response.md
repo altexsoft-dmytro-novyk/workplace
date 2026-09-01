@@ -4,7 +4,8 @@ type: 'handoff-response'
 created: '2026-08-31'
 responds_to: _bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md
 responds_to_revision: 2
-status: 'answered-pending-human-approval'
+status: 'accepted'
+accepted_by: 'Dmytro Novyk (Product Owner / Architect) — 2026-09-01'
 author: 'Winston (System Architect)'
 companions:
   - ../../specs/spec-user-management-access-control-adoption/SPEC.md
