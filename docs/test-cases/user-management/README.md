@@ -115,7 +115,7 @@ gone with `registration/`.
 
 | Folder | Covers | Files | State |
 | --- | --- | --- | --- |
-| `seed/` | FR-1/FR-4/FR-5a/FR-7 — population import, no `POST /users`, bootstrap HR Admin + ACM-0 root-id reuse (Story 1.1) | 3 | new draft |
+| `seed/` | FR-1/FR-4/FR-5a/FR-7 — population import (`POST /users/import` + deploy-script entrypoint): column mapping, Department create-on-import, `EmploymentStatus`, birthday split, idempotent re-import, malformed-row skip, authz, no `POST /users`, bootstrap HR Admin + ACM-0 root-id reuse (Story 1.1) | 13 | new draft |
 | `access-control-adoption/` | FR-16 — real facade adoption for `GET/PATCH /users/:id`, `PUT .../photo`; port rebind; minimal S1-card projection; colleague reads the S1 card (`200`) (Epic 0, `UMAC-1/2`) | 9 | new draft |
 | `auth/` | FR-2/FR-3/FR-8 — magic-link request/consume, security edge cases (Epic 2) | 6 | header-noted draft |
 | `profile/` | FR-9 — S1 data correctness given an entitled actor (entitlement is Epic 0's) (Epic 1 Story 1.2/1.3) | 4 | header-noted draft |
@@ -126,7 +126,7 @@ gone with `registration/`.
 | `registration/` | **RETIRED (v1.5)** — `um-reg-01..15` `POST /users` HTTP create. See folder README. | 15 | history only |
 | `deactivation/` | **RETIRED (v1.5)** — `um-deact-01..03` generic `DELETE /users/:id`. See folder README. | 3 | history only |
 
-**Live stage-1 scenario files (v1.5, subject to per-file approval):** 52.
+**Live stage-1 scenario files (v1.5, subject to per-file approval):** 62.
 **Retained as history (retired, do not approve):** 21 (`registration/` 15,
 `deactivation/` 3, `relationships/um-rel-04..06` 3).
 

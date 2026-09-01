@@ -513,7 +513,7 @@ Departure has to be recorded somewhere, or six months later the platform cannot 
 - **No SSO.** Entra ID is not part of this scope. Authentication is your own implementation over the seeded population, and the seeded record is the identity anchor.
 - **Do not import real employee data beyond the list you are given.** The delivered list is test data; that is what keeps Section 7's rule satisfied.
 
-**Departments.** Every employee belongs to **exactly one department**. Departments **nest**. A manager can be the manager of a department, and that relation grants Manager access to everyone in it and in its sub-departments (2.1). There is no separate "unit" entity; *Unit Manager* is the role name for the manager of a department.
+**Departments.** Every employee belongs to **one or more departments** — a person who works across specialisations (e.g. both `JS` and `Python`) holds a current membership in each. *(Amended 2026-09-02 — was "exactly one department".)* Departments **nest**. A manager can be the manager of a department, and that relation grants Manager access to everyone in it and in its sub-departments (2.1) — an employee is reachable through **any** of their departments. There is no separate "unit" entity; *Unit Manager* is the role name for the manager of a department. A resourcing request carries **one** department and routes to that department's Unit Manager (4.7).
 
 Departments are maintained under the *manage departments* permission. Changing a person's department, or a department's manager, is an access switch and follows the rules in 2.1: dedicated screen, dedicated permission, no self-assignment, journaled.
 

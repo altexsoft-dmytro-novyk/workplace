@@ -52,6 +52,38 @@ compiled spec stays the detailed contract; this file is the delta.
   Story 1.1 does not touch projects. Project assignment comes from the future
   timetracker path.
 
+## 2b. Multi-department membership + import decisions (2026-09-02)
+
+- **An employee belongs to one or more departments** (amended — was "exactly
+  one"). `docs/project-requirements.md` §4.17 and `database-schema.md`
+  §Project/Department updated. Derived S1 "department" is a set. Unit-Manager
+  access composes over any of the person's departments.
+- **The CSV carries one `DepartmentId` per row** → the import creates exactly
+  **one** `DepartmentMembership` per person. More memberships are added later
+  (second import / manual / timetracker API), never via duplicate rows in the
+  same file.
+- `DepartmentMembership { id, userId, departmentId, validFrom, validTo? }`,
+  `UNIQUE (userId, departmentId) WHERE validTo IS NULL`.
+- **Duplicate normalized `Email` → per-row skip** (revised 2026-09-02). The
+  offending row is skipped with an `errors[]` entry
+  `{ line, email, reason: "email already exists" }`; the rest of the import
+  commits (`200`). Within a file, the first occurrence is processed
+  (create/update) and each later duplicate row is the skipped one. All row
+  errors (missing field, unparseable date, duplicate email) are uniformly
+  per-row skip — there is **no** whole-import `400` branch. (An email matching
+  an existing active `User` from a prior run is the normal idempotent
+  `updated` case, not an error.)
+- **`EmploymentStatus` CHECK relaxed** (no `source` discriminator column — per
+  Dmytro): a `dismissed` row no longer requires `sourceDepartureId` /
+  `departureReason`. `database-schema.md` §EmploymentStatus updated. Import
+  `dismissed` row = `{status:'dismissed', validFrom: DismissedDate, validTo:
+  null, sourceDepartureId: null, departureReason: null}`.
+- **Import is HR-Admin-only**, authorized by the existing `user-management:create`
+  permission (seeded by ACM-1, held only by the HR-Admin root — the key the
+  retired `POST /users` required). No new `user-management:import` key, no new
+  kernel seed sequence. The import is v1.5's population-creation path, so it
+  reuses the create capability.
+
 ## 4. Employment status — replaces the `isActive` overload
 
 - New aggregate **`EmploymentStatus { id, userId, status: 'active' |

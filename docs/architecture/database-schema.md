@@ -78,10 +78,12 @@ EmploymentStatus {
 }
 UNIQUE: at most one row per user with validTo IS NULL
 CHECK: (status='active' AND sourceDepartureId IS NULL AND departureReason IS NULL)
-    OR (status='dismissed' AND sourceDepartureId IS NOT NULL AND departureReason IS NOT NULL)
+    OR (status='dismissed')
 ```
 
-Intervals are half-open `[validFrom, validTo)`: applying departure closes the current `active` row at `effectiveDate` and inserts `dismissed` from that same date. `sourceDepartureId` makes the materialized fact idempotent. There is deliberately no `departure`/`leaving` `UserEvents` type.
+Intervals are half-open `[validFrom, validTo)`: applying departure closes the current `active` row at `effectiveDate` and inserts `dismissed` from that same date, setting `sourceDepartureId` (which makes the materialized fact idempotent) and `departureReason`. There is deliberately no `departure`/`leaving` `UserEvents` type.
+
+**Import-origin dismissals (2026-09-02).** A `dismissed` row created by the seeded-population import (`IsDismissed=1` in the CSV) has **no `Departure`** — the departure predates the system. The CHECK therefore no longer requires `sourceDepartureId`/`departureReason` on a `dismissed` row; both stay nullable. The AD-20 apply-transaction still sets them explicitly for departures it processes — the constraint just no longer forbids the historical import case. `validFrom` for an import-origin `dismissed` row is the CSV `DismissedDate`.
 
 ### Departure (AD-20)
 
@@ -168,9 +170,29 @@ Rules:
 
 ### Project / Department
 
-Plain records. `Department` is a first-class nested entity; every employee has exactly one current department. It routes resourcing requests, keys CDS matrix lookup together with position, and a membership change writes `department_change` to `UserEvents`. No separate Unit entity exists. Projects have no `pmUserId`, `dmUserId`, or `users[]`; managerial facts are policy attachments and membership is `Relationship`.
+Plain records. `Department` is a first-class nested entity. It routes resourcing requests, keys CDS matrix lookup together with position, and a membership change writes `department_change` to `UserEvents`. No separate Unit entity exists. Projects have no `pmUserId`, `dmUserId`, or `users[]`; managerial facts are policy attachments and membership is `Relationship`.
 
-Exact indexed Department membership/parent/manager edge shapes remain an explicit follow-up contract (spine Deferred). `Policies.targetType:'department'` is not honored by AD-10 until that contract is approved; the interim is fail-closed.
+```text
+Department {
+  id          uuidv7 PK
+  name        string
+  externalId  string, unique          // timetracker DepartmentId
+  parentId    FK -> Department, nullable   // departments nest; null = top
+}
+
+DepartmentMembership {
+  id          uuidv7 PK
+  userId      FK -> User
+  departmentId FK -> Department
+  validFrom   date
+  validTo     date, nullable
+}
+UNIQUE: one (userId, departmentId) pair with validTo IS NULL
+```
+
+**Multi-department membership (2026-09-02).** An employee belongs to **one or more** current departments — e.g. a developer who works in both `JS` and `Python` (each is its own department) holds a current `DepartmentMembership` in each. This supersedes the earlier "exactly one current department" rule (mirrored in `docs/project-requirements.md` §4.17). Consequences: the derived S1 "department" display is a **set**, not a scalar; `department_change` `UserEvents` are add/remove events; a resourcing request still carries **one** department and routes to that department's Unit Manager (`project-requirements.md` §4.7); Unit-Manager access composes — managing any one of an employee's departments (or an ancestor of it) grants Reporting-line access to that employee. The seeded-population CSV carries **one** `DepartmentId` per row, so the import creates exactly one membership per person; additional memberships are added later (a second import, manual assignment, or the timetracker API).
+
+Exact indexed Department parent/manager edge shapes and the recursive department-tree walk remain an explicit follow-up contract (spine Deferred). `Policies.targetType:'department'` (the Unit-Manager attachment — `targetRole:'unit-manager'`) is not honored by AD-10 until that contract is approved; the interim is fail-closed.
 
 ### MentorshipPair (AD-17)
 
