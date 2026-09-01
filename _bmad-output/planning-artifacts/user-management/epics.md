@@ -43,6 +43,11 @@ Supporting sources folded in for precise, testable acceptance criteria (endpoint
 - FR-14: Mentorship pair persistence is not part of User Management; a dedicated mentorship context owns durable pairs and supplies start/end events.
 - FR-15: Public user listing exposes permission-safe profile fields and employment status, never technical `ttId`/`isActive` filters. The full §4.1 directory remains platform scope.
 
+**Added 2026-09-01 (Access Control adoption reconcile — numbered past FR-15 to avoid colliding with the derived FR-7..FR-15 above; sourced from the UM PRD FR-16/FR-17 and `architect-handoff-phase-b.md` §1):**
+
+- FR-16 *[PRD FR-16; adoption SPEC CAP-1/CAP-2/CAP-3; AD-21 amended]*: Every `user-management` controller authorizes target-scoped `/users/:id` through the real `AccessControlFacade` via `ACCESS_CONTROL_PORT`; `interim-access-control.adapter.ts` is deleted in the same cutover (no dual-running). `isAllowed` for `user-management:create`/`:deactivate`/`:list` (the ACM-1 seeded keys) delegates straight to the facade. `GET /users/:id` returns `200` with `{ data, canEdit }` — `data` the **S1 identity card**, `canEdit` a read-only dual-gate hint — for **any** active viewer over an active target — Self, reporting line, assigned PP, **or colleague** (§3.2 S1 row is `R` for the Colleague column; every active authenticated viewer is at least a Colleague); denials are `401` (session does not resolve to an active `User` — the session layer's job) and `403` (authenticated active viewer whose audience over the target is empty). Story 0.1 ships the minimal S1-card projection wrapped in the `{ data, canEdit }` envelope (replacing `toUserResponse`'s whole-row spread) — this is CAP-3, not the deferred FR-17 story. `canEdit` = `isAllowed(viewer, user-management:edit) && canAccessSection(viewer, 'S1', target) === 'write'`; `false` for every viewer until `user-management:edit` is seeded. `PATCH`/`PUT photo` are behind the §2.2 dual gate — blocked on a missing `user-management:edit` permission (Open Question). This makes NFR-4 concrete and testable. Authoritative contract: `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md`.
+- FR-17 *[PRD FR-17; `deferred-work.md` "Profile Projection"]*: The *further* audience-narrowed views beyond the S1 card — the colleague S10 dates-only view (own route `GET /users/:id/leaves`), the colleague S11 project-name-only view, S16 per-field custom-field visibility, S7/S8 record flags, and S1 derived-field immutability enforcement — are a separate UM-owned deliverable that calls the facade and only narrows its base section result. It is **no longer coupled to `GET /users/:id`** and no longer triggers any colleague decision — the colleague read works from Story 0.1's S1 card. (The former "flip colleague deny → allow-narrowed" adoption story UMAC-3 / Story 0.3 is removed.)
+
 Project-relationship assignment (`type: 'project'`) stays separately and explicitly out of scope ("Department and Project administration — platform scope; project membership from timetracker sync (§5.1); department per §4.17").
 
 ### NonFunctional Requirements
@@ -75,6 +80,8 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 
 | FR | Epic |
 |---|---|
+| FR-16 | Epic 0 — real facade adoption + `ACCESS_CONTROL_PORT` rebind (interim adapter removed) + minimal S1-card projection |
+| FR-17 | Deferred Profile Projection story — the S10/S11/S16 colleague views on their own surfaces, S7/S8 flags, S1 derived-field immutability (decoupled from `GET /users/:id`) |
 | FR-1 | Epic 1 — seed-script HR Admin bootstrap + population import |
 | FR-4 | Epic 1 — seeded population import (no HTTP create/deactivate) |
 | FR-5a | Epic 1 — S1 fields at import; `joined_company` at seed |
@@ -92,6 +99,11 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 | FR-14 | Handoff — dedicated Mentorship epic, outside User Management |
 
 ## Epic List
+
+### Epic 0: Access Control Adoption
+Rebind `ACCESS_CONTROL_PORT` in `user-management.module.ts` to a real `AccessControlFacade`-backed adapter in `src/user-management/infrastructure/` and delete the interim adapter in the same cutover (AD-21, no dual-running). Adopt the `GET /users/:id` read path now — `200` with `{ data, canEdit }` (`data` = the minimal **S1 identity card**, `canEdit` = the read-only dual-gate hint, `false` for all until `user-management:edit` is seeded) for any active viewer over an active target (Self, reporting, assigned PP, **or colleague**: §3.2 S1 row is `R` for the Colleague column); denials are `401` (unresolved session) and `403` (authenticated active viewer, empty audience). Story 0.1 replaces `toUserResponse`'s whole-row spread with the `{ data, canEdit }` mapper on that handler; the `{ data, canEdit }` envelope becomes the section/detail-read convention (rolled onto other routes as its own item). Put `PATCH /users/:id` and `PUT /users/:id/photo` behind the §2.2 dual gate once a `user-management:edit` permission exists. Proven by a real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E with no provider overrides (AD-3). A **dedicated small epic**, not a story under Epic 1, because it is a cross-cutting port-rebind cutover touching the same controller as Epic 1 Story 1.2 and needs its own real-consumer E2E (architect handoff §1). **Numbered Epic 0** so it runs before Epic 1's write paths; its read path can start now because ACM-8 made the facade DI-resolvable from `AppModule`.
+**FRs covered:** FR-16. (FR-17 — the further S10/S11/S16 colleague narrowing on their own surfaces — is the deferred Profile Projection story and is no longer coupled to this epic.)
+**Authoritative contract:** `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md` (+ `stories.yaml`, `.memlog.md`). This epics.md carries only the epic/story summary and FR mapping; the SPEC is the binding per-route contract.
 
 ### Epic 1: Employee Record Management
 Authorized actors manage identity data over the seeded population. S1 reads/writes require both access and capability; Self can upload a photo; public listing exposes permission-safe profile fields rather than technical identity keys.
@@ -120,32 +132,94 @@ Authorized HR actors record departure and the platform applies its complete effe
 
 Per project-requirements.md §8.2 (NORMATIVE, graded): "a situation where one person waits for another is unacceptable." Reading the epic list top-to-bottom as one dependency chain would violate that — but the real build-time dependency is looser than the product narrative suggests, per AD-3 (stage-2 E2E tests bind against fixture-seeded data in the real test DB, not against another epic's live HTTP endpoint):
 
-- Epic 2's magic-link flow needs a `User` row to exist, not Epic 1's HTTP surface — its test module seeds via Prisma or the population import script.
+- **Epic 0's read path (Story 0.1) can start now** — ACM-8 made `AccessControlFacade` DI-resolvable from `AppModule`, so the port rebind is a UM-module-only change; Story 0.1 also ships the minimal S1-card DTO. Its write path (Story 0.2) sequences **after** the missing-`user-management:edit`-permission decision (Open Question; option (a) triggers a new Access Control kernel seed AD-1 sequence first). There is **no Story 0.3** — the colleague `GET /users/:id` read is a positive `200` (S1 card) from Story 0.1, so there is no "flip" to schedule; the FR-17 Profile Projection story owns only the S10/S11/S16 colleague views on their own surfaces and is decoupled from this epic.
+- Epic 0 shares `PATCH /users/:id` with Epic 1 Story 1.2. **Story 1.2's authorization acceptance criteria are satisfied by Epic 0**, not duplicated: Story 1.2 asserts data correctness (the write persists, or is rejected wholesale on a uniqueness conflict), Epic 0 asserts who is entitled (architect handoff §1 Sequencing).
+- Epic 2's magic-link flow needs a `User` row to exist, not Epic 1's HTTP surface — its test module seeds via Prisma or the population import script. Epic 2 also **owns retiring the interim *session* resolver** (`interim-session-resolver.adapter.ts`) — Epic 0 keeps it and uses the `Bearer <token:<seeded-uuid>>` convention for its fixtures.
 - Epic 3's event store and application boundary can be designed in parallel with owning contexts; each trigger integrates only after its source mutation exists.
-- Epic 4's relationship stories are independent by fact type once the journal/application contracts are approved; Story 4.2 is blocked on CC-04.
+- Epic 4's relationship stories are independent by fact type once the journal/application contracts are approved. **Every Epic 4 story's stage-2/production (journal-writing) work is blocked on CC-04 AND CC-07** (AD-19 Journal gate) — scenario prose may proceed; journal-writing stages cannot. Story 4.2 (PP) additionally needs CC-04 for persistence/cardinality. The AD-19 Department-boundary gate keeps PP HR-line propagation fail-closed to the directly assigned PP until the Department contract lands.
 - Epic 5 BA/scenario work can proceed independently, but implementation is blocked on CC-06.
 
-Net: Epic 1 and Epic 2 remain parallel; Epic 3, Epic 4, and Epic 5 are decomposed by independent contracts rather than treated as one serial chain.
+Net: Epic 0's read path and Epic 1 and Epic 2 remain parallel; Epic 0's write path waits on the permission decision; Epic 3, Epic 4, and Epic 5 are decomposed by independent contracts rather than treated as one serial chain.
+
+## Epic 0: Access Control Adoption
+
+The Access Control Kernel MVP is built and headless: `AppModule` resolves `AccessControlFacade` (ACM-8), but `user-management.module.ts` still binds `ACCESS_CONTROL_PORT` to `InterimAccessControlAdapter`, which authorizes `isAllowedForTarget` as `Boolean(userId)` — every authenticated session reads every full `User` profile — and authorizes `isAllowed` by an `actor.position === 'HR Admin'` string check that `access-control.md` prohibits. This epic closes that leak and puts `/users/:id` behind the real fail-closed facade, and ships the minimal S1 identity-card projection for `GET /users/:id`. It does **not** close the product gate: the *further* FR-17 narrowing (S10 dates-only, S11 name-only, S16 per-field visibility, S7/S8 flags, S1 derived-field immutability), list/filter/export/search projection, Project line, Department, PP HR-line, shared links, and the full-profile overlay all remain deferred and fail-closed.
+**FRs covered:** FR-16.
+**Authoritative contract:** `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md` — the stories below mirror its `stories.yaml` (`UMAC-1`, `UMAC-2`; `UMAC-3` was removed 2026-09-01) and carry the summary + FR mapping only.
+
+**Sequencing:** Story 0.1 can start now (ACM-8 done). Story 0.2 is conditional on the missing-`user-management:edit`-permission decision. There is no Story 0.3.
+
+### Story 0.1: Adopt the Read Path and Rebind the Port (UMAC-1)
+
+As the platform,
+I want `/users/:id` target-scoped authorization resolved by the real `AccessControlFacade` and `GET /users/:id` to return the S1 identity card,
+So that a session reads an identity card only when it resolves to an active audience over an active target — and no longer every full `User` row for every session.
+
+**Acceptance Criteria:**
+
+**Given** the interim adapter is bound
+**When** this story lands
+**Then** `user-management.module.ts` binds `ACCESS_CONTROL_PORT` to a new `@Injectable()` adapter in `src/user-management/infrastructure/` that injects `AccessControlFacade` and implements both `AccessControlPort` methods, and `interim-access-control.adapter.ts` is deleted in the same change (AD-21)
+**And** `isAllowed(userId, feature)` delegates directly to `AccessControlFacade.isAllowed`; `POST /users`, `DELETE /users/:id`, `GET /users` keep working for the seeded HR-Admin session (the three features are the ACM-1 seeded keys) and fail closed otherwise
+
+**Given** viewer V and target T
+**When** V calls `GET /users/<T>`
+**Then** the response is `200` with `{ data, canEdit }` — `data` = the **S1 identity card** (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`) — when V's Phase-0 audience set over T is non-empty (contains any of `self`, `reporting`, `pp`, or `colleague`; §3.2 S1 row is `R` for the Colleague column, and every active authenticated viewer is at least a Colleague), the **same `data` for every audience**
+**And** `data` **drops** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy` (Story 0.1 routes `GET /users/:id` through a `{ data, canEdit }` mapper on that handler only, not a rewrite of the shared `toUserResponse`; the list / `POST` / `PATCH` / `DELETE` / photo responses are unchanged); derived S1 display fields (manager, people partner, department, mentor, current projects) are out of scope for this route until those contexts land and `data` omits them
+**And** `canEdit` = `isAllowed(V, user-management:edit) && canAccessSection(V, 'S1', T) === 'write'` — a read-only hint (enforcement stays on `PATCH`); `false` for every viewer while `user-management:edit` is unseeded, and permanently `false` for a colleague (`canAccessSection` → `'read'`)
+**And** a **`401`** when the session does not resolve to an active `User` (the session layer's job; the interim resolver is lax, so such a request currently surfaces as `403` via the guard), and a **`403`** when an authenticated active viewer's audience over T is empty (T not an active `User`; no existence distinction — human product decision 2026-09-01, no "leak-free 404")
+
+**Given** AD-3's consumer rule
+**When** the Stage-2 E2E runs
+**Then** it exercises real HTTP → router → `SessionGuard` → `AccessControlGuard` → real `AccessControlFacade` → real Prisma → migrated PostgreSQL with **no provider overrides**, seeding real `User` rows and real `Relationship` rows (`direct`, `people_partner`) and issuing `Bearer <token:<seeded-uuid>>`
+
+### Story 0.2: Adopt the Write Path Dual Gate (UMAC-2) — CONDITIONAL
+
+As the platform,
+I want `PATCH /users/:id` and `PUT /users/:id/photo` gated by both the functional permission and `write` S1 section access,
+So that identity mutation obeys the §2.2 dual gate.
+
+**Implementation gate:** blocked on Open Decision 1 (missing `user-management:edit` / photo permission). Option (a): a new three-stage AD-1 seed sequence in the Access Control kernel package adds the permission first; this story then consumes it. Option (b): this story implements a narrow `// INTERIM` write rule in the real adapter with a recorded expiry trigger.
+
+**Acceptance Criteria:**
+
+**Given** viewer V, target T
+**When** V submits `PATCH /users/<T>`
+**Then** `200` only when `AccessControlFacade.isAllowed(V, <edit permission key>)` is `true` **and** `AccessControlFacade.canAccessSection(V, 'S1', T) === 'write'`; `403` when either half fails
+**And** manager / people-partner / department fields in the PATCH body are rejected regardless of audience (§3.2 fn 1), enforced in `EditUserAction`/`UpdateUserDto` and tested, with no relationship change
+**And** `PUT /users/<T>/photo` succeeds only when V id == T id (Self-only) unless Product widens it
+
+### Story 0.3 — REMOVED (2026-09-01, human product decision)
+
+There is nothing to flip. §3.2's S1 (Identity card) row is `R` for the Colleague column, and every active authenticated viewer is at least a Colleague, so a colleague `GET /users/:id` returns `200` with the S1 identity card from **Story 0.1**. The deferred FR-17 Profile Projection story owns only the S10 dates-only, S11 project-name-only, and S16 per-field colleague views on their own surfaces (plus S7/S8 flags and S1 derived-field immutability), and is no longer coupled to `GET /users/:id`.
 
 ## Epic 1: Employee Record Management
 
-Entitled actors manage identity records over the imported population (§4.17): permission-safe S1 read/edit, self photo upload, and paginated public-profile listing. Generic deactivation is not part of this epic.
+Entitled actors manage identity records over the imported population (§4.17): permission-safe S1 read/edit, self photo upload, and paginated public-profile listing. Generic deactivation is not part of this epic. **Story 1.2's authorization ACs are satisfied by Epic 0** (Story 1.2 asserts data correctness; Epic 0 asserts entitlement).
 **FRs covered:** FR-1, FR-4, FR-5a, FR-7, FR-9, FR-15
 
 ### Story 1.1: Import Seeded Population
 
 As the system operator,
-I want the employee population imported from the seeded timetracker list,
+I want the employee population imported from the delivered timetracker export (`docs/Accounts_template.csv`),
 So that all features operate over a fixed set of users without any creation, AD, or SSO provisioning flow.
 
-**Stage-1 sub-deliverables (AD-1):** `um-seed-01` import success; `um-seed-02` no `POST /users` create path; `um-seed-03` bootstrap HR Admin present. Author under `docs/test-cases/user-management/seed/` (or equivalent). CAP-1 `um-reg-01`..`um-reg-15` are **retired / superseded** — do not translate to stage-2 for product create.
+**Stage-1 sub-deliverables (AD-1):** `um-seed-01` import success; `um-seed-02` no `POST /users` create path; `um-seed-03` bootstrap HR Admin present + root-row reuse. Author under `docs/test-cases/user-management/seed/` (or equivalent). CAP-1 `um-reg-01`..`um-reg-15` are **retired / superseded** — do not translate to stage-2 for product create.
+
+**Import source — `docs/Accounts_template.csv` (the file shape from TT).** A semicolon-delimited timetracker export. Header: `FirstName;LastName;Email;Birthday;PositionId;PositionName;RegistrationDate;DepartmentId;DepartmentName;DismissedDate;IsDismissed;EmployeeType;TimeZone;CountryId;CountryCode;CountryName;CountryStateId;CountryStateName`. The file has **no employee-id column**, so the import is **keyed by the normalized `Email`** and `ttId` (AD-13) has no source column → left `null`. Full column → `User` field mapping and the OPEN items in `docs/test-cases/user-management/seed/README.md` and `spec-1-1-import-seeded-population.md`. In brief: `Email`→`workEmail` (normalized, natural key); `FirstName`/`LastName`→`firstName`/`lastName`; `Birthday`→`birthDay`/`birthMonth` (year dropped; `NULL`→both null); `RegistrationDate`→`companyJoinDate`; `PositionName`→`position`; `CountryName`→`country`; `workPhone`/`city`/`photo`/`ttId` have **no source column** → `null`; `createdBy`→the ACM-0 root id. **OPEN (do not guess):** `PositionId` (positions dictionary?), `DepartmentName`/`DepartmentId` (Department edge contract deferred — spine Deferred), `CountryCode`/`CountryStateName`, `EmployeeType`→S4 (not on the `User` row), `IsDismissed`/`DismissedDate`→`EmploymentStatus` §4.16 (interim: `User.isActive=false` for a dismissed row until the aggregate lands, Epic 5/CC-06), `TimeZone` (not imported; distinct from AD-20's `BUSINESS_TIME_ZONE`).
+
+**Kernel-reality constraints (2026-09-01, from the Access Control Kernel MVP):**
+- **DEC-UM-007 canonical at write.** The seed/import writer trims and lowercases `workEmail` and **stores the normalized value** — not just on lookup. The DB `users_workEmail_key` index is on the raw stored value, so normalized uniqueness is a writer-side guarantee; a database-enforced functional unique index is separately gated deferred work (`deferred-work.md`).
+- **DEC-UM-009 reuse the root id.** ACM-0 (`npm run db:seed`) has already created the single active root `User` with a normalized `workEmail` before import runs (order: `db:deploy` → `db:seed` → `db:bootstrap:access-control` → `start:prod`). A CSV row whose normalized `Email` matches `ROOT_WORK_EMAIL` **updates the existing ACM-0 root `User`** in place and never inserts a second row for a normalized email that already exists (active or inactive). The CSV's own sample row `dmytro.novyk+boot@altexsoft.com` is a normal employee row unless it matches `ROOT_WORK_EMAIL`.
+- The `joined_company` system event at import must be written the same synchronous same-transaction way Epic 3 establishes — not via an HTTP create.
 
 **Acceptance Criteria:**
 
 **Given** a fresh, empty database
-**When** the population seed/import script runs against the delivered seeded timetracker list (§4.17)
-**Then** one `User` row exists per seeded employee with S1 identity fields populated from the list
-**And** `workEmail` and `ttId` (where present) are unique across imported rows (FR-5a, FR-7)
+**When** the population import runs against `docs/Accounts_template.csv` (semicolon-delimited TT export, §4.17)
+**Then** one `User` row exists per CSV row with the mapped S1 fields populated (`Email`→`workEmail` normalized, `FirstName`/`LastName`, `Birthday`→`birthDay`/`birthMonth` year-dropped, `RegistrationDate`→`companyJoinDate`, `PositionName`→`position`, `CountryName`→`country`)
+**And** `workPhone`, `city`, `photo`, and `ttId` are `null` on every imported row — the CSV has no source column for them (assert absence, not population)
+**And** `workEmail` is unique across imported rows and stored normalized (FR-5a, FR-7, DEC-UM-007)
 **And** no HTTP `POST /users` path is required or used for this outcome (AD-14, §4.17)
 **And** exactly one bootstrap `User` holds the HR Admin functional role via seed (FR-1, AD-12); bootstrap entitlement proof remains owned by access-control's `fc-03` when that suite exists — not duplicated here (traces `um-seed-01`, `um-seed-03`)
 
@@ -165,6 +239,8 @@ I want to read and edit an employee's S1 identity-card fields,
 So that identity data stays accurate without bypassing the two-dimensional access model.
 
 Self reads S1 and can write only their photo through Story 1.3. Manager, People Partner, and department are displayed in S1 but changed only through Epic 4's dedicated organisational-relationships flow.
+
+**Authorization is Epic 0's, not this story's (2026-09-01).** This story asserts **data correctness** — the write persists and reflects on a follow-up read, or is rejected wholesale on a `workEmail`/`ttId` conflict (`409`). *Who* is entitled to `PATCH`/`GET /users/:id` — every active audience (Self / reporting / PP / colleague) reads the S1 card, an unresolved session gets `401` and an authenticated active viewer with an empty audience gets `403`, and `PATCH` is behind the §2.2 dual gate — is asserted by Epic 0 against the real facade (architect handoff §1). Do not duplicate entitlement scenarios here; do not harden the interim-permissive `isAllowedForTarget` as intended behaviour.
 
 **Acceptance Criteria:**
 
@@ -344,11 +420,15 @@ So that the timeline stays accurate while the approved persistence mechanism pre
 
 Holders of the dedicated permission change the four organisational facts that alter access. Every change rejects self-assignment, is journaled atomically, and affects platform-owned access on the next request. **FRs covered:** FR-10.
 
+**Journal gate (AD-19, 2026-09-01).** Every story here writes the §3.4 journal in the same transaction as the fact change. CC-07 owns the immutable relationship/access-journal schema, snapshot payload, reader authorization, and transaction-enrolment contract. **Scenario prose may proceed; the stage-2 E2E and production (journal-writing) stages of Stories 4.1, 4.2, and 4.3 are blocked until CC-07 is approved** — `UserEvents` is not a journal substitute. Story 4.2 additionally needs CC-04 for PP persistence/cardinality. **AD-19 Department-boundary gate:** assigned-PP resolution may use the edge immediately, but transitive HR-line propagation stays fail-closed to the directly assigned PP until the Department contract identifies the HR root/boundary.
+
 ### Story 4.1: Change an Employee's Manager
 
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's manager on the dedicated screen,
 So that reports-to access reflects the current organisation without being editable through S1.
+
+**Implementation gate:** the atomic-journal half is blocked on **CC-07** (AD-19 Journal gate). Scenario prose and the reports-to fact-change design may proceed. DEC-UM-005 (reports-to reassignment: explicit `DELETE` then `POST`, second `POST` → `409`) still applies.
 
 **Acceptance Criteria:**
 
@@ -370,7 +450,7 @@ As a holder of the *change organisational relationships* permission,
 I want to change an employee's People Partner,
 So that PP access and the HR-line chain reflect the current assignment.
 
-**Implementation gate:** CC-04 must approve persistence/cardinality and the write contract before stage-2 or production work.
+**Implementation gate:** CC-04 must approve persistence/cardinality and the write contract, **AND CC-07 must approve the journal schema** (AD-19 Journal gate), before stage-2 or production work. Scenario prose may proceed now.
 
 **Acceptance Criteria:**
 
@@ -388,6 +468,8 @@ So that PP access and the HR-line chain reflect the current assignment.
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's department or a department's manager,
 So that department-derived access, routing, and CDS ownership remain correct.
+
+**Implementation gate:** the atomic-journal half is blocked on **CC-07** (AD-19 Journal gate); department-derived access also depends on the still-open Department edge contract (spine Deferred) — until it lands, `department`-targeted policy rows contribute nothing (fail-closed). Scenario prose may proceed.
 
 **Acceptance Criteria:**
 
@@ -446,4 +528,13 @@ So that the employee and every access they hold leave the active system consiste
 
 ## Mentorship Handoff
 
-The former User Management Story 4.2 is superseded. A dedicated Mentorship epic must define the company-wide willing pool, scoped mentee selection, durable pair lifecycle, required closure notes and their restricted projection, availability-flag behavior, career events, and departure auto-close before implementation resumes.
+The former User Management Story 4.2 is superseded (AD-17). Mentorship is **now
+planned** in its own bounded context — see
+[`_bmad-output/planning-artifacts/mentorship/epics.md`](../mentorship/epics.md)
+and [`prd-mentorship-2026-09-01/`](../prds/prd-mentorship-2026-09-01/prd.md)
+(both `draft`, 2026-09-01). That package owns the company-wide willing pool,
+scoped mentee selection, the durable `MentorshipPair` lifecycle, required closure
+notes and their restricted projection, availability-flag behaviour, career
+events, and departure auto-close. User Management receives only the
+`mentorship_start` / `mentorship_end` career events, via Epic 3 Story 3.1's
+application boundary.

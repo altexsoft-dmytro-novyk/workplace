@@ -1,6 +1,11 @@
 # UM-REL-06 · Multiple active mentors allowed
 
-**Trace:** epics.md Story 4.2 · AD-11 (no one-mentor UNIQUE on mentorship)
+> **SUPERSEDED / RETIRED (v1.5, 2026-09-01).** Mentorship pair lifecycle has left
+> User Management (AD-17) — see `um-rel-04`'s header. Now planned in the
+> `mentorship` context; scenarios at `docs/test-cases/mentorship/`. Retained as
+> history only.
+
+**Trace (historical):** epics.md (pre-v1.5) Story 4.2 · AD-11 (no one-mentor UNIQUE on mentorship)
 
 ## Scenario
 

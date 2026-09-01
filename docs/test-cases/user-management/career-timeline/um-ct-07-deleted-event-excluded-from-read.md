@@ -1,6 +1,6 @@
 # UM-CT-07 · A soft-deleted event is absent, not null, from the timeline read
 
-**Trace:** PRD Data Model — UserEvents.deletedAt · [../README.md](../README.md) ("Absence is absence")
+**Trace:** PRD Data Model — UserEvents.deletedAt · PRD FR-13 · epics.md Story 3.3 · [../README.md](../README.md) ("Absence is absence")
 
 ## Scenario
 

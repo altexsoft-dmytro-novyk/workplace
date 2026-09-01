@@ -4,6 +4,8 @@
 
 **Approved:** Anna Pikula, 2026-08-30
 
+> **Expected result superseded — 2026-09-01.** The fail-closed *principle* here is unchanged and still load-bearing: a deactivated intermediate manager must not bridge reach to their ancestors. But the way this file observes it — a `403` on `GET /users/:id` — no longer holds, because User Management now returns the S1 identity card (`200`) to any colleague, and Frank *is* a colleague to Erin ([adoption SPEC](../../../../_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md)). The rework: assert `resolveAudiences(Frank, [Erin])` yields `{colleague}` and does **not** contain `reporting` — the broken edge did not promote him. That is its own AD-1 pass and needs fresh approval. Do not translate the `403` below.
+
 ## Scenario
 
 **Given** Erin reports to InactiveMgr through a `direct` row, InactiveMgr is deactivated (`isActive = false`), and Frank is InactiveMgr's own manager through a live `direct` row.

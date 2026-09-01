@@ -1,6 +1,6 @@
 # UM-REL-03 · Second reports-to POST without DELETE returns 409
 
-**Trace:** epics.md Story 4.1 · [DEC-UM-005](../../../architecture/user-management-test-decisions.md) · AD-11
+**Trace:** epics.md Story 4.1 (Change an Employee's Manager) · PRD FR-10 · [DEC-UM-005](../../../architecture/user-management-test-decisions.md) · AD-11
 
 ## Scenario
 

@@ -1,6 +1,9 @@
 # UM-CT-04 · Unit Manager manually adds a backfill entry
 
-**Trace:** requirements §4.9 · [DEC-UM-001](../../../architecture/user-management-test-decisions.md)
+**Trace:** requirements §4.9 · PRD FR-5, FR-12 · epics.md Story 3.2 · [DEC-UM-001](../../../architecture/user-management-test-decisions.md) (direct Unit Manager = manager of the employee's department, §4.17 — there is no separate "unit" entity) · access-control.md §2.2 dual gate + §3.3
+
+> Same §2.2 dual gate and pending-S9-`canAccessSection` stage-2 block as
+> `um-ct-03`. This proves the **direct Unit Manager** write actor.
 
 ## Scenario
 

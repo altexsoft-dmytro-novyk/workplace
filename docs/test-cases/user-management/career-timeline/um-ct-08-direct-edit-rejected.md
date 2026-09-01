@@ -1,6 +1,6 @@
 # UM-CT-08 · Direct edit of a career-timeline event is rejected
 
-**Trace:** PRD Data Model — UserEvents ("An event is an immutable fact — a correction soft-deletes the wrong entry and appends a new one, never an in-place edit") · requirements §4.9 ("to correct events the system inferred wrongly")
+**Trace:** PRD Data Model — UserEvents (immutable-fact correction) · requirements §4.9 · PRD FR-12, FR-13 · epics.md Story 3.3
 
 ## Scenario
 

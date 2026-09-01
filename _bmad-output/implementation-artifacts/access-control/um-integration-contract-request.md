@@ -18,6 +18,8 @@ context:
 
 **To:** the User Management owner. **From:** Access Control.
 
+> **Answered — see `um-integration-contract-response.md` (Revised 2026-09-01).** This is the *request*; the authoritative answers are in the response doc. In particular, the "colleague answer has a shelf life" / "two-state rule" framing in §3 and §4 below was **not** taken: a colleague `GET /users/:id` returns the S1 identity card (`200`) from adoption Story 0.1 (§3.2 S1 = `R` for Colleague), the only denial is an empty audience → leak-free `404`, and `UMAC-3` does not exist. Read §3/§4/§6 below as the original suggestion, not the contract.
+
 **Revision 2 (2026-08-30).** The Phase-0 resolver now exists and is green, and building it corrected two of the questions this document originally asked. Question 1 was framed around a route when the real seam is a provider binding that serves three routes at once, and question 3 asked for one answer when it needs one per feature. Both are rewritten below. The practical effect is that the ask got **narrower and cheaper**: exactly one feature changes behaviour, two keep theirs, and your existing test suite keeps passing.
 
 ## What already exists on the Access Control side

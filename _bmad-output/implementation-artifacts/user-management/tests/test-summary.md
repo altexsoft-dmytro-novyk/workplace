@@ -1,5 +1,15 @@
 # Test Automation Summary — User Management (TDD red phase)
 
+> **SUPERSEDED (v1.5, 2026-09-01).** This summary predates the `user-management`
+> controllers landing and the v1.5 refresh. Stale claims: "no `user-management`
+> controllers exist yet" / "23/23 fail on 404" (the `/users` CRUD family is now
+> built; only `auth`/`events`/`relationships` routes 404); "24/24 docs
+> transcribed" (the v1.5 doc set is ~52 live files); `registration.e2e-spec.ts`
+> as "story 1-1" (Story 1.1 is now the seeded import, no HTTP create). Current
+> state and the path to v1.5-green are in
+> `_bmad-output/test-artifacts/e2e-actual-state-audit-2026-09-01.md` and
+> `docs/test-cases/user-management/README.md`.
+
 Request → expect translations of every scenario doc in
 `docs/test-cases/user-management/`, matching the existing
 `registration.e2e-spec.ts` convention. All currently fail (mostly `404`,

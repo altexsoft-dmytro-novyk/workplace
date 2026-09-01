@@ -1,6 +1,6 @@
 # UM-LIST-02 · List users filtered by country
 
-**Trace:** epics.md Story 1.5 · FR-16
+**Trace:** epics.md Story 1.5 · FR-15
 
 ## Scenario
 

@@ -424,6 +424,8 @@ All Employees supports date-of-last-assessment filters (before/after/between; ne
 
 **Description:** Pair formation, availability, visibility, and durable closure with a required pair closure note — no session tracking.
 
+**Bounded-context decomposition:** FR-32 / FR-33 / FR-34 are decomposed for implementation in the `mentorship` bounded-context PRD `_bmad-output/planning-artifacts/prds/prd-mentorship-2026-09-01/` and epics `_bmad-output/planning-artifacts/mentorship/epics.md` (both `draft`, 2026-09-01). Mentorship is its own bounded context (AD-17) — pairs are durable workflow records, never `Relationship` rows or access edges.
+
 **Functional Requirements:**
 
 #### FR-32: Self-service mentorship status

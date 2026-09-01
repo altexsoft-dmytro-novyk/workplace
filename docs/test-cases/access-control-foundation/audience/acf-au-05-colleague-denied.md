@@ -4,6 +4,8 @@
 
 **Approved:** Anna Pikula, 2026-08-30
 
+> **Expected result superseded — 2026-09-01.** User Management answered contract-request Q3 the opposite way this file assumed: a colleague `GET /users/:id` returns the **S1 identity card** (`200`), not `403` (§3.2 S1 row is `R` for Colleague; [adoption SPEC](../../../../_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md)). The **resolver behaviour is unchanged** — Colin still resolves to `colleague` as the fallback, and that is still "the case that makes the other four meaningful." The rework: assert `resolveAudiences(Colin, [Alice])` yields `{colleague}` (non-empty, and *not* `self`/`reporting`/`pp`), the way `ACF-FC-04` asserts, instead of a `403` on the route. That is its own AD-1 pass and needs fresh approval. Do not translate the `403` below.
+
 ## Scenario
 
 **Given** Colin is an authenticated employee who is not Alice, does not manage her directly or transitively, and is not her People Partner.

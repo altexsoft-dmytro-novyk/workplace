@@ -1,6 +1,6 @@
 # UM-LIST-01 · List users returns pagination metadata
 
-**Trace:** epics.md Story 1.5 · FR-16 · [api-conventions.md](../../../architecture/api-conventions.md) AD-14
+**Trace:** epics.md Story 1.5 · FR-15 · [api-conventions.md](../../../architecture/api-conventions.md) AD-14
 
 ## Scenario
 

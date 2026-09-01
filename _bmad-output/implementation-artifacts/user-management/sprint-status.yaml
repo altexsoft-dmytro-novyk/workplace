@@ -29,16 +29,34 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-22-2026 23:36
-last_updated: 08-31-2026 14:15
+last_updated: 09-01-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts/user-management
 development_status:
+  # Epic 0 — Access Control Adoption. Story keys mirror
+  # _bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml
+  # (UMAC-1/2). Authoritative contract is that SPEC, not a compiled spec file.
+  # 0-1 read path + minimal S1-card projection can start now (ACM-8 done);
+  # 0-2 write path conditional on the missing user-management:edit permission
+  # decision.
+  # retired: 0-3-flip-colleague-to-allow-narrowed — removed 2026-09-01 (human
+  #   product decision): §3.2 S1 row is R for the Colleague column, so a colleague
+  #   reads the S1 identity card from Story 0.1; there is nothing to flip.
+  epic-0: in-progress
+  0-1-adopt-read-path-and-rebind-port: in-progress  # UMAC-1-scenarios (Stage 1) approved 2026-09-01; UMAC-1-red-tests next
+
+  0-2-adopt-write-path-dual-gate: backlog
+  epic-0-retrospective: optional
+
   epic-1: backlog
   1-1-import-seeded-population: backlog
   1-2-view-and-edit-an-employee-s-identity-card-fields: backlog
   1-3-self-uploads-own-photo: backlog
+  # retired: old "1-4 HR Admin Deactivates an Employee" — generic deactivation is
+  # gone in v1.5 (AD-16); Epic 1 is stories 1.1, 1.2, 1.3, 1.5. The v1.5
+  # departure workflow lives in Epic 5.
   1-5-list-employees-with-pagination-and-filters: backlog
   epic-1-retrospective: optional
 
@@ -53,6 +71,11 @@ development_status:
   3-3-authorized-actor-edits-or-deletes-an-event: backlog
   epic-3-retrospective: optional
 
+  # Epic 4 — every story's stage-2/production (journal-writing) work is blocked on
+  # CC-07 (AD-19 Journal gate); 4-2 additionally on CC-04. Scenario prose may proceed.
+  # retired: old "4-2 HR Admin Pairs or Unpairs a Mentor and Mentee" — mentorship
+  # handed to a future dedicated Mentorship context (AD-17); the v1.5 4-2 below is
+  # "Change an Employee's People Partner".
   epic-4: backlog
   4-1-change-an-employee-s-manager: backlog
   4-2-change-an-employee-s-people-partner: backlog
