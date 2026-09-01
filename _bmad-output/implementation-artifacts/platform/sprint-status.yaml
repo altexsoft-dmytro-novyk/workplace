@@ -29,21 +29,26 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 08-31-2026 14:15
+last_updated: 09-01-2026 23:10
 project: people management
 project_key: NOKEY
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts/platform
 development_status:
   epic-1: in-progress
+  # 1-1: UM↔AC matrix exists; platform-wide changelog matrix under
+  # planning-artifacts/platform/ was not delivered.
   1-1-changelog-traceability-matrix: backlog
+  # 1-2: addendum still carries "pending v1.3" department language.
   1-2-platform-prd-addendum-drift-close: backlog
+  # 1-3: ACF-AU-05 / ACF-FC-01 / ACF-FC-02 HTTP colleague-403 still need a
+  # fresh AD-1 pass as resolver audience-set assertions.
   1-3-access-control-spec-stage-1-suite-alignment: backlog
   1-4-architecture-binding-updates: backlog
   1-5-dashboards-4-4-v1-5-fixed-facts: backlog
   1-6-platform-test-design-refresh-v1-2-v1-5: backlog
-  1-7-um-planning-residual-non-epic-2-4-scope: backlog
-  1-8-doc-pass-create-path-removal-from-binding-docs: backlog
+  1-7-um-planning-residual-non-epic-2-4-scope: done  # CAP-1 is seed; registration folder retired
+  1-8-doc-pass-create-path-removal-from-binding-docs: done  # api-conventions + DEC-UM-006/008 retired
   1-9-register-epic-in-platform-sprint-status: done
   epic-1-retrospective: optional
 

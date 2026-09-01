@@ -24,7 +24,7 @@ Cross-cutting planning/test/architecture alignment to spec **v1.5** after resear
 
 ## Epic 1: Platform Spec v1.5 Alignment
 
-**Status:** backlog  
+**Status:** in-progress  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 ### Story 1.1: Changelog Traceability Matrix

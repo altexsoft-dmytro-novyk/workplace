@@ -24,7 +24,7 @@ No section matrix, no functional permissions, no field projection, no writes, no
 
 `GET /users/:id` is binary: 200 or 403. Phase-0 audiences only become observable once someone decides *which audiences may read a profile*. That decision belongs to User Management (AD-2/AD-14). It was requested in [um-integration-contract-request.md](../../../_bmad-output/implementation-artifacts/access-control/um-integration-contract-request.md) question 3, and **answered on 2026-09-01**:
 
-> **`self`, `reporting`, `pp`, *and* `colleague` → allowed (`200`, S1 identity card).** The only denial is an **empty audience set** (viewer or target not an active `User`) → leak-free `404`.
+> **`self`, `reporting`, `pp`, *and* `colleague` → allowed (`200`, S1 identity card).** Empty audience (viewer or target not an active `User`) → `403`. Unresolved session → `401`. No leak-free `404`.
 
 This suite was authored on the earlier provisional assumption `colleague → denied (403)`, which is now **wrong**. Per the note at the top of this README, the resolver is unaffected but the HTTP expectations in `ACF-AU-05` / `ACF-FC-01` / `ACF-FC-02` are superseded and need rework + re-approval as an audience-set assertion.
 

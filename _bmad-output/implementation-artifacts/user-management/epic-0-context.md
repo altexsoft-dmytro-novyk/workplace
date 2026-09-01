@@ -37,8 +37,10 @@ AccessControl → PostgreSQL E2E with no provider overrides (AD-3).
   identity-card projection) + the CAP-4 read E2E. `GET /users/:id` → `200` with
   the **S1 identity card** for **any non-empty audience** (`self` / `reporting` /
   `pp` / `colleague` — §3.2's S1 row is `R` for the Colleague column, and every
-  active authenticated viewer is at least a Colleague); the only denial is an
-  **empty audience set** → leak-free `404`. Story 0.1 routes `GET /users/:id`
+  active authenticated viewer is at least a Colleague); denials are `401` when
+  the session does not resolve to an active `User` and **`403`** when an
+  authenticated active viewer's audience over the target is empty (no
+  leak-free `404` — human product decision 2026-09-01). Story 0.1 routes `GET /users/:id`
   through an S1-card DTO — a dedicated mapper on that handler only, **not** a
   rewrite of the shared `toUserResponse` (the list / `POST` / `PATCH` /
   `DELETE` / photo response bodies are unchanged) — returning `id`, `firstName`,
@@ -79,13 +81,11 @@ AccessControl → PostgreSQL E2E with no provider overrides (AD-3).
   S1 row is `R` for the Colleague column and every active authenticated viewer is
   at least a Colleague. Story 0.1 ships the S1-card projection, so the colleague
   read is a positive outcome from the start — there is no "two-state" rule and no
-  `UMAC-3` flip. Denial convention: the **only** `GET /users/:id` denial is an
-  empty audience set → leak-free `404`
-  (`um-integration-contract-response.md` Q4). `AccessControlGuard` maps
-  `isAllowedForTarget` denials to `403`, so the `404` needs a controller-level
-  decision (treat an empty audience / missing target as `NotFound`) — surface
-  for the human at the scenario stage if it cannot be expressed without a guard
-  change.
+  `UMAC-3` flip. Denial convention (`um-integration-contract-response.md` Q4,
+  revised 2026-09-01): unresolved session → `401`; authenticated active viewer
+  with an empty audience → `403`. No leak-free `404`. `AccessControlGuard`
+  already maps a denied `isAllowedForTarget` to `403`, so no guard or
+  controller change is required.
 - **CC-07 does not block Epic 0.** The facade *reads* `Relationship
   type='people_partner'` to resolve the PP audience; reading is fine. CC-07
   blocks Epic 4's PP/journal write path, not this slice.
@@ -106,7 +106,7 @@ AccessControl → PostgreSQL E2E with no provider overrides (AD-3).
   data correctness; Epic 0 asserts entitlement).
 - The existing `profile.e2e-spec.ts` `Bearer <token:Bob>` literal placeholders
   break under the real facade (`'Bob'` → non-existent user → empty audience →
-  leak-free `404`); whether `um-pf-01..04` move to real personas or the suite's scope note
+  `403`); whether `um-pf-01..04` move to real personas or the suite's scope note
   tightens is a call for Story 0.1's scenario stage — surfaced for the human,
   not silently rewritten.
 
@@ -114,7 +114,7 @@ AccessControl → PostgreSQL E2E with no provider overrides (AD-3).
 
 Three distinct dispatches per story — scenario prose (human-approved), then
 committed-red real-consumer HTTP E2E (human-approved), then production — each
-`author != approver`, each recorded in this package's `approvals.yaml` (created
-on the first approval; it does not exist yet). The validation-only evidence
+`author != approver`, each recorded in this package's `approvals.yaml`
+(`UMAC-1` Stage 1 and Stage 2 are already recorded). The validation-only evidence
 exception does **not** apply — every capability changes production code.
 Scenario docs live under `docs/test-cases/user-management/access-control-adoption/`.

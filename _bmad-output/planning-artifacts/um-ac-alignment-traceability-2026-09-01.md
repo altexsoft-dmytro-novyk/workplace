@@ -17,15 +17,16 @@ not resolved here.
 **Amended 2026-09-01 (human product decisions).** Two decisions were taken and
 folded across the corpus: (1) a colleague `GET /users/:id` returns the **S1
 identity card** (`200`) from adoption Story 0.1 — the "two-state colleague rule"
-and adoption story `UMAC-3` are **removed**; the only `GET /users/:id` denial is
-an empty audience → leak-free `404`; FR-17 Profile Projection shrinks to the
+and adoption story `UMAC-3` are **removed**; denials are `401` (unresolved
+session) and `403` (authenticated viewer, empty audience) — no leak-free `404`;
+FR-17 Profile Projection shrinks to the
 S10/S11/S16 colleague views on their own surfaces, S7/S8 flags, and S1
 derived-field immutability. Files swept in a follow-up alignment pass
 (2026-09-01, post-verification): `spec-user-management-test-cases/SPEC.md` CAP-0
 success + Constraints + Assumptions + Open Question (ii); adoption SPEC CAP-3 +
 Non-goals + `stories.yaml` (S1-card DTO scoped to the `GET /users/:id` handler
 only — the shared `toUserResponse` and the other five call sites are unchanged);
-`architect-handoff-phase-b.md` (superseded banner + inline `403`→`404`). **Knock-on
+`architect-handoff-phase-b.md` (superseded banner; later same-day decision kept empty-audience as `403`). **Knock-on
 to Access Control's own `access-control-foundation` suite:** its provisional
 `colleague → deny (403)` mapping is now answered the other way; the `ACF-AU-05` /
 `ACF-FC-01` / `ACF-FC-02` HTTP-status expectations are **superseded** and need a
@@ -97,7 +98,7 @@ Product/Access-Control decisions carried to proposal §7 ((vii)/(viii)/(ix)).
 | Phase B FR numbering (FR-16/FR-17) vs epics.md derived FR-7..FR-15 | no collision — derived FRs stop at FR-15; FR-16/FR-17 continue past |
 | Regenerated compiled specs vs reconciled `epics.md` stories | every live `spec-*.md` maps to an `epics.md` story; retired old-slug files carry SUPERSEDED pointers to their replacement |
 | `sprint-status.yaml` keys vs `epics.md` + adoption `stories.yaml` | match (Epic 0 `0-1/0-2`, Epics 1–5; retired keys — incl. `0-3-flip-colleague-to-allow-narrowed` — carry `# retired:` comments) |
-| `spec-user-management-test-cases` CAP list vs the refreshed `docs/test-cases/user-management/` folders | match (CAP-0 adoption … CAP-10 departure). **CAP-0 success text corrected 2026-09-01** — it still carried the pre-decision "colleague `403` two-state / whole row / unresolved `403`" wording; now: colleague → `200` S1 card, empty audience → leak-free `404`, S1-card DTO on the `GET /users/:id` handler only. |
+| `spec-user-management-test-cases` CAP list vs the refreshed `docs/test-cases/user-management/` folders | match (CAP-0 adoption … CAP-10 departure). **CAP-0 success text corrected 2026-09-01** — colleague → `200` S1 card, empty audience → `403`, S1-card DTO on the `GET /users/:id` handler only. |
 | kernel `validate.py` after this pass | **PASS** — 1225 checks, 0 failures (no kernel story ID changed) |
 | Backend commit reference | corrected from stale `865df5f` to audited `dn-um-2 @ e9d80ec` in the proposal §2, `epic-2-context.md`, `epic-3-context.md`; the E2E audit is the authority |
 | `POST /users` *create* references in the reconciled corpus | none outside explicit "retired" pointers; `POST /users/:id/{events,relationships,policies}` (AD-14 owned-collection routes) are unrelated and correct; the 15 `um-reg-*.md` history files are retained untouched under a folder-level RETIRED pointer (per the TEA phase's stated retire approach) |
@@ -114,7 +115,7 @@ Story 1.2 at the code stage.
 ## D. Open decisions carried to human review (from proposal §7 — restated for completeness)
 
 1. Missing `user-management:edit` (± photo) permission — option (a) new kernel seed AD-1 sequence, or (b) interim adapter rule with an expiry trigger.
-2. **RESOLVED 2026-09-01** — colleague `GET /users/:id` returns the S1 identity card from Story 0.1 (§3.2 S1 = `R` for Colleague). Two-state rule and adoption story `UMAC-3` removed; empty audience → leak-free `404`. FR-17 keeps only the S10/S11/S16 colleague views on their own surfaces, S7/S8 flags, S1 derived-field immutability.
+2. **RESOLVED 2026-09-01** — colleague `GET /users/:id` returns the S1 identity card from Story 0.1 (§3.2 S1 = `R` for Colleague). Two-state rule and adoption story `UMAC-3` removed; empty audience → `403` (no leak-free `404`). FR-17 keeps only the S10/S11/S16 colleague views on their own surfaces, S7/S8 flags, S1 derived-field immutability.
 3. Epic 0 as a dedicated epic vs a Story 1.0 inside Epic 1.
 4. Interim session resolver owner — Epic 0 or Epic 2.
 5. Photo write Self-only vs manager/PP-writable.

@@ -50,9 +50,9 @@ earlier "not yet authored" boundary is closed). Entitlement for `/users/:id`
     `POST` / `PATCH` / `DELETE` / photo response bodies are unchanged): `id`,
     `firstName`, `lastName`, `photo`, `position`, `country`, `city`,
     `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` — with
-    `ttId` / `isActive` / `customFields` / `createdAt` / `createdBy` absent. The **only** `GET /users/:id` denial is an
-    empty audience set (viewer or target not an active `User`) → leak-free `404`;
-    `401` still covers a missing/invalid token. *(Revised 2026-09-01 by human
+    `ttId` / `isActive` / `customFields` / `createdAt` / `createdBy` absent.     Denials: unresolved session → `401`; authenticated active viewer with an
+    empty audience set (viewer or target not an active `User`) → `403`. No
+    leak-free `404`. *(Revised 2026-09-01 by human
     product decision — the "two-state colleague rule" and adoption story `UMAC-3`
     are removed; the S10/S11/S16 colleague narrowing stays FR-17 on its own
     surfaces.)* No-target `isAllowed` delegates straight to the facade (root
@@ -267,7 +267,7 @@ Carried from the consolidated proposal §7 — approver decisions, not TEA's:
 2. **(ii) RESOLVED 2026-09-01 (human product decision).** A colleague
    `GET /users/:id` returns the S1 identity card (`200`) from Story 0.1 (§3.2 S1
    = `R` for Colleague); the "two-state rule" and adoption story `UMAC-3` are
-   removed; the only denial is an empty audience → leak-free `404`. FR-17 Profile
+   removed; empty audience → `403` (no leak-free `404`). FR-17 Profile
    Projection keeps only the S10 dates-only / S11 name-only / S16 per-field
    colleague views on their own surfaces.
 3. **(v)** Photo write Self-only vs manager-writable (`umac-09`).
