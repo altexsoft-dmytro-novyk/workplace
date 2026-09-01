@@ -181,3 +181,49 @@ approvals:
     approver: "Dmytro Novyk"
     decision: "approved"
     timestamp: "2026-09-01T14:05:00Z"
+
+  # UMAC-1 Stage 2 — committed-red real-consumer HTTP READ E2E. Approved by
+  # Dmytro Novyk 2026-09-01 after reviewing the diff (workspace 00c26e8 +
+  # services/backend 08931ad): read suite realigned to the { data, canEdit }
+  # envelope and the 403 empty-audience denial, fresh red run exit 1
+  # (9 failed / 3 passed / 12), no production code touched. Unblocks the
+  # UMAC-1-production (Stage 3) dispatch.
+  - story_id: "UMAC-1-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/access-control-adoption/read-adoption.e2e-spec.ts"
+    commit: "08931ad14778f1953ca551c0e25c782afa4ccb1b"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T15:30:00Z"
+
+  - story_id: "UMAC-1-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/access-control-adoption/read-denial.e2e-spec.ts"
+    commit: "08931ad14778f1953ca551c0e25c782afa4ccb1b"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T15:30:00Z"
+
+  - story_id: "UMAC-1-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/access-control-adoption/fixtures.ts"
+    commit: "08931ad14778f1953ca551c0e25c782afa4ccb1b"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T15:30:00Z"
+
+  - story_id: "UMAC-1-red-tests"
+    stage: "stage-2-tests"
+    repo: "workspace"
+    artifact_path: "_bmad-output/specs/spec-user-management-access-control-adoption/stories/UMAC-1-red-tests-real-consumer-http-read-e2e-committed-red.md"
+    commit: "00c26e858dc5e6d4b1a7e0bfd55fedc6d95cec71"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T15:30:00Z"
