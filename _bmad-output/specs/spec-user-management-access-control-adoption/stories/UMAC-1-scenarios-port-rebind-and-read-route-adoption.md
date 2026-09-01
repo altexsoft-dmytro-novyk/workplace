@@ -2,9 +2,10 @@
 title: 'UMAC-1 Stage 1 — port rebind + READ route adoption scenario prose'
 type: 'chore'
 created: '2026-09-01'
-status: 'in-review'
+status: 'done'
 review_loop_iteration: 0
 followup_review_recommended: false
+stage_1_approved_by: 'Dmytro Novyk — 2026-09-01 (see approvals.yaml)'
 baseline_revision: '9ac9d1b9e61385037e6254aef73be146753e6644'
 context:
   - '{project-root}/_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md'
@@ -277,6 +278,30 @@ READ decision the adapter only needs "audience set non-empty" from
 `resolveAudiences(viewer, [target])`; `canAccessSection(viewer, 'S1', target)
 === 'none'` expresses the same empty-set denial. The write `read`/`write`
 split is UMAC-2's concern, not this route's body.
+
+## Auto Run Result
+
+Status: done. Stage-1 scenario prose for Epic 0 Story 0.1 authored / reconciled:
+`docs/test-cases/user-management/access-control-adoption/umac-01..06.md` + folder
+`README.md`. Independently approved by Dmytro Novyk (Product Owner / Architect)
+on 2026-09-01 — recorded in
+`_bmad-output/specs/spec-user-management-access-control-adoption/approvals.yaml`
+(`UMAC-1-scenarios`, `stage-1-scenarios`, author = Claude Code agent, approver =
+Dmytro Novyk, commit `5fe0bb86759c350de1d88da710f4f10a09f0431e`).
+
+Human decision folded in at approval: `GET /users/:id` denials are `401`
+(unresolved session — session layer) and `403` (authenticated active viewer,
+empty audience); the earlier "leak-free `404`" is withdrawn. No guard/controller
+change — the `403` is what `AccessControlGuard` already produces.
+
+Next dispatch: `UMAC-1-red-tests` (Stage 2). Note for that dispatch: a
+prematurely-committed E2E suite already exists under
+`services/backend/test/user-management/access-control-adoption/`
+(`read-adoption`, `read-denial`, `no-target-permission`, `write-adoption`,
+`fixtures.ts`), committed in `986e90a`/`0681939` alongside the scenario prose
+before any Stage-1 approval — an AD-1 ordering violation. `read-denial` asserts
+`404` and must be realigned to `403`. `write-adoption` is UMAC-2 scope and does
+not belong to UMAC-1. The Stage-2 dispatch decides: accept, re-derive, or revert.
 
 ## Verification
 

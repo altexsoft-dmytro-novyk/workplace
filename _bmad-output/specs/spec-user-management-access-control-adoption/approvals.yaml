@@ -1,0 +1,118 @@
+# AD-1 stage-approval ledger — User Management ↔ Access Control Adoption
+#
+# Append-only. A superseding decision is APPENDED; no entry is ever edited or
+# removed. This file is the persisted, independently verifiable form of the
+# AD-1 gate: a claim in a report that "a human approved this" is not an
+# approval, this record is.
+#
+# Schema — every entry carries all eight fields:
+#
+#   - story_id:      dispatch entry id from stories.yaml (e.g. "UMAC-1-scenarios")
+#     stage:         stage-1-scenarios | stage-2-tests | stage-3-production
+#     repo:          workspace | services/backend
+#     artifact_path: path to the artifact, relative to THAT repo's root
+#     commit:        revision in THAT repo at which the artifact was read
+#     author:        who produced the artifact
+#     approver:      who approved it
+#     decision:      approved | rejected
+#     timestamp:     ISO-8601, e.g. 2026-09-01T14:03:00Z
+#
+# `repo` exists because this workspace spans two git repositories: planning
+# artifacts live here, tests and production code live in `services/backend`.
+#
+# Rules that make the record enforceable:
+#   1. author != approver (no self-certification).
+#   2. A dispatch may not start until the PRIOR stage's record exists and
+#      VERIFIES — `commit` resolves and `artifact_path` is present at it.
+#
+# Verify:
+#   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
+#   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
+#
+# Status: UMAC-1-scenarios stage-1-scenarios recorded below (Story 0.1 read
+# path — umac-01..06 + folder README + the consolidated story spec). No
+# Stage-2 or Stage-3 record exists yet; the next dispatch (UMAC-1-red-tests)
+# may proceed only after independently verifying these records.
+# UMAC-2 (write path) is unstarted and blocked on the Open Decision (i)
+# option (a) kernel seed sequence for user-management:edit.
+
+approvals:
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/umac-01-self-read-s1-card.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"
+
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/umac-02-reporting-line-viewer-read.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"
+
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/umac-03-assigned-pp-read.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"
+
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/umac-04-colleague-read-s1-card.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"
+
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/umac-05-unresolved-session-read-denied.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"
+
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/umac-06-no-target-isallowed-delegates-to-facade.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"
+
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/README.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"
+
+  - story_id: "UMAC-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "_bmad-output/specs/spec-user-management-access-control-adoption/stories/UMAC-1-scenarios-port-rebind-and-read-route-adoption.md"
+    commit: "5fe0bb86759c350de1d88da710f4f10a09f0431e"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-01T13:20:00Z"

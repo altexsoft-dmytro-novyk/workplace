@@ -4,6 +4,11 @@ Goals split out of the 2026-08-29 Access Control build run. Each entry is an
 independently shippable deliverable; none is authorized by the current spec.
 
 - source_spec: none
+  status: raised 2026-09-01 by the User Management owner (Dmytro Novyk) during UMAC-1 Stage-1 review; needs its own PRD/epic + bmad-ux pass + architect decision, then a three-stage AD-1 sequence. Access-Control-owned.
+  summary: Frontend capability projection — an endpoint (or an embedded block) that tells the UI what the current viewer may do with a given resource, so it can hide/disable actions instead of letting the user click and catch a 403.
+  evidence: The enforcement primitives already exist on the facade (`isAllowed(viewer, featureKey)`, `canAccessSection(viewer, section, target)` → `none`/`read`/`write`, `resolveAudiences`). What is missing is a read surface for the client. The adoption slice is backend-only and CAP-3 pins `GET /users/:id` to exactly the 12 S1 fields, so this cannot ride on that response as-is. Options to decide: (a) a `_capabilities` block on the resource response (`GET /users/:id` → S1 card + `{ s1: 'read'|'write', canUploadPhoto: bool }`), computed from the same facade calls the write guard uses — one round-trip, cannot drift from enforcement; (b) a dedicated `GET /users/:id/permissions` / `GET /me/capabilities` endpoint — more flexible, extra round-trip; (c) no projection, the client tries and handles 403 — worst UX. This belongs to Access Control because it owns the matrix→section/feature projection; the client must not re-derive it. Blocks any User Management edit UI (Story 1.2 frontend) from being built cleanly.
+
+- source_spec: none
   summary: Functional-role catalog — runtime-extensible FR policies, granular permission grants, and the HR Admin role-management surface.
   evidence: Split from the Access Control build intent. FR assignment is its own data model and HTTP surface (`/roles` per api-conventions.md) and must stay off the AR tier-resolution hot path (access-control.md, type-separated evaluation), so it can be reviewed and merged without the audience resolver.
 
