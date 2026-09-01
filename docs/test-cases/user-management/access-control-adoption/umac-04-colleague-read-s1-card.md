@@ -1,0 +1,44 @@
+# UMAC-04 · Colleague / unrelated active session reads a profile → 200 with the S1 identity card
+
+**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) + CAP-3 · `um-integration-contract-response.md` Q3 (`colleague` → allow, S1 card), Q5 (S1-card projection ships in Story 0.1) · PRD FR-16 · `docs/project-requirements.md` §3.2 (S1 Identity card row is `R` for the Colleague column; legend: Colleague = "any authenticated employee holding none of the above roles")
+
+## Scenario
+
+**Given** the port is rebound; V and T are active seeded `User` rows with **no**
+`Relationship` edge between them and V is not T (V's Phase-0 audience over T is the
+`colleague` floor only).
+
+**When** V calls `GET /users/<T>`.
+
+**Then** the response is **`200`** with the **S1 identity card** — the **same
+fields every other audience gets** on this route. §3.2's S1 (Identity card) row is
+`R` for the Colleague column, and the matrix legend defines Colleague as any
+authenticated employee holding none of the above roles — so every active
+authenticated viewer is at least a Colleague and is entitled to S1. This is a
+**positive** test: there is no "two-state" rule, no `403`, and no deferred flip.
+
+> **The S1 card projection (CAP-3, Story 0.1).** The body contains exactly `id`,
+> `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`,
+> `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`. It **does not**
+> contain `ttId`, `isActive`, `customFields`, `createdAt`, or `createdBy`.
+> Derived S1 display fields (manager, people partner, department, mentor,
+> current projects) come from other contexts and are out of scope for this
+> route until those land — the response omits them. The *further* colleague
+> narrowing — S10 dates-only (`GET /users/:id/leaves`), S11 project-name-only,
+> S16 per-field visibility — is the deferred FR-17 Profile Projection story on
+> those own surfaces, not this route.
+
+A genuinely unrelated *field* route for a colleague (e.g. `GET
+/users/:id/personal-contacts`, S2, absent from the colleague whitelist) is a
+`404`/`—`-cell case owned by other slices and is out of this slice's scope.
+
+**Preconditions:** [fixture](README.md#fixture-convention-per-um-integration-contract-response-md-q6); V and T active seeded rows; no `Relationship` edge either direction; V ≠ T; the port is rebound (this scenario's E2E is red until `UMAC-1-production` ships the S1-card DTO — under the interim adapter `toUserResponse` spreads the whole row, so the "technical fields absent" assertions fail).
+
+## Test
+
+- **inputURL:** `GET /users/<T-uuid>`
+- **inputRequest:**
+  ```json
+  { "headers": { "authorization": "Bearer <token:<V-uuid>>" } }
+  ```
+- **expectedResult:** `200`. Body **contains** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`. Body **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. Identical field set to `umac-01` / `umac-02` / `umac-03`.

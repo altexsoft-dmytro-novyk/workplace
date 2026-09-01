@@ -26,11 +26,18 @@ pointer.)*
 
 ## Requirements & Constraints
 
-- **No `POST /users`.** The population is an idempotent seeded import keyed by
-  external timetracker identity (`ttId`). Creating employees via API or UI is
-  out of scope (AD-14, AD-16, §4.17). `POST /users` and generic
-  `DELETE /users/:id` are **retired in the v1.5 cutover** (AD-21) — a
-  regenerated Story 1.1/1.2 must name them as removals, not extend them.
+- **No `POST /users`.** The population is an idempotent import of the delivered
+  semicolon-delimited timetracker export `docs/Accounts_template.csv`, **keyed
+  by the normalized `Email`** (the file has **no employee-id column**; `ttId` per
+  AD-13 has no source column and is left `null`). Column → `User` field mapping
+  and the OPEN items (`PositionId`, `DepartmentName`/`DepartmentId`,
+  `CountryCode`/`CountryStateName`, missing `city`, `EmployeeType`→S4,
+  `IsDismissed`/`DismissedDate`→`EmploymentStatus`, `TimeZone`) are in
+  `spec-1-1-import-seeded-population.md` and `docs/test-cases/user-management/seed/README.md`.
+  Creating employees via API or UI is out of scope (AD-14, AD-16, §4.17).
+  `POST /users` and generic `DELETE /users/:id` are **retired in the v1.5
+  cutover** (AD-21) — a regenerated Story 1.1/1.2 must name them as removals,
+  not extend them.
 - **Kernel-reality constraints on the seed/import writer (2026-09-01):**
   - **DEC-UM-007 canonical at write** — the writer trims + lowercases
     `workEmail` and **stores the normalized value**. The DB `users_workEmail_key`
@@ -39,9 +46,10 @@ pointer.)*
     (`deferred-work.md`).
   - **DEC-UM-009 / ACM-0** — `npm run db:seed` has already created the single
     active root `User` (normalized `workEmail`) before import runs (order:
-    `db:deploy` → `db:seed` → `db:bootstrap:access-control` → `start:prod`). An
-    import covering the root person **reuses the ACM-0 root `User` id**; no
-    writer inserts a second row for a normalized email that already exists.
+    `db:deploy` → `db:seed` → `db:bootstrap:access-control` → `start:prod`). A
+    CSV row whose normalized `Email` matches `ROOT_WORK_EMAIL` **updates the
+    existing ACM-0 root `User` id** in place; no writer inserts a second row for
+    a normalized email that already exists.
   - Each imported `User` gets a system `joined_company` `UserEvents` row written
     synchronously in the same transaction as the row insert (AD-11 / Epic 3
     pattern) — not via an HTTP create.
@@ -57,7 +65,8 @@ pointer.)*
 - **`workEmail`/`ttId` unique at write** — on the seed/import writer and on
   authorized identity `PATCH`; a conflicting write is rejected wholesale
   (`409`), leaving the target row unchanged. `ttId` null-vs-null is not a
-  duplicate.
+  duplicate — and the CSV import leaves `ttId` `null` on every row (no source
+  column).
 - **List scope (Story 1.5).** Filters cover permission-safe S1 fields on the
   `User` row plus employment status. Technical `ttId`/`isActive` are never
   public filters. A `dismissed` employee is absent from the default list but

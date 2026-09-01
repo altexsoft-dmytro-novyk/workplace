@@ -1,9 +1,12 @@
 # User Management — `access-control-adoption/` (Epic 0)
 
 Stage-1 scenario documents (AD-1) for **Epic 0 — Access Control Adoption**. They
-mirror the dispatch entries `UMAC-1` / `UMAC-2` / `UMAC-3` in
+mirror the dispatch entries `UMAC-1` / `UMAC-2` in
 `_bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml`
-and answer `um-integration-contract-response.md` Q3.
+and answer `um-integration-contract-response.md` Q3. (`UMAC-3` — the colleague
+deny→allow-narrowed flip — was **removed 2026-09-01** by human product decision:
+§3.2's S1 row is `R` for the Colleague column, so a colleague reads the S1
+identity card from Story 0.1 and there is nothing to flip.)
 
 **Status:** unapproved draft (2026-09-01). Per-file human approval under the AD-1
 stage-1 gate is required. **The adoption package's `approvals.yaml` does not
@@ -21,10 +24,16 @@ behaviour is chosen per feature string inside the adapter.
 
 | Route | Feature constant | Adapter behaviour |
 | --- | --- | --- |
-| `GET /users/:id` | `user-management:read` | allow `self` / `reporting` / `pp`; deny empty set or `colleague`-only (`403`, **temporary** two-state rule) |
+| `GET /users/:id` | `user-management:read` | allow **any non-empty audience** (`self` / `reporting` / `pp` / `colleague`) → `200` with the **S1 identity card** (same fields for every audience); deny **only** the empty set → leak-free `404` |
 | `PATCH /users/:id` | `user-management:edit` | §2.2 dual gate: `isAllowed(v, edit key)` **and** `canAccessSection(v, 'S1', t) === 'write'` — **blocked on a missing permission** |
 | `PUT /users/:id/photo` | `user-management:upload-photo` | Self-only (viewer id == target id) unless Product widens it |
 | `GET /users`, `POST /users`, `DELETE /users/:id` | `user-management:list` / `:create` / `:deactivate` | `isAllowed` delegates straight to the facade — these three keys are exactly the ACM-1 seeded set |
+
+**Response-body scope.** The S1-card DTO is a dedicated mapper on the
+`GET /users/:id` handler only. `GET /users` (list), `POST /users`,
+`PATCH /users/:id`, `DELETE /users/:id`, and `PUT /users/:id/photo` response
+bodies are **unchanged** by this slice — the shared `toUserResponse` is not
+rewritten. List projection is Epic 1 Story 1.5 / FR-15.
 
 ## `canAccessSection` section string
 
@@ -41,30 +50,38 @@ Cases that need a **real audience** use `Bearer <token:<seeded-uuid>>` — a rea
 `User` row's UUID that `InterimSessionResolverAdapter` accepts unchanged
 (`{ userId: persona }`) — **not** a literal persona placeholder like
 `Bearer <token:Bob>` (which resolves to the non-existent string id `'Bob'` →
-empty audience → `403` under the real facade). Stage-2 seeds real `User` rows and
+empty audience → leak-free `404` under the real facade). Stage-2 seeds real `User` rows and
 real `Relationship` rows (`direct`, `people_partner`) and threads the returned
 ids. The interim **session** resolver stays (Epic 2 retires it); only the interim
 **access-control** adapter is deleted here.
 
-## Two-state colleague rule
+## Colleague reads the S1 identity card (no "two-state" rule)
 
-`colleague → 403` on `GET /users/:id` is correct **only while the route returns
-the whole `User` row**. The durable rule is `colleague → 200, body narrowed to
-the §3.3.4 whitelist`. Every colleague scenario here (`umac-04`) records the
-`403` as **explicitly temporary** and names the deferred **Profile Projection**
-story (FR-17, `deferred-work.md`) as the trigger that flips it (adoption story
-`UMAC-3` / `umac-03` flip — a separate three-stage AD-1 sequence). Do not harden
-colleague-`403` as intended end-state.
+§3.2's S1 (Identity card) row is `R` for the Colleague column, and the matrix
+legend defines Colleague as "any authenticated employee holding none of the above
+roles" — so **every active authenticated viewer is at least a Colleague** and is
+entitled to S1. `umac-04` is a **positive** test: colleague → `200` with the S1
+card, the **same fields** as Self / reporting / PP. Story 0.1 ships the S1-card
+projection (`id`, `firstName`, `lastName`, `photo`, `position`, `country`,
+`city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`;
+`ttId` / `isActive` / `customFields` / `createdAt` / `createdBy` absent). The
+former "two-state" rule and adoption story `UMAC-3` were **removed 2026-09-01**.
+
+The deferred **FR-17 Profile Projection** story (`deferred-work.md`) still owns
+the *further* colleague narrowing — S10 dates-only (`GET /users/:id/leaves`), S11
+project-name-only, S16 per-field visibility — on those **own surfaces**, plus
+S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
+`GET /users/:id`.
 
 ## Contents
 
 | File | Story | State |
 | --- | --- | --- |
-| `umac-01-self-read-whole-row.md` | 0.1 | ready for approval |
-| `umac-02-reporting-line-viewer-read.md` | 0.1 | ready for approval |
-| `umac-03-assigned-pp-read.md` | 0.1 | ready for approval |
-| `umac-04-colleague-read-denied-temporary.md` | 0.1 | ready for approval (records the temporary two-state outcome) |
-| `umac-05-unresolved-session-read-denied.md` | 0.1 | ready for approval |
+| `umac-01-self-read-s1-card.md` | 0.1 | ready for approval (Self → 200, S1 card) |
+| `umac-02-reporting-line-viewer-read.md` | 0.1 | ready for approval (reporting → 200, S1 card) |
+| `umac-03-assigned-pp-read.md` | 0.1 | ready for approval (PP → 200, S1 card) |
+| `umac-04-colleague-read-s1-card.md` | 0.1 | ready for approval (**colleague → 200, S1 card — positive test**) |
+| `umac-05-unresolved-session-read-denied.md` | 0.1 | ready for approval (empty audience → leak-free `404`) |
 | `umac-06-no-target-isallowed-delegates-to-facade.md` | 0.1 | ready for approval |
 | `umac-07-write-dual-gate.md` | 0.2 | **CONDITIONAL — blocked on the missing `user-management:edit` permission (Open Decision i)** |
 | `umac-08-write-rejects-org-fields.md` | 0.2 | ready for approval (§3.2 fn 1) |

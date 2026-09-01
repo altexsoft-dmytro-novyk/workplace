@@ -37,6 +37,17 @@ ACM-8 imported `AccessControlModule` into `AppModule`
 adoption work itself is scoped as a new package:
 `_bmad-output/specs/spec-user-management-access-control-adoption/`.
 
+> **Revised 2026-09-01 (human product decision).** Q3/Q4/Q5 are updated: a
+> colleague `GET /users/:id` returns the **S1 identity card** (`200`), not
+> `403` — §3.2's S1 row is `R` for the Colleague column and every active
+> authenticated viewer is at least a Colleague. Story 0.1 ships a **minimal
+> S1-card projection** — a dedicated mapper on the `GET /users/:id` handler
+> only (not a rewrite of the shared `toUserResponse`); the
+> "two-state colleague rule" and adoption story `UMAC-3` are removed. The
+> only `GET /users/:id` denial is an empty audience set → leak-free `404`.
+> FR-17 Profile Projection shrinks to the S10/S11/S16 colleague views on
+> their own surfaces, S7/S8 flags, and S1 derived-field immutability.
+
 ## What changed since rev 2 was written
 
 Rev 2's answers to Q2 and Q3 were written when the facade could only
@@ -152,50 +163,55 @@ action, no domain service, and no controller may inject
 
 This is the decision Access Control cannot make. It is made per feature.
 
-### `READ_USER_FEATURE` (`GET /users/:id`) — adopt now, two-state colleague rule
+### `READ_USER_FEATURE` (`GET /users/:id`) — adopt now, S1 identity card for every audience
 
-**Decision.** `isAllowedForTarget(viewer, 'user-management:read', target)`
-resolves as:
+**Decision (revised 2026-09-01 by human product decision — the earlier
+"two-state colleague rule" is withdrawn).**
+`isAllowedForTarget(viewer, 'user-management:read', target)` resolves as:
 
-| Phase-0 audience over target | Decision now | Decision once Profile Projection lands |
-| --- | --- | --- |
-| `self` | allow | allow |
-| `reporting` | allow | allow |
-| `pp` | allow | allow |
-| `colleague` (floor, none of the above) | **deny** | **allow, response narrowed to the §3.3.4 whitelist** |
-| empty set (inactive/missing viewer or target) | deny | deny |
+| Phase-0 audience over an **active** target | Decision |
+| --- | --- |
+| `self` | allow → `200` S1 card |
+| `reporting` | allow → `200` S1 card |
+| `pp` | allow → `200` S1 card |
+| `colleague` (floor, none of the above) | **allow → `200`, the same S1 card** |
+| empty set (inactive/missing viewer or target) | deny → leak-free `404` (`401` still covers a missing/invalid token) |
 
-The adapter obtains the set from
-`AccessControlFacade.resolveAudiences(viewer, [target])` and inspects
-membership. (`canAccessSection(viewer, 'S1', target)` alone cannot express
-this rule — it returns `'read'` for both `self` and `colleague`, so the
-adapter must see the audience set to distinguish them. Reading the set to
-gate a route is not widening the facade result; it is the route decision AD-2
-gives User Management.)
+The rule is simply **non-empty audience set → allow**. §3.2's S1 (Identity
+card) row is `R` for the Colleague column, and the matrix legend defines
+Colleague as "any authenticated employee holding none of the above roles" —
+so every active authenticated viewer is at least a Colleague and is entitled
+to S1. The adapter still obtains the set from
+`AccessControlFacade.resolveAudiences(viewer, [target])`; it now only needs
+to check that the set is non-empty. (`canAccessSection(viewer, 'S1', target)
+=== 'none'` for an empty set would express the same thing; either works.)
 
-**Explicit two-state trigger — record this so the temporary state is not
-mistaken for the final one:**
+**The S1 identity-card projection ships in Story 0.1 (not the deferred
+Profile Projection story).** The `GET /users/:id` handler today serializes
+through `toUserResponse`
+(`services/backend/src/user-management/application/dtos/user.response.ts:10`),
+which spreads the whole `User` row. Story 0.1's production change routes that
+one handler through an S1-card DTO instead — a dedicated mapper, **not** a
+rewrite of the shared `toUserResponse`, so the `GET /users` list, `POST`,
+`PATCH`, `DELETE`, and `PUT photo` response bodies are unchanged — returning
+exactly `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`,
+`workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` — the
+**same fields for every audience on this route** (read-vs-write differs, but
+write is `PATCH` / `PUT
+photo`, separate). It **drops** the non-S1 technical fields: `ttId` (AD-13
+external identity), `isActive` (internal flag, "not exposed"), `customFields`
+(S16), `createdAt`, `createdBy` (audit — same reasoning that dropped
+`updatedAt`/`updatedBy`). Derived S1 display fields — manager, people
+partner, department, mentor, current project(s) — come from other contexts
+and are out of scope for this route until those land; the response omits
+them and that is noted.
 
-> `colleague → deny` holds **only while `GET /users/:id` returns the whole
-> `User` row.** The durable rule is `colleague → allow, narrowed`. The
-> trigger that flips it is: the **Profile Projection story**
-> (`deferred-work.md`, "Profile Projection" entry) reaches
-> `stage-3-production` and `toUserResponse` no longer spreads the whole row.
-> On that event, and not before, the adoption adapter's `READ` branch
-> changes `colleague` from deny to allow, and the projection narrows the body
-> to §3.3.4: S1 identity-card fields, S10 dates-only (own route
-> `GET /users/:id/leaves`), S11 project name only (inline on
-> `GET /users/:id`).
-
-**Reasoning.** §3.3.4 (`access-control.md:197,236`) says a colleague
-legitimately sees S1, S10 dates, and S11 project name — they are meant to be
-*narrowed*, not refused (rev 2 Q4). But narrowing is a serialization
-decision, and `canAccessSection` "does not serialize fields"
-(`access-control.md:156`, ACM-5 SPEC constraint). Until a projection exists,
-allowing a colleague through the route hands them every field of the row —
-`birthDay`, `workPhone`, `ttId`, `customFields`, `createdBy` — which §7 names
-the primary quality attribute against. Fail-closed is the sanctioned interim
-default (`deferred-work.md` resolutions, 2026-08-31).
+**What the FR-17 Profile Projection story still owns** (`deferred-work.md`,
+"Profile Projection" entry): the S10 dates-only colleague view (own route
+`GET /users/:id/leaves`), the S11 project-name-only colleague view, S16
+per-field custom-field visibility, S7/S8 record flags, and S1 derived-field
+immutability enforcement. It is **no longer the trigger for a colleague
+`GET /users/:id`** — that works from Story 0.1.
 
 ### `EDIT_USER_FEATURE` and `UPLOAD_PHOTO_FEATURE` — dual gate, blocked on a missing permission
 
@@ -288,50 +304,58 @@ call — the human decides.**
 
 ---
 
-## Q4 — Denial convention: `403` stays, as a symptom. **Confirmed.**
+## Q4 — Denial convention: only the empty-audience case remains, and it is `404`.
 
-**Decision.** `AccessControlGuard` maps a denied `isAllowedForTarget` to
-`ForbiddenException` → `403` (`access-control.guard.ts:52`). For a denied
-whole-profile read that stays `403` **and is recorded as a temporary
-consequence of Q5/Q3, not a settled convention.**
+**Decision (revised 2026-09-01).** With the colleague read now a positive
+`200` (S1 card), the **only** `GET /users/:id` denial is a genuinely
+unresolvable identity — the viewer or the target is not an active `User`, so
+`resolveAudiences` returns an empty `Set`. That is a **leak-free `404`**: do
+not confirm the target's existence to a caller who cannot see it.
+`401` still covers a missing/invalid token.
 
 **Reasoning.** `access-control.md:179` fixes the leak-free conventions:
 `401` no token, `403` "valid token without feature permission or write to a
 readable section", `404` "valid token touching a `—` cell or hidden field".
-Refusing a *whole profile* to a colleague is none of these cleanly — a
-colleague is meant to be *narrowed to the whitelist*, not refused. The
-correct end state is: colleague gets `200` with a narrowed body once Profile
-Projection lands. So the adoption scenarios must **not** harden a
-colleague-gets-`403`-on-`GET /users/:id` assertion as intended behaviour;
-they should assert it as the explicitly-temporary consequence of the
-two-state rule, with a comment pointing at the projection trigger. A
-genuinely unrelated *field* (e.g. a colleague hitting `GET
-/users/:id/personal-contacts`, S2, absent from the whitelist) is the real
-`404` case and is out of this slice's scope.
+An unresolvable identity is closest to the `404` shape — there is no profile
+this caller may know exists. The earlier "`403` as a temporary symptom of the
+missing projection" framing is dropped: there is no missing projection for
+this route (the S1 card ships in Story 0.1) and no colleague denial to
+explain. **Note the guard.** `AccessControlGuard` currently maps a denied
+`isAllowedForTarget` to `ForbiddenException` → `403`
+(`access-control.guard.ts:52`); producing the `404` for an unresolved
+identity without changing the guard needs a controller-level decision (the
+read action treats an empty audience / missing target as `NotFound`). If the
+approved scenario cannot express `404` without a guard change, that is a
+point to surface for the human, not to default to `403`. Write-path (`PATCH`
+/ `PUT photo`) denials stay `403` (valid token, no write entitlement).
 
 ---
 
-## Q5 — Projection is a separate story. **Say it out loud. Confirmed.**
+## Q5 — The minimal S1 card ships here; the *further* narrowing is a separate story.
 
-**Decision, stated for the record in the adoption SPEC and every adoption
-scenario:**
+**Decision (revised 2026-09-01), stated for the record in the adoption SPEC
+and every adoption scenario:**
 
-> Until the Profile Projection story lands, an **allowed** `GET /users/:id`
-> still returns **every `User` field**. The route is **audience-gated, not
-> field-gated.** `toUserResponse`
-> (`services/backend/src/user-management/application/dtos/user.response.ts:10`)
-> spreads the whole row (`return { ...user, companyJoinDate: ... }`). A
-> reviewer who sees the adoption slice merged must not conclude the endpoint
-> is permission-safe for field-level exposure — it is not.
+> Story 0.1 routes `GET /users/:id` through an **S1 identity-card DTO** — a
+> dedicated mapper on that handler only, not a rewrite of the shared
+> `toUserResponse` (the list / `POST` / `PATCH` / `DELETE` / photo response
+> bodies are unchanged) — returning `id`, `firstName`, `lastName`, `photo`,
+> `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`,
+> `birthMonth`, `companyJoinDate` — the same fields for every audience on
+> `GET /users/:id`.
+> The response **drops** `ttId`, `isActive`, `customFields`, `createdAt`,
+> `createdBy`. This is a real, minimal projection, and it is **not** the
+> deferred "Profile Projection" story.
 
-**Reasoning.** `canAccessSection` returns only `none/read/write` and "cannot
-decide an endpoint's field or record shape" (`deferred-work.md`, Profile
-Projection entry; `access-control.md:156`). Narrowing the payload —
-S1-derived-field immutability, colleague S10/S11 subsets, S16 visibility — is
-a distinct UM-owned deliverable that "calls the facade rather than reading
-policies or deriving audiences, and may only narrow its base section
-result." The adoption slice **references** that entry (`deferred-work.md`)
-and does **not** duplicate or absorb it.
+**What is still deferred (FR-17 Profile Projection, `deferred-work.md`).**
+`canAccessSection` returns only `none/read/write` and "cannot decide an
+endpoint's field or record shape". The *further* narrowing — S1 derived-field
+immutability, the colleague S10 dates-only view (own route), the colleague
+S11 name-only view, S16 per-field visibility, S7/S8 record flags — stays that
+distinct UM-owned deliverable, which "calls the facade rather than reading
+policies or deriving audiences, and may only narrow its base section result."
+It is no longer coupled to `GET /users/:id` and no longer triggers any
+colleague decision.
 
 ---
 
@@ -365,8 +389,10 @@ adapter they `403` before the `409` logic runs.
 **Consequence for the adoption slice.** Its own Stage-2 E2E must seed **real
 users with real `Relationship` rows** — a viewer with a `direct` edge to the
 target for the manager-write cases, a `people_partner` edge for the PP cases,
-the viewer id equal to the target id for Self, and an unrelated active user
-for the colleague-deny case — and issue `Bearer <token:<uuid>>` with seeded
+the viewer id equal to the target id for Self, an unrelated active user for
+the colleague read case (→ `200` S1 card), and a caller whose id resolves to
+no active `User` for the empty-audience `404` case — and issue
+`Bearer <token:<uuid>>` with seeded
 UUIDs, which `InterimSessionResolverAdapter` already accepts unchanged
 (`interim-session-resolver.adapter.ts:48`, `{ userId: persona }`). The
 existing `profile.e2e-spec.ts` is **not** rewritten by the adoption slice

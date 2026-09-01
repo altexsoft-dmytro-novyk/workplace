@@ -1,6 +1,6 @@
-# UMAC-03 · Assigned People Partner reads an employee's profile → 200
+# UMAC-03 · Assigned People Partner reads an employee's profile → 200 with the S1 identity card
 
-**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) + CAP-4 · `um-integration-contract-response.md` Q3 (`pp` → allow) · PRD FR-16 · access-control.md §3.2 (PP column), §2.1 (assigned PP + HR line) · Epic 0 constraint "CC-07 does not block Epic 0 — the facade *reads* `Relationship type='people_partner'`"
+**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) + CAP-3 + CAP-4 · `um-integration-contract-response.md` Q3 (`pp` → allow) · PRD FR-16 · access-control.md §3.2 (PP column), §2.1 (assigned PP + HR line) · Epic 0 constraint "CC-07 does not block Epic 0 — the facade *reads* `Relationship type='people_partner'`"
 
 ## Scenario
 
@@ -10,17 +10,18 @@ assigned People Partner), produced in-suite.
 
 **When** V calls `GET /users/<T>`.
 
-**Then** the response is `200` with the whole row — `resolveAudiences(V, [T])`
-contains `pp`, which the adapter maps to allow for `user-management:read`.
-Reading the `people_partner` edge to resolve the PP audience is **not** blocked by
-CC-07; only the Epic 4 PP *write*/journal path is. Transitive PP-HR-line
-propagation above V stays fail-closed to the directly assigned PP (AD-19
-Department-boundary gate) — out of scope for this read.
+**Then** the response is `200` with the **S1 identity card** — same field set as
+`umac-01`, `umac-02`, `umac-04`. `resolveAudiences(V, [T])` is non-empty (contains
+`pp`), which the adapter maps to allow for `user-management:read`. Reading the
+`people_partner` edge to resolve the PP audience is **not** blocked by CC-07; only
+the Epic 4 PP *write*/journal path is. Transitive PP-HR-line propagation above V
+stays fail-closed to the directly assigned PP (AD-19 Department-boundary gate) —
+out of scope for this read.
 
-**Preconditions:** [fixture](README.md#fixture-convention-per-um-integration-contract-response-md-q6); V and T active; real `Relationship` `T → V` `type='people_partner'`; the port is rebound.
+**Preconditions:** [fixture](README.md#fixture-convention-per-um-integration-contract-response-md-q6); V and T active; real `Relationship` `T → V` `type='people_partner'`; the port is rebound and the S1-card DTO is in place.
 
 ## Test
 
 - **inputURL:** `GET /users/<T-uuid>`
 - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:<V-uuid>>" } }`
-- **expectedResult:** `200`; whole `User` row for T.
+- **expectedResult:** `200`; body **contains** the S1 fields (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`) and **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`.

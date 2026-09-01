@@ -42,15 +42,25 @@ earlier "not yet authored" boundary is closed). Entitlement for `/users/:id`
     authorized through the real `AccessControlFacade` via the `ACCESS_CONTROL_PORT`
     binding; the interim adapter is deleted in the same cutover (AD-21).
   - **success:** `access-control-adoption/umac-01..09`: Self / reporting-line /
-    assigned-PP read → `200` whole row (audience-gated, not field-gated — CAP-3
-    boundary of the adoption SPEC); colleague read → `403` recorded **explicitly
-    as the temporary two-state outcome** with Profile Projection (FR-17) named as
-    the trigger; unresolved session → `403`; no-target `isAllowed` delegates
-    straight to the facade (root allowed, unrelated + Ida denied); `PATCH` behind
-    the §2.2 dual gate (`umac-07`, **CONDITIONAL — blocked on the missing
-    `user-management:edit` permission**); org fields in the PATCH body rejected
-    explicitly regardless of audience (§3.2 fn 1); photo write Self-only. Binding
-    per-route contract: `../spec-user-management-access-control-adoption/SPEC.md`.
+    assigned-PP / **colleague** read → `200` with the **S1 identity card** — the
+    same field set for every audience (§3.2's S1 row is `R` for the Colleague
+    column, and every active authenticated viewer is at least a Colleague). Story
+    0.1 adds an S1-card DTO as a dedicated mapper **on the `GET /users/:id`
+    handler only** (not a rewrite of the shared `toUserResponse`; the list /
+    `POST` / `PATCH` / `DELETE` / photo response bodies are unchanged): `id`,
+    `firstName`, `lastName`, `photo`, `position`, `country`, `city`,
+    `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` — with
+    `ttId` / `isActive` / `customFields` / `createdAt` / `createdBy` absent. The **only** `GET /users/:id` denial is an
+    empty audience set (viewer or target not an active `User`) → leak-free `404`;
+    `401` still covers a missing/invalid token. *(Revised 2026-09-01 by human
+    product decision — the "two-state colleague rule" and adoption story `UMAC-3`
+    are removed; the S10/S11/S16 colleague narrowing stays FR-17 on its own
+    surfaces.)* No-target `isAllowed` delegates straight to the facade (root
+    allowed, unrelated + Ida denied); `PATCH` behind the §2.2 dual gate
+    (`umac-07`, **CONDITIONAL — blocked on the missing `user-management:edit`
+    permission**); org fields in the PATCH body rejected explicitly regardless of
+    audience (§3.2 fn 1); photo write Self-only. Binding per-route contract:
+    `../spec-user-management-access-control-adoption/SPEC.md`.
 
 - **CAP-1** Seeded population import (Epic 1 Story 1.1) — *replaces the retired
   Registration capability*
@@ -168,8 +178,8 @@ earlier "not yet authored" boundary is closed). Entitlement for `/users/:id`
   matrix cells belong to `docs/test-cases/access-control/` and
   `docs/test-cases/access-control-kernel/`. CAP-0 is the exception: it proves the
   `/users/:id`-specific *adoption* of the facade (per-route feature → audience
-  mapping, the two-state colleague rule, the port rebind) — not the facade's own
-  internals.
+  mapping, the minimal S1 identity-card projection, the port rebind) — not the
+  facade's own internals.
 - **One requirement per file**, enforced strictly. Negatives are first-class
   files, never a footnote.
 - **`UserEvents` immutable-fact model** is asserted literally — soft-delete +
@@ -242,7 +252,10 @@ approvable file.
   produced by the future Mentorship context and appended to UM via an application
   boundary (Epic 3 Story 3.1 third AC) — not exercised by this suite.
 - Nullable columns a seed row omits (`photo`, `workPhone`, `birthDay`,
-  `birthMonth`, `ttId`) come back present-and-`null` for an entitled viewer.
+  `birthMonth`) come back present-and-`null` on the `GET /users/:id` S1 card for
+  any resolved audience. `ttId` is **not** on the S1 card (Story 0.1 drops it) —
+  its null-vs-null uniqueness is asserted at the datastore, not through the read
+  (`seed/um-seed-01`, `profile/um-pf-04`).
 
 ## Open Questions
 
@@ -251,8 +264,12 @@ Carried from the consolidated proposal §7 — approver decisions, not TEA's:
 1. **(i)** Missing `user-management:edit` (± photo) permission — option (a) new
    kernel seed AD-1 sequence, or (b) interim adapter rule with an expiry
    trigger. Blocks `umac-07` (CAP-0 write) and Story 0.2.
-2. **(ii)** Two-state colleague rule confirmation + §3.3.4 whitelist scope for
-   `GET /users/:id` (S1 + inline S11 project name).
+2. **(ii) RESOLVED 2026-09-01 (human product decision).** A colleague
+   `GET /users/:id` returns the S1 identity card (`200`) from Story 0.1 (§3.2 S1
+   = `R` for Colleague); the "two-state rule" and adoption story `UMAC-3` are
+   removed; the only denial is an empty audience → leak-free `404`. FR-17 Profile
+   Projection keeps only the S10 dates-only / S11 name-only / S16 per-field
+   colleague views on their own surfaces.
 3. **(v)** Photo write Self-only vs manager-writable (`umac-09`).
 4. **(vi)** Photo a distinct permission, or covered by `user-management:edit`.
 

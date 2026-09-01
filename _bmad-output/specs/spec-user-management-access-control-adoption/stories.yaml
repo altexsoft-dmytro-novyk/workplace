@@ -6,10 +6,16 @@
 # every approval is recorded in this package's approvals.yaml (created on the
 # first approval — it does not exist yet, so nothing here has a prior record).
 #
-# UMAC-1 rebinds the port and adopts the READ route (CAP-1 + CAP-2 read half +
-# CAP-4 read E2E). UMAC-2 adds the write dual gate (CAP-2 write half) and is
-# CONDITIONAL on the missing-edit-permission decision in SPEC.md Open
-# decisions. UMAC-3 flips the colleague decision when Profile Projection lands.
+# UMAC-1 rebinds the port, adopts the READ route, and ships the minimal S1
+# identity-card projection for GET /users/:id (CAP-1 + CAP-2 read half + CAP-3 +
+# CAP-4 read E2E). Every resolved audience — self / reporting / pp / colleague —
+# over an active target gets 200 with the same S1 card; an empty audience is a
+# leak-free 404. UMAC-2 adds the write dual gate (CAP-2 write half) and is
+# CONDITIONAL on the missing-edit-permission decision in SPEC.md Open decisions.
+# There is no UMAC-3: the colleague read is a positive outcome from Story 0.1
+# (§3.2 S1 = R for Colleague); the "two-state" rule was removed by the human
+# decision of 2026-09-01. FR-17 Profile Projection still owns the S10 dates-only,
+# S11 name-only, and S16 per-field colleague narrowing on their own surfaces.
 
 - id: "UMAC-1-scenarios"
   title: "UMAC-1 Stage 1 — port rebind + READ route adoption scenario prose"
@@ -17,8 +23,11 @@
     Depends on human acceptance of um-integration-contract-response.md and this
     SPEC. Author only scenario prose for CAP-1 (real facade-backed
     ACCESS_CONTROL_PORT adapter in src/user-management/infrastructure/,
-    interim adapter deleted) and the READ half of CAP-2 (GET /users/:id
-    feature -> audience mapping), plus the CAP-3 boundary statement.
+    interim adapter deleted), the READ half of CAP-2 (GET /users/:id
+    feature -> audience mapping: self / reporting / pp / colleague all allowed
+    over an active target; empty audience -> leak-free 404), and CAP-3 (the
+    minimal S1 identity-card projection replacing toUserResponse's whole-row
+    spread).
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
@@ -27,26 +36,34 @@
     architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md, AD-3 in
     architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md,
     docs/architecture/access-control.md (denial conventions, matrix exceptions,
-    §3.3.4 colleague whitelist), docs/architecture/nestjs-di-tokens.md (guards
-    are the only sanctioned port consumer; actions never inject ports),
+    §3.2 S1 = R for Colleague, §3.3.4), docs/architecture/nestjs-di-tokens.md
+    (guards are the only sanctioned port consumer; actions never inject ports),
     docs/architecture/testing-strategy.md, and um-integration-contract-response.md
     Q1/Q2/Q4/Q5/Q6. Write line-by-line actor -> request -> expected outcome
-    scenarios for: GET /users/:id as Self (200, whole row); as a reporting-line
-    viewer with a direct Relationship edge to the target (200, whole row); as
-    the target's assigned people_partner (200, whole row); as an unrelated
-    active session / colleague (403, leak-free body) recorded EXPLICITLY as the
-    temporary two-state outcome with the Profile Projection story named as the
-    trigger that flips it to 200-narrowed; as a session whose userId does not
-    resolve to an active User (403, empty audience). Include: isAllowed for
-    user-management:create / :deactivate / :list still allows the seeded
-    HR-Admin root and denies others (delegated straight to
-    AccessControlFacade.isAllowed); interim-access-control.adapter.ts is
-    deleted, not left beside the real one (AD-21). State the CAP-3 boundary in
-    the scenario doc: an allowed GET /users/:id still returns every User field;
-    the route is audience-gated, not field-gated; toUserResponse spreads the
-    whole row. Do NOT author write-path (PATCH / PUT photo) scenarios here —
-    those are UMAC-2. Do NOT author scenarios that touch Access Control files,
-    prisma schema, migrations, or seed.
+    scenarios for: GET /users/:id as Self (200, S1 card); as a reporting-line
+    viewer with a direct Relationship edge to the target (200, S1 card); as
+    the target's assigned people_partner (200, S1 card); as an unrelated
+    active session / colleague (200, the SAME S1 card — §3.2 S1 row is R for
+    the Colleague column, every active authenticated viewer is at least a
+    Colleague); as a session whose userId does not resolve to an active User
+    (leak-free 404, empty audience — 401 still covers a missing/invalid
+    token). The S1 card is: id, firstName, lastName, photo, position, country,
+    city, workEmail, workPhone, birthDay, birthMonth, companyJoinDate; the
+    response DROPS ttId, isActive, customFields, createdAt, createdBy; derived
+    S1 display fields (manager, people partner, department, mentor, current
+    projects) are out of scope for this route until those contexts land and
+    the response omits them. Include: isAllowed for user-management:create /
+    :deactivate / :list still allows the seeded HR-Admin root and denies
+    others (delegated straight to AccessControlFacade.isAllowed);
+    interim-access-control.adapter.ts is deleted, not left beside the real one
+    (AD-21). State the CAP-3 change in the scenario doc: Story 0.1 adds a
+    dedicated S1-card DTO on the GET /users/:id handler ONLY (the GET /users
+    list, POST /users, PATCH /users/:id, DELETE /users/:id and PUT
+    /users/:id/photo response bodies are unchanged by this slice); the FURTHER
+    narrowing (S10 dates-only, S11 name-only, S16 per-field) stays FR-17. Do
+    NOT author write-path (PATCH / PUT photo) scenarios here — those are
+    UMAC-2. Do NOT author scenarios that touch Access Control files, prisma
+    schema, migrations, or seed.
 
 - id: "UMAC-1-red-tests"
   title: "UMAC-1 Stage 2 — real-consumer HTTP READ E2E (committed red)"
@@ -66,15 +83,18 @@
     approver, decision, timestamp; author != approver; commit resolves and
     artifact present). Seed real User rows and real Relationship rows (a direct
     edge for the reporting case, a people_partner edge for the PP case, viewer
-    id == target id for Self, an unrelated active user for the colleague-deny
+    id == target id for Self, an unrelated active user for the colleague
     case) and issue Bearer <token:<seeded-uuid>> headers, which
     InterimSessionResolverAdapter accepts unchanged — do NOT use literal
     persona placeholders for the cases that need a real audience. One test per
     approved scenario, scenario id in the test title. Assert the colleague case
-    as 403 today with an inline comment that it becomes 200-narrowed when the
-    Profile Projection story lands. The suite must FAIL until UMAC-1-production
-    rebinds the port (the interim adapter returns Boolean(userId), so the
-    colleague-deny and unresolved-session-deny assertions are red). Follow
+    as 200 with the S1 card, asserting ttId / customFields / createdBy /
+    createdAt / isActive are ABSENT and the S1 fields present. Assert the
+    unresolved-session case as a leak-free 404. The suite must FAIL until
+    UMAC-1-production rebinds the port and ships the S1-card DTO (the interim
+    adapter returns Boolean(userId) and toUserResponse spreads the whole row,
+    so the absent-technical-field assertions and the 404 assertion are red).
+    Follow
     .claude/rules/nest-e2e.md. Note whether the four existing
     profile.e2e-spec.ts cases (um-pf-01..04) need real personas or a tightened
     scope note, and surface that for human decision — do not silently rewrite
@@ -84,8 +104,10 @@
   title: "UMAC-1 Stage 3 — rebind ACCESS_CONTROL_PORT to the real adapter"
   description: >-
     Depends on independent human approval of the committed-red UMAC-1 Stage-2
-    suite. Implement only the CAP-1 adapter + rebind and the READ half of
-    CAP-2; make the approved tests pass.
+    suite. Implement the CAP-1 adapter + rebind, the READ half of CAP-2, and
+    the CAP-3 S1-card DTO on the GET /users/:id handler only (a dedicated
+    mapper, not a rewrite of the shared toUserResponse); make the approved
+    tests pass.
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
@@ -98,14 +120,29 @@
     AccessControlFacade.isAllowed(userId, feature). isAllowedForTarget(userId,
     feature, targetUserId) for feature 'user-management:read': call
     AccessControlFacade.resolveAudiences(userId, [targetUserId]) and allow when
-    the target's audience set contains 'self', 'reporting', or 'pp'; deny for a
-    set that is empty or contains only 'colleague'. Rebind
+    the target's audience set is NON-EMPTY (any of 'self', 'reporting', 'pp',
+    or 'colleague' — every active viewer over an active target is at least a
+    Colleague and §3.2 S1 is R for Colleague); the only denial is an EMPTY set
+    (viewer or target not an active User), mapped to a leak-free 404 (not 403)
+    per access-control.md denial conventions — see the guard note below.
+    On the GET /users/:id handler ONLY, return an S1-card DTO via a dedicated
+    response mapper (do NOT rewrite the shared toUserResponse in place):
+    exactly id, firstName, lastName, photo, position, country, city, workEmail,
+    workPhone, birthDay, birthMonth, companyJoinDate — and NOT ttId, isActive,
+    customFields, createdAt, createdBy. Leave the GET /users list, POST /users,
+    PATCH /users/:id, DELETE /users/:id, and PUT /users/:id/photo response
+    bodies exactly as they are today. Rebind
     ACCESS_CONTROL_PORT in user-management.module.ts to the new adapter and
     DELETE interim-access-control.adapter.ts (AD-21 — no dual-running). Do NOT
-    add a route, change AccessControlPort's signatures, change
-    AccessControlGuard, inject the facade anywhere except this adapter, touch
-    any Access Control file, or touch prisma schema/migrations/seed. Do NOT
-    implement PATCH / PUT photo behaviour (UMAC-2). Run npm run lint,
+    add a route, change AccessControlPort's signatures, inject the facade
+    anywhere except this adapter, touch any Access Control file, or touch
+    prisma schema/migrations/seed. GUARD NOTE: AccessControlGuard maps a
+    denied isAllowedForTarget to 403; the leak-free 404 for an unresolved
+    identity without a guard change needs a controller-level decision (the
+    read action treats an empty audience / missing target as NotFound). If the
+    approved scenario cannot express 404 without changing the guard, surface
+    it for the human rather than defaulting to 403. Do NOT implement PATCH /
+    PUT photo behaviour (UMAC-2). Run npm run lint,
     npx tsc --noEmit, and the user-management + access-control e2e suites;
     the pre-existing not-yet-built /users/:id/relationships failures are
     unrelated and must be identical before and after.
@@ -181,24 +218,9 @@
     the // INTERIM comment and expiry trigger exactly as the approved scenario
     records it.
 
-- id: "UMAC-3-colleague-narrowing-flip"
-  title: "UMAC-3 — flip colleague from deny to allow-narrowed (TRIGGERED)"
-  description: >-
-    TRIGGERED, not scheduled. Runs only when the separate UM-owned Profile
-    Projection story (deferred-work.md) reaches stage-3-production and
-    toUserResponse no longer spreads the whole row. Three AD-1 stages of its
-    own — scenario, red-tests, production — to change the CAP-2 READ decision
-    for a colleague from 403 to 200 with the §3.3.4-narrowed body, and to
-    update the CAP-2 colleague scenarios that were recorded as temporary.
-  spec_checkpoint: true
-  done_checkpoint: true
-  invoke_dev_with: >-
-    services/backend only. Do not dispatch until the Profile Projection story's
-    stage-3-production approval is recorded and verified. Then run the ordinary
-    three-stage AD-1 sequence (each stage its own dispatch, author != approver,
-    recorded in approvals.yaml): scenario prose flipping the colleague READ
-    outcome to 200-narrowed and citing the projection story; committed-red E2E
-    asserting the narrowed body for a colleague viewer; production change to
-    the adapter's READ branch (allow when the set contains 'colleague') and to
-    the projection wiring. Cite access-control.md §3.3.4 and
-    um-integration-contract-response.md Q3/Q4.
+# UMAC-3 (flip colleague from deny to allow-narrowed) was REMOVED on
+# 2026-09-01 by human product decision: §3.2's S1 row is R for the Colleague
+# column, so a colleague is entitled to the S1 identity card from Story 0.1 —
+# there is nothing to flip. The S10 dates-only, S11 name-only, and S16
+# per-field colleague narrowing on their own surfaces stays with the FR-17
+# Profile Projection deferred story; it is no longer coupled to GET /users/:id.

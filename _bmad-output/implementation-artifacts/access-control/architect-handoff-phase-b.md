@@ -22,6 +22,18 @@ is approved — every stage still runs the AD-1 gate.
 This note tells you what to fold into the PRD and `epics.md`, the one decision
 that needs Product input, and the files I touched so we do not collide.
 
+> **Superseded 2026-09-01 (human product decision).** This handoff's
+> "two-state colleague rule" (deny the colleague whole-profile read now, allow
+> narrowed once Profile Projection lands) is **withdrawn**. A colleague
+> `GET /users/:id` returns the **S1 identity card** (`200`) from adoption
+> Story 0.1 — §3.2's S1 row is `R` for the Colleague column and every active
+> authenticated viewer is at least a Colleague. Adoption story `UMAC-3` is
+> removed; the only `GET /users/:id` denial is an empty audience → leak-free
+> `404`. The binding contract is
+> `../../specs/spec-user-management-access-control-adoption/SPEC.md`; where the
+> prose below still says "colleague denied" / "`403`" / "`UMAC-3` is the
+> trigger", read the SPEC instead.
+
 ## 1. What goes into the UM PRD and `epics.md`
 
 ### A new adoption epic (or a story under Epic 1)
@@ -41,10 +53,12 @@ Scope, from the adoption SPEC:
   (`user-management:create`, `:deactivate`, `:list`) are exactly the ACM-1
   seeded keys, so `POST /users`, `DELETE /users/:id`, `GET /users` keep
   working for the seeded HR-Admin session and fail closed otherwise.
-- **CAP-2 (read)** — `GET /users/:id` allows Self / reporting-line / assigned
-  PP; denies a colleague **as a two-state rule** (deny the whole-profile read
-  now; allow narrowed to the §3.3.4 whitelist once the Profile Projection
-  story lands). Denied whole-profile read is `403`, recorded as temporary.
+- **CAP-2 (read)** — `GET /users/:id` returns `200` with the **S1 identity
+  card** for any non-empty audience (Self / reporting-line / assigned PP /
+  **colleague**); the only denial is an empty audience set → leak-free `404`.
+  Story 0.1 ships the S1-card DTO on that handler. *(Revised 2026-09-01 — the
+  earlier "two-state colleague rule" / `403` is withdrawn; see the banner
+  above.)*
 - **CAP-2 (write)** — `PATCH /users/:id` and `PUT /users/:id/photo` behind the
   §2.2 dual gate. **Blocked on a missing permission — see section 2.**
 - **CAP-4** — real-consumer HTTP → router → session → AccessControl →
@@ -60,8 +74,9 @@ Scope, from the adoption SPEC:
   epic (recommended — Story 1.2 then asserts data correctness, adoption
   asserts who is entitled) or duplicated. `profile.e2e-spec.ts`'s current
   `Bearer <token:Bob>` literal placeholders break under the real facade
-  (`'Bob'` resolves to a non-existent user → empty audience → `403`); the
-  adoption Stage-2 must seed real users with real `Relationship` rows.
+  (`'Bob'` resolves to a non-existent user → empty audience → leak-free `404`
+  on the read, `403` on a write); the adoption Stage-2 must seed real users
+  with real `Relationship` rows.
 - The write path (CAP-2 write) sequences **after** the permission decision in
   section 2.
 
@@ -72,19 +87,22 @@ The UM PRD's numbered FRs do not currently name the adoption. Add:
 - **FR-Nx (adoption):** *"`user-management` controllers authorize
   target-scoped `/users/:id` access through the real `AccessControlFacade`
   via the `ACCESS_CONTROL_PORT` binding; the interim adapter is removed. A
-  `GET /users/:id` is allowed for Self, reporting line, and assigned People
-  Partner; a colleague is denied the whole-profile read until field-level
-  projection exists."* This makes NFR-4 (`epics.md` line 55 — "every
-  user-management controller must call through [the facade]") concrete and
-  testable rather than aspirational.
+  `GET /users/:id` returns the S1 identity card for any non-empty audience
+  (Self, reporting line, assigned People Partner, or colleague); only an empty
+  audience denies (leak-free `404`)."* This makes NFR-4 (`epics.md` line 55 —
+  "every user-management controller must call through [the facade]") concrete
+  and testable rather than aspirational.
 - **FR-9 refinement:** FR-9 already says *"Self can directly write only the
   photo. Manager, People Partner, and department are not writable through
   S1."* Add that `PATCH`/`PUT photo` require **both** the functional
   permission **and** `write` S1 section access (§2.2 dual gate), and that
   photo is Self-only unless Product widens it (Open decision 3 below).
 - **Profile Projection** is already split out in `deferred-work.md`; the PRD
-  should carry it as its own FR / story so the two-state colleague flip has a
-  home (adoption `stories.yaml` entry `UMAC-3` is the trigger).
+  should carry it as its own FR (this became **FR-17**). It owns only the
+  *further* colleague narrowing — S10 dates-only (`GET /users/:id/leaves`),
+  S11 name-only, S16 per-field visibility — on their own surfaces, plus S7/S8
+  flags and S1 derived-field immutability. It is **not** coupled to
+  `GET /users/:id` and there is no `UMAC-3` flip (removed 2026-09-01).
 
 ## 2. The one decision that needs Product input — missing edit permission
 
@@ -108,8 +126,10 @@ Related sub-questions for Product (adoption SPEC "Open decisions"):
   (Recommendation: not separate — photo is Self-only by FR-9.)
 - May a reporting-line manager or PP replace a report's photo, or is it
   strictly Self-only? (Recommendation: Self-only, per FR-9.)
-- Confirm the §3.3.4 whitelist the Profile Projection story implements for
-  `GET /users/:id` (S1 + inline S11 project name; S10 is its own route).
+- Confirm the FR-17 Profile Projection story keeps only the colleague S10
+  dates-only view (`GET /users/:id/leaves`), the S11 name-only view, and S16
+  per-field visibility — each on its own surface, decoupled from
+  `GET /users/:id` (which returns the full S1 card from Story 0.1).
 
 ## 3. CC-07 journal-schema dependency — blocks Epic 4 PP stage-2
 

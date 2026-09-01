@@ -10,16 +10,19 @@ has completed: ACM-0 created exactly one active root `User` whose stored
 seeded `hr-admin` FR policy (permissions `user-management:create` /
 `:deactivate` / `:list`) to that one row.
 
-**When** Story 1.1's population import runs, and the delivered seeded list
-**includes the root person** (a row whose `workEmail` normalizes to the same value
-as the root's stored `workEmail`).
+**When** Story 1.1's population import runs against `docs/Accounts_template.csv`,
+and a CSV row's `Email` **normalizes to the same value as the root's stored
+`workEmail`** (i.e. the CSV's `Email` matches `ROOT_WORK_EMAIL` after trim +
+lowercase — note the file's own sample row `dmytro.novyk+boot@altexsoft.com` is a
+normal employee row and does **not** by itself imply this; the match is on
+`ROOT_WORK_EMAIL`).
 
-**Then** the import **reuses the existing ACM-0 root `User` id** for that person —
-it does not insert a second `users` row for a normalized email that already
-exists (active or inactive) (DEC-UM-009). The exact-one match is reliable because
-DEC-UM-007 makes both the stored root value and the import writer's value
-canonical. After import there is still exactly one `User` holding the `hr-admin`
-FR attachment, and it is the ACM-0 root id.
+**Then** the import **reuses the existing ACM-0 root `User` id** for that row —
+it **updates** the existing root row rather than inserting a second `users` row
+for a normalized email that already exists (active or inactive) (DEC-UM-009). The
+exact-one match is reliable because DEC-UM-007 makes both the stored root value
+and the import writer's value canonical. After import there is still exactly one
+`User` holding the `hr-admin` FR attachment, and it is the ACM-0 root id.
 
 > **Not duplicated here.** That the bootstrap HR Admin is an *ordinary* user whose
 > power is an explicitly seeded, delegable, revocable FR policy — no superuser
@@ -34,9 +37,9 @@ FR attachment, and it is the ACM-0 root id.
 
 No HTTP surface — assertions are database row-level state after import.
 
-- **stateChange:** population import runs against a seeded list that includes the root person.
+- **stateChange:** population import runs against a CSV that contains a row whose `Email` normalizes to `ROOT_WORK_EMAIL`.
 - **expectedResult (database state):**
   - `SELECT count(*) FROM users WHERE lower(trim("workEmail")) = <normalized ROOT_WORK_EMAIL>` returns `1`.
-  - that row's `id` equals the id ACM-0 created (unchanged `id`, `createdAt`, `createdBy`).
+  - that row's `id`, `createdAt`, `createdBy` are unchanged from what ACM-0 created (the row was updated in place, not replaced).
   - exactly one `user_policies` row attaches an `hr-admin` `type='FR'` policy, and its `userId` is that same root id.
   - the import created no `joined_company` event that would double-count the root person against `um-seed-01`'s "one per imported row" (the root row was not inserted by the import).

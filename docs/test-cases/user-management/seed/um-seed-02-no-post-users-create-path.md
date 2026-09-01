@@ -4,7 +4,8 @@
 
 ## Scenario
 
-**Given** the application is running after seed, bootstrap, and population import.
+**Given** the application is running after seed, bootstrap, and the population
+import from `docs/Accounts_template.csv`.
 
 **When** any client — including the seeded HR-Admin session — issues `POST /users`
 with a well-formed employee body.

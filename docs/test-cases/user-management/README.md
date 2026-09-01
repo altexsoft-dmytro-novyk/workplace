@@ -116,7 +116,7 @@ gone with `registration/`.
 | Folder | Covers | Files | State |
 | --- | --- | --- | --- |
 | `seed/` | FR-1/FR-4/FR-5a/FR-7 — population import, no `POST /users`, bootstrap HR Admin + ACM-0 root-id reuse (Story 1.1) | 3 | new draft |
-| `access-control-adoption/` | FR-16 — real facade adoption for `GET/PATCH /users/:id`, `PUT .../photo`; port rebind; two-state colleague rule (Epic 0, `UMAC-1/2/3`) | 9 | new draft |
+| `access-control-adoption/` | FR-16 — real facade adoption for `GET/PATCH /users/:id`, `PUT .../photo`; port rebind; minimal S1-card projection; colleague reads the S1 card (`200`) (Epic 0, `UMAC-1/2`) | 9 | new draft |
 | `auth/` | FR-2/FR-3/FR-8 — magic-link request/consume, security edge cases (Epic 2) | 6 | header-noted draft |
 | `profile/` | FR-9 — S1 data correctness given an entitled actor (entitlement is Epic 0's) (Epic 1 Story 1.2/1.3) | 4 | header-noted draft |
 | `list/` | FR-15 — pagination, S1-field filters, dismissed-employee visibility (Epic 1 Story 1.5) | 5 | draft (`um-list-05` new) |
@@ -134,9 +134,9 @@ gone with `registration/`.
 
 | Blocker | Blocks |
 | --- | --- |
-| Epic 0 Story 0.1 not yet landed (port rebind) | `access-control-adoption/umac-01..06` E2E is committed-red until the rebind |
+| Epic 0 Story 0.1 not yet landed (port rebind + S1-card DTO) | `access-control-adoption/umac-01..06` E2E is committed-red until the rebind + S1-card DTO land |
 | Missing `user-management:edit` permission (Open Decision i) | `access-control-adoption/umac-07` (CONDITIONAL) |
-| Profile Projection story (FR-17) reaching production | flips `umac-04` colleague `403` → `200`-narrowed (`umac-03` / `UMAC-3`) |
+| Profile Projection story (FR-17) reaching production | the S10 dates-only / S11 name-only / S16 per-field colleague views **on their own surfaces** (`GET /users/:id/leaves`, etc.) — **not** `GET /users/:id`, which returns the S1 card from Story 0.1 (`umac-04`, positive test) |
 | S9 `canAccessSection` — a **pending Access Control increment** (ACM-5 ships S1/S10/S11 only) | the S9-write half of the `career-timeline/` dual gate (`um-ct-03..10`) |
 | CC-04 (PP persistence) + CC-07 (AD-19 journal) | `relationships/um-rel-09..11` (PP), and the atomic-journal Then-clause of `um-rel-01/02` |
 | CC-07 + Department edge contract | `relationships/um-rel-12..14` (department) |

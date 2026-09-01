@@ -14,6 +14,30 @@ dashboards, platform test-strategy, the CC-04/CC-06/CC-07 contracts themselves.
 scenario (`umac-08`). Open product decisions are enumerated in the proposal §7,
 not resolved here.
 
+**Amended 2026-09-01 (human product decisions).** Two decisions were taken and
+folded across the corpus: (1) a colleague `GET /users/:id` returns the **S1
+identity card** (`200`) from adoption Story 0.1 — the "two-state colleague rule"
+and adoption story `UMAC-3` are **removed**; the only `GET /users/:id` denial is
+an empty audience → leak-free `404`; FR-17 Profile Projection shrinks to the
+S10/S11/S16 colleague views on their own surfaces, S7/S8 flags, and S1
+derived-field immutability. Files swept in a follow-up alignment pass
+(2026-09-01, post-verification): `spec-user-management-test-cases/SPEC.md` CAP-0
+success + Constraints + Assumptions + Open Question (ii); adoption SPEC CAP-3 +
+Non-goals + `stories.yaml` (S1-card DTO scoped to the `GET /users/:id` handler
+only — the shared `toUserResponse` and the other five call sites are unchanged);
+`architect-handoff-phase-b.md` (superseded banner + inline `403`→`404`). **Knock-on
+to Access Control's own `access-control-foundation` suite:** its provisional
+`colleague → deny (403)` mapping is now answered the other way; the `ACF-AU-05` /
+`ACF-FC-01` / `ACF-FC-02` HTTP-status expectations are **superseded** and need a
+fresh AD-1 pass (assert resolver audience-set membership, not `GET /users/:id`
+status) — the resolver itself is unaffected. README + SPEC Open-Questions + memlog
++ scenario banners updated; the committed `audience-resolution.e2e-spec.ts`
+carries a superseded note (not silently rewritten). (2) the seed/import source is the concrete
+semicolon-delimited TT export `docs/Accounts_template.csv`, keyed by the
+normalized `Email` (no employee-id column; `ttId` left `null`), with the
+column → `User` field mapping and OPEN items recorded in the seed scenarios and
+`spec-1-1-import-seeded-population.md`. Proposal §7 (ii) is **RESOLVED**.
+
 **Amended 2026-09-01** — **Section E** added for the mentorship bounded-context
 architecture pass (`docs/architecture/mentorship.md` + spine/companion
 amendments + `docs/test-cases/mentorship/`). Section E scope is separate from the
@@ -34,9 +58,9 @@ Product/Access-Control decisions carried to proposal §7 ((vii)/(viii)/(ix)).
 | Departments — new entity, every employee in exactly one, departments nest (§4.17) | `epics.md` Story 4.3; `spec-4-3-change-employee-department-or-department-manager.md`; `um-rel-12..14` (blocked on the Department edge contract) | done (Department edge contract still open — spine Deferred) |
 | A department change emits a career-timeline event (§4.9) | `epics.md` Story 4.3 AC; `spec-4-3` Intent; `spec-3-1` cross-context list | done |
 | No separate "unit" entity; *Unit Manager* = the manager of a department (§2.2, §4.17) | `spec-4-3` Intent; `career-timeline/` DEC-UM-001 realignment uses "direct Unit Manager" for the S9 manual-write audience | done |
-| S10 for colleagues: dates only, type hidden (§3.3.4) | Adoption SPEC CAP-2 two-state colleague rule + `umac-04`; deferred to the Profile Projection story (FR-17) for the actual field narrowing; `deactivation/` and `list/um-list-05` unaffected (that folder was about `isActive`, not S10) | done (narrowing owned by FR-17 / `deferred-work.md`) |
+| S10 for colleagues: dates only, type hidden (§3.3.4) | The colleague `GET /users/:id` **identity-card** read is `200` from adoption Story 0.1 (§3.2 S1 row = `R` for Colleague; `umac-04` is a positive test). The S10 dates-only colleague view stays the FR-17 Profile Projection story **on its own route** (`GET /users/:id/leaves`), decoupled from `GET /users/:id`. `deactivation/` and `list/um-list-05` unaffected (that folder was about `isActive`, not S10) | done (S10/S11/S16 narrowing owned by FR-17 / `deferred-work.md`; two-state rule + UMAC-3 removed 2026-09-01) |
 | Employment status is time-bounded `active`/`dismissed` (§4.16) | PRD "Data Model — EmploymentStatus" (unchanged from the 2026-08-29 course); `epics.md` Epic 5; `list/um-list-05-dismissed-employee-filterable.md` (new — supersedes retired `um-deact-02`) | done (executor CC-06-gated) |
-| No SSO, no Active Directory, no employee creation — the population is a seeded list (§4.17, §10) | `epics.md` Story 1.1 "Import Seeded Population"; `spec-1-1-import-seeded-population.md` (new); `seed/um-seed-01..03` (new); `registration/` folder RETIRED (pointer); `deactivation/` folder RETIRED (pointer); `user-management-test-decisions.md` DEC-UM-003 reframed, DEC-UM-006/008 RETIRED; `api-conventions.md` create-path wording tightened (Phase A) | done |
+| No SSO, no Active Directory, no employee creation — the population is a seeded list (§4.17, §10) | `epics.md` Story 1.1 "Import Seeded Population" (import source is `docs/Accounts_template.csv` — semicolon-delimited TT export, keyed by normalized `Email`, no id column, `ttId` null; column→field mapping + OPEN items); `spec-1-1-import-seeded-population.md` (new, with the mapping table); `seed/um-seed-01..03` + `seed/README.md` (new, CSV mapping); `registration/` folder RETIRED (pointer); `deactivation/` folder RETIRED (pointer); `user-management-test-decisions.md` DEC-UM-003 reframed, DEC-UM-006/008 RETIRED, DEC-UM-007 "Import source" note added, DEC-UM-009 update-in-place; `api-conventions.md` create-path wording tightened (Phase A) | done |
 | Departure recorded by HR with effective date + reason; blocked while the person still manages/partners anyone; on the effective date profile read-only / items cancelled / mentorships auto-close / account deactivates / all access ends immediately (§4.16) | PRD FR-6 (unchanged); `epics.md` Epic 5 Stories 5.1/5.2; `spec-5-1-record-a-departure.md` + `spec-5-2-apply-an-effective-departure.md` (new); `departure/um-dep-01..04` (new, BLOCKED — CC-06) | done (all CC-06-gated; scenario prose only) |
 | Leaving is not a career-timeline event — it is employment status (§4.9) | PRD FR-5 (unchanged); `epics.md` Story 3.1 fourth AC ("no departure/left-company event"); `spec-3-1` | done |
 | Mentorship pair persistence is not User Management (§4.11, AD-17) | `epics.md` "Mentorship Handoff" (unchanged); old Story 4.2 retired → `spec-4-2-hr-admin-pairs-or-unpairs-a-mentor-and-mentee.md` SUPERSEDED pointer; new `spec-4-2-change-an-employee-s-people-partner.md`; `relationships/um-rel-04/05/06` superseded headers; `um-rel-11`/`DEC-UM-011` note that `mentorship_*` reach UM only as career events via an application boundary | done |
@@ -58,7 +82,7 @@ Product/Access-Control decisions carried to proposal §7 ((vii)/(viii)/(ix)).
 | Interim access-control adapter retirement + `ACCESS_CONTROL_PORT` rebind is a UM-owned AD-21 cutover, no dual-running | `um-integration-contract-request.md`; people-management spine AD-21 (amended 2026-08-31 by Phase A) | adoption SPEC CAP-1; `epics.md` Epic 0 Story 0.1; spine AD-21 amendment note + memlog; E2E audit §2 inventory; `umac-01..06` | done |
 | Interim **session** resolver is a separate retirement (UM Epic 2), not the adoption slice | Phase A analysis; AD-21 amendment | adoption SPEC constraints; `epics.md` Epic 2 sequencing note + Epic 0 constraints; proposal §7 decision (iv); E2E audit §2 (KEEP row) | done — open decision (iv) |
 | `AccessControlModule` already imported into `AppModule` (ACM-8, `stage-3-production`) — facade DI-resolvable now | `approvals.yaml` ACM-8; `app.module.ts` | `epics.md` Epic 0 "read path can start now"; adoption SPEC CAP-1; proposal §5 dependency graph; E2E audit §0 | done |
-| `resolveAudiences` returns `Set<Audience>` per target (ACM-4R shipped) — the old single-label limitation is gone | `acm4r-multi-audience.e2e-spec.ts`; `deferred-work.md` (dispatched item) | integration-contract response Q3 (the adapter inspects the set to separate `colleague` from `self`); adoption SPEC CAP-2 | done |
+| `resolveAudiences` returns `Set<Audience>` per target (ACM-4R shipped) — the old single-label limitation is gone | `acm4r-multi-audience.e2e-spec.ts`; `deferred-work.md` (dispatched item) | integration-contract response Q3 (the adapter checks the set is non-empty — any of `self`/`reporting`/`pp`/`colleague` → allow the S1 card); adoption SPEC CAP-2 | done |
 | AD-20 due/departure evaluation + dismissed-target projection deferred until a Departure persistence seam exists | kernel SPEC constraints; `access-control.md` "Effective-departure cutoff" | `epics.md` Epic 5 (CC-06); adoption SPEC Non-goals; PRD FR-6; `departure/` scenarios BLOCKED | done (unchanged deferral) |
 | ACM3-II-06 — Stage-1 scenario approved (`e42fd2d`); **no Stage-2 test**; false coverage comment in `acm3-termination-taxonomy.e2e-spec.ts:23` → kernel trace gate FAIL | `gate-decision.json`; `traceability-matrix.md` TRACE-1; `e2e-trace-summary.json` | E2E audit §3b — full remediation (scoped Stage-2 AD-1 sequence + comment fix) documented as a **separate code follow-up**, out of this no-code pass. Plus the two P0 MED recs (II-04 adopt `ACF-FC-03` or write canonical; II-05 extend `ACM4R-MA-04`). | documented (not executed) |
 
@@ -68,12 +92,12 @@ Product/Access-Control decisions carried to proposal §7 ((vii)/(viii)/(ix)).
 
 | Checked | Result |
 | --- | --- |
-| Phase A integration-contract answers vs Phase B PRD/epics | consistent — epics.md/PRD defer to the adoption SPEC as the binding contract; Epic 0 stories are 1:1 with `stories.yaml` `UMAC-1/2/3` |
+| Phase A integration-contract answers vs Phase B PRD/epics | consistent — epics.md/PRD defer to the adoption SPEC as the binding contract; Epic 0 stories are 1:1 with `stories.yaml` `UMAC-1/2` (`UMAC-3` removed 2026-09-01 — colleague read is a positive `200` from Story 0.1) |
 | Phase A `'S1'` section-string placeholder vs actual kernel code | **confirmed correct** — `acm5-section-access.e2e-spec.ts` uses the literal `'S1'` (E2E audit §3c) |
 | Phase B FR numbering (FR-16/FR-17) vs epics.md derived FR-7..FR-15 | no collision — derived FRs stop at FR-15; FR-16/FR-17 continue past |
 | Regenerated compiled specs vs reconciled `epics.md` stories | every live `spec-*.md` maps to an `epics.md` story; retired old-slug files carry SUPERSEDED pointers to their replacement |
-| `sprint-status.yaml` keys vs `epics.md` + adoption `stories.yaml` | match (Epic 0 `0-1/0-2/0-3`, Epics 1–5; retired keys carry `# retired:` comments) |
-| `spec-user-management-test-cases` CAP list vs the refreshed `docs/test-cases/user-management/` folders | match (CAP-0 adoption … CAP-10 departure) |
+| `sprint-status.yaml` keys vs `epics.md` + adoption `stories.yaml` | match (Epic 0 `0-1/0-2`, Epics 1–5; retired keys — incl. `0-3-flip-colleague-to-allow-narrowed` — carry `# retired:` comments) |
+| `spec-user-management-test-cases` CAP list vs the refreshed `docs/test-cases/user-management/` folders | match (CAP-0 adoption … CAP-10 departure). **CAP-0 success text corrected 2026-09-01** — it still carried the pre-decision "colleague `403` two-state / whole row / unresolved `403`" wording; now: colleague → `200` S1 card, empty audience → leak-free `404`, S1-card DTO on the `GET /users/:id` handler only. |
 | kernel `validate.py` after this pass | **PASS** — 1225 checks, 0 failures (no kernel story ID changed) |
 | Backend commit reference | corrected from stale `865df5f` to audited `dn-um-2 @ e9d80ec` in the proposal §2, `epic-2-context.md`, `epic-3-context.md`; the E2E audit is the authority |
 | `POST /users` *create* references in the reconciled corpus | none outside explicit "retired" pointers; `POST /users/:id/{events,relationships,policies}` (AD-14 owned-collection routes) are unrelated and correct; the 15 `um-reg-*.md` history files are retained untouched under a folder-level RETIRED pointer (per the TEA phase's stated retire approach) |
@@ -90,7 +114,7 @@ Story 1.2 at the code stage.
 ## D. Open decisions carried to human review (from proposal §7 — restated for completeness)
 
 1. Missing `user-management:edit` (± photo) permission — option (a) new kernel seed AD-1 sequence, or (b) interim adapter rule with an expiry trigger.
-2. Two-state colleague rule confirmation + the §3.3.4 whitelist scope for `GET /users/:id`.
+2. **RESOLVED 2026-09-01** — colleague `GET /users/:id` returns the S1 identity card from Story 0.1 (§3.2 S1 = `R` for Colleague). Two-state rule and adoption story `UMAC-3` removed; empty audience → leak-free `404`. FR-17 keeps only the S10/S11/S16 colleague views on their own surfaces, S7/S8 flags, S1 derived-field immutability.
 3. Epic 0 as a dedicated epic vs a Story 1.0 inside Epic 1.
 4. Interim session resolver owner — Epic 0 or Epic 2.
 5. Photo write Self-only vs manager/PP-writable.

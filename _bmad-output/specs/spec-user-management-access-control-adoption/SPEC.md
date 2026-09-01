@@ -47,8 +47,13 @@ check `access-control.md:49` prohibits. The Kernel SPEC's non-goals
 explicitly park this: *"A later User Management-owned package must define the
 consumer contract, production port rebinding, projection, route mapping, and
 real-consumer HTTP E2E."* This is that package. It closes the read leak and
-puts `/users/:id` reads and writes behind the real fail-closed facade, while
-leaving field-level projection to its own separately tracked story.
+puts `/users/:id` reads and writes behind the real fail-closed facade. It also
+ships the **minimal S1 identity-card projection** for `GET /users/:id` in
+Story 0.1 (every resolved audience — `self`, `reporting`, `pp`, **or
+`colleague`** — over an active target gets `200` with the same S1 card); the
+*further* field/record narrowing (S10 dates-only, S11 project-name-only, S16
+per-field visibility, S7/S8 flags, S1 derived-field immutability) stays in the
+separately tracked FR-17 Profile Projection story.
 
 ## Capabilities
 
@@ -78,38 +83,64 @@ leaving field-level projection to its own separately tracked story.
     existing `AccessControlGuard` and the new adapter's `feature` branch.
   - **success:** For `GET /users/:id` (`READ_USER_FEATURE` =
     `user-management:read`) the adapter allows a viewer whose Phase-0
-    audience over the target is `self`, `reporting`, or `pp`; denies
-    `colleague` **until the Profile Projection story lands, then allows
-    `colleague` with the response narrowed to the §3.3.4 whitelist** (the
-    two-state rule, with the explicit projection trigger recorded); denies an
-    empty audience set. For `PATCH /users/:id` (`EDIT_USER_FEATURE`) and
+    audience over the **active** target resolves to **any** of `self`,
+    `reporting`, `pp`, **or `colleague`** (§3.2: the S1 identity-card row is
+    `R` for the Colleague column, and every active authenticated viewer is at
+    least a Colleague). All four audiences get `200` with the **same S1
+    identity-card projection** (see CAP-3). The only denial is a genuinely
+    **empty audience set** — the viewer or the target is not an active `User`
+    — which is a leak-free `404` (do not confirm the target's existence to a
+    caller who cannot see it); `401` still covers a missing/invalid token.
+    For `PATCH /users/:id` (`EDIT_USER_FEATURE`) and
     `PUT /users/:id/photo` (`UPLOAD_PHOTO_FEATURE`) the adapter applies the
     §2.2 dual gate — `AccessControlFacade.isAllowed(viewer, <edit permission
     key>) === true` **and** `AccessControlFacade.canAccessSection(viewer,
     'S1', target) === 'write'` — plus the §3.2 fn 1 constraint (manager,
     people partner, department never writable through S1; rejected in
     `EditUserAction`/`UpdateUserDto`, tested) plus the photo narrower rule
-    (photo write is Self-only per FR-9 / DEC unless Product widens it). A
-    denied whole-profile read maps to `403`, recorded as a temporary
-    consequence of CAP-3, not a settled convention.
+    (photo write is Self-only per FR-9 / DEC unless Product widens it).
 
-- **CAP-3 — Profile projection boundary (reference only, not built here)**
-  - **intent:** The reader knows exactly what this slice does **not** do:
-    narrow the response body.
-  - **success:** The SPEC and every CAP-2 scenario state that an *allowed*
-    `GET /users/:id` returns **every `User` field** —
-    `toUserResponse`
-    (`services/backend/src/user-management/application/dtos/user.response.ts:10`)
-    spreads the whole row — because the route is audience-gated, not
-    field-gated. Field/record narrowing (S1 derived-field immutability,
-    colleague S10/S11 subsets, S7/S8 flags, S16 visibility) is the separate
-    UM-owned **Profile Projection** deliverable already split out in
-    `_bmad-output/implementation-artifacts/access-control/deferred-work.md`.
-    That story calls the facade, only narrows its base section result, and
-    owns serialization; this SPEC cross-references it and does not duplicate
-    or absorb it. Flipping the CAP-2 `colleague` decision from deny to
-    allow-narrowed is the one coupling point, and it is triggered by that
-    story reaching `stage-3-production`.
+- **CAP-3 — Minimal S1 identity-card projection (shipped in Story 0.1)**
+  - **intent:** `GET /users/:id` returns the S1 identity card — the same
+    fields for every audience on this route — and no more.
+  - **success:** the `GET /users/:id` handler
+    (`users.controller.ts` `findOne`) today serializes through `toUserResponse`
+    (`services/backend/src/user-management/application/dtos/user.response.ts:10`),
+    which spreads the whole `User` row (`return { ...user, companyJoinDate:
+    ... }`). Story 0.1's production change routes that one handler through a
+    new **S1-card DTO** instead (a dedicated mapper — see the scope bullet),
+    returning exactly:
+    `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`,
+    `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`.
+    It **drops** the non-S1 technical fields from the response body:
+    `ttId` (AD-13 external identity — not S1), `isActive` (PRD: internal
+    account/row-retention flag, "not exposed"), `customFields` (S16 —
+    per-field visibility, not S1), `createdAt` and `createdBy` (audit; same
+    reasoning that dropped `updatedAt`/`updatedBy` for lack of a named
+    consumer). This is a **real, minimal projection**, not the deferred
+    "Profile Projection" story. The S1 derived display fields — manager,
+    people partner, department, mentor, current project(s) — come from other
+    contexts and are **out of scope for this route** until those land; the
+    response omits them and that is noted.
+  - **what stays deferred (FR-17 Profile Projection,
+    `_bmad-output/implementation-artifacts/access-control/deferred-work.md`):**
+    the S10 dates-only colleague view (own route `GET /users/:id/leaves`),
+    the S11 project-name-only colleague view, S16 per-field custom-field
+    visibility, S7/S8 record flags, and S1 derived-field immutability
+    enforcement. That story calls the facade, only narrows its base section
+    result, and owns serialization; this SPEC cross-references it and does
+    not duplicate or absorb it. It is **no longer the trigger for a
+    colleague `GET /users/:id`** — that works from Story 0.1.
+  - **scope — the `GET /users/:id` handler only.** Story 0.1 introduces a
+    dedicated S1-card response mapper for the `findOne` handler; it does
+    **not** rewrite the shared `toUserResponse` in place. The other five
+    `toUserResponse` call sites in `users.controller.ts` — `GET /users` list
+    items, `POST /users`, `PATCH /users/:id`, `DELETE /users/:id`,
+    `PUT /users/:id/photo` — are **untouched by this slice** and keep
+    returning what they return today. List-response projection is Epic 1
+    Story 1.5 / FR-15; the writer-echo responses on `POST`/`PATCH`/`DELETE`/
+    photo are out of scope here. A Stage-2 assertion for this slice checks
+    the `GET /users/:id` body shape and does not assert the other five.
 
 - **CAP-4 — Real-consumer HTTP E2E (AD-3 consumer rule)**
   - **intent:** The adoption is proven end to end the way AD-3 requires of a
@@ -123,8 +154,10 @@ leaving field-level projection to its own separately tracked story.
     `Relationship` rows (`direct`, `people_partner`) and issue
     `Bearer <token:<seeded-uuid>>`, which `InterimSessionResolverAdapter`
     accepts unchanged. It covers: Self read/write, reporting-line read and
-    S1 write, direct-PP read and S1 write, colleague read denied (temporary),
-    empty-audience denied, the dual-gate write denial when the functional
+    S1 write, direct-PP read and S1 write, **colleague read → `200` with the
+    S1 card** (asserting `ttId`/`customFields`/`createdBy`/`createdAt`/
+    `isActive` are absent and the S1 fields present), empty-audience →
+    leak-free `404`, the dual-gate write denial when the functional
     permission is absent, and the §3.2 fn 1 rejection of manager/PP/
     department fields through `PATCH`. Kernel Stage-2 evidence never
     substitutes for this gate.
@@ -149,12 +182,14 @@ leaving field-level projection to its own separately tracked story.
   access, plus any narrower command rule. A read must not call `isAllowed`
   merely to convert a data-access denial into a feature denial
   (`facade-contract.md`).
-- **The two-state colleague rule is a rule, not a bug.** `colleague → deny`
-  on `GET /users/:id` is correct only while the response is the whole row.
-  The scenario and test artifacts record the deny state as explicitly
-  temporary, name the Profile Projection story as the trigger, and must not
-  harden `colleague`-gets-`403` as intended end-state behaviour. The durable
-  outcome is `200` with a §3.3.4-narrowed body.
+- **A colleague `GET /users/:id` returns the S1 identity card (`200`), not
+  `403`.** §3.2's S1 row is `R` for the Colleague column, and the matrix
+  legend defines Colleague as "any authenticated employee holding none of the
+  above roles" — so every active authenticated viewer is at least a Colleague
+  and is entitled to S1. Story 0.1 ships the S1-card projection, so the
+  colleague read is a positive outcome from the start. There is no
+  "two-state" rule and no `UMAC-3` flip. The only `GET /users/:id` denial is
+  a genuinely unresolvable identity (empty audience) → leak-free `404`.
 - **Missing-edit-permission dependency (open — see Open decisions).** The
   seeded FR catalog is exactly `user-management:create`,
   `user-management:deactivate`, `user-management:list`
@@ -176,8 +211,11 @@ leaving field-level projection to its own separately tracked story.
   **access-control** interim adapter (retired by CAP-1), not the session
   resolver.
 - **This SPEC does not close the product gate by itself.** After it lands,
-  `/users/:id` reads and writes are audience-gated through the real facade,
-  but field-level projection (CAP-3 reference), list/filter/export/search
+  `/users/:id` reads and writes are audience-gated through the real facade
+  and the response is the minimal S1 card (CAP-3), but the further
+  field/record narrowing (FR-17: S10 dates-only, S11 name-only, S16
+  per-field, S7/S8 flags, S1 derived-field immutability),
+  list/filter/export/search
   projection (`deferred-work.md`), Project line, Department, PP HR-line,
   shared links, and full-profile overlay all remain out of scope and
   fail-closed. The `access-control.md` "Open product decisions" (full-profile
@@ -201,8 +239,14 @@ leaving field-level projection to its own separately tracked story.
 
 ## Non-goals
 
-- Field/record projection for the profile response (the separate Profile
-  Projection story), and all list/filter/export/search projection.
+- The *further* field/record narrowing beyond the S1 card (the separate
+  FR-17 Profile Projection story: S10 dates-only, S11 name-only, S16
+  per-field visibility, S7/S8 flags, S1 derived-field immutability), and all
+  list/filter/export/search projection. The minimal S1 identity-card
+  projection for `GET /users/:id` **is** in scope — it ships in Story 0.1
+  (CAP-3), and it is the **only** response body this slice changes: the
+  `GET /users` list, `POST /users`, `PATCH /users/:id`, `DELETE /users/:id`,
+  and `PUT /users/:id/photo` response bodies are unchanged.
 - Any change to `AccessControlPort`'s signatures, to `AccessControlGuard`,
   or to any Access Control file, test, seed, migration, or schema.
 - Adding `user-management:edit` or a photo permission (Access Control kernel
@@ -219,15 +263,20 @@ leaving field-level projection to its own separately tracked story.
 `user-management.module.ts` binds `ACCESS_CONTROL_PORT` to a real
 facade-backed adapter in `src/user-management/infrastructure/`;
 `interim-access-control.adapter.ts` is deleted; `GET /users/:id` returns
-`200` (whole row) for Self / reporting / PP viewers and `403` for a
-colleague or an unrelated session; `PATCH /users/:id` and
+`200` with the **S1 identity card** (`id`, `firstName`, `lastName`, `photo`,
+`position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`,
+`birthMonth`, `companyJoinDate` — `ttId`/`isActive`/`customFields`/
+`createdAt`/`createdBy` absent) for any active viewer over an active target —
+`self`, `reporting`, `pp`, **or `colleague`** — and a leak-free `404` when
+the viewer or target is not an active `User`; `PATCH /users/:id` and
 `PUT /users/:id/photo` are refused unless both the functional permission and
 `write` S1 section access hold (once the permission exists); the
 real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E passes
 with no provider overrides; and every stage carries an independent human
 approval in this package's `approvals.yaml`. The read leak
-(`isAllowedForTarget` returning `Boolean(userId)`) is closed. Field-level
-projection and the broader access program remain explicitly deferred.
+(`isAllowedForTarget` returning `Boolean(userId)`) is closed. The *further*
+FR-17 field/record narrowing and the broader access program remain
+explicitly deferred.
 
 ## Open decisions (for the human / Product Manager — not defaulted here)
 
@@ -246,10 +295,12 @@ projection and the broader access program remain explicitly deferred.
    strictly Self-only?** FR-9 says "Self can directly write only the photo."
    Recommendation: Self-only. Confirm before the CAP-2 photo scenario is
    authored.
-4. **Colleague-narrowed read whitelist scope on `GET /users/:id`.** §3.3.4
-   is S1 + S10 dates-only + S11 project-name-only; `GET /users/:id` carries
-   S1 and inline S11 (S10 is its own route). Confirm the whitelist the
-   Profile Projection story implements for this route.
+4. **RESOLVED 2026-09-01 — colleague gets the S1 card in Story 0.1.** The
+   colleague `GET /users/:id` read is `200` with the S1 identity card from
+   Story 0.1 (§3.2 S1 = `R` for Colleague). What the FR-17 Profile Projection
+   story still owns for a colleague is narrower: the S10 dates-only view (its
+   own route `GET /users/:id/leaves`), the S11 project-name-only view, and
+   S16 per-field custom-field visibility. Confirm those three remain FR-17's.
 5. **Sequencing against UM Epic 1 / Epic 4.** This slice touches the same
    controller as Story 1.2 (`PATCH /users/:id`) and depends on `Relationship`
    `direct` / `people_partner` rows existing as fixtures — the PP write path

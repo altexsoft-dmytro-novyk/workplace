@@ -242,9 +242,12 @@ Access Control increment**; stage-2 for those scenarios is partially AC-blocked.
   says the rejection "must be explicit and tested". Recorded as `umac-08` and in
   Section 2 — an `@IsEmpty()` addition, owned by Epic 0 Story 0.2 / Epic 1
   Story 1.2.
-- **For the approver:** the four open decisions the adoption SPEC / proposal §7
-  raise — (i) missing edit permission, (ii) two-state colleague whitelist scope,
-  (v) photo Self-only, (vi) photo a distinct permission — all still block or
-  shape `umac-07`/`umac-09`. Scenario prose records both states; the code stages
-  cannot start on the write path until (i) is decided.
+- **For the approver:** the open decisions the adoption SPEC / proposal §7
+  raise — (i) missing edit permission, (v) photo Self-only, (vi) photo a
+  distinct permission — still block or shape `umac-07`/`umac-09`. The code
+  stages cannot start on the write path until (i) is decided. *(Decision (ii),
+  two-state colleague rule, was **RESOLVED 2026-09-01**: colleague `GET
+  /users/:id` → `200` S1 card from Story 0.1; `UMAC-3` removed; the read-path
+  `umac-01..05` scenarios are updated accordingly and no longer record a
+  temporary state.)*
 - **`test-summary.md` is stale** and should get a superseded header (Section 1).

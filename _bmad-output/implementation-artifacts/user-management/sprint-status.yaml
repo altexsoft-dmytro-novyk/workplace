@@ -37,14 +37,16 @@ story_location: _bmad-output/implementation-artifacts/user-management
 development_status:
   # Epic 0 — Access Control Adoption. Story keys mirror
   # _bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml
-  # (UMAC-1/2/3). Authoritative contract is that SPEC, not a compiled spec file.
-  # 0-1 read path can start now (ACM-8 done); 0-2 write path conditional on the
-  # missing user-management:edit permission decision; 0-3 triggered by the
-  # deferred Profile Projection story reaching stage-3-production.
+  # (UMAC-1/2). Authoritative contract is that SPEC, not a compiled spec file.
+  # 0-1 read path + minimal S1-card projection can start now (ACM-8 done);
+  # 0-2 write path conditional on the missing user-management:edit permission
+  # decision.
+  # retired: 0-3-flip-colleague-to-allow-narrowed — removed 2026-09-01 (human
+  #   product decision): §3.2 S1 row is R for the Colleague column, so a colleague
+  #   reads the S1 identity card from Story 0.1; there is nothing to flip.
   epic-0: backlog
   0-1-adopt-read-path-and-rebind-port: backlog
   0-2-adopt-write-path-dual-gate: backlog
-  0-3-flip-colleague-to-allow-narrowed: backlog
   epic-0-retrospective: optional
 
   epic-1: backlog

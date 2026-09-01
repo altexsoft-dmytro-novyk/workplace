@@ -1,2 +1,2 @@
 ﻿FirstName;LastName;Email;Birthday;PositionId;PositionName;RegistrationDate;DepartmentId;DepartmentName;DismissedDate;IsDismissed;EmployeeType;TimeZone;CountryId;CountryCode;CountryName;CountryStateId;CountryStateName
-Site;Administrator;dmytro.novyk+boot@altexsoft.com;NULL;2;Developer;2026-08-17;1;JS;NULL;0;Employee;Europe/Kyiv;227;UA;Ukraine;NULL;NULL
+Site;Administrator;email+boot@provider.domain;NULL;2;Developer;2026-08-17;1;JS;NULL;0;Employee;Europe/Kyiv;227;UA;Ukraine;NULL;NULL

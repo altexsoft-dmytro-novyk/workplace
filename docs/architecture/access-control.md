@@ -198,15 +198,24 @@ adapter in `src/user-management/infrastructure/` injects the facade forwards
 across the boundary and replaces the interim adapter wholesale (AD-21). One
 binding answers three routes at once — `GET /users/:id`, `PATCH /users/:id`,
 `PUT /users/:id/photo` — so behaviour is chosen per feature, not per route.
-The per-route feature → audience/section mapping, the two-state colleague
-rule (deny the whole-profile read until field-level projection lands, then
-allow narrowed to the §3.3.4 whitelist), and the §2.2 dual gate for the write
-routes are specified in
+The per-route feature → audience/section mapping and the §2.2 dual gate for
+the write routes are specified in
 `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md`,
 answering `_bmad-output/implementation-artifacts/access-control/um-integration-contract-response.md`.
-The "consumer contract" deferral elsewhere in the Access Control planning set
-is now **pointed at that package**, not open-ended; the product gate stays
-open until it and the separate Profile Projection story land.
+For `GET /users/:id` the read is `200` with the **minimal S1 identity card**
+(shipped in adoption Story 0.1) for **any non-empty audience** — `self`,
+`reporting`, `pp`, **or `colleague`** (§3.2's S1 row is `R` for the Colleague
+column, and the matrix legend makes every active authenticated viewer at
+least a Colleague); the only denial is an empty audience set → leak-free
+`404`. *(Revised 2026-09-01 by human product decision — the earlier "two-state
+colleague rule" and adoption story `UMAC-3` are removed.)* The *further*
+field/record narrowing (colleague S10 dates-only on `GET /users/:id/leaves`,
+colleague S11 name-only, S16 per-field visibility §3.3.4/§3.3.6, S7/S8 flags,
+S1 derived-field immutability) stays the separate Profile Projection story on
+its own surfaces, decoupled from `GET /users/:id`. The "consumer contract"
+deferral elsewhere in the Access Control planning set is now **pointed at that
+package**, not open-ended; the product gate stays open until it and the
+separate Profile Projection story land.
 
 ### Bulk short-circuit
 

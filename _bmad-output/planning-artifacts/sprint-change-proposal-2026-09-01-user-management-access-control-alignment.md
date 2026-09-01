@@ -56,7 +56,7 @@ Three things converged after the 2026-08-29 v1.5 BA alignment:
 | `services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts` | `isAllowedForTarget` returns `Boolean(userId)`; `isAllowed` does an `actor.position === 'HR Admin'` check. |
 | `docs/architecture/access-control.md` §"User Management adoption seam" (Phase A) | The facade is headless; adopting it for `/users/:id` is a UM-owned slice (AD-2). |
 | `_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md` CAP-8/ACM-0, seeded set | Seeded FR catalog is exactly `user-management:create/deactivate/list`. DEC-UM-007 "canonical at write". DEC-UM-009 "import reuses root User id". |
-| `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md` + `stories.yaml` | The authoritative per-route contract: CAP-1 rebind, CAP-2 read/write mapping, CAP-3 projection boundary, CAP-4 real-consumer E2E; stories `UMAC-1/2/3`. |
+| `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md` + `stories.yaml` | The authoritative per-route contract: CAP-1 rebind, CAP-2 read/write mapping, CAP-3 minimal S1-card projection, CAP-4 real-consumer E2E; stories `UMAC-1/2` (`UMAC-3` removed 2026-09-01). |
 | `sprint-change-proposal-2026-08-29.md` §2, §4 Proposal 3/4 | v1.5 PRD/epics aligned; specs + contexts left stale by design. |
 | `_bmad-output/implementation-artifacts/user-management/spec-1-1…4-2` | 13 pre-v1.5 specs with `status: in-review`/`ready-for-dev`, stale `baseline_commit`, `POST /users`, deactivation, mentorship. |
 | ARCHITECTURE-SPINE.md AD-19 (Journal gate), AD-21 (amended 2026-08-31) | Epic 4 PP/journal work blocked on CC-07; interim-adapter retirement owned by the adoption slice. |
@@ -78,7 +78,7 @@ plan and its one Product decision (the missing edit permission) is unrecorded.
 
 | Epic | Impact |
 | --- | --- |
-| **UM Epic 0 — Access Control Adoption (NEW)** | Added. Rebinds `ACCESS_CONTROL_PORT` to a real facade-backed adapter, deletes the interim adapter (AD-21), adopts the `GET /users/:id` read path now, and the `PATCH`/`PUT photo` dual gate once a permission exists. Stories 0.1 (read, can start now), 0.2 (write, conditional), 0.3 (colleague-flip, triggered). |
+| **UM Epic 0 — Access Control Adoption (NEW)** | Added. Rebinds `ACCESS_CONTROL_PORT` to a real facade-backed adapter, deletes the interim adapter (AD-21), adopts the `GET /users/:id` read path now (`200` S1 identity card for any non-empty audience incl. `colleague`; empty audience → leak-free `404`) plus the S1-card DTO, and the `PATCH`/`PUT photo` dual gate once a permission exists. Stories 0.1 (read + S1-card DTO, can start now), 0.2 (write, conditional). *(Story 0.3 colleague-flip removed 2026-09-01 — §7 (ii).)* |
 | UM Epic 1 — Employee Record Management | Story 1.1 gains ACM-0 / DEC-UM-007 canonical-at-write / DEC-UM-009 constraints. Story 1.2's authorization ACs are **satisfied by Epic 0** (1.2 asserts data correctness). No Story 1.4 (generic deactivation retired). |
 | UM Epic 2 — Magic-Link Authentication | Unchanged in scope; now explicitly **owns retiring the interim session resolver** (separate from Epic 0's interim access-control adapter). |
 | UM Epic 3 — Career Timeline | Stories 3.2/3.3 renamed to v1.5 titles; gate stated as the §2.2 dual gate (edit-the-career-timeline permission + DEC-UM-001 narrowed S9 write audience: assigned PP + direct Unit Manager). |
@@ -198,24 +198,33 @@ The authoritative contract is
   `interim-access-control.adapter.ts` in the same change** (AD-21). `isAllowed`
   delegates straight to the facade — the three no-target features
   (`user-management:create/deactivate/list`) are exactly the ACM-1 seeded keys.
-- **CAP-2 read** — `GET /users/:id` allows `self`/`reporting`/`pp`; denies
-  `colleague` **as a two-state rule** (deny the whole-profile read now, `403`
-  recorded temporary; allow narrowed to the §3.3.4 whitelist once Profile
-  Projection lands).
+- **CAP-2 read** — `GET /users/:id` returns `200` with the **S1 identity card**
+  for **any** non-empty audience (`self`/`reporting`/`pp`/**`colleague`** —
+  §3.2's S1 row is `R` for the Colleague column); the only denial is an empty
+  audience set → leak-free `404`. *(Revised 2026-09-01: the earlier "two-state
+  colleague rule" is removed — see §7 (ii), RESOLVED.)*
 - **CAP-2 write** — `PATCH /users/:id` and `PUT /users/:id/photo` behind the
   §2.2 dual gate (`isAllowed(viewer, <edit key>)` **and**
   `canAccessSection(viewer, 'S1', target) === 'write'`), plus §3.2 fn 1
   rejection of manager/PP/department fields, plus photo Self-only. **Blocked on
   a missing permission** — see §7 decision (i).
-- **CAP-3** — projection boundary: an *allowed* `GET /users/:id` still returns
-  every `User` field; the route is audience-gated, not field-gated. Field
-  narrowing is the separate deferred Profile Projection story.
+- **CAP-3** — minimal **S1 identity-card projection** ships in Story 0.1: the
+  S1-card DTO (`id`, `firstName`, `lastName`, `photo`, `position`, `country`,
+  `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`;
+  drops `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`) is a
+  dedicated mapper on the `GET /users/:id` handler only — **not** a rewrite of
+  the shared `toUserResponse` (the list / `POST` / `PATCH` / `DELETE` / photo
+  response bodies are unchanged). The *further* FR-17 narrowing (S10
+  dates-only, S11 name-only, S16 per-field, S7/S8 flags, S1 derived-field
+  immutability) stays the separate deferred Profile Projection story, decoupled
+  from `GET /users/:id`. *(Revised 2026-09-01 — see §7 (ii), RESOLVED.)*
 - **CAP-4** — real-consumer HTTP → router → session → AccessControl → PostgreSQL
   E2E, no provider overrides (AD-3).
 
-Dispatch entries `UMAC-1` (read + rebind), `UMAC-2` (write dual gate,
-CONDITIONAL), `UMAC-3` (colleague-flip, TRIGGERED) in `stories.yaml`. Nothing
-approved; `approvals.yaml` for that package does not exist yet.
+Dispatch entries `UMAC-1` (read + rebind + S1-card DTO), `UMAC-2` (write dual
+gate, CONDITIONAL) in `stories.yaml`. `UMAC-3` (colleague-flip) was **removed
+2026-09-01** (§7 (ii)). Nothing approved; `approvals.yaml` for that package does
+not exist yet.
 
 ### 4.2 — UM PRD
 
@@ -229,14 +238,19 @@ decision. 4 memlog lines appended.
 ### 4.3 — epics.md
 
 Epic 0 added as a dedicated epic (list entry + detailed section + Stories
-0.1/0.2/0.3 mirroring `UMAC-1/2/3`), cross-referencing the adoption SPEC as the
-binding contract. FR-16/FR-17 added to the Requirements Inventory and the FR
-Coverage Map. Epic 1 Story 1.1 gains the ACM-0/DEC-UM-007/009 constraints; Story
+0.1/0.2 mirroring `UMAC-1/2`; Story 0.3 / `UMAC-3` removed 2026-09-01),
+cross-referencing the adoption SPEC as the binding contract. FR-16/FR-17 added to
+the Requirements Inventory and the FR Coverage Map (FR-16 now includes the S1-card
+projection; FR-17 shrinks to the S10/S11/S16 colleague views on their own
+surfaces, decoupled from `GET /users/:id`). Epic 1 Story 1.1 gains the
+ACM-0/DEC-UM-007/009 constraints and the concrete `docs/Accounts_template.csv`
+import source + column→field mapping; Story
 1.2 gains the "authorization is Epic 0's" note. Epic 4 gains the CC-07 Journal
 gate on Stories 4.1/4.2/4.3 (stage-2/production blocked; scenario prose may
 proceed) and the AD-19 Department-boundary gate note. Epic Sequencing rewritten:
 Epic 0 read path can start now (ACM-8), write path waits on the permission
-decision, Story 0.3 is triggered by Profile Projection.
+decision. There is no Story 0.3 (the colleague read is a positive `200` from
+Story 0.1).
 
 ### 4.4 — Compiled specs + epic contexts
 
@@ -257,10 +271,11 @@ and the TEA phase's job).
 ### 4.5 — sprint-status.yaml
 
 `epic-0` + `0-1-adopt-read-path-and-rebind-port` +
-`0-2-adopt-write-path-dual-gate` + `0-3-flip-colleague-to-allow-narrowed` +
-`epic-0-retrospective` added at `backlog`. `# retired:` comments for old 1.4
-(deactivation) and old 4.2 (mentorship). Everything `backlog` — nothing is
-implemented to v1.5. STATUS DEFINITIONS header preserved.
+`0-2-adopt-write-path-dual-gate` + `epic-0-retrospective` added at `backlog`.
+`# retired:` comments for old 1.4 (deactivation), old 4.2 (mentorship), and
+`0-3-flip-colleague-to-allow-narrowed` (removed 2026-09-01 — §7 (ii)).
+Everything `backlog` — nothing is implemented to v1.5. STATUS DEFINITIONS header
+preserved.
 
 ### 4.6 — user-management-test-decisions.md
 
@@ -268,8 +283,10 @@ DEC-UM-003 reframed to the seed/import writer; DEC-UM-006 and DEC-UM-008
 RETIRED (no `POST /users`, no registration dispatch — with pointers to the seed
 story); DEC-UM-007 KEPT and reconciled from "uniqueness enforced on the
 normalized value" to "writer-side canonical; DB-enforced functional unique index
-is deferred work"; DEC-UM-009 KEPT and reframed to the seed/import writer +
-ACM-0 root-id reuse; DEC-UM-002 records that generic deactivation is retired but
+is deferred work", **plus the concrete import source `docs/Accounts_template.csv`
+(semicolon-delimited TT export; normalization applies to the `Email` column;
+keyed by normalized `Email` — no id column; `ttId` left `null`)**; DEC-UM-009
+KEPT and reframed to the seed/import writer + ACM-0 root-id **update-in-place**; DEC-UM-002 records that generic deactivation is retired but
 the no-role-name-checks principle carries to the adoption adapter; DEC-UM-001
 and DEC-UM-005 get v1.5 mappings; Traceability drops `um-reg-*`, adds `um-seed-*`.
 
@@ -354,15 +371,21 @@ ACM-8 (done, facade DI-resolvable from AppModule)
                      └─ option (b): Story 0.2 ships a // INTERIM adapter rule
                                     with a recorded expiry trigger
 
-Deferred Profile Projection story (deferred-work.md) reaches stage-3-production
-   └─> Epic 0 Story 0.3 (flip colleague deny -> allow-narrowed)   [TRIGGERED, not scheduled]
+Deferred Profile Projection story (deferred-work.md): the S10 dates-only / S11
+   name-only / S16 per-field colleague views on their OWN surfaces, S7/S8 flags,
+   S1 derived-field immutability.  NO edge into Epic 0 — decoupled from
+   GET /users/:id by the 2026-09-01 decision (Story 0.3 / UMAC-3 removed).
 
-Epic 0 Story 0.1  ── satisfies ──>  Epic 1 Story 1.2 authorization ACs
-                                    (1.2 asserts data correctness only)
+Epic 0 Story 0.1 (read path + port rebind + interim adapter deletion + minimal
+   S1-card DTO)  ── satisfies ──>  Epic 1 Story 1.2 authorization ACs
+                                   (1.2 asserts data correctness only)
 
 ACM-0 (npm run db:seed) creates the normalized active root User
-   └─> Epic 1 Story 1.1 import  ── reuses the root User id (DEC-UM-009),
-                                   writer-side canonical workEmail (DEC-UM-007)
+   └─> Epic 1 Story 1.1 import of docs/Accounts_template.csv (semicolon-delimited
+                                   TT export; keyed by normalized Email — no id
+                                   column; ttId left null)
+       ── a CSV row matching ROOT_WORK_EMAIL updates the root User in place
+          (DEC-UM-009); writer-side canonical workEmail (DEC-UM-007)
 
 CC-04 (PP persistence/cardinality/write contract)  ┐
 CC-07 (AD-19 journal schema / snapshot / txn contract) ┤──> Epic 4 Story 4.2 stage-2/production
@@ -406,8 +429,11 @@ Mentorship context (prd-mentorship-2026-09-01 / mentorship/epics.md — §4.8):
 
 - **Epic 0 Story 0.2 (write path)** — until Open Decision (i) and, under option
   (a), the new kernel seed sequence reaching `stage-3-production`.
-- **Epic 0 Story 0.3** — until the deferred Profile Projection story reaches
-  `stage-3-production`.
+- ~~**Epic 0 Story 0.3**~~ — **removed 2026-09-01** (§7 (ii)): the colleague
+  `GET /users/:id` read is a positive `200` (S1 identity card) from Story 0.1;
+  there is nothing to flip. The deferred FR-17 Profile Projection story keeps
+  only the S10/S11/S16 colleague views on their own surfaces, decoupled from
+  `GET /users/:id`.
 - **Epic 4 Stories 4.1/4.2/4.3 journal-writing stages** — until CC-07.
 - **Epic 4 Story 4.2** — additionally until CC-04.
 - **Epic 4 Story 4.3 department-derived access** — additionally until the
@@ -431,7 +457,7 @@ Mentorship context (prd-mentorship-2026-09-01 / mentorship/epics.md — §4.8):
 | # | Decision | Options / recommendation |
 | --- | --- | --- |
 | **(i)** | **Missing `user-management:edit` (and photo) permission.** The seeded FR catalog is exactly `create/deactivate/list`; the write dual gate cannot pass under the real facade. | **(a, recommended)** Access Control adds `user-management:edit` (± a photo key) to the bootstrap catalog + grant via a **new three-stage AD-1 seed sequence in the kernel package**; Epic 0 Story 0.2 then consumes it. One extra kernel sequence + one seed/migration touch; correct on first adoption; AD-21 satisfied in one pass. **(b)** Adopt READ now; keep `EDIT`/`UPLOAD_PHOTO` on a narrow `// INTERIM` rule in the real adapter with a recorded expiry trigger. Closes the read leak immediately; second cutover later; AD-21 only partly satisfied. |
-| **(ii)** | **Two-state colleague rule confirmation.** `GET /users/:id` for a colleague: deny the whole-profile read now (`403`, recorded temporary), then allow narrowed to the §3.3.4 whitelist (S1 + inline S11 project name; S10 is its own route) once Profile Projection reaches `stage-3-production`. | Confirm the rule and the whitelist scope. Recommendation: as stated — the durable outcome is `200`-narrowed, not `403`; scenarios must not harden colleague-`403`. |
+| **(ii)** | ~~**Two-state colleague rule confirmation.** `GET /users/:id` for a colleague: deny the whole-profile read now (`403`, recorded temporary), then allow narrowed to the §3.3.4 whitelist once Profile Projection reaches `stage-3-production`.~~ **RESOLVED 2026-09-01 (human product decision).** A colleague `GET /users/:id` returns the **S1 identity card** (`200`) from adoption **Story 0.1** — §3.2's S1 row is `R` for the Colleague column, and the matrix legend makes every active authenticated viewer at least a Colleague. There is no "two-state" rule and no flip. Adoption story **`UMAC-3` / Story 0.3 is removed**. Story 0.1 ships the minimal S1-card projection (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` — dropping `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`). The only `GET /users/:id` denial is an empty audience set → leak-free `404`. FR-17 Profile Projection keeps only the S10 dates-only, S11 name-only, and S16 per-field colleague views **on their own surfaces**, plus S7/S8 flags and S1 derived-field immutability. | *(audit trail retained above; decision recorded)* |
 | **(iii)** | **Epic 0 vs Story 1.0 placement.** The adoption work as a dedicated **Epic 0** (recommended, architect handoff §1) vs a Story 1.0 inside Epic 1. | Recommendation: dedicated Epic 0 — it is a cross-cutting cutover with its own real-consumer E2E and its own conditional/triggered stories. |
 | **(iv)** | **Interim session resolver — in scope for Epic 0 or Epic 2?** | Recommendation: **Epic 2** (Magic-Link Authentication) owns retiring `interim-session-resolver.adapter.ts`; Epic 0 keeps it and uses the `Bearer <token:<seeded-uuid>>` fixture convention. AD-21's interim-adapter clause refers to the *access-control* adapter, retired by Epic 0. |
 | **(v)** | **Photo write: Self-only or manager-writable?** FR-9 says "Self can directly write only the photo." | Recommendation: **Self-only** — a reporting-line manager or PP may **not** replace a report's photo. Confirm before Story 0.2's photo scenario is authored. |
@@ -451,7 +477,8 @@ Mentorship context (prd-mentorship-2026-09-01 / mentorship/epics.md — §4.8):
 - Open Decision (i) — missing `user-management:edit` permission: option ____
   (a / b): ______________________
 - Open Decision (ii) — two-state colleague rule + §3.3.4 whitelist scope:
-  ______________________
+  **RESOLVED 2026-09-01 — colleague `GET /users/:id` returns the S1 identity card
+  in Story 0.1; two-state rule and `UMAC-3` removed; empty audience → `404`.**
 - Open Decision (iii) — Epic 0 vs Story 1.0: ______________________
 - Open Decision (iv) — interim session resolver owner (Epic 0 / Epic 2):
   ______________________
