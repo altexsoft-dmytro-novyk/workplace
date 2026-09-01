@@ -6,10 +6,12 @@
 # every approval is recorded in this package's approvals.yaml (created on the
 # first approval — it does not exist yet, so nothing here has a prior record).
 #
-# UMAC-1 rebinds the port, adopts the READ route, and ships the minimal S1
-# identity-card projection for GET /users/:id (CAP-1 + CAP-2 read half + CAP-3 +
-# CAP-4 read E2E). Every resolved audience — self / reporting / pp / colleague —
-# over an active target gets 200 with the same S1 card. Denials: an unresolved
+# UMAC-1 rebinds the port, adopts the READ route, and ships the
+# { data, canEdit } envelope for GET /users/:id (CAP-1 + CAP-2 read half +
+# CAP-3 + CAP-4 read E2E). data = the 12 S1 identity fields; canEdit = the
+# read-only dual-gate hint (false for all until user-management:edit is
+# seeded). Every resolved audience — self / reporting / pp / colleague — over
+# an active target gets 200 with the same envelope. Denials: an unresolved
 # session is 401 (session layer); an authenticated active viewer with an empty
 # audience is 403 (human product decision 2026-09-01 — no "leak-free 404").
 # UMAC-2 adds the write dual gate (CAP-2 write half) and is
@@ -28,9 +30,10 @@
     interim adapter deleted), the READ half of CAP-2 (GET /users/:id
     feature -> audience mapping: self / reporting / pp / colleague all allowed
     over an active target; unresolved session -> 401, authenticated active
-    viewer with empty audience -> 403), and CAP-3 (the
-    minimal S1 identity-card projection replacing toUserResponse's whole-row
-    spread).
+    viewer with empty audience -> 403), and CAP-3 (the { data, canEdit }
+    envelope replacing toUserResponse's whole-row spread on GET /users/:id —
+    data = the 12 S1 fields, canEdit = the read-only dual-gate hint, false for
+    all until user-management:edit is seeded).
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
@@ -51,21 +54,26 @@
     Colleague); a request whose session does not resolve to an active User
     (401 — the session layer's job; note the interim resolver is lax); an
     authenticated active viewer whose audience over the target is empty
-    (403 — target not an active User; no existence distinction). The S1 card
-    is: id, firstName, lastName, photo, position, country,
-    city, workEmail, workPhone, birthDay, birthMonth, companyJoinDate; the
-    response DROPS ttId, isActive, customFields, createdAt, createdBy; derived
-    S1 display fields (manager, people partner, department, mentor, current
-    projects) are out of scope for this route until those contexts land and
-    the response omits them. Include: isAllowed for user-management:create /
+    (403 — target not an active User; no existence distinction). The body is
+    the envelope { data, canEdit }. data is: id, firstName, lastName, photo,
+    position, country, city, workEmail, workPhone, birthDay, birthMonth,
+    companyJoinDate; data DROPS ttId, isActive, customFields, createdAt,
+    createdBy; derived S1 display fields (manager, people partner, department,
+    mentor, current projects) are out of scope for this route until those
+    contexts land and data omits them. canEdit = isAllowed(viewer,
+    user-management:edit) && canAccessSection(viewer, 'S1', target) ===
+    'write' — false for every viewer now (edit permission unseeded; colleague
+    permanently false by section access). Include: isAllowed for user-management:create /
     :deactivate / :list still allows the seeded HR-Admin root and denies
     others (delegated straight to AccessControlFacade.isAllowed);
     interim-access-control.adapter.ts is deleted, not left beside the real one
     (AD-21). State the CAP-3 change in the scenario doc: Story 0.1 adds a
-    dedicated S1-card DTO on the GET /users/:id handler ONLY (the GET /users
-    list, POST /users, PATCH /users/:id, DELETE /users/:id and PUT
-    /users/:id/photo response bodies are unchanged by this slice); the FURTHER
-    narrowing (S10 dates-only, S11 name-only, S16 per-field) stays FR-17. Do
+    dedicated { data, canEdit } mapper on the GET /users/:id handler ONLY (the
+    GET /users list, POST /users, PATCH /users/:id, DELETE /users/:id and PUT
+    /users/:id/photo response bodies are unchanged by this slice; rolling the
+    envelope onto the other section/detail routes is its own planning item);
+    the FURTHER narrowing (S10 dates-only, S11 name-only, S16 per-field) stays
+    FR-17. Do
     NOT author write-path (PATCH / PUT photo) scenarios here — those are
     UMAC-2. Do NOT author scenarios that touch Access Control files, prisma
     schema, migrations, or seed.
@@ -92,14 +100,17 @@
     case) and issue Bearer <token:<seeded-uuid>> headers, which
     InterimSessionResolverAdapter accepts unchanged — do NOT use literal
     persona placeholders for the cases that need a real audience. One test per
-    approved scenario, scenario id in the test title. Assert the colleague case
-    as 200 with the S1 card, asserting ttId / customFields / createdBy /
-    createdAt / isActive are ABSENT and the S1 fields present. Assert the
+    approved scenario, scenario id in the test title. Assert every read case
+    (self / reporting / pp / colleague) as 200 with body { data, canEdit }:
+    data has exactly the 12 S1 fields (ttId / customFields / createdBy /
+    createdAt / isActive ABSENT), and canEdit === false for all four (colleague
+    by section access, the rest by the unseeded edit permission). Assert the
     empty-audience denial (authenticated active viewer, inactive/missing
     target) as 403. The suite must FAIL until
-    UMAC-1-production rebinds the port and ships the S1-card DTO (the interim
-    adapter returns Boolean(userId) and toUserResponse spreads the whole row,
-    so the absent-technical-field assertions and the 403 assertion are red).
+    UMAC-1-production rebinds the port and ships the { data, canEdit } mapper
+    (the interim adapter returns Boolean(userId) and toUserResponse spreads the
+    whole row with no envelope, so the shape, absent-technical-field and 403
+    assertions are red).
     Follow
     .claude/rules/nest-e2e.md. Note whether the four existing
     profile.e2e-spec.ts cases (um-pf-01..04) need real personas or a tightened
@@ -111,9 +122,9 @@
   description: >-
     Depends on independent human approval of the committed-red UMAC-1 Stage-2
     suite. Implement the CAP-1 adapter + rebind, the READ half of CAP-2, and
-    the CAP-3 S1-card DTO on the GET /users/:id handler only (a dedicated
-    mapper, not a rewrite of the shared toUserResponse); make the approved
-    tests pass.
+    the CAP-3 { data, canEdit } envelope on the GET /users/:id handler only (a
+    dedicated mapper, not a rewrite of the shared toUserResponse); make the
+    approved tests pass.
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
@@ -136,11 +147,19 @@
     layer); the interim resolver is lax, so such a request may reach the guard
     and surface as 403 — acceptable during the interim. No "leak-free 404"
     (human product decision 2026-09-01).
-    On the GET /users/:id handler ONLY, return an S1-card DTO via a dedicated
-    response mapper (do NOT rewrite the shared toUserResponse in place):
-    exactly id, firstName, lastName, photo, position, country, city, workEmail,
-    workPhone, birthDay, birthMonth, companyJoinDate — and NOT ttId, isActive,
-    customFields, createdAt, createdBy. Leave the GET /users list, POST /users,
+    On the GET /users/:id handler ONLY, return the envelope { data, canEdit }
+    via a dedicated response mapper (do NOT rewrite the shared toUserResponse
+    in place). data = exactly id, firstName, lastName, photo, position,
+    country, city, workEmail, workPhone, birthDay, birthMonth, companyJoinDate
+    — and NOT ttId, isActive, customFields, createdAt, createdBy. canEdit =
+    (await AccessControlFacade.isAllowed(userId, EDIT_USER_FEATURE)) &&
+    (await AccessControlFacade.canAccessSection(userId, 'S1', targetUserId))
+    === 'write' — a read-only hint computed on the GET; enforcement stays on
+    PATCH (UMAC-2). EDIT_USER_FEATURE ('user-management:edit') is not seeded,
+    so isAllowed fails closed and canEdit is false for every viewer now; that
+    is correct and expected — the Stage-2 suite asserts canEdit === false.
+    Wire the computation in the adapter/handler; do NOT add the edit route or
+    permission. Leave the GET /users list, POST /users,
     PATCH /users/:id, DELETE /users/:id, and PUT /users/:id/photo response
     bodies exactly as they are today. Rebind
     ACCESS_CONTROL_PORT in user-management.module.ts to the new adapter and

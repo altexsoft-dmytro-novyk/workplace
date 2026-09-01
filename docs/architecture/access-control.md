@@ -202,13 +202,18 @@ The per-route feature → audience/section mapping and the §2.2 dual gate for
 the write routes are specified in
 `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md`,
 answering `_bmad-output/implementation-artifacts/access-control/um-integration-contract-response.md`.
-For `GET /users/:id` the read is `200` with the **minimal S1 identity card**
-(shipped in adoption Story 0.1) for **any non-empty audience** — `self`,
-`reporting`, `pp`, **or `colleague`** (§3.2's S1 row is `R` for the Colleague
-column, and the matrix legend makes every active authenticated viewer at
-least a Colleague); denials are `401` when the session does not resolve to an
-active `User` (the session layer's responsibility) and `403` when an
-authenticated active viewer's audience over the target is empty. *(Revised
+For `GET /users/:id` the read is `200` with `{ data, canEdit }` — `data` the
+**minimal S1 identity card**, `canEdit` a read-only hint (`isAllowed(viewer,
+user-management:edit) && canAccessSection(viewer, 'S1', target) === 'write'`;
+`false` for all until `user-management:edit` is seeded) — shipped in adoption
+Story 0.1, for **any non-empty audience** — `self`, `reporting`, `pp`, **or
+`colleague`** (§3.2's S1 row is `R` for the Colleague column, and the matrix
+legend makes every active authenticated viewer at least a Colleague); denials
+are `401` when the session does not resolve to an active `User` (the session
+layer's responsibility) and `403` when an authenticated active viewer's
+audience over the target is empty. The `{ data, canEdit }` envelope is the
+intended section/detail-read shape going forward (its own planning item in
+`_bmad-output/implementation-artifacts/access-control/deferred-work.md`). *(Revised
 2026-09-01 by human product decision — the earlier "two-state colleague rule"
 and adoption story `UMAC-3` are removed; the earlier "leak-free `404`" for an
 empty audience is withdrawn in favour of standard `401`/`403` — this is an

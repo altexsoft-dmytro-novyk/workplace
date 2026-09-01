@@ -63,15 +63,28 @@ human approval — write nothing to `approvals.yaml`.
   `nestjs-di-tokens.md` (guards are the only sanctioned port consumer;
   actions never inject ports); `testing-strategy.md` (AD-1 stage separation);
   `um-integration-contract-response.md` Q1/Q2/Q4/Q5/Q6.
-- The S1 card is exactly: `id`, `firstName`, `lastName`, `photo`, `position`,
-  `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`,
-  `companyJoinDate`. The response DROPS `ttId`, `isActive`, `customFields`,
-  `createdAt`, `createdBy`. Derived S1 display fields (manager, people
-  partner, department, mentor, current projects) are out of scope for this
-  route until those contexts land; the response omits them and that is
+- The `GET /users/:id` body is the envelope `{ data, canEdit }` (human
+  decision 2026-09-01 — fold the capability envelope in now). `data` is
+  exactly: `id`, `firstName`, `lastName`, `photo`, `position`, `country`,
+  `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`,
+  `companyJoinDate` — and DROPS `ttId`, `isActive`, `customFields`,
+  `createdAt`, `createdBy`. `canEdit` is the read-only dual-gate hint:
+  `isAllowed(viewer, EDIT_USER_FEATURE) && canAccessSection(viewer, 'S1',
+  target) === 'write'` — computed on the GET, enforcement stays on `PATCH`.
+  `user-management:edit` is unseeded (Open Decision (i) = option (a),
+  pending), so `canEdit` is `false` for every viewer today; it flips to
+  `true` for `self`/`reporting`/`pp` once that kernel-seed sequence reaches
+  `stage-3-production`, and is permanently `false` for a `colleague`
+  (`canAccessSection` → `'read'`). The `{ data, canEdit }` shape is the
+  section/detail-read convention going forward (photo, relationships, etc.
+  each get their own envelope) — rolling it onto the other routes is its own
+  planning item. Derived S1 display fields (manager, people partner,
+  department, mentor, current projects) are out of scope for this route
+  until those contexts land; `data` omits them and that is
   stated.
 - `GET /users/:id`: any non-empty audience over an **active** target
-  (`self`, `reporting`, `pp`, or `colleague`) → `200` with the same S1 card.
+  (`self`, `reporting`, `pp`, or `colleague`) → `200` with the same
+  `{ data, canEdit }` envelope (identical `data`; `canEdit` per the dual gate).
   Denials: an unresolved session → `401` (session layer; the interim
   resolver is lax, so such a request reaches the guard and surfaces as
   `403`); an authenticated active viewer with an empty audience (target not
@@ -212,8 +225,10 @@ scenarios describe and what Stage 2/3 will change.
   Scenario, carry an explicit request spec and a Trace line, and every
   required source above is cited somewhere in the set.
 - Given `umac-01`/`umac-02`/`umac-03`/`umac-04`, when their `expectedResult`
-  bodies are compared, then all four assert the identical 12-field S1 card
-  and the identical five absent technical fields.
+  bodies are compared, then all four assert the identical `{ data, canEdit }`
+  shape — `data` the identical 12 S1 fields with the five technical fields
+  absent, and `canEdit` `false` (all four; `umac-04` `false` by section
+  access, the rest by the unseeded edit permission).
 - Given `umac-04`, when read, then the colleague outcome is `200` with the S1
   card (not `403`), justified by §3.2 S1 = `R` for the Colleague column.
 - Given `umac-05`, when read, then an unresolved session is `401` (the
@@ -242,11 +257,11 @@ scenarios describe and what Stage 2/3 will change.
 
 | # | Actor / session | Request | Expected outcome |
 |---|---|---|---|
-| umac-01 | V = active seeded `User`, session for own id (`Bearer <token:<V>>`) | `GET /users/<V>` | `200`; body = S1 card (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`); `ttId`/`isActive`/`customFields`/`createdAt`/`createdBy` absent |
-| umac-02.1 | V, with real `Relationship` `T → V` `type='direct'` | `GET /users/<T>` as V | `200`; same S1 card |
-| umac-02.2 | V, with real chain `T → M → V` `type='direct'` | `GET /users/<T>` as V | `200`; same S1 card (transitive `reporting`) |
-| umac-03 | V, with real `Relationship` `T → V` `type='people_partner'` | `GET /users/<T>` as V | `200`; same S1 card (`pp`) |
-| umac-04 | V active, no edge to T, V ≠ T (colleague floor) | `GET /users/<T>` as V | `200`; the SAME S1 card |
+| umac-01 | V = active seeded `User`, session for own id (`Bearer <token:<V>>`) | `GET /users/<V>` | `200`; `{ data, canEdit }`. `data` = S1 card (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`); `ttId`/`isActive`/`customFields`/`createdAt`/`createdBy` absent. `canEdit`: `false` (edit permission unseeded) |
+| umac-02.1 | V, with real `Relationship` `T → V` `type='direct'` | `GET /users/<T>` as V | `200`; same `{ data, canEdit }`; `canEdit` `false` |
+| umac-02.2 | V, with real chain `T → M → V` `type='direct'` | `GET /users/<T>` as V | `200`; same `{ data, canEdit }` (transitive `reporting`); `canEdit` `false` |
+| umac-03 | V, with real `Relationship` `T → V` `type='people_partner'` | `GET /users/<T>` as V | `200`; same `{ data, canEdit }` (`pp`); `canEdit` `false` |
+| umac-04 | V active, no edge to T, V ≠ T (colleague floor) | `GET /users/<T>` as V | `200`; the SAME `data`; `canEdit` `false` **by section access** (`canAccessSection` → `'read'`) |
 | umac-05.1 | `Bearer <token:Bob>` (→ non-existent id `'Bob'`) | `GET /users/<T>` | `403` via the guard (interim resolver); `401` once the real session middleware lands |
 | umac-05.2 | caller's own `User` row `isActive: false` | `GET /users/<T>` as deactivated caller | `403` via the guard; `401` end state |
 | umac-05.3 | valid active caller, inactive or non-existent target id | `GET /users/<target>` | `403` (empty audience; no existence distinction) |
@@ -289,10 +304,18 @@ on 2026-09-01 — recorded in
 (`UMAC-1-scenarios`, `stage-1-scenarios`, author = Claude Code agent, approver =
 Dmytro Novyk, commit `5fe0bb86759c350de1d88da710f4f10a09f0431e`).
 
-Human decision folded in at approval: `GET /users/:id` denials are `401`
-(unresolved session — session layer) and `403` (authenticated active viewer,
-empty audience); the earlier "leak-free `404`" is withdrawn. No guard/controller
-change — the `403` is what `AccessControlGuard` already produces.
+Human decisions folded in at approval (Dmytro Novyk, 2026-09-01):
+1. `GET /users/:id` denials are `401` (unresolved session — session layer) and
+   `403` (authenticated active viewer, empty audience); the earlier "leak-free
+   `404`" is withdrawn. No guard/controller change — the `403` is what
+   `AccessControlGuard` already produces.
+2. Fold the `{ data, canEdit }` capability envelope into `GET /users/:id` now
+   (option (a), not deferred). `data` = the 12 S1 fields; `canEdit` = the
+   read-only dual-gate hint `isAllowed(viewer, EDIT_USER_FEATURE) &&
+   canAccessSection(viewer, 'S1', target) === 'write'`. `canEdit` is `false`
+   for every viewer until `user-management:edit` is seeded (colleague:
+   permanently `false` by section access). Scenarios re-approved the same day
+   (superseding entry in `approvals.yaml`).
 
 Next dispatch: `UMAC-1-red-tests` (Stage 2). Note for that dispatch: a
 prematurely-committed E2E suite already exists under

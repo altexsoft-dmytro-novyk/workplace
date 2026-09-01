@@ -23,7 +23,9 @@ are the only sanctioned port consumer; actions never inject ports);
 `um-integration-contract-response.md` Q1/Q2/Q4/Q5/Q6.
 
 **Status:** `umac-01`..`umac-06` (Story 0.1) **approved 2026-09-01** by Dmytro
-Novyk (Product Owner / Architect); recorded in
+Novyk (Product Owner / Architect), then **revised and re-approved the same day**
+when he directed folding the `{ data, canEdit }` capability envelope into
+`GET /users/:id`; both entries are in
 `_bmad-output/specs/spec-user-management-access-control-adoption/approvals.yaml`
 (`UMAC-1-scenarios`, `stage-1-scenarios`; author = Claude Code agent, approver =
 Dmytro Novyk). `umac-07`..`umac-09` (Story 0.2 write path) remain unapproved
@@ -41,7 +43,7 @@ behaviour is chosen per feature string inside the adapter.
 
 | Route | Feature constant | Adapter behaviour |
 | --- | --- | --- |
-| `GET /users/:id` | `user-management:read` | allow **any non-empty audience** (`self` / `reporting` / `pp` / `colleague`) → `200` with the **S1 identity card** (same fields for every audience); unresolved session → `401` (session layer; interim resolver lax → surfaces as `403`); authenticated active viewer with an empty audience → `403` (no "leak-free 404" — human decision 2026-09-01) |
+| `GET /users/:id` | `user-management:read` | allow **any non-empty audience** (`self` / `reporting` / `pp` / `colleague`) → `200` with `{ data, canEdit }` — `data` the **S1 identity card** (same 12 fields for every audience), `canEdit` the read-only dual-gate hint (`isAllowed(v, edit key) && canAccessSection(v, 'S1', t) === 'write'`; `false` for all until `user-management:edit` is seeded; always `false` for a colleague); unresolved session → `401` (interim resolver lax → `403`); authenticated active viewer, empty audience → `403` (no "leak-free 404" — human decision 2026-09-01) |
 | `PATCH /users/:id` | `user-management:edit` | §2.2 dual gate: `isAllowed(v, edit key)` **and** `canAccessSection(v, 'S1', t) === 'write'` — **blocked on a missing permission** |
 | `PUT /users/:id/photo` | `user-management:upload-photo` | Self-only (viewer id == target id) unless Product widens it |
 | `GET /users`, `POST /users`, `DELETE /users/:id` | `user-management:list` / `:create` / `:deactivate` | `isAllowed` delegates straight to the facade — these three keys are exactly the ACM-1 seeded set |
@@ -95,10 +97,10 @@ S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
 
 | File | Story | State |
 | --- | --- | --- |
-| `umac-01-self-read-s1-card.md` | 0.1 | **approved 2026-09-01** (Self → 200, S1 card) |
-| `umac-02-reporting-line-viewer-read.md` | 0.1 | **approved 2026-09-01** (reporting → 200, S1 card) |
-| `umac-03-assigned-pp-read.md` | 0.1 | **approved 2026-09-01** (PP → 200, S1 card) |
-| `umac-04-colleague-read-s1-card.md` | 0.1 | **approved 2026-09-01** (**colleague → 200, S1 card — positive test**) |
+| `umac-01-self-read-s1-card.md` | 0.1 | **approved 2026-09-01** (Self → 200, `{ data: S1 card, canEdit: false }`) |
+| `umac-02-reporting-line-viewer-read.md` | 0.1 | **approved 2026-09-01** (reporting → 200, `{ data, canEdit: false }`) |
+| `umac-03-assigned-pp-read.md` | 0.1 | **approved 2026-09-01** (PP → 200, `{ data, canEdit: false }`) |
+| `umac-04-colleague-read-s1-card.md` | 0.1 | **approved 2026-09-01** (**colleague → 200, `{ data, canEdit: false }` — positive test; `canEdit` false by section access**) |
 | `umac-05-unresolved-session-read-denied.md` | 0.1 | **approved 2026-09-01** (unresolved session → `401`, interim → `403` via guard; authenticated active viewer with empty audience → `403`; no "leak-free 404" — human product decision) |
 | `umac-06-no-target-isallowed-delegates-to-facade.md` | 0.1 | **approved 2026-09-01** (root → allowed on `GET`/`POST` `/users` + `DELETE /users/:id` = `200`/`201`/`200`; unrelated session, Ida, **and an `HR Admin` impostor with no FR grant chain** → `403` on all three — the facade never reads `User.position`; `interim-access-control.adapter.ts` deleted in the same cutover, AD-21) |
 | `umac-07-write-dual-gate.md` | 0.2 | **CONDITIONAL — blocked on the missing `user-management:edit` permission (Open Decision i)** |

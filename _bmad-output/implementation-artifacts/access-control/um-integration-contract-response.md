@@ -42,8 +42,10 @@ adoption work itself is scoped as a new package:
 > colleague `GET /users/:id` returns the **S1 identity card** (`200`), not
 > `403` — §3.2's S1 row is `R` for the Colleague column and every active
 > authenticated viewer is at least a Colleague. Story 0.1 ships a **minimal
-> S1-card projection** — a dedicated mapper on the `GET /users/:id` handler
-> only (not a rewrite of the shared `toUserResponse`); the
+> S1-card projection wrapped in the `{ data, canEdit }` envelope** — a
+> dedicated mapper on the `GET /users/:id` handler only (not a rewrite of the
+> shared `toUserResponse`); `canEdit` is the read-only dual-gate hint, `false`
+> for all until `user-management:edit` is seeded. The
 > "two-state colleague rule" and adoption story `UMAC-3` are removed. The
 > `GET /users/:id` denials are `401` (session does not resolve to an active
 > `User`) and `403` (authenticated active viewer, empty audience) — the
@@ -340,21 +342,31 @@ no write entitlement).
 
 ---
 
-## Q5 — The minimal S1 card ships here; the *further* narrowing is a separate story.
+## Q5 — The minimal S1 card ships here, wrapped in `{ data, canEdit }`; the *further* narrowing is a separate story.
 
-**Decision (revised 2026-09-01), stated for the record in the adoption SPEC
-and every adoption scenario:**
+**Decision (revised 2026-09-01 — the second revision folds in the capability
+envelope, per Dmytro Novyk), stated for the record in the adoption SPEC and
+every adoption scenario:**
 
-> Story 0.1 routes `GET /users/:id` through an **S1 identity-card DTO** — a
-> dedicated mapper on that handler only, not a rewrite of the shared
+> Story 0.1 routes `GET /users/:id` through a **`{ data, canEdit }` mapper** —
+> a dedicated mapper on that handler only, not a rewrite of the shared
 > `toUserResponse` (the list / `POST` / `PATCH` / `DELETE` / photo response
-> bodies are unchanged) — returning `id`, `firstName`, `lastName`, `photo`,
+> bodies are unchanged). `data` = `id`, `firstName`, `lastName`, `photo`,
 > `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`,
-> `birthMonth`, `companyJoinDate` — the same fields for every audience on
-> `GET /users/:id`.
-> The response **drops** `ttId`, `isActive`, `customFields`, `createdAt`,
-> `createdBy`. This is a real, minimal projection, and it is **not** the
+> `birthMonth`, `companyJoinDate` — the same `data` for every audience on
+> `GET /users/:id`; it **drops** `ttId`, `isActive`, `customFields`,
+> `createdAt`, `createdBy`. `canEdit` = `isAllowed(viewer,
+> user-management:edit) && canAccessSection(viewer, 'S1', target) === 'write'`
+> — a read-only UI hint (enforcement stays on `PATCH`); `false` for every
+> viewer until `user-management:edit` is seeded, permanently `false` for a
+> colleague. This is a real, minimal projection, and it is **not** the
 > deferred "Profile Projection" story.
+>
+> The `{ data, canEdit }` envelope is the section/detail-read API convention
+> going forward — each readable section/resource (a later photo endpoint, the
+> relationship endpoints, `GET /users/:id/leaves`, …) gets its own envelope
+> with its own `canEdit`. Rolling it onto the other routes and into
+> `api-conventions.md` is its own planning item (`deferred-work.md`).
 
 **What is still deferred (FR-17 Profile Projection, `deferred-work.md`).**
 `canAccessSection` returns only `none/read/write` and "cannot decide an

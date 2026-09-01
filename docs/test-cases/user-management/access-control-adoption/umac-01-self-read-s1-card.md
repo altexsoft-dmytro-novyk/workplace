@@ -10,26 +10,37 @@ and V is an active seeded `User`.
 
 **When** V calls `GET /users/<V>` with a session for its own id.
 
-**Then** the response is `200` and the body is the **S1 identity card** —
-`toUserResponse` no longer spreads the whole row; Story 0.1's S1-card DTO returns
-`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`,
-`workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and nothing
-else. V's Phase-0 audience over itself is `self` (after identity confirmation; Self
+**Then** the response is `200` and the body is the read envelope
+`{ data, canEdit }`. `data` is the **S1 identity card** — `toUserResponse` no
+longer spreads the whole row; Story 0.1's S1-card DTO returns exactly `id`,
+`firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`,
+`workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and nothing else.
+V's Phase-0 audience over itself is `self` (after identity confirmation; Self
 is exclusive), a non-empty set, so the adapter allows `user-management:read`.
 
-> **CAP-3 — the S1 card is the same fields for every audience on this route.**
-> The response **drops** the non-S1 technical fields: `ttId` (AD-13 external
-> identity), `isActive` (internal flag, "not exposed"), `customFields` (S16),
-> `createdAt`, `createdBy` (audit). Derived S1 display fields (manager, people
-> partner, department, mentor, current projects) come from other contexts and
-> are out of scope for this route until those land — the response omits them.
-> The *further* narrowing (S10 dates-only, S11 name-only, S16 per-field) is the
-> deferred FR-17 Profile Projection story on its own surfaces.
+`canEdit` is the read-only dual-gate hint —
+`isAllowed(V, EDIT_USER_FEATURE) && canAccessSection(V, 'S1', V) === 'write'`.
+Self has `canAccessSection === 'write'`, but `user-management:edit` is not
+seeded yet (Open Decision (i) = option (a), pending), so `isAllowed` fails
+closed and **`canEdit` is `false`** today. It flips to `true` for Self once the
+`user-management:edit` kernel-seed sequence reaches `stage-3-production`.
+
+> **CAP-3 — `{ data, canEdit }`; `data` is the same 12 fields for every
+> audience on this route.** `data` **drops** the non-S1 technical fields:
+> `ttId` (AD-13 external identity), `isActive` (internal flag, "not exposed"),
+> `customFields` (S16), `createdAt`, `createdBy` (audit). Derived S1 display
+> fields (manager, people partner, department, mentor, current projects) come
+> from other contexts and are out of scope for this route until those land —
+> `data` omits them. The *further* narrowing (S10 dates-only, S11 name-only,
+> S16 per-field) is the deferred FR-17 Profile Projection story on its own
+> surfaces.
 >
-> **Scope.** Story 0.1 adds this S1-card DTO as a dedicated mapper on the
-> `GET /users/:id` handler only. `GET /users` (list), `POST /users`,
+> **Scope.** Story 0.1 adds this S1-card DTO + envelope as a dedicated mapper
+> on the `GET /users/:id` handler only. `GET /users` (list), `POST /users`,
 > `PATCH /users/:id`, `DELETE /users/:id`, and `PUT /users/:id/photo` response
-> bodies are **unchanged** by this slice.
+> bodies are **unchanged** by this slice — the `{ data, canEdit }` envelope
+> convention rolls onto the other section/detail routes as its own later
+> planning item.
 
 **Preconditions:** [fixture](README.md#fixture-convention-per-um-integration-contract-response-md-q6); V is an active seeded `User`; the port is rebound and the S1-card DTO is in place (this scenario's E2E is red until `UMAC-1-production` lands — the interim adapter + whole-row spread make the "technical fields absent" assertions fail).
 
@@ -40,4 +51,4 @@ is exclusive), a non-empty set, so the adapter allows `user-management:read`.
   ```json
   { "headers": { "authorization": "Bearer <token:<V-uuid>>" } }
   ```
-- **expectedResult:** `200`. Body **contains** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`. Body **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`.
+- **expectedResult:** `200`. Body is `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `false` (no `user-management:edit` seeded). Forward: `canEdit` becomes `true` for Self once that permission reaches `stage-3-production`.

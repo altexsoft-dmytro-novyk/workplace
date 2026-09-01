@@ -90,8 +90,9 @@ separately tracked FR-17 Profile Projection story.
     audience over the **active** target resolves to **any** of `self`,
     `reporting`, `pp`, **or `colleague`** (§3.2: the S1 identity-card row is
     `R` for the Colleague column, and every active authenticated viewer is at
-    least a Colleague). All four audiences get `200` with the **same S1
-    identity-card projection** (see CAP-3). Denial (revised 2026-09-01 by
+    least a Colleague). All four audiences get `200` with the **same
+    `{ data, canEdit }` envelope** — identical `data` (the S1 card), and
+    `canEdit` per the dual gate (see CAP-3). Denial (revised 2026-09-01 by
     human product decision — no "leak-free 404"; standard REST codes): a
     request whose session does not resolve to an active `User` is **`401`**
     (the session layer's responsibility — the Epic 2 magic-link middleware
@@ -110,28 +111,55 @@ separately tracked FR-17 Profile Projection story.
     `EditUserAction`/`UpdateUserDto`, tested) plus the photo narrower rule
     (photo write is Self-only per FR-9 / DEC unless Product widens it).
 
-- **CAP-3 — Minimal S1 identity-card projection (shipped in Story 0.1)**
-  - **intent:** `GET /users/:id` returns the S1 identity card — the same
-    fields for every audience on this route — and no more.
+- **CAP-3 — Minimal S1 identity-card projection + capability envelope (shipped in Story 0.1)**
+  - **intent:** `GET /users/:id` returns the S1 identity card wrapped in the
+    standard read envelope `{ data, canEdit }` — the same shape and fields for
+    every audience on this route — and no more.
   - **success:** the `GET /users/:id` handler
     (`users.controller.ts` `findOne`) today serializes through `toUserResponse`
     (`services/backend/src/user-management/application/dtos/user.response.ts:10`),
     which spreads the whole `User` row (`return { ...user, companyJoinDate:
     ... }`). Story 0.1's production change routes that one handler through a
-    new **S1-card DTO** instead (a dedicated mapper — see the scope bullet),
-    returning exactly:
-    `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`,
-    `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`.
-    It **drops** the non-S1 technical fields from the response body:
-    `ttId` (AD-13 external identity — not S1), `isActive` (PRD: internal
-    account/row-retention flag, "not exposed"), `customFields` (S16 —
-    per-field visibility, not S1), `createdAt` and `createdBy` (audit; same
-    reasoning that dropped `updatedAt`/`updatedBy` for lack of a named
+    new **S1-card DTO** wrapped in an envelope:
+    ```
+    { "data": {
+        "id", "firstName", "lastName", "photo", "position", "country",
+        "city", "workEmail", "workPhone", "birthDay", "birthMonth",
+        "companyJoinDate" },
+      "canEdit": <boolean> }
+    ```
+    `data` is exactly those 12 fields and no more. It **drops** the non-S1
+    technical fields: `ttId` (AD-13 external identity — not S1), `isActive`
+    (PRD: internal account/row-retention flag, "not exposed"), `customFields`
+    (S16 — per-field visibility, not S1), `createdAt` and `createdBy` (audit;
+    same reasoning that dropped `updatedAt`/`updatedBy` for lack of a named
     consumer). This is a **real, minimal projection**, not the deferred
     "Profile Projection" story. The S1 derived display fields — manager,
     people partner, department, mentor, current project(s) — come from other
     contexts and are **out of scope for this route** until those land; the
     response omits them and that is noted.
+  - **`canEdit` — the honest answer to "would `PATCH /users/:id` on the S1
+    identity fields succeed for this viewer".** It is `true` **iff**
+    `AccessControlFacade.isAllowed(viewer, EDIT_USER_FEATURE) === true`
+    **and** `AccessControlFacade.canAccessSection(viewer, 'S1', target) ===
+    'write'` — the §2.2 dual gate, read-only, computed on the GET. It is a UI
+    hint; the real enforcement stays on `PATCH` (UMAC-2). Because
+    `user-management:edit` is **not yet seeded** (Open Decision (i) = option
+    (a), pending), `isAllowed` fails closed and **`canEdit` is `false` for
+    every viewer today**. It becomes `true` for `self` / `reporting` /
+    `pp` viewers once the kernel-seed sequence for `user-management:edit`
+    reaches `stage-3-production`; a `colleague` viewer's `canEdit` is always
+    `false` (`canAccessSection` → `'read'`). Story 0.1 wires the computation;
+    UMAC-2 makes it non-trivially true.
+  - **the `{ data, canEdit }` envelope is the API convention for
+    section/detail reads going forward.** Each readable section/resource is
+    its own endpoint returning `{ data, canEdit }` (a later photo endpoint,
+    the relationship endpoints, `GET /users/:id/leaves`, etc. each get their
+    own envelope with their own `canEdit`). This SPEC establishes the shape
+    on `GET /users/:id`; rolling it onto the other routes and into
+    `api-conventions.md` is tracked as its own planning item
+    (`deferred-work.md`). Lists and writer-echo responses are **not**
+    enveloped by this slice.
   - **what stays deferred (FR-17 Profile Projection,
     `_bmad-output/implementation-artifacts/access-control/deferred-work.md`):**
     the S10 dates-only colleague view (own route `GET /users/:id/leaves`),
@@ -165,8 +193,11 @@ separately tracked FR-17 Profile Projection story.
     `Bearer <token:<seeded-uuid>>`, which `InterimSessionResolverAdapter`
     accepts unchanged. It covers: Self read/write, reporting-line read and
     S1 write, direct-PP read and S1 write, **colleague read → `200` with the
-    S1 card** (asserting `ttId`/`customFields`/`createdBy`/`createdAt`/
-    `isActive` are absent and the S1 fields present), an unresolved session
+    `{ data, canEdit }` envelope** (asserting `data` is exactly the 12 S1
+    fields — `ttId`/`customFields`/`createdBy`/`createdAt`/`isActive` absent —
+    and `canEdit` is `false`), the same envelope for self / reporting / pp
+    with `canEdit` reflecting the dual gate (`false` today, no
+    `user-management:edit` seeded), an unresolved session
     → `401` and an authenticated active viewer with an empty audience →
     `403`, the dual-gate write denial when the functional
     permission is absent, and the §3.2 fn 1 rejection of manager/PP/
@@ -275,10 +306,12 @@ separately tracked FR-17 Profile Projection story.
 `user-management.module.ts` binds `ACCESS_CONTROL_PORT` to a real
 facade-backed adapter in `src/user-management/infrastructure/`;
 `interim-access-control.adapter.ts` is deleted; `GET /users/:id` returns
-`200` with the **S1 identity card** (`id`, `firstName`, `lastName`, `photo`,
-`position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`,
-`birthMonth`, `companyJoinDate` — `ttId`/`isActive`/`customFields`/
-`createdAt`/`createdBy` absent) for any active viewer over an active target —
+`200` with `{ data, canEdit }` — `data` the **S1 identity card** (`id`,
+`firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`,
+`workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` —
+`ttId`/`isActive`/`customFields`/`createdAt`/`createdBy` absent), `canEdit` the
+read-only dual-gate hint (`false` for all until `user-management:edit` is
+seeded) — for any active viewer over an active target —
 `self`, `reporting`, `pp`, **or `colleague`** — a `401` when the session
 does not resolve to an active `User`, and a `403` when an authenticated
 active viewer's audience over the target is empty; `PATCH /users/:id` and

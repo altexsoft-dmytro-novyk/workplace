@@ -10,20 +10,26 @@
 
 **When** V calls `GET /users/<T>`.
 
-**Then** the response is **`200`** with the **S1 identity card** — the **same
-fields every other audience gets** on this route. §3.2's S1 (Identity card) row is
-`R` for the Colleague column, and the matrix legend defines Colleague as any
-authenticated employee holding none of the above roles — so every active
-authenticated viewer is at least a Colleague and is entitled to S1. This is a
-**positive** test: there is no "two-state" rule, no `403`, and no deferred flip.
+**Then** the response is **`200`** with the **`{ data, canEdit }` envelope** —
+`data` is the **same fields every other audience gets** on this route. §3.2's S1
+(Identity card) row is `R` for the Colleague column, and the matrix legend
+defines Colleague as any authenticated employee holding none of the above roles
+— so every active authenticated viewer is at least a Colleague and is entitled
+to S1. This is a **positive** test: there is no "two-state" rule, no `403`, and
+no deferred flip.
 
-> **The S1 card projection (CAP-3, Story 0.1).** The body contains exactly `id`,
+`canEdit` is **`false`** — and, unlike self/reporting/pp, it is `false` by
+**section access**: `canAccessSection(V, 'S1', T)` returns `'read'` for a
+colleague, so `canEdit` is `false` regardless of any functional permission. It
+never flips to `true` for a colleague.
+
+> **The S1 card projection (CAP-3, Story 0.1).** `data` contains exactly `id`,
 > `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`,
 > `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`. It **does not**
 > contain `ttId`, `isActive`, `customFields`, `createdAt`, or `createdBy`.
 > Derived S1 display fields (manager, people partner, department, mentor,
 > current projects) come from other contexts and are out of scope for this
-> route until those land — the response omits them. The *further* colleague
+> route until those land — `data` omits them. The *further* colleague
 > narrowing — S10 dates-only (`GET /users/:id/leaves`), S11 project-name-only,
 > S16 per-field visibility — is the deferred FR-17 Profile Projection story on
 > those own surfaces, not this route.
@@ -41,4 +47,4 @@ A genuinely unrelated *field* route for a colleague (e.g. `GET
   ```json
   { "headers": { "authorization": "Bearer <token:<V-uuid>>" } }
   ```
-- **expectedResult:** `200`. Body **contains** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`. Body **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. Identical field set to `umac-01` / `umac-02` / `umac-03`.
+- **expectedResult:** `200`. Body `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **not** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy` — identical `data` to `umac-01` / `umac-02` / `umac-03`. `canEdit` is `false` (colleague → `canAccessSection` `'read'`; never flips true).
