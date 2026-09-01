@@ -11,6 +11,19 @@ context: ['{project-root}/_bmad-output/implementation-artifacts/user-management/
 > Regenerated 2026-09-01 from epics.md v1.5 — supersedes the pre-v1.5 version
 > ("HR Admin Registers a New Hire"); **NOT an AD-1 approval.** Compiled planning
 > context for a future story-authoring / dev pass, not a stage-1 scenario doc.
+>
+> **OPEN items resolved 2026-09-02 — see
+> [`epic-1-story-1-1-decisions.md`](./epic-1-story-1-1-decisions.md) (the binding
+> delta).** Summary of what changed below: the operator endpoint is
+> **`POST /users/import`** (multipart, upload-only, HR-Admin via the existing
+> `user-management:create` key — no new permission or kernel seed) plus a
+> deploy-script entrypoint; a structurally invalid file → `400` nothing written,
+> row errors → `200` with a `skipped`/`errors[]` summary; `Department` is created
+> on import, identity = the `(externalId, name)` pair, plus one
+> `DepartmentMembership` per person; `IsDismissed` → an `EmploymentStatus` row and
+> **`User.isActive` is `true` for every imported row** (the interim
+> `isActive=false` stopgap below is **withdrawn**); `PositionId` / `CountryCode` /
+> `CountryStateName` / `EmployeeType` / `TimeZone` are not stored; `city` → `null`.
 
 ## Intent
 
@@ -26,10 +39,11 @@ semicolon-delimited timetracker export **`docs/Accounts_template.csv`** and
 populates `User` rows with the mapped S1 identity-card fields. The file carries
 **no employee-id column**, so the import is **keyed by the normalized `Email`**
 (trim + lowercase, DEC-UM-007) — `ttId` (AD-13) has **no source column** and is
-left `null`. The exact batch transport / operator endpoint is an explicit AD-1
-follow-up contract (`api-conventions.md` "Seeded-population import") — fix it in a
-scenario before implementation. Existing local test data is re-imported through
-this path, never migrated from the old routes.
+left `null`. The operator endpoint is **`POST /users/import`** (multipart
+`file` part, upload-only; `api-conventions.md` "Seeded-population import"), with a
+deploy/operator script reading `docs/Accounts_template.csv` from the repo path as
+the second entrypoint on the same writer (resolved 2026-09-02). Existing local
+test data is re-imported through this path, never migrated from the old routes.
 
 **Column → `User` field mapping (from `docs/Accounts_template.csv`).** Header:
 `FirstName;LastName;Email;Birthday;PositionId;PositionName;RegistrationDate;DepartmentId;DepartmentName;DismissedDate;IsDismissed;EmployeeType;TimeZone;CountryId;CountryCode;CountryName;CountryStateId;CountryStateName`
@@ -41,13 +55,13 @@ this path, never migrated from the old routes.
 | `Birthday` | `birthDay` + `birthMonth` | `NULL` or a date; date → split day/month, **drop the year** (§3.2); `NULL` → both `null` (deliberate `NULL` ≠ the "incomplete pair rejected" DEC). |
 | `RegistrationDate` | `companyJoinDate` (`date`) | |
 | `PositionName` | `position` (free-text S1) | |
-| `PositionId` | — | **OPEN:** positions dictionary? Not stored now. |
-| `DepartmentName` / `DepartmentId` | department **org fact** (§4.17), **not** a free-text S1 field | **OPEN:** Department edge contract deferred (spine Deferred) — store the name transiently or defer department assignment. Do **not** invent the Department schema. |
+| `PositionId` | — | **not stored** in Story 1.1 — `position` is free-text S1 (`PositionName`); no positions dictionary (resolved 2026-09-02). |
+| `DepartmentName` + `DepartmentId` | `Department.name` + `Department.externalId` (`database-schema.md` §Project/Department) + `DepartmentMembership` | **resolved 2026-09-02.** Create-on-import; identity is the **`(externalId, name)` pair** (`UNIQUE (externalId, name)` — `externalId` alone **not** unique; a divergent name for a known `DepartmentId` is a **second** `Department` row). `parentId` = `null`. One `DepartmentMembership { userId, departmentId, validFrom=RegistrationDate, validTo=null }` per person; the CSV carries one `DepartmentId` per row. Department-manager attachment / tree walk stay deferred + fail-closed. |
 | `CountryName` | `country` | |
-| `CountryCode` / `CountryStateId` / `CountryStateName` / `CountryId` | — | **OPEN** whether stored. `city` has **no source column** → `null`. **OPEN.** |
-| `IsDismissed` (`0`/`1`) + `DismissedDate` | **employment status** (§4.16 `active`/`dismissed`), **not** `User.isActive` directly | **Interim:** `User.isActive` may be set `false` for a dismissed row until the `EmploymentStatus` aggregate lands (Epic 5, CC-06). Flag it. |
-| `EmployeeType` (`Employee`/…) | S4 employee type (FTE/Subcontractor) | **S4 not on `User`** (PRD: `User` is S1-only) → **OPEN / not imported yet.** |
-| `TimeZone` | — | not an S1 field. Distinct from AD-20's `BUSINESS_TIME_ZONE`. |
+| `CountryCode` / `CountryStateId` / `CountryStateName` / `CountryId` | — | **not stored** (resolved 2026-09-02). `city` has **no source column** → `null`. |
+| `IsDismissed` (`0`/`1`) + `DismissedDate` | an **`EmploymentStatus`** row (§4.16 `active`/`dismissed`) | **resolved 2026-09-02.** `1` → `{ status:'dismissed', validFrom: DismissedDate }`; `0` → `{ status:'active', validFrom: RegistrationDate }`; `validTo`/`departureReason`/`sourceDepartureId` = `null` (CHECK relaxed for import-origin dismissals — `database-schema.md` §EmploymentStatus). **`User.isActive` is `true` for every imported row, dismissed included** — the import never sets it from `IsDismissed` (the interim `isActive=false` stopgap is withdrawn). |
+| `EmployeeType` (`Employee`/…) | — | **not stored in Story 1.1** — S4 employee type is not on the `User` row; a later story (resolved 2026-09-02). |
+| `TimeZone` | — | not stored — not an S1 field. Distinct from AD-20's `BUSINESS_TIME_ZONE`. |
 | *(none)* | `workPhone`, `photo` | **no source column** → `null`. |
 | *(writer)* | `createdBy` | the ACM-0 root `User` id (import runs as the root operator). |
 | *(DB default)* | `customFields` | `{}` (writer omits it — DEC-UM-003). |
@@ -72,7 +86,7 @@ entitlement ports, interim adapters) does not survive v1.5 and is not restated.
   **updates the existing ACM-0 root `User`** (same `id`/`createdAt`/`createdBy`);
   no writer inserts a second row for a normalized email that already exists
   (active or inactive). The file's own sample row
-  `dmytro.novyk+boot@altexsoft.com` is a normal employee row unless it matches
+  `email+boot@provider.domain` is a normal employee row unless it matches
   `ROOT_WORK_EMAIL`. Deployment order: `db:deploy` → `db:seed` →
   `db:bootstrap:access-control` → `start:prod`.
 - `workEmail` unique (normalized). `ttId` is `null` for every imported row
@@ -104,6 +118,10 @@ entitlement ports, interim adapters) does not survive v1.5 and is not restated.
 | Re-run | Import run twice | Idempotent — no duplicate rows, keyed by the normalized `Email` |
 | Ambiguous normalized match | Pre-existing non-normalized rows collide on normalized `workEmail` | Fail closed with actionable diagnostics; never silently pick one |
 | `Birthday` is `NULL` | CSV row with `Birthday=NULL` | `birthDay` and `birthMonth` both `null` — a deliberate `NULL` is accepted, not the incomplete-pair rejection |
+| File-level failure | No `file` part / non-CSV / wrong content-type / header row missing or not matching the expected columns / structurally unparseable | **`400`, nothing written** — zero rows touched, no summary counters |
+| Row-level problem | Structurally valid file; a row is missing a required field / has an unparseable date / duplicates an earlier row's normalized `Email` | **`200`** with `{created,updated,departmentsCreated,skipped,errors[]}`; that row per-row skipped (`errors[]` entry `{line,email,reason}`), every good row commits. First occurrence of a duplicated email is processed; each later duplicate is skipped (`reason: "email already exists"`) |
+| Department create-on-import | CSV rows referencing new + repeated `DepartmentId`, one repeat with a divergent `DepartmentName` | One `Department` row per `(externalId, name)` pair (divergent name → a second row); `parentId` null; one `DepartmentMembership` per user; no Unit-Manager policy row |
+| `EmploymentStatus` mapping | `IsDismissed=0` row; `IsDismissed=1` row | One `active` (`validFrom=RegistrationDate`) resp. one `dismissed` (`validFrom=DismissedDate`) row; `sourceDepartureId`/`departureReason` null; `User.isActive=true` on both |
 
 ## v1.5 Cutover Notes
 
@@ -119,15 +137,22 @@ entitlement ports, interim adapters) does not survive v1.5 and is not restated.
 
 ## Open Questions / Gates
 
-- The batch transport + operator endpoint shape (AD-14/AD-16 follow-up) — fix in
-  the `um-seed-*` scenario before implementation.
-- Whether the import runs as a script, an authorized operator HTTP command, or
-  both — architect call.
-- **OPEN mapping items (do not guess — see the mapping table):** `PositionId`
-  (positions dictionary?); `DepartmentName`/`DepartmentId` (Department edge
-  contract deferred — store transiently or defer assignment; do not invent the
-  schema); `CountryCode`/`CountryStateName` storage and the missing `city`
-  source; `EmployeeType` → S4 (not on the `User` row); `IsDismissed`/
-  `DismissedDate` → `EmploymentStatus` §4.16 vs the interim `User.isActive=false`
-  stopgap (Epic 5, CC-06); `TimeZone` (not imported); whether a later TT sync
-  populates `ttId`.
+**Resolved 2026-09-02** (`epic-1-story-1-1-decisions.md`):
+
+- Operator endpoint shape → **`POST /users/import`** (multipart, upload-only) plus
+  a deploy/operator script entrypoint on the same writer. It runs as **both**.
+- Response codes → structurally invalid file `400` (nothing written); row-level
+  errors `200` with a per-row `skipped`/`errors[]` summary.
+- Mapping → `PositionId` / `CountryCode` / `CountryStateName` / `EmployeeType` /
+  `TimeZone` **not stored**; `city` → `null`; `DepartmentName`+`DepartmentId` → a
+  `Department` (identity `(externalId, name)`) + one `DepartmentMembership` per
+  person; `IsDismissed`+`DismissedDate` → an `EmploymentStatus` row, **not**
+  `User.isActive` (which is `true` for every imported row).
+
+**Still open:**
+
+- Exact stage-3 name / package wiring of the deploy-script entrypoint
+  (`npm run db:import:population` vel sim.) — an implementation choice.
+- Whether a later timetracker sync populates `ttId` (out of Story 1.1).
+- The Access-Control department-tree walk increment (unblocks department-derived
+  access) — a separate kernel increment.

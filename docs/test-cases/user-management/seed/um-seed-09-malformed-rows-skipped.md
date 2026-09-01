@@ -1,13 +1,34 @@
-# UM-SEED-09 · Every row-level problem is a per-row skip with an `errors[]` entry; good rows commit
+# UM-SEED-09 · File-level failure → `400` nothing written; every row-level problem → `200` per-row skip, good rows commit
 
-**Trace:** requirements §4.17 · [spec-1-1](../../../../_bmad-output/implementation-artifacts/user-management/spec-1-1-import-seeded-population.md) I/O matrix ("never silently pick one"; deliberate `NULL` birthday accepted) · [decisions §2b / §6](../../../../_bmad-output/implementation-artifacts/user-management/epic-1-story-1-1-decisions.md) (an in-file duplicate normalized `Email` is a per-row skip — first occurrence processed, later duplicates skipped with an `errors[]` entry, rest of the import commits; re-run creates the fixed rows) · [seed README](README.md#malformed-row-behavior-settled-in-scenario) (uniform per-row skip for all row-level problems) · [DEC-UM-007](../../../architecture/user-management-test-decisions.md#dec-um-007--workemail-normalization-oq2--kept-reconciled-to-kernel-reality) (normalized-email comparison for the in-file duplicate check) · epics.md Story 1.1
+**Trace:** requirements §4.17 · [spec-1-1](../../../../_bmad-output/implementation-artifacts/user-management/spec-1-1-import-seeded-population.md) I/O matrix ("never silently pick one"; deliberate `NULL` birthday accepted) · [decisions §2b / §2c / §6](../../../../_bmad-output/implementation-artifacts/user-management/epic-1-story-1-1-decisions.md) (**file-level** failure — no `file` part, non-CSV / wrong content-type, header row missing or not matching the expected columns, structurally unparseable — → `400`, nothing written; **row-level** problems → `200` with the summary + `errors[]`, the bad row per-row skipped, every good row committed; an in-file duplicate normalized `Email` is a per-row skip — first occurrence processed, later duplicates skipped, rest of the import commits; re-run creates the fixed rows) · [seed README](README.md#malformed-row-behavior-settled-in-scenario) (file-level `400` vs uniform per-row skip for all row-level problems) · [DEC-UM-007](../../../architecture/user-management-test-decisions.md#dec-um-007--workemail-normalization-oq2--kept-reconciled-to-kernel-reality) (normalized-email comparison for the in-file duplicate check) · epics.md Story 1.1
+
+## File-level vs row-level (decision §2c)
+
+Two disjoint dispositions:
+
+- **File-level failure → `400`, nothing written.** No multipart `file` part; the
+  part is not a CSV / wrong content-type / unreadable; the header row is missing
+  or does not match the expected delivered columns; the file is structurally
+  unparseable; or a file-wide precondition fails. The body identifies the
+  failure; **zero** rows are touched, no `Department` / `EmploymentStatus` /
+  `joined_company` row is written, the summary counters are not returned.
+- **Row-level problems → `200`** with `{ created, updated, departmentsCreated,
+  skipped, errors[] }`. Individual rows in an **otherwise-valid** file that fail
+  are per-row skipped; every good row commits. There is **no** whole-import
+  `400` branch for a row-level problem, and **no** partial `400` — a structurally
+  valid file whose every data row is bad still returns `200` (`created: 0`,
+  all rows in `skipped` / `errors[]`).
 
 ## Scenario
 
 **Given** the deployment order has completed through
 `db:bootstrap:access-control`.
 
-Every **row-level problem** in an import file has the **same** disposition — the
+A **structurally valid** file is one with a readable CSV `file` part whose header
+row matches the expected delivered columns. Only such a file reaches row
+processing; anything else is a **file-level `400`** (see above), nothing written.
+
+Every **row-level problem** in an *otherwise-valid* file has the **same** disposition — the
 offending row is **skipped**, it writes nothing, `skipped` is incremented, one
 `{ line, email, reason }` entry is added to `errors[]`, and every well-formed row
 in the same file is still imported and committed. HTTP status stays **`200`**.
@@ -105,3 +126,17 @@ second.
   - **expectedResult:** `200`; `created` = the count of previously-skipped rows
     now valid, `updated` = 3 (lines 1, 4, 6), `skipped = 0`, `errors = []`; the
     datastore now holds every distinct employee from the file exactly once.
+- **Test 3 — file-level failure aborts the whole import (`400`, nothing written)**
+  - **inputURL:** `POST /users/import`
+  - Run three sub-cases, each with `authorization: Bearer <token:<root-uuid>>`:
+    - **(a) no `file` part** — a multipart body with no `file` part (or a JSON
+      body) → `400`.
+    - **(b) header mismatch** — a CSV `file` part whose header row is missing, or
+      lists columns that are not the expected delivered set → `400`.
+    - **(c) not a CSV** — a `file` part that is not parseable as
+      semicolon-delimited CSV (binary / wrong content-type / unreadable) → `400`.
+  - **expectedResult:** `400` with a leak-free body naming the failure class; **no
+    summary counters**; the datastore is **unchanged** — no `users`, `department`,
+    `department_membership`, `employment_status`, or `user_events` row is written,
+    even for rows that would have been well-formed. Re-uploading a fixed,
+    structurally valid file then imports normally (`200`, per Test 1 semantics).

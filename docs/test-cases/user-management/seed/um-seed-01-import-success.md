@@ -46,7 +46,8 @@ provides:
 Each imported user gets exactly one `Department` membership — the CSV carries one
 `DepartmentId` per row; the schema permits an employee to hold more than one
 current membership, but this import never creates a second one (detail:
-`um-seed-04`) — and each new `DepartmentId` one `Department` row; exactly one
+`um-seed-04`) — and each new `(DepartmentId, DepartmentName)` pair one `Department`
+row (identity is the pair, `UNIQUE (externalId, name)` — `um-seed-04`); exactly one
 `EmploymentStatus` row (detail: `um-seed-05`); and exactly one system
 `UserEvents` row `{ type: "joined_company", source: "system" }` with
 `eventDate = companyJoinDate`, written in the same transaction as the row insert

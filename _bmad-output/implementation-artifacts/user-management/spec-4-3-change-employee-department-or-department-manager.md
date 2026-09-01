@@ -12,7 +12,15 @@ context: ['{project-root}/_bmad-output/implementation-artifacts/user-management/
 
 ## Intent
 
-**Problem:** Every employee belongs to exactly one department; departments nest
+> **Amended 2026-09-02:** §4.17 now says an employee belongs to **one or more**
+> departments (`DepartmentMembership`; `database-schema.md` §Project/Department);
+> `department_change` events are add/remove events. The "move" scenario below
+> models the replace case (Alice ends up in B only). The multi-membership
+> add/remove semantics and whether "move" replaces the sole membership or ends
+> one + adds another are for this story to fix — the Story 1.1 decisions don't
+> settle them.
+
+**Problem:** Every employee belongs to one or more departments; departments nest
 (§4.17). A department change alters Reporting-line access, routes resourcing
 requests, emits a career-timeline event, and re-keys the CDS skills matrix. A
 department-manager change grants Manager access to everyone in that department
@@ -30,12 +38,14 @@ row through Epic 3's synchronous same-transaction mechanism (AD-11).
 - **CC-07 (AD-19 Journal gate):** every change writes the §3.4 journal in the
   same transaction. Journal-writing stages blocked until CC-07 is approved.
 - **Department edge contract (spine Deferred):** the nested-department entity,
-  exactly-one membership, department-manager access walk, resourcing routing,
-  and CDS key are fixed by §2.1/§4.7/§4.9/§4.10/§4.17 + AD-18, but the **indexed
-  edge schema is not**. Until it lands, `department`-targeted policy rows
-  contribute **nothing** to tier resolution (fail-closed, AD-12), so the
-  department-manager access half of this story cannot go green. Scenario prose
-  may proceed.
+  one-or-more membership, department-manager access walk, resourcing routing,
+  and CDS key are fixed by §2.1/§4.7/§4.9/§4.10/§4.17 + AD-18, and the
+  `Department` / `DepartmentMembership` shapes are now fixed in
+  `database-schema.md` §Project/Department (2026-09-02), but the **indexed
+  parent/manager edge schema and the recursive walk are not**. Until they land,
+  `department`-targeted policy rows contribute **nothing** to tier resolution
+  (fail-closed, AD-12), so the department-manager access half of this story
+  cannot go green. Scenario prose may proceed.
 
 ## Boundaries & Constraints — behaviour
 
@@ -60,7 +70,7 @@ row through Epic 3's synchronous same-transaction mechanism (AD-11).
 
 | Scenario | Input / State | Expected Output / Behavior |
 |---|---|---|
-| Move employee | Alice in Dept A; authorized actor moves her to Dept B | Alice belongs to exactly one department (B); Reporting-line access changes on the next request; a `department_change` event is appended; journal records before/after (journal stage gated on CC-07) |
+| Move employee | Alice in Dept A; authorized actor moves her to Dept B | Alice holds a current membership in B and no longer in A (replace semantics — see the Intent note; multi-membership add/remove is this story's to fix); Reporting-line access changes on the next request; a `department_change` event is appended; journal records before/after (journal stage gated on CC-07) |
 | Change dept manager | Authorized actor changes Dept B's manager | The new manager gets Reporting-line access to Dept B and its nested departments on the next request (gated on the Department edge contract); journal records before/after |
 | Self-assignment | Actor tries to make themselves manager of a department they don't already manage | Rejected; no access changes |
 

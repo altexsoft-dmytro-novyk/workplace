@@ -502,7 +502,7 @@ On the effective date, the profile becomes read-only and leaves the default empl
 
 #### FR-42: Nested department management
 
-Every employee belongs to exactly one department and departments may nest. Managing a department grants Reporting-line access to everyone in it and its sub-departments. Department maintenance requires the *manage departments* permission; changing employee membership or a department manager additionally follows FR-7's organisational-relationship rules. A department change writes a career-timeline event, and the CDS matrix lookup keys on department entity plus position.
+Every employee belongs to **one or more** departments *(amended 2026-09-02 — was "exactly one"; §4.17, `database-schema.md` §Project/Department)* and departments may nest. Managing a department grants Reporting-line access to everyone in it and its sub-departments; an employee is reachable through any of their departments. Department maintenance requires the *manage departments* permission; changing employee membership or a department manager additionally follows FR-7's organisational-relationship rules. A department change writes a career-timeline event, and the CDS matrix lookup keys on department entity plus position.
 
 ---
 

@@ -32,8 +32,12 @@ bootstrap, **before** the app serves traffic.
   first.
 - the **HTTP endpoint never reads a server-local path**: `POST /users/import`
   requires the multipart `file` part and ignores / rejects any body field that
-  names a path. A request with no `file` part is `400`, whatever path-like fields
-  it carries.
+  names a path. A request with no `file` part is a **file-level `400`, nothing
+  written** (decision §2c; `um-seed-09` Test 3), whatever path-like fields it
+  carries — as is any non-CSV / header-mismatched / structurally unparseable
+  `file` part. Only the deploy/operator script reads `docs/Accounts_template.csv`
+  from the repo path; it shares the writer and the same file-level-`400` /
+  row-level-`200` contract but is invoked in-process, not over HTTP.
 
 **Preconditions:** [fixture](../README.md#canonical-personas); fresh migrated DB;
 `db:deploy` → `db:seed` → `db:bootstrap:access-control` completed; the repo
@@ -60,4 +64,4 @@ working tree contains `docs/Accounts_template.csv` at the known path.
       "body": { "path": "docs/Accounts_template.csv" }
     }
     ```
-  - **expectedResult:** `400` (no multipart `file` part); no import runs; datastore unchanged. A path field in the body is never honored.
+  - **expectedResult:** `400` (no multipart `file` part — a file-level failure per decision §2c); no import runs; datastore unchanged. A path field in the body is never honored.

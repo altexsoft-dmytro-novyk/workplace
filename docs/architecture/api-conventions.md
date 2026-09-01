@@ -11,7 +11,7 @@ Earlier test-case drafts used `GET /users/:id/sections/s07` as documentation sho
 1. **The `User` resource itself** — `S1 Identity` and `S16 custom fields`' scalar core, i.e. fields that live directly on the `User` row (`database-schema.md`):
    - `GET /users` (list, `?columns=`/`?filter[key]=value`), `GET /users/export`
    - `GET /users/:id` (read — response body is audience-filtered per viewer, §3.3.4), `PATCH /users/:id` (update). **There is no `POST /users` create route** (the population is a seeded import, AD-16 — see "Seeded-population import" below) and no generic user delete/deactivate route; departure is the §4.16 workflow gated by `record a departure`, effective date, reason, and re-parenting precondition (AD-16). The `User` resource is read/update only — shape 2's "`POST` to create" applies to owned sub-collections, never to `/users` itself.
-   - **Route ordering:** `export` sits at the same depth as `:id`. NestJS/Express matches in controller-declaration order, so a `:id` handler declared first silently swallows `GET /users/export` (`id = 'export'`) — no error, wrong behavior. Declare `export` (and any future literal sibling) **before** `:id` in every controller.
+   - **Route ordering:** `export` and `import` sit at the same depth as `:id`. NestJS/Express matches in controller-declaration order, so a `:id` handler declared first silently swallows `GET /users/export` (`id = 'export'`) or `POST /users/import` (`id = 'import'`) — no error, wrong behavior. Declare `export`, `import`, and any future literal sibling **before** `:id` in every controller.
    - `PUT /users/:id/photo` — the one field needing a distinct content type (multipart upload). `PUT`, not `PATCH`: full-replace semantics, no partial-update meaning for a single photo.
 
 2. **Owned collections** — rows with their own identity and lifecycle, independent of the `User` row: `POST /users/:id/<collection>` to create, `GET/PATCH/DELETE /users/:id/<collection>/:itemId` for one row, `GET /users/:id/<collection>` to list.
@@ -33,7 +33,18 @@ Earlier test-case drafts used `GET /users/:id/sections/s07` as documentation sho
 
 ## Seeded-population import (AD-16)
 
-There is **no `POST /users` employee-creation route**. The supplied seeded population is imported as an idempotent administrative workflow keyed by `ttId`; it is not a per-employee registration surface and it cannot import arbitrary real employee data. The exact batch transport and operator endpoint are an explicit follow-up contract: they must be fixed in an AD-1 scenario before import implementation begins. Until then, do not substitute `POST /users`.
+There is **no `POST /users` employee-creation route**. The supplied seeded population is loaded by an idempotent administrative import; it is not a per-employee registration surface and it cannot import arbitrary real employee data.
+
+**Endpoint contract (fixed 2026-09-02 — `_bmad-output/implementation-artifacts/user-management/epic-1-story-1-1-decisions.md`, resolving the earlier "explicit follow-up contract" placeholder):**
+
+- **`POST /users/import`** — a collection-level operation at the same depth as `/users/:id`, mirroring `GET /users/export` (shape 1). **Not** a REST sub-resource: no `/users/imports` run resource, no `GET /users/imports/:id` status polling, no import-run history table. The summary is returned **synchronously** in the response body.
+- **Route ordering:** `import` is a literal sibling and MUST be declared **before** any `/users/:id` route in `users.controller.ts`, exactly as `export` is (see shape 1).
+- **Method / body:** `POST`, `multipart/form-data`, one file part `file` = the semicolon-delimited timetracker CSV. **Upload only** — the HTTP handler never reads a server-local path. The known-path load of `docs/Accounts_template.csv` is a separate deploy/operator script entrypoint that shares the same import writer and normalization + idempotent-upsert contract.
+- **Authorization:** the **existing** `user-management:create` kernel permission (seeded by ACM-1, held only by the HR-Admin root — the same key the retired `POST /users` required). **No** new `user-management:import` key and **no** new Access Control kernel seed sequence. In the seeded system the import is effectively HR-Admin-only. The handler makes a no-target `AccessControlFacade.isAllowed(callerId, 'user-management:create')` check — never a `User.position` / role-name comparison.
+- **Response:** for a **structurally valid** file, **`200 OK`** with `{ created, updated, departmentsCreated, skipped, errors[] }` — every good row commits; each bad row (missing required field, unparseable date, in-file duplicate normalized email) is per-row skipped with an `errors[]` entry `{ line, email, reason }`. A **file-level** failure (no `file` part, non-CSV / wrong content-type, header row missing or not matching the expected columns, structurally unparseable) → **`400`, nothing written.** There is no whole-import or partial `400` for a row-level problem.
+- **Keyed by the normalized `Email`** (`trim().toLowerCase()`) — the CSV has no employee-id column; `ttId` has no source column and is left `null`. A row whose normalized `Email` matches `ROOT_WORK_EMAIL` updates the ACM-0 root `User` in place (DEC-UM-009).
+
+Deployment order (binding): `db:deploy` → `db:seed` (ACM-0) → `db:bootstrap:access-control` (ACM-1) → population import → `start:prod`.
 
 ## Departure command and status (AD-20)
 

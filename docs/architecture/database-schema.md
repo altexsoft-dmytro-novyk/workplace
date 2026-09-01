@@ -16,6 +16,9 @@ erDiagram
   User ||--o{ Relationship : "reportsToUserId"
   Project ||--o{ Relationship : "projectId"
   Department ||--o{ Project : "groups"
+  Department ||--o{ Department : "parentId"
+  User ||--o{ DepartmentMembership : "userId"
+  Department ||--o{ DepartmentMembership : "departmentId"
   User ||--o{ UserPolicies : ""
   Policies ||--o{ UserPolicies : ""
   Policies ||--o{ PolicyPermissions : ""
@@ -58,7 +61,7 @@ User {
 
 No `updatedAt`/`updatedBy` — see Conventions above; nothing here consumes a last-touch marker.
 
-Derived, not stored: current manager, project(s), and People Partner read through `Relationship` (below); department reads through the pending Department/Policy edge model; mentor reads through `MentorshipPair`.
+Derived, not stored: current manager, project(s), and People Partner read through `Relationship` (below); department reads through `DepartmentMembership` (§Project/Department) and is a **set** — an employee may hold one or more current memberships — with department-manager access still gated on the pending Department edge walk; mentor reads through `MentorshipPair`.
 
 Users are loaded only by the idempotent seeded-population import (AD-16). No request-level employee-creation API owns this table.
 
@@ -176,9 +179,11 @@ Plain records. `Department` is a first-class nested entity. It routes resourcing
 Department {
   id          uuidv7 PK
   name        string
-  externalId  string, unique          // timetracker DepartmentId
+  externalId  string, nullable        // timetracker DepartmentId; NOT unique on its own
   parentId    FK -> Department, nullable   // departments nest; null = top
 }
+UNIQUE: (externalId, name)   -- identity is the pair; same DepartmentId with a
+                             -- different name is a distinct department
 
 DepartmentMembership {
   id          uuidv7 PK

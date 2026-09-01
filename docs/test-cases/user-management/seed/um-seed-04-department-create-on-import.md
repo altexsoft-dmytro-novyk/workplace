@@ -1,6 +1,6 @@
-# UM-SEED-04 · Department create-on-import: one `Department` per `DepartmentId`, one membership per user
+# UM-SEED-04 · Department create-on-import: identity is the `(externalId, name)` pair, one membership per user
 
-**Trace:** requirements §4.17 · [decisions §2 / §2b](../../../../_bmad-output/implementation-artifacts/user-management/epic-1-story-1-1-decisions.md) (Department created on import if `externalId` is new; `parentId` null; `DepartmentMembership`; **no** Unit-Manager assignment; **no** department-tree walk; the CSV carries **one** `DepartmentId` per row → **one** membership per person) · [database-schema.md](../../../architecture/database-schema.md) §Project/Department "Multi-department membership (2026-09-02)" (an employee belongs to **one or more** current departments; `UNIQUE (userId, departmentId) WHERE validTo IS NULL`; `User` carries no `departmentId`) · [seed README](README.md#seam-table) seam row "`Department` create-on-import" · epics.md Story 1.1
+**Trace:** requirements §4.17 · [decisions §2 / §2b / §2c](../../../../_bmad-output/implementation-artifacts/user-management/epic-1-story-1-1-decisions.md) (Department created on import if no row with the same `(externalId, name)` pair exists; `externalId` alone is **NOT** unique — the same timetracker `DepartmentId` with a different `DepartmentName` is a **distinct** department, a second row; `parentId` null; `DepartmentMembership`; **no** Unit-Manager assignment; **no** department-tree walk; the CSV carries **one** `DepartmentId` per row → **one** membership per person) · [database-schema.md](../../../architecture/database-schema.md) §Project/Department (`Department { … externalId string nullable — NOT unique on its own, parentId FK? }`, `UNIQUE (externalId, name)`; "Multi-department membership" — an employee belongs to **one or more** current departments; `UNIQUE (userId, departmentId) WHERE validTo IS NULL`; `User` carries no `departmentId`) · [seed README](README.md#seam-table) seam row "`Department` create-on-import" · epics.md Story 1.1
 
 ## Scenario
 
@@ -21,25 +21,30 @@ occurrence — e.g.:
 
 **Then**:
 
-- **exactly one `Department` row per distinct `externalId`** — 3 rows
-  (`"10"`, `"20"`, `"30"`), created on first sight. `externalId` is stored as a
-  **string** (`"10"`), consistent with `ttId` being a string external id
-  (decision 6).
+- **`Department` identity is the `(externalId, name)` pair** (`database-schema.md`
+  §Project/Department, `UNIQUE (externalId, name)`; decision §2c). `externalId`
+  alone is **not** unique. `externalId` is stored as a **string** (`"10"`),
+  consistent with `ttId` being a string external id (decision 6).
+- this fixture creates **four** `Department` rows:
+  `("10", "Platform")`, `("10", "Platform Engineering")`, `("20", "Design")`,
+  `("30", "Data")`. Line 2's `DepartmentId "10"` arriving with a **different
+  `DepartmentName`** than line 1 is a **distinct department** — a **second row**
+  with the same `externalId`, **not** a reuse and **not** an `errors[]` entry
+  (revised 2026-09-02 — was "first-write-wins reuse").
 - every created `Department` has `parentId IS NULL` — the CSV carries no parent
   column and Story 1.1 assigns no hierarchy (decisions §2).
-- **`name` is first-write-wins**: `Department "10"` keeps `Platform` (line 1);
-  line 2 **reuses** the row and does **not** rename it, and the divergence is
-  **not** an `errors[]` entry (decision 7). Line 2's user still imports normally.
-- **`departmentsCreated` counts only the new rows** → `3` for this fixture; a
-  later re-import of the same file adds `0` (`um-seed-08`).
+- **`departmentsCreated` counts the new rows** → `4` for this fixture; a later
+  re-import of the same file adds `0` (`um-seed-08`).
 - each imported user gets **exactly one** `department_membership` row
-  `{ id, userId, departmentId, validFrom, validTo? }` with `validFrom` = that
-  row's `RegistrationDate` (decision 8 — the CSV has no separate membership date)
-  and `validTo IS NULL` (current).
+  `{ id, userId, departmentId, validFrom, validTo? }` pointing at the department
+  created for **its own row's `(externalId, name)` pair** (line 1's user → the
+  `("10", "Platform")` row; line 2's user → the `("10", "Platform Engineering")`
+  row), with `validFrom` = that row's `RegistrationDate` (decision 8 — the CSV
+  has no separate membership date) and `validTo IS NULL` (current).
 - **Multi-department is a schema capability, not an import behavior.** The schema
   now permits an employee to hold **more than one** current
   `department_membership` — `UNIQUE (userId, departmentId) WHERE validTo IS NULL`
-  bounds it to one *current* row per (user, department) pair, not one per user
+  bounds it to one *current* row per `(user, department)` pair, not one per user
   (`database-schema.md` §Project/Department "Multi-department membership
   (2026-09-02)"; `project-requirements.md` §4.17 "one or more departments").
   Story 1.1's import still writes **exactly one** membership per imported person
@@ -66,10 +71,19 @@ bootstrap; no `Department` rows; Root holds the `hr-admin` FR grant chain; the
     "body": "<multipart; file part = the 4-row department fixture (delivered header verbatim)>"
   }
   ```
-- **expectedResult:** `200`; summary `{ "created": 4, "updated": 0, "departmentsCreated": 3, "skipped": 0, "errors": [] }`.
+- **expectedResult:** `200`; summary `{ "created": 4, "updated": 0, "departmentsCreated": 4, "skipped": 0, "errors": [] }`.
 - **expectedResult (database state):**
-  - `department` has 3 rows; `SELECT "externalId" FROM department ORDER BY 1` → `"10"`, `"20"`, `"30"`; every row `parentId IS NULL`.
-  - `department` row with `externalId = "10"` has `name = 'Platform'` (not `'Platform Engineering'`).
-  - `department_membership` has 4 rows, exactly one **current** (`validTo IS NULL`) row per imported user; each row's `validFrom` equals its user's `companyJoinDate` and `validTo IS NULL`.
+  - `department` has 4 rows;
+    `SELECT "externalId", name FROM department ORDER BY 1, 2` →
+    `("10", "Platform")`, `("10", "Platform Engineering")`, `("20", "Design")`,
+    `("30", "Data")`; every row `parentId IS NULL`.
+  - `SELECT "externalId", count(*) FROM department GROUP BY 1` → `"10"` has count
+    `2` (identity is the pair, not the id alone); `"20"` and `"30"` count `1`.
+  - a second insert of any existing `(externalId, name)` pair is rejected by
+    `UNIQUE (externalId, name)`.
+  - `department_membership` has 4 rows, exactly one **current** (`validTo IS NULL`)
+    row per imported user; line 1's user's membership `departmentId` is the
+    `("10", "Platform")` row, line 2's user's is the `("10", "Platform
+    Engineering")` row; each row's `validFrom` equals its user's `companyJoinDate`.
   - `SELECT "userId", count(*) FROM department_membership WHERE "validTo" IS NULL GROUP BY 1 HAVING count(*) > 1` returns zero rows — **for this import** (the CSV carries one `DepartmentId` per row); the schema's `UNIQUE (userId, departmentId) WHERE validTo IS NULL` would still permit a second current membership for a *different* department added by a later step.
   - no `policies` row with `targetType = 'department'`; no `user_events` row with `type = 'department_change'`.

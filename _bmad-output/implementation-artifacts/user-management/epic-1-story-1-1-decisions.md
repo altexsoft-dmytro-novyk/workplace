@@ -84,6 +84,36 @@ compiled spec stays the detailed contract; this file is the delta.
   kernel seed sequence. The import is v1.5's population-creation path, so it
   reuses the create capability.
 
+## 2c. Final refinements (2026-09-02)
+
+- **Response code — file-level vs row-level (revises "always 200"):**
+  - **File-level failure → `400`, nothing written:** no multipart `file` part,
+    unreadable / non-CSV / wrong content-type, header row missing or not
+    matching the expected columns, the file is structurally unparseable, or a
+    file-wide precondition fails. Body identifies the failure; zero rows
+    touched.
+  - **Row-level problems → `200`** with the summary + `errors[]`: individual
+    rows in an otherwise-valid file that fail (missing required field,
+    unparseable date, duplicate email) are per-row skipped; every good row
+    commits.
+- **`isActive` vs `EmploymentStatus` — kept SEPARATE, distinct meanings
+  (neither is redundant):**
+  - `User.isActive` — the **account/row-retention** flag. `isActive=false` is
+    effectively **user deletion / hard retirement** of the record (as
+    originally designed — `database-schema.md` §User, PRD Data Model). Not
+    driven by employment. The import sets `isActive=true` for **every** row,
+    dismissed included.
+  - `EmploymentStatus.status ('active'|'dismissed')` — whether the person
+    **currently works here**. Drives directory-list visibility (a `dismissed`
+    employee drops from the default `GET /users` list, findable via an
+    authorized employment-status filter). Does NOT touch `isActive`.
+  - The Access Control kernel keeps joining `User.isActive` unchanged. No
+    kernel rework.
+- **`Department` identity = (`externalId`, `name`) — `externalId` alone is NOT
+  unique (revises #7).** The same timetracker `DepartmentId` arriving with a
+  different `DepartmentName` creates a **second** `Department` row. Dedup key
+  for create-on-import is the (`externalId`, `name`) pair.
+
 ## 4. Employment status — replaces the `isActive` overload
 
 - New aggregate **`EmploymentStatus { id, userId, status: 'active' |
