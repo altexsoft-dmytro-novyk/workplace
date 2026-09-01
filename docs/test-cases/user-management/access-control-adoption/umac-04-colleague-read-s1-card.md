@@ -1,6 +1,6 @@
 # UMAC-04 · Colleague / unrelated active session reads a profile → 200 with the S1 identity card
 
-**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) + CAP-3 · `um-integration-contract-response.md` Q3 (`colleague` → allow, S1 card), Q5 (S1-card projection ships in Story 0.1) · PRD FR-16 · `docs/project-requirements.md` §3.2 (S1 Identity card row is `R` for the Colleague column; legend: Colleague = "any authenticated employee holding none of the above roles")
+**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) + CAP-3 · `um-integration-contract-response.md` Q3 (`colleague` → allow, S1 card), Q5 (S1-card projection ships in Story 0.1) · PRD FR-16 · `docs/project-requirements.md` §3.2 (S1 Identity card row is `R` for the Colleague column; legend: Colleague = "any authenticated employee holding none of the above roles") · `access-control.md` §3.3.4 (colleague whitelist — exactly S1, S10 dates-only, S11 project name; the *further* S10/S11/S16 narrowing is FR-17 on its own surfaces, not this route) · AD-2 (User Management alone owns the route shape, guard, binding, adapter, and projection)
 
 ## Scenario
 

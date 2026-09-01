@@ -1,6 +1,6 @@
 # UMAC-02 · Reporting-line viewer reads a report's profile → 200 with the S1 identity card
 
-**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) + CAP-3 + CAP-4 · `um-integration-contract-response.md` Q3 (`reporting` → allow) · PRD FR-16 · access-control.md §3.2 (Reporting line) · AD-3 (real-consumer E2E, no provider overrides)
+**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) + CAP-3 + CAP-4 · `um-integration-contract-response.md` Q3 (`reporting` → allow) · PRD FR-16 · `access-control.md` §3.2 (Reporting line column), matrix exceptions §3.3 (§3.2 fn 1: manager/PP/department on S1 are read-only for every audience — read is unaffected here) · AD-3 (real-consumer HTTP E2E, no provider overrides) in `architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md`
 
 ## Scenario
 
@@ -31,6 +31,6 @@ T's manager's manager) resolves the same way — `reporting` is the transitive
   - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:<V-uuid>>" } }`
   - **expectedResult:** `200`; body **contains** the S1 fields (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`) and **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`.
 - **Test 2 — transitive reporting line**
-  - **stateChange:** a real `Relationship` chain `T → M → V` (`type='direct'`) exists; V is two hops up.
+  - **Preconditions:** a real seeded `Relationship` chain `T → M → V` (both edges `type='direct'`), so V is two hops up T's reporting line; produced in-suite, never a hardcoded id. This is static seeded state, not a transition — no baseline/change/observe steps.
   - **inputURL:** `GET /users/<T-uuid>` with `Bearer <token:<V-uuid>>`
-  - **expectedResult:** `200`, same S1-card assertions — `reporting` resolves through the transitive `direct` walk.
+  - **expectedResult:** `200`, same S1-card assertions (S1 fields present; `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy` absent) — `reporting` resolves through the transitive `direct` walk to chain termination without a repeated node.

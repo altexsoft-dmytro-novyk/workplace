@@ -3,10 +3,24 @@
 Stage-1 scenario documents (AD-1) for **Epic 0 — Access Control Adoption**. They
 mirror the dispatch entries `UMAC-1` / `UMAC-2` in
 `_bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml`
-and answer `um-integration-contract-response.md` Q3. (`UMAC-3` — the colleague
-deny→allow-narrowed flip — was **removed 2026-09-01** by human product decision:
-§3.2's S1 row is `R` for the Colleague column, so a colleague reads the S1
-identity card from Story 0.1 and there is nothing to flip.)
+and answer `um-integration-contract-response.md` Q1 (the seam is the
+`ACCESS_CONTROL_PORT` binding), Q2 (port shape kept, adapter UM-owned), Q3
+(feature → audience/section mapping), Q4 (empty audience → leak-free `404`), Q5
+(the minimal S1-card projection ships in Story 0.1), and Q6 (seeded-UUID fixture
+convention). (`UMAC-3` — the colleague deny→allow-narrowed flip — was **removed
+2026-09-01** by human product decision: §3.2's S1 row is `R` for the Colleague
+column, so a colleague reads the S1 identity card from Story 0.1 and there is
+nothing to flip.)
+
+Every required source for this Stage-1 package is cited across `umac-01`..`umac-06`:
+this SPEC (CAP-1 / CAP-2 read half / CAP-3); AD-2 and AD-21 in
+`architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md`; AD-3 in
+`architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md`;
+`access-control.md` denial conventions, §3.2 (S1 = `R` for Colleague), §3.3.4
+(colleague whitelist), and matrix exceptions §3.3; `nestjs-di-tokens.md` (guards
+are the only sanctioned port consumer; actions never inject ports);
+`testing-strategy.md` (AD-1 stage separation); and
+`um-integration-contract-response.md` Q1/Q2/Q4/Q5/Q6.
 
 **Status:** unapproved draft (2026-09-01). Per-file human approval under the AD-1
 stage-1 gate is required. **The adoption package's `approvals.yaml` does not
@@ -81,8 +95,8 @@ S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
 | `umac-02-reporting-line-viewer-read.md` | 0.1 | ready for approval (reporting → 200, S1 card) |
 | `umac-03-assigned-pp-read.md` | 0.1 | ready for approval (PP → 200, S1 card) |
 | `umac-04-colleague-read-s1-card.md` | 0.1 | ready for approval (**colleague → 200, S1 card — positive test**) |
-| `umac-05-unresolved-session-read-denied.md` | 0.1 | ready for approval (empty audience → leak-free `404`) |
-| `umac-06-no-target-isallowed-delegates-to-facade.md` | 0.1 | ready for approval |
+| `umac-05-unresolved-session-read-denied.md` | 0.1 | ready for approval (empty audience → leak-free `404`: Test 1 `Bearer <token:Bob>` caller, Test 2 deactivated caller, Test 3 valid caller + well-formed non-existent target; `401` is the missing/invalid-token boundary, not a numbered row; the `404`-vs-`403` guard mechanism is flagged **open for the human**) |
+| `umac-06-no-target-isallowed-delegates-to-facade.md` | 0.1 | ready for approval (root → allowed on `GET`/`POST` `/users` + `DELETE /users/:id` = `200`/`201`/`200`; unrelated session, Ida, **and an `HR Admin` impostor with no FR grant chain** → `403` on all three — the facade never reads `User.position`; `interim-access-control.adapter.ts` deleted in the same cutover, AD-21) |
 | `umac-07-write-dual-gate.md` | 0.2 | **CONDITIONAL — blocked on the missing `user-management:edit` permission (Open Decision i)** |
 | `umac-08-write-rejects-org-fields.md` | 0.2 | ready for approval (§3.2 fn 1) |
 | `umac-09-photo-write-self-only.md` | 0.2 | ready for approval (Open Decision v — confirm Self-only) |

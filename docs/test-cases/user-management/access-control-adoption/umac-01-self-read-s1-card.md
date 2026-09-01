@@ -1,6 +1,6 @@
 # UMAC-01 · Self reads own profile → 200 with the S1 identity card
 
-**Trace:** SPEC-user-management-access-control-adoption CAP-1 + CAP-2 (read) + CAP-3 · `um-integration-contract-response.md` Q3 (READ_USER_FEATURE, `self` → allow), Q5 (S1-card projection ships in Story 0.1) · PRD FR-16 · access-control.md §3.2 (Self) · AD-2 · AD-3
+**Trace:** SPEC-user-management-access-control-adoption CAP-1 + CAP-2 (read) + CAP-3 · `um-integration-contract-response.md` Q1 (the adoption seam is the single `ACCESS_CONTROL_PORT` binding, not a route), Q2 (the port shape is kept; the adapter is UM-owned `infrastructure/`), Q3 (READ_USER_FEATURE, `self` → allow), Q5 (S1-card projection ships in Story 0.1) · PRD FR-16 · `access-control.md` §3.2 (Self column) · AD-2 (hexagonal boundary is absolute) / AD-21 (v1.5 brownfield cutover — the interim adapter is deleted in the same change) in `architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` · AD-3 (real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E, no provider overrides) in `architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md` · `nestjs-di-tokens.md` (only `application/guards/` consumes `ACCESS_CONTROL_PORT`; actions never `@Inject` a port) · `testing-strategy.md` AD-1 (scenario prose → human approval → committed-red E2E → production; no stage is self-certified)
 
 ## Scenario
 
