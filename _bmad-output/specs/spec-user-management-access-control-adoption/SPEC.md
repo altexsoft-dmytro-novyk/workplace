@@ -91,10 +91,16 @@ separately tracked FR-17 Profile Projection story.
     `reporting`, `pp`, **or `colleague`** (§3.2: the S1 identity-card row is
     `R` for the Colleague column, and every active authenticated viewer is at
     least a Colleague). All four audiences get `200` with the **same S1
-    identity-card projection** (see CAP-3). The only denial is a genuinely
-    **empty audience set** — the viewer or the target is not an active `User`
-    — which is a leak-free `404` (do not confirm the target's existence to a
-    caller who cannot see it); `401` still covers a missing/invalid token.
+    identity-card projection** (see CAP-3). Denial (revised 2026-09-01 by
+    human product decision — no "leak-free 404"; standard REST codes): a
+    request whose session does not resolve to an active `User` is **`401`**
+    (the session layer's responsibility — the Epic 2 magic-link middleware
+    enforces this; the interim resolver is lax, so some such requests
+    currently reach the facade and must be denied there too). A request from
+    an authenticated **active** viewer whose audience over the target is
+    empty — which on this read route means the target is not an active
+    `User` — is **`403`**. There is no `404` authorization branch on this
+    route. `401` also covers a missing/invalid token.
     For `PATCH /users/:id` (`EDIT_USER_FEATURE`) and
     `PUT /users/:id/photo` (`UPLOAD_PHOTO_FEATURE`) the adapter applies the
     §2.2 dual gate — `AccessControlFacade.isAllowed(viewer, <edit permission
@@ -160,8 +166,9 @@ separately tracked FR-17 Profile Projection story.
     accepts unchanged. It covers: Self read/write, reporting-line read and
     S1 write, direct-PP read and S1 write, **colleague read → `200` with the
     S1 card** (asserting `ttId`/`customFields`/`createdBy`/`createdAt`/
-    `isActive` are absent and the S1 fields present), empty-audience →
-    leak-free `404`, the dual-gate write denial when the functional
+    `isActive` are absent and the S1 fields present), an unresolved session
+    → `401` and an authenticated active viewer with an empty audience →
+    `403`, the dual-gate write denial when the functional
     permission is absent, and the §3.2 fn 1 rejection of manager/PP/
     department fields through `PATCH`. Kernel Stage-2 evidence never
     substitutes for this gate.
@@ -192,8 +199,9 @@ separately tracked FR-17 Profile Projection story.
   above roles" — so every active authenticated viewer is at least a Colleague
   and is entitled to S1. Story 0.1 ships the S1-card projection, so the
   colleague read is a positive outcome from the start. There is no
-  "two-state" rule and no `UMAC-3` flip. The only `GET /users/:id` denial is
-  a genuinely unresolvable identity (empty audience) → leak-free `404`.
+  "two-state" rule and no `UMAC-3` flip. The only `GET /users/:id` denials
+  are: an unresolved session → `401` (session layer); an authenticated
+  active viewer with an empty audience over the target → `403`.
 - **Missing-edit-permission dependency (open — see Open decisions).** The
   seeded FR catalog is exactly `user-management:create`,
   `user-management:deactivate`, `user-management:list`
@@ -271,8 +279,9 @@ facade-backed adapter in `src/user-management/infrastructure/`;
 `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`,
 `birthMonth`, `companyJoinDate` — `ttId`/`isActive`/`customFields`/
 `createdAt`/`createdBy` absent) for any active viewer over an active target —
-`self`, `reporting`, `pp`, **or `colleague`** — and a leak-free `404` when
-the viewer or target is not an active `User`; `PATCH /users/:id` and
+`self`, `reporting`, `pp`, **or `colleague`** — a `401` when the session
+does not resolve to an active `User`, and a `403` when an authenticated
+active viewer's audience over the target is empty; `PATCH /users/:id` and
 `PUT /users/:id/photo` are refused unless both the functional permission and
 `write` S1 section access hold (once the permission exists); the
 real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E passes

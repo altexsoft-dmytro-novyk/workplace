@@ -5,7 +5,7 @@ mirror the dispatch entries `UMAC-1` / `UMAC-2` in
 `_bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml`
 and answer `um-integration-contract-response.md` Q1 (the seam is the
 `ACCESS_CONTROL_PORT` binding), Q2 (port shape kept, adapter UM-owned), Q3
-(feature → audience/section mapping), Q4 (empty audience → leak-free `404`), Q5
+(feature → audience/section mapping), Q4 (denials: `401` unresolved session, `403` authenticated viewer with empty audience — no "leak-free 404"), Q5
 (the minimal S1-card projection ships in Story 0.1), and Q6 (seeded-UUID fixture
 convention). (`UMAC-3` — the colleague deny→allow-narrowed flip — was **removed
 2026-09-01** by human product decision: §3.2's S1 row is `R` for the Colleague
@@ -22,10 +22,13 @@ are the only sanctioned port consumer; actions never inject ports);
 `testing-strategy.md` (AD-1 stage separation); and
 `um-integration-contract-response.md` Q1/Q2/Q4/Q5/Q6.
 
-**Status:** unapproved draft (2026-09-01). Per-file human approval under the AD-1
-stage-1 gate is required. **The adoption package's `approvals.yaml` does not
-exist yet** — it is created on the first recorded approval; nothing here has a
-prior record. `author != approver` for every stage.
+**Status:** `umac-01`..`umac-06` (Story 0.1) **approved 2026-09-01** by Dmytro
+Novyk (Product Owner / Architect); recorded in
+`_bmad-output/specs/spec-user-management-access-control-adoption/approvals.yaml`
+(`UMAC-1-scenarios`, `stage-1-scenarios`; author = Claude Code agent, approver =
+Dmytro Novyk). `umac-07`..`umac-09` (Story 0.2 write path) remain unapproved
+draft and are blocked on the missing `user-management:edit` permission
+(Open Decision (i) = option (a)). `author != approver` for every stage.
 
 ## The seam
 
@@ -38,7 +41,7 @@ behaviour is chosen per feature string inside the adapter.
 
 | Route | Feature constant | Adapter behaviour |
 | --- | --- | --- |
-| `GET /users/:id` | `user-management:read` | allow **any non-empty audience** (`self` / `reporting` / `pp` / `colleague`) → `200` with the **S1 identity card** (same fields for every audience); deny **only** the empty set → leak-free `404` |
+| `GET /users/:id` | `user-management:read` | allow **any non-empty audience** (`self` / `reporting` / `pp` / `colleague`) → `200` with the **S1 identity card** (same fields for every audience); unresolved session → `401` (session layer; interim resolver lax → surfaces as `403`); authenticated active viewer with an empty audience → `403` (no "leak-free 404" — human decision 2026-09-01) |
 | `PATCH /users/:id` | `user-management:edit` | §2.2 dual gate: `isAllowed(v, edit key)` **and** `canAccessSection(v, 'S1', t) === 'write'` — **blocked on a missing permission** |
 | `PUT /users/:id/photo` | `user-management:upload-photo` | Self-only (viewer id == target id) unless Product widens it |
 | `GET /users`, `POST /users`, `DELETE /users/:id` | `user-management:list` / `:create` / `:deactivate` | `isAllowed` delegates straight to the facade — these three keys are exactly the ACM-1 seeded set |
@@ -64,7 +67,8 @@ Cases that need a **real audience** use `Bearer <token:<seeded-uuid>>` — a rea
 `User` row's UUID that `InterimSessionResolverAdapter` accepts unchanged
 (`{ userId: persona }`) — **not** a literal persona placeholder like
 `Bearer <token:Bob>` (which resolves to the non-existent string id `'Bob'` →
-empty audience → leak-free `404` under the real facade). Stage-2 seeds real `User` rows and
+empty audience → `403` under the real facade via the guard; `401` once the real
+session middleware lands). Stage-2 seeds real `User` rows and
 real `Relationship` rows (`direct`, `people_partner`) and threads the returned
 ids. The interim **session** resolver stays (Epic 2 retires it); only the interim
 **access-control** adapter is deleted here.
@@ -91,12 +95,12 @@ S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
 
 | File | Story | State |
 | --- | --- | --- |
-| `umac-01-self-read-s1-card.md` | 0.1 | ready for approval (Self → 200, S1 card) |
-| `umac-02-reporting-line-viewer-read.md` | 0.1 | ready for approval (reporting → 200, S1 card) |
-| `umac-03-assigned-pp-read.md` | 0.1 | ready for approval (PP → 200, S1 card) |
-| `umac-04-colleague-read-s1-card.md` | 0.1 | ready for approval (**colleague → 200, S1 card — positive test**) |
-| `umac-05-unresolved-session-read-denied.md` | 0.1 | ready for approval (empty audience → leak-free `404`: Test 1 `Bearer <token:Bob>` caller, Test 2 deactivated caller, Test 3 valid caller + well-formed non-existent target; `401` is the missing/invalid-token boundary, not a numbered row; the `404`-vs-`403` guard mechanism is flagged **open for the human**) |
-| `umac-06-no-target-isallowed-delegates-to-facade.md` | 0.1 | ready for approval (root → allowed on `GET`/`POST` `/users` + `DELETE /users/:id` = `200`/`201`/`200`; unrelated session, Ida, **and an `HR Admin` impostor with no FR grant chain** → `403` on all three — the facade never reads `User.position`; `interim-access-control.adapter.ts` deleted in the same cutover, AD-21) |
+| `umac-01-self-read-s1-card.md` | 0.1 | **approved 2026-09-01** (Self → 200, S1 card) |
+| `umac-02-reporting-line-viewer-read.md` | 0.1 | **approved 2026-09-01** (reporting → 200, S1 card) |
+| `umac-03-assigned-pp-read.md` | 0.1 | **approved 2026-09-01** (PP → 200, S1 card) |
+| `umac-04-colleague-read-s1-card.md` | 0.1 | **approved 2026-09-01** (**colleague → 200, S1 card — positive test**) |
+| `umac-05-unresolved-session-read-denied.md` | 0.1 | **approved 2026-09-01** (unresolved session → `401`, interim → `403` via guard; authenticated active viewer with empty audience → `403`; no "leak-free 404" — human product decision) |
+| `umac-06-no-target-isallowed-delegates-to-facade.md` | 0.1 | **approved 2026-09-01** (root → allowed on `GET`/`POST` `/users` + `DELETE /users/:id` = `200`/`201`/`200`; unrelated session, Ida, **and an `HR Admin` impostor with no FR grant chain** → `403` on all three — the facade never reads `User.position`; `interim-access-control.adapter.ts` deleted in the same cutover, AD-21) |
 | `umac-07-write-dual-gate.md` | 0.2 | **CONDITIONAL — blocked on the missing `user-management:edit` permission (Open Decision i)** |
 | `umac-08-write-rejects-org-fields.md` | 0.2 | ready for approval (§3.2 fn 1) |
 | `umac-09-photo-write-self-only.md` | 0.2 | ready for approval (Open Decision v — confirm Self-only) |

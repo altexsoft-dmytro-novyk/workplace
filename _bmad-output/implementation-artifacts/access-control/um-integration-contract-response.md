@@ -45,7 +45,9 @@ adoption work itself is scoped as a new package:
 > S1-card projection** — a dedicated mapper on the `GET /users/:id` handler
 > only (not a rewrite of the shared `toUserResponse`); the
 > "two-state colleague rule" and adoption story `UMAC-3` are removed. The
-> only `GET /users/:id` denial is an empty audience set → leak-free `404`.
+> `GET /users/:id` denials are `401` (session does not resolve to an active
+> `User`) and `403` (authenticated active viewer, empty audience) — the
+> earlier "leak-free `404`" is withdrawn (see Q4).
 > FR-17 Profile Projection shrinks to the S10/S11/S16 colleague views on
 > their own surfaces, S7/S8 flags, and S1 derived-field immutability.
 
@@ -176,7 +178,8 @@ This is the decision Access Control cannot make. It is made per feature.
 | `reporting` | allow → `200` S1 card |
 | `pp` | allow → `200` S1 card |
 | `colleague` (floor, none of the above) | **allow → `200`, the same S1 card** |
-| empty set (inactive/missing viewer or target) | deny → leak-free `404` (`401` still covers a missing/invalid token) |
+| empty set — session does not resolve to an active `User` | `401` (session layer; interim resolver is lax → falls through to `403`) |
+| empty set — authenticated active viewer, target inactive/missing | deny → `403` (no existence distinction; see Q4) |
 
 The rule is simply **non-empty audience set → allow**. §3.2's S1 (Identity
 card) row is `R` for the Colleague column, and the matrix legend defines
@@ -305,30 +308,35 @@ call — the human decides.**
 
 ---
 
-## Q4 — Denial convention: only the empty-audience case remains, and it is `404`.
+## Q4 — Denial convention: standard REST codes, no "leak-free 404".
 
-**Decision (revised 2026-09-01).** With the colleague read now a positive
-`200` (S1 card), the **only** `GET /users/:id` denial is a genuinely
-unresolvable identity — the viewer or the target is not an active `User`, so
-`resolveAudiences` returns an empty `Set`. That is a **leak-free `404`**: do
-not confirm the target's existence to a caller who cannot see it.
-`401` still covers a missing/invalid token.
+**Decision (revised 2026-09-01 by human product decision — Dmytro Novyk).**
+The earlier "leak-free `404`" for an unresolvable identity is **withdrawn**.
+This is an internal employee directory; knowing a user id resolves to a real
+person is not sensitive, and standard REST codes are clearer for consumers.
 
-**Reasoning.** `access-control.md:179` fixes the leak-free conventions:
-`401` no token, `403` "valid token without feature permission or write to a
-readable section", `404` "valid token touching a `—` cell or hidden field".
-An unresolvable identity is closest to the `404` shape — there is no profile
-this caller may know exists. The earlier "`403` as a temporary symptom of the
-missing projection" framing is dropped: there is no missing projection for
-this route (the S1 card ships in Story 0.1) and no colleague denial to
-explain. **Note the guard.** `AccessControlGuard` currently maps a denied
+`GET /users/:id` denials:
+
+- **`401`** — the request's session does not resolve to an active `User` (no
+  token, invalid token, or a token whose id is not an active row). This is
+  the **session layer's** responsibility. The Epic 2 magic-link middleware
+  enforces it; `InterimSessionResolverAdapter` is lax (it parses the token
+  without checking the row exists / is active), so during the interim some
+  such requests still reach the facade and must be denied there — as `403`
+  (see below), because at that point the request is nominally "authenticated".
+- **`403`** — an authenticated **active** viewer whose audience over the
+  target is empty. On this read route, with `colleague` as the floor, an
+  empty audience means the target is not an active `User`. No existence
+  distinction is made — a missing target and a forbidden target both return
+  `403`.
+- There is **no `404` authorization branch** on `GET /users/:id`.
+
+**Guard note.** `AccessControlGuard` already maps a denied
 `isAllowedForTarget` to `ForbiddenException` → `403`
-(`access-control.guard.ts:52`); producing the `404` for an unresolved
-identity without changing the guard needs a controller-level decision (the
-read action treats an empty audience / missing target as `NotFound`). If the
-approved scenario cannot express `404` without a guard change, that is a
-point to surface for the human, not to default to `403`. Write-path (`PATCH`
-/ `PUT photo`) denials stay `403` (valid token, no write entitlement).
+(`access-control.guard.ts:52`), so this decision needs **no** guard or
+controller change — the `403` is what the existing wiring produces. Write-path
+(`PATCH` / `PUT photo`) denials are `403` for the same reason (valid token,
+no write entitlement).
 
 ---
 
@@ -392,7 +400,8 @@ users with real `Relationship` rows** — a viewer with a `direct` edge to the
 target for the manager-write cases, a `people_partner` edge for the PP cases,
 the viewer id equal to the target id for Self, an unrelated active user for
 the colleague read case (→ `200` S1 card), and a caller whose id resolves to
-no active `User` for the empty-audience `404` case — and issue
+no active `User` for the empty-audience denial case (→ `401`/`403` per Q4) —
+and issue
 `Bearer <token:<uuid>>` with seeded
 UUIDs, which `InterimSessionResolverAdapter` already accepts unchanged
 (`interim-session-resolver.adapter.ts:48`, `{ userId: persona }`). The

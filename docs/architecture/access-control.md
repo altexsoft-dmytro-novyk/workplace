@@ -206,9 +206,13 @@ For `GET /users/:id` the read is `200` with the **minimal S1 identity card**
 (shipped in adoption Story 0.1) for **any non-empty audience** — `self`,
 `reporting`, `pp`, **or `colleague`** (§3.2's S1 row is `R` for the Colleague
 column, and the matrix legend makes every active authenticated viewer at
-least a Colleague); the only denial is an empty audience set → leak-free
-`404`. *(Revised 2026-09-01 by human product decision — the earlier "two-state
-colleague rule" and adoption story `UMAC-3` are removed.)* The *further*
+least a Colleague); denials are `401` when the session does not resolve to an
+active `User` (the session layer's responsibility) and `403` when an
+authenticated active viewer's audience over the target is empty. *(Revised
+2026-09-01 by human product decision — the earlier "two-state colleague rule"
+and adoption story `UMAC-3` are removed; the earlier "leak-free `404`" for an
+empty audience is withdrawn in favour of standard `401`/`403` — this is an
+internal directory and a user id's existence is not sensitive.)* The *further*
 field/record narrowing (colleague S10 dates-only on `GET /users/:id/leaves`,
 colleague S11 name-only, S16 per-field visibility §3.3.4/§3.3.6, S7/S8 flags,
 S1 derived-field immutability) stays the separate Profile Projection story on

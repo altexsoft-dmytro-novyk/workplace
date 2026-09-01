@@ -9,8 +9,10 @@
 # UMAC-1 rebinds the port, adopts the READ route, and ships the minimal S1
 # identity-card projection for GET /users/:id (CAP-1 + CAP-2 read half + CAP-3 +
 # CAP-4 read E2E). Every resolved audience — self / reporting / pp / colleague —
-# over an active target gets 200 with the same S1 card; an empty audience is a
-# leak-free 404. UMAC-2 adds the write dual gate (CAP-2 write half) and is
+# over an active target gets 200 with the same S1 card. Denials: an unresolved
+# session is 401 (session layer); an authenticated active viewer with an empty
+# audience is 403 (human product decision 2026-09-01 — no "leak-free 404").
+# UMAC-2 adds the write dual gate (CAP-2 write half) and is
 # CONDITIONAL on the missing-edit-permission decision in SPEC.md Open decisions.
 # There is no UMAC-3: the colleague read is a positive outcome from Story 0.1
 # (§3.2 S1 = R for Colleague); the "two-state" rule was removed by the human
@@ -25,7 +27,8 @@
     ACCESS_CONTROL_PORT adapter in src/user-management/infrastructure/,
     interim adapter deleted), the READ half of CAP-2 (GET /users/:id
     feature -> audience mapping: self / reporting / pp / colleague all allowed
-    over an active target; empty audience -> leak-free 404), and CAP-3 (the
+    over an active target; unresolved session -> 401, authenticated active
+    viewer with empty audience -> 403), and CAP-3 (the
     minimal S1 identity-card projection replacing toUserResponse's whole-row
     spread).
   spec_checkpoint: true
@@ -45,9 +48,11 @@
     the target's assigned people_partner (200, S1 card); as an unrelated
     active session / colleague (200, the SAME S1 card — §3.2 S1 row is R for
     the Colleague column, every active authenticated viewer is at least a
-    Colleague); as a session whose userId does not resolve to an active User
-    (leak-free 404, empty audience — 401 still covers a missing/invalid
-    token). The S1 card is: id, firstName, lastName, photo, position, country,
+    Colleague); a request whose session does not resolve to an active User
+    (401 — the session layer's job; note the interim resolver is lax); an
+    authenticated active viewer whose audience over the target is empty
+    (403 — target not an active User; no existence distinction). The S1 card
+    is: id, firstName, lastName, photo, position, country,
     city, workEmail, workPhone, birthDay, birthMonth, companyJoinDate; the
     response DROPS ttId, isActive, customFields, createdAt, createdBy; derived
     S1 display fields (manager, people partner, department, mentor, current
@@ -90,10 +95,11 @@
     approved scenario, scenario id in the test title. Assert the colleague case
     as 200 with the S1 card, asserting ttId / customFields / createdBy /
     createdAt / isActive are ABSENT and the S1 fields present. Assert the
-    unresolved-session case as a leak-free 404. The suite must FAIL until
+    empty-audience denial (authenticated active viewer, inactive/missing
+    target) as 403. The suite must FAIL until
     UMAC-1-production rebinds the port and ships the S1-card DTO (the interim
     adapter returns Boolean(userId) and toUserResponse spreads the whole row,
-    so the absent-technical-field assertions and the 404 assertion are red).
+    so the absent-technical-field assertions and the 403 assertion are red).
     Follow
     .claude/rules/nest-e2e.md. Note whether the four existing
     profile.e2e-spec.ts cases (um-pf-01..04) need real personas or a tightened
@@ -122,9 +128,14 @@
     AccessControlFacade.resolveAudiences(userId, [targetUserId]) and allow when
     the target's audience set is NON-EMPTY (any of 'self', 'reporting', 'pp',
     or 'colleague' — every active viewer over an active target is at least a
-    Colleague and §3.2 S1 is R for Colleague); the only denial is an EMPTY set
-    (viewer or target not an active User), mapped to a leak-free 404 (not 403)
-    per access-control.md denial conventions — see the guard note below.
+    Colleague and §3.2 S1 is R for Colleague); an EMPTY set (target not an
+    active User) denies. An authenticated active viewer with an empty audience
+    gets 403 — this is exactly what AccessControlGuard already produces from a
+    denied isAllowedForTarget, so NO guard or controller change is needed. A
+    request whose session does not resolve to an active User is 401 (session
+    layer); the interim resolver is lax, so such a request may reach the guard
+    and surface as 403 — acceptable during the interim. No "leak-free 404"
+    (human product decision 2026-09-01).
     On the GET /users/:id handler ONLY, return an S1-card DTO via a dedicated
     response mapper (do NOT rewrite the shared toUserResponse in place):
     exactly id, firstName, lastName, photo, position, country, city, workEmail,
@@ -136,13 +147,10 @@
     DELETE interim-access-control.adapter.ts (AD-21 — no dual-running). Do NOT
     add a route, change AccessControlPort's signatures, inject the facade
     anywhere except this adapter, touch any Access Control file, or touch
-    prisma schema/migrations/seed. GUARD NOTE: AccessControlGuard maps a
-    denied isAllowedForTarget to 403; the leak-free 404 for an unresolved
-    identity without a guard change needs a controller-level decision (the
-    read action treats an empty audience / missing target as NotFound). If the
-    approved scenario cannot express 404 without changing the guard, surface
-    it for the human rather than defaulting to 403. Do NOT implement PATCH /
-    PUT photo behaviour (UMAC-2). Run npm run lint,
+    prisma schema/migrations/seed. GUARD NOTE: AccessControlGuard already maps
+    a denied isAllowedForTarget to 403, which is the intended denial for this
+    route — do NOT change AccessControlGuard or add a NotFound branch. Do NOT
+    implement PATCH / PUT photo behaviour (UMAC-2). Run npm run lint,
     npx tsc --noEmit, and the user-management + access-control e2e suites;
     the pre-existing not-yet-built /users/:id/relationships failures are
     unrelated and must be identical before and after.

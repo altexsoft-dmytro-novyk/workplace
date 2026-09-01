@@ -37,7 +37,8 @@ CAP-2 (`GET /users/:id` feature → audience mapping), and CAP-3 (the minimal
 S1 identity-card projection on the `GET /users/:id` handler only). Deliver
 line-by-line actor → request → expected-outcome scenarios covering Self /
 reporting-line / assigned-PP / colleague reads (all `200`, the same S1 card),
-the empty-audience leak-free `404`, and the no-target `isAllowed` delegation
+the empty-audience denial (`401` unresolved session / `403` authenticated
+active viewer), and the no-target `isAllowed` delegation
 to the real facade. Reconcile the pre-existing `access-control-adoption/`
 scenario docs to this SPEC and close their gaps. Then stop for independent
 human approval — write nothing to `approvals.yaml`.
@@ -70,9 +71,11 @@ human approval — write nothing to `approvals.yaml`.
   stated.
 - `GET /users/:id`: any non-empty audience over an **active** target
   (`self`, `reporting`, `pp`, or `colleague`) → `200` with the same S1 card.
-  The only denial is a genuinely empty audience set (viewer or target not an
-  active `User`) → leak-free `404`; `401` still covers a missing/invalid
-  token.
+  Denials: an unresolved session → `401` (session layer; the interim
+  resolver is lax, so such a request reaches the guard and surfaces as
+  `403`); an authenticated active viewer with an empty audience (target not
+  an active `User`) → `403`. No "leak-free `404`" (human product decision
+  2026-09-01) and no guard/controller change.
 - CAP-3 scope statement in the doc: Story 0.1 adds a dedicated S1-card DTO on
   the `GET /users/:id` handler ONLY. `GET /users` (list), `POST /users`,
   `PATCH /users/:id`, `DELETE /users/:id`, `PUT /users/:id/photo` response
@@ -86,10 +89,11 @@ human approval — write nothing to `approvals.yaml`.
   whose `User.position` is `'HR Admin'` but who holds no FR grant chain.
 - Real-audience scenarios use `Bearer <token:<seeded-uuid>>`, never a persona
   literal. `Bearer <token:Bob>` resolves to the non-existent string id
-  `'Bob'` → empty audience → leak-free `404`.
-- The `404`-vs-`403` mechanism stays explicitly open in `umac-05` for the
-  human: `AccessControlGuard` maps a denied `isAllowedForTarget` to `403`;
-  the leak-free `404` needs a controller/read-action `NotFound` decision.
+  `'Bob'` → empty audience → `403` via the guard (`401` once the real
+  session middleware lands).
+- The denial mechanism is settled (2026-09-01): `AccessControlGuard` already
+  maps a denied `isAllowedForTarget` to `403`, which is the intended outcome
+  — no guard or controller `NotFound` branch.
   Flag it; do not silently pick one.
 
 **Block If:**
@@ -112,8 +116,7 @@ human approval — write nothing to `approvals.yaml`.
   those are UMAC-2 (`umac-07`..`umac-09`), which this story does not author
   or modify.
 - No new route; no `AccessControlPort` signature change; no `AccessControlGuard`
-  change proposed as in-scope (the `404` mechanism is flagged for the human,
-  not decided here).
+  change (the `403` the guard already produces is the intended denial).
 - No rewrite of the shared `toUserResponse`; no change to the other five
   response bodies.
 - Do not fake or stub this story's own deliverable.
@@ -139,8 +142,8 @@ scenarios describe and what Stage 2/3 will change.
   -- `toUserResponse` spreads the whole `User` row; CAP-3 adds a separate
   S1-card mapper for `findOne` only.
 - `services/backend/src/user-management/application/guards/access-control.guard.ts:44-55`
-  -- maps a denied `isAllowedForTarget` to `ForbiddenException` (`403`) — the
-  reason `umac-05`'s `404` target is a flagged open mechanism.
+  -- maps a denied `isAllowedForTarget` to `ForbiddenException` (`403`) — this
+  is `umac-05`'s intended denial; no change here.
 - `services/backend/src/access-control/application/access-control.facade.ts`
   -- `isAllowed(userId, key)`, `resolveAudiences(viewerId, ids)` (empty `Set`
   for an unconfirmed viewer/target), `canAccessSection(viewerId, 'S1', target)`.
@@ -182,10 +185,10 @@ scenarios describe and what Stage 2/3 will change.
   every active authenticated viewer is at least a Colleague). Positive test,
   no `403`, no two-state rule.
 - `.../umac-05-unresolved-session-read-denied.md` -- verify Test 1 (`Bearer <token:Bob>`),
-  Test 2 (deactivated caller), Test 3 (well-formed non-existent target,
-  valid active caller) each → leak-free `404` (empty audience); `401` still
-  covers a missing/invalid token; the `404`-vs-`403` mechanism is flagged
-  open for the human. Add Test 3 if absent.
+  Test 2 (deactivated caller) each → `403` via the guard under the interim
+  resolver (`401` once the real session middleware lands); Test 3 (valid
+  active caller, inactive/non-existent target) → `403`, no existence
+  distinction. No "leak-free `404`" branch.
 - `.../umac-06-no-target-isallowed-delegates-to-facade.md` -- verify Test 1
   (seeded HR-Admin root → allowed on `GET /users` / `POST /users` /
   `DELETE /users/:id`), Test 2 (unrelated active session → `403`), Test 3
@@ -212,10 +215,10 @@ scenarios describe and what Stage 2/3 will change.
   and the identical five absent technical fields.
 - Given `umac-04`, when read, then the colleague outcome is `200` with the S1
   card (not `403`), justified by §3.2 S1 = `R` for the Colleague column.
-- Given `umac-05`, when read, then the empty-audience outcome is a leak-free
-  `404` for every variant, `401` is distinguished as the missing/invalid
-  token case, and the `404`-vs-`403` guard mechanism is explicitly left open
-  for the human.
+- Given `umac-05`, when read, then an unresolved session is `401` (the
+  session layer; `403` via the guard under the interim resolver) and an
+  authenticated active viewer with an empty audience is `403` with no
+  existence distinction; there is no `404` branch.
 - Given `umac-06`, when read, then it includes the impostor case
   (`User.position = 'HR Admin'`, no FR grant → `403`) and states that
   `isAllowed` delegates straight to `AccessControlFacade.isAllowed` and that
@@ -243,9 +246,9 @@ scenarios describe and what Stage 2/3 will change.
 | umac-02.2 | V, with real chain `T → M → V` `type='direct'` | `GET /users/<T>` as V | `200`; same S1 card (transitive `reporting`) |
 | umac-03 | V, with real `Relationship` `T → V` `type='people_partner'` | `GET /users/<T>` as V | `200`; same S1 card (`pp`) |
 | umac-04 | V active, no edge to T, V ≠ T (colleague floor) | `GET /users/<T>` as V | `200`; the SAME S1 card |
-| umac-05.1 | `Bearer <token:Bob>` (→ non-existent id `'Bob'`) | `GET /users/<T>` | leak-free `404` (empty audience); fallback `403` only if the guard mechanism is unresolved |
-| umac-05.2 | caller's own `User` row `isActive: false` | `GET /users/<T>` as deactivated caller | leak-free `404` |
-| umac-05.3 | valid active caller, well-formed non-existent target id | `GET /users/<missing>` | leak-free `404` |
+| umac-05.1 | `Bearer <token:Bob>` (→ non-existent id `'Bob'`) | `GET /users/<T>` | `403` via the guard (interim resolver); `401` once the real session middleware lands |
+| umac-05.2 | caller's own `User` row `isActive: false` | `GET /users/<T>` as deactivated caller | `403` via the guard; `401` end state |
+| umac-05.3 | valid active caller, inactive or non-existent target id | `GET /users/<target>` | `403` (empty audience; no existence distinction) |
 | umac-06.1 | seeded HR-Admin root (holds `hr-admin` FR grant) | `GET /users`, `POST /users`, `DELETE /users/:id` | allowed (`200` / `201` / `200`) |
 | umac-06.2 | unrelated active `User`, no FR attachment | same three | `403` |
 | umac-06.3 | Ida — holds an unrelated FR permission | same three | `403` (DEC-UM-002) |
