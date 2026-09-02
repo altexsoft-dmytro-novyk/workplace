@@ -2,6 +2,20 @@
 
 This workspace repository ties together the `services/backend` and `services/frontend` projects as git submodules.
 
+## ClickUp sprint-status synchronization
+
+`npm run sync:clickup` is a one-way synchronization from BMad `sprint-status.yaml`
+files to existing ClickUp tasks. It never creates ClickUp tasks, Lists, folders, or
+Custom Fields. The synchronizer requires a `CLICKUP_API_TOKEN` and refuses to write
+unless that token is authorized for Workspace `90122019689`; this Workspace ID is
+mandatory. Configure only existing ClickUp task IDs in `clickup-sync.yaml`.
+
+Run its focused tests with:
+
+```
+npm run test:clickup
+```
+
 ## Getting started
 
 Clone the workspace and its submodules in one step:
@@ -59,4 +73,3 @@ npm run services:dev:frontend
 | workspace (this repo) | `.` | `git@github.com:altexsoft-dmytro-novyk/workplace.git` |
 | backend | `services/backend` | `git@github.com:altexsoft-dmytro-novyk/backend.git` |
 | frontend | `services/frontend` | `git@github.com:altexsoft-dmytro-novyk/frontend.git` |
-
