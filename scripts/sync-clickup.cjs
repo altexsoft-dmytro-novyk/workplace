@@ -54,6 +54,14 @@ async function collectSyncEntries(options = {}) {
   const statusMap = asObject(config.status_map, `status_map in ${configPath}`);
   const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
   const entries = [];
+  const discoveredSourceKeys = new Set();
+
+  for (const [sourceKey, taskMapping] of Object.entries(tasks)) {
+    const task = asObject(taskMapping, `task mapping for ${sourceKey}`);
+    if (!task.task_id || typeof task.task_id !== 'string') {
+      throw new Error(`Task mapping for ${sourceKey} must include task_id`);
+    }
+  }
 
   for (const sourcePath of sourcePaths) {
     const resolvedSourcePath = path.resolve(sourcePath);
@@ -61,11 +69,9 @@ async function collectSyncEntries(options = {}) {
     const developmentStatus = asObject(sprintStatus.development_status, `development_status in ${resolvedSourcePath}`);
     for (const [developmentStatusKey, sourceStatus] of Object.entries(developmentStatus)) {
       const sourceKey = relativeSourceKey(rootDir, resolvedSourcePath, developmentStatusKey);
+      discoveredSourceKeys.add(sourceKey);
       if (!Object.hasOwn(tasks, sourceKey)) continue;
-      const task = asObject(tasks[sourceKey], `task mapping for ${sourceKey}`);
-      if (!task.task_id || typeof task.task_id !== 'string') {
-        throw new Error(`Task mapping for ${sourceKey} must include task_id`);
-      }
+      const task = tasks[sourceKey];
       if (!Object.hasOwn(statusMap, sourceStatus)) {
         throw new Error(`No ClickUp status mapping for ${sourceKey} with BMad status ${String(sourceStatus)}`);
       }
@@ -76,6 +82,11 @@ async function collectSyncEntries(options = {}) {
         ...(task.git_branch ? { gitBranch: task.git_branch } : {}),
         ...(task.validation_status ? { validationStatus: task.validation_status } : {}),
       });
+    }
+  }
+  for (const sourceKey of Object.keys(tasks)) {
+    if (!discoveredSourceKeys.has(sourceKey)) {
+      throw new Error(`Configured task mapping source was not found: ${sourceKey}`);
     }
   }
   return entries;
@@ -96,6 +107,14 @@ async function request(fetchImpl, url, init, context, token) {
   return response;
 }
 
+async function readResponseJson(response, context, token) {
+  try {
+    return await response.json();
+  } catch (error) {
+    throw new Error(`ClickUp ${context} response was not valid JSON: ${redactToken(error.message, token)}`);
+  }
+}
+
 async function syncClickUp(options = {}) {
   const token = options.token || process.env.CLICKUP_API_TOKEN;
   if (!token) throw new Error('CLICKUP_API_TOKEN is required');
@@ -110,7 +129,7 @@ async function syncClickUp(options = {}) {
   const entries = await collectSyncEntries({ ...options, rootDir, configPath });
   const headers = { Authorization: token, 'Content-Type': 'application/json' };
   const teamsResponse = await request(fetchImpl, `${CLICKUP_API_BASE}/team`, { headers }, 'team authorization', token);
-  const teamPayload = await teamsResponse.json();
+  const teamPayload = await readResponseJson(teamsResponse, 'team authorization', token);
   const authorized = Array.isArray(teamPayload.teams)
     && teamPayload.teams.some((team) => String(team.id) === EXPECTED_WORKSPACE_ID);
   if (!authorized) throw new Error(`Authorized ClickUp teams do not include required Workspace ${EXPECTED_WORKSPACE_ID}`);
