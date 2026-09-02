@@ -45,14 +45,28 @@ The former User Management and Mentorship PRDs are preserved unchanged as dated 
 - `_bmad-output/specs/spec-user-management-domain/SPEC.md`
 - `_bmad-output/specs/spec-mentorship-domain/SPEC.md`
 
-Existing epic files remain immutable bounded-context slices. The global cross-product rollup is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`.
+Existing epic files remain immutable bounded-context slices. Later slices decompose the
+remaining product requirements and reuse no `ACF-*`, `ACM-*`, or `UMAC-*` identifier:
+
+| Slice | File (under `_bmad-output/planning-artifacts/`) | Namespace | Decomposes |
+|---|---|---|---|
+| Platform capabilities | `platform-capabilities/epics.md` | `PMC-E{epic}-S{story}` | Directory and dashboard requirements |
+| Resourcing | `resourcing/epics.md` | `RS-E{epic}-S{story}` | Resourcing request lifecycle and S15 history (`PM-FR-23`–`PM-FR-26`) |
+| Engagement | `engagement/epics.md` | `ENG-E{epic}-S{story}` | Action items and form campaigns (`PM-FR-19`, `PM-FR-20`). Epic 3 (risk) and Epic 4 (feedback) are superseded |
+| Risk | `risk/epics.md` | `RISK-E{epic}-S{story}` | Risk records and the scoped risk dashboard (`PM-FR-21`, `PM-FR-22`) — carved out of engagement Epic 3, which is superseded |
+| Feedback | `feedback/epics.md` | `FB-E{epic}-S{story}` | Feedback records (`PM-FR-35`) — carved out of engagement Epic 4, which is superseded |
+| TimeTracker | `timetracker/epics.md` | `TT-E{epic}-S{story}` | TimeTracker integration (`PM-FR-36`, `PM-FR-37`) |
+| CDS | `cds/epics.md` | `CDS-E{epic}-S{story}` | CDS registry on profile S12 and the two directory filters (`PM-FR-30`, `PM-FR-31`). Registered `draft-bounded-context-slice`: the `cds` bounded context is still *pending confirmation* in PM/AD-5 and must be confirmed before Epic 1 enters a sprint |
+
+The global cross-product rollup is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`, which is authoritative for which slice owns each requirement and is the register of record when this table and the model disagree. **A requirement has exactly one owning slice**; a second decomposition of an already-owned `PM-FR-*` is a defect, not an alternative. Moving ownership between slices means re-pointing the requirement's `stories:` and marking the vacating epic superseded — never leaving two live decompositions.
 
 Identifiers are always namespaced outside their source document:
 
 - `PM-FR-*` — canonical product requirements in this PRD.
 - `UM-FR-*` — historical User Management requirement aliases.
 - `M-FR-*` — historical Mentorship requirement aliases.
-- `PLAT-E*`, `UM-E*`, `M-E*` — context-qualified epic and story identifiers.
+- `PLAT-E*`, `UM-E*`, `M-E*`, `PMC-E*`, `RS-E*`, `ENG-E*`, `RISK-E*`, `FB-E*`, `TT-E*`, `CDS-E*` — context-qualified epic and story identifiers.
+- Retired identifiers are never reused: `ENG-E3-S3.1`–`S3.5` (superseded by `RISK-E*`) and `ENG-E4-S4.1`–`S4.3` (superseded by `FB-E*`).
 - `ACF-*`, `ACM-*`, `UMAC-*` — stable workboard identifiers; never reassigned.
 
 ### 0.3 Delivery status vocabulary
@@ -718,26 +732,28 @@ These must land **before the named wave starts**, not before foundation phase be
 
 ## 13. Product Traceability Index
 
-The machine-readable row-level model is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`. This index defines product ownership; it does not duplicate every story edge.
+The machine-readable row-level model is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`. This index defines product ownership; it does not duplicate every story edge. **Postures below are a summary of that model as of 2026-09-03; where they disagree, the model is the register of record.** `specified` means a current story exists, not implemented behavior — see §0.3.
 
-| Normative source | Canonical product FRs | Primary domain/capability | Current delivery posture |
-|---|---|---|---|
-| §2–§3 | PM-FR-1–7, PM-FR-39–40 | Access Control | Kernel implemented; broader matrix/adoption partial or gated |
-| §4.1 | PM-FR-8–11 | Directory | Uncovered beyond partial User list |
-| §4.2–§4.3 | PM-FR-12–14 | User Management | Partial/in transition |
-| §4.4 | PM-FR-15–18 | Dashboards | Uncovered; architecture gate open |
-| §4.5, §4.12 | PM-FR-19–20 | Tasks/Campaigns | Uncovered |
-| §4.6 | PM-FR-21–22 | Risk | Uncovered |
-| §4.7 | PM-FR-23–26 | Resourcing | Uncovered |
-| §4.8 | PM-FR-27 | Sharing | Uncovered |
-| §4.9 | PM-FR-28–29 | User Management | Specified/gated |
-| §4.10 | PM-FR-30–31 | CDS | Uncovered |
-| §4.11 | PM-FR-32–34 | Mentorship | Specified/blocked; not implemented |
-| §4.15 | PM-FR-35 | Feedback | Uncovered |
-| §5.1 | PM-FR-36–37 | Timetracker integration | Uncovered |
-| §5.2 | PM-FR-38 | PeopleForce prefill | Deferred/good-to-have |
-| §4.16 | PM-FR-41 | User Management | Specified/blocked |
-| §4.17 | PM-FR-42 | User Management/Departments | Partial and gated |
+| Normative source | Canonical product FRs | Primary domain/capability | Owning slice | Current delivery posture |
+|---|---|---|---|---|
+| §2–§3 | PM-FR-1–7, PM-FR-39–40 | Access Control | PLAT, UM | Kernel implemented; broader matrix/adoption partial or gated. PM-FR-1–4 `in-progress`, PM-FR-7/40 `specified`, PM-FR-5/6/39 `deferred` |
+| §4.1 | PM-FR-8–11 | Directory | PMC | PM-FR-8, 10, 11 `specified`; **PM-FR-9 `uncovered`** — inline directory editing has no slice |
+| §4.2–§4.3 | PM-FR-12–14 | User Management | UM | PM-FR-12 `in-progress`; PM-FR-13, 14 `specified` |
+| §4.4 | PM-FR-15–18 | Dashboards | PMC | PM-FR-15, 18 `specified`; **PM-FR-16, 17 `uncovered`** — `PMC-E3` carries no stories, gated on `TT-IDENTITY-01` |
+| §4.5, §4.12 | PM-FR-19–20 | Tasks/Campaigns | ENG | `specified` (`ENG-E1`, `ENG-E2`); partial by gate |
+| §4.6 | PM-FR-21–22 | Risk | RISK | `specified` (`RISK-E1`, `RISK-E2`); dashboard scope capped by PM/AD-10, filters gated on `DEPARTMENT-EDGE` and `TT-IDENTITY-01` |
+| §4.7 | PM-FR-23–26 | Resourcing | RS | `specified` (`RS-E*`) |
+| §4.8 | PM-FR-27 | Sharing | — | **`uncovered`** — accepted gap; the sharing bounded context does not exist |
+| §4.9 | PM-FR-28–29 | User Management | UM, M | `specified`/gated |
+| §4.10 | PM-FR-30–31 | CDS | CDS | `specified` (`CDS-E1`, `CDS-E2`). PM-FR-30's matrix clause hard-gated on `DEPARTMENT-EDGE`; slice is `status: draft` pending PM/AD-5 context confirmation |
+| §4.11 | PM-FR-32–34 | Mentorship | M | `specified`/blocked; not implemented. Slice is `status: draft` |
+| §4.15 | PM-FR-35 | Feedback | FB | `specified` (`FB-E1`, `FB-E2`) |
+| §5.1 | PM-FR-36–37 | Timetracker integration | TT | `specified` (`TT-E*`) |
+| §5.2 | PM-FR-38 | PeopleForce prefill | — | `deferred`/good-to-have |
+| §4.16 | PM-FR-41 | User Management | UM, M | `specified`/blocked |
+| §4.17 | PM-FR-42 | User Management/Departments | UM | `specified`; partial and gated |
+
+Requirement-level rollup: `in-progress` 5 · `specified` 29 · `uncovered` 4 · `deferred` 4 · `implemented` 0. The four `uncovered` are PM-FR-9, PM-FR-16, PM-FR-17 and PM-FR-27.
 
 ## 14. Product Definition of Done
 

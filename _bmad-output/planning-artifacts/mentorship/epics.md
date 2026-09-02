@@ -8,6 +8,9 @@ inputDocuments:
   - docs/architecture/domain-driven-design.md
   - docs/project-requirements.md
 status: draft
+slice: mentorship
+id_namespace: M-E{epic}-S{story}
+updated: 2026-09-03
 ---
 
 # mentorship — Epic Breakdown
@@ -80,14 +83,14 @@ profile section have no UX contract yet; recorded for later.
 
 ## FR Coverage Map
 
-| FR | Story |
-|---|---|
-| FR-M1, FR-M3 | Story 1.1 — Open-to-mentoring flag |
-| FR-M4 | Story 1.2 — The willing-mentor pool |
-| FR-M5, FR-M6, FR-M7 | Story 1.3 — Create a mentorship pair |
-| FR-M9, FR-M10, FR-M11, FR-M12, FR-M13 | Story 1.4 — End a mentorship pair |
-| FR-M2, FR-M8, FR-M15, FR-M16, FR-M17 | Story 1.5 — S13 projection, profile-header mentor, directory filter |
-| FR-M14 | Story 1.6 — Departure auto-close |
+| FR | Story ID | Story |
+|---|---|---|
+| FR-M1, FR-M3 | `M-E1-S1.1` | Story 1.1 — Open-to-mentoring flag |
+| FR-M4 | `M-E1-S1.2` | Story 1.2 — The willing-mentor pool |
+| FR-M5, FR-M6, FR-M7 | `M-E1-S1.3` | Story 1.3 — Create a mentorship pair |
+| FR-M9, FR-M10, FR-M11, FR-M12, FR-M13 | `M-E1-S1.4` | Story 1.4 — End a mentorship pair |
+| FR-M2, FR-M8, FR-M15, FR-M16, FR-M17 | `M-E1-S1.5` | Story 1.5 — S13 projection, profile-header mentor, directory filter |
+| FR-M14 | `M-E1-S1.6` | Story 1.6 — Departure auto-close |
 
 ## Epic List
 
@@ -126,6 +129,8 @@ departure auto-close. One epic; six stories split by capability.
 
 ### Story 1.1: Open-to-mentoring flag
 
+**ID:** `M-E1-S1.1` · **Sprint key:** `1-1-open-to-mentoring-flag`
+
 As an employee,
 I want to set or clear my own *open to mentoring* flag,
 So that I control whether I appear in the willing-mentor pool without asking HR.
@@ -160,6 +165,8 @@ from the pool for future assignments
 
 ### Story 1.2: The willing-mentor pool
 
+**ID:** `M-E1-S1.2` · **Sprint key:** `1-2-the-willing-mentor-pool`
+
 As a holder of the *assign and end mentorships* permission,
 I want a company-wide list of everyone open to mentoring,
 So that I can pick a mentor from anywhere in the organisation.
@@ -184,6 +191,8 @@ from S13 (FR-M4)
 role-name or `User.position` check)
 
 ### Story 1.3: Create a mentorship pair
+
+**ID:** `M-E1-S1.3` · **Sprint key:** `1-3-create-a-mentorship-pair`
 
 As a holder of the *assign and end mentorships* permission,
 I want to pair a willing mentor with a mentee inside my access scope,
@@ -220,6 +229,8 @@ boundary — not by mentorship writing `UserEvents` directly (FR-M7; AD-11)
 **Then** the response is `403`
 
 ### Story 1.4: End a mentorship pair
+
+**ID:** `M-E1-S1.4` · **Sprint key:** `1-4-end-a-mentorship-pair`
 
 As a manager (reporting line) or People Partner,
 I want to end a pair with a required closure note,
@@ -264,6 +275,8 @@ history on **both** the mentor's and the mentee's profile (FR-M12)
 
 ### Story 1.5: S13 projection, profile-header mentor, directory filter
 
+**ID:** `M-E1-S1.5` · **Sprint key:** `1-5-s13-projection-profile-header-mentor-directory-filter`
+
 As a viewer of a profile / the directory,
 I want the mentorship read surfaces,
 So that I see the mentor, the pairs, and can filter employees by mentorship status.
@@ -297,6 +310,8 @@ employee and does not leak a value a viewer cannot see (FR-M15; NFR-M3) — the
 directory engine itself is not built here
 
 ### Story 1.6: Departure auto-close
+
+**ID:** `M-E1-S1.6` · **Sprint key:** `1-6-departure-auto-close`
 
 As the platform,
 I want a departing person's active pairs auto-closed with a system note,
