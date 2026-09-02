@@ -1,3 +1,8 @@
+# SUPERSEDED 2026-09-02 — PM/AD-24: the 403 empty-audience denial recorded
+# below is historical AD-1 evidence. Live oracle is 401 / 404 / 403 per
+# PM/AD-24. Do not rewrite these descriptions as if they had always said 404.
+# Regeneration is a new AD-1 dispatch.
+#
 # AD-1 three-stage dispatch entries for the User Management Access Control
 # adoption package. Field set mirrors
 # _bmad-output/specs/spec-access-control-kernel-mvp/stories.yaml exactly:

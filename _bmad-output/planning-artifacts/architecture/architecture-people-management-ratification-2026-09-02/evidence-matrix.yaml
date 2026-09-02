@@ -1,0 +1,451 @@
+version: 2
+baseline_date: 2026-09-02
+revision: 2026-09-02-reviewer-gate-correction
+ratification: ratified-with-transition-debt
+status_enums:
+  design: [ratified, partial, blocked, open]
+  implementation: [conformant, partial, transition-debt, absent, not-applicable]
+invariants:
+  - An AD carrying an open transition-debt item may not be rated conformant; the two
+    values are mutually exclusive under this status model.
+  - No AD ID is ever renumbered, reused, or retired by a ratification revision.
+decisions:
+  - id: AD-1
+    design: ratified
+    implementation: partial
+    evidence:
+      - docs/architecture/testing-strategy.md
+      - docs/test-cases/
+      - services/backend/test/
+  - id: AD-2
+    design: ratified
+    implementation: partial
+    evidence:
+      - docs/architecture/domain-driven-design.md
+      - services/backend/src/user-management/
+      - services/backend/src/access-control/
+  - id: AD-3
+    design: ratified
+    implementation: partial
+    evidence:
+      - services/backend/test/access-control/
+      - services/backend/test/user-management/
+      - services/backend/test/mentorship/
+  - id: AD-4
+    design: ratified
+    implementation: partial
+    evidence:
+      - _bmad-output/planning-artifacts/platform/epics.md
+      - _bmad-output/planning-artifacts/user-management/epics.md
+      - _bmad-output/planning-artifacts/mentorship/epics.md
+  - id: AD-5
+    design: ratified
+    implementation: partial
+    evidence:
+      - docs/architecture/domain-driven-design.md
+      - services/backend/src/app.module.ts
+  - id: AD-6
+    design: ratified
+    implementation: transition-debt
+    evidence:
+      - services/backend/src/access-control/
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts
+  - id: AD-7
+    design: ratified
+    implementation: partial
+    previous_implementation: conformant
+    downgraded: 2026-09-02-reviewer-gate-update
+    carries_transition_debt: [TD-08]
+    evidence:
+      - services/backend/prisma/schema.prisma:121-131
+      - services/backend/prisma/migrations/20260831070000_access_control_functional_roles/migration.sql
+    divergence:
+      - >
+        Catalog/runtime-editable FR policies that AD-7 requires do not exist
+        (TD-08). Kernel data slice uses Permissions.key as binding identity.
+      - >
+        AD-7 carries TD-08, which the status model makes incompatible with a
+        conformant rating.
+    note: >
+      H4 2026-09-02: PM/AD-7 amended in place. Binding identity is Permissions.key
+      (unique, append-only). title is not identity. ACF/AD-4 supersedes the earlier
+      physical {id, title, description} shape. The former title-vs-key divergence is
+      closed as an AD refinement, not an unresolved conflict.
+  - id: AD-8
+    design: ratified
+    implementation: partial
+    previous_implementation: conformant
+    downgraded: 2026-09-02-reviewer-gate-update
+    evidence:
+      - services/backend/src/access-control/domain/services/functional-role-evaluator.service.ts
+      - services/backend/prisma/migrations/20260831070000_access_control_functional_roles/migration.sql:17
+      - services/backend/src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts:185-188
+    divergence:
+      - >
+        AD-8's rule bars '!=' from tier-granting rules to prevent fail-open by absent
+        data. The Policies.operator column is TEXT NOT NULL DEFAULT '==' with no CHECK
+        constraint.
+      - >
+        The cited evaluator never reads the operator column, so it is conformant only in
+        the sense that it ignores the field. The guard becomes absent the moment AD-10
+        tier resolution starts consuming it.
+      - >
+        Partial rather than absent, because access-control-bootstrap.ts:185-188 throws on
+        operator drift - but only at bootstrap and only for the single functional-role
+        policy row. It is neither a schema constraint nor an evaluation-time guard.
+  - id: AD-9
+    design: ratified
+    implementation: transition-debt
+    evidence:
+      - services/backend/src/access-control/application/access-control.facade.ts
+      - services/backend/src/user-management/user-management.module.ts
+  - id: AD-10
+    design: partial
+    implementation: partial
+    evidence:
+      - services/backend/src/access-control/domain/services/audience-resolver.service.ts
+      - _bmad-output/implementation-artifacts/access-control/deferred-work.md
+  - id: AD-11
+    design: ratified
+    implementation: partial
+    evidence:
+      - services/backend/prisma/migrations/20260830010000_access_control_relationships/migration.sql
+      - docs/architecture/domain-driven-design.md
+  - id: AD-12
+    design: ratified
+    implementation: transition-debt
+    evidence:
+      - services/backend/src/access-control/
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts
+  - id: AD-13
+    design: ratified
+    implementation: partial
+    evidence:
+      - services/backend/prisma/schema.prisma
+  - id: AD-14
+    design: ratified
+    implementation: partial
+    evidence:
+      - docs/architecture/api-conventions.md
+      - services/backend/src/user-management/application/controllers/users.controller.ts
+  - id: AD-15
+    design: ratified
+    implementation: transition-debt
+    evidence:
+      - docs/architecture/testing-strategy.md
+      - services/backend/src/user-management/infrastructure/
+      - services/backend/src/storage/
+  - id: AD-16
+    design: ratified
+    implementation: transition-debt
+    decision_refs: [PM/AD-16, PM/AD-22]
+    evidence:
+      - services/backend/src/user-management/application/controllers/users.controller.ts
+      - services/backend/prisma/seed.ts
+    note: >
+      Target ownership is PM/AD-22. Live code still writes isActive via DELETE
+      /users/:id and seed IsDismissed mapping. EmploymentStatus model absent.
+  - id: AD-17
+    design: ratified
+    implementation: absent
+    decision_refs: [PM/AD-17, PM/AD-23]
+    evidence:
+      - docs/architecture/mentorship.md
+      - services/backend/test/mentorship/
+  - id: AD-18
+    design: ratified
+    implementation: not-applicable
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md
+  - id: AD-19
+    design: ratified
+    implementation: partial
+    blocked_by: [CC-07]
+    decision_refs: [PM/AD-19, PM/AD-29, PM/AD-35]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-19
+      - services/backend/prisma/schema.prisma
+      - services/backend/prisma/migrations/20260830010000_access_control_relationships/migration.sql
+    note: >
+      Journal schema is PM/AD-29. HR-line boundary is PM/AD-35. Stage 2 still
+      blocked on journal implementation. CC-04 remains implementation.
+  - id: AD-20
+    design: ratified
+    implementation: absent
+    blocked_by: [CC-06, CC-08, CC-09]
+    decision_refs: [PM/AD-20, PM/AD-22, PM/AD-23]
+    evidence:
+      - docs/architecture/database-schema.md
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-20
+      - docs/architecture/mentorship.md
+      - services/backend/test/user-management/epic-5/
+    note: >
+      Design of ownership (AD-22) and the participant contract (AD-23) is
+      approved 2026-09-02. UserEvents ownership/idempotency design is PM/AD-30.
+      Implementation is absent. CC-06/CC-08/CC-09 remain implementation blockers
+      with tightened closure conditions.
+  - id: AD-21
+    design: ratified
+    implementation: transition-debt
+    evidence:
+      - _bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md
+      - _bmad-output/implementation-artifacts/user-management/sprint-status.yaml
+  - id: AD-22
+    design: ratified
+    implementation: absent
+    blocked_by: [CC-08]
+    decision_refs: [PM/AD-22]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-22
+      - services/backend/src/user-management/infrastructure/user.repository.ts
+      - services/backend/src/access-control/infrastructure/prisma-identity.adapter.ts
+  - id: AD-23
+    design: ratified
+    implementation: absent
+    blocked_by: [CC-06]
+    decision_refs: [PM/AD-23]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-23
+      - docs/architecture/mentorship.md
+      - docs/architecture/domain-driven-design.md
+  - id: AD-24
+    design: ratified
+    implementation: transition-debt
+    blocked_by: [CONFLICT-UM-01]
+    decision_refs: [PM/AD-24]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-24
+      - docs/architecture/access-control.md
+      - docs/test-cases/user-management/access-control-adoption/umac-05-unresolved-session-read-denied.md
+    note: >
+      Design supersedes the 2026-09-01 UMAC 403 empty-audience decision.
+      Implementation still splits 403/404/bypass. Historical scenarios are stale,
+      not rewritten.
+  - id: AD-25
+    design: ratified
+    implementation: transition-debt
+    carries_transition_debt: [TD-11]
+    decision_refs: [PM/AD-25]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-25
+      - services/frontend/package.json
+      - services/frontend/src/main.tsx:13
+  - id: AD-26
+    design: ratified
+    implementation: transition-debt
+    decision_refs: [PM/AD-26]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-26
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts
+  - id: AD-27
+    design: ratified
+    implementation: absent
+    decision_refs: [PM/AD-27]
+    evidence:
+      - docs/architecture/access-control.md
+  - id: AD-28
+    design: ratified
+    implementation: absent
+    decision_refs: [PM/AD-28]
+    evidence:
+      - docs/architecture/access-control.md
+  - id: AD-29
+    design: ratified
+    implementation: absent
+    blocked_by: [CC-07]
+    decision_refs: [PM/AD-29]
+    evidence:
+      - docs/architecture/database-schema.md
+  - id: AD-30
+    design: ratified
+    implementation: absent
+    blocked_by: [CC-09]
+    decision_refs: [PM/AD-30]
+    evidence:
+      - docs/architecture/database-schema.md
+  - id: AD-31
+    design: ratified
+    implementation: absent
+    blocked_by: [ARCH-PROJ-WRITER-01, TT-IDENTITY-01]
+    decision_refs: [PM/AD-31]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-31
+  - id: AD-32
+    design: ratified
+    implementation: transition-debt
+    carries_transition_debt: [TD-12]
+    decision_refs: [PM/AD-32]
+    evidence:
+      - docs/architecture/custom-fields.md
+      - services/backend/prisma/schema.prisma
+  - id: AD-33
+    design: ratified
+    implementation: absent
+    decision_refs: [PM/AD-33]
+    evidence:
+      - docs/architecture/dashboards.md
+  - id: AD-34
+    design: ratified
+    implementation: partial
+    decision_refs: [PM/AD-34]
+    closed_blockers: [ARCH-ENV-01]
+    evidence:
+      - docs/architecture/access-control.md
+    note: >
+      Design closed OQ-117 and ARCH-ENV-01 (architecture OQ-118 ID superseded).
+      Runtime still whole-row serializes User.
+  - id: AD-35
+    design: ratified
+    implementation: absent
+    blocked_by: [DEPARTMENT-EDGE]
+    decision_refs: [PM/AD-35]
+    evidence:
+      - docs/architecture/database-schema.md
+
+# Bound Access Control Foundation spine (namespace ACF). Qualified IDs only.
+# Do not merge with PM/AD numbering. Implementation claims require evidence.
+acf_decisions:
+  - id: ACF/AD-1
+    design: ratified
+    implementation: partial
+    decision_refs: [ACF/AD-1]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#AD-1
+    note: Foundation boundary. Not a claim that Phase-1 AC suite is complete.
+  - id: ACF/AD-2
+    design: ratified
+    implementation: partial
+    decision_refs: [ACF/AD-2]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#AD-2
+    note: UM ownership boundary. Consumer rebind remains UMAC/transition debt.
+  - id: ACF/AD-3
+    design: ratified
+    implementation: partial
+    decision_refs: [ACF/AD-3]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#AD-3
+    note: Kernel vs consumer evidence separation. TD-09 references this prohibition.
+  - id: ACF/AD-4
+    design: ratified
+    implementation: partial
+    decision_refs: [ACF/AD-4]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#AD-4
+      - services/backend/prisma/schema.prisma
+    note: >
+      Minimal FR kernel. Permissions.key is binding identity; refines PM/AD-7.
+      Catalog/runtime FR admin remain deferred.
+
+acf_artifacts:
+  - id: ACM-0
+    design: ratified
+    implementation: partial
+    decision_refs: [ACF/AD-4]
+    evidence:
+      - services/backend/prisma/seed.ts
+    note: Root User seed entrypoint. Not full population import.
+  - id: ACM-1
+    design: ratified
+    implementation: partial
+    decision_refs: [ACF/AD-4]
+    evidence:
+      - services/backend/src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts
+    note: FR bootstrap. Catalog completeness is not claimed.
+  - id: ACM-2
+    design: ratified
+    implementation: partial
+    evidence:
+      - services/backend/src/access-control/
+    note: isAllowed evaluator exists for kernel seed; full catalog evaluation not claimed.
+  - id: ACM-3
+    design: ratified
+    implementation: partial
+    evidence:
+      - services/backend/src/access-control/
+    note: Inactive viewer/bridge/target. Gate ACM3-II-06 historically FAIL remains.
+  - id: ACM-4
+    design: ratified
+    implementation: partial
+    evidence:
+      - _bmad-output/implementation-artifacts/access-control/acm-4-disposition.yaml
+  - id: ACM-5
+    design: ratified
+    implementation: partial
+    evidence:
+      - services/backend/src/access-control/
+    note: Base S1/S10/S11 only. AC-S9-S13 remains open.
+  - id: ACM-6
+    design: open
+    implementation: absent
+    note: Not in Kernel MVP workboard set for this ratification; retained for ACM-0..ACM-9 inventory completeness.
+  - id: ACM-7
+    design: open
+    implementation: absent
+    note: Not in Kernel MVP workboard set for this ratification; retained for ACM-0..ACM-9 inventory completeness.
+  - id: ACM-8
+    design: ratified
+    implementation: partial
+    evidence:
+      - services/backend/src/app.module.ts
+    note: Composition exists; UM port still interim.
+  - id: ACM-9
+    design: ratified
+    implementation: absent
+    blocked_by: [QUALITY-GATE-AC-NFR]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md
+    note: Protocol ratified; absolute 500/2s evidence not claimed closed.
+
+# Dimensions this altitude owns that no AD covers. A dimension left silent is a finding,
+# not a clean spine; recording it here gives it an owner without amending either spine.
+dimensions:
+  - id: operational-envelope
+    added: 2026-09-02-reviewer-gate-update
+    owner: Architect
+    design: open
+    implementation: absent
+    blocker: OPERATIONAL-ENVELOPE
+    covers:
+      - Hosting provider
+      - Environment topology
+      - Observability vendor and alert ownership
+      - Manual retry surface
+      - BUSINESS_TIME_ZONE validation across environments
+      - Worker process topology
+      - Rollback position
+      - Secret management for external integration keys
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md:196
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md:316
+      - docs/integrations/timetracker-external-api.json
+    note: >
+      Previously silent across all four package files. AD-20's operational release gate
+      requires that every deployed environment validate the same businessTimeZone, run at
+      least one worker against the same PostgreSQL source, expose health signals for
+      oldest-due lag, retry-wait count, and expired or reclaimed leases, and demonstrate
+      alert ownership and a manual retry surface before release. AD-20 classifies mixed
+      process configuration as a startup or deployment failure, so divergence here is a
+      runtime failure mode. Recording the dimension as open with an owner is not a
+      readiness claim and does not certify deployment.
+  - id: frontend-architecture
+    added: 2026-09-02-batch-architecture-update
+    owner: Architect
+    design: ratified
+    implementation: transition-debt
+    ad: AD-25
+    blocker: null
+    transition_debt: [TD-11]
+    covers:
+      - Backend projection as sole authorization source of truth
+      - No client-side role or access matrices
+      - Server-provided capabilities such as canEdit
+      - Permission-sensitive query cache semantics
+      - Installed React/Vite/Router/TanStack/Axios/Tailwind/shadcn/i18n stack
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-25
+      - services/frontend/src/main.tsx:13
+      - services/frontend/package.json
+    note: >
+      Design approved 2026-09-02. The global five-minute staleTime is recorded as
+      TD-11, not as the target. This is not a release-readiness claim.

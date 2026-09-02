@@ -1,11 +1,18 @@
 ---
-stepsCompleted: [1]
+stepsCompleted: [1, 2, 3, 4]
 inputDocuments:
   - docs/requirements-changelog-v1.2-to-v1.5.md
   - docs/project-requirements.md
   - _bmad-output/planning-artifacts/sprint-change-proposal-2026-08-27.md
   - _bmad-output/planning-artifacts/prds/prd-people-management-2026-08-24/prd.md
   - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md
+  - _bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md
+  - _bmad-output/planning-artifacts/architecture/architecture-people-management-ratification-2026-09-02/ARCHITECTURE-RATIFICATION.md
+  - _bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml
+status: final
+reproducible: working-tree-only
+updated: 2026-09-02
+review: platform/reviews/review-cross-slice-seams-2026-09-02.md
 ---
 
 # Platform Spec v1.5 Alignment — Epic Breakdown
@@ -22,9 +29,78 @@ Cross-cutting planning/test/architecture alignment to spec **v1.5** after resear
 
 **Weekend MVP gate:** Platform stories below agreed before platform-wide matrix engine / dashboard engine implementation. UM continues on seeded population.
 
+**Ratification overlay (2026-09-02):** Epic 1 stories absorb post-ratification documentation debt (denial oracle, blocker register, gate IDs, departure wording). No Epic 4. Sprint-status keys are not changed by this CE pass. Guards G1–G5 from `platform/reviews/review-cross-slice-seams-2026-09-02.md` applied 2026-09-02.
+
+## Requirements Inventory
+
+### Functional Requirements (platform slice)
+
+- PM-FR-1: Separate derived access roles from assigned functional roles
+- PM-FR-2: Resolve Reporting, Project, and People Partner access transitively with required revocation windows
+- PM-FR-3: Enforce section-level access matrix (S1, S10, S11 kernel substrate; full matrix deferred)
+- PM/AD-24: HTTP denial oracle — 401 / 404 / 403 (platform Epic 1 = documentation alignment; runtime `PM-FR-4` owner is `UM-E0-S0.1` per coverage model)
+- PM-FR-36 / PM-FR-37: TimeTracker required integration (§5.1)
+- PM-FR-38: PeopleForce optional prefill only (§5.2)
+
+### Non-Functional Requirements (platform slice)
+
+- NFR-AC-1: Access Control kernel resolves 500-target audience workloads within documented ACM-9 evidence protocol (p50/p95, 2s threshold)
+- NFR-AC-2: QUALITY-GATE-AC closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered
+- NFR-AC-3: QUALITY-GATE-AC-NFR records ACM-9 500-target / 2s performance evidence separately from functional gate
+
+### Additional Requirements (architecture / ratification)
+
+- PM/AD-7: Functional-role binding identity is `Permissions.key` (unique, append-only); `title` is display-only (ACF/AD-4)
+- PM/AD-24: HTTP denial oracle supersedes 2026-09-01 UMAC empty-audience 403; historical artifacts remain as evidence only
+- PM/AD-28: Self / full-profile overlay design ratified; `matrix/full-profile-access/` scenarios are not authored — AD-1 dispatch required
+- PM/AD-31 / ARCH-PROJ-WRITER-01: Sole writer of project membership (architecture `CC-11` superseded)
+- PM/AD-34 / ARCH-ENV-01: Profile assembly + envelope (architecture `OQ-118` superseded)
+- Ratification blocker register: see `blockers.yaml` (canonical ID and count source)
+- CC-06 departure: apply transaction cancels **only open Action Items assigned to the departing person**
+- ACF Inherited Invariants bind PM/AD-22, PM/AD-23 (`applyDepartureEffects` five-field contract), PM/AD-24
+
+### UX Design Requirements
+
+None — no `bmad-ux` contract exists for platform scope.
+
+### FR Coverage Map
+
+| FR / ID | Epic | Story |
+|---------|------|-------|
+| PM-FR-1 | PLAT-E2, PLAT-E3 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.5 |
+| PM-FR-2 | PLAT-E2, PLAT-E3 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.4 |
+| PM-FR-3 | PLAT-E3 | PLAT-E3-S3.6 |
+| PM/AD-24 | PLAT-E1 | PLAT-E1-S1.3, PLAT-E1-S1.4 (documentation alignment; runtime owner is UM-E0-S0.1 per coverage model) |
+| PM-FR-36, PM-FR-37, PM-FR-38 | PLAT-E1 | PLAT-E1-S1.6 |
+| PLAT-E1 | PLAT-E1 | PLAT-E1-S1.1–S1.9 |
+| PLAT-E2 | PLAT-E2 | PLAT-E2-S2.1 |
+| PLAT-E3 | PLAT-E3 | PLAT-E3-S3.1–S3.8 |
+| NFR-AC-1 | PLAT-E3 | PLAT-E3-S3.8 |
+| NFR-AC-2, NFR-AC-3 | PLAT-E1 | PLAT-E1-S1.6 |
+
+## Epic List
+
+### Epic 1: Platform Spec v1.5 Alignment
+
+Cross-cutting planning, spec, architecture, and test-design alignment to v1.5 SoT plus 2026-09-02 ratification documentation debt. Planning artifacts only — no application code.
+
+**FRs covered:** PM/AD-24 (documentation alignment), PM-FR-36, PM-FR-37, PM-FR-38, NFR-AC-2, NFR-AC-3
+
+### Epic 2: Access Control Foundation
+
+Deliver a narrow, reusable Phase-0 audience-resolution boundary without taking ownership of User Management routes.
+
+**FRs covered:** PM-FR-1, PM-FR-2
+
+### Epic 3: Access Control Kernel MVP
+
+Deliver a deployable, headless Access Control kernel proven on real PostgreSQL without changing User Management routes.
+
+**FRs covered:** PM-FR-1, PM-FR-2, PM-FR-3, NFR-AC-1
+
 ## Epic 1: Platform Spec v1.5 Alignment
 
-**Status:** backlog  
+**Status:** in-progress  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 ### Story 1.1: Changelog Traceability Matrix
@@ -38,6 +114,11 @@ So that weekend work knows what is done, gap, or N/A.
 - Matrix includes a row for **`docs/project-requirements.md` as SoT** (not only the changelog).
 - Each Breaking + Roles/Departments/Profile/Risks/Resourcing/Sharing/Lifecycle/Integrations/DoD item maps to PRD / SPEC / architecture / test-design status: `done` | `gap` | `N/A`.
 - Output lives under `_bmad-output/planning-artifacts/platform/` (or linked from this epic).
+- **Ratification reconciliation (2026-09-02):** Matrix includes a row for `architecture-people-management-ratification-2026-09-02/` with companion status (`blockers.yaml`, `evidence-matrix.yaml`, `transition-debt.yaml`).
+- Mechanical blocker counts match `blockers.yaml` (not narrative-only; verify open / closed / superseded at execution time).
+- Every live `gates:` ID in `global-fr-epic-story-coverage.yaml` resolves to an ID in `blockers.yaml` (e.g. `CC-10-MENTORSHIP`, `OQ-PERM-01`, `TT-IDENTITY-01`, `DEPARTMENT-EDGE` — not superseded historical IDs `TIMETRACKER-CONTRACT`, architecture `OQ-118`, or architecture `CC-11`).
+- Every `PLAT-E1-S1.x` story resolves to an entry in `global-fr-epic-story-coverage.yaml`, or is recorded there as decision/gate-serving work with no PM-FR owner (modelling gap called out explicitly).
+- Superseded-ID mapping is documented: `TIMETRACKER-CONTRACT` → `TT-IDENTITY-01` + `TT-PMDM-01`; architecture `CC-11` → `ARCH-PROJ-WRITER-01`; architecture `OQ-118` → `ARCH-ENV-01`; `CC-10` → `CC-10-MENTORSHIP` + `ARCH-GOV-01`; historical SCP alias `P-1…P-9` → `PLAT-E1-S1.1…S1.9` / sprint keys `1-1-…`…`1-9-…` (Story 1.9 `done` status predates the corrected AC oracle — record, do not re-key).
 
 ### Story 1.2: Platform PRD + Addendum Drift Close
 
@@ -63,6 +144,11 @@ So that stage-2 E2E does not encode a single Manager line or HR Admin full matri
 - HR Admin = configuration only; full-profile access = separate §2.4 grant mechanism.
 - Never-share set `{S3, S7, S13, S14}`; cfg defaults per §4.8.
 - Close or rewrite OQ2/OQ3/OQ4/OQ6 where v1.5 answers them; department-manager tier no longer “provisional-only because not in requirements.”
+- **PM/AD-24 denial oracle (ratification 2026-09-02):** Live binding docs state 401 invalid/inactive session; 404 missing or hidden-existence target; 403 visible resource forbidden feature/action; lists omit invisible rows; hidden-target 404 precedes mutation permission checks.
+- No live empty-audience **403** presented as the current oracle in access-control SPEC, stage-1 scenarios, binding architecture prose, **`user-management/epics.md`**, or UM PRD FR-16/FR-17 text — historical UMAC 403 text may remain with explicit superseded-by-PM/AD-24 annotation (annotate; do not rewrite the 2026-09-01 decision record).
+- **Cross-slice editing license:** Platform may annotate UM- and mentorship-owned planning artifacts for PM/AD-24 alignment only; gate-alias changes in `mentorship/epics.md` (draft, unapproved) are out of scope — canonical gate IDs live in `spec-mentorship-domain/SPEC.md` and coverage companions.
+- **PM/AD-28 honesty:** No live claim that `matrix/full-profile-access/` scenarios exist; docs state scenarios are not authored and require AD-1 dispatch.
+- `spec-mentorship-domain/SPEC.md` and coverage companion gates resolve only to `blockers.yaml` IDs (no live duplicate globals `G-CTX` / `G-PERM` / `G-S13` / `G-CT` / `G-DEP` or `OQ-M1`–`OQ-M7`).
 
 ### Story 1.4: Architecture Binding Updates
 
@@ -75,6 +161,11 @@ So that implementers do not build one transitive Manager-line graph as the v1.5 
 - ARCHITECTURE-SPINE AD-10 and access-control.md document Reporting vs Project line behavior.
 - Department management as a manager-access relation is specified (even if implementation phasing is staged).
 - Full-profile grant and journal scope are noted; revocation timing (platform next-request vs project 15m / 4h outage) referenced from SoT.
+- **PM/AD-7 (H4):** Binding functional-role identity is `Permissions.key` (unique, append-only); `title` is display-only; ACF/AD-4 supersedes earlier `{id, title, description}` catalog shape in live binding docs.
+- **ARCH-ENV-01 / PM/AD-34:** Profile assembly + envelope documented; architecture `OQ-118` entries marked `superseded` (not rewritten) with pointer to `ARCH-ENV-01`.
+- **ARCH-PROJ-WRITER-01 / PM/AD-31:** Sole writer of project membership documented; architecture `CC-11` entries marked `superseded` with pointer to `ARCH-PROJ-WRITER-01`.
+- ACF spine Inherited Invariants include PM/AD-22, PM/AD-23 (exact five-field `applyDepartureEffects` contract), and PM/AD-24; PM and ACF namespaces are not merged.
+- `access-control.md` short denial summary links to the complete PM/AD-24 rule (not a partial duplicate).
 
 ### Story 1.5: Dashboards + §4.4 v1.5 Fixed Facts
 
@@ -98,6 +189,10 @@ So that PF vacancies SoT and dual-required integrations are not planned as manda
 - `test-design-architecture-platform`, QA, handoff, and validation cite v1.5 / current SoT.
 - PeopleForce = optional prefill; no PF vacancies SoT as required.
 - Timetracker is the only required integration; DoD negatives for narrowed project-line noted; PR-B-04 re-gated.
+- **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite `gate-decision.json` ACM3-II-06 explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
+- **QUALITY-GATE-AC-NFR:** ACM-9 500-target / 2s performance evidence is tracked separately from the functional P0 gate; baseline and final artifacts are referenced by path.
+- Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01` — not superseded `TIMETRACKER-CONTRACT`.
+- **Evidence caveat:** Both TimeTracker gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin — record the caveat verbatim alongside gate IDs; committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4 evidence baseline).
 
 ### Story 1.7: UM Planning Residual (Non–Epic-2–4 Scope)
 
@@ -109,7 +204,7 @@ So that test contracts do not still mandate HTTP registration.
 
 - `spec-user-management-test-cases` CAP-1 retired/superseded in favor of seed scenarios.
 - Registration folder disposition matches Story 1.1 (retired pointer).
-- Does **not** change UM Epics 2–4 feature scope.
+- Does **not** change UM Epics 0–5 feature scope (CAP-1 / registration retirement only; denial-oracle alignment is Story 1.3).
 
 ### Story 1.8: Doc Pass — Create-Path Removal from Binding Docs
 
@@ -119,9 +214,11 @@ So that AD-14 and api-conventions agree with v1.5.
 
 **Acceptance Criteria:**
 
-- `docs/architecture/api-conventions.md`: remove `POST /users` (create) from User resource shape.
-- `docs/architecture/user-management-test-decisions.md`: retire/rewrite DEC-UM-003/006/008/009 (and um-reg traces); keep DEC-UM-001/002/004/005/007 as applicable.
+- **Verify** `docs/architecture/api-conventions.md` states no `POST /users` create route exists (expected phrases: "There is no `POST /users` create route" and "no `POST /users` employee-creation route"); owned sub-collection `POST /users/:id/<collection>` routes are out of scope and must remain.
+- `docs/architecture/user-management-test-decisions.md`: confirm `DEC-UM-006`/`DEC-UM-008` remain **RETIRED** and `DEC-UM-003` remains **REFRAMED**; drop stale `um-reg-*` traces; **keep** `DEC-UM-001`, `DEC-UM-002`, `DEC-UM-003`, `DEC-UM-004`, `DEC-UM-005`, `DEC-UM-007`, and **`DEC-UM-009`** (load-bearing for ACM-0 root-row reuse — cited by Platform Story 3.3, UM Story 1.1, and the kernel MVP spec; must not be retired).
 - Code removal of `POST /users` remains **implementation handoff** (not this story’s deliverable).
+- **Verify** `docs/architecture/database-schema.md` departure transaction (CC-06 / PM/AD-23) contains the phrase **"only open Action Items assigned to the departing person"** (authored-for-other-active-assignee items remain open) — must match `docs/project-requirements.md` CC-06 condition 6.
+- No live “open / not yet decided / pending” instructions for designs resolved by PM/AD-32, PM/AD-34, or PM/AD-35 in `database-schema.md`, `api-conventions.md`, or `mentorship.md` (implementation-absent status may remain).
 
 ### Story 1.9: Register Epic in Platform Sprint Status
 
@@ -131,10 +228,14 @@ So that Alignment work is visible for the weekend build.
 
 **Acceptance Criteria:**
 
-- `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` lists this epic and P-1…P-9.
+- `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` lists Epic 1 with canonical sprint keys `1-1-changelog-traceability-matrix` … `1-9-register-epic-in-platform-sprint-status` and global IDs `PLAT-E1-S1.1` … `PLAT-E1-S1.9`. Historical SCP alias `P-1…P-9` (`sprint-change-proposal-2026-08-27.md`) is superseded — do not rewrite the SCP.
 - No Platform stories nested under UM `epic-1`…`epic-4` keys.
 
 ## Epic 2: Access Control Foundation
+
+**Production code.** Every story runs the full AD-1 three-stage gate (scenario prose → human approval → red E2E → production).  
+**Status:** in-progress  
+**Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 Deliver a narrow, reusable audience-resolution boundary without taking ownership of User Management routes, profile projection, or UI. This is a two-day technical foundation; it does not replace the full Access Control facade program or its complete Stage-1 suite.
 
@@ -155,6 +256,10 @@ So that User Management can later replace its interim target-access adapter with
 - No Project, Department, PP HR-line, shared-link, full-profile, functional-permission, or section-matrix decision is enabled by this story.
 
 ## Epic 3: Access Control Kernel MVP
+
+**Production code.** Every story runs the full AD-1 three-stage gate (scenario prose → human approval → red E2E → production).  
+**Status:** in-progress  
+**Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 Deliver a deployable, headless Access Control kernel without changing User
 Management or frontend code. The kernel is imported into `AppModule` and proven

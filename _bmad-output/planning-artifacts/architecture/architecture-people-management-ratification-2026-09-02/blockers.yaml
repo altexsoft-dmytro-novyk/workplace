@@ -1,0 +1,658 @@
+version: 2
+baseline_date: 2026-09-02
+revision: 2026-09-02-reviewer-gate-correction
+rule: Open blockers remain fail-closed and are not resolved by ratification
+status_enums:
+  - open
+  - design-approved-pending-signoff
+  - design-approved-implementation-blocked
+  - superseded
+  - closed
+severity_enums: [P0, P1, P2, P3]
+note: >
+  Design-closed questions retained: CC-05, OQ-105, OQ-114, OQ-115, OQ-116,
+  OQ-117, ARCH-ENV-01. Architecture OQ-118 and CC-11 are superseded IDs
+  (replaced by ARCH-ENV-01 and ARCH-PROJ-WRITER-01). Implementation blockers
+  remain open until their closure conditions are met with production evidence.
+evidence_caveat: >
+  docs/integrations/timetracker-external-api.json is UNTRACKED and does not exist at the
+  pinned workplace SHA. Every finding resting on it - TIMETRACKER-CONTRACT,
+  TT-IDENTITY-01, TT-PMDM-01, and part of OPERATIONAL-ENVELOPE - is a working-tree
+  observation as of 2026-09-02, not a reproducible baseline claim. Committing the contract
+  is a precondition for those four entries being auditable by anyone else.
+validator_note: >
+  A file-existence check on evidence paths is necessary but not sufficient. The
+  2026-09-02 gate found a cited path that existed and supported nothing (OQ-118 against
+  api-conventions.md). Evidence validation must assert relevance, not just resolution.
+
+blockers:
+  # --- RE-SCOPED ---
+
+  - id: CC-04
+    owner: Product Owner and Architect
+    severity: P2
+    blocks: [People Partner mutation contract]
+    status: open
+    status_note: >
+      Design is resolved-approved (PM/AD-19). This entry stays open only as an
+      implementation and journal-enrolment gate. It is not a design blocker on
+      AD-19 (H8 verified 2026-09-02).
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-19, PM/AD-29]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-19
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md
+      - services/backend/prisma/migrations/20260830010000_access_control_relationships/migration.sql
+    closure_condition: >
+      Close only when CC-07 is closed AND PUT/DELETE people-partner routes exist
+      with journal-in-transaction behind independently approved AD-1 Stage-2
+      evidence. A named memlog decision does not close implementation. Do not
+      require architecture-approvals.yaml or a second architecture approver.
+    note: >
+      Design resolved by AD-19 (storage as Relationship, fixed cardinality, atomic
+      replace with expectedCurrentTargetId, 409 semantics, journal-in-transaction).
+      AD-19 design gates are PM/AD-29 (journal implementation) and DEPARTMENT-EDGE
+      implementation for HR-line — not CC-04 redesign. Implementation is absent:
+      Relationship model and people_partner partial unique index exist, but no
+      PUT/DELETE people-partner route and no journal write exist.
+
+  - id: CC-05
+    owner: Product Owner and Architect
+    severity: P1
+    blocks: [Self versus full-profile precedence, overlay-to-column projection]
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-28]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-28
+      - docs/architecture/access-control.md
+    closure_condition: >
+      Closed at design: Self exclusive when viewer equals target; overlay is
+      read-only; max(Self, overlay) with write>read>none is testable. Overlay
+      implementation remains absent.
+    note: >
+      Grant lifecycle was already AD-10. Precedence and overlay-to-section
+      projection are PM/AD-28. Historical "unresolved column mapping" notes are
+      stale.
+
+  - id: CC-06
+    owner: Product Owner and Architect
+    severity: P1
+    blocks: [Departure aggregate, effective-date executor, mentorship auto-close, action-items departure cancel]
+    status: open
+    design_status: resolved-approved
+    implementation_status: absent
+    depends_on: [CC-07, CC-08, CC-09, OPERATIONAL-ENVELOPE]
+    decision_refs: [PM/AD-20, PM/AD-22, PM/AD-23]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-20
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-23
+      - docs/architecture/mentorship.md
+      - docs/architecture/domain-driven-design.md
+    participants:
+      - mentorship.applyDepartureEffects
+      - action-items.applyDepartureEffects
+      - access-control access-ending participant
+    closure_condition: >
+      Close only when ALL of the following are true, with independently approved
+      production evidence, not scenarios or red tests:
+      (1) every listed participant implements PM/AD-23 against the same signature
+      and uses the supplied tx with no nested transaction;
+      (2) the executor owns claim/fencing and stale tokens no-op;
+      (3) retry/idempotency is proven per participant via departureId (and
+      sourceDepartureId / status=active predicates);
+      (4) CC-07, CC-08, and CC-09 are closed;
+      (5) AD-20 operational release gate is demonstrated (shared BUSINESS_TIME_ZONE,
+      worker against the same PostgreSQL, health signals, alert ownership, manual
+      retry surface) without weakening OPERATIONAL-ENVELOPE remaining open items
+      that AD-20 itself requires;
+      (6) assigned-only action-item cancel and mentorship openToMentoring=false plus
+      pair auto-close occur in the same transaction as EmploymentStatus dismissed
+      and User.isActive.
+      Satisfying the signature alone does not close this blocker.
+    note: >
+      Design of the participant contract is approved 2026-09-02. Implementation is
+      absent in every part. This is not delivery progress.
+
+  - id: TIMETRACKER-CONTRACT
+    owner: Architect and Integration owner
+    severity: P1
+    blocks: [Project-line resolution, 15-minute revocation, 4-hour withdrawal]
+    status: superseded
+    superseded_by: [TT-IDENTITY-01, TT-PMDM-01]
+    evidence:
+      - docs/integrations/timetracker-external-api.json
+    note: >
+      The delivered contract resolves this entry's "no contract in repo" premise and
+      decides three sub-questions on evidence: assignment arrives as state-at-sync
+      (no cursor, since parameter, delta, webhook, or event feed), no write or
+      reassignment operation exists, and the 15-minute/4-hour rules are therefore a
+      poll cadence plus a platform-side consecutive-failure timer. Superseded, not
+      closed: two harder contradictions replace it, both open below. The leaves
+      endpoint remains absent from the delivered OpenAPI contract.
+    remaining_gaps:
+      - No leaves endpoint is present in the delivered OpenAPI contract
+      - The project/member mapping and revocation design is not yet approved
+
+  - id: QUALITY-GATE-AC
+    owner: Access Control and Quality Engineering
+    severity: P0
+    blocks:
+      - Unqualified production-readiness claim
+      - ACM3-II-06 inactive-identity fail-closed coverage
+    status: closed
+    closed: 2026-09-02
+    decision_refs: [PM/AD-12, ACF/AD-1]
+    artifact_refs: [ACM3-II-04, ACM3-II-05, ACM3-II-06]
+    evidence:
+      - _bmad-output/test-artifacts/gate-decision.json
+      - services/backend/test/access-control/acm3-bulk-input-contract.e2e-spec.ts
+      - services/backend/test/access-control/acm3-cycle-acyclicity.e2e-spec.ts
+      - _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml
+    closure_condition: >
+      Closed 2026-09-02: gate-decision.json shows gate_status=PASS, p0_status=MET,
+      critical_open=0. ACM3-II-04, ACM3-II-05, and ACM3-II-06 each have
+      independently approved Stage-2 evidence (sixth, sixth, and fifth increments).
+    note: >
+      Prior FAIL record (evaluated 2026-08-31, uncovered ACM3-II-06) is historical.
+      The 500-record/2s NFR remains tracked separately as QUALITY-GATE-AC-NFR.
+
+  - id: QUALITY-GATE-AC-NFR
+    owner: Access Control and Quality Engineering
+    severity: P1
+    blocks: [500-record / 2-second permission-resolution NFR, PM/AD-10 bulk resolver]
+    status: open
+    design_status: resolved-approved
+    implementation_status: unproven
+    decision_refs: [PM/AD-10]
+    artifact_refs: [ACM-9]
+    evidence:
+      - docs/architecture/testing-strategy.md
+      - docs/project-requirements.md
+    closure_condition: >
+      Close only when an ACM9-MVP-v1 FINAL artifact exists with status PASS,
+      500 requested active targets, warm p95 and worst case both <= 2 seconds,
+      and protocol steps 1-6 followed. A baseline-only run, an INCOMPLETE run,
+      or a PASS on fewer than 500 targets does not close. ACM-8 composition is
+      not a substitute for ACM-9 measurement.
+
+  # --- UNCHANGED, NOW WITH SEVERITY AND CLOSURE CONDITION ---
+
+  - id: CC-07
+    owner: Product Owner and Architect
+    severity: P0
+    blocks: [Relationship and grant journal, atomic organisational mutations]
+    status: open
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-29]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-29
+      - docs/architecture/database-schema.md
+    closure_condition: >
+      Close only when AccessJournal exists, same-transaction enrolment is proven
+      for every listed kind, reader authorization matches PM/AD-29, and
+      idempotencyKey uniqueness is proven under retry. Schema approval alone
+      does not close implementation.
+    note: >
+      Design resolved 2026-09-02 by PM/AD-29 (schema, snapshots, readers,
+      enrolment, idempotency). No journal table exists. Still the upstream
+      implementation blocker for CC-04 and AD-19 stage 2.
+
+  - id: CONFLICT-UM-01
+    owner: Product Owner, Architect, and Quality Engineering
+    severity: P1
+    blocks: ['Single empty-audience denial oracle for GET /users/:id']
+    status: open
+    design_status: resolved-approved
+    implementation_status: stale-and-divergent
+    alternatives: [403, 404]
+    superseded_design: empty-audience-403-2026-09-01
+    decision_refs: [PM/AD-24]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-24
+      - _bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md
+      - docs/test-cases/user-management/access-control-adoption/umac-05-unresolved-session-read-denied.md
+    closure_condition: >
+      Close only when AD-1-regenerated scenarios and Stage-2 tests assert PM/AD-24
+      (401 / 404 / 403 with hidden-target 404 preceding mutation checks) AND
+      production handlers implement that oracle. Historical 2026-09-01 approvals
+      remaining on disk do not keep this open once the live artifacts and code
+      match AD-24. Rewriting historical expectedResult lines as if they had always
+      said 404 does not close this.
+    note: >
+      Design resolved 2026-09-02 by PM/AD-24, which supersedes the UMAC 403
+      empty-audience decision. Implementation still splits 403/404/bypass. Marked
+      scenarios remain historical.
+
+  - id: OQ-PERM-01
+    owner: Product Owner
+    severity: P1
+    blocks: [Default functional-role permission assignments]
+    status: open
+    evidence:
+      - docs/project-requirements.md
+    closure_condition: Approved default role-to-permission assignment matrix
+    note: >
+      Scope is assignment only. Permission-key existence is a separate gap tracked as
+      OQ-AC-EDIT. Three permissions are seeded in bootstrap; seeding does not
+      establish a catalog. 2026-09-02: remains open. Architect must not invent
+      default grants. Requires a later PO batch confirmation of the role-to-permission
+      matrix before the roles admin screen is built (§2.3).
+
+  - id: OQ-114
+    owner: Architect
+    severity: P2
+    blocks: [Custom-field storage, directory arbitrary filtering]
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: transition-debt
+    decision_refs: [PM/AD-32]
+    carries_transition_debt: [TD-12]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-32
+      - docs/architecture/custom-fields.md
+      - services/backend/prisma/schema.prisma
+    closure_condition: >
+      Closed at design: typed EAV plus definitions table. Implementation still
+      uses User.customFields jsonb (TD-12).
+    note: Companion rewritten from stub. Do not query the jsonb bag.
+
+  - id: OQ-115
+    owner: Architect
+    severity: P2
+    blocks: [Dashboard engine and widget access model]
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-33]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-33
+      - docs/architecture/dashboards.md
+    closure_condition: >
+      Closed at design: four fixed read models; authorize then aggregate; no
+      generic widget framework. Implementation absent.
+    note: Companion rewritten from stub.
+
+  - id: OQ-117
+    owner: Architect
+    severity: P2
+    blocks: [Profile bounded-context placement]
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: partial
+    decision_refs: [PM/AD-34]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-34
+    closure_condition: Closed at design. user-management owns assembly. No new bounded context.
+    note: Decided together with ARCH-ENV-01 (PM/AD-34). Runtime still serializes whole User rows.
+
+  - id: DEPARTMENT-EDGE
+    owner: Architect
+    severity: P1
+    blocks: [Department hierarchy audience walk, department mutations, routing]
+    status: open
+    design_status: resolved-approved
+    implementation_status: absent
+    depends_on: []
+    decision_refs: [PM/AD-35]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-35
+      - docs/architecture/database-schema.md
+    closure_condition: >
+      Close only when Department, parentId index, UserDepartment, cycle rejection,
+      and isHr-bounded PP HR-line exist with AD-1 evidence. Schema approval alone
+      does not close. TimeTracker remains a non-source.
+    note: >
+      Design resolved 2026-09-02. OQ-116 dependency removed. Platform is source of
+      truth; seed CSV is flat roots; nesting and isHr are platform-administered.
+      No Department table exists. Walk stays fail-closed until implemented.
+
+  - id: AC-S9-S13
+    owner: Access Control
+    severity: P1
+    blocks: [Career timeline writes, Mentorship profile projection and closure-note visibility]
+    status: open
+    design_status: target-approved-increment-not-approved
+    implementation_status: absent
+    evidence:
+      - docs/project-requirements.md
+      - services/backend/src/access-control/application/access-control.facade.ts
+    closure_condition: An approved AD-1 increment for S9-S13, then production evidence
+    note: >
+      Two different things, reported separately: the target section matrix is approved,
+      the increment is not. The facade returns 'none' for every section other than
+      S1/S10/S11.
+
+  # --- NEW: PREVIOUSLY UNTRACKED (Reviewer Gate 2026-09-02) ---
+
+  - id: SEC-AUTH-01
+    owner: Architect and Security
+    severity: P0
+    blocks:
+      - Deployment of interim adapters to any shared environment
+      - AD-12 privilege-escalation invariant
+      - AD-16 no-provisioning-API invariant
+    status: open
+    evidence:
+      - services/backend/src/user-management/infrastructure/interim-session-resolver.adapter.ts:43-48
+      - services/backend/src/user-management/infrastructure/interim-session-resolver.adapter.ts:74-87
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts:11-14
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts:37
+      - services/backend/src/user-management/user-management.module.ts
+    closure_condition: Interim adapters fail closed, or are removed from the production module
+    note: >
+      Three compounding paths, all bound into the production module. (1) Any
+      "Bearer <token:persona>" resolves to a session. (2) The "Root" persona
+      self-provisions a User row with position 'HR Admin' when no root exists, which
+      the interim access-control adapter then grants user-management:create,
+      :deactivate, and :list. (3) isAllowedForTarget returns Boolean(userId) for every
+      target check. This bypasses the AC-spine bootstrap contract and contradicts
+      AD-12 and AD-16.
+    exposure: >
+      Latent, not live. The backend is not containerized in docker-compose.yml and is
+      not deployed, so there is no exploitable surface today. That is a reason to
+      sequence the fix before the first shared-environment deploy, not a reason to
+      downgrade it. Tracked as transition debt TD-02, re-scoped to P0.
+
+  - id: CC-08
+    owner: Architect
+    severity: P0
+    blocks:
+      - Departure effective-date executor
+      - Seeded-import dismissal handling
+      - TimeTracker sync employment-state writes
+      - Legacy DELETE /users/:id isActive writer
+    status: open
+    design_status: resolved-approved
+    implementation_status: absent
+    depends_on: []
+    decision_refs: [PM/AD-22, PM/AD-16, PM/AD-20]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-22
+      - services/backend/src/user-management/infrastructure/user.repository.ts
+      - services/backend/src/access-control/infrastructure/prisma-identity.adapter.ts
+      - docs/test-cases/user-management/seed/README.md
+    closure_condition: >
+      Close only when production evidence proves ALL of:
+      (1) EmploymentStatus is written only by employment lifecycle (import
+      initialize-only, executor for active to dismissed);
+      (2) TimeTracker writes no employment state;
+      (3) User.isActive is updated only inside the same transaction as the
+      dismissed fact, or the column is gone;
+      (4) the legacy direct-deactivate path is removed (AD-21 cutover), not
+      merely unused;
+      (5) a re-import after an applied departure cannot restore EmploymentStatus
+      to active and cannot restore isActive or authorization.
+      An approved prose rule without (5) does not close this blocker.
+    statement: >
+      Design resolved 2026-09-02 by PM/AD-22. Implementation still has four live
+      or planned writers. Do not treat design approval as closure.
+    resolution_note: >
+      Ownership rule is user-approved. Implementation and the re-import proof remain
+      open. CC-06 depends on this.
+
+  - id: CC-09
+    owner: Architect
+    severity: P0
+    blocks: [UserEvents career history, AD-20 retry policy]
+    status: open
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-30]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-30
+      - docs/architecture/database-schema.md
+    closure_condition: >
+      Close only when UserEvents persistence exists in user-management, other
+      contexts call only the career-event application boundary, and
+      idempotencyKey uniqueness is proven for departure and mentorship retries.
+    note: >
+      Design resolved 2026-09-02 by PM/AD-30. No UserEvents model exists.
+
+  - id: CC-10
+    owner: Product Owner and Architect
+    severity: P0
+    blocks:
+      - Mentorship bounded context
+      - MentorshipAvailability aggregate
+    status: superseded
+    superseded_by: [CC-10-MENTORSHIP, ARCH-GOV-01]
+    note: >
+      Split 2026-09-02 so a process question cannot keep the mentorship design
+      gate unfalsifiable.
+
+  - id: CC-10-MENTORSHIP
+    owner: Product Owner and Architect
+    severity: P1
+    blocks: [Mentorship bounded context implementation]
+    status: open
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-5, PM/AD-17, PM/AD-23]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-5
+      - docs/architecture/mentorship.md
+    closure_condition: >
+      Close only when src/mentorship exists with the approved aggregates, routes,
+      and AD-23 participant, behind independently approved AD-1 Stage-2 evidence.
+      This batch sign-off closes the design-approval gap only.
+    note: Mentorship design approved 2026-09-02. No source context exists.
+
+  - id: ARCH-GOV-01
+    owner: Architect
+    severity: P2
+    blocks: [Architecture document-status governance]
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: recorded
+    decision_refs: []
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md
+      - docs/architecture/README.md
+    closure_condition: >
+      Closed when the People Management spine frontmatter status is
+      approved-with-open-items, updated/revision match the 2026-09-02 amendment
+      date, README cites that status, and qualified spine_id refs are documented.
+    note: >
+      Lightweight governance approved 2026-09-02: memlog plus user batch sign-off
+      plus Update plus a future commit SHA. No architecture-approvals.yaml. No
+      second architecture approver. AD-1 ledgers unchanged. TD-10 retired.
+
+  - id: OPERATIONAL-ENVELOPE
+    owner: Architect
+    severity: P0
+    blocks:
+      - Hosting provider
+      - Environment topology
+      - Observability vendor and alert ownership
+      - Manual retry surface
+      - BUSINESS_TIME_ZONE validation across environments
+      - Worker process topology
+      - Rollback position
+      - Secret management for external integration keys
+    status: open
+    register_dimension: operational-envelope
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-20
+      - docs/integrations/timetracker-external-api.json
+    closure_condition: >
+      Each listed dimension decided or explicitly deferred with a named owner, without
+      weakening AD-20's shared-database, timezone, health, alert, or worker requirements
+    note: >
+      A whole dimension the initiative altitude owns was silent across all four package
+      files. AD-20's operational release gate makes concrete demands and the spine's
+      Deferred list says the remaining envelope must be resolved before first release;
+      neither appeared in any register. AD-20 classifies mixed process configuration as
+      a startup/deployment failure, so divergence here is a runtime failure mode, not a
+      documentation inconsistency. Declining to certify deployment readiness is not the
+      same as recording the envelope as deferred with an owner. Secret management is
+      included because the only declared TimeTracker server is a dev host authenticated
+      by per-partner X-Api-Key with no production topology or secret decision.
+    also_recorded_in: Section 3.1 Dimension register, ARCHITECTURE-RATIFICATION.md
+
+  - id: TT-IDENTITY-01
+    owner: Architect and Integration owner
+    severity: P0
+    blocks: [TimeTracker project-member sync, AD-13 ttId identity rule, project-line audience derivation]
+    status: open
+    supersedes_part_of: TIMETRACKER-CONTRACT
+    evidence:
+      - docs/integrations/timetracker-external-api.json
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-13
+      - docs/project-requirements.md
+    closure_condition: >
+      An approved durable identity source for project members, or an approved amendment
+      to the AD-13 identity rule
+    note: >
+      Project members arrive as AccountTalentDto {email, dateStart, dateEnd} with no
+      durable id, while requirements state email alone is insufficient and AD-13 builds
+      User.ttId on that premise. The seed CSV is also keyed by email with no id column.
+      User.ttId therefore has no population source, and the only available join is the
+      one the requirements forbid. A durable Employee.id exists but only on the
+      Accounting endpoint, behind a different partner key, requiring month and year and
+      returning only employees with time entries in that period; using it as an identity
+      bridge needs an explicit approved decision, not an inference.
+
+  - id: TT-PMDM-01
+    owner: Architect and Integration owner
+    severity: P1
+    blocks: [PM/DM audience derivation, project-line permission edges]
+    status: open
+    supersedes_part_of: TIMETRACKER-CONTRACT
+    evidence:
+      - docs/integrations/timetracker-external-api.json
+    closure_condition: An approved resolvable identifier for projectManager and deliveryManager
+    note: >
+      projectManager and deliveryManager are declared as untyped strings while members in
+      the same object are emails. Joining an authorization edge on an unformatted display
+      name is a fail-open risk, and requirements class project assignment as a security
+      concern rather than a data-quality nicety.
+
+  - id: CC-11
+    owner: Architect
+    severity: P1
+    blocks: [Relationship type='project' writes]
+    status: superseded
+    superseded_by: [ARCH-PROJ-WRITER-01]
+    superseded: 2026-09-02
+    decision_refs: [PM/AD-31]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-31
+    note: >
+      Architecture-register ID collision with historical PRD "CC-11 Option 1".
+      Superseded by ARCH-PROJ-WRITER-01. Do not reuse CC-11 for this blocker.
+      Historical PRD CC-11 Option 1 meaning is preserved elsewhere.
+
+  - id: ARCH-PROJ-WRITER-01
+    owner: Architect
+    severity: P1
+    blocks: [Relationship type='project' writes]
+    status: open
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-31]
+    depends_on: [TT-IDENTITY-01]
+    supersedes: [CC-11]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-31
+    closure_condition: >
+      Close only when TimeTracker sync is the sole production writer of
+      Relationship type=project and no manual/admin/resourcing path writes those
+      rows. Identity join remains TT-IDENTITY-01.
+    note: >
+      Globally unambiguous replacement for the architecture CC-11 collision.
+      Design resolved 2026-09-02 by PM/AD-31. Sync is absent.
+
+  - id: OQ-AC-EDIT
+    owner: Architect and Access Control
+    severity: P1
+    blocks: [user-management:edit permission key, mentorship:assign permission key]
+    status: open
+    evidence:
+      - _bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md
+    closure_condition: Both keys present in an approved permission catalog, or the design references removed
+    note: >
+      Permission-key existence, distinct from OQ-PERM-01 which is about assignment. Both
+      keys are referenced by design and exist in no catalog. Present in the PRD but never
+      recorded here.
+
+  - id: OQ-116
+    owner: Product Owner
+    severity: P1
+    blocks: [Non-manager project assignment semantics]
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: absent
+    decision_refs: [PM/AD-27]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-27
+      - docs/architecture/access-control.md
+    closure_condition: Closed. Ordinary membership is not Project-line. No member targetRole.
+    note: >
+      DEPARTMENT-EDGE no longer depends on this question. Project-line implementation
+      remains fail-closed/absent.
+
+  - id: OQ-105
+    owner: Product Owner
+    severity: P1
+    blocks: [HR Admin grant and revoke chain]
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: transition-debt
+    decision_refs: [PM/AD-26, PM/AD-12]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-26
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts
+    closure_condition: >
+      Closed at design and consistent with AD-12. Implementation still treats
+      User.position as HR Admin and has no last-holder FR guard.
+    note: Present in the PRD. Runtime gaps are transition debt, not a reason to reopen.
+
+  - id: OQ-118
+    owner: Architect
+    severity: P1
+    blocks: ['data/canEdit response envelope ownership']
+    status: superseded
+    superseded_by: [ARCH-ENV-01]
+    superseded: 2026-09-02
+    decision_refs: [PM/AD-34]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-34
+    note: >
+      Architecture-register ID collision with historical PRD OQ-118 (already
+      resolved in the product Decision Log). Superseded by ARCH-ENV-01. Do not
+      reuse OQ-118 for the envelope blocker. Historical OQ-118/OQ-119 meanings
+      remain those recorded in the PRD recently-resolved list.
+
+  - id: ARCH-ENV-01
+    owner: Architect
+    severity: P1
+    blocks: ['data/canEdit response envelope ownership']
+    status: closed
+    closed: 2026-09-02
+    design_status: resolved-approved
+    implementation_status: partial
+    decision_refs: [PM/AD-34]
+    supersedes: [OQ-118]
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md#AD-34
+      - docs/architecture/access-control.md
+      - docs/test-cases/user-management/access-control-adoption/umac-01-self-read-s1-card.md
+    closure_condition: >
+      Design closed with OQ-117 by PM/AD-34. user-management owns the envelope;
+      AccessControl computes canEdit. Implementation remains partial (whole-row
+      serializer). Do not treat design closure as production-ready projection.
+    note: >
+      Globally unambiguous replacement for the architecture OQ-118 collision.
+      Runtime still whole-row serializes User. Historical UMAC 403 denial text
+      remains stale (PM/AD-24).

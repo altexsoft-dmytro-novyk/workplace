@@ -1,6 +1,6 @@
 {
   "schema_version": "0.2.0",
-  "snapshot_at": "2026-08-31T14:04:52.886179Z",
+  "snapshot_at": "2026-09-02T07:15:25Z",
   "repo": "people management",
   "collection_mode": "contract_static",
   "collection_status": "COLLECTED",
@@ -27,15 +27,15 @@
   },
   "coverage": {
     "inventory": {
-      "covered": 78,
+      "covered": 81,
       "total": 81,
-      "pct": 96
+      "pct": 100
     },
     "priority_breakdown": {
       "P0": {
         "total": 64,
-        "covered": 61,
-        "pct": 95
+        "covered": 64,
+        "pct": 100
       },
       "P1": {
         "total": 17,
@@ -82,13 +82,13 @@
   },
   "tests": {
     "files": 14,
-    "cases": 99,
+    "cases": 103,
     "skipped_cases": 0,
     "fixme_cases": 0,
     "pending_cases": 0
   },
   "risk_summary": {
-    "critical_open": 1,
+    "critical_open": 0,
     "high_open": 0,
     "medium_open": 0,
     "low_open": 0
@@ -118,48 +118,25 @@
     "invalid": 0,
     "requirements_live_only": 0
   },
-  "blockers": [
-    {
-      "id": "ACM3-II-06",
-      "severity": "high",
-      "reason": "No test exists for 'repeated node before viewer proof, viewer off-chain, falls to Colleague'; a comment in acm3-termination-taxonomy.e2e-spec.ts falsely claims coverage in acm3-cycle-acyclicity.e2e-spec.ts",
-      "test_file": "",
-      "test_title": "ACM3-II-06"
-    }
-  ],
+  "blockers": [],
   "recommendations": [
-    {
-      "priority": "URGENT",
-      "action": "Add a committed-red-then-green Stage-2 test for ACM3-II-06 (repeated node before viewer proof, viewer off-chain) and correct the stale cross-reference comment in acm3-termination-taxonomy.e2e-spec.ts",
-      "requirements": [
-        "ACM3-II-06"
-      ]
-    },
-    {
-      "priority": "MEDIUM",
-      "action": "Complete coverage for 2 partially/cross-mapped requirements: add a canonical ACM-3 Stage-2 test for II-04 (or formally adopt ACF-FC-03 as its Stage-2 evidence in approvals.yaml) and extend the ACM4R-MA-04 test (or add a new one) to cover a duplicated viewer-self id alongside a duplicated target in one bulk call for II-05",
-      "requirements": [
-        "ACM3-II-04",
-        "ACM3-II-05"
-      ]
-    },
     {
       "priority": "LOW",
       "action": "Run bmad-testarch-test-review to assess test quality",
       "requirements": []
     }
   ],
-  "gate_status": "FAIL",
+  "gate_status": "PASS",
   "gate_criteria": {
     "p0_coverage_required": "100%",
-    "p0_coverage_actual": "95%",
-    "p0_status": "NOT_MET",
+    "p0_coverage_actual": "100%",
+    "p0_status": "MET",
     "p1_coverage_target": "90%",
     "p1_coverage_minimum": "80%",
     "p1_coverage_actual": "100%",
     "p1_status": "MET",
     "overall_coverage_minimum": "80%",
-    "overall_coverage_actual": "96%",
+    "overall_coverage_actual": "100%",
     "overall_status": "MET"
   },
   "links": {

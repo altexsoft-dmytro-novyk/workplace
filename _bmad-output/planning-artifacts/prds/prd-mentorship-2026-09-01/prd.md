@@ -1,13 +1,25 @@
 ---
 title: Mentorship — PRD
-status: draft
+status: historical
 created: 2026-09-01
-updated: 2026-09-01
+updated: 2026-09-02
+superseded_by: _bmad-output/specs/spec-mentorship-domain/SPEC.md
 ---
 
 # Mentorship — PRD
 
-> **Nothing in this document is approved.** `status: draft`. It decomposes
+> **Historical record.** Retained for decision and requirements traceability.
+> Do not use this document for new requirements or implementation dispatch.
+> Use the canonical People Management PRD and
+> `_bmad-output/specs/spec-mentorship-domain/SPEC.md`.
+
+> **Stale relative to 2026-09-02 architecture (do not rewrite body as if current).**
+> MentorshipPair / MentorshipAvailability aggregates, derived status, approved
+> routes, and PM/AD-23 departure participant are binding in
+> `spec-mentorship-domain/SPEC.md` and `docs/architecture/mentorship.md`. This
+> historical PRD must not be read as leaving those design facts open.
+>
+> **Nothing in this historical document is approved for dispatch.** `status: historical`. It decomposed
 > People Management PRD **FR-32 / FR-33 / FR-34** (`prd-people-management-2026-08-24`
 > §4.12) and `docs/project-requirements.md` **§4.11 (Mentorship Hub)** into the
 > `mentorship` bounded context. It mirrors the shape of
