@@ -1,54 +1,95 @@
 # UM-SEED-01 · Population import creates one canonical `User` row per seeded employee
 
-**Trace:** PRD FR-1, FR-4, FR-5a, FR-7 · requirements §4.17 · [DEC-UM-007](../../../architecture/user-management-test-decisions.md#dec-um-007--workemail-normalization-oq2--kept-reconciled-to-kernel-reality) (canonical at write) · [DEC-UM-003](../../../architecture/user-management-test-decisions.md#dec-um-003--customfields-at-seedimport-b-05--a-03--reframed-v15--no-post-users) (`customFields` DB default) · AD-11 (same-transaction system event) · epics.md Story 1.1
+**Trace:** PRD FR-1, FR-4, FR-5a, FR-7 · requirements §4.17 (the population is a delivered import, no employee-creation flow) · [decisions §5](../../../../_bmad-output/implementation-artifacts/user-management/epic-1-story-1-1-decisions.md) (column mapping) · [spec-1-1](../../../../_bmad-output/implementation-artifacts/user-management/spec-1-1-import-seeded-population.md) I/O matrix "Import success" · [seed README](README.md#the-import-operator-endpoint-settled-in-scenario--confirm-at-approval) (`POST /users/import`, synchronous summary) · [DEC-UM-007](../../../architecture/user-management-test-decisions.md#dec-um-007--workemail-normalization-oq2--kept-reconciled-to-kernel-reality) (writer stores the normalized `workEmail`) · [DEC-UM-003](../../../architecture/user-management-test-decisions.md#dec-um-003--customfields-at-seedimport-b-05--a-03--reframed-v15--no-post-users) (`customFields` DB default) · AD-11 (system `joined_company` event in the row transaction — atomicity is `um-seed-13`) · epics.md Story 1.1
 
 ## Scenario
 
-**Given** a freshly migrated, empty database on which `npm run db:seed` (ACM-0)
-and `npm run db:bootstrap:access-control` (ACM-1) have already run, so exactly
-one active root `User` and its `hr-admin` FR attachment exist.
+**Given** a freshly migrated database on which the binding deployment order has
+run up to but not past the import: `npm run db:seed` created the single active
+ACM-0 root `User` (stored `workEmail` = normalized `ROOT_WORK_EMAIL`) and
+`npm run db:bootstrap:access-control` attached the one seeded `hr-admin` FR policy
+(permissions `user-management:create` / `:deactivate` / `:list`) to that root row.
+**Root** is the operator persona holding that grant chain.
 
-**When** the population import runs against the delivered semicolon-delimited
-timetracker export `docs/Accounts_template.csv` (§4.17) — a pseudonymised fixture
-file, never real employee data (NFR-1).
+**When** Root `POST`s `/users/import` with the pseudonymised fixture
+[`seed-basic.csv`](README.md#fixture-convention) as the multipart `file` part — a
+5-row semicolon-delimited file with the delivered header, verbatim (NFR-1: never
+real employee data). None of its rows normalize to `ROOT_WORK_EMAIL`.
 
-**Then** one `User` row exists per CSV row, each with the fields the
-[column → `User` field mapping](README.md#column---user-field-mapping) provides:
-`FirstName`→`firstName`, `LastName`→`lastName`, `Email`→`workEmail` (**the natural
-key** — no employee-id column in the file), `Birthday`→`birthDay`/`birthMonth`
-(year dropped; `NULL`→both `null`), `RegistrationDate`→`companyJoinDate`,
-`PositionName`→`position`, `CountryName`→`country`. Fields with **no source
-column** come back `null`: **`workPhone`, `city`, `photo`, `ttId`** — assert this
-explicitly rather than asserting they are populated. `workEmail` is **stored
-trimmed and lowercased** (DEC-UM-007 — the writer stores the normalized value,
-not the raw CSV value) and is unique across imported rows; each imported row's
-`customFields` persists as `{}` (DB default, writer omits it — DEC-UM-003); and
-each imported row has exactly one system `UserEvents` row with
-`type: "joined_company"`, `source: "system"`, `eventDate` equal to that row's
-`companyJoinDate`, written in the **same transaction** as the row insert (AD-11 /
-Epic 3 pattern) — never via an HTTP create.
+**Then** the response is `200` with the synchronous summary
 
-**OPEN (do not assert either way — see the mapping table):** `PositionId`
-(positions dictionary?), `DepartmentName`/`DepartmentId` (Department edge
-contract deferred), `CountryCode`/`CountryStateName`, `EmployeeType` (S4 — not on
-the `User` row), `IsDismissed`/`DismissedDate` (employment status §4.16, not
-`User.isActive` directly — interim `isActive=false` for a dismissed row until the
-`EmploymentStatus` aggregate lands), `TimeZone` (not an S1 field).
+```json
+{ "created": 5, "updated": 0, "departmentsCreated": 3, "skipped": 0, "errors": [] }
+```
 
-**Preconditions:** [fixture](../README.md#canonical-personas); fresh DB; `db:deploy` → `db:seed` → `db:bootstrap:access-control` completed; `docs/Accounts_template.csv` is the only import source.
+and after the import commits, one `User` row exists per CSV data row, each with
+the fields the [column → `User` field mapping](README.md#column--user-field-mapping-resolved--per-the-2026-09-01-decisions)
+provides:
+
+- `FirstName`→`firstName`, `LastName`→`lastName` verbatim;
+- `Email`→`workEmail` — **the natural key** (the file carries no employee-id
+  column) — stored **trimmed and lowercased** (DEC-UM-007: the writer stores the
+  normalized value, not the raw CSV value), so row 4's `  Katherine@X.Example `
+  persists as `katherine@x.example`;
+- `RegistrationDate`→`companyJoinDate`, `PositionName`→`position` (free-text S1),
+  `CountryName`→`country` verbatim;
+- `Birthday`→`birthDay`/`birthMonth` (year dropped; `NULL`→both `null`) — the
+  detail is `um-seed-06`;
+- `isActive` is `true` on every imported row, dismissed employees included — the
+  import never sets it from `IsDismissed` (decisions §4; detail in `um-seed-05`);
+- `customFields` persists as `{}` (DB default, writer omits it — DEC-UM-003);
+- `createdBy` = the ACM-0 root `User` id on every imported row (the import runs
+  as the root operator);
+- fields with **no source column** persist as `null`, asserted explicitly:
+  `workPhone`, `city`, `photo`, `ttId` — detail in `um-seed-07`.
+
+Each imported user gets exactly one `Department` membership — the CSV carries one
+`DepartmentId` per row; the schema permits an employee to hold more than one
+current membership, but this import never creates a second one (detail:
+`um-seed-04`) — and each new `(DepartmentId, DepartmentName)` pair one `Department`
+row (identity is the pair, `UNIQUE (externalId, name)` — `um-seed-04`); exactly one
+`EmploymentStatus` row (detail: `um-seed-05`); and exactly one system
+`UserEvents` row `{ type: "joined_company", source: "system" }` with
+`eventDate = companyJoinDate`, written in the same transaction as the row insert
+(atomicity: `um-seed-13`) — never through an HTTP create (`um-seed-02`).
+
+**Preconditions:** [fixture](../README.md#canonical-personas); fresh migrated DB;
+`db:deploy` → `db:seed` → `db:bootstrap:access-control` completed and nothing
+imported yet; Root holds the live `hr-admin` FR grant chain; `seed-basic.csv` is
+the upload. Real-session cases use `Bearer <token:<root-uuid>>`.
 
 ## Test
 
-Story 1.1's writer has no HTTP surface — assertions are against database row-level
-state after the import completes (stage 2 runs the import script's production
-entrypoint against migrated PostgreSQL).
-
-- **stateChange:** the population import runs to completion against `docs/Accounts_template.csv`.
-- **expectedResult (database state):**
-  - `users` contains one row per CSV data row (plus the pre-existing ACM-0 root row; minus any CSV row whose normalized `Email` equals the normalized `ROOT_WORK_EMAIL` — that one **updates** the root row, DEC-UM-009).
-  - every imported row's stored `workEmail` equals `trim(lowercase(CSV Email))`; no stored value carries outer whitespace or uppercase.
-  - `SELECT "workEmail", count(*) ... GROUP BY "workEmail" HAVING count(*) > 1` returns zero rows.
-  - for every imported row: `workPhone IS NULL`, `city IS NULL`, `photo IS NULL`, `ttId IS NULL` (no source column in the CSV).
-  - `birthDay` / `birthMonth` are both `NULL` for a row whose `Birthday` is `NULL`; for a dated `Birthday` they hold the day/month with **no year retained anywhere**.
-  - every imported row has `customFields = {}`.
-  - `user_events` contains exactly one `{ type: "joined_company", source: "system" }` row per imported `User`, `eventDate = companyJoinDate`, in the same committed transaction as the insert (asserted by both existing when the import completes and neither existing if the import is made to fail mid-row).
+- **inputURL:** `POST /users/import`
+- **inputRequest:**
+  ```json
+  {
+    "headers": {
+      "authorization": "Bearer <token:<root-uuid>>",
+      "content-type": "multipart/form-data"
+    },
+    "body": "<multipart form-data; one file part: file=seed-basic.csv (semicolon-delimited, delivered header verbatim, 5 data rows)>"
+  }
+  ```
+- **expectedResult:** `200`. Body is exactly
+  `{ "created": 5, "updated": 0, "departmentsCreated": 3, "skipped": 0, "errors": [] }`.
+- **expectedResult (database state after the import commits):**
+  - `users` gains 5 rows (plus the untouched pre-existing ACM-0 root row).
+  - every new row's stored `workEmail` equals `trim(lower(<CSV Email>))`; no
+    stored value carries outer whitespace or an uppercase character;
+    `SELECT "workEmail", count(*) FROM users GROUP BY "workEmail" HAVING count(*) > 1`
+    returns zero rows.
+  - for every new row: `workPhone IS NULL`, `city IS NULL`, `photo IS NULL`,
+    `ttId IS NULL`, `customFields = '{}'::jsonb`, `isActive = true`,
+    `createdBy = <ACM-0 root id>`.
+  - `firstName` / `lastName` / `position` / `country` / `companyJoinDate` hold
+    the mapped CSV values verbatim.
+  - `department` has 3 rows (`externalId` `"1"` / `"2"` / `"3"`, `name` `JS` /
+    `QA` / `Infra`, `parentId IS NULL` on each); `department_membership` has 5
+    rows, exactly one current row per new user.
+  - `employment_status` has 5 rows, exactly one per new user.
+  - `user_events` has exactly one `{ type: "joined_company", source: "system" }`
+    row per new user with `eventDate = companyJoinDate`, `createdBy = <ACM-0 root
+    id>`, `deletedAt IS NULL`.
+  - the ACM-0 root row's `id` / `createdAt` / `createdBy` and its single
+    `hr-admin` FR attachment are unchanged.

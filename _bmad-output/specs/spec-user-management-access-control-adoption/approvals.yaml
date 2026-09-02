@@ -29,12 +29,11 @@
 #   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
 #   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
 #
-# Status: UMAC-1-scenarios stage-1-scenarios recorded below (Story 0.1 read
-# path — umac-01..06 + folder README + the consolidated story spec). No
-# Stage-2 or Stage-3 record exists yet; the next dispatch (UMAC-1-red-tests)
-# may proceed only after independently verifying these records.
-# UMAC-2 (write path) is unstarted and blocked on the Open Decision (i)
-# option (a) kernel seed sequence for user-management:edit.
+# Status: UMAC-1 Stage 1 (scenarios) and Stage 2 (red tests) are recorded
+# below (Story 0.1 read path). No Stage-3 record exists yet; the next
+# dispatch is UMAC-1-production, after independently verifying the Stage-2
+# records. UMAC-2 (write path) is unstarted and blocked on the Open
+# Decision (i) option (a) kernel seed sequence for user-management:edit.
 
 approvals:
   - story_id: "UMAC-1-scenarios"

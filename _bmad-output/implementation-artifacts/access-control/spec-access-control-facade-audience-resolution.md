@@ -2,7 +2,7 @@
 title: 'Access Control — AccessControl facade and audience resolution'
 type: 'feature'
 created: '2026-08-29'
-status: 'ready-for-dev'
+status: 'review'
 review_loop_iteration: 0
 context:
   - '{project-root}/docs/architecture/access-control.md'

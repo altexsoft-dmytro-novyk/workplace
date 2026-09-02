@@ -28,8 +28,8 @@ that needs Product input, and the files I touched so we do not collide.
 > `GET /users/:id` returns the **S1 identity card** (`200`) from adoption
 > Story 0.1 — §3.2's S1 row is `R` for the Colleague column and every active
 > authenticated viewer is at least a Colleague. Adoption story `UMAC-3` is
-> removed; the only `GET /users/:id` denial is an empty audience → leak-free
-> `404`. The binding contract is
+> removed; denials are `401` (unresolved session) and `403` (empty audience).
+> No leak-free `404`. The binding contract is
 > `../../specs/spec-user-management-access-control-adoption/SPEC.md`; where the
 > prose below still says "colleague denied" / "`403`" / "`UMAC-3` is the
 > trigger", read the SPEC instead.
@@ -55,10 +55,10 @@ Scope, from the adoption SPEC:
   working for the seeded HR-Admin session and fail closed otherwise.
 - **CAP-2 (read)** — `GET /users/:id` returns `200` with the **S1 identity
   card** for any non-empty audience (Self / reporting-line / assigned PP /
-  **colleague**); the only denial is an empty audience set → leak-free `404`.
-  Story 0.1 ships the S1-card DTO on that handler. *(Revised 2026-09-01 — the
-  earlier "two-state colleague rule" / `403` is withdrawn; see the banner
-  above.)*
+  **colleague**); denials are `401` (unresolved session) and `403` (empty
+  audience). No leak-free `404`. Story 0.1 ships the S1-card DTO on that
+  handler. *(Revised 2026-09-01 — the earlier "two-state colleague rule" is
+  withdrawn; empty-audience stayed `403`; see the banner above.)*
 - **CAP-2 (write)** — `PATCH /users/:id` and `PUT /users/:id/photo` behind the
   §2.2 dual gate. **Blocked on a missing permission — see section 2.**
 - **CAP-4** — real-consumer HTTP → router → session → AccessControl →
@@ -74,8 +74,8 @@ Scope, from the adoption SPEC:
   epic (recommended — Story 1.2 then asserts data correctness, adoption
   asserts who is entitled) or duplicated. `profile.e2e-spec.ts`'s current
   `Bearer <token:Bob>` literal placeholders break under the real facade
-  (`'Bob'` resolves to a non-existent user → empty audience → leak-free `404`
-  on the read, `403` on a write); the adoption Stage-2 must seed real users
+  (`'Bob'` resolves to a non-existent user → empty audience → `403`
+  on the read and on a write); the adoption Stage-2 must seed real users
   with real `Relationship` rows.
 - The write path (CAP-2 write) sequences **after** the permission decision in
   section 2.
@@ -89,7 +89,7 @@ The UM PRD's numbered FRs do not currently name the adoption. Add:
   via the `ACCESS_CONTROL_PORT` binding; the interim adapter is removed. A
   `GET /users/:id` returns the S1 identity card for any non-empty audience
   (Self, reporting line, assigned People Partner, or colleague); only an empty
-  audience denies (leak-free `404`)."* This makes NFR-4 (`epics.md` line 55 —
+  audience denies (`403`)."* This makes NFR-4 (`epics.md` line 55 —
   "every user-management controller must call through [the facade]") concrete
   and testable rather than aspirational.
 - **FR-9 refinement:** FR-9 already says *"Self can directly write only the

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-22-2026 23:36
-last_updated: 09-01-2026 00:00
+last_updated: 09-01-2026 23:10
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -45,7 +45,7 @@ development_status:
   #   product decision): §3.2 S1 row is R for the Colleague column, so a colleague
   #   reads the S1 identity card from Story 0.1; there is nothing to flip.
   epic-0: in-progress
-  0-1-adopt-read-path-and-rebind-port: in-progress  # UMAC-1-scenarios (Stage 1) approved 2026-09-01; UMAC-1-red-tests next
+  0-1-adopt-read-path-and-rebind-port: in-progress  # UMAC-1 Stage 1 + Stage 2 approved 2026-09-01; UMAC-1-production next
 
   0-2-adopt-write-path-dual-gate: backlog
   epic-0-retrospective: optional

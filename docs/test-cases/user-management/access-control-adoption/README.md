@@ -1,5 +1,14 @@
 # User Management — `access-control-adoption/` (Epic 0)
 
+> **Denial oracle superseded 2026-09-02 (PM/AD-24).** Q4 / `umac-05` still record
+> the 2026-09-01 empty-audience `403` product decision as **historical AD-1
+> evidence**. Live rule: invalid/inactive session `401`; missing or hidden-existence
+> target `404`; visible resource but forbidden feature/action `403`; lists omit
+> invisible rows; hidden-target `404` precedes mutation permission checks.
+> Do not rewrite historical expectedResult lines as if they had always said `404`.
+> Regeneration is a new AD-1 dispatch. Implementation still diverges (guard `403`,
+> action `404`, interim adapter bypass).
+
 Stage-1 scenario documents (AD-1) for **Epic 0 — Access Control Adoption**. They
 mirror the dispatch entries `UMAC-1` / `UMAC-2` in
 `_bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml`

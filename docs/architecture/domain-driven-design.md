@@ -1,21 +1,22 @@
 # Domain-Driven Design & Hexagonal Structure
 
-Binding rules for how backend code is organized. Spine: AD-2, AD-5, AD-6, AD-15…AD-21.
+Binding rules for how backend code is organized. Spine: PM/AD-2, PM/AD-5, PM/AD-6, PM/AD-15…PM/AD-25.
 
 ## Bounded contexts (AD-5)
 
 The backend is a set of bounded contexts under `src/`. Confirmed so far:
 
-- `user-management` — seeded users, org facts (reports-to, People Partner, and project membership), projects, departments, time-bounded employment status, durable Departure commands, and the `UserEvents` career-timeline log. Users are imported from the provided seeded population; there is no employee-registration/create capability (AD-16). PP assignment follows AD-19. `UserEvents` writes are synchronous in the same transaction as the causing use case — no event bus or generic table-change listener in this iteration.
+- `user-management` — seeded users, org facts (reports-to, People Partner, and project membership), projects, departments, time-bounded employment status, durable Departure commands, and the `UserEvents` career-timeline log. Users are loaded only by the idempotent seeded-population import (`POST /users/import` plus a deploy-script entrypoint sharing one writer), authorized by the existing `user-management:create` permission; there is **no per-employee registration flow and no `POST /users` single-create** (AD-16 / AD-21). PP assignment follows AD-19. `UserEvents` writes are synchronous in the same transaction as the causing use case — no event bus or generic table-change listener in this iteration.
 - `access-control` — the policies engine; covers **both** role dimensions (access roles and functional roles)
-- `dashboards` — dashboard engine (design pending, see [dashboards.md](dashboards.md))
-- `mentorship` — the willing-mentor pool, the `MentorshipAvailability` open-to-mentoring aggregate, the durable `MentorshipPair` record (active + ended, mandatory-note closure, departure auto-close), the S13 read projection, and the profile-header mentor field. Consumes `user-management`'s career-event boundary and the `AccessControl` facade; never writes `UserEvents` and never feeds audience resolution (AD-17). Design: [mentorship.md](mentorship.md). Confirmed 2026-09-01 (AD-5 amended).
+- `dashboards` — four fixed read models composed from owning-context queries after AccessControl authorization (PM/AD-33). Not a generic widget engine.
+- `mentorship` — the willing-mentor pool, the `MentorshipAvailability` open-to-mentoring aggregate, the durable `MentorshipPair` record (active + ended, mandatory-note closure, departure auto-close), the S13 read projection, and the profile-header mentor field. Consumes `user-management`'s career-event application boundary and the `AccessControl` facade; never writes `UserEvents` and never feeds audience resolution (AD-17). Design: [mentorship.md](mentorship.md). Confirmed 2026-09-01 (AD-5 amended); **user-approved 2026-09-02**.
+- `action-items` — S14 task entity; exports `applyDepartureEffects` (PM/AD-23). Confirmed 2026-09-02.
 
-Pending context-boundary confirmation: profile, resourcing, cds, risk, feedback, campaigns. Their v1.5 feature semantics are already fixed and must be recorded in scenario contracts before the context design is approved (AD-18). In particular, resourcing requests route by department.
+Pending context-boundary confirmation: resourcing, cds, risk, feedback, campaigns. No `profile` context (PM/AD-34). Their v1.5 feature semantics are already fixed and must be recorded in scenario contracts before the context design is approved (AD-18). In particular, resourcing requests route by department and must not write project membership (PM/AD-31).
 
 The AD-20 executor is a user-management application orchestrator. It calls exported application services of action-items, mentorship, access-control, and other owning contexts under one shared PostgreSQL unit of work; it never reaches into their domain or infrastructure folders. No event bus or generic table listener substitutes for this explicit cross-context transaction.
 
-The shared lifecycle unit of work is an application-level contract backed by one Prisma/PostgreSQL transaction. Participating application services expose `applyDepartureEffects({departureId, leaseToken, tx})`-shaped operations, accept the same transaction scope, and must not open independent nested transactions. The Departure row is locked and its current token is verified before any effect; effect records/events use a unique departure mutation key where the owning table can otherwise duplicate an outcome. A stale executor returns ownership-lost/no-op and cannot update retry state.
+The shared lifecycle unit of work is an application-level contract backed by one Prisma/PostgreSQL transaction. Participating application services expose `applyDepartureEffects({departureId, leaseToken, departingUserId, effectiveDate, tx})` (PM/AD-23), accept the same transaction scope, and must not open independent nested transactions. The executor owns claim/fencing. The Departure row is locked and its current token is verified before any effect; effect records/events use a unique departure mutation key where the owning table can otherwise duplicate an outcome. A stale executor returns ownership-lost/no-op and cannot update retry state.
 
 ## Internal layout — identical in every context (AD-2, AD-5)
 

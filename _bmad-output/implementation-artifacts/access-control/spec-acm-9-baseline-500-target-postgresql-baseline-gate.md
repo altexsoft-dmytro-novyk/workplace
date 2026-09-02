@@ -2,7 +2,7 @@
 title: 'ACM-9 — 500-target PostgreSQL baseline gate'
 type: 'feature'
 created: '2026-08-31'
-status: 'in-progress'
+status: 'review'
 review_loop_iteration: 0
 baseline_commit: 'f870f7fe2c838cad78da9407c2d83170ebf83257'
 context:

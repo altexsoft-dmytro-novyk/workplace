@@ -5,6 +5,7 @@
 **Change log:** [v1.2 → v1.5](requirements-changelog-v1.2-to-v1.5.md)
 **Supersedes:** Test Assignment: People Management & Resourcing MVP (Iteration 1)
 **Status:** Draft for review
+**Amendment 2026-09-02:** observable-behavior alignment only — assignee-only action-item cancel on departure (§4.5, §4.16); mentorship availability/pool on departure (§4.11, §4.16); HTTP denial oracle 401/404/403 (§3.3). Version remains 1.5. Historical UMAC 403 evidence is stale, not rewritten.
 
 ---
 
@@ -202,6 +203,7 @@ Legend: `RW` = read and write · `R` = read only · `—` = no access, section n
    - nothing in any other section: the sender still sees these people through the colleague view everywhere else;
    - it ends when the campaign is closed.
    No other feature may widen the colleague view. If a second such need appears, that is a product decision, not an implementation detail.
+8. **HTTP denials are a single oracle.** Invalid or inactive session → `401`. Missing resource, or a target whose existence is hidden from the actor → `404` with a leak-free body. Visible resource but forbidden feature or action → `403`. List endpoints omit invisible rows rather than returning per-row denials. Hidden-target `404` takes precedence over mutation permission checks. This is the live product rule; it supersedes the 2026-09-01 empty-audience `403` adoption decision.
 
 There are exactly **two** documented exceptions to "a manager sees everything": the narrowed set for the project line (rule 2) and the PM's flag-gated read of S7 (rule 3).
 
@@ -308,6 +310,8 @@ Action items are the single task entity in the system. They appear on the employ
 **Fields:** title, short description, assignee, author, due date, optional link, status, completion date, and the source (manual or campaign).
 
 **Lifecycle:** `open` → `completed`. The assignee marks their own items complete, and the completion date is recorded and displayed. The author can cancel an item with a reason. An item past its due date is shown as overdue wherever it appears.
+
+**On effective departure (4.16):** only **open** items **assigned to** the departing person close as *cancelled — departed* (fixed system reason). Items the departing person **authored for other, still-active assignees** remain open. Manual and campaign-generated items follow the same assignee rule. Completing or author-cancelling an item is unchanged.
 
 Visibility follows S14. The single exception is a campaign author's view of their own campaign's items, per 3.3.7.
 
@@ -430,7 +434,7 @@ Whoever holds the *maintain CDS records* permission can create assessment record
 
 **For the manager line and PP:**
 
-- A list of everyone who has flagged themselves as open to mentoring. **The pool is company-wide** — a good mentor for somebody in one department frequently sits in another, which is the point of a pool. The list shows identity-card data plus the flag; it does not expose anyone's S13 section. Visible to holders of the *assign and end mentorships* permission.
+- A list of everyone who has flagged themselves as open to mentoring **and whose employment status is `active`**. **The pool is company-wide** — a good mentor for somebody in one department frequently sits in another, which is the point of a pool. Dismissed people are excluded even if a leftover flag exists. The list shows identity-card data plus the flag; it does not expose anyone's S13 section. Visible to holders of the *assign and end mentorships* permission.
 - Clicking a willing mentor opens an assignment flow. **Mentee selection is scoped** to people the assigner holds access over.
 - On creation of the first pair, the person's mentorship status changes from **open to mentoring** to **mentor**. This status is a filterable field on All Employees.
 - A view of all mentor–mentee pairs, active and ended, with start date, end date and status.
@@ -438,6 +442,8 @@ Whoever holds the *maintain CDS records* permission can create assessment record
 **Ending a mentorship:** a manager or PP ends a pair explicitly. The end date is recorded, and **a closure note is required to close it** — a pair cannot be ended without one. The closure note is a **field on the pair record, not a feedback record**: S8 has a single subject, and this note is about a pairing rather than a person. It is readable by the reporting line, the project line and PP; not by the mentor, not by the mentee, not by colleagues. Ended pairs remain visible in history on both profiles, and an end event is written to the career timeline (4.9). If the mentor has no other active mentees, their status returns to *open to mentoring*.
 
 **Un-flagging.** A person may clear their open-to-mentoring flag while holding an active mentee. Doing so removes them from the pool for future assignments and does not touch active pairs; their status stays `mentor` while any pair is active.
+
+**Departure and rehire.** Effective departure (4.16) clears the open-to-mentoring flag in the same transaction that auto-closes active pairs. A later return to `active` employment does **not** restore the flag; the person must opt in again.
 
 **On any profile:** the mentor is displayed alongside the manager and the people partner in the profile header.
 
@@ -498,8 +504,8 @@ Departure has to be recorded somewhere, or six months later the platform cannot 
 **Recording a departure.** HR records it in the platform, with an **effective date and a reason**, under the *record a departure* permission. On the effective date:
 
 - the profile becomes read-only and drops out of the default employee list, while staying filterable;
-- open action items close as *cancelled — departed*;
-- active mentorship pairs end automatically with a system-generated closure note, **bypassing the mandatory-closure-note gate** in 4.11 — a departed person cannot supply one;
+- open action items **assigned to** the departing person close as *cancelled — departed*; items they authored for other active assignees stay open (4.5);
+- the open-to-mentoring flag is cleared; dismissed people are excluded from the willing-mentor pool; active mentorship pairs end automatically with a system-generated closure note, **bypassing the mandatory-closure-note gate** in 4.11 — a departed person cannot supply one;
 - the departed person's own account is deactivated;
 - **all access that person held ends immediately** — the revocation rule in 2.1 covers departure as well as a relationship ending.
 
@@ -513,7 +519,7 @@ Departure has to be recorded somewhere, or six months later the platform cannot 
 - **No SSO.** Entra ID is not part of this scope. Authentication is your own implementation over the seeded population, and the seeded record is the identity anchor.
 - **Do not import real employee data beyond the list you are given.** The delivered list is test data; that is what keeps Section 7's rule satisfied.
 
-**Departments.** Every employee belongs to **exactly one department**. Departments **nest**. A manager can be the manager of a department, and that relation grants Manager access to everyone in it and in its sub-departments (2.1). There is no separate "unit" entity; *Unit Manager* is the role name for the manager of a department.
+**Departments.** Every employee belongs to **one or more departments** — a person who works across specialisations (e.g. both `JS` and `Python`) holds a current membership in each. *(Amended 2026-09-02 — was "exactly one department".)* Departments **nest**. A manager can be the manager of a department, and that relation grants Manager access to everyone in it and in its sub-departments (2.1) — an employee is reachable through **any** of their departments. There is no separate "unit" entity; *Unit Manager* is the role name for the manager of a department. A resourcing request carries **one** department and routes to that department's Unit Manager (4.7).
 
 Departments are maintained under the *manage departments* permission. Changing a person's department, or a department's manager, is an access switch and follows the rules in 2.1: dedicated screen, dedicated permission, no self-assignment, journaled.
 
