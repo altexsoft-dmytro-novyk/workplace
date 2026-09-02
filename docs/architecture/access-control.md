@@ -184,7 +184,7 @@ Profile sections are not the only authorization surface. Every list column, filt
 
 ### Denial conventions
 
-Per [test-cases/README.md](../test-cases/README.md): missing/invalid token → `401`; valid token without feature permission or write to a readable section → `403`; valid token touching a `—` cell or hidden field → `404` with a leak-free body. HR Admin (configuration FR only, §2.2) has **no default data access** — profile reads without a relationship-derived audience or full-profile grant follow the same denial rules.
+Per [test-cases/README.md](../test-cases/README.md): missing/invalid token → `401`; valid token without feature permission or write to a readable section → `403`; valid token touching a `—` cell or hidden field → `404` with a leak-free body. HR Admin (configuration FR only, §2.2) has **no default data access** — profile reads without a relationship-derived audience or full-profile grant follow the same denial rules. **Complete five-clause oracle (PM/AD-24):** see the User Management adoption seam denial paragraph below (invalid/inactive session `401`; missing or hidden-existence target `404`; visible resource forbidden feature/action `403`; lists omit invisible rows; hidden-target `404` precedes mutation permission checks).
 
 ### User Management adoption seam
 
@@ -203,21 +203,12 @@ the write routes are specified in
 `_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md`,
 answering `_bmad-output/implementation-artifacts/access-control/um-integration-contract-response.md`.
 For `GET /users/:id` the read is `200` with `{ data, canEdit }` — `data` the
-**minimal S1 identity card**, `canEdit` a read-only hint (`isAllowed(viewer,
-user-management:edit) && canAccessSection(viewer, 'S1', target) === 'write'`;
-`false` for all until `user-management:edit` is seeded) — shipped in adoption
-Story 0.1, for **any non-empty audience** — `self`, `reporting`, `pp`, **or
-`colleague`** (§3.2's S1 row is `R` for the Colleague column, and the matrix
-legend makes every active authenticated viewer at least a Colleague); denials
-are `401` when the session does not resolve to an active `User` (the session
-layer's responsibility) and `403` when an authenticated active viewer's
-audience over the target is empty. The `{ data, canEdit }` envelope is the
-intended section/detail-read shape going forward (its own planning item in
-`_bmad-output/implementation-artifacts/access-control/deferred-work.md`). *(Revised
-2026-09-01 by human product decision — the earlier "two-state colleague rule"
-and adoption story `UMAC-3` are removed; the earlier "leak-free `404`" for an
-empty audience is withdrawn in favour of standard `401`/`403` — this is an
-internal directory and a user id's existence is not sensitive.)* The *further*
+**minimal S1 identity card**, `canEdit` a read-only hint of the same dual gate
+(`isAllowed` feature permission AND `canAccessSection` write). `user-management`
+owns the HTTP envelope (PM/AD-34); AccessControl computes the gate. Do not
+treat the 2026-09-01 empty-audience `403` paragraph below as live (PM/AD-24).
+**Superseded 2026-09-02 (PM/AD-24, user batch sign-off).** The 2026-09-01 empty-audience `403` decision is historical evidence, not live architecture. Current oracle: invalid/inactive session `401`; missing resource or hidden-existence target `404`; visible resource but forbidden feature/action `403`; lists omit invisible rows; hidden-target `404` precedes mutation permission checks. Do not rewrite the 2026-09-01 approval records. Affected UMAC scenarios/tests are stale and regenerate through AD-1.
+ The *further*
 field/record narrowing (colleague S10 dates-only on `GET /users/:id/leaves`,
 colleague S11 name-only, S16 per-field visibility §3.3.4/§3.3.6, S7/S8 flags,
 S1 derived-field immutability) stays the separate Profile Projection story on
@@ -240,7 +231,7 @@ The §3.2 matrix has distinct audience columns — not one merged "Manager line.
 | --- | --- | --- |
 | **Self** | `viewerId === targetEmployeeId`, **after** both viewer and target are confirmed present and active | Identity validation runs **before** any audience derivation, Self included; Self is exclusive only once that confirmation holds (where target = viewer, one confirmation settles both). An unconfirmed viewer or target yields an empty audience `Set` — never Self, never the Colleague floor. Once confirmed, Self applies before any manager column (unique cells per §3.2 — e.g. S2/S3 RW, S6 no access, S1 photo RW). A viewer in their own reporting chain does not also inherit manager cells for their own profile. |
 | **Reporting line** | Reports-to + department management (transitive) | Separate graph from project |
-| **Project line** | PM/DM via shared project assignment + project-management chain only | Narrower cells per §3.3.2; evaluated **per shared project** before column merge |
+| **Project line** | Explicit PM/DM policy on a project the target belongs to + project-management chain only | Ordinary `Relationship type='project'` membership is **not** an audience (PM/AD-27) |
 | **PP** | `Relationship type='people_partner'` + the assigned PP's `direct` HR line above (§2.1, AD-19) | Not the employee's reporting chain; section rights still come from matrix/policy projection |
 | **Colleague** | Authenticated employee with none of the above | Whitelist only (§3.3.4): S1, S10 dates-only, S11 project name |
 | **Shared link** | Authenticated named recipient via valid share link (§4.8) | Overlay; never anonymous; never grants write |
@@ -253,7 +244,7 @@ The §3.2 matrix has distinct audience columns — not one merged "Manager line.
 | --- | --- | --- |
 | Reports-to | Reporting line | `Relationship type='direct'` recursive tree |
 | Department management | Reporting line | `Policies targetType:'department'` over nested department membership (§4.17) |
-| PM/DM of employee's project | Project line | `Relationship type='project'` + manages-project policy attachments |
+| PM/DM of employee's project | Project line | Explicit PM/DM `Policies` grant on a project of which the target is a `Relationship type='project'` member. Membership alone grants nothing (PM/AD-27). |
 | Assigned PP + HR line above | PP (not Reporting/Project) | `Relationship type='people_partner'` + PP's own `direct` manager chain inside HR (§2.1, AD-19) |
 
 **Reporting line** and **Project line** are resolved by **separate graph passes**. Do not walk reports-to and project PM/DM attachments as one transitive graph. A reports-to manager of a DM does **not** inherit Project-line access to the DM's project members unless they hold their own project-management relation to that project. Project-line chain walks **project-management policy attachments only** — not reports-to edges.
@@ -268,7 +259,8 @@ When a viewer holds multiple audiences for the same target (for example Reportin
 
 1. Compute each applicable matrix column independently (project line per shared project first).
 2. For each section, take the **best** column permission: RW > R > no access.
-3. Apply overlays after relationship-derived columns: **shared link** (if valid; per-section cfg from link creation, §4.8) then **full-profile access** (if held; column mapping unresolved — see below).
+3. When `viewerId === targetId`, Self is exclusive of Reporting, Project, PP, and Colleague (PM/AD-28).
+4. Apply overlays after that: **shared link** (if valid; per-section cfg from link creation, §4.8) then **full-profile access** (if held; PM/AD-28). Full-profile is read-only: effective access is `max(Self, full-profile)` with write > read > none; the overlay never supplies write and never bypasses functional permissions, command rules, field/record restrictions, or narrower rules (including mentorship closure-note visibility).
 
 Self is not merged with manager columns for the same viewer×target when `viewerId === targetEmployeeId`.
 
@@ -327,9 +319,9 @@ Separate from HR Admin (configuration-only, §2.2) and from relationship-derived
 - Removing the last holder is blocked — including self-revocation by the sole holder.
 - Every grant and revocation is journaled (§3.4).
 - Holders are the **backstop** for shared-link revocation when the relationship holder cannot revoke.
-- Full-profile resolution runs as an overlay **after** relationship-derived audience merge.
+- Full-profile resolution: Self first, then the read-only overlay (PM/AD-28).
 
-> **Unresolved:** Requirements define grant mechanics (§2.4) and state there is no profile-level permission (§3.1), but do **not** specify which §3.2 column(s) the overlay equates to. Test scenarios in `matrix/full-profile-access/` must be approved against an explicit product decision before implementation hard-codes a column mapping.
+> **Resolved 2026-09-02 (PM/AD-28).** Overlay is not a matrix column. AD-28 full-profile-access scenarios are **not yet authored** — `docs/test-cases/access-control/` marks the matrix folder deferred; do not invent scenarios. Authoring requires an AD-1 Stage-1 dispatch. Historical “unresolved column mapping” notes are stale, not rewritten.
 
 ### Relationship and access journal (§3.4)
 
@@ -340,7 +332,7 @@ A narrow journal (not a general audit log) records:
 - Full-profile-access grants and revocations
 - Shared-link accesses
 
-Mutations that change tier-resolution inputs must emit the appropriate journal entry in the same transaction as the org-fact write.
+Mutations that change those facts emit one `AccessJournal` row in the same transaction (PM/AD-29): append-only snapshots `before`/`after`, unique `idempotencyKey`, readers via AccessControl (full-profile overlay, or the subject's current Reporting-line manager or assigned PP). HR Admin by functional role is not a journal reader.
 
 ### Revocation timing (§2.1, §5.1)
 
@@ -363,10 +355,11 @@ Do not hard-code until explicitly decided:
 
 | Decision | Gap |
 | --- | --- |
-| Full-profile overlay column mapping | §2.4 grant mechanics vs §3.1 no profile-level permission — which §3.2 column(s) does the overlay apply? |
-| Full-profile + Self precedence | When a full-profile holder views their own profile, which wins per section — Self column or overlay? |
+| Full-profile overlay column mapping | **Resolved 2026-09-02 PM/AD-28.** Overlay is read-only, not a column. Historical rows below are stale. |
+| Full-profile + Self precedence | **Resolved 2026-09-02 PM/AD-28.** Self exclusive when viewer equals target; then `max(Self, overlay)`. |
 | Partial timetracker sync | §5.1 defines failed-sync withdrawal only; no rule for intermittent partial success. |
 | Policy-level `IN` operator | Deferred from the initial facade slice. It needs a concrete product use case plus approved target-set storage, valid `targetType` values, cardinality/mutation rules, and indexed query plan. |
+| Ordinary project membership | **Resolved 2026-09-02 PM/AD-27.** Membership is not Project-line. No member `targetRole`. |
 
 ### Bulk, live, never stored
 

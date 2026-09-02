@@ -1,38 +1,27 @@
 <!-- bmad:context -->
-<!-- Verified 2026-08-13 against 26b53fc. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
+<!-- Verified 2026-09-02 against 0e703d1. Managed by bmad-project-context; edits inside this block are replaced on refresh. Keep anything you want preserved outside the markers. -->
 
 ## workspace (people management)
 
-Spec-driven development workspace for the "people management" product, run with the
-BMad Method. Application code lives in two git submodules — `services/backend`
-(NestJS 11 + Prisma 7 + PostgreSQL) and `services/frontend` (React 19 + Vite 8) —
-each a separate Github repository. This root repo holds only BMad planning/spec
-artifacts, workspace skills, and submodule gitlinks.
+Spec-driven BMad workspace for the people-management product. Application code lives in git submodules `services/backend` (NestJS 11 + Prisma 7) and `services/frontend` (React 19 + Vite 8). This repo holds BMad planning/spec artifacts, workspace skills, and submodule gitlinks only.
 
 ## Policy
 
-- Never put application code in this repo — it belongs in `services/backend` or
-  `services/frontend`. The root commits only BMad artifacts and gitlink updates.
-- Commit each service in its own repository first, then update the workspace
-  gitlink — the `commit-and-push-services` skill runs the full sequence.
+- Never put application code in this repo — commit it in `services/backend` or `services/frontend`. This root commits only BMad artifacts and gitlink updates.
+- When saving service work, commit and push each service repo first, then update workspace gitlinks — use the `commit-and-push-services` skill for the full sequence.
 
 ## Where things are
 
-- Product owner requirements: `docs/project-requirements.md` (configured as BMad
-  `project_knowledge`) — the source scope for all planning work.
-- Planning artifacts: `_bmad-output/planning-artifacts/`; implementation artifacts:
-  `_bmad-output/implementation-artifacts/`
-- Backend agent guide: `services/backend/CLAUDE.md` + per-area rules in
-  `services/backend/.claude/rules/`
-- Frontend agent guide: `services/frontend/CLAUDE.md` + per-area rules in
-  `services/frontend/.claude/rules/`
-- BMad config: `_bmad/config.toml`, merged via
-  `uv run _bmad/scripts/resolve_config.py --project-root .`
+- Product requirements: `docs/project-requirements.md` (BMad `project_knowledge` is `docs/`)
+- Architecture spine: `_bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md`
+- Before implementing or changing backend behavior, read `docs/architecture/README.md` and the relevant linked binding documents, including DDD, API conventions, testing strategy, and Access Control.
+- Domain specs: `_bmad-output/specs/spec-*/SPEC.md`
+- Planning artifacts: `_bmad-output/planning-artifacts/`; implementation artifacts: `_bmad-output/implementation-artifacts/{active-domain}`
+- Backend agent instructions: `services/backend/AGENTS.md`; frontend: `services/frontend/AGENTS.md`
+- BMad config: `_bmad/config.toml`, merged via `uv run python _bmad/scripts/resolve_config.py --project-root .`
 
 ## Running and verifying
 
-- Nothing runs from the root — root `npm test` is a stub. Run service commands from
-  inside each service directory, per its own guide.
-- Fresh clone: `npm run services:init` pulls both submodules.
+- Root `npm test` is a stub — use `npm run services:test`, `services:build`, or `services:lint` to fan out to both services, or run commands inside each service directory.
 
 <!-- /bmad:context -->

@@ -1,7 +1,10 @@
 ---
-status: draft
+status: approved-with-open-items
+approved: 2026-09-02
+approval: user-batch-sign-off
 binds_spine: _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md
-spine_ads: [AD-2, AD-5, AD-9, AD-10, AD-11, AD-14, AD-15, AD-17, AD-18, AD-20]
+spine_id: PM
+spine_ads: [AD-2, AD-5, AD-9, AD-10, AD-11, AD-14, AD-15, AD-17, AD-18, AD-20, AD-23]
 companions:
   - domain-driven-design.md
   - access-control.md
@@ -19,15 +22,7 @@ sources:
 
 # Mentorship — Bounded Context
 
-**Nothing in this document is approved.** `status: draft`. It is the binding
-technical design for the `mentorship` bounded context, answering the ten
-questions in
-`_bmad-output/planning-artifacts/mentorship/architect-handoff.md`. Every
-capability below still runs the full AD-1 three-stage gate with independent
-human approval. Binding rules for the mentorship feature. Spine: **AD-5, AD-11,
-AD-14, AD-17, AD-20** (plus AD-2, AD-9, AD-10, AD-15, AD-18). Normative
-requirements: `docs/project-requirements.md` §4.11, §3.2 (S1 "mentor", S13),
-§4.9, §4.16, §4.1.
+**Boundary, routes, and shared-transaction contracts in this document are approved** (user batch sign-off 2026-09-02, PM/AD-5, PM/AD-17, PM/AD-23). Feature delivery still runs the full AD-1 three-stage gate with independent human approval. Binding rules for the mentorship feature. Spine: **AD-5, AD-11, AD-14, AD-17, AD-20, AD-23** (plus AD-2, AD-9, AD-10, AD-15, AD-18). Normative requirements: `docs/project-requirements.md` §4.11, §3.2 (S1 "mentor", S13), §4.9, §4.16, §4.1.
 
 ---
 
@@ -313,8 +308,7 @@ appendCareerEvent(input: {
 
 ### 5.2 Departure auto-close (FR-M14, AD-20) — exported to the executor
 
-**Blocked on CC-06 / the AD-20 executor (gate G-DEP)** — scenario prose only
-until then. The operation mentorship exposes:
+**Blocked on CC-06 implementation / the AD-20 executor (gate G-DEP)** — design of the shared contract is PM/AD-23 (resolved). Scenario prose and production participants remain implementation-absent until then. The operation mentorship exposes:
 
 ```ts
 // mentorship application export — the AD-20 departure executor calls this
@@ -345,9 +339,8 @@ applyDepartureEffects(input: {
 - **System closure-note template** (fixed): `"Auto-closed on <effectiveDate>:
   <departing participant> left the company."` No human note; the FR-M9 gate in
   `EndMentorshipPairAction` is not on this path.
-- Contract shape note: `domain-driven-design.md` shows the bare
-  `{departureId, leaseToken, tx}`. mentorship needs `departingUserId` and
-  `effectiveDate` too (Decision 10) — resolve with CC-06.
+- Also in the same transaction: set `MentorshipAvailability.openToMentoring=false` for the departing user. Pool and directory projections additionally require active employment (PM/AD-17). Rehire, if later introduced, requires explicit opt-in again.
+- Contract shape is PM/AD-23 (user-approved 2026-09-02). The earlier note that `domain-driven-design.md` showed a three-field call is historical; both documents now use `{departureId, leaseToken, departingUserId, effectiveDate, tx}`. The executor owns claim/fencing; mentorship does not re-verify the lease beyond using the supplied `tx`.
 
 ### 5.3 AccessControl (AD-9)
 
@@ -356,7 +349,7 @@ applyDepartureEffects(input: {
 
 | Surface | Facade calls | Rule |
 | --- | --- | --- |
-| **Mentee-scoping** (FR-M5, men-pair-02) | `resolveAudiences(assignerId, [menteeUserId])` | reject (`403`, leak-free) unless the set contains `self`/`reporting`/`project`/`pp` (non-empty, not colleague-only). Eve → empty → reject |
+| **Mentee-scoping** (FR-M5, men-pair-02) | `resolveAudiences(assignerId, [menteeUserId])` | reject unless the set contains `self`/`reporting`/`project`/`pp` (non-empty, not colleague-only). Hidden or missing mentee → `404` (PM/AD-24). Visible mentee outside assigner scope → `403`. |
 | **Create-pair gate** (§2.2 dual gate) | `isAllowed(actorId, 'mentorship:assign')` **and** mentee-scoping above | `mentorship:assign` is **unseeded** — Decision 1 |
 | **End-pair gate** (§2.2 dual gate) | `isAllowed(actorId, 'mentorship:assign')` **and** `resolveAudiences(actorId, [menteeUserId])` ∩ `{reporting, pp}` ≠ ∅ | §4.11 "a manager or PP"; DEC-UM-001 S9 pattern (reporting line + PP write; project line read-only). Decision 7 |
 | **S13 base read** (the inline summary, `GET /mentorship-pairs[/:id]` row visibility) | `canAccessSection(viewerId, 'S13', menteeUserId)` — **does not exist** (ACM-5 = S1/S10/S11 only) | Decision 3. Interim: derive from `resolveAudiences` ∩ `{reporting, project, pp, self}`; colleague/empty → `404`. Marked `// INTERIM` with the expiry trigger |
@@ -371,7 +364,7 @@ narrow its result").
 
 ### 5.4 The S1 `mentor` field and the S13 inline summary on `GET /users/:id`
 
-`user-management` (or the eventual `profile` assembler — spine Deferred) consumes
+`user-management` (profile HTTP assembly per PM/AD-34; no separate `profile` context) consumes
 two exported read models; it **never** reaches into `mentorship/domain/` or
 `infrastructure/` (AD-2 entry-point rule):
 
@@ -471,7 +464,7 @@ Access Control call, **(A)** = architecture-internal.
 | **7** | **End-pair authorization audience** — §4.11 "a manager or PP". | Recommend: reporting line + PP **write**; project line **read-only** (DEC-UM-001 S9 pattern). | **P + AC** |
 | **8** | **`MentorshipPair.closedByUserId`** — the current `database-schema.md` shape has `closedBy FK → User, nullable`; no scenario consumes it. | Recommend: **drop** ([[feedback_no_speculative_fields]]); re-add only if a pair-history "ended by" display is sourced. | **A** |
 | **9** | **Directory read contract** — bulk `application/` export vs a mentorship-owned SQL view. | Recommend: **bulk export** (boundary-clean, matches the `resolveAudiences` bulk precedent). Revisit only if the §7 500-record / 2-second budget fails with the extra bulk call. | **A** |
-| **10** | **Departure executor contract fields** — `domain-driven-design.md` shows bare `{departureId, leaseToken, tx}`. | Recommend: the executor also passes `departingUserId` and `effectiveDate` (mentorship does not read `Departure`). Resolve with CC-06. | **A (CC-06)** |
+| **10** | **Departure executor contract fields** | **Resolved by PM/AD-23.** Binding signature is `{departureId, leaseToken, departingUserId, effectiveDate, tx}`. Remaining work is implementation under CC-06 (not redesign). Historical note that `domain-driven-design.md` showed a three-field call is stale. | **A (closed design)** |
 
 ---
 
