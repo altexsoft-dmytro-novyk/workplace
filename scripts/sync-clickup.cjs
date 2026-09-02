@@ -126,6 +126,9 @@ async function syncClickUp(options = {}) {
   if (config.workspace_id !== EXPECTED_WORKSPACE_ID) {
     throw new Error(`ClickUp sync configuration must use Workspace ${EXPECTED_WORKSPACE_ID}`);
   }
+  const customFields = config.custom_fields === undefined
+    ? {}
+    : asObject(config.custom_fields, `custom_fields in ${configPath}`);
   const entries = await collectSyncEntries({ ...options, rootDir, configPath });
   const headers = { Authorization: token, 'Content-Type': 'application/json' };
   const teamsResponse = await request(fetchImpl, `${CLICKUP_API_BASE}/team`, { headers }, 'team authorization', token);
@@ -139,6 +142,18 @@ async function syncClickUp(options = {}) {
       headers,
       body: JSON.stringify({ status: entry.status }),
     }, `status update for task ${entry.taskId}`, token);
+    const fieldUpdates = [
+      { fieldId: customFields.git_branch, value: entry.gitBranch, name: 'Git Branch' },
+      { fieldId: customFields.validation_status, value: entry.validationStatus, name: 'Validation Status' },
+    ];
+    for (const fieldUpdate of fieldUpdates) {
+      if (!fieldUpdate.fieldId || !fieldUpdate.value) continue;
+      await request(fetchImpl, `${CLICKUP_API_BASE}/task/${encodeURIComponent(entry.taskId)}/field/${encodeURIComponent(fieldUpdate.fieldId)}`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ value: fieldUpdate.value }),
+      }, `${fieldUpdate.name} update for task ${entry.taskId}`, token);
+    }
   }
   return entries;
 }
