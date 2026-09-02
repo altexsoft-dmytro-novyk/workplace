@@ -29,6 +29,8 @@ erDiagram
   User ||--o{ MentorshipPair : "mentorUserId"
   User ||--o{ MentorshipPair : "menteeUserId"
   User ||--o| MentorshipAvailability : "userId"
+  User ||--o{ AccessJournal : "subjectUserId"
+  User ||--o{ AccessJournal : "actorUserId"
 ```
 
 ## Tables
@@ -199,6 +201,38 @@ UNIQUE: one (userId, departmentId) pair with validTo IS NULL
 **Multi-department membership (2026-09-02).** An employee belongs to **one or more** current departments — e.g. a developer who works in both `JS` and `Python` (each is its own department) holds a current `DepartmentMembership` in each. This supersedes the earlier "exactly one current department" rule (mirrored in `docs/project-requirements.md` §4.17). Consequences: the derived S1 "department" display is a **set**, not a scalar; `department_change` `UserEvents` are add/remove events; a resourcing request still carries **one** department and routes to that department's Unit Manager (`project-requirements.md` §4.7); Unit-Manager access composes — managing any one of an employee's departments (or an ancestor of it) grants Reporting-line access to that employee. The seeded-population CSV carries **one** `DepartmentId` per row, so the import creates exactly one membership per person; additional memberships are added later (a second import, manual assignment, or the timetracker API).
 
 Exact indexed Department parent/manager edge shapes and the recursive department-tree walk remain an explicit follow-up contract (spine Deferred). `Policies.targetType:'department'` (the Unit-Manager attachment — `targetRole:'unit-manager'`) is not honored by AD-10 until that contract is approved; the interim is fail-closed.
+
+### AccessJournal (PM/AD-29)
+
+```text
+AccessJournal {
+  id             uuidv7 PK
+  occurredAt     timestamptz
+  actorUserId    FK -> User
+  subjectUserId  FK -> User
+  kind           manager | people_partner | department_membership
+               | department_manager | full_profile_grant
+               | full_profile_revoke | shared_link_access
+  before         jsonb   // complete snapshot of the changed fact; null = none
+  after          jsonb
+  idempotencyKey unique
+}
+```
+
+Append-only. Written in the **same transaction as the fact write**. Not a substitute: `UserEvents`.
+
+**What this table is for — and what it is not.** `AccessJournal` is **not** an access-control mechanism. Enforcement ("can viewer X see section S of profile Y right now?") is answered entirely by the live `Policies` / `UserPolicies` / `Relationship` rows and AD-10's resolution walk — `AccessJournal` is never read on that path. It exists to satisfy requirements **§3.4**: a *narrow* audit record of the events that change **who can see whom**, plus profile views through a shared link. Each entry captures the **actor**, the **subject**, the **before** and **after** values, and the **timestamp**. It is a user-facing feature — the subject's current Reporting-line manager or assigned People Partner, and any full-profile-overlay holder, can read it (resolved live via AccessControl; **HR Admin by functional role is not a reader**).
+
+No existing table can carry this:
+
+- `UserPolicies {userId, policyId}` records no actor, no timestamp, and no prior value — detaching a grant destroys the fact it ever existed.
+- `Relationship` `DELETE` is a **hard delete**, so the previous manager / People Partner survives nowhere once reassigned.
+- `shared_link_access` is a *view event*, not a state row — there is nothing in the enforcement tables to inspect.
+- `UserEvents` is the single-owner career timeline (AD-30): no before/after columns, different reader authorization.
+
+**Performance:** journal writes sit on the **mutation** path (manager change, PP swap, grant/revoke, link view) — one extra `INSERT` inside a transaction that is already writing the fact. They are **not** on the audience-resolution read path and do not count against the ACM-9 500-record / 2-second permission-resolution NFR.
+
+**Status:** design ratified 2026-09-02 (closes CC-07); **no implementation yet** — the table, writer, and read endpoint are gated behind CC-07 / AD-19 stage-2 (People Partner write path) and are not required by the Epic 0 read path.
 
 ### MentorshipPair (AD-17)
 
