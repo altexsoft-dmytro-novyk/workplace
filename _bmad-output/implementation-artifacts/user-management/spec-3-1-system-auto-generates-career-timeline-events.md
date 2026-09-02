@@ -1,9 +1,10 @@
 ---
 title: 'Story 3.1: System Auto-Generates Career Timeline Events'
 type: 'feature'
-status: draft
+status: done
 created: 2026-08-24
 regenerated: 2026-09-01
+completed: 2026-09-02
 context: ['{project-root}/_bmad-output/implementation-artifacts/user-management/epic-3-context.md']
 ---
 
@@ -96,9 +97,9 @@ internal row id only.)
   Approach). No longer a blocker on the AC `profile:timeline` `canAccessSection`
   increment; that increment is tracked in `deferred-work.md` and swaps in behind
   the `// INTERIM` marker later.
-- `details` shape for `position_change` = `{ "position": <new value> }`
-  (Dmytro 2026-09-02: "достатньо нового значення"). Other auto-event types keep
-  `details: {}` until their owning context defines a payload.
-- `eventDate` for auto-events = today's date in UTC (Dmytro 2026-09-02: "в UTC,
-  як і інші всі дати" — the column is `@db.Date`), except `joined_company`
-  which carries `companyJoinDate`.
+- `details` shape for `position_change` = `{ "position": <new value> }` — the
+  new value only, no prior value (Dmytro, 2026-09-02). Other auto-event types
+  keep `details: {}` until their owning context defines a payload.
+- `eventDate` for auto-events = today's date in UTC — consistent with every
+  other date field; the column is `@db.Date` (Dmytro, 2026-09-02). Exception:
+  `joined_company` carries `companyJoinDate`.

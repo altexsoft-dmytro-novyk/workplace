@@ -401,3 +401,214 @@ approvals:
       b) — the established UM section-read convention; canEdit = the Story
       3.2/3.3 manual-mutation gate, false for everyone until 3.2 lands. Red
       tests + scenario docs + spec updated to this shape post-gate (mechanical).
+
+  - story_id: "3-1-auto-career-timeline-events-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (8 new + 6 modified — see AUTONOMOUS-RUN-LOG.md Story 3.1 Stage 3 entry)"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T22:30:00Z"
+    note: >-
+      Approved together with the Stage-3 gate; Dmytro also authorized continuing
+      into Story 3.2 without pausing at each sub-gate. GET /users/:id/events ->
+      { data: UserEventResponse[], canEdit } ; read gate =
+      CareerTimelineAccessFacadeAdapter // INTERIM resolveAudiences ∩
+      {self,reporting,pp,project} + verbatim expiry trigger to
+      canAccessSection('profile:timeline'); colleague + nonexistent target ->
+      403 (no 404 enumeration); 401 from class-level SessionGuard.
+      canEdit = isAllowed('profile:timeline:write') (unseeded -> false for all)
+      && S9 write audience. AD-11 same-tx position_change via
+      UserRepository.update(id,patch,systemEvents?) $transaction; empty path
+      unchanged (edit-identity stays green). EditUserAction gains viewerId
+      (controller passes session.userId). details={position:<new>},
+      eventDate=today UTC date, createdBy=editing viewer.
+      COORDINATOR-VERIFIED (independent re-run): Story 3.1 e2e 11/11 green,
+      jest exit 0; full test/user-management + test/access-control sweep
+      91 failed / 262 passed / 3 todo (was 100 / 253) - exactly the 9 Story 3.1
+      tests flipping green, 0 new failures, no AC movement; tsc clean (3 known
+      epic-4); ESLint clean on all touched files.
+      SCENARIO DEVIATION (corrected + doc updated): um-ct-01 Stage-1 Test said
+      Bearer <token:Root> -> 200; wrong under the real S9 gate (HR Admin has no
+      data audience per §2.2 NORMATIVE -> Root resolves Colleague -> 403, per
+      um-ct-11 Test 4). Stage 3 switched um-ct-01 reader to Self (S9 Self = R).
+      SUBAGENT DECISIONS: joined_company left writing through the import's own
+      $transaction (not the shared descriptor - reshaping writeRow risked the
+      pre-existing-red seed suite); event order eventDate ASC, createdAt ASC;
+      canReadTimeline audience set includes 'project' (no effect today).
+      Story 3.1 is COMPLETE - all 3 AD-1 stages.
+
+  - story_id: "3-2-manual-backfill-add-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/career-timeline/{um-ct-03,04,09,10,12}.md + career-timeline/README.md + spec-3-2-authorized-actor-manually-adds-a-backfill-entry.md"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T23:30:00Z"
+    note: >-
+      Approved together with the ongoing Epic 3 push; Dmytro drove the gate
+      design directly (feature-action gate, hr-admin-only grant, edit-implies-
+      read). Story 3.2 ships: profile:timeline:write is a real functional
+      permission (NOT Variant A - keeps requirements §2.3/§4.9/§132), seeded +
+      granted to the hr-admin role only for now; the FR-permission-matrix adds
+      PP + Unit Manager holders later. Manual-write gate at this stage =
+      isAllowed(actor,'profile:timeline:write') alone - a feature action, no
+      data-audience half (HR Admin has no S9 audience, so requiring it would
+      close the gate to everyone; HR-Admin Excel backfill is a feature action
+      like directory:import). DEC-UM-001 audience narrowing (assigned PP +
+      direct UM, per-assignee scoped) is a DEFERRED refinement, activates with
+      the matrix grant. Read gate widened: canReadTimeline = <S9 read audience>
+      OR isAllowed(viewer,'profile:timeline:write') - "edit implies read" - so
+      HR Admin GETs the timeline back (200, canEdit:true observable). Broader
+      "HR Admin sees everything" = §2.4 Full profile access, a deferred AC
+      resolver item; edit-implies-read is its timeline-scoped interim.
+      LIVE this story: um-ct-10 (no permission -> 403), um-ct-12 NEW (HR Admin
+      Root POST -> 201 bare UserEventResponse, source:"manual" server-stamped,
+      whitelist strips id/deletedAt/source/createdBy, 400 on bad type/eventDate,
+      Test 2 = Root reads back 200 {data,canEdit:true}). DEFERRED it.todo:
+      um-ct-03 (PP add), um-ct-04 (UM add), um-ct-09 (permission-without-
+      audience denial) - reactivate when the matrix grants the permission to
+      PP/UM roles (+ AC department-tree walk for um-ct-04's "direct UM").
+      POST 201 = bare resource (matches PATCH /users/:id). New folder README
+      docs/test-cases/user-management/career-timeline/README.md carries the
+      split-gate table + the two ratify boxes.
+      OPEN / TO RATIFY (unresolved, flagged in the spec + folder README):
+      DEC-UM-001 scopes manual mutation by data audience (PP + direct UM);
+      Story 3.2 ships it as an HR-Admin feature action. Reconcile at the FR
+      matrix grant.
+      Stage 3 will touch src/access-control/infrastructure/bootstrap/access-
+      control-bootstrap.ts to seed profile:timeline:write + grant it to
+      hr-admin (Anna's kernel package - flag for her review; UM-owned seed is
+      the fallback).
+
+  - story_id: "3-2-manual-backfill-add-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-3/manual-events.e2e-spec.ts + test/user-management/epic-3/fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T23:55:00Z"
+    note: >-
+      Committed-red, 7 failed / 5 todo. All 7 failures = no POST /users/:id/events
+      route (404). LIVE: um-ct-10 (Bob, no profile:timeline:write -> 403),
+      um-ct-12 (6 its: Root granted profile:timeline:write in-test -> POST 201
+      bare UserEventResponse / source:manual server-stamped / whitelist strips
+      id,deletedAt,source,createdBy / 400 missing|empty type / 400 bad eventDate
+      / Ida 403 / no-token 401; Test 2 Root reads back 200 {data,canEdit:true} +
+      Alice-Self canEdit:false). it.todo x5: um-ct-03/04/09 + DEC-UM-001
+      narrowing + hr-admin-default-seed. fixtures key -> profile:timeline:write.
+      Full sweep 93 failed / 262 passed / 8 todo (zero green->red). tsc clean
+      (3 known epic-4), lint clean. Coordinator re-verified.
+
+  - story_id: "3-2-manual-backfill-add-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (2 new + 7 modified — POST /users/:id/events, AddManualUserEventAction, CreateUserEventDto, gate changes)"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T00:20:00Z"
+    note: >-
+      POST /users/:id/events + AddManualUserEventAction + CreateUserEventDto
+      (type @IsString/@IsNotEmpty, eventDate @IsDateString, details @IsObject
+      optional; whitelist strips server-owned keys). canEditTimeline ->
+      isAllowed('profile:timeline:write') ALONE (dropped && canReadTimeline).
+      canReadTimeline -> <audience> OR isAllowed('profile:timeline:write')
+      (edit-implies-read). UserEventRepositoryPort.add + repo impl +
+      CareerTimelineService.addManualEvent (server-stamps source:'manual').
+      Missing target -> 403 (explicit findById, no 404 enumeration, no FK 500).
+      access-control-bootstrap.ts DELIBERATELY NOT TOUCHED: a 4th canonical
+      permission would break acm1r-fr-foundation ACM1-FB-01/03 ("exactly three")
+      -> green->red. Default hr-admin seed of profile:timeline:write stays an
+      it.todo; suites grant it in-test; README "What blocks Stage-2" updated.
+      COORDINATOR-VERIFIED: manual-events 7 pass / 5 todo; epic-3 full = 3
+      suites green (auto/manual/read), edit-delete still 6 red (Story 3.3).
+      Full sweep 82 failed / 273 passed / 8 todo vs baseline 93/262/8 =
+      11 red->green (7 Story 3.2 + 4 Story 3.3 POST-precondition steps),
+      ZERO green->red. tsc clean (3 known epic-4), lint clean.
+      spec-3-2 status -> done. Story 3.2 COMPLETE (all 3 AD-1 stages).
+      CARRIED: um-ct-12 default-seed it.todo; ⚠️-to-ratify DEC-UM-001 tension.
+
+  - story_id: "3-3-edit-delete-event-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/career-timeline/{um-ct-05,06,07,08,13}.md + README.md + spec-3-3-authorized-actor-edits-or-deletes-an-event.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T00:45:00Z"
+    note: >-
+      Same split-gate shape as Story 3.2. DELETE /users/:id/events/:eventId =
+      soft-delete (deletedAt set, row persists, never exposed); gate =
+      isAllowed(actor,'profile:timeline:write') alone (hr-admin only now);
+      DEC-UM-001 audience narrowing deferred; NO PATCH on a single event;
+      correction = DELETE + POST (no "correct" endpoint). LIVE: um-ct-07
+      (soft-deleted absent from read, actor Root), um-ct-08 (direct PATCH
+      rejected 404/405, actor Root), um-ct-13 NEW (HR Admin happy path, 6 tests:
+      seed+DELETE 204, absent from read, full DELETE+POST correction, unknown/
+      already-deleted -> 404, Bob -> 403 / no token -> 401, cross-timeline
+      DELETE -> 404). DEFERRED it.todo: um-ct-05 (PP corrects), um-ct-06 (UM
+      deletes; two-part unblock = FR-matrix UM grant + AC department-tree walk).
+      DECISIONS: DELETE success -> 204 No Content (nothing to echo; fallback
+      200+empty if the team wants uniformity with the deactivate route);
+      unknown eventId -> 404; already-soft-deleted -> 404 (absence is absence,
+      not idempotent 204); cross-timeline (event.userId != :id) -> 404; gate
+      order = permission 403 first (covers nonexistent :id, no enumeration),
+      then scoped event lookup 404. spec-3-3 status stays draft.
+      INHERITED ratify item: DEC-UM-001 audience-scoping vs HR-Admin
+      feature-action (now covers delete too). No new tension from 3.3.
+
+  - story_id: "3-3-edit-delete-event-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-3/edit-delete-events.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T01:15:00Z"
+    note: >-
+      Committed-red 7 failed / 6 passed / 2 todo. All 7 failures targeted on the
+      missing DELETE /users/:id/events/:eventId route (404 instead of 204; gate
+      never reached). GREEN already: um-ct-08 (no PATCH route, by design),
+      um-ct-13 Test 6 cross-timeline (coincidental now, stays green post-scoped-
+      lookup), seed POST + baseline GET steps. it.todo x2: um-ct-05 (PP),
+      um-ct-06 (UM). GET assertions moved to res.body.data envelope; DELETE
+      expectations 204 / 404. Full sweep 83 failed / 274 passed / 10 todo vs
+      82/273/8 baseline - delta entirely this one file, zero green->red.
+      tsc clean (3 known epic-4), lint clean. Coordinator re-verified 7f/6p/2todo.
+
+  - story_id: "3-3-edit-delete-event-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (2 new + 5 modified — DELETE /users/:id/events/:eventId soft-delete)"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T01:45:00Z"
+    note: >-
+      DELETE /users/:id/events/:eventId @HttpCode(204) + SoftDeleteUserEventAction:
+      canEdit gate -> 403 (covers nonexistent :id); CareerTimelineService.
+      softDeleteEvent(userId,eventId) does the scoped (id,userId,deletedAt:null)
+      lookup, returns boolean, action maps false -> NotFoundException 404
+      (unknown / cross-timeline / already-soft-deleted; non-idempotent).
+      UserEventRepositoryPort.findActiveOnTimeline + softDelete. No PATCH route
+      (absence = correct). domain/ stays HTTP-free.
+      COORDINATOR-VERIFIED: epic-3 all 4 suites green (31 passed / 7 todo / 0
+      failed); full sweep 76 failed / 281 passed / 10 todo vs baseline 83/274/10
+      = 7 red->green, ZERO green->red; tsc clean (3 known epic-4), lint clean.
+      spec-3-3 status -> done. Story 3.3 COMPLETE (all 3 AD-1 stages).
+      EPIC 3 COMPLETE within current infra (Stories 3.1/3.2/3.3). Carried
+      it.todo (7): um-ct-03/04/09 + DEC-UM-001 narrowing + hr-admin default seed
+      (3.2), um-ct-05/06 (3.3) - all pending the FR-permission-matrix grant of
+      profile:timeline:write to PP/UM roles (+ AC department-tree walk for the
+      "direct UM" leg) and/or the kernel default seed.

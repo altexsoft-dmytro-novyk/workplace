@@ -8,7 +8,7 @@
 
 **When** Bob (Reporting line, entitled — entitlement is Epic 0's) edits Alice's `position` to `"Senior Engineer"` via `PATCH /users/:id` (`profile/um-edit-01`).
 
-**Then** the system writes a `UserEvents` row for Alice with `type: "position_change"`, `source: "system"`, `eventDate` = today's date in UTC (the `eventDate` column is a `DATE`; "in UTC, like every other date" — Dmytro 2026-09-02), and `details` carrying **the new value only** — `{ "position": "Senior Engineer" }`, no `from`/previous value. The write happens in the **same transaction** as the `PATCH` (AD-11); no separate request from Bob produces it.
+**Then** the system writes a `UserEvents` row for Alice with `type: "position_change"`, `source: "system"`, `eventDate` = today's date in UTC (the `eventDate` column is a `DATE`, consistent with every other date field — Dmytro, 2026-09-02), and `details` carrying **the new value only** — `{ "position": "Senior Engineer" }`, no `from`/previous value. The write happens in the **same transaction** as the `PATCH` (AD-11); no separate request from Bob produces it.
 
 **And** a `PATCH` that does not change `position` (same value, or `position` absent from the body) writes **no** `position_change` event.
 

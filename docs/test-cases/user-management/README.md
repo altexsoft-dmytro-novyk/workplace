@@ -26,7 +26,20 @@ baseline" no longer holds for the changed files:
 - `relationships/` was **split** to v1.5 Epic 4 — some files retraced (fresh
   approval required), three mentorship files retired (superseded header).
 - `career-timeline/` traces were **realigned** to DEC-UM-001 / Stories 3.2–3.3
-  (fresh approval required); two dual-gate negatives added.
+  (fresh approval required); two dual-gate negatives added. **Story 3.2
+  reconciled 2026-09-02** to the split-gate decision (Dmytro): manual backfill
+  ships gated on `profile:timeline:write` **alone** (feature action, `hr-admin`
+  only); the DEC-UM-001 PP/direct-UM audience scoping is deferred to the
+  FR-permission-matrix grant. New `um-ct-12` (HR-Admin add, live); `um-ct-03/04/09`
+  reframed as deferred `it.todo`; `um-ct-10` stays live. A folder
+  `career-timeline/README.md` now carries the decision + the ⚠️-to-ratify tension.
+  **Story 3.3 reconciled 2026-09-03** to the same shape: `DELETE .../events/:eventId`
+  is soft-delete-only, gated on `profile:timeline:write` alone (`hr-admin` only);
+  a correction is `DELETE` + `POST`, no `PATCH`, no "correct" endpoint. New
+  `um-ct-13` (HR-Admin soft-delete + correction flow, live); `um-ct-07/08`
+  retargeted to Root and stay live (actor-agnostic); `um-ct-05/06` reframed as
+  deferred `it.todo`. Scenario-stage decisions: `DELETE` → `204 No Content`;
+  unknown / already-soft-deleted / cross-timeline `eventId` → `404`.
 - `profile/` gained the `um-photo-*` set (Story 1.3, 9 new files + folder
   `README.md`); `um-pf-02` retired to a superseded pointer; `um-pf-01/03/04` and
   `auth/` got **header notes** (fresh approval required).
@@ -107,7 +120,7 @@ graphs overlap.
 
 | Persona | Role in this suite |
 | --- | --- |
-| **Root** | Seeded bootstrap `User` holding the `hr-admin` FR policy (`user-management:create` / `:deactivate` / `:list`). ACM-0 creates the row; ACM-1 attaches the policy. Also holds *change organisational relationships* and *record a departure* where those scenarios need an entitled actor. |
+| **Root** | Seeded bootstrap `User` holding the `hr-admin` FR policy (`user-management:create` / `:deactivate` / `:list`). ACM-0 creates the row; ACM-1 attaches the policy. Also holds *change organisational relationships* and *record a departure* where those scenarios need an entitled actor, and — for Epic 3 Story 3.2 — a seeded `profile:timeline:write` permission on the `hr-admin` role (manual career-timeline backfill; `career-timeline/README.md`). |
 | **Alice** | Seeded employee. Reports to Bob; assigned PP Paula. Subject of profile-edit, auth, career-timeline, relationship, and departure scenarios. |
 | **Bob** | Alice's **direct** Unit Manager (Reporting line). Edits Alice's S1 fields (entitlement asserted by Epic 0); manual career-timeline add/correct/delete under DEC-UM-001. |
 | **Paula** | Alice's assigned People Partner. Manual career-timeline add/correct/delete under DEC-UM-001. |
@@ -128,14 +141,19 @@ gone with `registration/`.
 | `auth/` | FR-2/FR-3/FR-8 — magic-link request/consume, security edge cases (Epic 2) | 6 | header-noted draft |
 | `profile/` | FR-9 — S1 data correctness given an entitled actor (entitlement is Epic 0's): `um-pf-*` = Story 1.2 scalar `PATCH`; `um-photo-*` = Story 1.3 `PUT .../photo` + real object storage (AD-15). Folder `README.md` carries the photo cluster's in-scenario decisions. | 12 (+ `um-pf-02` retired pointer) | new/refreshed draft |
 | `list/` | FR-15 — `GET /users` pagination + metadata, permission-safe S1-field filters, dismissed-employee visibility via `employmentStatus`, endpoint authz, fixed fail-closed projection, unknown-filter rejection, empty page, deterministic sort, NFR-2 perf note (Epic 1 Story 1.5) | 12 | blank-page v1.5 rewrite (`um-list-01..04` retargeted, `um-list-05..12` reworked/new); folder README carries the in-scenario decisions |
-| `career-timeline/` | FR-5/FR-11/FR-12/FR-13 — system events; career-timeline read audience; DEC-UM-001 manual mechanics (assigned PP + direct UM); dual gate; edit-immutability (Epic 3) | 11 | retraced draft (`um-ct-09/10` new, `um-ct-11` read gate) |
+| `career-timeline/` | FR-5/FR-11/FR-12/FR-13 — system events; career-timeline read audience; Story 3.2 manual backfill + Story 3.3 soft-delete / correction (feature-permission gate, `hr-admin` only this stage; DEC-UM-001 PP/direct-UM audience scoping deferred to the FR-matrix grant); edit-immutability, no `PATCH` (Epic 3). Folder README carries the split-gate decision + the ⚠️-to-ratify tension. | 13 (+ folder `README.md`) | Story 3.2 reconciled 2026-09-02; **Story 3.3 reconciled 2026-09-03** (`um-ct-13` new; `um-ct-03/04/05/06/09` → `it.todo` deferred; `um-ct-07/08/10/12/13` live) |
 | `relationships/` | FR-10 — Epic 4 organisational facts: manager (4.1, retraced), PP (4.2, blocked stubs), department (4.3, blocked stubs) | 11 | split; see folder README |
 | `departure/` | FR-6 — Epic 5 employment lifecycle (record / blocked / apply / retry) | 4 | new draft, **all BLOCKED — CC-06** |
 | `registration/` | **RETIRED (v1.5)** — `um-reg-01..15` `POST /users` HTTP create. See folder README. | 15 | history only |
 | `deactivation/` | **RETIRED (v1.5)** — `um-deact-01..03` generic `DELETE /users/:id`. See folder README. | 3 | history only |
 
-**Live stage-1 scenario files (v1.5, subject to per-file approval):** 71
-(+8: the `um-photo-*` set replacing the single `um-pf-02`; +1: `um-ct-11`).
+**Live stage-1 scenario files (v1.5, subject to per-file approval):** 73
+(+8: the `um-photo-*` set replacing the single `um-pf-02`; +1: `um-ct-11`;
++1: `um-ct-12`; +1: `um-ct-13`). `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06`,
+`um-ct-09` stay on disk as **deferred `it.todo`** — target end-state prose
+retained, approved as such; they reactivate on the FR-permission-matrix grant of
+`profile:timeline:write` to the PP / Unit-Manager roles (`um-ct-06` also needs
+the AC department-tree walk) (`career-timeline/README.md`).
 **Retained as history (retired, do not approve):** 22 (`registration/` 15,
 `deactivation/` 3, `relationships/um-rel-04..06` 3, `profile/um-pf-02` 1).
 
@@ -146,8 +164,9 @@ gone with `registration/`.
 | Epic 0 Story 0.1 not yet landed (port rebind + S1-card DTO) | `access-control-adoption/umac-01..06` E2E is committed-red until the rebind + S1-card DTO land |
 | Missing `user-management:edit` permission (Open Decision i) | `access-control-adoption/umac-07` (CONDITIONAL) |
 | Profile Projection story (FR-17) reaching production | the S10 dates-only / S11 name-only / S16 per-field colleague views **on their own surfaces** (`GET /users/:id/leaves`, etc.) — **not** `GET /users/:id`, which returns the S1 card from Story 0.1 (`umac-04`, positive test) |
-| `profile:timeline` `canAccessSection` — a **pending Access Control increment** (ACM-5 ships the three legacy section strings only) | the **write** half of the `career-timeline/` dual gate (`um-ct-03..10`). The **read** gate (`um-ct-11`, Story 3.1 `GET /users/:id/events`) is **not** blocked — it uses the sanctioned `resolveAudiences`-derived interim (mentorship timeline-section precedent, `// INTERIM` + expiry trigger); `deferred-work.md` tracks the real increment. |
-| DEC-UM-001 direct-Unit-Manager leg needs the AC **department-tree walk** increment (`targetType:'department'` + recursion) | the direct-UM manual-write path in `um-ct-04`/`um-ct-06` (the assigned-PP leg is unaffected) |
+| FR-permission-matrix grant of `profile:timeline:write` to the PP / Unit-Manager roles (`fr-permission-matrix-draft-2026-09-02.md` §6 item 4, `?`) + the DEC-UM-001 audience narrowing being wired (`canAccessSection('profile:timeline', …) === 'write'`, scoped to assigned PP / direct UM) | `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06`, `um-ct-09` — held as deferred `it.todo` target prose. **Not** blocked: `um-ct-10` / `um-ct-12` (Story 3.2) and `um-ct-07` / `um-ct-08` / `um-ct-13` (Story 3.3) — the live paths' gate at this stage is `isAllowed(actor, 'profile:timeline:write')` alone, a no-target facade call; `career-timeline/README.md`. |
+| `profile:timeline` `canAccessSection` — a **pending Access Control increment** (ACM-5 ships the three legacy section strings only) | the reactivation of `um-ct-03/04/09` (Story 3.2) and `um-ct-05/06` (Story 3.3). **Story 3.2's** live paths (`um-ct-10/12`) and **Story 3.3's** live paths (`um-ct-07/08/13`) do **not** need it. The **read** gate (`um-ct-11`, Story 3.1 `GET /users/:id/events`) is **not** blocked — it uses the sanctioned `resolveAudiences`-derived interim (mentorship timeline-section precedent, `// INTERIM` + expiry trigger); `deferred-work.md` tracks the real increment. |
+| DEC-UM-001 direct-Unit-Manager leg needs the AC **department-tree walk** increment (`targetType:'department'` + recursion) | the direct-UM manual-write path in `um-ct-04` and the direct-UM soft-delete path in `um-ct-06` (both deferred `it.todo`; the assigned-PP leg in `um-ct-03`/`um-ct-05` is unaffected) |
 | CC-04 (PP persistence) + CC-07 (AD-19 journal) | `relationships/um-rel-09..11` (PP), and the atomic-journal Then-clause of `um-rel-01/02` |
 | CC-07 + Department edge contract | `relationships/um-rel-12..14` (department) |
 | CC-06 (scheduled-departure state + executor) | all of `departure/` |

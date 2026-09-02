@@ -206,7 +206,7 @@ Autonomous approvals in `epic-1-approvals.yaml` still carry `commit: UNCOMMITTED
 - **`GET /users/:id/events` read gate = career-timeline read audience** (requirements §3.2 matrix row S9): **Self, Reporting line, Project line, PP** → `200`. **Colleague → denied** (the row is `—` for colleague; §3.3.1 strict — route must not leak, `403` for an authenticated viewer with empty audience). Gate is wired in Story 3.1 (not deferred) via the `resolveAudiences` interim (see the interim-pattern note below); section name `profile:timeline`, `S9` is only the matrix's row id. Shared-link `cfg` path is out of scope (no link feature yet).
 - **`details` jsonb payload for auto-events = the new value only** (no old/prior value, no diff).
 - **`eventDate` = server "now" in UTC**, same as every other timestamp in the system.
-- **`um-ct-05`** (event the system inferred wrongly) — precondition seeded through the manual-add endpoint with an in-file comment; there is no HTTP way to force a bad inference. Approach preserved (Dmytro: "не знаю про шо ти, але ок").
+- **`um-ct-05`** (event the system inferred wrongly) — precondition seeded through the manual-add endpoint with an in-file comment; there is no HTTP way to force a bad inference. Approach preserved (Dmytro, 2026-09-02).
 
 ### S9 manual-write gate (Story 3.2/3.3 — recorded now, still blocked)
 Requirements are explicit, no fresh decision needed: **dual gate** = the runtime *edit the career timeline* functional permission **AND** the DEC-UM-001-narrowed S9 write audience = **assigned PP + the employee's direct Unit Manager only** (project-derived DM/PM and transitive managers are read-only for manual mutation). `edit the career timeline` default holder is a §132 PO-confirm item but does not block 3.1. The "direct Unit Manager" leg still needs the AC department-tree walk increment.
@@ -231,8 +231,8 @@ Earlier note in this section over-flagged this. `AccessControlFacade.canAccessSe
 - `_bmad-output/implementation-artifacts/access-control/deferred-work.md` — new item for the real `profile:timeline` `canAccessSection` increment.
 - `um-ct-03..10` untouched — already reconciled to DEC-UM-001, they belong to Stories 3.2/3.3.
 
-### Story 3.1 Stage 1 — APPROVED by Dmytro 2026-09-02 ("approve. імплементуй.")
-Recorded in `epic-1-approvals.yaml` (`story_id: 3-1-auto-career-timeline-events-scenarios`, author=agent, approver=Dmytro Novyk). Dmytro also asked: fresh subagents per stage, clean context.
+### Story 3.1 Stage 1 — APPROVED by Dmytro 2026-09-02
+Recorded in `epic-1-approvals.yaml` (`story_id: 3-1-auto-career-timeline-events-scenarios`, author=agent, approver=Dmytro Novyk). Dmytro also asked for fresh subagents per stage (clean context).
 
 Late scenario fix (post-approval, mechanical): `um-ct-02` `eventDate` for `position_change` = **today's UTC date** (the `user_events.eventDate` column is `@db.Date`, not a timestamp), not "server instant". Propagated to `spec-3-1`.
 
@@ -251,7 +251,7 @@ Brief: committed-red E2E only, no `src/` changes, no git. Reconcile `test/user-m
 2. **um-ct-01 scenario literal** — doc says Nina, `eventDate "2026-09-01"`; the real `docs/Accounts_template.csv` has ONE data row (a bootstrap "Site Administrator", `RegistrationDate 2026-08-17`). The e2e reconciles by asserting `eventDate === csv.RegistrationDate`. Scenario prose vs import-fixture reality — inherent, e2e handles it; a one-line note on `um-ct-01` would tidy it.
 3. um-ct-11 Test 5 (401 no-token) depends on guard ordering once the route exists — documented inline, fine.
 
-### Story 3.1 Stage 2 — APPROVED by Dmytro 2026-09-02 ("b")
+### Story 3.1 Stage 2 — APPROVED by Dmytro 2026-09-02 (response shape = option b, the `{ data, canEdit }` envelope)
 Recorded in `epic-1-approvals.yaml`. **Response-shape decision: option (b)** — `GET /users/:id/events` → `{ data: UserEvent[], canEdit: boolean }` envelope; `canEdit` = the Story 3.2/3.3 manual-mutation dual gate, `false` for every viewer until 3.2 ships.
 - Post-gate mechanical updates (coordinator): scenario docs `um-ct-01/02/11` + `spec-3-1` + the 2 Stage-2 test files updated to assert the `{ data, canEdit:false }` envelope. `um-ct-01` gained an "import-fixture reality" note (CSV has one row, a bootstrap Site Administrator `RegistrationDate 2026-08-17`, not "Nina 2026-09-01"). Re-verified red: **9 failed / 2 passed**, tsc clean (3 known epic-4), envelope assertions in place.
 
@@ -282,8 +282,100 @@ The Stage-3 subagent spent ~20 min / 237k tokens exploring, then set up a backgr
 ### First-pass stall (recorded)
 The Stage-3 agent's *first* turn (~20 min / 237k tok) ended by backgrounding a Monitor for the baseline sweep — which never resumes an unattended subagent. Zero `src/` changes that pass. Resumed with a "no Monitor, all commands inline" corrective; the resume did the whole implementation cleanly.
 
-### Next action
-**HOLD for Dmytro's Stage-3 gate.** On approval → record in `epic-1-approvals.yaml`; Story 3.1 is then complete (all 3 AD-1 stages). Epic 3 Stories 3.2/3.3 remain blocked on the DEC-UM-001 direct-UM write leg → AC department-tree walk.
+### Story 3.1 — COMPLETE 2026-09-02 (all 3 AD-1 stages, uncommitted)
+Stage 3 APPROVED by Dmytro. Recorded in `epic-1-approvals.yaml` (`3-1-*-production`). `spec-3-1` status → `done`.
+
+## ☀️ STATE 2026-09-02 ~22:30 — Epic 0 + 1 + 2 + **Epic 3 Story 3.1** COMPLETE (uncommitted, `dn-um-implementation`)
+
+Career timeline: the **automatic** half is live — `joined_company` at import, `position_change` on `PATCH` (AD-11 same-tx), `GET /users/:id/events` `{ data, canEdit }` with the interim S9 read gate. **Manual** add/correct/delete (Stories 3.2/3.3) is NOT built.
+
+### Epic 3 Stories 3.2 / 3.3 — the real blocker (not a gate, missing infrastructure)
+DEC-UM-001 manual-write audience = **assigned PP OR the employee's direct Unit Manager**. The assigned-PP leg is resolvable today (`resolveAudiences` emits `pp`). The **direct-Unit-Manager leg has no data and no resolver support**:
+- No way to record "user X manages department D" — Story 1.1 deliberately did not populate `Policies{type:'AR', targetType:'department', targetRole:'unit-manager'}` (no CSV source). Assigning a department manager is **Epic 4 Story 4.3**'s relationship-write path.
+- `AudienceResolverService` does not walk `targetType:'department'` at all — that's a separate **AC-kernel increment** (Anna's package `spec-access-control-kernel-mvp`, approver Anna Pikula), S13-class, its own AD-1 sequence.
+- Also `canAccessSection('profile:timeline')` itself (the non-interim gate) is a pending AC increment (`deferred-work.md`).
+
+So Epic 3 cannot be "finished" from the User Management side alone. Options recorded for Dmytro below.
+
+### Path chosen (Dmytro, 2026-09-02): Stories 3.2/3.3 keep the functional permission; seed it to HR Admin only for now, the FR matrix decides other holders later.
+- **`profile:timeline:write` IS a real functional permission** (keeps §2.3 / §4.9 / §132 intact — no Variant A here, unlike the identity card). Seeded + granted to the **`hr-admin` role only** at this stage. Non-HR-Admin holders (PP, Unit Manager) come from the FR-matrix grant work, later.
+- **Manual add / correct / delete = a feature action gated by `isAllowed(actor, 'profile:timeline:write')`** — no data-audience requirement at this stage. Rationale: HR Admin holds no S9 write audience (§2.2 — HR Admin grants no data access), so requiring the audience half now would close the gate to everyone; and the FR matrix treats bulk-migration actions (`directory:import`, `org:relationships:write`) as feature actions. HR-Admin backfill of the legacy Excel headcount record is that shape.
+- **DEC-UM-001 audience narrowing (assigned PP + direct Unit Manager) is a DEFERRED refinement** — it activates when the matrix grants `profile:timeline:write` to PP / Unit-Manager roles, at which point those grants must be scoped so a PP can only backfill their own assignees (not everyone). Flag `// INTERIM` + `deferred-work.md` entry. **Requirements tension to ratify later:** DEC-UM-001 as written scopes manual mutation to PP + direct UM *by audience*; this stage ships it as an HR-Admin feature action instead.
+- **`canEdit`** in the `GET /users/:id/events` envelope = `isAllowed(viewer, 'profile:timeline:write')` → `true` for HR Admin, `false` for everyone else at this stage. (Story 3.1 shipped it already returning `false` for all — this just makes the wiring real.)
+- Scenario reshaping for Stage 1: `um-ct-03` (PP add) / `um-ct-04` (UM add) → `it.todo` / blocked pending the matrix grant; `um-ct-10` (has relationship audience, lacks the permission → `403`) → holds; `um-ct-09` (holds permission, lacks audience → denied) → does NOT hold in the interim (feature-action gate, no audience check) — reshape to `it.todo` for when the narrowing lands; **NEW** scenario: HR Admin (Root) `POST /users/:id/events` → `201`.
+- Where `profile:timeline:write` gets seeded: prefer extending `CANONICAL_PERMISSIONS` + a canonical grant pair in `src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts` (smallest change; the bootstrap already tolerates non-canonical additions). **This touches Anna's kernel-bootstrap file** — flag for her review; a UM-owned seed is the fallback if that's not acceptable.
+
+### Story 3.2 (manual backfill add) — Stage 1 DONE + one revision in progress, AWAITING Dmytro's Stage-1 gate
+First pass (subagent): `um-ct-03/04/09` → deferred `it.todo` (unblock = FR-matrix grants `profile:timeline:write` to PP/UM + DEC-UM-001 scoping); `um-ct-10` LIVE (no permission → 403); **new `um-ct-12`** LIVE (HR Admin/Root `POST` → `201` bare `UserEventResponse`, `source:"manual"` server-stamped, `whitelist` strips `id`/`deletedAt`/`source`/`createdBy`, `400` on bad `type`/`eventDate`); new `docs/test-cases/user-management/career-timeline/README.md`; `spec-3-2` + suite README rewritten.
+
+**Scenario-stage decisions for the gate:** (1) `POST` `201` returns the **bare `UserEventResponse`**, not the `{ data, canEdit }` envelope (matches `PATCH /users/:id`). (2) `CreateUserEventDto` — `whitelist` silently strips server-owned fields, `400` only for missing/invalid `type`/`eventDate`.
+
+**Revision (Dmytro, 2026-09-02): HR Admin can read the timeline back — "HR Admin can do and see everything".**
+- Timeline-scoped rule (Story 3.2 implements): **edit implies read** — `canReadTimeline` = S9 read audience **OR** `isAllowed(viewer, 'profile:timeline:write')`. HR Admin GETs the timeline → `200`, `canEdit: true` observable. `um-ct-12` follow-up read now done by Root directly.
+- Broader: the user's "HR Admin sees everything" = the §2.4 **Full profile access** grant (seeded at deployment, every section). `resolveAudiences` has no `full` audience → new `deferred-work.md` item (affects more than the timeline; the edit-implies-read rule is the timeline-scoped interim).
+- Still open / ⚠️-to-ratify: DEC-UM-001 audience scoping (assigned PP + direct UM) vs shipping manual-write as an HR-Admin feature action.
+
+### Story 3.2 Stage 1 — APPROVED 2026-09-02 (recorded in `epic-1-approvals.yaml`, `3-2-*-scenarios`)
+Dmytro drove the gate design directly. Live: `um-ct-10`, `um-ct-12`. Deferred `it.todo`: `um-ct-03/04/09`. New folder `career-timeline/README.md`. ⚠️-to-ratify: DEC-UM-001 audience scoping vs HR-Admin feature action.
+
+### Story 3.2 Stage 2 — DISPATCHED 2026-09-02 (fresh subagent, no Monitor / inline)
+Reconcile `test/user-management/epic-3/manual-events.e2e-spec.ts`: `CAREER_TIMELINE_PERMISSION_KEY` → `'profile:timeline:write'`; `um-ct-10` live (403 no permission); `um-ct-12` new live (Root grants self `profile:timeline:write` in-test, POST → 201 bare `UserEventResponse`, reads back 200 `canEdit:true`, whitelist strip, 400 cases, Ida 403 / no-token 401, + `it.todo` for the real hr-admin default seed); `um-ct-03/04/09` + DEC-UM-001 case → `it.todo`. Committed-red (route 404). Baseline sweep 91f/262p/3todo.
+
+### Story 3.2 Stage 2 — DONE + APPROVED 2026-09-02 (recorded `3-2-*-red-tests`)
+Committed-red 7 failed / 5 todo (route 404). Coordinator re-verified: manual-events 7f/5todo, tsc 3 known. `fixtures.ts` key → `profile:timeline:write`. `GET /users/:id/events` already exists (Story 3.1) — `um-ct-12` red on the missing `POST` + the edit-implies-read gate widening.
+
+### Story 3.2 Stage 3 — DISPATCHED 2026-09-02 (fresh subagent, no Monitor / inline)
+Build: `POST /users/:id/events` + `AddManualUserEventAction` + `CreateUserEventDto`; `canEditTimeline` → `isAllowed('profile:timeline:write')` alone (drop the `&& canReadTimeline`); `canReadTimeline` → `<audience> OR isAllowed('profile:timeline:write')` (edit-implies-read); `UserEventRepositoryPort.add` + repo impl + `CareerTimelineService.addManualEvent`. Seed `profile:timeline:write` in `access-control-bootstrap.ts` **only if low-risk** (drift logic is "exactly three canonical" — flag for Anna either way); else leave the `it.todo`. Make 7 red green, `it.todo`s stay, 0 green→red.
+
+### Story 3.2 — COMPLETE 2026-09-03 (all 3 AD-1 stages, uncommitted). `spec-3-2` status → `done`.
+Stage 3: `POST /users/:id/events` + `AddManualUserEventAction` + `CreateUserEventDto` (2 new + 7 modified src). `canEditTimeline` = `isAllowed('profile:timeline:write')` alone; `canReadTimeline` widened with edit-implies-read. Missing target → `403` (explicit `findById`, no enumeration). **`access-control-bootstrap.ts` deliberately untouched** — a 4th canonical permission breaks `acm1r-fr-foundation` ACM1-FB-01/03; the `hr-admin` default seed of `profile:timeline:write` stays an `it.todo`, suites grant it in-test.
+Coordinator-verified: manual-events 7 pass / 5 todo; full sweep **82 failed / 273 passed / 8 todo** (was 93/262/8) — 11 red→green (7 Story 3.2 + 4 Story 3.3 `POST`-precondition steps), **0 green→red**. tsc clean (3 known epic-4), lint clean.
+
+**Carried:** `um-ct-12` default-seed `it.todo` (kernel "exactly three" guard); the ⚠️-to-ratify DEC-UM-001 audience-scoping-vs-feature-action tension.
+
+## ☀️ STATE 2026-09-03 ~00:20 — Epic 0 + 1 + 2 + Epic 3 Stories 3.1 & 3.2 COMPLETE (uncommitted)
+Career timeline: auto-events + `GET /users/:id/events` + **manual add (`POST`, HR-Admin feature-action gate)** all live. Remaining: Story 3.3 (edit/delete = soft-delete + append; `um-ct-05..08`).
+
+### Story 3.3 (edits or deletes an event) — Stage 1 dispatched 2026-09-03
+Fresh subagent, docs-only, no Monitor. Reconcile `um-ct-05` (PP corrects = soft-delete + append), `um-ct-06` (delete), `um-ct-07` (soft-deleted absent from read), `um-ct-08` (direct `PATCH` rejected) + `spec-3-3` + the career-timeline README to the same split-gate shape as 3.2: `DELETE /users/:id/events/:eventId` gated by `isAllowed('profile:timeline:write')` alone (HR-Admin only for now); correction = soft-delete then re-`POST`; no `PATCH` on a single event. Personas: Root/HR-Admin live; PP/UM deferred `it.todo`.
+
+### Story 3.3 Stage 1 — APPROVED 2026-09-03 (recorded `3-3-*-scenarios`)
+`DELETE /users/:id/events/:eventId` soft-delete; gate = `isAllowed('profile:timeline:write')` alone. LIVE: `um-ct-07`/`um-ct-08` (retargeted to Root), new `um-ct-13` (HR-Admin happy path, 6 tests). Deferred `it.todo`: `um-ct-05` (PP), `um-ct-06` (UM — two-part unblock). Decisions: `DELETE`→`204`; unknown/re-delete/cross-timeline→`404`; gate order permission-403-then-scoped-404.
+
+### Story 3.3 Stage 2 — DISPATCHED 2026-09-03 (fresh subagent, no Monitor / inline)
+Reconcile `test/user-management/epic-3/edit-delete-events.e2e-spec.ts`: `um-ct-05/06` → `it.todo`; `um-ct-07/08` live (Root); new `um-ct-13` (6 tests); `GET` assertions → `res.body.data` envelope; `DELETE` expectations → `204`/`404`. Committed-red on the missing `DELETE` route. Baseline sweep 82f/273p/8todo.
+
+### Story 3.3 Stage 2 — DONE + APPROVED 2026-09-03 (`3-3-*-red-tests`)
+Committed-red 7 failed / 6 passed / 2 todo, targeted on the missing `DELETE` route. Full sweep 83f/274p/10todo (was 82/273/8) — delta entirely this file, 0 green→red. Coordinator re-verified.
+
+### Story 3.3 Stage 3 — DISPATCHED 2026-09-03 (fresh subagent, no Monitor / inline)
+`DELETE /users/:id/events/:eventId` `@HttpCode(204)` + `SoftDeleteUserEventAction`: `canEdit` gate → 403 (covers nonexistent `:id`); scoped `findActiveOnTimeline(userId, eventId)` → 404 (covers unknown id, cross-timeline, already-deleted); `softDelete` sets `deletedAt`. `UserEventRepositoryPort.findActiveOnTimeline` + `.softDelete`; `CareerTimelineService.softDeleteEvent`. No `PATCH` route (its absence = correct). Make 7 red green, `it.todo`s stay, 0 green→red.
+
+### Story 3.3 — COMPLETE 2026-09-03 (all 3 AD-1 stages). `spec-3-3` → `done`.
+`DELETE /users/:id/events/:eventId` `@HttpCode(204)` soft-delete + `SoftDeleteUserEventAction`. Coordinator-verified: **epic-3 all 4 suites green (31 passed / 7 todo / 0 failed)**; full sweep 76f/281p/10todo (was 83/274/10) — 7 red→green, 0 green→red; tsc clean, lint clean.
+
+## ☀️ STATE 2026-09-03 ~01:45 — Epic 0 + 1 + 2 + **Epic 3 COMPLETE** (within current infra; uncommitted since `cc3ef93`/`042a741`)
+
+| Epic | Status |
+|---|---|
+| 0 (adoption) · 1 (import/edit/photo/list) · 2 (magic-link) | ✅ done + committed |
+| **3 (career timeline)** | ✅ **3.1 committed; 3.2 + 3.3 done, uncommitted** |
+| 4 (org relationships) | ⛔ CC-04 + CC-07 |
+| 5 (departure) | ⛔ CC-06 |
+
+**Career timeline shipped:** auto-events (`joined_company` at import, `position_change` on `PATCH`, AD-11 same-tx); `GET /users/:id/events` `{ data, canEdit }` with the interim S9 read gate + edit-implies-read; `POST /users/:id/events` manual add; `DELETE /users/:id/events/:eventId` soft-delete; no `PATCH` on a single event (correction = `DELETE` + `POST`). Manual add/delete gated by `isAllowed('profile:timeline:write')` alone — an HR-Admin feature action.
+
+**Uncommitted src (Story 3.2 + 3.3):** 3 new actions/dto (`add-manual-user-event.action.ts`, `soft-delete-user-event.action.ts`, `create-user-event.dto.ts`) + 7 modified (`users.controller.ts`, `career-timeline-access.port.ts`, `user-event.repository.port.ts`, `career-timeline.service.ts`, `career-timeline-access-facade.adapter.ts`, `user-event.repository.ts`, `user-management.module.ts`) + 3 test files (`edit-delete-events`, `manual-events`, `fixtures`). Plus the workspace scenario/spec/README/approvals docs.
+
+### Epic 3 tail — carried, needs no immediate action (7 `it.todo`)
+1. `um-ct-03` (PP add), `um-ct-05` (PP correct) — reactivate when the FR-permission-matrix grants `profile:timeline:write` to the **People Partner** role + DEC-UM-001 assignee scoping.
+2. `um-ct-04` (UM add), `um-ct-06` (UM delete) — the above for the **Unit Manager** role **+** the AC **department-tree-walk** increment (`targetType:'department'`) for DEC-UM-001 "direct UM".
+3. `um-ct-09` (permission-without-audience denial) + the DEC-UM-001 narrowing case — reactivate when `canAccessSection('profile:timeline')` / the audience half is wired.
+4. `um-ct-12` seed `it.todo` — the `hr-admin` role holds `profile:timeline:write` by a real **kernel/ACM default seed** (blocked on the bootstrap "exactly three canonical" drift guard; suites grant it in-test meanwhile).
+5. **⚠️ To ratify:** DEC-UM-001 scopes manual timeline mutation (add + delete) to assigned PP + direct UM *by data audience*; Epic 3 ships it as an HR-Admin *feature action*. PO reconciles at the FR-matrix grant.
+
+### Next
+Await Dmytro. Options: (a) commit Epic 3 3.2/3.3; (b) the FR-permission-matrix grant work (unblocks most of the tail); (c) the AC increments (`canAccessSection('profile:timeline')` + department-manager audience + §2.4 `full`); (d) Epic 4/5 (both still CC-blocked).
 
 ---
 
