@@ -35,7 +35,7 @@ erDiagram
 
 ### User
 
-Identity and profile root, owned by `user-management` ([PRD](../../_bmad-output/planning-artifacts/prds/prd-user-management-2026-08-20/prd.md)). Carries `ttId` (timetracker external identity, AD-13) from day one — email alone is not sufficient identity across systems (§6). **Never** carries role flags, manager pointers, project references, department references, or any other access-derived field — those are derived from `Relationship` (AD-11) and pending Department/Policy edges, not stored here.
+Identity and profile root, owned by `user-management` ([PRD](../../_bmad-output/planning-artifacts/prds/prd-user-management-2026-08-20/prd.md)). Carries `ttId` (timetracker external identity, AD-13) from day one — email alone is not sufficient identity across systems (§6). **Never** carries role flags, manager pointers, project references, department references, or any other access-derived field — those are derived from `Relationship` (AD-11) and Department/Policy edges (PM/AD-35 design approved; schema/implementation absent), not stored here.
 
 ```text
 User {
@@ -53,7 +53,7 @@ User {
   companyJoinDate date
   isActive        boolean, default true  // technical account/row-retention flag; never employment status (AD-16)
   ttId            string, nullable, unique
-  customFields    jsonb, default '{}'   // interim only; final storage remains open in custom-fields.md
+  customFields    jsonb, default '{}'   // interim TD-12 bag only; EAV storage approved PM/AD-32 (custom-fields.md)
   createdAt       timestamp
   createdBy       FK -> User
 }
@@ -117,7 +117,7 @@ UNIQUE: one non-applied Departure per user
 
 At creation, the required startup-validated IANA setting `BUSINESS_TIME_ZONE` is snapshotted to `effectiveTimeZone` and `dueAt` is resolved once for `00:00`; every guard/worker compares stored `dueAt` with PostgreSQL time and never falls back to host/runtime local time. `requestHash` canonically includes endpoint version, user id, normalized ISO effective date, normalized reason, and creator id; replay rechecks current authorization before returning the original result. Key reuse with a different hash is `409`. The partial non-applied uniqueness and state machine use raw-SQL constraints where Prisma cannot express them. Workers claim eligible rows in stable `effectiveDate,id` order with skip-locked selection and a fresh `leaseToken`; apply/fail/reclaim locks the row and predicates on that token, so an expired/reclaimed worker cannot commit stale work. There is no terminal abandoned state.
 
-The apply transaction closes/inserts `EmploymentStatus`, deactivates the account/profile, cancels open action items, system-closes mentorship pairs, ends persisted access held by the actor, and marks the Departure applied. Every effect is keyed or constrained by `Departure.id` so uncertain-commit retries cannot duplicate it. Recording is blocked by any active v1.5 manager or PP responsibility; after scheduling, new such assignments are rejected or quarantined. Legacy blockers produce an authorized remediation incident but never delay effective access cutoff. Cancellation/rescheduling are not defined.
+The apply transaction closes/inserts `EmploymentStatus`, deactivates the account/profile, cancels only open Action Items assigned to the departing person (authored-for-other-active-assignee items remain open), system-closes mentorship pairs, ends persisted access held by the actor, and marks the Departure applied. Every effect is keyed or constrained by `Departure.id` so uncertain-commit retries cannot duplicate it. Recording is blocked by any active v1.5 manager or PP responsibility; after scheduling, new such assignments are rejected or quarantined. Legacy blockers produce an authorized remediation incident but never delay effective access cutoff. Cancellation/rescheduling are not defined.
 
 ### UserEvents
 
@@ -133,13 +133,14 @@ UserEvents {
   eventDate date
   details   jsonb                  // type-specific metadata, e.g. grade_change: {from, to}
   source    'system' | 'manual'
+  idempotencyKey string, nullable unique  // required for source='system' (PM/AD-30)
   deletedAt timestamp, nullable    // soft delete -- e.g. superseding a wrongly-inferred event
   createdAt timestamp
   createdBy FK -> User
 }
 ```
 
-`department_change`'s payload fields reference Department ids once the Department edge contract lands. `mentorship_start`/`mentorship_end` are fired by `MentorshipPair` transitions (AD-17).
+`department_change` payload references `Department.id` (PM/AD-35). `mentorship_start`/`mentorship_end` are delivered through `user-management`'s career-event boundary (PM/AD-30), never written by mentorship directly. System `idempotencyKey` is `(sourceContext, sourceAggregateId, eventType, occurrenceId)`; departure-driven pair closure uses `occurrenceId = departureId`.
 
 ### Relationship (AD-11)
 
@@ -166,7 +167,7 @@ Rules:
 
 - Edge types share the table but never a polymorphic target column: `direct` and `people_partner` point to `User` through `reportsToUserId`; `project` points to `Project` through `projectId`. This keeps AD-10's audience walks indexable.
 - No `roleOnProject` field — managerial semantics live in policy attachments (AD-7).
-- Project membership derives **solely** from these rows. `Project` holds no member array; a project's members are `SELECT userId FROM Relationship WHERE projectId = :id`.
+- Project membership derives **solely** from these rows and is written **only** by TimeTracker sync (PM/AD-31). Membership is not Project-line access (PM/AD-27). `Project` holds no member array; a project's members are `SELECT userId FROM Relationship WHERE projectId = :id`.
 - **`DELETE` is a hard delete**, for all types. The §3.4 narrow journal, not this table, retains required organisational-change evidence. Mentorship is not stored here (AD-17).
 - `people_partner` uses atomic expected-current `PUT`/`DELETE` semantics (AD-19); generic second-create behavior is not its replacement contract.
 - **Migration note (rechecked 2026-08-29):** Prisma 7 can express partial indexes only through the `partialIndexes` Preview feature, which this repository does not enable; PostgreSQL `CHECK` constraints remain database-enforced. Keep this project on explicit raw SQL for these constraints unless a separate reviewed decision enables that Preview feature.
@@ -504,5 +505,5 @@ an index.
 ## What is deliberately absent
 
 - Any stored access-role/tier/permission result (AD-10: derived access is never persisted).
-- Custom-field tables — storage model not yet decided ([custom-fields.md](custom-fields.md)).
-- Other profile-section tables — pending the Profile bounded-context decision (spine Deferred).
+- Custom-field EAV tables — design approved (PM/AD-32); not yet migrated ([custom-fields.md](custom-fields.md)). jsonb bag remains TD-12 interim only.
+- Other profile-section tables — profile assembly owned by `user-management` (PM/AD-34); section tables remain implementation-absent.

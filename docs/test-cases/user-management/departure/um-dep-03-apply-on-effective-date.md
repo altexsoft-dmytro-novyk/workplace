@@ -1,10 +1,18 @@
 # UM-DEP-03 · Applying a departure on its effective date
 
-**Trace:** PRD FR-6 · requirements §4.16 · epics.md Story 5.2 · access-control.md §revocation-timing ("From `00:00` effective date ... request-time auth denies the actor ... overrides the project 15-minute window") · AD-20
+**Trace:** PRD FR-6 · requirements §4.16 · epics.md Story 5.2 · access-control.md §revocation-timing ("From `00:00` effective date ... request-time auth denies the actor ... overrides the project 15-minute window") · AD-20 · AD-22 · AD-23
 
-> **BLOCKED — CC-06; scenario prose only.** The scheduled state, the executor,
-> and clock control are the CC-06 contract; there is no effective-date executor
-> to drive. Not translatable to stage-2 or production until CC-06 is approved.
+> **STALE IN PART — 2026-09-02 PM/AD-5 / PM/AD-23.** Scenario prose remains
+> useful for employment, mentorship auto-close, and request-time cutoff.
+> The clause "open action items owned by/assigned to Alice" is **stale**.
+> Live rule: cancel only open items **assigned to** the departing user;
+> items Alice authored for active assignees remain active. Persist cancelled
+> status, fixed system reason, cancelledAt, and sourceDepartureId.
+> Do not silently rewrite the expectedResult below. Regeneration is AD-1.
+> Implementation remains blocked on CC-06 (executor) even though the participant
+> contract is now approved.
+
+> **Previously:** BLOCKED — CC-06; scenario prose only.
 
 ## Scenario
 
