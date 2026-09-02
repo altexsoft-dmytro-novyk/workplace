@@ -126,6 +126,198 @@ test('syncClickUp sends the mapped status with the expected request boundary', a
   });
 });
 
+test('syncClickUp writes mapped custom fields after the successful status update', async () => {
+  const fixture = await createFixture({ config: [
+    'workspace_id: "90122019689"',
+    'status_map:',
+    '  in-progress: "in progress"',
+    'custom_fields:',
+    '  git_branch: "git-branch-field"',
+    '  validation_status: "validation-status-field"',
+    'tasks:',
+    '  "status/sprint-status.yaml#story-1":',
+    '    task_id: "task-123"',
+    '    git_branch: "feature/story-1"',
+    '    validation_status: "passed"',
+  ].join('\n') });
+  const requests = [];
+
+  await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: async (url, init = {}) => {
+      requests.push({ url, init });
+      return url.endsWith('/team')
+        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
+        : jsonResponse(200, {});
+    },
+  });
+
+  assert.deepEqual(requests, [
+    {
+      url: 'https://api.clickup.com/api/v2/team',
+      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
+    },
+    {
+      url: 'https://api.clickup.com/api/v2/task/task-123',
+      init: {
+        method: 'PUT',
+        headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'in progress' }),
+      },
+    },
+    {
+      url: 'https://api.clickup.com/api/v2/task/task-123/field/git-branch-field',
+      init: {
+        method: 'POST',
+        headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: 'feature/story-1' }),
+      },
+    },
+    {
+      url: 'https://api.clickup.com/api/v2/task/task-123/field/validation-status-field',
+      init: {
+        method: 'POST',
+        headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' },
+        body: JSON.stringify({ value: 'passed' }),
+      },
+    },
+  ]);
+});
+
+test('syncClickUp writes custom fields only with both a configured ID and mapped value', async () => {
+  const fixture = await createFixture({ config: [
+    'workspace_id: "90122019689"',
+    'status_map:',
+    '  in-progress: "in progress"',
+    'custom_fields:',
+    '  git_branch: "git-branch-field"',
+    '  validation_status: ""',
+    'tasks:',
+    '  "status/sprint-status.yaml#story-1":',
+    '    task_id: "task-123"',
+    '    git_branch: "feature/story-1"',
+    '    validation_status: "passed"',
+  ].join('\n') });
+  const requests = [];
+
+  await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: async (url, init = {}) => {
+      requests.push({ url, init });
+      return url.endsWith('/team')
+        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
+        : jsonResponse(200, {});
+    },
+  });
+
+  assert.deepEqual(requests.map(({ url }) => url), [
+    'https://api.clickup.com/api/v2/team',
+    'https://api.clickup.com/api/v2/task/task-123',
+    'https://api.clickup.com/api/v2/task/task-123/field/git-branch-field',
+  ]);
+});
+
+test('syncClickUp skips a configured custom field when its mapped value is empty', async () => {
+  const fixture = await createFixture({ config: [
+    'workspace_id: "90122019689"',
+    'status_map:',
+    '  in-progress: "in progress"',
+    'custom_fields:',
+    '  git_branch: "git-branch-field"',
+    '  validation_status: "validation-status-field"',
+    'tasks:',
+    '  "status/sprint-status.yaml#story-1":',
+    '    task_id: "task-123"',
+    '    git_branch: ""',
+    '    validation_status: "passed"',
+  ].join('\n') });
+  const requests = [];
+
+  await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: async (url, init = {}) => {
+      requests.push({ url, init });
+      return url.endsWith('/team')
+        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
+        : jsonResponse(200, {});
+    },
+  });
+
+  assert.deepEqual(requests.map(({ url }) => url), [
+    'https://api.clickup.com/api/v2/team',
+    'https://api.clickup.com/api/v2/task/task-123',
+    'https://api.clickup.com/api/v2/task/task-123/field/validation-status-field',
+  ]);
+});
+
+test('syncClickUp reports custom field failures without revealing the token', async () => {
+  const fixture = await createFixture({ config: [
+    'workspace_id: "90122019689"',
+    'status_map:',
+    '  in-progress: "in progress"',
+    'custom_fields:',
+    '  git_branch: "git-branch-field"',
+    'tasks:',
+    '  "status/sprint-status.yaml#story-1":',
+    '    task_id: "task-123"',
+    '    git_branch: "feature/story-1"',
+  ].join('\n') });
+
+  await assert.rejects(
+    syncClickUp({
+      ...fixture,
+      sprintStatusPaths: [fixture.sourcePath],
+      token: 'secret-token',
+      fetchImpl: async (url) => {
+        if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+        if (url.includes('/field/')) return jsonResponse(422, {});
+        return jsonResponse(200, {});
+      },
+    }),
+    (error) => /Git Branch/.test(error.message) && /task-123/.test(error.message) && /422/.test(error.message)
+      && !error.message.includes('secret-token'),
+  );
+});
+
+test('syncClickUp URL-encodes task and custom field IDs', async () => {
+  const fixture = await createFixture({ config: [
+    'workspace_id: "90122019689"',
+    'status_map:',
+    '  in-progress: "in progress"',
+    'custom_fields:',
+    '  git_branch: "field/id"',
+    'tasks:',
+    '  "status/sprint-status.yaml#story-1":',
+    '    task_id: "task/id"',
+    '    git_branch: "feature/story-1"',
+  ].join('\n') });
+  const requests = [];
+
+  await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: async (url, init = {}) => {
+      requests.push({ url, init });
+      return url.endsWith('/team')
+        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
+        : jsonResponse(200, {});
+    },
+  });
+
+  assert.deepEqual(requests.map(({ url }) => url), [
+    'https://api.clickup.com/api/v2/team',
+    'https://api.clickup.com/api/v2/task/task%2Fid',
+    'https://api.clickup.com/api/v2/task/task%2Fid/field/field%2Fid',
+  ]);
+});
+
 test('syncClickUp reports API failures without revealing the token', async () => {
   const fixture = await createFixture();
 
