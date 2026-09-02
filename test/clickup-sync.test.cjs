@@ -104,6 +104,15 @@ test('syncClickUp sends the mapped status with the expected request boundary', a
     },
   });
 
+  assert.deepEqual(requests[0], {
+    url: 'https://api.clickup.com/api/v2/team',
+    init: {
+      headers: {
+        Authorization: 'secret-token',
+        'Content-Type': 'application/json',
+      },
+    },
+  });
   assert.deepEqual(requests[1], {
     url: 'https://api.clickup.com/api/v2/task/task-123',
     init: {
@@ -144,6 +153,61 @@ test('syncClickUp redacts the token when a transport error includes it', async (
       fetchImpl: async () => { throw new Error('authorization secret-token rejected'); },
     }),
     (error) => /team authorization/.test(error.message) && !error.message.includes('secret-token'),
+  );
+});
+
+test('syncClickUp redacts malformed team response errors before any task write', async () => {
+  const fixture = await createFixture();
+  const requests = [];
+
+  await assert.rejects(
+    syncClickUp({
+      ...fixture,
+      sprintStatusPaths: [fixture.sourcePath],
+      token: 'secret-token',
+      fetchImpl: async (url, init) => {
+        requests.push({ url, init });
+        return { ok: true, status: 200, json: async () => { throw new Error('invalid team payload secret-token'); } };
+      },
+    }),
+    (error) => /team authorization/.test(error.message) && !error.message.includes('secret-token'),
+  );
+
+  assert.deepEqual(requests.map(({ url }) => url), ['https://api.clickup.com/api/v2/team']);
+});
+
+test('collectSyncEntries rejects a configured task mapping without an ID even when its source key is absent', async () => {
+  const fixture = await createFixture({ config: [
+    'workspace_id: "90122019689"',
+    'status_map:',
+    '  in-progress: "in progress"',
+    'tasks:',
+    '  "status/sprint-status.yaml#story-1":',
+    '    task_id: "task-123"',
+    '  "status/missing.yaml#story-2": {}',
+  ].join('\n') });
+
+  await assert.rejects(
+    collectSyncEntries({ ...fixture, sprintStatusPaths: [fixture.sourcePath] }),
+    /status\/missing\.yaml#story-2/,
+  );
+});
+
+test('collectSyncEntries rejects configured task mappings for source keys it did not discover', async () => {
+  const fixture = await createFixture({ config: [
+    'workspace_id: "90122019689"',
+    'status_map:',
+    '  in-progress: "in progress"',
+    'tasks:',
+    '  "status/sprint-status.yaml#story-1":',
+    '    task_id: "task-123"',
+    '  "status/missing.yaml#story-2":',
+    '    task_id: "task-456"',
+  ].join('\n') });
+
+  await assert.rejects(
+    collectSyncEntries({ ...fixture, sprintStatusPaths: [fixture.sourcePath] }),
+    /status\/missing\.yaml#story-2/,
   );
 });
 
