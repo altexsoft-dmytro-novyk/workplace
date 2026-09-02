@@ -7,6 +7,8 @@ inputDocuments:
   - docs/architecture/database-schema.md
   - docs/test-cases/user-management/README.md
   - docs/project-requirements.md
+slice: user-management
+id_namespace: UM-E{epic}-S{story}
 ---
 
 # people management - Epic Breakdown
@@ -151,6 +153,8 @@ The Access Control Kernel MVP is built and headless: `AppModule` resolves `Acces
 
 ### Story 0.1: Adopt the Read Path and Rebind the Port (UMAC-1)
 
+**ID:** `UM-E0-S0.1` · **Sprint key:** `0-1-adopt-read-path-and-rebind-port`
+
 As the platform,
 I want `/users/:id` target-scoped authorization resolved by the real `AccessControlFacade` and `GET /users/:id` to return the S1 identity card,
 So that a session reads an identity card only when it resolves to an active audience over an active target — and no longer every full `User` row for every session.
@@ -174,6 +178,8 @@ So that a session reads an identity card only when it resolves to an active audi
 **Then** it exercises real HTTP → router → `SessionGuard` → `AccessControlGuard` → real `AccessControlFacade` → real Prisma → migrated PostgreSQL with **no provider overrides**, seeding real `User` rows and real `Relationship` rows (`direct`, `people_partner`) and issuing `Bearer <token:<seeded-uuid>>`
 
 ### Story 0.2: Adopt the Write Path Dual Gate (UMAC-2) — CONDITIONAL
+
+**ID:** `UM-E0-S0.2` · **Sprint key:** `0-2-adopt-write-path-dual-gate`
 
 As the platform,
 I want `PATCH /users/:id` and `PUT /users/:id/photo` gated by both the functional permission and `write` S1 section access,
@@ -199,6 +205,8 @@ Entitled actors manage identity records over the imported population (§4.17): p
 **FRs covered:** FR-1, FR-4, FR-5a, FR-7, FR-9, FR-15
 
 ### Story 1.1: Import Seeded Population
+
+**ID:** `UM-E1-S1.1` · **Sprint key:** `1-1-import-seeded-population`
 
 As the system operator,
 I want the employee population imported from the delivered timetracker export (`docs/Accounts_template.csv`),
@@ -234,6 +242,8 @@ So that all features operate over a fixed set of users without any creation, AD,
 
 ### Story 1.2: View and Edit an Employee's Identity-Card Fields
 
+**ID:** `UM-E1-S1.2` · **Sprint key:** `1-2-view-and-edit-an-employee-s-identity-card-fields`
+
 As an actor whose access audience and functional capability both permit the operation,
 I want to read and edit an employee's S1 identity-card fields,
 So that identity data stays accurate without bypassing the two-dimensional access model.
@@ -260,6 +270,8 @@ Self reads S1 and can write only their photo through Story 1.3. Manager, People 
 
 ### Story 1.3: Self Uploads Own Photo
 
+**ID:** `UM-E1-S1.3` · **Sprint key:** `1-3-self-uploads-own-photo`
+
 As an employee,
 I want to upload my own profile photo,
 So that my identity card shows an accurate photo without anyone else's help.
@@ -272,6 +284,8 @@ So that my identity card shows an accurate photo without anyone else's help.
 **And** a subsequent `GET /users/<aliceId>` reflects the same value (FR-9; traces `um-pf-02`)
 
 ### Story 1.5: List Employees with Pagination and Filters
+
+**ID:** `UM-E1-S1.5` · **Sprint key:** `1-5-list-employees-with-pagination-and-filters`
 
 As an entitled actor,
 I want to list employees with pagination and filters on identity-card fields,
@@ -303,6 +317,8 @@ Any active employee in the imported population can request a magic link and log 
 
 ### Story 2.1: Request a Magic Link by Work Email
 
+**ID:** `UM-E2-S2.1` · **Sprint key:** `2-1-request-a-magic-link-by-work-email`
+
 As an employee,
 I want to request a magic link sent to my work email,
 So that I can log in without ever needing a password.
@@ -319,6 +335,8 @@ So that I can log in without ever needing a password.
 **And** no email is actually dispatched, asserted against the email-adapter fake at stage 2 (traces `um-auth-02`)
 
 ### Story 2.2: Consume a Magic-Link Token to Establish a Session
+
+**ID:** `UM-E2-S2.2` · **Sprint key:** `2-2-consume-a-magic-link-token-to-establish-a-session`
 
 As an employee,
 I want to consume my magic-link token,
@@ -353,6 +371,8 @@ The system records every v1.5 career event through the owning context. Manual ad
 
 ### Story 3.1: System Auto-Generates Career Timeline Events
 
+**ID:** `UM-E3-S3.1` · **Sprint key:** `3-1-system-auto-generates-career-timeline-events`
+
 As the system,
 I want to write a career-timeline event whenever any tracked change occurs,
 So that every audience entitled to S9 sees an accurate history without manual duplication.
@@ -377,6 +397,8 @@ So that every audience entitled to S9 sees an accurate history without manual du
 
 ### Story 3.2: Authorized Actor Manually Adds a Backfill Entry
 
+**ID:** `UM-E3-S3.2` · **Sprint key:** `3-2-authorized-actor-manually-adds-a-backfill-entry`
+
 As an actor with S9 write access and the *edit the career timeline* permission,
 I want to manually add a career-timeline entry,
 So that I can backfill history that predates the system (the legacy Excel headcount record).
@@ -397,6 +419,8 @@ So that I can backfill history that predates the system (the legacy Excel headco
 **Then** the request is denied and no event is written
 
 ### Story 3.3: Authorized Actor Edits or Deletes an Event
+
+**ID:** `UM-E3-S3.3` · **Sprint key:** `3-3-authorized-actor-edits-or-deletes-an-event`
 
 As an actor with S9 write access and the *edit the career timeline* permission,
 I want to correct a wrongly-inferred event or delete one that shouldn't exist,
@@ -424,6 +448,8 @@ Holders of the dedicated permission change the four organisational facts that al
 
 ### Story 4.1: Change an Employee's Manager
 
+**ID:** `UM-E4-S4.1` · **Sprint key:** `4-1-change-an-employee-s-manager`
+
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's manager on the dedicated screen,
 So that reports-to access reflects the current organisation without being editable through S1.
@@ -446,6 +472,8 @@ So that reports-to access reflects the current organisation without being editab
 
 ### Story 4.2: Change an Employee's People Partner
 
+**ID:** `UM-E4-S4.2` · **Sprint key:** `4-2-change-an-employee-s-people-partner`
+
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's People Partner,
 So that PP access and the HR-line chain reflect the current assignment.
@@ -464,6 +492,8 @@ So that PP access and the HR-line chain reflect the current assignment.
 **Then** self-assignment is rejected and the current assignment remains
 
 ### Story 4.3: Change Employee Department or Department Manager
+
+**ID:** `UM-E4-S4.3` · **Sprint key:** `4-3-change-employee-department-or-department-manager`
 
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's department or a department's manager,
@@ -492,6 +522,8 @@ Authorized HR actors record departure and the platform applies the complete effe
 
 ### Story 5.1: Record a Departure
 
+**ID:** `UM-E5-S5.1` · **Sprint key:** `5-1-record-a-departure`
+
 As an actor with the *record a departure* permission,
 I want to record an employee's effective departure date and reason,
 So that the lifecycle change is scheduled without changing current status early.
@@ -509,6 +541,8 @@ So that the lifecycle change is scheduled without changing current status early.
 **Then** the operation is blocked and the UI identifies relationships that must be re-parented, offering Alice's own manager as a default where applicable
 
 ### Story 5.2: Apply an Effective Departure
+
+**ID:** `UM-E5-S5.2` · **Sprint key:** `5-2-apply-an-effective-departure`
 
 As the platform,
 I want to apply a recorded departure exactly once on its effective date,
