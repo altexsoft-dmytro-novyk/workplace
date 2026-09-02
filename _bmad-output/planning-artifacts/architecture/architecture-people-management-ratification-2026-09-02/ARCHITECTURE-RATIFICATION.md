@@ -272,7 +272,7 @@ Automation candidates:
 - Alert when code evidence changes without ratification or coverage-model refresh.
 - Cross-file AD status consistency: §3 against `evidence-matrix.yaml` against `transition-debt.yaml`, including reciprocal `decision_refs` links.
 - The `conformant` versus `transition-debt` mutual-exclusion invariant.
-- Blocker-ID reconciliation between §7 prose and `blockers.yaml` (current: 18 open / 8 closed / 4 superseded = 30).
+- Blocker-ID reconciliation between §7 prose and `blockers.yaml` (current: 16 open / 10 closed / 4 superseded = 30).
 - Evidence-path existence (file rather than directory) and gate IDs resolving in `blockers.yaml`.
 - Spine/ratification frontmatter `revision` against the latest in-body revision heading.
 - Pinned-SHA reachability and superproject/submodule cleanliness at pin time.
@@ -292,4 +292,4 @@ Detailed history is retained in `.memlog.md` and `reviews/`. This section is a d
 | `2026-09-02-reviewer-gate-correction` | H1–H7/H11 reconciliation; H8 verified; current package revision | `reviews/CORRECTION-VERIFICATION-PROMPT-2026-09-02-reviewer-gate.md` |
 | `2026-09-02-doc-cleanup` | Editorial/status/traceability reconciliation from bmad-review §§1–2; no new ADs | `.memlog.md` (this update) |
 
-Live open/closed/superseded surface: §7 and `blockers.yaml` (18 open / 8 closed / 4 superseded).
+Live open/closed/superseded surface: §7 and `blockers.yaml` (16 open / 10 closed / 4 superseded).
