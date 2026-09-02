@@ -164,9 +164,10 @@ blockers:
     owner: Access Control and Quality Engineering
     severity: P1
     blocks: [500-record / 2-second permission-resolution NFR, PM/AD-10 bulk resolver]
-    status: open
+    status: closed
+    closed: 2026-09-02
     design_status: resolved-approved
-    implementation_status: unproven
+    implementation_status: proven
     decision_refs: [PM/AD-10]
     artifact_refs: [ACM-9]
     evidence:
@@ -178,6 +179,27 @@ blockers:
       and protocol steps 1-6 followed. A baseline-only run, an INCOMPLETE run,
       or a PASS on fewer than 500 targets does not close. ACM-8 composition is
       not a substitute for ACM-9 measurement.
+    closure_evidence: >
+      Closed 2026-09-02 against
+      _bmad-output/test-artifacts/performance/acm9-final-acm9-1788173458416-ff94a3e685d1.json
+      (protocol ACM9-MVP-v1, role final, status PASS, stop_reason completed).
+      Verified against every clause of the closure condition: 500 requested
+      active targets on all 32 gates; warm p95 11.603 ms and worst case
+      12.357 ms, both far inside the 2-second absolute limit; step 2 covers
+      Reporting, direct PP, Colleague and mixed as four independent gate
+      shapes; step 3 covers depths 5, 25, 50, 100, 200, 300, 400 and 499 in
+      the prescribed order with 5 warm-ups and 20 measured samples per gate;
+      step 5 compares against baseline run acm9-1788173258311-697e946d9f11
+      (status PASS), and the final is faster than that baseline
+      (11.603 ms vs 12.702 ms warm p95); step 6 references that baseline run
+      id with protocol, fixture-manifest and environment-manifest hashes all
+      matching, so comparability is `comparable` rather than `mismatched`.
+      Measurement currency: the artifact's source_revision f89e034 is an
+      ancestor of backend origin/main, and `git diff f89e034..origin/main --
+      src/access-control/` is empty, so no resolver change has landed since
+      the measurement. gate-decision.json is not regenerated: its gate_basis
+      is priority_thresholds over trace coverage and does not include this
+      blocker, so a rerun would restate the same verdict.
 
   # --- UNCHANGED, NOW WITH SEVERITY AND CLOSURE CONDITION ---
 
