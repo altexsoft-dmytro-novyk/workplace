@@ -43,7 +43,7 @@ If you read nothing else, read the first section.
 
 ## Departments
 
-- **New entity.** Every employee belongs to exactly one department. Departments nest. — §4.17
+- **New entity.** Every employee belongs to one or more departments *(amended 2026-09-02 — was "exactly one"; a person who works across specialisations holds a current membership in each)*. Departments nest. — §4.17
 - A manager can manage a department, and that grants Manager access to everyone in it and in its sub-departments. — §2.1
 - **There is no separate "unit" entity.** *Unit Manager* is the role name for the manager of a department. S1 says "department". — §2.2, §4.17
 - A **resourcing request carries a department**, and that field routes it to the responsible unit manager. — §4.7

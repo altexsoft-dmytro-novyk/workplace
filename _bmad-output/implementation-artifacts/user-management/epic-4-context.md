@@ -44,11 +44,14 @@ handed to Mentorship. New: 4.3.)*
   HR-line inheritance is blocked until that contract and its boundary-negative
   scenarios are approved.
 - **Department edge contract** (Story 4.3): the nested-department entity,
-  exactly-one membership, department-manager access, resourcing routing,
-  timeline event, and CDS key are fixed by §2.1/§4.7/§4.9/§4.10/§4.17 and AD-18,
-  but the indexed edge schema remains pending (spine Deferred). Until it lands,
+  **one-or-more** membership (§4.17 amended 2026-09-02), department-manager
+  access, resourcing routing, timeline event, and CDS key are fixed by
+  §2.1/§4.7/§4.9/§4.10/§4.17 and AD-18, and the `Department` /
+  `DepartmentMembership` shapes are now fixed in `database-schema.md`
+  §Project/Department, but the indexed parent/manager edge schema and the
+  recursive walk remain pending (spine Deferred). Until they land,
   `department`-targeted policy rows contribute nothing to tier resolution
-  (fail-closed, AD-12).
+  (fail-closed, AD-12). `department_change` events are add/remove events.
 
 ## Requirements & Constraints — behaviour
 

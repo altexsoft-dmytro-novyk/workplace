@@ -27,8 +27,12 @@ baseline" no longer holds for the changed files:
   approval required), three mentorship files retired (superseded header).
 - `career-timeline/` traces were **realigned** to DEC-UM-001 / Stories 3.2–3.3
   (fresh approval required); two dual-gate negatives added.
-- `profile/` and `auth/` got **header notes** (fresh approval required).
-- `list/` gained `um-list-05` (new).
+- `profile/` gained the `um-photo-*` set (Story 1.3, 9 new files + folder
+  `README.md`); `um-pf-02` retired to a superseded pointer; `um-pf-01/03/04` and
+  `auth/` got **header notes** (fresh approval required).
+- `list/` was **rewritten from a blank page** for spec v1.5 (2026-09-02) —
+  12 files (`um-list-01..12`); the four pre-v1.5 drafts are replaced. See the
+  folder README.
 
 **No `_bmad-output/specs/*/approvals.yaml` records any of this refresh.** An
 agent's review of its own output is never a substitute for human approval
@@ -115,20 +119,21 @@ gone with `registration/`.
 
 | Folder | Covers | Files | State |
 | --- | --- | --- | --- |
-| `seed/` | FR-1/FR-4/FR-5a/FR-7 — population import, no `POST /users`, bootstrap HR Admin + ACM-0 root-id reuse (Story 1.1) | 3 | new draft |
+| `seed/` | FR-1/FR-4/FR-5a/FR-7 — population import (`POST /users/import` + deploy-script entrypoint): column mapping, Department create-on-import, `EmploymentStatus`, birthday split, idempotent re-import, malformed-row skip, authz, no `POST /users`, bootstrap HR Admin + ACM-0 root-id reuse (Story 1.1) | 13 | new draft |
 | `access-control-adoption/` | FR-16 — real facade adoption for `GET/PATCH /users/:id`, `PUT .../photo`; port rebind; minimal S1-card projection; colleague reads the S1 card (`200`) (Epic 0, `UMAC-1/2`) | 9 | new draft |
 | `auth/` | FR-2/FR-3/FR-8 — magic-link request/consume, security edge cases (Epic 2) | 6 | header-noted draft |
-| `profile/` | FR-9 — S1 data correctness given an entitled actor (entitlement is Epic 0's) (Epic 1 Story 1.2/1.3) | 4 | header-noted draft |
-| `list/` | FR-15 — pagination, S1-field filters, dismissed-employee visibility (Epic 1 Story 1.5) | 5 | draft (`um-list-05` new) |
+| `profile/` | FR-9 — S1 data correctness given an entitled actor (entitlement is Epic 0's): `um-pf-*` = Story 1.2 scalar `PATCH`; `um-photo-*` = Story 1.3 `PUT .../photo` + real object storage (AD-15). Folder `README.md` carries the photo cluster's in-scenario decisions. | 12 (+ `um-pf-02` retired pointer) | new/refreshed draft |
+| `list/` | FR-15 — `GET /users` pagination + metadata, permission-safe S1-field filters, dismissed-employee visibility via `employmentStatus`, endpoint authz, fixed fail-closed projection, unknown-filter rejection, empty page, deterministic sort, NFR-2 perf note (Epic 1 Story 1.5) | 12 | blank-page v1.5 rewrite (`um-list-01..04` retargeted, `um-list-05..12` reworked/new); folder README carries the in-scenario decisions |
 | `career-timeline/` | FR-5/FR-11/FR-12/FR-13 — system events; DEC-UM-001 manual mechanics (assigned PP + direct UM); dual gate; edit-immutability (Epic 3) | 10 | retraced draft (`um-ct-09/10` new) |
 | `relationships/` | FR-10 — Epic 4 organisational facts: manager (4.1, retraced), PP (4.2, blocked stubs), department (4.3, blocked stubs) | 11 | split; see folder README |
 | `departure/` | FR-6 — Epic 5 employment lifecycle (record / blocked / apply / retry) | 4 | new draft, **all BLOCKED — CC-06** |
 | `registration/` | **RETIRED (v1.5)** — `um-reg-01..15` `POST /users` HTTP create. See folder README. | 15 | history only |
 | `deactivation/` | **RETIRED (v1.5)** — `um-deact-01..03` generic `DELETE /users/:id`. See folder README. | 3 | history only |
 
-**Live stage-1 scenario files (v1.5, subject to per-file approval):** 52.
-**Retained as history (retired, do not approve):** 21 (`registration/` 15,
-`deactivation/` 3, `relationships/um-rel-04..06` 3).
+**Live stage-1 scenario files (v1.5, subject to per-file approval):** 70
+(+8: the `um-photo-*` set replacing the single `um-pf-02`).
+**Retained as history (retired, do not approve):** 22 (`registration/` 15,
+`deactivation/` 3, `relationships/um-rel-04..06` 3, `profile/um-pf-02` 1).
 
 ## What blocks stage-2
 

@@ -1,7 +1,7 @@
 ---
 id: SPEC-user-management-access-control-adoption
 status: approved
-implementation_status: stage-1-authorized
+implementation_status: stage-3-authorized
 authorized_by: 'Dmytro Novyk (Product Owner / Architect) — 2026-09-01'
 denial_oracle: >
   SUPERSEDED 2026-09-02 by PM/AD-24. The 2026-09-01 empty-audience 403 decision
@@ -35,10 +35,12 @@ sources:
 > Open Decisions are approved (Dmytro Novyk, Product Owner / Architect,
 > 2026-09-01 — see the alignment proposal §8): decision (i) = option (a),
 > (iii) = dedicated Epic 0, (iv) = Epic 2 owns the session resolver, (v) =
-> photo Self-only, (vi) = no separate photo permission. Stage-1 scenario
-> authoring is authorized. This still authorizes **no** test or production
-> code: every capability below runs the full AD-1 three-stage gate with
-> independent human approval, recorded in this package's own `approvals.yaml`.
+> photo Self-only, (vi) = no separate photo permission. `UMAC-1` Stage 1
+> (scenarios) and Stage 2 (red tests) are approved in this package's
+> `approvals.yaml`. Stage 3 (`UMAC-1-production`) is the next authorized
+> dispatch. `UMAC-2` remains blocked on the kernel seed for
+> `user-management:edit`. Every remaining stage still runs the AD-1 gate with
+> independent human approval.
 
 # User Management — Access Control Adoption
 

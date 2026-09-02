@@ -25,6 +25,15 @@ approved_by: 'Dmytro Novyk (Product Owner / Architect) — 2026-09-01'
 > the approved 2026-08-29 correct course and is **not** re-litigated; this is
 > the delta.
 
+> **Amendment 2026-09-01 (later same day — living-contract correction, not a
+> re-approval).** Two facts in the body below are superseded by the adoption
+> SPEC and the recorded AD-1 approvals; they are left in §4.1 / §7 (ii) / §8
+> as the original write-up:
+> 1. Empty-audience denial on `GET /users/:id` is **`403`**, not leak-free
+>    `404` (`stories.yaml`, approved `umac-05`, `access-control.md`).
+> 2. The adoption package now has `approvals.yaml`. `UMAC-1` Stage 1 and
+>    Stage 2 are approved; next dispatch is `UMAC-1-production`.
+
 ---
 
 ## 1. Issue Summary

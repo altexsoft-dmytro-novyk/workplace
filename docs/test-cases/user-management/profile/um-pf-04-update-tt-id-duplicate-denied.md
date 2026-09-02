@@ -1,31 +1,19 @@
-# UM-PF-04 · Setting ttId to a value already in use is rejected
+# UM-PF-04 · Setting `ttId` to a value already in use is rejected — SUPERSEDED
 
-**Trace:** database-schema.md `User.ttId` (unique) · AD-13 (external identity field) · epics.md Story 1.2 (second AC)
+**Status:** SUPERSEDED 2026-09-02 by
+[`um-edit-04-duplicate-ttid-rejected-wholesale.md`](um-edit-04-duplicate-ttid-rejected-wholesale.md)
+(Epic 1 Story 1.2 AD-1 stage-1 package). Do **not** translate, cite, or approve
+this file. ID `um-pf-04` is retired **in place** (ID-stability rule,
+[../../README.md](../../README.md)).
 
-> **Scope (v1.5).** Entitlement is Epic 0's (`access-control-adoption/`). This
-> file asserts **data correctness**: the `ttId` write is rejected on the
-> uniqueness conflict (`409`) and the row is unchanged. Alice/Colin are
-> **seeded** (Story 1.1); stage 2 resolves ids from the seeded fixture id table,
-> never a hardcoded literal.
+## Why
 
-## Scenario
+The successor keeps the original `409`-on-conflict / row-unchanged assertion and
+**adds** the wholesale-rollback assertion and an explicit `null`-vs-`null`
+negative (two rows both holding `ttId: null` is not a conflict).
 
-**Given** Bob, Alice's unit manager, and Colin, an existing user already carrying `ttId: "tt-1042"`.
+## Stage-2 note
 
-**When** Bob attempts to set Alice's `ttId` to `"tt-1042"`.
-
-**Then** the write is rejected on the uniqueness constraint; Alice's `ttId` is unchanged.
-
-**Preconditions:** [fixture](../README.md#canonical-personas); Colin seeded with `ttId: "tt-1042"`; Alice seeded with `ttId: null`.
-
-## Test
-
-- **inputURL:** `PATCH /users/<aliceId>`
-- **inputRequest:**
-  ```json
-  {
-    "headers": { "authorization": "Bearer <token:Bob>" },
-    "body": { "ttId": "tt-1042" }
-  }
-  ```
-- **expectedResult:** `409`; a follow-up `GET /users/<aliceId>` shows `ttId: null`, unchanged.
+The `describe('um-pf-04 …')` block in `profile-v15.e2e-spec.ts` is re-pointed at
+`um-edit-04` when the `um-edit-*` set is approved. No code or E2E changed by this
+doc.

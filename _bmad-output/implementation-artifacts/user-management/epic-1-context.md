@@ -26,18 +26,28 @@ pointer.)*
 
 ## Requirements & Constraints
 
-- **No `POST /users`.** The population is an idempotent import of the delivered
-  semicolon-delimited timetracker export `docs/Accounts_template.csv`, **keyed
-  by the normalized `Email`** (the file has **no employee-id column**; `ttId` per
-  AD-13 has no source column and is left `null`). Column → `User` field mapping
-  and the OPEN items (`PositionId`, `DepartmentName`/`DepartmentId`,
-  `CountryCode`/`CountryStateName`, missing `city`, `EmployeeType`→S4,
-  `IsDismissed`/`DismissedDate`→`EmploymentStatus`, `TimeZone`) are in
-  `spec-1-1-import-seeded-population.md` and `docs/test-cases/user-management/seed/README.md`.
-  Creating employees via API or UI is out of scope (AD-14, AD-16, §4.17).
-  `POST /users` and generic `DELETE /users/:id` are **retired in the v1.5
-  cutover** (AD-21) — a regenerated Story 1.1/1.2 must name them as removals,
-  not extend them.
+- **No `POST /users` single-create.** The population is an idempotent import of
+  the delivered semicolon-delimited timetracker export
+  `docs/Accounts_template.csv`, **keyed by the normalized `Email`** (the file has
+  **no employee-id column**; `ttId` per AD-13 has no source column and is left
+  `null`). **Endpoint (resolved 2026-09-02 — `epic-1-story-1-1-decisions.md`):**
+  `POST /users/import` (multipart `file` part; upload-only) plus a deploy/operator
+  script entrypoint reading the repo-path file — one shared writer. Authorized by
+  the **existing** `user-management:create` permission (ACM-1-seeded, HR-Admin
+  root only — no new `user-management:import` key, no new kernel seed).
+  Structurally invalid file (no `file` part / non-CSV / header mismatch /
+  unparseable) → `400`, nothing written; row-level errors → `200` with a per-row
+  `skipped` / `errors[]` summary. **Column mapping (resolved):** `PositionId` /
+  `CountryCode` / `CountryStateName` / `EmployeeType` / `TimeZone` not stored;
+  `city` → `null`; `DepartmentName`+`DepartmentId` → a `Department` created on
+  import, identity = the `(externalId, name)` pair (`externalId` alone not
+  unique), plus one `DepartmentMembership` per person; `IsDismissed`+
+  `DismissedDate` → an `EmploymentStatus` row, **never** `User.isActive` (set
+  `true` on every imported row). Details in `spec-1-1-import-seeded-population.md`
+  and `docs/test-cases/user-management/seed/README.md`. Creating employees via a
+  registration flow is out of scope (AD-14, AD-16, §4.17); `POST /users` and
+  generic `DELETE /users/:id` are **retired in the v1.5 cutover** (AD-21) — a
+  regenerated Story 1.1/1.2 must name them as removals, not extend them.
 - **Kernel-reality constraints on the seed/import writer (2026-09-01):**
   - **DEC-UM-007 canonical at write** — the writer trims + lowercases
     `workEmail` and **stores the normalized value**. The DB `users_workEmail_key`

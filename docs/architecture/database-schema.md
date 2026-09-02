@@ -16,6 +16,9 @@ erDiagram
   User ||--o{ Relationship : "reportsToUserId"
   Project ||--o{ Relationship : "projectId"
   Department ||--o{ Project : "groups"
+  Department ||--o{ Department : "parentId"
+  User ||--o{ DepartmentMembership : "userId"
+  Department ||--o{ DepartmentMembership : "departmentId"
   User ||--o{ UserPolicies : ""
   Policies ||--o{ UserPolicies : ""
   Policies ||--o{ PolicyPermissions : ""
@@ -26,6 +29,8 @@ erDiagram
   User ||--o{ MentorshipPair : "mentorUserId"
   User ||--o{ MentorshipPair : "menteeUserId"
   User ||--o| MentorshipAvailability : "userId"
+  User ||--o{ AccessJournal : "subjectUserId"
+  User ||--o{ AccessJournal : "actorUserId"
 ```
 
 ## Tables
@@ -58,7 +63,7 @@ User {
 
 No `updatedAt`/`updatedBy` — see Conventions above; nothing here consumes a last-touch marker.
 
-Derived, not stored: current manager, project(s), and People Partner read through `Relationship` (below); department reads through the Department/Policy edge model (PM/AD-35 design approved; tables absent); mentor reads through `MentorshipPair`.
+Derived, not stored: current manager, project(s), and People Partner read through `Relationship` (below); department reads through `DepartmentMembership` (§Project/Department) and is a **set** — an employee may hold one or more current memberships — with department-manager access still gated on the pending Department edge walk; mentor reads through `MentorshipPair`.
 
 Users are loaded only by the idempotent seeded-population import (AD-16). No request-level employee-creation API owns this table.
 
@@ -78,10 +83,12 @@ EmploymentStatus {
 }
 UNIQUE: at most one row per user with validTo IS NULL
 CHECK: (status='active' AND sourceDepartureId IS NULL AND departureReason IS NULL)
-    OR (status='dismissed' AND sourceDepartureId IS NOT NULL AND departureReason IS NOT NULL)
+    OR (status='dismissed')
 ```
 
-Intervals are half-open `[validFrom, validTo)`: applying departure closes the current `active` row at `effectiveDate` and inserts `dismissed` from that same date. `sourceDepartureId` makes the materialized fact idempotent. There is deliberately no `departure`/`leaving` `UserEvents` type.
+Intervals are half-open `[validFrom, validTo)`: applying departure closes the current `active` row at `effectiveDate` and inserts `dismissed` from that same date, setting `sourceDepartureId` (which makes the materialized fact idempotent) and `departureReason`. There is deliberately no `departure`/`leaving` `UserEvents` type.
+
+**Import-origin dismissals (2026-09-02).** A `dismissed` row created by the seeded-population import (`IsDismissed=1` in the CSV) has **no `Departure`** — the departure predates the system. The CHECK therefore no longer requires `sourceDepartureId`/`departureReason` on a `dismissed` row; both stay nullable. The AD-20 apply-transaction still sets them explicitly for departures it processes — the constraint just no longer forbids the historical import case. `validFrom` for an import-origin `dismissed` row is the CSV `DismissedDate`.
 
 ### Departure (AD-20)
 
@@ -167,25 +174,33 @@ Rules:
 - `people_partner` uses atomic expected-current `PUT`/`DELETE` semantics (AD-19); generic second-create behavior is not its replacement contract.
 - **Migration note (rechecked 2026-08-29):** Prisma 7 can express partial indexes only through the `partialIndexes` Preview feature, which this repository does not enable; PostgreSQL `CHECK` constraints remain database-enforced. Keep this project on explicit raw SQL for these constraints unless a separate reviewed decision enables that Preview feature.
 
-### Project / Department (PM/AD-35)
+### Project / Department
 
-`Department` is platform-owned. TimeTracker has no department concept.
+Plain records. `Department` is a first-class nested entity. It routes resourcing requests, keys CDS matrix lookup together with position, and a membership change writes `department_change` to `UserEvents`. No separate Unit entity exists. Projects have no `pmUserId`, `dmUserId`, or `users[]`; managerial facts are policy attachments and membership is `Relationship`.
 
 ```text
 Department {
-  id       uuidv7 PK
-  name     string
-  parentId FK -> Department, nullable
-  isHr     boolean default false
+  id          uuidv7 PK
+  name        string
+  externalId  string, nullable        // timetracker DepartmentId; NOT unique on its own
+  parentId    FK -> Department, nullable   // departments nest; null = top
 }
-INDEX: parentId
-UserDepartment {
-  userId      PK FK -> User
+UNIQUE: (externalId, name)   -- identity is the pair; same DepartmentId with a
+                             -- different name is a distinct department
+
+DepartmentMembership {
+  id          uuidv7 PK
+  userId      FK -> User
   departmentId FK -> Department
+  validFrom   date
+  validTo     date, nullable
 }
+UNIQUE: one (userId, departmentId) pair with validTo IS NULL
 ```
 
-Writes reject cycles. Exactly one current membership per employee. Department manager is `Policies targetType='department'`, not a Relationship type. Seed CSV is flat: import as roots; nesting and `isHr` are platform-administered. `Policies.targetType:'department'` stays fail-closed in the walk until `UserDepartment` and the parent index exist in production.
+**Multi-department membership (2026-09-02).** An employee belongs to **one or more** current departments — e.g. a developer who works in both `JS` and `Python` (each is its own department) holds a current `DepartmentMembership` in each. This supersedes the earlier "exactly one current department" rule (mirrored in `docs/project-requirements.md` §4.17). Consequences: the derived S1 "department" display is a **set**, not a scalar; `department_change` `UserEvents` are add/remove events; a resourcing request still carries **one** department and routes to that department's Unit Manager (`project-requirements.md` §4.7); Unit-Manager access composes — managing any one of an employee's departments (or an ancestor of it) grants Reporting-line access to that employee. The seeded-population CSV carries **one** `DepartmentId` per row, so the import creates exactly one membership per person; additional memberships are added later (a second import, manual assignment, or the timetracker API).
+
+Exact indexed Department parent/manager edge shapes and the recursive department-tree walk remain an explicit follow-up contract (spine Deferred). `Policies.targetType:'department'` (the Unit-Manager attachment — `targetRole:'unit-manager'`) is not honored by AD-10 until that contract is approved; the interim is fail-closed.
 
 ### AccessJournal (PM/AD-29)
 
@@ -198,13 +213,26 @@ AccessJournal {
   kind           manager | people_partner | department_membership
                | department_manager | full_profile_grant
                | full_profile_revoke | shared_link_access
-  before         jsonb   // complete snapshot; null = none
+  before         jsonb   // complete snapshot of the changed fact; null = none
   after          jsonb
   idempotencyKey unique
 }
 ```
 
-Append-only. Same transaction as the fact write. Not a substitute: `UserEvents`.
+Append-only. Written in the **same transaction as the fact write**. Not a substitute: `UserEvents`.
+
+**What this table is for — and what it is not.** `AccessJournal` is **not** an access-control mechanism. Enforcement ("can viewer X see section S of profile Y right now?") is answered entirely by the live `Policies` / `UserPolicies` / `Relationship` rows and AD-10's resolution walk — `AccessJournal` is never read on that path. It exists to satisfy requirements **§3.4**: a *narrow* audit record of the events that change **who can see whom**, plus profile views through a shared link. Each entry captures the **actor**, the **subject**, the **before** and **after** values, and the **timestamp**. It is a user-facing feature — the subject's current Reporting-line manager or assigned People Partner, and any full-profile-overlay holder, can read it (resolved live via AccessControl; **HR Admin by functional role is not a reader**).
+
+No existing table can carry this:
+
+- `UserPolicies {userId, policyId}` records no actor, no timestamp, and no prior value — detaching a grant destroys the fact it ever existed.
+- `Relationship` `DELETE` is a **hard delete**, so the previous manager / People Partner survives nowhere once reassigned.
+- `shared_link_access` is a *view event*, not a state row — there is nothing in the enforcement tables to inspect.
+- `UserEvents` is the single-owner career timeline (AD-30): no before/after columns, different reader authorization.
+
+**Performance:** journal writes sit on the **mutation** path (manager change, PP swap, grant/revoke, link view) — one extra `INSERT` inside a transaction that is already writing the fact. They are **not** on the audience-resolution read path and do not count against the ACM-9 500-record / 2-second permission-resolution NFR.
+
+**Status:** design ratified 2026-09-02 (closes CC-07); **no implementation yet** — the table, writer, and read endpoint are gated behind CC-07 / AD-19 stage-2 (People Partner write path) and are not required by the Epic 0 read path.
 
 ### MentorshipPair (AD-17)
 

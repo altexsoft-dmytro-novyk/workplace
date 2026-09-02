@@ -156,7 +156,7 @@ Dmytro opens the risk dashboard scoped to people in his reporting line, filters 
 | **Access role** | Computed relationship tier: Self, Reporting line, Project line, People Partner, Colleague. Derived from reports-to, department management, and project assignment (§2.1). |
 | **Functional role** | Assigned capability bundle (UM, DM, PM, PP, HR Admin, or runtime-defined). Governs *features*, not data visibility (§2.2–2.3). |
 | **HR Admin** | Functional role for system configuration: roles, permissions, custom fields, dictionaries, departments. No default employee-data access (§2.2, §2.4). |
-| **Department** | Org entity: every employee belongs to one department; departments nest (§4.17). |
+| **Department** | Org entity: an employee belongs to one or more departments; departments nest (§4.17). |
 | **Section (S1–S16)** | Atomic profile partition with its own access matrix cell per audience. |
 | **Reporting line** | Transitive closure of reports-to and department-management relationships (§2.1). |
 | **Project line** | Access from project assignment only — narrower §3.2 cells (§3.3.2). |
@@ -555,7 +555,7 @@ On the effective date, the profile becomes read-only and leaves the default empl
 
 #### FR-42: Nested department management
 
-Every employee belongs to exactly one department and departments may nest. Managing a department grants Reporting-line access to everyone in it and its sub-departments. Department maintenance requires the *manage departments* permission; changing employee membership or a department manager additionally follows FR-7's organisational-relationship rules. A department change writes a career-timeline event, and the CDS matrix lookup keys on department entity plus position.
+Every employee belongs to **one or more** departments *(amended 2026-09-02 — was "exactly one"; §4.17, `database-schema.md` §Project/Department)* and departments may nest. Managing a department grants Reporting-line access to everyone in it and its sub-departments; an employee is reachable through any of their departments. Department maintenance requires the *manage departments* permission; changing employee membership or a department manager additionally follows FR-7's organisational-relationship rules. A department change writes a career-timeline event, and the CDS matrix lookup keys on department entity plus position.
 
 ### 4.17 User Management domain decomposition
 

@@ -1,32 +1,21 @@
-# UM-PF-03 · Editing workEmail to an address already in use is rejected
+# UM-PF-03 · Editing `workEmail` to an address already in use is rejected — SUPERSEDED
 
-**Trace:** database-schema.md `User.workEmail` (unique) · requirements §3.2 S1 (Reporting line: RW) · [DEC-UM-007](../../../architecture/user-management-test-decisions.md) · epics.md Story 1.2 (second AC)
+**Status:** SUPERSEDED 2026-09-02 by
+[`um-edit-03-duplicate-workemail-rejected-wholesale.md`](um-edit-03-duplicate-workemail-rejected-wholesale.md)
+(Epic 1 Story 1.2 AD-1 stage-1 package). Do **not** translate, cite, or approve
+this file. ID `um-pf-03` is retired **in place** (ID-stability rule,
+[../../README.md](../../README.md)).
 
-> **Scope (v1.5).** Entitlement (who may `PATCH /users/:id`) is Epic 0's
-> (`access-control-adoption/`). This file asserts **data correctness**: the write
-> is rejected wholesale on the uniqueness conflict (`409`) and the row is
-> unchanged. `workEmail` comparison is against the **normalized** value
-> (DEC-UM-007 — the DTO already trims+lowercases on write). Alice/Colin are
-> **seeded** (Story 1.1); stage 2 resolves ids from the seeded fixture id table.
+## Why
 
-## Scenario
+The successor keeps the original `409`-on-conflict / row-unchanged assertion and
+**adds** the wholesale-rollback assertion (a sibling field in the same body is
+also not applied) and the normalized-comparison detail. Normalization-before-the-check
+is split out into
+[`um-edit-02-workemail-normalized-before-uniqueness-check.md`](um-edit-02-workemail-normalized-before-uniqueness-check.md).
 
-**Given** Bob, Alice's unit manager, and Colin, an existing user with `workEmail: colin@company.example`.
+## Stage-2 note
 
-**When** Bob attempts to change Alice's `workEmail` to Colin's address.
-
-**Then** the write is rejected on the uniqueness constraint; Alice's `workEmail` is unchanged.
-
-**Preconditions:** [fixture](../README.md#canonical-personas); Colin seeded with `workEmail: colin@company.example`.
-
-## Test
-
-- **inputURL:** `PATCH /users/<aliceId>`
-- **inputRequest:**
-  ```json
-  {
-    "headers": { "authorization": "Bearer <token:Bob>" },
-    "body": { "workEmail": "colin@company.example" }
-  }
-  ```
-- **expectedResult:** `409`; a follow-up `GET /users/<aliceId>` shows Alice's original `workEmail` unchanged.
+The `describe('um-pf-03 …')` block in `profile-v15.e2e-spec.ts` is re-pointed at
+`um-edit-03` when the `um-edit-*` set is approved. No code or E2E changed by this
+doc.
