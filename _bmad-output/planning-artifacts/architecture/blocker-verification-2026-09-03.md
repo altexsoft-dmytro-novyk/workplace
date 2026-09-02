@@ -90,21 +90,24 @@ The 17 reduce to two workstreams, and neither is a planning pass:
 
 ### 5.1 New contradiction — department cardinality
 
-`docs/project-requirements.md` §4.17 was **amended 2026-09-02**:
+**The normative rule is unchanged.** `docs/project-requirements.md` §4.17: *"Every employee belongs to **exactly one department**."* PM/AD-35 encodes it structurally as `UserDepartment {userId PK, departmentId}` — the primary key *is* the constraint.
 
-> Every employee belongs to **one or more departments** … *(Amended 2026-09-02 — was "exactly one department".)*
+**The shipped schema does not implement it.** `DepartmentMembership` is temporal, and its partial unique index is on `(userId, departmentId)` where `validTo IS NULL`, which permits an employee to hold **many** current memberships across different departments. The migration comment states this is deliberate, citing `docs/architecture/database-schema.md` §Project/Department *"Multi-department membership"*.
 
-The backend implements the amended rule: `DepartmentMembership` is temporal and its partial unique index is on `(userId, departmentId)`, with a migration comment stating the schema deliberately permits many current memberships per employee.
+**Direction of the defect:** the implementation and an architecture document diverge from the normative source — not the reverse.
 
-**The planning artifacts still encode the superseded rule**, in four places that need an architecture-owned amendment rather than a planning edit:
+`a9c6873 User management WIP (#15)` additionally edited `docs/project-requirements.md` §4.17 and `docs/requirements-changelog-v1.2-to-v1.5.md` to read *"one or more departments"*, self-labelled *"(Amended 2026-09-02)"*. **Both edits have been reverted on this branch.** PRD §0.1 makes `docs/project-requirements.md` v1.5 the upstream normative assignment and grading source; an implementation WIP branch is not an authority that can amend it, and amending the requirement to match what was built removes the very divergence a normative source exists to expose. Nothing else from that commit was touched — the architecture docs, design prototypes and test cases it added are downstream work at their own altitude.
 
-| Artifact | Stale content |
+**Consequently `DEPARTMENT-EDGE` is correct as written and stays open on four counts, not three:**
+
+| Closure element | State |
 |---|---|
-| `ARCHITECTURE-SPINE.md` **AD-35** | `UserDepartment` with `userId` as PK — the shape *is* the "exactly one" constraint |
-| `blockers.yaml` `DEPARTMENT-EDGE` | `closure_condition` names `UserDepartment`, an entity that will never be built under the amended rule |
-| `platform/epics.md` | AD-35 restatement, the dependency table, and `PLAT-E6` audience-walk criteria naming `UserDepartment` |
-| `platform-capabilities/epics.md:959` | Acceptance criterion: *"each employee appears under **exactly one** department"* — now a wrong assertion, not merely stale prose |
+| `Department` table | ✅ exists |
+| `parentId` **index** | ❌ absent — the FK constraint does not create one in PostgreSQL |
+| `UserDepartment` | ❌ what shipped is `DepartmentMembership`, temporal and multi-valued — a **different entity with a different cardinality** |
+| cycle rejection | ❌ absent — `prisma-relationship-graph.adapter.ts:42` calls cycles *"pathological data the schema still permits"* |
+| isHr-bounded PP HR-line | ❌ no `isHr` column anywhere |
 
-`cds/epics.md` carried the same error in its 2026-09-03 draft and **has been corrected in place**, including a new `[DERIVED]` rule on Story 1.1: a multi-department employee resolves one matrix entry per current department, and the section renders all of them rather than silently picking a specialisation.
+**Open for the architect, not for planning:** either the schema is brought to the §4.17 cardinality, or an amendment to §4.17 is raised and approved **at the requirements altitude** and AD-35 follows it. What must not stand is the current state — a normative rule, an architecture document, and a shipped migration each asserting a different cardinality, with the migration citing the architecture document as its authority.
 
-**Recommended:** amend AD-35 to the membership shape actually built, then repoint `DEPARTMENT-EDGE`'s closure condition to it and fix the `PMC-E1` criterion. Until AD-35 moves, the other three should not be edited individually — that is how one amendment becomes four divergent restatements.
+`cds/epics.md` states the §4.17 rule and records the schema divergence rather than building against it; its SD-2 matrix key resolves against the employee's single department.
