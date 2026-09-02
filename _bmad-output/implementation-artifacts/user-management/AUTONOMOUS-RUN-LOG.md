@@ -28,8 +28,7 @@ Dispatched Story 1.3 + 1.5 Stage 3 in parallel; both edit `users.controller.ts`.
 
 
 **Started 2026-09-02 (~00:05 BST)** on Dmytro's instruction: "implement it
-autonomously ... I will wake in a few hours. user management backend must be
-done." Branch `dn-um-implementation`, both repos. **No git operations** — every
+autonomously ..." Branch `dn-um-implementation`, both repos. **No git operations** — every
 change is left on the working tree for review + commit on wake.
 
 ## Standing rules for this run
