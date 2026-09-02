@@ -24,6 +24,7 @@ namespace_rules:
   feedback_epics: FB-E*
   timetracker_epics: TT-E*
   cds_epics: CDS-E*
+  profile_sharing_epics: PSH-E*
   stable_workboard_ids: [ACF-*, ACM-*, UMAC-*]
 source_slices:
   - id: PLAT
@@ -55,6 +56,9 @@ source_slices:
     role: bounded-context-slice
   - id: CDS
     path: _bmad-output/planning-artifacts/cds/epics.md
+    role: draft-bounded-context-slice
+  - id: PSH
+    path: _bmad-output/planning-artifacts/profile-sharing/epics.md
     role: draft-bounded-context-slice
 conflicts:
   - id: CONFLICT-UM-01
@@ -477,22 +481,50 @@ requirements:
   - id: PM-FR-27
     normative_refs: ["§4.8"]
     summary: Authenticated named-recipient profile sharing
-    coverage_status: uncovered
-    stories: []
-    epics: [PLAT-E7]
+    coverage_status: specified
+    stories:
+      - {id: PSH-E1-S1.1, sprint_key: 1-1-create-a-link-for-one-named-authenticated-recipient, status: specified}
+      - {id: PSH-E1-S1.2, sprint_key: 1-2-configure-which-sections-the-link-exposes, status: specified}
+      - {id: PSH-E1-S1.3, sprint_key: 1-3-open-a-link-as-the-named-recipient, status: specified}
+      - {id: PSH-E2-S2.1, sprint_key: 2-1-the-expiry-clock-default-24h-and-request-bound, status: specified}
+      - {id: PSH-E2-S2.2, sprint_key: 2-2-creator-liveness-re-checked-on-every-view, status: specified}
+      - {id: PSH-E2-S2.3, sprint_key: 2-3-revocation-and-access-visibility-follow-the-relationship, status: specified}
+      - {id: PSH-E2-S2.4, sprint_key: 2-4-journal-every-access-through-a-link, status: specified}
+    epics: [PLAT-E7, PSH-E1, PSH-E2]
+    gates: [SEC-AUTH-01, CC-07, AC-S9-S13, AC-SECTION-MATRIX-01, OQ-PERM-01, CONFLICT-UM-01]
     notes: >
-      Epic-referenced but deliberately NOT covered. PLAT-E7-S7.1 and S7.2 deliver only the
-      access-control §3.2 Shared-link section-policy port — which sections a link may expose,
-      the never-share set {S3,S7,S13,S14}, default-off cfg sections, per-link re-enablement,
-      and creator-liveness re-check. That work is counted under PM-FR-3, because the Shared
-      link column is a section-matrix column.
-      The FR-27 capability itself — link creation, recipient authentication, expiry clock,
-      revocation path, and link storage — has NO owning slice. resourcing/epics.md assigns it
-      to a "future profile-sharing context" that does not exist. RS-E1-S1.4 (auto-generated
-      request-bound share link) depends on that engine and is blocked by its absence.
-      A port is not the capability: do not promote this to specified on PLAT-E7 completion.
-      Every shared-link access must be journaled as AccessJournal kind shared_link_access
-      (PM/AD-29); CC-07 is P0 open and no journal table exists.
+      2026-09-03: decomposed by the new profile-sharing slice (PSH-E*), closing the longest-standing
+      recorded gap in this model. PLAT-E7-S7.1/S7.2 still deliver only the access-control §3.2
+      Shared-link section-policy port, counted under PM-FR-3 — platform SD-5's "a port is not the
+      capability" is unchanged. PSH-E* owns the capability: link creation, the named-recipient
+      binding, the expiry clock, creator-liveness enforcement, the revocation path, link storage,
+      and journaling. PLAT-E7 is retained in epics[] as the consumed port, not as coverage.
+      Slice is status: draft (role: draft-bounded-context-slice) because PM/AD-5's context map has
+      no profile-sharing context; it must be confirmed before Epic 1 enters a sprint (PSH SD-9).
+      No scaffolding story was created for that confirmation.
+      A link is an authorization artifact, never a document (SD-2): no profile content is
+      snapshotted, cached or frozen at creation, because a snapshot would survive revocation,
+      creator-access loss, and a section being switched off.
+      Partial by gate, and the gate is a RELEASE BLOCKER rather than a deferrable clause:
+      PSH-E2-S2.4 is hard-gated on CC-07 (P0, no AccessJournal table), while §4.8 makes journaling
+      every link access unconditional. A share link is the only path that grants profile access
+      outside the relationship graph, so shipping links without shared_link_access journaling would
+      create the one access class nobody can audit. CC-07 therefore blocks the slice, not one story.
+      Delivered CAPPED: PM/AD-10 resolves only reporting-line and direct-PP audiences, so
+      project-line managers — the §4.8 archetype, "typically a DM evaluating a proposed candidate"
+      — cannot create links at all. Must not be promoted beyond capped while that traversal is
+      absent.
+      NORMATIVE GUARANTEE UNMET (Step 4 check 7 FAIL, no owner): §4.8 guarantees "there must never
+      be a link nobody can revoke" and names full-profile holders as the backstop, but PM-FR-39 is
+      deferred with no stories and no owner and PLAT-E7-S7.3 creates no grant/revoke/seed path.
+      PSH-E2-S2.3 delivers the relationship-derived revocation path in full and records the backstop
+      as unreachable rather than asserting a guarantee the platform cannot keep.
+      NORMATIVE CONTRADICTION escalated, not resolved: S5 is an explicit-re-enable-every-link
+      section under §4.8 and a default-on evaluation-link section under §4.7 (RS-E1-S1.4). This
+      slice implements §4.8 for creator-made links and leaves the resourcing default set with
+      RS-E1-S1.4, so neither story rewrites the other silently.
+      RS-E1-S1.4 is a consumer of this engine, not a variant (SD-7) — its request-bound lifetime is
+      one of two expiry configurations on one SharedLink, not a second link type.
   - id: PM-FR-28
     normative_refs: ["§4.9"]
     summary: Automatic career timeline events

@@ -57,6 +57,7 @@ remaining product requirements and reuse no `ACF-*`, `ACM-*`, or `UMAC-*` identi
 | Feedback | `feedback/epics.md` | `FB-E{epic}-S{story}` | Feedback records (`PM-FR-35`) — carved out of engagement Epic 4, which is superseded |
 | TimeTracker | `timetracker/epics.md` | `TT-E{epic}-S{story}` | TimeTracker integration (`PM-FR-36`, `PM-FR-37`) |
 | CDS | `cds/epics.md` | `CDS-E{epic}-S{story}` | CDS registry on profile S12 and the two directory filters (`PM-FR-30`, `PM-FR-31`). Registered `draft-bounded-context-slice`: the `cds` bounded context is still *pending confirmation* in PM/AD-5 and must be confirmed before Epic 1 enters a sprint |
+| Profile Sharing | `profile-sharing/epics.md` | `PSH-E{epic}-S{story}` | Authenticated named-recipient profile sharing (`PM-FR-27`). Registered `draft-bounded-context-slice`: PM/AD-5's context map has no `profile-sharing` context and it must be confirmed before Epic 1 enters a sprint. `PLAT-E7` delivers the consumed section-policy port only — a port is not the capability (platform SD-5) |
 
 The global cross-product rollup is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`, which is authoritative for which slice owns each requirement and is the register of record when this table and the model disagree. **A requirement has exactly one owning slice**; a second decomposition of an already-owned `PM-FR-*` is a defect, not an alternative. Moving ownership between slices means re-pointing the requirement's `stories:` and marking the vacating epic superseded — never leaving two live decompositions.
 
@@ -65,7 +66,7 @@ Identifiers are always namespaced outside their source document:
 - `PM-FR-*` — canonical product requirements in this PRD.
 - `UM-FR-*` — historical User Management requirement aliases.
 - `M-FR-*` — historical Mentorship requirement aliases.
-- `PLAT-E*`, `UM-E*`, `M-E*`, `PMC-E*`, `RS-E*`, `ENG-E*`, `RISK-E*`, `FB-E*`, `TT-E*`, `CDS-E*` — context-qualified epic and story identifiers.
+- `PLAT-E*`, `UM-E*`, `M-E*`, `PMC-E*`, `RS-E*`, `ENG-E*`, `RISK-E*`, `FB-E*`, `TT-E*`, `CDS-E*`, `PSH-E*` — context-qualified epic and story identifiers.
 - Retired identifiers are never reused: `ENG-E3-S3.1`–`S3.5` (superseded by `RISK-E*`) and `ENG-E4-S4.1`–`S4.3` (superseded by `FB-E*`).
 - `ACF-*`, `ACM-*`, `UMAC-*` — stable workboard identifiers; never reassigned.
 
@@ -743,7 +744,7 @@ The machine-readable row-level model is `_bmad-output/planning-artifacts/global-
 | §4.5, §4.12 | PM-FR-19–20 | Tasks/Campaigns | ENG | `specified` (`ENG-E1`, `ENG-E2`); partial by gate |
 | §4.6 | PM-FR-21–22 | Risk | RISK | `specified` (`RISK-E1`, `RISK-E2`); dashboard scope capped by PM/AD-10, filters gated on `DEPARTMENT-EDGE` and `TT-IDENTITY-01` |
 | §4.7 | PM-FR-23–26 | Resourcing | RS | `specified` (`RS-E*`) |
-| §4.8 | PM-FR-27 | Sharing | — | **`uncovered`** — accepted gap; the sharing bounded context does not exist |
+| §4.8 | PM-FR-27 | Sharing | PSH | `specified` (`PSH-E1`, `PSH-E2`). Journal clause hard-gated on `CC-07` (P0) — and §4.8 makes journaling unconditional, so the gate blocks the slice's release, not one story. Capped by PM/AD-10: project-line managers cannot create links |
 | §4.9 | PM-FR-28–29 | User Management | UM, M | `specified`/gated |
 | §4.10 | PM-FR-30–31 | CDS | CDS | `specified` (`CDS-E1`, `CDS-E2`). PM-FR-30's matrix clause hard-gated on `DEPARTMENT-EDGE`; slice is `status: draft` pending PM/AD-5 context confirmation |
 | §4.11 | PM-FR-32–34 | Mentorship | M | `specified`/blocked; not implemented. Slice is `status: draft` |
@@ -753,7 +754,7 @@ The machine-readable row-level model is `_bmad-output/planning-artifacts/global-
 | §4.16 | PM-FR-41 | User Management | UM, M | `specified`/blocked |
 | §4.17 | PM-FR-42 | User Management/Departments | UM | `specified`; partial and gated |
 
-Requirement-level rollup: `in-progress` 5 · `specified` 29 · `uncovered` 4 · `deferred` 4 · `implemented` 0. The four `uncovered` are PM-FR-9, PM-FR-16, PM-FR-17 and PM-FR-27.
+Requirement-level rollup: `in-progress` 5 · `specified` 30 · `uncovered` 3 · `deferred` 4 · `implemented` 0. The three `uncovered` are PM-FR-9 (no UX surface), and PM-FR-16 / PM-FR-17 (epic-assigned to `PMC-E3`, story-uncovered by ruling PMC SD-7 until `TT-IDENTITY-01` closes).
 
 ## 14. Product Definition of Done
 
