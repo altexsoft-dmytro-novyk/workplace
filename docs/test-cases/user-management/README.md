@@ -33,6 +33,10 @@ baseline" no longer holds for the changed files:
 - `list/` was **rewritten from a blank page** for spec v1.5 (2026-09-02) —
   12 files (`um-list-01..12`); the four pre-v1.5 drafts are replaced. See the
   folder README.
+- `auth/` — **Story 2.1 scenarios reconciled 2026-09-02** (`um-auth-01`,
+  `um-auth-02`, new `um-auth-02b`; `um-auth-06` split to consume-half only) and a
+  folder `README.md` added. Story 2.2 files (`um-auth-03..06`) not otherwise
+  touched. Fresh approval required.
 
 **No `_bmad-output/specs/*/approvals.yaml` records any of this refresh.** An
 agent's review of its own output is never a substitute for human approval

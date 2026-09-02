@@ -25,8 +25,8 @@ it forces every client to diff before sending and offers no safety benefit
 guard in `EditUserAction` and this scenario flips.
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded with
-`position: "Engineer"`; real `Relationship` Alice→Bob `type='direct'`;
-`user-management:edit` seeded and held; port rebound.
+`position: "Engineer"`; real `Relationship` Alice→Bob `type='direct'` (Bob's
+`canAccessSection(Bob, 'S1', Alice)` is `write`); port rebound.
 
 ## Test
 

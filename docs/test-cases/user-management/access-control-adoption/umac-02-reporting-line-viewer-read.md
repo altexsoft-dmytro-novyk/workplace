@@ -18,11 +18,10 @@ non-empty (contains `reporting`), and allows `user-management:read`. A transitiv
 reporting edge (V is T's manager's manager) resolves the same way — `reporting`
 is the transitive `direct` walk.
 
-`canEdit` = `isAllowed(V, EDIT_USER_FEATURE) && canAccessSection(V, 'S1', T) ===
-'write'`. A reporting-line viewer has `canAccessSection === 'write'`, but
-`user-management:edit` is not seeded yet, so `canEdit` is **`false`** today; it
-flips to `true` for a reporting-line viewer once that permission reaches
-`stage-3-production` (and the actual `PATCH` lands in UMAC-2).
+`canEdit` — **Variant A (product decision 2026-09-02): the identity card has no
+separate functional permission; the whole edit gate is
+`canAccessSection(V, 'S1', T) === 'write'`.** A reporting-line viewer has
+`canAccessSection === 'write'`, so `canEdit` is **`true`**.
 
 > The `GET /users/:id` **`data` is the same S1 card** for every audience;
 > `canEdit` is what differs.
@@ -34,8 +33,8 @@ flips to `true` for a reporting-line viewer once that permission reaches
 - **Test 1 — direct report**
   - **inputURL:** `GET /users/<T-uuid>`
   - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:<V-uuid>>" } }`
-  - **expectedResult:** `200`; body `{ data, canEdit }`. `data` contains exactly the 12 S1 fields (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`) and not `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `false` (no `user-management:edit` seeded).
+  - **expectedResult:** `200`; body `{ data, canEdit }`. `data` contains exactly the 12 S1 fields (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`) and not `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `true` (Variant A: reporting-line viewer → `canAccessSection` `'write'`).
 - **Test 2 — transitive reporting line**
   - **Preconditions:** a real seeded `Relationship` chain `T → M → V` (both edges `type='direct'`), so V is two hops up T's reporting line; produced in-suite, never a hardcoded id. This is static seeded state, not a transition — no baseline/change/observe steps.
   - **inputURL:** `GET /users/<T-uuid>` with `Bearer <token:<V-uuid>>`
-  - **expectedResult:** `200`, same `{ data, canEdit }` assertions (`data` = the 12 S1 fields; `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy` absent; `canEdit` `false`) — `reporting` resolves through the transitive `direct` walk to chain termination without a repeated node.
+  - **expectedResult:** `200`, same `{ data, canEdit }` assertions (`data` = the 12 S1 fields; `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy` absent; `canEdit` `true`) — `reporting` resolves through the transitive `direct` walk to chain termination without a repeated node.

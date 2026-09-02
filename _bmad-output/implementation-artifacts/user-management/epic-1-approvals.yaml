@@ -191,15 +191,164 @@ approvals:
     artifact_path: "docs/test-cases/user-management/profile/"
     commit: "UNCOMMITTED-2026-09-02"
     author: "Claude Code (agent)"
-    approver: "PENDING - Dmytro must decide the user-management:edit holder first"
-    decision: "authored, NOT approved"
-    timestamp: "2026-09-02T09:30:00Z"
+    approver: "Dmytro Novyk (Variant A decision 2026-09-02 + autonomous authorization)"
+    decision: "approved"
+    timestamp: "2026-09-02T10:30:00Z"
     note: >-
-      8 um-edit-01..08 scenarios + README; um-pf-01/03/04 -> pointer stubs
-      (superseded). PATCH /users/:id data-correctness only (entitlement is
-      Epic 0's). Stages 2-3 BLOCKED on the user-management:edit holder
-      decision - see
-      _bmad-output/implementation-artifacts/access-control/user-management-edit-permission-options.md
-      (recommends Option 2: universal baseline `employee` FR role holds the
-      key; the §2.2 section gate does the audience narrowing). NOT recorded as
-      approved - this one needs a real Dmytro decision, not autonomous auth.
+      8 um-edit-01..08 scenarios + README; um-pf-01/03/04 -> pointer stubs.
+      PATCH /users/:id DATA-CORRECTNESS ONLY (partial-merge; 409 wholesale on
+      workEmail/ttId dup; 400 on org fields §3.2 fn 1; 400 on
+      photo/isActive/employmentStatus/customFields; birthday pair). Entitlement
+      is Epic 0's = Variant A: canAccessSection('S1') === 'write' (reporting
+      manager / assigned PP), NO functional permission, NO kernel seed.
+      Dmytro decided Variant A 2026-09-02 ("по дефолту най буде варіант А");
+      scenarios reconciled to it. Stage 2/3 no longer blocked.
+
+  - story_id: "UMAC-2-write-path"
+    stage: "stage-1-scenarios+stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/access-control-adoption/write-adoption.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (Variant A + autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T10:30:00Z"
+    note: >-
+      Variant A collapses UMAC-2's "dual gate" to a write-audience check.
+      Adapter branch (isAllowedForTarget EDIT_USER_FEATURE ->
+      canAccessSection('S1') === 'write') done by the coordinator. Scenarios
+      umac-07/08/09 + write-adoption.e2e-spec.ts reconciled: UMAC-07 (5) green
+      (reporting mgr + PP PATCH scalar S1 -> 200), UMAC-09 (3) green (photo
+      Self-only), UMAC-08 (3) RED pending Epic 1 Story 1.2 Stage 3 (@IsEmpty
+      on org fields). No kernel-seed dependency. stories.yaml UMAC-2 entries
+      still carry stale dual-gate language - reconcile in a follow-up.
+
+  - story_id: "1-2-edit-identity-card-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-1/edit-identity.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T11:00:00Z"
+    note: >-
+      New edit-identity.e2e-spec.ts (24 tests, 16 green / 8 red). Deleted the
+      stale all-403 profile-v15.e2e-spec.ts (superseded by um-edit-* +
+      um-photo-*). Red (all Story 1.2 Stage 3): um-edit-05 org fields ->400
+      (4), um-edit-06 T3/T4 employmentStatus/customFields ->400 (2), um-edit-08
+      T1/T5 birthday half-pair ->400 (2). Already green: partial-merge write,
+      {data,canEdit:true} readback, workEmail normalize-before-check, 409
+      wholesale rollback (atomic prisma update). tsc = 3 known epic-4 errors.
+
+  - story_id: "1-2-edit-identity-card-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/dtos/update-user.dto.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T11:30:00Z"
+    note: >-
+      UpdateUserDto @IsEmpty on manager/managerId/reportsToUserId/peoplePartner/
+      peoplePartnerId/department/departmentId/employmentStatus/customFields.
+      EditUserAction: birthday-pair invariant (resulting pair both-or-neither).
+      Gate / normalization / atomic 409 rollback untouched. edit-identity
+      24/24 green; write-adoption 11/11 (umac-08 green); adoption dir 23/23.
+      Delta +11 green, 0 regressions. tsc = 3 known epic-4. Completes UMAC-2
+      §3.2 fn 1.
+
+  - story_id: "2-1-request-magic-link-scenarios+red-tests"
+    stage: "stage-1-scenarios+stage-2-tests"
+    repo: "workspace+services/backend"
+    artifact_path: "docs/test-cases/user-management/auth/ + test/user-management/epic-2/request-magic-link.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T12:30:00Z"
+    note: >-
+      um-auth-01/02 reconciled + um-auth-02b NEW (deactivated=unknown,
+      DEC-UM-012 draft) + auth/README.md. Body settled `{ sent: true }`,
+      byte-identical enumeration guard. request-magic-link.e2e-spec.ts 4/4 red
+      (route 404, no magic_link_token table). Flagged for architect:
+      MagicLinkToken uses `tokenHash` (SHA-256, unique) NOT raw `token`
+      (epic-2-context draft said `token`) — store a hash, raw secret only in
+      the emailed link. 15-min TTL config-owned (MAGIC_LINK_TTL_MINUTES).
+      Dispatcher port widens to dispatch(workEmail, token). Deactivated keyed
+      on User.isActive (recommendation). tsc = 3 known epic-4.
+
+  - story_id: "2-1-request-magic-link-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/services/magic-link.service.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T13:30:00Z"
+    note: >-
+      MagicLinkToken model + migration 20260902124244_story_2_1_magic_link_token
+      (additive, tokenHash unique, userId FK cascade). Config
+      MAGIC_LINK_TTL_MINUTES(15)/APP_BASE_URL/MAIL_*. /auth area in
+      src/user-management/ (controller/action/dto/service/2 repos/SMTP adapter).
+      nodemailer dep added (was extraneous). POST /auth/magic-link ->
+      {sent:true}, enumeration-safe, real SMTP adapter (NFR-3 swallows errors).
+      request-magic-link.e2e-spec.ts 4/4 green. tsc = 3 known epic-4.
+      MIGRATION INCIDENT recovered: prisma migrate dev auto-dropped the
+      access-control PolicyPermissions FK; agent rewrote migration additive +
+      restored the FK; coordinator verified acm1r-fr-foundation green again
+      (66/66 across acm1r + magic-link + adoption).
+      ARCHITECT FLAGS: (1) tokenHash vs raw token; (2) /auth in user-management
+      not a new context; (3) node:crypto direct in domain service;
+      (4) .env.example NOT editable by the harness - user must add MAIL_*/
+      MAGIC_LINK_* entries (listed in the agent report).
+
+  - story_id: "2-2-consume-magic-link-scenarios+red-tests"
+    stage: "stage-1-scenarios+stage-2-tests"
+    repo: "workspace+services/backend"
+    artifact_path: "docs/test-cases/user-management/auth/um-auth-03..06 + test/user-management/epic-2/consume-magic-link.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T14:00:00Z"
+    note: >-
+      um-auth-03/04/05/06 reconciled (real minted tokens, no placeholders) +
+      um-auth-consume-malformed. consume-magic-link.e2e-spec.ts 5/5 red
+      (route 404, no session issuance, SESSION_RESOLVER_PORT still interim).
+      request-magic-link stays 4/4 green. PROPOSED (Stage 3 + architect):
+      session body {sessionToken, tokenType:"Bearer", expiresIn}; format
+      signed JWT HS256 sub=userId (config SESSION_JWT_SECRET, no Session
+      table); lifetime 8h (SESSION_TTL_HOURS); one generic 401 for all
+      failure shapes; SessionResolverPort AD-21 cutover folds the
+      Bearer <token:<uuid>> shorthand into the real adapter behind a non-prod
+      env flag, interim adapter retired (not dual-run). tsc = 3 known epic-4.
+
+  - story_id: "2-2-consume-magic-link-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/infrastructure/jwt-session-resolver.adapter.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T15:00:00Z"
+    note: >-
+      POST /auth/magic-link/consume + ConsumeMagicLinkAction + MagicLinkService.
+      consume (atomic conditional UPDATE, generic 401, no session material on
+      failure). Hand-rolled HS256 JWT (jwt.util.ts, node:crypto, NO new dep),
+      SessionTokenIssuerPort/adapter. JwtSessionResolverAdapter: verifies JWT
+      + ALLOW_TEST_SESSION_TOKENS gates the Bearer <token:persona> shorthand
+      (Root self-provision ported verbatim). interim-session-resolver.adapter.ts
+      DELETED, SESSION_RESOLVER_PORT rebound. Config SESSION_JWT_SECRET (prod-
+      required)/SESSION_TTL_HOURS(8)/ALLOW_TEST_SESSION_TOKENS(!prod).
+      consume 5/5 + request 4/4 green. FULL sweep: 0 regressions (comm -23 of
+      failing lists = empty; all Bearer <token:uuid> suites stay green).
+      Coordinator verified: 9 suites / 98 green (epic-2 + adoption + edit-
+      identity + list-v15 + acm2). tsc = 3 known epic-4.
+      .env.example NOT editable - user adds SESSION_JWT_SECRET/SESSION_TTL_HOURS/
+      ALLOW_TEST_SESSION_TOKENS. Architect flag: hand-rolled JWT vs @nestjs/jwt;
+      stateless JWT / no Session table / no revocation (fine for Epic 2, revisit
+      if "sign out everywhere" lands).

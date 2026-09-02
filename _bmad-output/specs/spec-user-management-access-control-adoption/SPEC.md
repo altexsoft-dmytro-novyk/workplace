@@ -119,6 +119,21 @@ separately tracked FR-17 Profile Projection story.
     people partner, department never writable through S1; rejected in
     `EditUserAction`/`UpdateUserDto`, tested) plus the photo narrower rule
     (photo write is Self-only per FR-9 / DEC unless Product widens it).
+  - **NOTE 2026-09-02 (Dmytro Novyk) — write half is "Variant A"
+    (audience-only).** The employee identity card (S1) has **no separate
+    functional permission**. The whole `PATCH /users/:id` gate is
+    `AccessControlFacade.canAccessSection(viewer, 'S1', target) === 'write'` —
+    the target's reporting-line manager or assigned People Partner. §2.2's
+    functional-permission half is **not applied to this section**; the string
+    `user-management:edit` survives only as the adapter's internal routing key
+    for the `EDIT_USER_FEATURE` branch. **UMAC-2's dependency on the Access
+    Control kernel-seed sequence for `user-management:edit` (Open Decision (i) =
+    option (a)) is removed** — the write path ships on the audience gate Epic 0
+    already provides. A narrower FR grant on this section can be added later via
+    the roles admin screen if finer control is ever needed. The §3.2 fn 1
+    org-field rejection and the photo Self-only rule are unchanged. The `canEdit`
+    hint in CAP-3 follows: `true` for a reporting-line / PP viewer, `false` for
+    self / colleague, no deferred flip.
 
 - **CAP-3 — Minimal S1 identity-card projection + capability envelope (shipped in Story 0.1)**
   - **intent:** `GET /users/:id` returns the S1 identity card wrapped in the

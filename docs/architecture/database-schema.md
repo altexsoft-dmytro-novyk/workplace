@@ -536,6 +536,44 @@ Asserting it against `pg_indexes` on the migrated database is legitimate
 Stage-2 evidence, and is named here so the story cannot stall on how to observe
 an index.
 
+### MagicLinkToken (Epic 2, Story 2.1)
+
+The one-time login-token store for magic-link authentication (FR-2 — a link
+sent to `workEmail` is the sole login mechanism; no password is ever stored).
+Owned by `user-management`'s `/auth` sub-area. Minted by `POST /auth/magic-link`
+on a match against an active user; consumed by `POST /auth/magic-link/consume`
+(Story 2.2).
+
+```text
+MagicLinkToken {
+  id         uuidv7 PK
+  userId     FK -> User, ON DELETE CASCADE
+  tokenHash  string, unique      // SHA-256 hex of the raw token
+  expiresAt  timestamptz
+  consumedAt timestamptz, nullable   // presence marks the token spent (single-use, one-way — DEC-UM-004)
+  createdAt  timestamptz, default now()
+}
+UNIQUE: tokenHash
+```
+
+Table `magic_link_token` (`@@map`, matching `employment_status` /
+`department_membership`). Audit-column discipline (`nest-prisma.md`): no
+`updatedAt`/`updatedBy` — `consumedAt` is the only post-mint mutation and is a
+one-way marker.
+
+**`tokenHash`, not a raw `token` — deliberate hardening over
+`epic-2-context.md`'s draft (`token` unique). FLAGGED FOR ARCHITECT
+RATIFICATION.** The database stores only the SHA-256 hash; the usable secret
+(32 random bytes, base64url) exists only inside the emailed link. A lookup at
+consume time hashes the presented token and matches on `tokenHash`. Rationale:
+a database or backup disclosure must not hand an attacker working login tokens.
+
+**Open (not built by Story 2.1):** a partial unique index "at most one
+unconsumed, unexpired token per user" — deferred to the architect (the request
+is idempotent-safe without it; Story 2.1 asserts only per-mint state). TTL is
+configuration-owned (`MAGIC_LINK_TTL_MINUTES`, default 15); Story 2.1 asserts
+only `expiresAt > now()` at mint.
+
 ## What is deliberately absent
 
 - Any stored access-role/tier/permission result (AD-10: derived access is never persisted).

@@ -2,10 +2,22 @@
 
 **Trace:** SPEC-user-management-access-control-adoption CAP-2 (write, §3.2 fn 1) · `um-integration-contract-response.md` Q3 step 3 ("manager, people partner and department are read-only for every audience on S1 ... enforced in `EditUserAction` / `UpdateUserDto`, not in the guard ... the rejection must be explicit and tested") · access-control.md §3.3 (§3.2 fn 1–2 S1 derived fields) · PRD FR-9 refinement · epics.md Story 1.2 (third AC)
 
+> **Variant A (product decision 2026-09-02).** The identity-card edit gate is
+> `canAccessSection(V, 'S1', T) === 'write'` alone (`umac-07`); there is no
+> functional-permission half and no `user-management:edit` seed. This scenario's
+> intent is unchanged: the org-field rejection lives in `EditUserAction` /
+> `UpdateUserDto`, not the guard, and fires for **every** audience.
+>
+> **Stage-2 / Stage-3 state.** The E2E stays **red** until Epic 1 Story 1.2
+> Stage 3 adds the explicit `@IsEmpty()` rejection on the org keys. Today those
+> keys are absent from `UpdateUserDto`, so `whitelist: true` silently strips
+> them and the request `200`s on the sibling field.
+
 ## Scenario
 
-**Given** V is a fully-entitled writer over T (reporting or PP; holds the edit
-permission — the dual gate of `umac-07` passes).
+**Given** V is an entitled writer over T (reporting-line manager or assigned PP —
+V has `canAccessSection(V, 'S1', T) === 'write'`, so the `umac-07` gate passes
+and the request reaches the DTO).
 
 **When** V submits `PATCH /users/<T>` whose body carries an organisational fact —
 `manager` / `reportsTo` / `managerId`, `peoplePartner` / `peoplePartnerId`, or

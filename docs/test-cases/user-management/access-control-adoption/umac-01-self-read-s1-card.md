@@ -18,12 +18,13 @@ longer spreads the whole row; Story 0.1's S1-card DTO returns exactly `id`,
 V's Phase-0 audience over itself is `self` (after identity confirmation; Self
 is exclusive), a non-empty set, so the adapter allows `user-management:read`.
 
-`canEdit` is the read-only dual-gate hint —
-`isAllowed(V, EDIT_USER_FEATURE) && canAccessSection(V, 'S1', V) === 'write'`.
-Self has `canAccessSection === 'write'`, but `user-management:edit` is not
-seeded yet (Open Decision (i) = option (a), pending), so `isAllowed` fails
-closed and **`canEdit` is `false`** today. It flips to `true` for Self once the
-`user-management:edit` kernel-seed sequence reaches `stage-3-production`.
+`canEdit` is the read-only edit-gate hint. **Variant A (product decision
+2026-09-02): the identity card has no separate functional permission — the whole
+gate is `canAccessSection(V, 'S1', target) === 'write'`.** Self's
+`canAccessSection(V, 'S1', V)` is `'read'` (S1 is read-only for self; only the
+photo is Self-writable — `umac-09`), so **`canEdit` is `false`** for a self
+read. This does not flip — a person is never the reporting-line manager or
+assigned People Partner of themselves.
 
 > **CAP-3 — `{ data, canEdit }`; `data` is the same 12 fields for every
 > audience on this route.** `data` **drops** the non-S1 technical fields:
@@ -51,4 +52,4 @@ closed and **`canEdit` is `false`** today. It flips to `true` for Self once the
   ```json
   { "headers": { "authorization": "Bearer <token:<V-uuid>>" } }
   ```
-- **expectedResult:** `200`. Body is `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `false` (no `user-management:edit` seeded). Forward: `canEdit` becomes `true` for Self once that permission reaches `stage-3-production`.
+- **expectedResult:** `200`. Body is `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `false` (Variant A: `canAccessSection(V, 'S1', V)` is `'read'` for self; no flip).

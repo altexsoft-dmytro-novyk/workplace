@@ -1,5 +1,22 @@
 # `user-management:edit` — who holds it?
 
+> **RESOLVED 2026-09-02 (Dmytro) — Variant A: there is NO separate functional
+> permission for the identity card.** The whole gate on `GET /users/:id`
+> `canEdit` and on `PATCH /users/:id` is `canAccessSection(viewer, 'S1',
+> target) === 'write'` — i.e. the reporting-line manager or the assigned People
+> Partner. §2.2's functional half is not applied to this section. No kernel-seed
+> AD-1 sequence for `user-management:edit`; the string `user-management:edit`
+> survives only as the adapter's routing key for the `PATCH` gate (mapping to
+> the S1 write-access check, not to `isAllowed`). HR Admin can introduce a
+> *narrower* FR grant later through the roles admin screen if finer control is
+> ever needed (§2.3). This supersedes adoption Open Decision (i) option (a) for
+> the identity-card section — the S9 career-timeline and other sections that
+> §2.3 flags may still carry a functional layer; that is the FR-matrix draft's
+> concern (`fr-permission-matrix-draft-2026-09-02.md`).
+>
+> The options analysis below is kept as the record of how the decision was
+> reached. Options 1–4 and the "recommended Option 2" are HISTORICAL.
+
 **Status:** decision doc for Dmytro. Prose only — no schema, no `seed.ts`, no
 `approvals.yaml`, no code. **Not an AD-1 approval.**
 

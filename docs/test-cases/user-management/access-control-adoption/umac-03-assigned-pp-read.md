@@ -18,11 +18,10 @@ audience is **not** blocked by CC-07; only the Epic 4 PP *write*/journal path is
 Transitive PP-HR-line propagation above V stays fail-closed to the directly
 assigned PP (AD-19 Department-boundary gate) — out of scope for this read.
 
-`canEdit` = `isAllowed(V, EDIT_USER_FEATURE) && canAccessSection(V, 'S1', T) ===
-'write'`. An assigned PP has `canAccessSection === 'write'`, but
-`user-management:edit` is not seeded yet → `canEdit` is **`false`** today; it
-flips to `true` for the assigned PP once that permission reaches
-`stage-3-production`.
+`canEdit` — **Variant A (product decision 2026-09-02): the identity card has no
+separate functional permission; the whole edit gate is
+`canAccessSection(V, 'S1', T) === 'write'`.** An assigned PP has
+`canAccessSection === 'write'`, so `canEdit` is **`true`**.
 
 **Preconditions:** [fixture](README.md#fixture-convention-per-um-integration-contract-response-md-q6); V and T active; real `Relationship` `T → V` `type='people_partner'`; the port is rebound and the S1-card DTO is in place.
 
@@ -30,4 +29,4 @@ flips to `true` for the assigned PP once that permission reaches
 
 - **inputURL:** `GET /users/<T-uuid>`
 - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:<V-uuid>>" } }`
-- **expectedResult:** `200`; body `{ data, canEdit }`. `data` contains exactly the 12 S1 fields (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`) and not `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `false` (no `user-management:edit` seeded).
+- **expectedResult:** `200`; body `{ data, canEdit }`. `data` contains exactly the 12 S1 fields (`id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate`) and not `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `true` (Variant A: assigned PP → `canAccessSection` `'write'`).

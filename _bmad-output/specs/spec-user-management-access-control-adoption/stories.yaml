@@ -13,14 +13,16 @@
 #
 # UMAC-1 rebinds the port, adopts the READ route, and ships the
 # { data, canEdit } envelope for GET /users/:id (CAP-1 + CAP-2 read half +
-# CAP-3 + CAP-4 read E2E). data = the 12 S1 identity fields; canEdit = the
-# read-only dual-gate hint (false for all until user-management:edit is
-# seeded). Every resolved audience — self / reporting / pp / colleague — over
-# an active target gets 200 with the same envelope. Denials: an unresolved
-# session is 401 (session layer); an authenticated active viewer with an empty
-# audience is 403 (human product decision 2026-09-01 — no "leak-free 404").
-# UMAC-2 adds the write dual gate (CAP-2 write half) and is
-# CONDITIONAL on the missing-edit-permission decision in SPEC.md Open decisions.
+# CAP-3 + CAP-4 read E2E). data = the 12 S1 identity fields; canEdit =
+# canAccessSection(viewer, 'S1', target) === 'write' (Variant A, 2026-09-02 —
+# true for a reporting-line manager / assigned PP, false for self / colleague;
+# no functional permission). Every resolved audience — self / reporting / pp /
+# colleague — over an active target gets 200 with the same envelope.
+# Denials: see the access-control-adoption/README.md denial-oracle banner
+# (superseded 2026-09-02 by PM/AD-24: 401 invalid/inactive session / 404
+# missing-or-hidden target / 403 forbidden action).
+# UMAC-2 (CAP-2 write half) is SUPERSEDED BY VARIANT A — see the block comment
+# above the UMAC-2 entries below.
 # There is no UMAC-3: the colleague read is a positive outcome from Story 0.1
 # (§3.2 S1 = R for Colleague); the "two-state" rule was removed by the human
 # decision of 2026-09-01. FR-17 Profile Projection still owns the S10 dates-only,
@@ -179,76 +181,65 @@
     the pre-existing not-yet-built /users/:id/relationships failures are
     unrelated and must be identical before and after.
 
+# ─────────────────────────────────────────────────────────────────────────────
+# UMAC-2 — SUPERSEDED BY "VARIANT A" (human product decision, Dmytro, 2026-09-02).
+# The identity card has NO separate functional permission. PATCH /users/:id and
+# the GET canEdit hint are gated by canAccessSection(viewer, 'S1', target) ===
+# 'write' ALONE (reporting-line manager or assigned People Partner). §2.2's
+# functional half is not applied to this section. No kernel-seed AD-1 sequence;
+# 'user-management:edit' survives only as the adapter's routing key. The three
+# CONDITIONAL / dual-gate / option-(a)/(b) entries below are HISTORICAL.
+#
+# The work that was UMAC-2 is DONE and folded into other slices:
+#   - the write-audience gate branch: services/backend/src/user-management/
+#     infrastructure/access-control-facade.adapter.ts (isAllowedForTarget,
+#     EDIT_USER_FEATURE branch → canAccessSection('S1') === 'write')
+#   - the §3.2 fn 1 rejection of manager/people-partner/department + the
+#     employmentStatus/customFields/birthday-pair rules: UM Epic 1 Story 1.2
+#     (UpdateUserDto @IsEmpty + EditUserAction), test/user-management/epic-1/
+#     edit-identity.e2e-spec.ts (24/24) + write-adoption.e2e-spec.ts umac-07/08/09
+#   - photo Self-only: UM Epic 1 Story 1.3 (@SelfOnly guard)
+# Scenarios: docs/test-cases/user-management/access-control-adoption/umac-07/08/09
+# (reconciled to Variant A). Approvals: epic-1-approvals.yaml (UMAC-2-write-path,
+# 1-2-*, 1-3-*).
+# ─────────────────────────────────────────────────────────────────────────────
+
 - id: "UMAC-2-write-path-scenarios"
-  title: "UMAC-2 Stage 1 — PATCH / PUT photo dual-gate scenario prose (CONDITIONAL)"
+  title: "UMAC-2 Stage 1 — HISTORICAL (superseded by Variant A 2026-09-02)"
   description: >-
-    CONDITIONAL on the SPEC Open-decision 1 outcome. If option (a): depends on
-    the new Access Control kernel seed story that adds user-management:edit
-    (and any photo permission) reaching stage-3-production. If option (b):
-    author the interim write rule with its recorded expiry trigger instead.
-    Author only scenario prose for the CAP-2 write half.
+    HISTORICAL. The CAP-2 write half is Variant A: gated by
+    canAccessSection(viewer, 'S1', target) === 'write' alone, no functional
+    permission, no kernel seed. Scenarios umac-07/08/09 are reconciled to that
+    and approved (epic-1-approvals.yaml). Do not dispatch this entry.
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
-    services/backend only. Scenario prose only — stop for independent human
-    approval. Cite this SPEC, access-control.md §2.2 dual gate and §3.2 fn 1,
-    FR-9 in _bmad-output/planning-artifacts/user-management/epics.md, and
-    um-integration-contract-response.md Q3. PRECONDITION: confirm which Open-
-    decision-1 option the human chose and, for option (a), verify the Access
-    Control kernel seed story's stage-3-production approval so
-    user-management:edit exists as a real permission key. Scenarios: PATCH
-    /users/:id succeeds only when AccessControlFacade.isAllowed(viewer,
-    <edit permission key>) is true AND
-    AccessControlFacade.canAccessSection(viewer, 'S1', target) === 'write'
-    (viewer resolves reporting or pp); denied (403) when either half fails;
-    manager / people-partner / department fields in the PATCH body are rejected
-    regardless of audience (§3.2 fn 1) and no relationship changes; PUT
-    /users/:id/photo is Self-only (viewer id == target id) unless Product
-    widened it. For option (b), the scenario records the interim rule
-    explicitly AS interim with the trigger 'replace with the dual gate when
-    user-management:edit is seeded'. Do NOT touch Access Control files or
-    prisma schema/migrations/seed.
+    HISTORICAL — do not dispatch. See the block comment above.
 
 - id: "UMAC-2-write-path-red-tests"
-  title: "UMAC-2 Stage 2 — PATCH / PUT photo dual-gate E2E (committed red)"
+  title: "UMAC-2 Stage 2 — HISTORICAL (superseded by Variant A 2026-09-02)"
   description: >-
-    Depends on independent human approval of UMAC-2 Stage 1. Translate the
-    approved scenarios into a committed-red real-consumer HTTP E2E suite under
-    services/backend/test/user-management/ — no provider overrides.
+    HISTORICAL. The write-path E2E lives in
+    services/backend/test/user-management/access-control-adoption/write-adoption.e2e-spec.ts
+    (umac-07/08/09, 11/11 green) and
+    test/user-management/epic-1/edit-identity.e2e-spec.ts (24/24). Do not
+    dispatch this entry.
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
-    services/backend only. Stage-2 test code only — commit red, stop for
-    independent human approval, no production code. Record and verify the
-    UMAC-2-write-path-scenarios Stage-1 approval in approvals.yaml first
-    (author != approver; commit resolves; artifact present). Seed real Users,
-    real Relationship rows (direct / people_partner), and — for option (a) —
-    the seeded user-management:edit grant on the actor's FR policy. One test
-    per approved scenario. Follow .claude/rules/nest-e2e.md and the
-    seeded-UUID Bearer token convention. The suite must FAIL until
-    UMAC-2-write-path-production lands.
+    HISTORICAL — do not dispatch. See the block comment above.
 
 - id: "UMAC-2-write-path-production"
-  title: "UMAC-2 Stage 3 — PATCH / PUT photo dual-gate implementation"
+  title: "UMAC-2 Stage 3 — HISTORICAL (superseded by Variant A 2026-09-02)"
   description: >-
-    Depends on independent human approval of the committed-red UMAC-2 Stage-2
-    suite. Implement only the CAP-2 write half; make the approved tests pass.
+    HISTORICAL. The write-audience gate branch is in
+    access-control-facade.adapter.ts; the §3.2 fn 1 + DTO rules are UM Epic 1
+    Story 1.2; photo Self-only is UM Epic 1 Story 1.3. Do not dispatch this
+    entry.
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
-    services/backend only. Production code only. Record and verify the
-    UMAC-2-write-path-red-tests Stage-2 approval in approvals.yaml first.
-    In access-control-facade.adapter.ts, extend isAllowedForTarget: for
-    'user-management:edit' require isAllowed(viewer, 'user-management:edit')
-    AND canAccessSection(viewer, 'S1', target) === 'write'; for
-    'user-management:upload-photo' require viewer id == target id (Self) unless
-    Product widened it. Add / confirm the §3.2 fn 1 rejection of manager /
-    people-partner / department fields in EditUserAction or UpdateUserDto with
-    a test. Do NOT change AccessControlGuard, add routes, inject the facade
-    outside the adapter, or touch Access Control files or prisma
-    schema/migrations/seed. Under option (b) implement the interim rule with
-    the // INTERIM comment and expiry trigger exactly as the approved scenario
-    records it.
+    HISTORICAL — do not dispatch. See the block comment above.
 
 # UMAC-3 (flip colleague from deny to allow-narrowed) was REMOVED on
 # 2026-09-01 by human product decision: §3.2's S1 row is R for the Colleague

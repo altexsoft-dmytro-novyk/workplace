@@ -38,8 +38,13 @@ when he directed folding the `{ data, canEdit }` capability envelope into
 `_bmad-output/specs/spec-user-management-access-control-adoption/approvals.yaml`
 (`UMAC-1-scenarios`, `stage-1-scenarios`; author = Claude Code agent, approver =
 Dmytro Novyk). `umac-07`..`umac-09` (Story 0.2 write path) remain unapproved
-draft and are blocked on the missing `user-management:edit` permission
-(Open Decision (i) = option (a)). `author != approver` for every stage.
+draft. **Reframed to Variant A (product decision 2026-09-02, Dmytro Novyk):**
+the identity-card edit gate is `canAccessSection('S1') === 'write'` alone (the
+reporting-line manager or assigned People Partner) — §2.2's functional-permission
+half is **not** applied to this section, so the write path no longer depends on a
+`user-management:edit` kernel seed. `user-management:edit` survives only as the
+adapter's internal routing key for the `PATCH` gate branch. `author != approver`
+for every stage.
 
 ## The seam
 
@@ -52,8 +57,8 @@ behaviour is chosen per feature string inside the adapter.
 
 | Route | Feature constant | Adapter behaviour |
 | --- | --- | --- |
-| `GET /users/:id` | `user-management:read` | allow **any non-empty audience** (`self` / `reporting` / `pp` / `colleague`) → `200` with `{ data, canEdit }` — `data` the **S1 identity card** (same 12 fields for every audience), `canEdit` the read-only dual-gate hint (`isAllowed(v, edit key) && canAccessSection(v, 'S1', t) === 'write'`; `false` for all until `user-management:edit` is seeded; always `false` for a colleague); unresolved session → `401` (interim resolver lax → `403`); authenticated active viewer, empty audience → `403` (no "leak-free 404" — human decision 2026-09-01) |
-| `PATCH /users/:id` | `user-management:edit` | §2.2 dual gate: `isAllowed(v, edit key)` **and** `canAccessSection(v, 'S1', t) === 'write'` — **blocked on a missing permission** |
+| `GET /users/:id` | `user-management:read` | allow **any non-empty audience** (`self` / `reporting` / `pp` / `colleague`) → `200` with `{ data, canEdit }` — `data` the **S1 identity card** (same 12 fields for every audience), `canEdit` the read-only edit-gate hint. **Variant A (product decision 2026-09-02): the identity card has NO separate functional permission — the whole gate is `canAccessSection(v, 'S1', t) === 'write'`.** `canEdit` is `true` for a reporting-line manager / assigned PP, `false` for self / colleague; unresolved session → `401` (interim resolver lax → `403`); authenticated active viewer, empty audience → `403` (no "leak-free 404" — human decision 2026-09-01) |
+| `PATCH /users/:id` | `user-management:edit` (adapter routing key only) | **Variant A:** the whole gate is `canAccessSection(v, 'S1', t) === 'write'` (reporting-line manager or assigned PP). §2.2's functional-permission half is not applied to this section; `user-management:edit` survives only as the adapter's internal routing key for this branch |
 | `PUT /users/:id/photo` | `user-management:upload-photo` | Self-only (viewer id == target id) unless Product widens it |
 | `GET /users`, `POST /users`, `DELETE /users/:id` | `user-management:list` / `:create` / `:deactivate` | `isAllowed` delegates straight to the facade — these three keys are exactly the ACM-1 seeded set |
 
@@ -106,12 +111,12 @@ S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
 
 | File | Story | State |
 | --- | --- | --- |
-| `umac-01-self-read-s1-card.md` | 0.1 | **approved 2026-09-01** (Self → 200, `{ data: S1 card, canEdit: false }`) |
-| `umac-02-reporting-line-viewer-read.md` | 0.1 | **approved 2026-09-01** (reporting → 200, `{ data, canEdit: false }`) |
-| `umac-03-assigned-pp-read.md` | 0.1 | **approved 2026-09-01** (PP → 200, `{ data, canEdit: false }`) |
+| `umac-01-self-read-s1-card.md` | 0.1 | **approved 2026-09-01** (Self → 200, `{ data: S1 card, canEdit: false }` — Variant A: S1 is `read` for self) |
+| `umac-02-reporting-line-viewer-read.md` | 0.1 | **approved 2026-09-01**; **canEdit reconciled to Variant A 2026-09-02** (reporting → 200, `{ data, canEdit: true }` — `canAccessSection` `'write'` is the whole gate) |
+| `umac-03-assigned-pp-read.md` | 0.1 | **approved 2026-09-01**; **canEdit reconciled to Variant A 2026-09-02** (PP → 200, `{ data, canEdit: true }`) |
 | `umac-04-colleague-read-s1-card.md` | 0.1 | **approved 2026-09-01** (**colleague → 200, `{ data, canEdit: false }` — positive test; `canEdit` false by section access**) |
 | `umac-05-unresolved-session-read-denied.md` | 0.1 | **approved 2026-09-01** (unresolved session → `401`, interim → `403` via guard; authenticated active viewer with empty audience → `403`; no "leak-free 404" — human product decision) |
 | `umac-06-no-target-isallowed-delegates-to-facade.md` | 0.1 | **approved 2026-09-01** (root → allowed on `GET`/`POST` `/users` + `DELETE /users/:id` = `200`/`201`/`200`; unrelated session, Ida, **and an `HR Admin` impostor with no FR grant chain** → `403` on all three — the facade never reads `User.position`; `interim-access-control.adapter.ts` deleted in the same cutover, AD-21) |
-| `umac-07-write-dual-gate.md` | 0.2 | **CONDITIONAL — blocked on the missing `user-management:edit` permission (Open Decision i)** |
-| `umac-08-write-rejects-org-fields.md` | 0.2 | ready for approval (§3.2 fn 1) |
-| `umac-09-photo-write-self-only.md` | 0.2 | ready for approval (Open Decision v — confirm Self-only) |
+| `umac-07-write-dual-gate.md` | 0.2 | **reframed to Variant A 2026-09-02** — identity-card edit is gated by S1 write-access alone (`canAccessSection('S1') === 'write'`); no `user-management:edit` seed dependency. `write-adoption.e2e-spec.ts` UMAC-07 is green |
+| `umac-08-write-rejects-org-fields.md` | 0.2 | ready for approval (§3.2 fn 1); E2E stays red until Story 1.2 Stage 3 adds `@IsEmpty()` on the org keys |
+| `umac-09-photo-write-self-only.md` | 0.2 | Self-only (Open Decision v) — implemented via `@SelfOnly`; `write-adoption.e2e-spec.ts` UMAC-09 is green |

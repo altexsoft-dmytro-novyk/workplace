@@ -18,10 +18,10 @@ defines Colleague as any authenticated employee holding none of the above roles
 to S1. This is a **positive** test: there is no "two-state" rule, no `403`, and
 no deferred flip.
 
-`canEdit` is **`false`** — and, unlike self/reporting/pp, it is `false` by
-**section access**: `canAccessSection(V, 'S1', T)` returns `'read'` for a
-colleague, so `canEdit` is `false` regardless of any functional permission. It
-never flips to `true` for a colleague.
+`canEdit` is **`false`**. **Variant A (product decision 2026-09-02): the whole
+edit gate is `canAccessSection(V, 'S1', T) === 'write'`.** `canAccessSection`
+returns `'read'` for a colleague, so `canEdit` is `false`; a colleague never
+gains S1 write access, so it never flips.
 
 > **The S1 card projection (CAP-3, Story 0.1).** `data` contains exactly `id`,
 > `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`,
@@ -47,4 +47,4 @@ A genuinely unrelated *field* route for a colleague (e.g. `GET
   ```json
   { "headers": { "authorization": "Bearer <token:<V-uuid>>" } }
   ```
-- **expectedResult:** `200`. Body `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **not** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy` — identical `data` to `umac-01` / `umac-02` / `umac-03`. `canEdit` is `false` (colleague → `canAccessSection` `'read'`; never flips true).
+- **expectedResult:** `200`. Body `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **not** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy` — identical `data` to `umac-01` / `umac-02` / `umac-03`. `canEdit` is `false` (Variant A: colleague → `canAccessSection` `'read'`; never flips true).
