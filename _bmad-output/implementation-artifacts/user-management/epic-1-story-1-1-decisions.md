@@ -26,13 +26,14 @@ compiled spec stays the detailed contract; this file is the delta.
 
 ## 2. Departments — create-on-import
 
-- **`Department` is created during import if one with the same `externalId`
-  (CSV `DepartmentId`) does not exist yet.** `Department { id uuidv7 PK, name,
-  externalId (unique), parentId uuid? }`. Departments nest via `parentId`
-  (`project-requirements.md:516`); the CSV has no parent column, so `parentId`
-  is `null` on import — hierarchy is assigned later.
+- **`Department` is created during import if one with the same
+  (`externalId`, `name`) pair does not exist yet** (see §2c — `externalId`
+  alone is NOT unique). `Department { id uuidv7 PK, name, externalId string
+  nullable, parentId uuid? }`, `UNIQUE (externalId, name)`. Departments nest
+  via `parentId` (`project-requirements.md`); the CSV has no parent column, so
+  `parentId` is `null` on import — hierarchy is assigned later.
 - Membership: **`DepartmentMembership { id, userId, departmentId, validFrom
-  date }`** — "every employee belongs to exactly one current department"
+  date }`** — an employee belongs to one or more current departments (§4.17, amended 2026-09-02)
   (`database-schema.md` §Project/Department). `User` does **not** carry a
   `departmentId` column (it never carries derived/access fields —
   `database-schema.md:35`).

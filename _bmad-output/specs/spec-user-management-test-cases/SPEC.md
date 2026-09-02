@@ -157,8 +157,10 @@ earlier "not yet authored" boundary is closed). Entitlement for `/users/:id`
 
 - **CAP-9** Change department or department manager (Epic 4 Story 4.3) — **BLOCKED**
   - **intent:** Move an employee between departments / change a department's
-    manager; exactly one department; Reporting-line access changes on the next
-    request; a `department_change` career event; one before/after journal record.
+    manager; an employee belongs to **one or more** departments (§4.17 amended
+    2026-09-02 — was "exactly one"; move/replace semantics are this story's to
+    fix); Reporting-line access changes on the next request; a
+    `department_change` career event; one before/after journal record.
   - **success:** `relationships/um-rel-12..14` — **scenario prose only. BLOCKED
     on CC-07 AND the Department edge contract** (spine Deferred — until it lands,
     `department`-targeted policy rows contribute nothing, fail-closed).

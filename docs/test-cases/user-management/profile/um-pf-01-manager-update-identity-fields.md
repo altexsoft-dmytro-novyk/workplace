@@ -1,41 +1,29 @@
-# UM-PF-01 · Manager-line edit to identity fields persists
+# UM-PF-01 · Manager-line edit to identity fields persists — SUPERSEDED
 
-**Trace:** requirements §3.2 S1 (Reporting line: RW) · PRD Data Model — User entity · epics.md Story 1.2 (data-correctness ACs)
+**Status:** SUPERSEDED 2026-09-02 by the `um-edit-*` set in this folder (Epic 1
+Story 1.2 AD-1 stage-1 scenario package). Do **not** translate, cite, or approve
+this file. Its ID `um-pf-01` is retired **in place** — never reused, never
+renumbered (ID-stability rule, [../../README.md](../../README.md)).
 
-> **Scope (v1.5).** *Who* is entitled to `PATCH` / `GET /users/:id` — Self /
-> reporting / PP allowed, colleague denied, the §2.2 dual gate — is **Epic 0's**
-> (`access-control-adoption/umac-07`), asserted against the real facade. This
-> file asserts **data correctness** given an already-entitled actor: the write
-> persists and reflects on a follow-up read. Do not duplicate entitlement
-> scenarios here; do not harden the interim-permissive `isAllowedForTarget` as
-> intended behaviour.
->
-> **Persona-id note.** Alice/Bob are **seeded** employees (Story 1.1) — there is
-> no `POST /users`. Stage 2 resolves `<aliceId>` from the seeded fixture id
-> table (as `docs/test-cases/access-control/` does via
-> `access-control-fixture-ids.ts`), never a hardcoded literal. Whether the
-> `Bearer <token:Bob>` header becomes a real seeded UUID with a real `direct`
-> `Relationship` row (so the post-Epic-0 dual gate passes) or this suite's scope
-> note is tightened is a call for Epic 0 Story 0.1's scenario stage — flagged,
-> not silently rewritten here.
+## Why
 
-## Scenario
+The single "a manager edit persists and reflects on a read" case did not cover
+the Story 1.2 contract surface once `GET /users/:id` returns the CAP-3
+`{ data, canEdit }` envelope and the edit path acquired explicit
+partial-merge / wholesale-reject / DTO-rejection rules. The successor set:
 
-**Given** Bob, Alice's direct Unit Manager (Reporting-line access to Alice), acting as an already-entitled actor.
+| Successor | Covers |
+| --- | --- |
+| [`um-edit-01-entitled-actor-edits-identity-fields.md`](um-edit-01-entitled-actor-edits-identity-fields.md) | the original UM-PF-01 case — entitled actor edits S1 scalars, partial merge, follow-up `GET` reflects it in the `{ data, canEdit }` envelope |
+| [`um-edit-02-workemail-normalized-before-uniqueness-check.md`](um-edit-02-workemail-normalized-before-uniqueness-check.md) | DEC-UM-007 normalization on the edit path, before the uniqueness check |
+| [`um-edit-05-org-fields-in-body-rejected.md`](um-edit-05-org-fields-in-body-rejected.md) | §3.2 fn 1 — manager / PP / department in the body → `400` |
+| [`um-edit-06-forbidden-technical-fields-rejected.md`](um-edit-06-forbidden-technical-fields-rejected.md) | `photo` / `isActive` / `employmentStatus` / `customFields` → `400` |
+| [`um-edit-07-empty-or-no-op-patch.md`](um-edit-07-empty-or-no-op-patch.md) | empty / no-op body → `200` |
+| [`um-edit-08-birthday-pair-both-or-neither.md`](um-edit-08-birthday-pair-both-or-neither.md) | `birthDay` / `birthMonth` pair invariant on edit |
 
-**When** Bob updates Alice's `position` and `city`.
+## Stage-2 note
 
-**Then** the change is persisted and a subsequent read reflects the new values.
-
-**Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded with `position: "Engineer"`, `city: "Warsaw"`.
-
-## Test
-
-- **Test 1 — the write**
-  - **inputURL:** `PATCH /users/<aliceId>`
-  - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:Bob>" }, "body": { "position": "Senior Engineer", "city": "Krakow" } }`
-  - **expectedResult:** `200`; body reflects `position: "Senior Engineer"`, `city: "Krakow"`.
-- **Test 2 — observing the change**
-  - **inputURL:** `GET /users/<aliceId>`
-  - **inputRequest:** `{ "headers": { "authorization": "Bearer <token:Bob>" } }`
-  - **expectedResult:** `200`; `position: "Senior Engineer"`, `city: "Krakow"`.
+`services/backend/test/user-management/epic-1/profile-v15.e2e-spec.ts` has a
+`describe('um-pf-01 …')` block. When the `um-edit-*` set is approved, that block
+is re-pointed at `um-edit-01` and the rest of the set is added as new
+`describe`s. No production code or E2E is changed by this doc.
