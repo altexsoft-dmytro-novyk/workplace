@@ -33,11 +33,12 @@ actor from `00:00` effective regardless of worker state.
 - AD-1 gate, blank page: scenario docs → red E2E → implementation.
 - On `dueAt`, one transaction: close the active employment interval, insert the
   idempotent `dismissed` fact, deactivate account/profile (read-only, out of the
-  default list but still filterable), cancel open action items as
-  *cancelled — departed*, system-close active mentorship pairs with a system
-  note (bypassing the closure-note gate), end every persisted access assignment
-  the actor holds, mark the departure `applied`. Failure rolls all local effects
-  back.
+  default list but still filterable), cancel only open action items **assigned
+  to** the departing person as *cancelled — departed* (items they authored for
+  other, still-active assignees remain open), system-close active mentorship
+  pairs with a system note (bypassing the closure-note gate), end every
+  persisted access assignment the actor holds, mark the departure `applied`.
+  Failure rolls all local effects back.
 - **All access the departed person held ends immediately**, overriding the
   project 15-minute window. Request-time auth/AccessControl deny the actor from
   `00:00` effective in `effectiveTimeZone` regardless of worker delay.

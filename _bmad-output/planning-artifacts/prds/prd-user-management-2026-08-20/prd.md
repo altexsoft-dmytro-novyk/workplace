@@ -1,12 +1,25 @@
 ---
 title: User Management — PRD
-status: draft
+status: historical
 created: 2026-08-20
-updated: 2026-09-01
+updated: 2026-09-02
+superseded_by: _bmad-output/specs/spec-user-management-domain/SPEC.md
 ---
 
 # User Management — PRD
 
+> **Historical record.** Retained for decision and requirements traceability.
+> Do not use this document for new requirements or implementation dispatch.
+> Use the canonical People Management PRD and
+> `_bmad-output/specs/spec-user-management-domain/SPEC.md`.
+
+> **Stale relative to 2026-09-02 architecture (do not rewrite body as if current).**
+> CC-04 / People Partner design is resolved by PM/AD-19; remaining work is
+> implementation and AccessJournal enrolment (PM/AD-29). CC-06 / departure design
+> is resolved by PM/AD-20, PM/AD-22, PM/AD-23; remaining work is implementation
+> and named dependent blockers. Live authority is the canonical PM PRD, UM domain
+> SPEC, and PM spine — not this historical file.
+>
 > **Reconciled 2026-09-01** (sprint-change-proposal-2026-09-01-user-management-access-control-alignment).
 > The v1.5 BA alignment of this PRD was applied by the 2026-08-29 correct course
 > and is not re-litigated here. This pass folds in two deltas only: (a) the

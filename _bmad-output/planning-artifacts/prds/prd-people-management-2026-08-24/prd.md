@@ -1,15 +1,17 @@
 ---
 title: People Management Platform
-status: draft
+status: canonical
 created: 2026-08-24
-updated: 2026-08-29
+updated: 2026-09-02
+normative_source: docs/project-requirements.md@v1.5
+rebaseline: sprint-change-proposal-2026-09-02-people-management-rebaseline.md
 ---
 
 # PRD: People Management Platform
 
 ## 0. Document Purpose
 
-This PRD defines the **People Management Platform** for an internal engineering organisation (~500 employees). It is the product-requirements artifact for Team 7 (Lazy Load) in the AI-native SDLC Bootcamp 2.0 and the binding scope reference for UX, architecture, epics, and test design.
+This PRD defines the **People Management Platform** for an internal engineering organisation (~500 employees). It is the single canonical product interpretation for Team 7 (Lazy Load) in the AI-native SDLC Bootcamp 2.0 and the binding product-level scope reference for UX, architecture, epics, domain specs, and test design.
 
 **Structure:** Glossary-anchored vocabulary; features grouped with globally numbered functional requirements (FR-N); assumptions tagged inline and indexed in §12.
 
@@ -20,13 +22,51 @@ This PRD defines the **People Management Platform** for an internal engineering 
 | `docs/project-requirements.md` v1.5 | Primary functional and normative scope |
 | `_bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` | Architectural invariants and deferred topics |
 | `docs/architecture/access-control.md` | Access-control binding rules |
-| `AI SLDC Bootcamp 2.0 Resources/Decision Log.md` | Confirmed `DEC-*` decisions |
-| `AI SLDC Bootcamp 2.0 Resources/Open Questions.md` | Unresolved `OQ-*` gaps |
+| `AI SLDC Bootcamp 2.0 Resources/Decision Log.md` *(external)* | Confirmed `DEC-*` decisions |
+| `AI SLDC Bootcamp 2.0 Resources/Open Questions.md` *(external)* | Unresolved `OQ-*` gaps |
 | Market landscape research (2026) | Strategic positioning — see `addendum.md` |
 
 Technical implementation choices belong in `addendum.md` and downstream architecture — not in this document.
 
 **Source authority:** `docs/project-requirements.md` v1.5 is normative. Earlier decisions remain valid only where they do not contradict v1.5. The approved CC-02 Option 1 decision additionally defines how multiple simultaneously applicable access audiences combine; unresolved CC decisions remain explicit implementation gates in §11.
+
+### 0.1 Authority hierarchy
+
+1. `docs/project-requirements.md` v1.5 is the upstream normative assignment and grading source.
+2. This document is the canonical product PRD: it owns product FRs, journeys, MVP scope, NFRs, open product decisions, and product-level traceability.
+3. Approved architecture decisions and Correct Course proposals constrain implementation only within their stated scope; unresolved decisions remain gates.
+4. Domain specs decompose this PRD for a bounded context. They may add testable implementation detail but may not redefine product behavior.
+5. Epics, stories, compiled specs, test designs, and sprint trackers are downstream delivery artifacts.
+
+### 0.2 Historical records and identifier namespaces
+
+The former User Management and Mentorship PRDs are preserved unchanged as dated historical records. Their detail is carried forward through:
+
+- `_bmad-output/specs/spec-user-management-domain/SPEC.md`
+- `_bmad-output/specs/spec-mentorship-domain/SPEC.md`
+
+Existing epic files remain immutable bounded-context slices. The global cross-product rollup is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`.
+
+Identifiers are always namespaced outside their source document:
+
+- `PM-FR-*` — canonical product requirements in this PRD.
+- `UM-FR-*` — historical User Management requirement aliases.
+- `M-FR-*` — historical Mentorship requirement aliases.
+- `PLAT-E*`, `UM-E*`, `M-E*` — context-qualified epic and story identifiers.
+- `ACF-*`, `ACM-*`, `UMAC-*` — stable workboard identifiers; never reassigned.
+
+### 0.3 Delivery status vocabulary
+
+Requirement coverage uses six evidence-based states:
+
+- `implemented` — shipped behavior with implementation evidence.
+- `in-progress` — active implementation or review.
+- `specified` — a current story/spec exists but implementation is not active.
+- `deferred` — explicitly gated or outside the current delivery slice.
+- `superseded` — historical pointer retained for traceability.
+- `uncovered` — normative product behavior has no current delivery story.
+
+These states describe delivery evidence, not product priority or approval. A mapped requirement is not necessarily implemented.
 
 ---
 
@@ -125,7 +165,7 @@ Dmytro opens the risk dashboard scoped to people in his reporting line, filters 
 | **Employment status** | Time-bounded `active` or `dismissed` fact; the sole source for whether a person has departed (§4.16). |
 | **Tier** | Resolved access role of a viewer with respect to a specific target employee. |
 | **Policy attachment** | Data record linking a user to a managerial or functional capability scope. [ASSUMPTION: implementation uses unified policy model per architecture spine — see addendum.] |
-| **Action item** | Single task entity: manual or campaign-generated; lifecycle open → completed (or cancelled by author). |
+| **Action item** | Single task entity: manual or campaign-generated; lifecycle open → completed (assignee) or cancelled (author with reason). Effective departure cancels only open items assigned to the departing person. |
 | **Form campaign** | Audience-selected distribution of external form links as action items. |
 | **CDS** | Career Development System registry — links to external matrix/assessment files, conclusions, and IDP completion; does not host assessments. |
 | **Shared link** | Time-limited, revocable, read-only profile view for authenticated users without reporting-line, project-line, or PP access over the subject. |
@@ -134,6 +174,18 @@ Dmytro opens the risk dashboard scoped to people in his reporting line, filters 
 ---
 
 ## 4. Features
+
+### 4.0 Bounded-context ownership
+
+| Context | Product responsibility | Canonical FRs | Domain/decomposition authority |
+|---|---|---|---|
+| `access-control` | Access audiences, section decisions, functional permission evaluation, full-profile overlay | PM-FR-1–7, PM-FR-39–40 | Approved Access Control architecture/spec packages |
+| `user-management` | Seeded identity, authentication, profile identity, career events, organisational mutations, employment lifecycle, Access Control adoption | PM-FR-12–14, PM-FR-28–29, PM-FR-41–42 (partial) | `spec-user-management-domain/SPEC.md` |
+| `mentorship` | Availability, pair lifecycle, pool/read surfaces, cross-context effects | PM-FR-32–34 | `spec-mentorship-domain/SPEC.md` |
+| Platform capabilities | Directory, dashboards, action items, campaigns, risks, resourcing, sharing, CDS, feedback | PM-FR-8–11, PM-FR-15–27, PM-FR-30–31, PM-FR-35 | Future capability specs and global coverage model |
+| Timetracker integration | Leaves, projects/people, access freshness | PM-FR-36–37 | Future integration contract |
+
+Ownership does not imply implementation completeness. Current evidence and gaps are recorded in the global coverage model and architecture ratification package.
 
 ### 4.1 Access Control and Role Model
 
@@ -178,6 +230,7 @@ Profile and list responses are assembled from entitled sections only, after live
 **Consequences (testable):**
 - Negative tests exist for every `—` matrix cell, every audience, and representative relationship paths (Definition of Done §9).
 - Flag-gated records (S7, S8) respect per-record visibility independently of section tier.
+- HTTP denials follow one oracle: `401` for invalid or inactive session; `404` for a missing resource or a target whose existence is hidden from the actor (leak-free body); `403` for a visible resource where the feature or action is forbidden. List endpoints omit invisible rows. Hidden-target `404` precedes mutation permission checks. This resolves CONFLICT-UM-01 at product level; historical UMAC `403` empty-audience artifacts are stale and are not rewritten.
 
 #### FR-5: Custom field visibility inheritance
 
@@ -307,7 +360,7 @@ Same building blocks scoped to PP-assigned people; groupable by department or pr
 
 #### FR-19: Manual action item lifecycle
 
-Managers (UM/DM/PM) and PP — plus any functional role with create-action-items permission — create action items for people in their access scope. Fields: title, description, assignee, author, due date, optional link, status, completion date, source. Lifecycle: open → completed (assignee) or cancelled (author with reason). Overdue items visually distinguished.
+Managers (UM/DM/PM) and PP — plus any functional role with create-action-items permission — create action items for people in their access scope. Fields: title, description, assignee, author, due date, optional link, status, completion date, source. Lifecycle: open → completed (assignee) or cancelled (author with reason). Overdue items visually distinguished. Effective departure cancels only **open** items **assigned to** the departing person (`cancelled — departed`); items they authored for other active assignees remain open (FR-41).
 
 #### FR-20: Form campaign flow
 
@@ -424,13 +477,13 @@ All Employees supports date-of-last-assessment filters (before/after/between; ne
 
 **Description:** Pair formation, availability, visibility, and durable closure with a required pair closure note — no session tracking.
 
-**Bounded-context decomposition:** FR-32 / FR-33 / FR-34 are decomposed for implementation in the `mentorship` bounded-context PRD `_bmad-output/planning-artifacts/prds/prd-mentorship-2026-09-01/` and epics `_bmad-output/planning-artifacts/mentorship/epics.md` (both `draft`, 2026-09-01). Mentorship is its own bounded context (AD-17) — pairs are durable workflow records, never `Relationship` rows or access edges.
+**Bounded-context decomposition:** PM-FR-32 / PM-FR-33 / PM-FR-34 are decomposed in `_bmad-output/specs/spec-mentorship-domain/SPEC.md`. The former Mentorship PRD and its draft epic file are retained as historical source evidence. Mentorship is its own bounded context (AD-17) — pairs are durable workflow records, never `Relationship` rows or access edges.
 
 **Functional Requirements:**
 
 #### FR-32: Self-service mentorship status
 
-Employee marks themselves open to mentoring and sees assigned mentor/mentees. Clearing the flag removes the employee from the future mentor pool but does not alter any active pair; status remains `mentor` while an active mentee exists.
+Employee marks themselves open to mentoring and sees assigned mentor/mentees. Clearing the flag removes the employee from the future mentor pool but does not alter any active pair; status remains `mentor` while an active mentee exists. Effective departure clears the flag in the same transaction as pair auto-close. Returning to `active` employment does not restore availability; the person must opt in again.
 
 #### FR-33: Mentorship assignment and closure
 
@@ -440,7 +493,7 @@ Closure notes are readable by Reporting line, Project line, and PP only; they ar
 
 #### FR-34: Mentorship hub views
 
-Company-wide willing-mentor pool showing S1 identity data plus availability, without exposing S13; scoped mentee assignment flow; active and ended pairs with dates and status; filterable mentorship status on All Employees.
+Company-wide willing-mentor pool of **active** employees showing S1 identity data plus availability, without exposing S13; dismissed people are excluded even if a leftover flag exists; scoped mentee assignment flow; active and ended pairs with dates and status; filterable mentorship status on All Employees.
 
 ---
 
@@ -490,9 +543,9 @@ Grade, seniority, employee type, department, manager, People Partner, contract d
 
 #### FR-41: Employment status and departure
 
-Employment status values are `active` and `dismissed`. An authorized HR actor records a departure with an effective date and reason under the *record a departure* permission. Recording is blocked while the person still manages a reporting line or department, manages a project, or is assigned as anybody's People Partner; the UI prompts the actor to re-parent those relationships first.
+Employment status values are `active` and `dismissed`. An authorized HR actor records a departure with an effective date and reason under the *record a departure* permission. Recording is blocked while the person still manages or partners anybody through a platform-owned manager, department-manager, or People Partner relationship; the UI prompts the actor to re-parent those relationships first. This does not add a separate project-management block beyond the normative rule.
 
-On the effective date, the profile becomes read-only and leaves the default employee list while remaining filterable; open action items become `cancelled — departed`; active mentorship pairs auto-close with a system note; the account deactivates; and every access held by the departed person ends immediately. Departure is never written as a career-timeline event.
+On the effective date, the profile becomes read-only and leaves the default employee list while remaining filterable; only open action items **assigned to** the departing person become `cancelled — departed` (authored-for-others stay open); the open-to-mentoring flag is cleared and dismissed people are excluded from the willing-mentor pool; active mentorship pairs auto-close with a system note; the account deactivates; and every access held by the departed person ends immediately. Departure is never written as a career-timeline event. Rehire does not restore mentorship availability without explicit opt-in.
 
 ---
 
@@ -503,6 +556,12 @@ On the effective date, the profile becomes read-only and leaves the default empl
 #### FR-42: Nested department management
 
 Every employee belongs to **one or more** departments *(amended 2026-09-02 — was "exactly one"; §4.17, `database-schema.md` §Project/Department)* and departments may nest. Managing a department grants Reporting-line access to everyone in it and its sub-departments; an employee is reachable through any of their departments. Department maintenance requires the *manage departments* permission; changing employee membership or a department manager additionally follows FR-7's organisational-relationship rules. A department change writes a career-timeline event, and the CDS matrix lookup keys on department entity plus position.
+
+### 4.17 User Management domain decomposition
+
+User Management owns the seeded `User` identity anchor, magic-link authentication, S1 identity maintenance, career timeline events, platform-owned organisational mutations, employment status/departure, and adoption of the Access Control facade on `/users` routes. Detailed contracts are defined in `_bmad-output/specs/spec-user-management-domain/SPEC.md`.
+
+It does not own the Access Control matrix engine, Mentorship pairs, Timetracker synchronization, or department-administration product UX. The former User Management PRD and context-local epics remain historical decomposition evidence and do not override this PRD.
 
 ---
 
@@ -544,7 +603,7 @@ Notifications (§4.13) are out of MVP scope. When implemented, these invariants 
 - Real timetracker integration (leaves + projects/people) over the seeded population — required.
 - PeopleForce optional prefill button (§5.2) — good-to-have; candidate ID storage and external link acceptable without integration.
 - **Department entity** — normative in SoT §4.17 (v1.5), including nesting, exactly-one employee membership, Reporting-line access, and resourcing routing. Schema detail remains an architecture concern (addendum).
-- Temporal employment status and the departure workflow (FR-41); effective-date executor implementation remains blocked on CC-06.
+- Temporal employment status and the departure workflow (FR-41); effective-date executor **implementation** remains blocked on CC-06 (design resolved by PM/AD-20/22/23).
 - Bootcamp engineering process requirements (BMAD, foundation phase, parallel decomposition, intelligent repository, three-stage quality gate).
 - Deployed demonstrable environment — not laptop-only.
 
@@ -624,18 +683,15 @@ Only unresolved product and architecture gates are listed here. Closed v1.5 ques
 
 | ID | Question | Impact | Escalation |
 |----|----------|--------|------------|
-| OQ-105 | HR Admin grant/revoke chain for the HR Admin functional role | Admin UX | Product Owner |
-| OQ-114 | Custom-field storage (EAV vs JSONB) | FR-8 — **blocks Wave 1 directory kickoff** | Architect (Dmytro Novyk): record AD by **foundation-phase close**. **Column-per-field excluded** (`docs/project-requirements.md` §6) |
-| OQ-115 | Dashboard widget access model | FR-15–18 — **blocks dashboard Wave kickoff** | Architect (Dmytro Novyk): record AD by **foundation-phase close** |
-| OQ-116 | Non-manager project assignment (info-sec case) | Policy targetRole values | Stakeholders |
-| OQ-117 | Profile bounded context boundary | Repo structure | Architect |
 | OQ-121 | Token usage tracking for bootcamp | Process measurement | Bootcamp organizers |
 | OQ-122 | Agent rule-loading for architecture docs | Dev experience | Architect |
-| CC-04 | People Partner assignment storage and write contract | Blocks PP relationship implementation and journal schema | Product Owner + Architect |
-| CC-05 | Self versus full-profile access precedence | Blocks full-profile projection scenarios | Product Owner + Architect |
-| CC-06 | Representable scheduled departure state and effective-date executor | Blocks FR-41 implementation | Product Owner + Architect |
+| CC-04 | People Partner mutation — **design resolved** (PM/AD-19); remaining work is implementation and AccessJournal enrolment (PM/AD-29) | Blocks PP route delivery, not redesign | Product Owner + Architect |
+| CC-06 | Departure executor — **design resolved** (PM/AD-20, PM/AD-22, PM/AD-23); remaining work is implementation, AD-23 participants, fencing/idempotency proof, and operational release gate | Blocks FR-41 production delivery. Still blocked by CC-07/CC-08/CC-09 implementation and OPERATIONAL-ENVELOPE | Product Owner + Architect |
+| CC-07 | Relationship and grant journal — design approved (PM/AD-29); table absent | Blocks FR-7/FR-40 implementation | Product Owner + Architect |
+| OQ-PERM-01 | Default holders for manage-custom-fields, assign/end-mentorships, approve/reject candidates, edit-career-timeline, and create-feedback permissions | Blocks seed/default role matrix. **Stays open** until a later PO batch. Do not invent grants. | Product Owner |
+| OQ-AC-EDIT | Whether `user-management:edit` and mentorship write permissions enter the kernel seed or a separately approved increment | Blocks complete dual-gate writes | Product Owner + Architect |
 
-**Recently resolved (see Decision Log and Correct Course records):** OQ-101–OQ-104, OQ-106, OQ-108–OQ-113, OQ-118–OQ-119; CC-02 Option 1; CC-03 Option 1; CC-11 Option 1; M8 Option 1.
+**Recently resolved (see Decision Log and Correct Course records):** OQ-101–OQ-104, OQ-106, OQ-108–OQ-113, OQ-118–OQ-119; CC-02 Option 1; CC-03 Option 1; CC-11 Option 1; M8 Option 1; CONFLICT-UM-01 (HTTP 401/404/403); OQ-105 (PM/AD-26); OQ-114 (PM/AD-32); OQ-115 (PM/AD-33); OQ-116 (PM/AD-27); OQ-117 (PM/AD-34); CC-05 (PM/AD-28). Architecture journal/events/project-writer/department designs are PM/AD-29..AD-31 and PM/AD-35 — implementation still absent. Historical OQ-118/OQ-119 and CC-11 Option 1 meanings are preserved; architecture envelope/project-writer blockers use `ARCH-ENV-01` and `ARCH-PROJ-WRITER-01` (do not collide with those historical IDs).
 
 Resolved decisions are incorporated only where they remain consistent with normative v1.5.
 
@@ -645,15 +701,52 @@ These must land **before the named wave starts**, not before foundation phase be
 
 | Condition | Owner | Blocks |
 |-----------|-------|--------|
-| OQ-114 resolved: custom-field storage pattern confirmed (column-per-field excluded) | Architect (Dmytro Novyk) | FR-8, Wave 1 directory |
-| OQ-115 resolved: dashboard widget access model confirmed | Architect (Dmytro Novyk) | FR-15–18, dashboard Wave |
-| CC-04 resolved: PP assignment storage and lifecycle approved | Product Owner + Architect | FR-7, FR-40, PP implementation |
-| CC-06 resolved: scheduled departure state/executor approved | Product Owner + Architect | FR-41, UM Epic 5 implementation |
+| OQ-114 resolved: typed EAV custom-field storage (PM/AD-32); jsonb bag is transition debt | Architect | FR-8, Wave 1 directory |
+| OQ-115 resolved: four fixed dashboard read models (PM/AD-33) | Architect | FR-15–18, dashboard Wave |
+| CC-04 design resolved (PM/AD-19); implementation + AccessJournal enrolment (PM/AD-29) still open | Product Owner + Architect | FR-7, FR-40, PP implementation |
+| CC-06 design resolved (PM/AD-20/22/23); executor/participants/ops proof still open | Product Owner + Architect | FR-41, UM Epic 5 implementation |
+| CC-07 design resolved: AccessJournal (PM/AD-29); implementation still absent | Product Owner + Architect | FR-7, FR-40, relationship mutation implementation |
 
 ---
 
 ## 12. Assumptions Index
 
-- **A-1:** Authoritative scope is `docs/project-requirements.md` v1.5.
 - **A-2:** Policy-attachment access engine per architecture spine implements FR-1–FR-4 without PRD-level mechanism detail (see addendum).
 - **A-7:** Production retention remains an unresolved governance input. No retention mechanism is added to MVP scope without an approved requirement.
+
+---
+
+## 13. Product Traceability Index
+
+The machine-readable row-level model is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`. This index defines product ownership; it does not duplicate every story edge.
+
+| Normative source | Canonical product FRs | Primary domain/capability | Current delivery posture |
+|---|---|---|---|
+| §2–§3 | PM-FR-1–7, PM-FR-39–40 | Access Control | Kernel implemented; broader matrix/adoption partial or gated |
+| §4.1 | PM-FR-8–11 | Directory | Uncovered beyond partial User list |
+| §4.2–§4.3 | PM-FR-12–14 | User Management | Partial/in transition |
+| §4.4 | PM-FR-15–18 | Dashboards | Uncovered; architecture gate open |
+| §4.5, §4.12 | PM-FR-19–20 | Tasks/Campaigns | Uncovered |
+| §4.6 | PM-FR-21–22 | Risk | Uncovered |
+| §4.7 | PM-FR-23–26 | Resourcing | Uncovered |
+| §4.8 | PM-FR-27 | Sharing | Uncovered |
+| §4.9 | PM-FR-28–29 | User Management | Specified/gated |
+| §4.10 | PM-FR-30–31 | CDS | Uncovered |
+| §4.11 | PM-FR-32–34 | Mentorship | Specified/blocked; not implemented |
+| §4.15 | PM-FR-35 | Feedback | Uncovered |
+| §5.1 | PM-FR-36–37 | Timetracker integration | Uncovered |
+| §5.2 | PM-FR-38 | PeopleForce prefill | Deferred/good-to-have |
+| §4.16 | PM-FR-41 | User Management | Specified/blocked |
+| §4.17 | PM-FR-42 | User Management/Departments | Partial and gated |
+
+## 14. Product Definition of Done
+
+The normative Definition of Done remains `docs/project-requirements.md` §9. Product completion requires both implemented behavior and evidence; a PRD, domain spec, epic, scenario, red E2E test, or architecture ratification alone is not implementation proof.
+
+At product level:
+
+- Every PM-FR has an explicit global coverage state and evidence pointer.
+- Normative access-control negative tests pass for every applicable audience, path, and section.
+- Timetracker integration operates against the required test environment.
+- Runtime role extensibility, directory performance, deployment, and process evidence meet SM-1–SM-5.
+- Specs match shipped behavior, and transition debt is either retired or explicitly accepted for a non-production slice.

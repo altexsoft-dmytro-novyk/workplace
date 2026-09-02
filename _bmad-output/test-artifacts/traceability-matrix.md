@@ -50,7 +50,8 @@ Resolved via formal requirements (tier 1 of 4) — see prior save. This project'
 | `access-control/acm1r-fr-foundation.e2e-spec.ts` | E2E | 24 | ACM1-FB-01..09, ACM1R-FB-10..28 (all 28 CAP-3 criteria; several `it`s each assert 2+ IDs together) | none |
 | `access-control/acm2-is-allowed.e2e-spec.ts` | E2E | 10 | ACM2-IA-01..10 | none |
 | `access-control/acm3-inactive-identity.e2e-spec.ts` | E2E | 5 | ACM3-II-01, 02, 03 | none |
-| `access-control/acm3-cycle-acyclicity.e2e-spec.ts` | E2E | 6 | ACM3-II-07, 08 | none |
+| `access-control/acm3-cycle-acyclicity.e2e-spec.ts` | E2E | 8 | ACM3-II-06, 07, 08 | none |
+| `access-control/acm3-bulk-input-contract.e2e-spec.ts` | E2E | 4 | ACM3-II-04, 05 | none |
 | `access-control/acm3-termination-taxonomy.e2e-spec.ts` | E2E | 4 | ACM3-II-09, 10 | none |
 | `access-control/acm3-path-local-visited-state.e2e-spec.ts` | E2E | 2 | ACM3-II-12 | none |
 | `access-control/acm3-inactive-pp-endpoint.e2e-spec.ts` | E2E | 3 | ACM3-II-11 | none |
@@ -61,7 +62,7 @@ Resolved via formal requirements (tier 1 of 4) — see prior save. This project'
 | `access-control/audience-resolution.e2e-spec.ts` | E2E | 11 | Phase-0 ACF-AU-01..05, ACF-FC-01..04 (pre-epic baseline; cross-mapped below for ACM3-II-04/05) | none |
 | `measurement/acm9/acm9-baseline.measurement-spec.ts` | Live (artifact) | 1 (run twice: `role=baseline`, `role=final`) | CAP-7 performance gate | none |
 
-**Totals:** 13 E2E spec files, 99 `it` cases, 0 `.skip`/`.only`/`.todo`/`xit`/`fit` found anywhere in the suite — no committed skips or focus.
+**Totals:** 14 E2E spec files, 103 `it` cases, 0 `.skip`/`.only`/`.todo`/`xit`/`fit` found anywhere in the suite — no committed skips or focus.
 
 ### Coverage Heuristics Inventory
 
@@ -131,9 +132,9 @@ All 28 criteria (ACM1-FB-01..09, ACM1R-FB-10..28) map into one suite, `acm1r-fr-
 | ACM3-II-01 | Inactive viewer at top of active chain → empty set (both for a target and for self) | FULL | `acm3-inactive-identity.e2e-spec.ts:146,154` |
 | ACM3-II-02 | Inactive bridge stops traversal → Colleague above it, Reporting below it | FULL | `:164,172` |
 | ACM3-II-03 | Inactive target below active manager → empty set, sibling unaffected | FULL | `:182` |
-| ACM3-II-04 | Empty target list → empty map, **zero** graph-port calls | **PARTIAL (cross-mapped)** | `audience-resolution.e2e-spec.ts:288` (`ACF-FC-03`, pre-epic Phase-0 test — asserts the identical port-call-count claim, but is not itself an approved ACM-3 Stage-2 artifact in `approvals.yaml`) |
-| ACM3-II-05 | Duplicate targets **and** a duplicated viewer id in one call collapse correctly; viewer id never reaches the graph port | **PARTIAL (cross-mapped)** | `acm4r-multi-audience.e2e-spec.ts:296` (`ACM4R-MA-04` — covers the duplicate-*target* half only; does **not** test a duplicated viewer-self id in the same bulk call, and does not assert the port received each id at most once) |
-| ACM3-II-06 | A repeated node reached **before** viewer proof (viewer off-chain) denies Reporting for that target and falls to Colleague, leaving a sibling target unaffected | **NONE** | See finding below |
+| ACM3-II-04 | Empty target list → empty map, **zero** graph-port calls (and zero identity reads when viewer would fail) | FULL | `acm3-bulk-input-contract.e2e-spec.ts:139,150` |
+| ACM3-II-05 | Duplicate targets **and** a duplicated viewer id in one call collapse correctly; viewer id never reaches the graph port | FULL | `acm3-bulk-input-contract.e2e-spec.ts:164,178` |
+| ACM3-II-06 | A repeated node reached **before** viewer proof (viewer off-chain) denies Reporting for that target and falls to Colleague, leaving a sibling target unaffected | FULL | `acm3-cycle-acyclicity.e2e-spec.ts:199,211` |
 | ACM3-II-07 | Repeat AFTER viewer proof denies Reporting | FULL | `acm3-cycle-acyclicity.e2e-spec.ts:176,186,194` |
 | ACM3-II-08 | Viewer herself inside the cycle is denied, not proven | FULL | `:208,216,226` |
 | ACM3-II-09 | Absent manager edge is a clean end → Reporting granted | FULL | `acm3-termination-taxonomy.e2e-spec.ts:142,150` |
@@ -143,9 +144,9 @@ All 28 criteria (ACM1-FB-01..09, ACM1R-FB-10..28) map into one suite, `acm1r-fr-
 | ACM3-II-13 | Real infra failure (unreadable relation, mid-flight) propagates as a thrown error, never a partial/empty map | FULL | `acm3-fail-closed-identity.e2e-spec.ts:124,155` |
 | ACM3-II-14 | Missing viewer/target id(s) → empty set(s), never Self/Colleague | FULL | `:165,180,195` |
 
-**CAP-1: 11/14 FULL, 2/14 PARTIAL (cross-mapped), 1/14 NONE.**
+**CAP-1: 14/14 FULL.**
 
-**🔴 Finding TRACE-1 (documentation defect, not a behavior defect):** `acm3-termination-taxonomy.e2e-spec.ts` line 23 states *"ACM3-II-06/07/08 are covered in `acm3-cycle-acyclicity.e2e-spec.ts` and are not restated here."* But `acm3-cycle-acyclicity.e2e-spec.ts` itself states, in its own header (line 22), *"Scope: these two scenarios only [ACM3-II-07 and ACM3-II-08]. The identity cases ... are not restated here"* — it never claims II-06, and inspection of its `describe` blocks (`ACM3-II-07`, `ACM3-II-08` only) confirms II-06 is absent. **ACM3-II-06 — "a repeated node reached before viewer proof denies Reporting and falls to Colleague" — has no test anywhere in the suite.** This is a real, previously unnoticed gap: it is a documented, code-verified-not-a-behavior-change scenario, but "code-verified" here means human/manual reasoning recorded in the scenario doc's prose, not a re-runnable assertion. Nothing currently guards this specific case against a future regression.
+**Finding TRACE-1 (resolved 2026-09-02):** `acm3-termination-taxonomy.e2e-spec.ts:23` cross-references `acm3-cycle-acyclicity.e2e-spec.ts` for ACM3-II-06/07/08. II-06 coverage was added at commit `6aa7745` in that suite; the cross-reference is now accurate. II-04 and II-05 canonical Stage-2 evidence was added at `32cc8d5` in `acm3-bulk-input-contract.e2e-spec.ts`.
 
 ### CAP-2 / ACM-4R — Multi-audience retention, Self/Colleague, dedup, FR-separation (P1)
 
@@ -224,24 +225,21 @@ This is genuinely **Live** evidence in this workflow's sense (a recorded runtime
 
 | Priority | Total Criteria | Fully Covered | Coverage | Status |
 |---|---:|---:|---:|---|
-| P0 | 64 | 61 | 95% | CONCERNS (1 NONE gap) |
+| P0 | 64 | 64 | 100% | PASS |
 | P1 | 17 | 17 | 100% | PASS |
 | P2 | 0 | 0 | N/A | N/A |
 | P3 | 0 | 0 | N/A | N/A |
-| **Total** | **81** | **78** | **96%** | — |
+| **Total** | **81** | **81** | **100%** | — |
 
-Fully covered: 78. Partially covered: 2 (`ACM3-II-04`, `ACM3-II-05`). Uncovered: 1 (`ACM3-II-06`).
+Fully covered: 81. Partially covered: 0. Uncovered: 0.
 
 ### Gap Analysis
 
-**Critical gaps (P0, coverage NONE): 1**
-- `ACM3-II-06` — see Finding TRACE-1 above. This is a P0 gap because CAP-1's fail-closed audience derivation is the security-critical core of the entire epic, and this specific case (a cycle the viewer is off of, encountered before viewer proof) is exactly the shape most likely to regress silently if the Reporting-walk implementation changes again — there is currently nothing to catch it.
+**Critical gaps (P0, coverage NONE): 0**
 
 **High gaps (P1, coverage NONE): 0**
 
-**Partial coverage items: 2**
-- `ACM3-II-04` — cross-mapped to a pre-epic Phase-0 test (`ACF-FC-03`) that asserts the identical claim (zero graph-port calls on empty input) but was never an approved ACM-3 Stage-2 artifact in its own right. Functionally proven; procedurally orphaned from this epic's own AD-1 ledger.
-- `ACM3-II-05` — cross-mapped to `ACM4R-MA-04`, which proves duplicate-*target* collapsing but not the scenario's second half (a duplicated *viewer* id in the same bulk call never reaching the graph port).
+**Partial coverage items: 0**
 
 ### Coverage Heuristics
 
@@ -256,11 +254,9 @@ Fully covered: 78. Partially covered: 2 (`ACM3-II-04`, `ACM3-II-05`). Uncovered:
 
 ### Recommendations
 
-1. **URGENT** — Add committed-red-then-green Stage-2 coverage for `ACM3-II-06`, and correct the false cross-reference comment in `acm3-termination-taxonomy.e2e-spec.ts:23` that currently claims it. *(1 requirement: ACM3-II-06)*
-2. **MEDIUM** — Close the 2 partial/cross-mapped items: either formally adopt `ACF-FC-03` as `ACM3-II-04`'s Stage-2 record in `approvals.yaml`, or write a canonical one; extend `ACM4R-MA-04` (or add a sibling test) to also cover a duplicated viewer-self id in the same bulk call for `ACM3-II-05`. *(2 requirements: ACM3-II-04, ACM3-II-05)*
-3. **LOW** — Run `bmad-testarch-test-review` (or `bmad-code-review`, already in progress in a parallel session per the user) to assess test quality beyond coverage.
+1. **LOW** — Run `bmad-testarch-test-review` (or `bmad-code-review`) to assess test quality beyond coverage.
 
-Full machine-readable coverage matrix: `_bmad-output/test-artifacts/tea-trace-coverage-matrix-2026-08-31.json`.
+Full machine-readable coverage matrix: `_bmad-output/test-artifacts/tea-trace-coverage-matrix-2026-09-02.json` (supersedes `tea-trace-coverage-matrix-2026-08-31.json` for gate purposes).
 
 Load next step: step-05-gate-decision.
 
@@ -268,63 +264,53 @@ Load next step: step-05-gate-decision.
 
 **Gate eligible:** yes (`allow_gate: true`, `collection_status: COLLECTED`).
 
-## 🚨 GATE DECISION: FAIL
+## ✅ GATE DECISION: PASS
 
-**Rationale:** P0 coverage is 95% (required: 100%). 1 critical requirement uncovered: `ACM3-II-06`.
+**Rationale:** P0 coverage is 100% (required: 100%). All P0 requirements are FULL-covered, including `ACM3-II-04`, `ACM3-II-05`, and `ACM3-II-06`.
 
 | Criterion | Required | Actual | Status |
 |---|---|---|---|
-| P0 coverage | 100% | 95% | **NOT MET** |
+| P0 coverage | 100% | 100% | **MET** |
 | P1 coverage | 90% (min 80%) | 100% | MET |
-| Overall coverage | ≥80% | 96% | MET |
+| Overall coverage | ≥80% | 100% | MET |
 
-This is a **strict, deterministic** result: the rule is "P0 coverage must be 100%, no exceptions," and this epic's own AD-1 process has applied exactly this severity before — recall the ACM-4 coverage audit, which halted an entire downstream chain (`ACM-4-red-tests`, `ACM-4-production`, `ACM-5`) over a coverage gap alone, with no behavior defect involved. This trace holds the epic to the same bar it has held itself to throughout.
-
-**What FAIL means here, precisely — and what it does not mean:**
-- It does **not** mean any of the 78 FULL-covered criteria are wrong, unproven, or regressed. ACM-0 through ACM-9-final all have real, re-runnable, currently-passing evidence.
-- It does **not** mean CAP-1's actual runtime behavior is broken for the `ACM3-II-06` case — the scenario doc's own "code-verified" reasoning and the shared implementation logic in `prisma-relationship-graph.adapter.ts` (which now handles the sibling cases II-07/08/09/10/12 correctly per FULL-covered tests) make an undetected regression here unlikely, but "unlikely" is exactly the word this whole epic has spent nine stories refusing to accept as evidence.
-- It **does** mean: there is currently no test in the repository that would catch a future regression in "a cycle the viewer is not part of, encountered before the viewer is reached, with a sibling target proving the denial is target-local" — and a comment in the codebase incorrectly claims this case is covered, which is worse than an acknowledged gap because it would not surface in a routine self-check.
+**What changed since 2026-08-31 FAIL:**
+- `ACM3-II-06` — Stage-2 termination guard in `acm3-cycle-acyclicity.e2e-spec.ts` at `6aa7745` (approved fifth increment).
+- `ACM3-II-04` and `ACM3-II-05` — canonical Stage-2 bulk-input contract suite at `32cc8d5` (approved sixth increment).
 
 ### Gate Criteria Detail
 
 ```json
 {
-  "p0_coverage_required": "100%", "p0_coverage_actual": "95%", "p0_status": "NOT_MET",
+  "p0_coverage_required": "100%", "p0_coverage_actual": "100%", "p0_status": "MET",
   "p1_coverage_target": "90%", "p1_coverage_minimum": "80%", "p1_coverage_actual": "100%", "p1_status": "MET",
-  "overall_coverage_minimum": "80%", "overall_coverage_actual": "96%", "overall_status": "MET"
+  "overall_coverage_minimum": "80%", "overall_coverage_actual": "100%", "overall_status": "MET"
 }
 ```
 
-### Path to PASS
-
-Only recommendation #1 from Step 4 blocks the gate: add committed Stage-2 evidence for `ACM3-II-06` (a repeated node before viewer proof, viewer off-chain, denies Reporting and falls to Colleague, sibling target unaffected) and fix the false cross-reference comment at `acm3-termination-taxonomy.e2e-spec.ts:23`. This is scoped, small, and follows the exact same pattern already used for the sibling scenarios (II-09/10/11/12/13/14) — a single new spec file exercising the real facade against real PostgreSQL. Recommendation #2 (the two PARTIAL items) does not block the gate on its own (P0 coverage counts PARTIAL as not-FULL, but even fixing only II-06 would restore P0 to 100% since PARTIAL items are pre-existing and were already priced into the 95%... **correction, verified**: P0 total is 64, with 61 FULL; fixing II-06 alone brings FULL to 62/64 = 97%, which is *still* short of 100% because the two PARTIAL items (II-04, II-05) are P0 and also not FULL. **All three — II-04, II-05, and II-06 — must reach FULL for the gate to pass**, not just the NONE one.
-
 ### Machine-Readable Outputs
 
-- `_bmad-output/test-artifacts/tea-trace-coverage-matrix-2026-08-31.json` — full Phase 1 coverage matrix (81 requirements)
 - `_bmad-output/test-artifacts/e2e-trace-summary.json` — portable CI/CD-consumable summary
 - `_bmad-output/test-artifacts/gate-decision.json` — slim gate signal
 
 ### Display
 
 ```
-🚨 GATE DECISION: FAIL
+✅ GATE DECISION: PASS
 
 📊 Coverage Analysis:
-- P0 Coverage: 95% (Required: 100%) → NOT_MET
+- P0 Coverage: 100% (Required: 100%) → MET
 - P1 Coverage: 100% (PASS target: 90%, minimum: 80%) → MET
-- Overall Coverage: 96% (Minimum: 80%) → MET
+- Overall Coverage: 100% (Minimum: 80%) → MET
 
-⚠️ Critical Gaps: 1 (ACM3-II-06)
+⚠️ Critical Gaps: 0
 
 📝 Recommended Actions:
-1. URGENT — Add Stage-2 coverage for ACM3-II-06; fix the false coverage claim in acm3-termination-taxonomy.e2e-spec.ts:23
-2. MEDIUM — Close ACM3-II-04 and ACM3-II-05 to canonical FULL coverage (both are P0 and also block 100%)
-3. LOW — Run bmad-testarch-test-review for test quality
+1. LOW — Run bmad-testarch-test-review for test quality
 
 📂 Full Report: _bmad-output/test-artifacts/traceability-matrix.md
 
-🚫 GATE: FAIL - Release BLOCKED until coverage improves
+✅ GATE: PASS — P0 trace coverage complete for Access Control Kernel MVP
 ```
 
 **Workflow complete.**

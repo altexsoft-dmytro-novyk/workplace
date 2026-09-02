@@ -1,0 +1,233 @@
+version: 2
+baseline_date: 2026-09-02
+revision: 2026-09-02-reviewer-gate-correction
+policy:
+  meaning: Dated implementation deviation from a ratified target decision
+  retirement_rule: Retire only with linked, independently approved production evidence
+  severity_rule: >
+    Severity reflects the consequence if the deviation reaches a shared environment, not
+    the effort to retire it. A deviation that defeats an authorization invariant is P0
+    even while it is latent.
+items:
+  - id: TD-01
+    severity: P0
+    deviation: User Management binds InterimAccessControlAdapter; target checks can allow any resolved user
+    decisions: [AD-6, AD-9, AD-12, AD-21]
+    owner: UM-E0-S0.1
+    expiry_trigger: UMAC-1 reaches approved production and the interim adapter is removed
+    evidence: services/backend/src/user-management/user-management.module.ts
+  - id: TD-02
+    severity: P0
+    previous_severity: P1
+    rescoped: 2026-09-02-reviewer-gate-update
+    deviation: >
+      InterimSessionResolverAdapter, bound into the production module, accepts any
+      fixture-style bearer identity AND self-provisions a privileged account. A request
+      carrying Bearer <token:Root> against a database with no seeded root creates a User
+      row with position 'HR Admin', which InterimAccessControlAdapter then grants
+      user-management:create, user-management:deactivate, and user-management:list.
+    decisions: [AD-12, AD-15, AD-16, AD-21]
+    previous_decisions: [AD-15, AD-21]
+    owner: UM-E2
+    expiry_trigger: Magic-link session implementation reaches approved production
+    deploy_gate: >
+      Must fail closed or be removed from the production module before the backend is
+      deployed to any shared environment. This gate is independent of the expiry trigger.
+    exposure: >
+      Latent, not live. The backend is not containerized in docker-compose.yml and is not
+      deployed, so there is no exploitable surface today.
+    blocker: SEC-AUTH-01
+    evidence:
+      - services/backend/src/user-management/infrastructure/interim-session-resolver.adapter.ts:43-48
+      - services/backend/src/user-management/infrastructure/interim-session-resolver.adapter.ts:74-87
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts:11-14
+      - services/backend/src/user-management/user-management.module.ts
+    rescope_reason: >
+      The previous description covered only the persona-token path and omitted root
+      self-provisioning entirely, which is the part that bypasses the Access Control
+      spine's bootstrap contract and contradicts AD-12's stated Prevents and AD-16's
+      no-provisioning-API rule.
+  - id: TD-03
+    severity: P1
+    deviation: Legacy POST /users and DELETE /users/:id remain available
+    decisions: [AD-14, AD-16, AD-21]
+    owner: UM-E1
+    expiry_trigger: Seeded-import and departure cutover removes both legacy product operations
+    evidence: services/backend/src/user-management/application/controllers/users.controller.ts
+  - id: TD-04
+    severity: P0
+    rescoped: 2026-09-02-reviewer-gate-update
+    deviation: >
+      The whole-row toUserResponse serializer is applied by every User handler, not only
+      GET /users/:id, so a broader User shape than the target S1 envelope is returned by
+      six routes including the GET /users list. Independently, the target-scoped
+      authorization behind three of those routes is unconditional: isAllowedForTarget
+      returns Boolean(userId) regardless of feature or target, so PATCH /users/:id and
+      PUT /users/:id/photo are as ungated as GET /users/:id.
+    previous_deviation: GET /users/:id serializes a broader User shape than the target S1 envelope
+    decisions: [AD-12, AD-14, AD-21]
+    owner: UM-E0-S0.1
+    expiry_trigger: >
+      The S1 projection reaches approved production on ALL six affected routes, AND
+      target-scoped authorization is real on all three target-scoped routes. Retiring this
+      item on the UMAC-1 slice alone is insufficient: that slice scopes the S1 projection
+      to the GET /users/:id handler, which would leave five whole-row routes - including
+      the GET /users list - still emitting non-S1 fields under a retired P0.
+    previous_expiry_trigger: UMAC-1 S1 projection reaches approved production
+    expiry_trigger_corrected: 2026-09-02-reviewer-gate-update
+    affected_routes:
+      - GET /users
+      - POST /users
+      - GET /users/:id
+      - PATCH /users/:id
+      - PUT /users/:id/photo
+      - DELETE /users/:id
+    ungated_target_routes:
+      - GET /users/:id
+      - PATCH /users/:id
+      - PUT /users/:id/photo
+    evidence:
+      - services/backend/src/user-management/application/dtos/user.response.ts
+      - services/backend/src/user-management/application/controllers/users.controller.ts:65
+      - services/backend/src/user-management/application/controllers/users.controller.ts:76
+      - services/backend/src/user-management/application/controllers/users.controller.ts:84
+      - services/backend/src/user-management/application/controllers/users.controller.ts:90
+      - services/backend/src/user-management/application/controllers/users.controller.ts:104
+      - services/backend/src/user-management/application/controllers/users.controller.ts:112
+      - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts:37
+    rescope_reason: >
+      The previous scope was read-only and single-route. Both narrowings understated the
+      risk relative to the spine this package ratifies, which already recorded the
+      unconditional target check. POST /users and DELETE /users/:id are additionally
+      covered by TD-03 as legacy operations.
+  - id: TD-05
+    severity: P2
+    previous_severity: P3
+    rescoped: 2026-09-02-reviewer-gate-update
+    deviation: >
+      MagicLinkDispatcherFake is bound in the production module providers, not scoped to
+      tests. Under AD-15 a fake standing in for a real external integration must be named
+      and owned; this one ships in the production composition.
+    previous_deviation: Magic-link dispatcher is a scoped external-integration fake
+    decisions: [AD-15]
+    owner: UM-E2
+    expiry_trigger: Approved real dispatcher is required for the target environment
+    deploy_gate: >
+      No magic link is actually dispatched in any environment running this module, so
+      production magic-link authentication cannot function until the real adapter lands.
+    evidence:
+      - services/backend/src/user-management/user-management.module.ts:34
+      - services/backend/src/user-management/infrastructure/magic-link-dispatcher.fake.ts
+    rescope_reason: >
+      The previous wording described the fake as scoped, which the module binding
+      contradicts. Severity raised because the deviation is present in the production
+      composition rather than confined to the test seam.
+  - id: TD-06
+    severity: P1
+    deviation: Project-line and department audience traversal are not implemented
+    decisions: [AD-10, AD-13]
+    owner: access-control-deferred-work
+    expiry_trigger: Approved Timetracker and Department edge contracts reach production
+    evidence: _bmad-output/implementation-artifacts/access-control/deferred-work.md
+  - id: TD-07
+    severity: P1
+    deviation: canAccessSection supports only the implemented base section slice
+    decisions: [AD-10, AD-17]
+    owner: access-control-section-increments
+    expiry_trigger: S9 and S13 increments reach approved production
+    evidence: services/backend/src/access-control/application/access-control.facade.ts
+  - id: TD-08
+    severity: P1
+    deviation: user-management:edit is approved as a future seed increment but not delivered
+    decisions: [AD-7, AD-12, AD-21]
+    owner: access-control-kernel-seed-increment
+    expiry_trigger: Permission/grant increment reaches approved production
+    evidence: _bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md
+  - id: TD-09
+    severity: P3
+    deviation: Access Control E2E uses a User Management token as a test seam
+    decisions: []
+    previous_decisions: [AD-2]
+    decision_refs: [ACF/AD-3]
+    artifact_refs: [ACM-3]
+    link_corrected: 2026-09-02-batch-architecture-update
+    owner: UM-E0-S0.1
+    expiry_trigger: Real consumer adoption removes the temporary coupling
+    evidence: services/backend/test/access-control/
+    link_correction_reason: >
+      Historical bare AD-2 resolved to PM/AD-2 (hexagonal boundary). The deviation
+      is the ACF/AD-3 prohibition on User Management provider overrides as kernel
+      evidence. Bare historical prose is preserved elsewhere; this machine-readable
+      row uses the additive qualified field.
+  - id: TD-10
+    severity: P3
+    previous_severity: P2
+    deviation: >
+      Previously: parent spine said draft while rendered architecture index said
+      binding. 2026-09-02 batch set the spine to approved-with-open-items and
+      README now cites that status plus qualified spine_id refs.
+    decisions: []
+    decision_refs: []
+    previous_decisions: [AD-1]
+    link_corrected: 2026-09-02-reviewer-gate-update
+    blocker: ARCH-GOV-01
+    owner: architecture-governance
+    status: retired
+    expiry_trigger: ARCH-GOV-01 closed
+    evidence:
+      - docs/architecture/README.md
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md
+    retirement_note: >
+      Spine frontmatter is approved-with-open-items, updated 2026-09-02, matching
+      the in-body amendment date. README cites that status. Remaining governance
+      is the lightweight memlog path, not a draft/binding label mismatch.
+  - id: TD-11
+    severity: P2
+    added: 2026-09-02-batch-architecture-update
+    deviation: >
+      Frontend QueryClient default staleTime is five minutes (main.tsx:13).
+      PM/AD-25 requires staleTime 0 for permission-sensitive queries, actor/session
+      identity in query keys, cache clear on session change, and no persistent
+      personal-data query cache.
+    decisions: []
+    decision_refs: [PM/AD-25]
+    owner: frontend
+    expiry_trigger: Permission-sensitive queries ship with AD-25 cache semantics
+    evidence:
+      - services/frontend/src/main.tsx:13
+    note: Recorded as implementation divergence; the installed stack is preserved.
+  - id: TD-12
+    severity: P2
+    added: 2026-09-02-architect-design-batch
+    deviation: >
+      User.customFields jsonb is the live column. PM/AD-32 requires
+      CustomFieldDefinition plus typed EAV CustomFieldValue as the directory
+      query path.
+    decisions: []
+    decision_refs: [PM/AD-32]
+    owner: user-management
+    expiry_trigger: Directory filters/sorts use CustomFieldValue; jsonb bag retired or unused
+    evidence:
+      - services/backend/prisma/schema.prisma
+    note: Do not weaken AD-32 to match the jsonb bag.
+  - id: TD-13
+    severity: P2
+    added: 2026-09-02-reviewer-gate-correction
+    deviation: >
+      Architecture pin is Node major 24.x. Current toolchain admits later majors
+      via engines.node ">=24", backend @types/node major 26, frontend @types/node
+      major 24, and local Node 22 below the pin. NestJS remains 11.x; NestJS 12 is
+      optional and separately planned (no ESM-migration requirement).
+    decisions: []
+    decision_refs: [PM]
+    owner: platform
+    expiry_trigger: >
+      Runtime and CI on Node 24.x; package engines constrained to major 24;
+      @types/node aligned to major 24 across packages. Documentation-only until
+      then — do not treat this debt row as license to edit manifests in an
+      architecture correction pass.
+    evidence:
+      - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md
+      - services/backend/package.json
+      - services/frontend/package.json
+    note: H7/H11. Package.json/lockfiles/CI unchanged in this documentation pass.

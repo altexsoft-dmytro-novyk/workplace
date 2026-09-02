@@ -3,6 +3,11 @@ id: SPEC-user-management-access-control-adoption
 status: approved
 implementation_status: stage-3-authorized
 authorized_by: 'Dmytro Novyk (Product Owner / Architect) — 2026-09-01'
+denial_oracle: >
+  SUPERSEDED 2026-09-02 by PM/AD-24. The 2026-09-01 empty-audience 403 decision
+  in this SPEC is historical approval evidence and must not be rewritten.
+  Regeneration of affected scenarios/tests is an AD-1 dispatch. Live architecture
+  is 401 / 404 / 403 as PM/AD-24.
 companions:
   - stories.yaml
   - .memlog.md
@@ -103,7 +108,9 @@ separately tracked FR-17 Profile Projection story.
     an authenticated **active** viewer whose audience over the target is
     empty — which on this read route means the target is not an active
     `User` — is **`403`**. There is no `404` authorization branch on this
-    route. `401` also covers a missing/invalid token.
+    route. *(Historical empty-audience 403 — SUPERSEDED 2026-09-02 by PM/AD-24.
+    Live oracle is 401 / 404 / 403; see frontmatter `denial_oracle`. Do not
+    rewrite this approval passage.)* `401` also covers a missing/invalid token.
     For `PATCH /users/:id` (`EDIT_USER_FEATURE`) and
     `PUT /users/:id/photo` (`UPLOAD_PHOTO_FEATURE`) the adapter applies the
     §2.2 dual gate — `AccessControlFacade.isAllowed(viewer, <edit permission
@@ -201,7 +208,8 @@ separately tracked FR-17 Profile Projection story.
     with `canEdit` reflecting the dual gate (`false` today, no
     `user-management:edit` seeded), an unresolved session
     → `401` and an authenticated active viewer with an empty audience →
-    `403`, the dual-gate write denial when the functional
+    `403` *(historical empty-audience — SUPERSEDED by PM/AD-24; live 401/404/403)*,
+    the dual-gate write denial when the functional
     permission is absent, and the §3.2 fn 1 rejection of manager/PP/
     department fields through `PATCH`. Kernel Stage-2 evidence never
     substitutes for this gate.
@@ -234,7 +242,8 @@ separately tracked FR-17 Profile Projection story.
   colleague read is a positive outcome from the start. There is no
   "two-state" rule and no `UMAC-3` flip. The only `GET /users/:id` denials
   are: an unresolved session → `401` (session layer); an authenticated
-  active viewer with an empty audience over the target → `403`.
+  active viewer with an empty audience over the target → `403`
+  *(historical empty-audience — SUPERSEDED by PM/AD-24; live 401/404/403)*.
 - **Missing-edit-permission dependency (open — see Open decisions).** The
   seeded FR catalog is exactly `user-management:create`,
   `user-management:deactivate`, `user-management:list`
@@ -316,7 +325,8 @@ read-only dual-gate hint (`false` for all until `user-management:edit` is
 seeded) — for any active viewer over an active target —
 `self`, `reporting`, `pp`, **or `colleague`** — a `401` when the session
 does not resolve to an active `User`, and a `403` when an authenticated
-active viewer's audience over the target is empty; `PATCH /users/:id` and
+active viewer's audience over the target is empty *(historical empty-audience
+— SUPERSEDED by PM/AD-24; live 401/404/403)*; `PATCH /users/:id` and
 `PUT /users/:id/photo` are refused unless both the functional permission and
 `write` S1 section access hold (once the permission exists); the
 real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E passes

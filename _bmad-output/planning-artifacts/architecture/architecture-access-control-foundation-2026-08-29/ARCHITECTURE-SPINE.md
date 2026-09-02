@@ -1,5 +1,6 @@
 ---
 name: 'Access Control Foundation — decision review'
+spine_id: ACF
 type: architecture-spine
 purpose: discussion
 altitude: epic
@@ -10,8 +11,8 @@ implementation_status: stage-1-authorized
 package_review_approved_by: user
 package_review_approved: 2026-08-31
 created: '2026-08-29'
-updated: '2026-08-31'
-revision: p2-repair
+updated: '2026-09-02'
+revision: 2026-09-02-reviewer-gate-correction
 binds:
   - ACF-1
   - ACM-0
@@ -62,13 +63,16 @@ binding, and UI ownership.
 
 | Inherited | From parent | Binds here |
 | --- | --- | --- |
-| AD-1 | People Management Architecture Spine | Human-approved Stage-1 scenario, then independently approved red Stage-2 evidence, precede any new production behavior; one dispatch covers one stage only. |
-| AD-2 / AD-3 | People Management Architecture Spine | Hexagonal boundary; ordinary consumer Stage-2 uses real HTTP and PostgreSQL. The approved kernel exception is defined below. |
-| AD-6 / AD-7 / AD-8 | People Management Architecture Spine | Functional and access roles remain separate; policy attachments stay data-driven and equality-only. Local AD-4 refines AD-7's incomplete FR schema for the Kernel MVP without repealing the future runtime catalog direction. |
-| AD-9 / AD-10 | People Management Architecture Spine | The facade is the authorization entry point; audiences are live, bulk, split, and never persisted. |
-| AD-11 / AD-12 | People Management Architecture Spine | Typed relationship facts and fail-closed resolution. |
-| AD-14 / AD-19 | People Management Architecture Spine | User Management owns route shape; direct PP derives only from `people_partner` relationship fact. |
-| AD-20 | People Management Architecture Spine, scoped amendment below | Due/departure cutoff and dismissed-target projection remain the binding future target. Local AD-4 formally defers request-time due behavior for the entire Kernel MVP, explicitly ACM-0 through ACM-5; ACM-8 only composes and ACM-9 only measures. Later lifecycle/full-facade work gets no exception and still requires AD-1. |
+| PM/AD-1 | People Management Architecture Spine | Human-approved Stage-1 scenario, then independently approved red Stage-2 evidence, precede any new production behavior; one dispatch covers one stage only. |
+| PM/AD-2 / PM/AD-3 | People Management Architecture Spine | Hexagonal boundary; ordinary consumer Stage-2 uses real HTTP and PostgreSQL. The approved kernel exception is defined below. |
+| PM/AD-6 / PM/AD-7 / PM/AD-8 | People Management Architecture Spine | Functional and access roles remain separate; policy attachments stay data-driven and equality-only. Local ACF/AD-4 refines PM/AD-7's incomplete FR schema for the Kernel MVP without repealing the future runtime catalog direction. |
+| PM/AD-9 / PM/AD-10 | People Management Architecture Spine | The facade is the authorization entry point; audiences are live, bulk, split, and never persisted. |
+| PM/AD-11 / PM/AD-12 | People Management Architecture Spine | Typed relationship facts and fail-closed resolution. |
+| PM/AD-14 / PM/AD-19 | People Management Architecture Spine | User Management owns route shape; direct PP derives only from `people_partner` relationship fact. |
+| PM/AD-20 | People Management Architecture Spine, scoped amendment below | Due/departure cutoff and dismissed-target projection remain the binding future target. Local ACF/AD-4 formally defers request-time due behavior for the entire Kernel MVP, explicitly ACM-0 through ACM-5; ACM-8 only composes and ACM-9 only measures. Later lifecycle/full-facade work gets no exception and still requires PM/AD-1. |
+| PM/AD-22 | People Management Architecture Spine | Employment lifecycle owns employment state. Access Control departure participants never write `EmploymentStatus` or invent a parallel employment writer. |
+| PM/AD-23 | People Management Architecture Spine | Any Access Control departure participant binds to the exact shared `applyDepartureEffects({ departureId, leaseToken, departingUserId, effectiveDate, tx })` contract (same signature, supplied `tx`, no nested transaction, idempotent on `departureId`). |
+| PM/AD-24 | People Management Architecture Spine | HTTP denial oracle is 401 / 404 / 403 with hidden-target 404 first. Kernel Stage-2 evidence remains facade/integration; HTTP mapping stays User Management-owned. |
 
 ## Invariants & Rules
 
@@ -137,11 +141,13 @@ flowchart LR
 
 ## Decision Register
 
+Local AD headings below are **ACF/AD-1..ACF/AD-4** (`spine_id: ACF`). Parent People Management decisions are cited as **PM/AD-n**.
+
 | Status | Item | Action / owner |
 | --- | --- | --- |
 | **Historical FAIL preserved** | ACF-1 feature-to-audience mapping and production `/users` wiring | Keep `_bmad-output/test-artifacts/gate-decision.json` unchanged as the historical result. |
-| **Decision recorded; package in review** | OQ-3, OQ-4, OQ-6, OQ-7, OQ-11 | AD-4 is binding input, but no Stage-1 or implementation dispatch is authorized by this repair. |
-| **One gate statement** | FR-AMD-1 authority | Architecture decisions are approved and final under `approval_scope: architecture-decision-only`. No Stage-1 dispatch is authorized until the Kernel package review is approved. This replaces the earlier contradiction between its Status and Authority and Remaining Gate sections. |
+| **OQs resolved; package review approved 2026-08-31** | OQ-3, OQ-4, OQ-6, OQ-7, OQ-11 | ACF/AD-4 is binding input. Frontmatter `package_review_approved: 2026-08-31` and `implementation_status: stage-1-authorized` control dispatch. |
+| **One gate statement** | FR-AMD-1 authority | Architecture decisions are approved and final under `approval_scope: architecture-decision-only`. Kernel package review is approved; Stage-1 follows ACF/AD-1. |
 | **Executable, not assumed** | CAP-8 / ACM-0 on a fresh database | ACM-0 creates and validates the normalized root User at a named entrypoint. No unnamed external prerequisite remains in the package. |
 | **Persisted, verifiable** | AD-1 stage approvals | `approvals.yaml` ledger with `author != approver` and a resolvable commit + artifact per record; a prose assertion is not an approval. |
 | **Checked against artifact state** | ACM-5 and ACM-8 / ACM-9-final gating | `acm-4-disposition.yaml` `disposition: no-gap`; ACM-9 baseline `status: PASS`. |

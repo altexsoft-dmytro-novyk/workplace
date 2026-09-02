@@ -50,10 +50,12 @@ event** (§4.9) — employment status is the sole source of truth for a departur
 - **Story 5.2 (apply).** On `dueAt`, one cross-context PostgreSQL transaction:
   close the active employment interval, insert the idempotent `dismissed` fact,
   deactivate account/profile (read-only, out of the default list but still
-  filterable), cancel open action items as *cancelled — departed*, system-close
-  active mentorship pairs with a system note (bypassing the closure-note gate),
-  and end every persisted access assignment the actor holds. **All access the
-  departed person held ends immediately**, overriding the project 15-minute
+  filterable), cancel only open action items **assigned to** the departing
+  person as *cancelled — departed* (items they authored for other, still-active
+  assignees remain open), system-close active mentorship pairs with a system
+  note (bypassing the closure-note gate), and end every persisted access
+  assignment the actor holds. **All access the departed person held ends
+  immediately**, overriding the project 15-minute
   window (`access-control.md` revocation timing / AD-20). Request-time
   auth/AccessControl denies the actor from `00:00` effective regardless of
   worker lag. **No departure event is added to the career timeline.**

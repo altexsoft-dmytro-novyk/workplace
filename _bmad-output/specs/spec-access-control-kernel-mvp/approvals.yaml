@@ -699,6 +699,47 @@ approvals:
     # commit 9e69682, so this is post-hoc regression evidence rather than a
     # committed-red gate. The stable dispatch identifiers remain unchanged.
 
+  # ACM-3 Stage 2, fifth increment. Approves ACM3-II-06 cycle-termination
+  # coverage. Characterization: this is a termination guard, not a denial
+  # test. The II-06 fixture places the viewer (Sasha) off the target's
+  # chain entirely, so `colleague` for Rhea is the correct answer whether
+  # or not the repeat-denial clause runs — removing the final
+  # `NOT EXISTS (... b.repeated)` predicate leaves the suite green. What
+  # the assertions do exercise is that the walk terminates on a cycle and
+  # that one cyclic target does not poison the batch. No red phase exists:
+  # the only mutation that fails this test is unbounded recursion, which
+  # is not safely runnable. Post-hoc regression evidence, not committed-red.
+  # Remaining approved scenarios with no Stage-2 record of their own:
+  # ACM3-II-04, 05, 11, 12, 13, 14.
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-cycle-acyclicity.e2e-spec.ts"
+    commit: "6aa774589436def0ccd4d7178f8291b42a5eb0ed"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-02T07:10:00Z"
+
+  # ACM-3 Stage 2, sixth increment. Approves ACM3-II-04 and ACM3-II-05 bulk-input
+  # contract coverage in one suite. Both are regression guards for already-shipped
+  # behavior: empty bulk short-circuits before graph and identity reads (II-04);
+  # duplicate target and viewer ids collapse to one map key with deduplication
+  # before the graph port (II-05). Post-hoc regression evidence, not committed-red.
+  # With the fifth increment (II-06), all fourteen approved CAP-1 scenarios now
+  # have Stage-2 records in approvals.yaml.
+
+  - story_id: "ACM-3-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/access-control/acm3-bulk-input-contract.e2e-spec.ts"
+    commit: "32cc8d5acc066c701dd8563b8ad37124b707efd4"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-02T07:15:25Z"
+
   # ACM-4R Stage 2 — all six approved ACM4R-MA-01..06 contracts translated
   # into one direct-facade PostgreSQL suite; 8/8 assertions pass green (a
   # characterization result, no production code changed). Artifact commit

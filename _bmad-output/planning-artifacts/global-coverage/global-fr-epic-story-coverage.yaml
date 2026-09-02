@@ -1,0 +1,351 @@
+version: 1
+baseline_date: 2026-09-02
+status: canonical
+normative_source: docs/project-requirements.md
+canonical_prd: _bmad-output/planning-artifacts/prds/prd-people-management-2026-08-24/prd.md
+allowed_coverage_statuses:
+  - implemented
+  - in-progress
+  - specified
+  - deferred
+  - superseded
+  - uncovered
+namespace_rules:
+  product_requirements: PM-FR-*
+  historical_user_management_requirements: UM-FR-*
+  historical_mentorship_requirements: M-FR-*
+  platform_epics: PLAT-E*
+  user_management_epics: UM-E*
+  mentorship_epics: M-E*
+  stable_workboard_ids: [ACF-*, ACM-*, UMAC-*]
+source_slices:
+  - id: PLAT
+    path: _bmad-output/planning-artifacts/platform/epics.md
+    role: bounded-context-and-cross-cutting-slice
+  - id: UM
+    path: _bmad-output/planning-artifacts/user-management/epics.md
+    role: bounded-context-slice
+  - id: M
+    path: _bmad-output/planning-artifacts/mentorship/epics.md
+    role: draft-bounded-context-slice
+conflicts:
+  - id: CONFLICT-UM-01
+    status: resolved
+    requirement: PM-FR-4
+    description: Product/domain oracle is 401/404/403 (requirements §3.3 rule 8, PM-FR-4). Historical UMAC 403 and historical UM PRD/test-case 404 artifacts are stale and not rewritten. Runtime still diverges and is implementation/transition debt, not an open product conflict.
+requirements:
+  - id: PM-FR-1
+    normative_refs: ["§2", "§3"]
+    summary: Separate derived access roles from assigned functional roles
+    coverage_status: in-progress
+    aliases: [UM-FR-16]
+    stories:
+      - {id: PLAT-E3-S3.4, workboard_id: ACM-1, sprint_key: 3-4-minimal-functional-role-data-foundation-acm-1, status: implemented}
+      - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
+    notes: Kernel separation exists; real consumer adoption remains incomplete
+  - id: PM-FR-2
+    normative_refs: ["§2.1", "§5.1"]
+    summary: Resolve Reporting, Project, and People Partner access transitively with required revocation windows
+    coverage_status: in-progress
+    stories:
+      - {id: PLAT-E2-S2.1, workboard_id: ACF-1, sprint_key: 2-1-resolve-phase-0-audiences-acf-1, status: in-progress}
+      - {id: PLAT-E3-S3.1, workboard_id: ACM-3, sprint_key: 3-1-inactive-viewer-bridge-and-target-fail-closed-behavior-acm-3, status: implemented}
+    gates: [DEPARTMENT-EDGE, TT-IDENTITY-01, TT-PMDM-01]
+    notes: >
+      Reporting/direct-PP Phase-0 exists; department, project, and PP HR-line are not complete.
+      Live TimeTracker gates are TT-IDENTITY-01 and TT-PMDM-01. TIMETRACKER-CONTRACT is
+      superseded historical only.
+  - id: PM-FR-3
+    normative_refs: ["§3.2", "§3.3"]
+    summary: Enforce the S1-S16 section access matrix
+    coverage_status: in-progress
+    stories:
+      - {id: PLAT-E3-S3.6, workboard_id: ACM-5, sprint_key: 3-6-base-section-access-for-s1-s10-and-s11-acm-5, status: implemented}
+      - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
+    gates: [AC-S9-S13]
+    notes: Only the base S1/S10/S11 kernel slice is implemented
+  - id: PM-FR-4
+    normative_refs: ["§3.3"]
+    summary: Assemble authorized responses server-side on every request
+    coverage_status: in-progress
+    aliases: [UM-FR-16, UM-FR-17]
+    stories:
+      - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
+    notes: Current whole-row projection is transition debt; broader projections are deferred. Product denial oracle is 401/404/403; runtime still maps target deny to 403 and bypasses target checks via the interim adapter.
+  - id: PM-FR-5
+    normative_refs: ["§3.3.6", "§4.1"]
+    summary: Preserve custom-field visibility in reads, filters, and columns
+    coverage_status: deferred
+    aliases: [UM-FR-17]
+    stories: []
+    notes: Visibility rule bound by PM/AD-32; EAV implementation absent.
+  - id: PM-FR-6
+    normative_refs: ["§2.3"]
+    summary: Runtime functional role and permission administration
+    coverage_status: deferred
+    stories: []
+    specs: [_bmad-output/specs/spec-functional-roles-catalog/SPEC.md]
+    gates: [OQ-PERM-01]
+    notes: Default role-to-permission matrix is not approved. Do not seed or infer grants.
+  - id: PM-FR-7
+    normative_refs: ["§2.1", "§2.3"]
+    summary: Assign functional roles and change organisational facts through dedicated controls
+    coverage_status: specified
+    aliases: [UM-FR-10]
+    stories:
+      - {id: UM-E4-S4.1, sprint_key: 4-1-change-an-employee-s-manager, status: specified}
+      - {id: UM-E4-S4.2, sprint_key: 4-2-change-an-employee-s-people-partner, status: specified}
+      - {id: UM-E4-S4.3, sprint_key: 4-3-change-employee-department-or-department-manager, status: specified}
+    gates: [CC-04, CC-07, DEPARTMENT-EDGE]
+  - id: PM-FR-8
+    normative_refs: ["§4.1"]
+    summary: Universal profile-field filters and columns
+    coverage_status: uncovered
+    stories: []
+    notes: Storage design is PM/AD-32 typed EAV. User.customFields jsonb is transition debt.
+  - id: PM-FR-9
+    normative_refs: ["§4.1"]
+    summary: Permission-safe inline directory editing
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-10
+    normative_refs: ["§4.1"]
+    summary: Saved and shared directory views
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-11
+    normative_refs: ["§4.1"]
+    summary: Visibility-safe XLSX export
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-12
+    normative_refs: ["§4.2", "§3.2 S1"]
+    summary: Section-based profile rendering
+    coverage_status: in-progress
+    aliases: [UM-FR-9, UM-FR-16, M-FR-16]
+    stories:
+      - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
+      - {id: UM-E1-S1.2, sprint_key: 1-2-view-and-edit-an-employee-s-identity-card-fields, status: specified}
+      - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    notes: CONFLICT-UM-01 is resolved at product level (401/404/403); profile denial runtime still diverges.
+  - id: PM-FR-13
+    normative_refs: ["§4.3"]
+    summary: Employee self-service across authorized profile capabilities
+    coverage_status: specified
+    aliases: [UM-FR-9, M-FR-1, M-FR-2, M-FR-3]
+    stories:
+      - {id: UM-E1-S1.3, sprint_key: 1-3-self-uploads-own-photo, status: specified}
+      - {id: M-E1-S1.1, sprint_key: 1-1-open-to-mentoring-flag, status: specified}
+    notes: Only selected User Management and Mentorship slices are decomposed
+  - id: PM-FR-14
+    normative_refs: ["§3.2 S1", "§4.2", "§5.1"]
+    summary: Source manager, People Partner, mentor, and projects from owning contexts
+    coverage_status: specified
+    aliases: [UM-FR-14, M-FR-16]
+    stories:
+      - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    gates: [CC-10-MENTORSHIP, TT-IDENTITY-01, TT-PMDM-01]
+    notes: Live TimeTracker gates are TT-IDENTITY-01 and TT-PMDM-01; TIMETRACKER-CONTRACT is superseded historical only.
+  - id: PM-FR-15
+    normative_refs: ["§4.4.1"]
+    summary: Unit Manager dashboard
+    coverage_status: uncovered
+    stories: []
+    notes: Composition design is PM/AD-33. No generic widget engine. Implementation absent.
+  - id: PM-FR-16
+    normative_refs: ["§4.4.2"]
+    summary: Delivery Manager dashboard
+    coverage_status: uncovered
+    stories: []
+    notes: Composition design is PM/AD-33. No generic widget engine. Implementation absent.
+  - id: PM-FR-17
+    normative_refs: ["§4.4.3"]
+    summary: Project Manager dashboard
+    coverage_status: uncovered
+    stories: []
+    notes: Composition design is PM/AD-33. No generic widget engine. Implementation absent.
+  - id: PM-FR-18
+    normative_refs: ["§4.4.4"]
+    summary: People Partner dashboard without resourcing
+    coverage_status: uncovered
+    stories: []
+    notes: Composition design is PM/AD-33. No generic widget engine. Implementation absent.
+  - id: PM-FR-19
+    normative_refs: ["§4.5"]
+    summary: Manual action-item lifecycle
+    coverage_status: uncovered
+    stories: []
+    notes: Departure cancels only open items assigned to the departing user; authored-for-others remain open.
+  - id: PM-FR-20
+    normative_refs: ["§4.12"]
+    summary: Form campaign flow and narrow sender exception
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-21
+    normative_refs: ["§4.6"]
+    summary: Risk record, level, history, and trend
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-22
+    normative_refs: ["§4.6"]
+    summary: Scoped risk dashboard
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-23
+    normative_refs: ["§4.7"]
+    summary: Create and route resourcing requests
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-24
+    normative_refs: ["§4.7"]
+    summary: Fulfil requests with internal or external candidates
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-25
+    normative_refs: ["§4.7"]
+    summary: Review candidates and explicitly close requests
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-26
+    normative_refs: ["§4.7", "§3.2 S15"]
+    summary: Resourcing request history on profile
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-27
+    normative_refs: ["§4.8"]
+    summary: Authenticated named-recipient profile sharing
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-28
+    normative_refs: ["§4.9"]
+    summary: Automatic career timeline events
+    coverage_status: specified
+    aliases: [UM-FR-5, UM-FR-11, M-FR-7, M-FR-11]
+    stories:
+      - {id: UM-E3-S3.1, sprint_key: 3-1-system-auto-generates-career-timeline-events, status: specified}
+      - {id: M-E1-S1.3, sprint_key: 1-3-create-a-mentorship-pair, status: specified}
+      - {id: M-E1-S1.4, sprint_key: 1-4-end-a-mentorship-pair, status: specified}
+    gates: [CC-09]
+  - id: PM-FR-29
+    normative_refs: ["§4.9"]
+    summary: Dual-gated manual career timeline maintenance
+    coverage_status: specified
+    aliases: [UM-FR-12, UM-FR-13]
+    stories:
+      - {id: UM-E3-S3.2, sprint_key: 3-2-authorized-actor-manually-adds-a-backfill-entry, status: specified}
+      - {id: UM-E3-S3.3, sprint_key: 3-3-authorized-actor-edits-or-deletes-an-event, status: specified}
+    gates: [AC-S9-S13]
+  - id: PM-FR-30
+    normative_refs: ["§4.10"]
+    summary: CDS registry content
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-31
+    normative_refs: ["§4.10", "§4.1"]
+    summary: CDS directory filtering
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-32
+    normative_refs: ["§4.11", "§3.2 S13"]
+    summary: Self-service mentorship availability and pair view
+    coverage_status: specified
+    aliases: [M-FR-1, M-FR-2, M-FR-3]
+    stories:
+      - {id: M-E1-S1.1, sprint_key: 1-1-open-to-mentoring-flag, status: specified}
+      - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    gates: [CC-10-MENTORSHIP, AC-S9-S13]
+    notes: Departure clears availability; rehire requires explicit opt-in.
+  - id: PM-FR-33
+    normative_refs: ["§4.11", "§4.16"]
+    summary: Mentorship assignment, manual closure, and departure auto-close
+    coverage_status: specified
+    aliases: [M-FR-5, M-FR-6, M-FR-7, M-FR-9, M-FR-10, M-FR-11, M-FR-12, M-FR-13, M-FR-14]
+    stories:
+      - {id: M-E1-S1.3, sprint_key: 1-3-create-a-mentorship-pair, status: specified}
+      - {id: M-E1-S1.4, sprint_key: 1-4-end-a-mentorship-pair, status: specified}
+      - {id: M-E1-S1.6, sprint_key: 1-6-departure-auto-close, status: specified}
+    gates: [CC-10-MENTORSHIP, OQ-PERM-01, AC-S9-S13, CC-09, CC-06]
+  - id: PM-FR-34
+    normative_refs: ["§4.11", "§4.1"]
+    summary: Willing pool, pair views, mentor header, and directory status
+    coverage_status: specified
+    aliases: [M-FR-4, M-FR-8, M-FR-15, M-FR-16, M-FR-17]
+    stories:
+      - {id: M-E1-S1.2, sprint_key: 1-2-the-willing-mentor-pool, status: specified}
+      - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    gates: [CC-10-MENTORSHIP, OQ-PERM-01, AC-S9-S13]
+    notes: Willing pool requires active employment; dismissed users are excluded.
+  - id: PM-FR-35
+    normative_refs: ["§4.15"]
+    summary: Feedback records and requested-feedback campaign path
+    coverage_status: uncovered
+    stories: []
+  - id: PM-FR-36
+    normative_refs: ["§5.1", "§3.2 S10"]
+    summary: Timetracker leaves integration
+    coverage_status: uncovered
+    stories: []
+    gates: []
+    notes: >
+      Leaves endpoint/contract remains unspecified. Do not invent a live gate ID.
+      TIMETRACKER-CONTRACT is superseded historical only and is not a live gate here.
+  - id: PM-FR-37
+    normative_refs: ["§5.1", "§2.1", "§3.2 S11"]
+    summary: Timetracker projects and people integration for display and access
+    coverage_status: uncovered
+    stories: []
+    gates: [TT-IDENTITY-01, TT-PMDM-01]
+    notes: Live TimeTracker gates are TT-IDENTITY-01 and TT-PMDM-01; TIMETRACKER-CONTRACT is superseded historical only.
+  - id: PM-FR-38
+    normative_refs: ["§5.2"]
+    summary: Optional PeopleForce profile prefill
+    coverage_status: deferred
+    stories: []
+  - id: PM-FR-39
+    normative_refs: ["§2.4"]
+    summary: Separate full-profile access grant lifecycle
+    coverage_status: deferred
+    stories: []
+    notes: Overlay semantics are PM/AD-28. Grant lifecycle remains AD-10. Implementation absent.
+  - id: PM-FR-40
+    normative_refs: ["§3.4"]
+    summary: Relationship and grant journal
+    coverage_status: specified
+    aliases: [UM-FR-10]
+    stories:
+      - {id: UM-E4-S4.1, sprint_key: 4-1-change-an-employee-s-manager, status: specified}
+      - {id: UM-E4-S4.2, sprint_key: 4-2-change-an-employee-s-people-partner, status: specified}
+      - {id: UM-E4-S4.3, sprint_key: 4-3-change-employee-department-or-department-manager, status: specified}
+    gates: [CC-07]
+  - id: PM-FR-41
+    normative_refs: ["§4.16"]
+    summary: Temporal employment status and effective departure
+    coverage_status: specified
+    aliases: [UM-FR-6, M-FR-14]
+    stories:
+      - {id: UM-E5-S5.1, sprint_key: 5-1-record-a-departure, status: specified}
+      - {id: UM-E5-S5.2, sprint_key: 5-2-apply-an-effective-departure, status: specified}
+      - {id: M-E1-S1.6, sprint_key: 1-6-departure-auto-close, status: specified}
+    gates: [CC-06]
+    notes: Assignee-only action-item cancel; mentorship availability cleared and pool excludes dismissed; rehire opt-in. No production executor exists.
+  - id: PM-FR-42
+    normative_refs: ["§4.17"]
+    summary: Nested department management and exactly-one membership
+    coverage_status: specified
+    aliases: [UM-FR-10]
+    stories:
+      - {id: UM-E4-S4.3, sprint_key: 4-3-change-employee-department-or-department-manager, status: specified}
+    gates: [CC-07, DEPARTMENT-EDGE]
+superseded_work:
+  - id: UMAC-3
+    status: superseded
+    reason: Colleague S1 read is positive from UMAC-1; no later flip exists
+  - id: UM-E1-S1.4
+    status: superseded
+    reason: Generic deactivation retired; departure is UM-E5
+  - id: UM-E4-S4.2-LEGACY-MENTORSHIP
+    status: superseded
+    reason: Mentorship moved to its own context under AD-17
+  - id: P-1..P-9
+    status: superseded
+    reason: Unmaterialized alias scheme; PLAT-E1-S1.1..S1.9 are canonical global aliases
