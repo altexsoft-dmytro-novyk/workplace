@@ -128,14 +128,14 @@ gone with `registration/`.
 | `auth/` | FR-2/FR-3/FR-8 — magic-link request/consume, security edge cases (Epic 2) | 6 | header-noted draft |
 | `profile/` | FR-9 — S1 data correctness given an entitled actor (entitlement is Epic 0's): `um-pf-*` = Story 1.2 scalar `PATCH`; `um-photo-*` = Story 1.3 `PUT .../photo` + real object storage (AD-15). Folder `README.md` carries the photo cluster's in-scenario decisions. | 12 (+ `um-pf-02` retired pointer) | new/refreshed draft |
 | `list/` | FR-15 — `GET /users` pagination + metadata, permission-safe S1-field filters, dismissed-employee visibility via `employmentStatus`, endpoint authz, fixed fail-closed projection, unknown-filter rejection, empty page, deterministic sort, NFR-2 perf note (Epic 1 Story 1.5) | 12 | blank-page v1.5 rewrite (`um-list-01..04` retargeted, `um-list-05..12` reworked/new); folder README carries the in-scenario decisions |
-| `career-timeline/` | FR-5/FR-11/FR-12/FR-13 — system events; DEC-UM-001 manual mechanics (assigned PP + direct UM); dual gate; edit-immutability (Epic 3) | 10 | retraced draft (`um-ct-09/10` new) |
+| `career-timeline/` | FR-5/FR-11/FR-12/FR-13 — system events; career-timeline read audience; DEC-UM-001 manual mechanics (assigned PP + direct UM); dual gate; edit-immutability (Epic 3) | 11 | retraced draft (`um-ct-09/10` new, `um-ct-11` read gate) |
 | `relationships/` | FR-10 — Epic 4 organisational facts: manager (4.1, retraced), PP (4.2, blocked stubs), department (4.3, blocked stubs) | 11 | split; see folder README |
 | `departure/` | FR-6 — Epic 5 employment lifecycle (record / blocked / apply / retry) | 4 | new draft, **all BLOCKED — CC-06** |
 | `registration/` | **RETIRED (v1.5)** — `um-reg-01..15` `POST /users` HTTP create. See folder README. | 15 | history only |
 | `deactivation/` | **RETIRED (v1.5)** — `um-deact-01..03` generic `DELETE /users/:id`. See folder README. | 3 | history only |
 
-**Live stage-1 scenario files (v1.5, subject to per-file approval):** 70
-(+8: the `um-photo-*` set replacing the single `um-pf-02`).
+**Live stage-1 scenario files (v1.5, subject to per-file approval):** 71
+(+8: the `um-photo-*` set replacing the single `um-pf-02`; +1: `um-ct-11`).
 **Retained as history (retired, do not approve):** 22 (`registration/` 15,
 `deactivation/` 3, `relationships/um-rel-04..06` 3, `profile/um-pf-02` 1).
 
@@ -146,7 +146,8 @@ gone with `registration/`.
 | Epic 0 Story 0.1 not yet landed (port rebind + S1-card DTO) | `access-control-adoption/umac-01..06` E2E is committed-red until the rebind + S1-card DTO land |
 | Missing `user-management:edit` permission (Open Decision i) | `access-control-adoption/umac-07` (CONDITIONAL) |
 | Profile Projection story (FR-17) reaching production | the S10 dates-only / S11 name-only / S16 per-field colleague views **on their own surfaces** (`GET /users/:id/leaves`, etc.) — **not** `GET /users/:id`, which returns the S1 card from Story 0.1 (`umac-04`, positive test) |
-| S9 `canAccessSection` — a **pending Access Control increment** (ACM-5 ships S1/S10/S11 only) | the S9-write half of the `career-timeline/` dual gate (`um-ct-03..10`) |
+| `profile:timeline` `canAccessSection` — a **pending Access Control increment** (ACM-5 ships the three legacy section strings only) | the **write** half of the `career-timeline/` dual gate (`um-ct-03..10`). The **read** gate (`um-ct-11`, Story 3.1 `GET /users/:id/events`) is **not** blocked — it uses the sanctioned `resolveAudiences`-derived interim (mentorship timeline-section precedent, `// INTERIM` + expiry trigger); `deferred-work.md` tracks the real increment. |
+| DEC-UM-001 direct-Unit-Manager leg needs the AC **department-tree walk** increment (`targetType:'department'` + recursion) | the direct-UM manual-write path in `um-ct-04`/`um-ct-06` (the assigned-PP leg is unaffected) |
 | CC-04 (PP persistence) + CC-07 (AD-19 journal) | `relationships/um-rel-09..11` (PP), and the atomic-journal Then-clause of `um-rel-01/02` |
 | CC-07 + Department edge contract | `relationships/um-rel-12..14` (department) |
 | CC-06 (scheduled-departure state + executor) | all of `departure/` |

@@ -352,3 +352,52 @@ approvals:
       ALLOW_TEST_SESSION_TOKENS. Architect flag: hand-rolled JWT vs @nestjs/jwt;
       stateless JWT / no Session table / no revocation (fine for Epic 2, revisit
       if "sign out everywhere" lands).
+
+  - story_id: "3-1-auto-career-timeline-events-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/career-timeline/um-ct-01, um-ct-02, um-ct-11 + _bmad-output/implementation-artifacts/user-management/spec-3-1-system-auto-generates-career-timeline-events.md"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T16:30:00Z"
+    note: >-
+      Story 3.1 scope = um-ct-01 (joined_company at import, same-tx AD-11),
+      um-ct-02 (position_change on PATCH; details = NEW VALUE ONLY
+      { "position": <new> }; eventDate = server now UTC; no-op PATCH writes
+      nothing; trigger chained off profile/um-edit-01, not a placeholder),
+      um-ct-11 NEW (GET /users/:id/events read gate: Self/Reporting/Project/PP
+      -> 200, Colleague -> 403, unresolved -> 401). Section identifier is
+      'profile:timeline' (S9 is the requirements matrix row id only).
+      canAccessSection does not answer profile:timeline yet -> Story 3.1 uses
+      the sanctioned resolveAudiences-derived INTERIM (mentorship timeline-
+      section precedent): allow on resolveAudiences ∩ {self,reporting,pp} != ∅,
+      // INTERIM + expiry trigger, deferred-work.md item added for the real AC
+      increment. um-ct-03..10 untouched (Stories 3.2/3.3, DEC-UM-001 dual gate).
+      Supporting reconciliation: deferred-work.md, docs/test-cases/user-
+      management/README.md (counts + blocks table).
+
+  - story_id: "3-1-auto-career-timeline-events-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-3/auto-events.e2e-spec.ts + test/user-management/epic-3/timeline-read-audience.e2e-spec.ts (+ deleted test/user-management/career-timeline.e2e-spec.ts)"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T21:45:00Z"
+    note: >-
+      Committed-red: 9 failed / 2 passed (the 2 green = Story 1.1's already-
+      shipped joined_company DB-state). Red for the right reasons: no
+      position_change hook in EditUserAction, no GET /users/:id/events route.
+      um-ct-02 details realigned to new-value-only { position: <new> }; eventDate
+      = today's UTC date (column is @db.Date); +no-op-edit case. New
+      timeline-read-audience.e2e-spec.ts for um-ct-11 (Self/reporting/PP -> 200,
+      colleague -> 403, no-token -> 401). Legacy career-timeline.e2e-spec.ts
+      deleted (retired POST /users). tsc clean (3 known epic-4), lint clean, no
+      src/ or git changes. STAGE-2 GATE DECISION (Dmytro): GET /users/:id/events
+      response shape = { data: UserEvent[], canEdit: boolean } envelope (option
+      b) — the established UM section-read convention; canEdit = the Story
+      3.2/3.3 manual-mutation gate, false for everyone until 3.2 lands. Red
+      tests + scenario docs + spec updated to this shape post-gate (mechanical).
