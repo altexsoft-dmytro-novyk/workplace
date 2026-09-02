@@ -1,15 +1,22 @@
-# Custom Fields — NOT YET DECIDED
+# Custom Fields (PM/AD-32)
 
-**Status: open. Do not build, do not improvise a storage model.**
+**Status: design approved 2026-09-02. Do not keep using `User.customFields` jsonb as the query path.**
 
-The storage design (EAV table vs JSONB on the profile, indexing strategy, filter integration) has not been decided with the architect yet. Any implementation before that decision will be rejected.
+## Binding rule
 
-## What is already fixed (from the requirements — will bind the design)
+Column-per-field schema is forbidden (§6). New fields must be filterable and sortable on All Employees without a deploy or migration (§4.1).
 
-- HR Admin and managers define new fields (text, number, date, single-select, multi-select, boolean) at runtime: **no deploy, no schema migration, no developer** (§4.1).
-- Every custom field is immediately usable as a filter and a column on All Employees, sortable included (§4.1). A column-per-field schema will not survive this (§6).
-- Each field carries its own visibility level, set at creation: *management* (default), *employee*, or *colleague* (§3.3.5). Filters and list columns respect it — a user must not be able to **infer** a value they cannot see through filtering.
-- Field values on profiles are section S16 of the access matrix (§3.2).
-- The All Employees list with 500+ records, arbitrary filters and derived fields must respond within 2 seconds including permission resolution (§7).
+## Storage
 
-When the decision lands it will be added to the spine as a new `AD-n` and this file will be rewritten.
+- `CustomFieldDefinition {id uuidv7, key unique, type, visibility, options jsonb, createdAt}`  
+  Types: `text | number | date | single-select | multi-select | boolean`.  
+  Visibility: `management` (default) | `employee` | `colleague` (§3.3.6).
+- `CustomFieldValue {userId, fieldId, valueText, valueNumber, valueDate, valueBool, valueJson}`  
+  One row per user×field. Multi-select uses `valueJson`. Partial unique `(userId, fieldId)`.
+- Btree indexes: `(fieldId, valueText)`, `(fieldId, valueNumber)`, `(fieldId, valueDate)`, `(fieldId, valueBool)`.
+
+Directory filter/sort reads `CustomFieldValue`, never `User.customFields`. Access Control visibility is applied **before** filter execution so a hidden value cannot be inferred.
+
+## Transition
+
+`User.customFields jsonb` exists in the current schema as an interim bag. It is not the target. Do not build new filters against it (TD-12).

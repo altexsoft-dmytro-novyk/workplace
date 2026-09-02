@@ -1,0 +1,325 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "TimeTracker External API",
+    "description": "Endpoints exposed to 3rd-party integration partners. Every endpoint in this document is authenticated with a per-partner API key sent in the X-Api-Key header (no cookie/JWT session is involved). Contact the TimeTracker team to obtain a key for your integration.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    { "url": "https://tt-bootcamp.dev.altexsoft.dev/", "description": "TimeTracker dev bootcamp environment" }
+  ],
+  "security": [],
+  "tags": [
+    { "name": "Accounting", "description": "Endpoints for the Accounting integration partner" },
+    { "name": "Projects", "description": "Endpoints for the Talents integration partner" }
+  ],
+  "paths": {
+    "/api/accounting/report": {
+      "post": {
+        "operationId": "postAccountingReport",
+        "summary": "Generate an accounting report",
+        "description": "Returns time-tracking data (working days, hours, statuses) for employees for a given month/year, optionally filtered.",
+        "tags": ["Accounting"],
+        "security": [{ "AccountingApiKey": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AccountingReportRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report generated successfully.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AccountingReportResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation failed (e.g. month not in 1-12, year not greater than 0).",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationErrorList" }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-Api-Key header." },
+          "403": { "description": "The supplied API key is not authorized for the Accounting policy." },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationErrorList" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/projects/talents": {
+      "get": {
+        "operationId": "getProjectsTalents",
+        "summary": "List projects and team members for the Talents integration",
+        "description": "Returns projects (optionally filtered by status) with their team members, plus lookup lists of the available project status/type values.",
+        "tags": ["Projects"],
+        "security": [{ "TalentsApiKey": [] }],
+        "parameters": [
+          {
+            "name": "statuses",
+            "in": "query",
+            "required": false,
+            "description": "Zero or more project status filters. Repeat the parameter for multiple values, e.g. ?statuses=1&statuses=2. Omit to return projects in any status.",
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": { "$ref": "#/components/schemas/ProjectStatus" }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Projects retrieved successfully.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/GetTalentProjectsResponse" }
+              }
+            }
+          },
+          "401": { "description": "Missing or invalid X-Api-Key header." },
+          "403": { "description": "The supplied API key is not authorized for the Talents policy." },
+          "500": {
+            "description": "Unexpected server error.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ValidationErrorList" }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "AccountingApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key",
+        "description": "API key issued to the Accounting integration partner."
+      },
+      "TalentsApiKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-Api-Key",
+        "description": "API key issued to the Talents integration partner."
+      }
+    },
+    "schemas": {
+      "ValidationError": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "details": { "type": "string", "nullable": true, "description": "Only populated in non-production environments." }
+        },
+        "required": ["message"]
+      },
+      "ValidationErrorList": {
+        "type": "array",
+        "description": "Errors are always returned as an array, even when there is only one.",
+        "items": { "$ref": "#/components/schemas/ValidationError" }
+      },
+      "TaskDurationStatus": {
+        "type": "integer",
+        "enum": [0, 1, 2],
+        "x-enum-varnames": ["Open", "Submitted", "Accepted"]
+      },
+      "DayStatus": {
+        "type": "integer",
+        "enum": [0, 1, 2, 3, 4, 5, 6, 7, 17, 18, 92, 93, 99],
+        "x-enum-varnames": [
+          "Vacation", "UnpaidLeave", "Sick", "OneDaySick", "WorkingDay", "Holiday", "Weekend",
+          "RemoteWorkingDay", "WorkingHolidayWeekend", "RemoteWorkingHolidayWeekend",
+          "CompensatedDayOff", "AdditionalWorkingDay", "VacationBlockedDay"
+        ]
+      },
+      "DayApprovalState": {
+        "type": "integer",
+        "enum": [0, 1, 2],
+        "x-enum-varnames": ["NoApprovalNeeded", "PendingApproval", "Approved"]
+      },
+      "ProjectStatus": {
+        "type": "integer",
+        "enum": [1, 2, 3, 4],
+        "x-enum-varnames": ["Draft", "Active", "Support", "Closed"]
+      },
+      "ProjectType": {
+        "type": "integer",
+        "enum": [0, 1, 2, 3, 4, 5],
+        "x-enum-varnames": ["AllTypes", "Billable", "Unbillable", "Various", "FixedPrice", "Company"]
+      },
+      "AccountingReportRequest": {
+        "type": "object",
+        "properties": {
+          "month": { "type": "integer", "minimum": 1, "maximum": 12, "description": "Must be between 1 and 12." },
+          "year": { "type": "integer", "exclusiveMinimum": 0, "description": "Must be greater than 0." },
+          "reportStates": {
+            "type": "array",
+            "nullable": true,
+            "items": { "$ref": "#/components/schemas/TaskDurationStatus" }
+          },
+          "employeeIds": {
+            "type": "array",
+            "nullable": true,
+            "items": { "type": "integer" }
+          },
+          "dayStatuses": {
+            "type": "array",
+            "nullable": true,
+            "items": { "$ref": "#/components/schemas/DayStatus" }
+          },
+          "dayApprovalStates": {
+            "type": "array",
+            "nullable": true,
+            "items": { "$ref": "#/components/schemas/DayApprovalState" }
+          }
+        },
+        "required": ["month", "year"]
+      },
+      "AccountingReportResponse": {
+        "type": "object",
+        "properties": {
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time" },
+          "employees": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Employee" }
+          },
+          "dayStatuses": {
+            "type": "object",
+            "description": "Lookup of all DayStatus values: numeric value (as string key) -> name.",
+            "additionalProperties": { "type": "string" }
+          },
+          "reportStates": {
+            "type": "object",
+            "description": "Lookup of all TaskDurationStatus values: numeric value (as string key) -> name.",
+            "additionalProperties": { "type": "string" }
+          },
+          "dayApprovalStates": {
+            "type": "object",
+            "description": "Lookup of all DayApprovalState values: numeric value (as string key) -> name.",
+            "additionalProperties": { "type": "string" }
+          }
+        },
+        "required": ["startDate", "endDate", "employees", "dayStatuses", "reportStates", "dayApprovalStates"]
+      },
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "email": { "type": "string" },
+          "name": { "type": "string" },
+          "hash": { "type": "string" },
+          "countryCode": { "type": "string" },
+          "totalHours": { "type": "number", "format": "double", "nullable": true },
+          "days": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/WorkingDay" }
+          }
+        },
+        "required": ["id", "email", "name", "hash", "countryCode", "days"]
+      },
+      "WorkingDay": {
+        "type": "object",
+        "properties": {
+          "date": { "type": "string", "format": "date-time" },
+          "companyId": { "type": "string", "nullable": true },
+          "projectId": { "type": "integer" },
+          "projectUniqueName": { "type": "string" },
+          "project": { "type": "string" },
+          "hours": { "type": "number", "format": "double" },
+          "hoursForCustomer": { "type": "number", "format": "double" },
+          "overtime": { "type": "number", "format": "double" },
+          "overtimeRate": { "type": "number", "format": "double" },
+          "outOfScope": { "type": "number", "format": "double" },
+          "reportState": {
+            "allOf": [{ "$ref": "#/components/schemas/TaskDurationStatus" }],
+            "nullable": true
+          },
+          "dayStatus": { "$ref": "#/components/schemas/DayStatus" },
+          "dayApprovalState": {
+            "allOf": [{ "$ref": "#/components/schemas/DayApprovalState" }],
+            "nullable": true
+          }
+        },
+        "required": [
+          "date", "projectId", "projectUniqueName", "project", "hours",
+          "hoursForCustomer", "overtime", "overtimeRate", "outOfScope", "dayStatus"
+        ]
+      },
+      "GetTalentProjectsResponse": {
+        "type": "object",
+        "properties": {
+          "projects": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ProjectTalentDto" }
+          },
+          "statuses": {
+            "type": "array",
+            "description": "All available ProjectStatus values as value/name pairs.",
+            "items": { "$ref": "#/components/schemas/ProjectTalentEnumDto" }
+          },
+          "types": {
+            "type": "array",
+            "description": "All available ProjectType values as value/name pairs.",
+            "items": { "$ref": "#/components/schemas/ProjectTalentEnumDto" }
+          }
+        },
+        "required": ["projects", "statuses", "types"]
+      },
+      "ProjectTalentEnumDto": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "integer" },
+          "name": { "type": "string" }
+        },
+        "required": ["value", "name"]
+      },
+      "ProjectTalentDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "startDate": { "type": "string", "format": "date-time" },
+          "endDate": { "type": "string", "format": "date-time", "nullable": true },
+          "status": { "$ref": "#/components/schemas/ProjectStatus" },
+          "type": { "$ref": "#/components/schemas/ProjectType" },
+          "projectManager": { "type": "string" },
+          "deliveryManager": { "type": "string" },
+          "members": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AccountTalentDto" }
+          },
+          "isBillable": { "type": "boolean", "nullable": true }
+        },
+        "required": [
+          "id", "name", "description", "startDate", "status", "type",
+          "projectManager", "deliveryManager", "members"
+        ]
+      },
+      "AccountTalentDto": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "dateStart": { "type": "string", "format": "date-time" },
+          "dateEnd": { "type": "string", "format": "date-time", "nullable": true }
+        },
+        "required": ["email", "dateStart"]
+      }
+    }
+  }
+}

@@ -1,6 +1,12 @@
 # UMAC-05 · `GET /users/:id` denials — `401` for an unresolved session, `403` for an authenticated viewer with no audience
 
-**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) · `um-integration-contract-response.md` Q3 (empty set → deny), Q4 (**revised 2026-09-01 by human product decision — no "leak-free 404"; standard REST codes**), Q6 (the `Bearer <token:Bob>` literal-placeholder trap; adoption fixtures use `Bearer <token:<seeded-uuid>>`) · `access-control.md` §3.2 (identity validation runs **before** any audience derivation — an unconfirmed viewer or target yields an empty audience `Set`, never Self, never the Colleague floor) · `nestjs-di-tokens.md` (`AccessControlGuard` is the only sanctioned `ACCESS_CONTROL_PORT` consumer; it already maps a denied `isAllowedForTarget` to `403`) · `testing-strategy.md` AD-1 · `docs/test-cases/README.md`
+> **SUPERSEDED 2026-09-02 — PM/AD-24.** Historical AD-1 evidence of the 2026-09-01
+> empty-audience `403` product decision. Not the live denial oracle.
+> Live rule: invalid/inactive session `401`; missing or hidden-existence target
+> `404`; visible resource but forbidden action `403`. Do not edit expectedResult
+> lines below as if they had always said `404`. Regeneration is a new AD-1 dispatch.
+
+**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) · `um-integration-contract-response.md` Q3 (empty set → deny), Q4 (**revised 2026-09-01 by human product decision — no "leak-free 404"; standard REST codes**; **superseded 2026-09-02 by PM/AD-24**), Q6 (the `Bearer <token:Bob>` literal-placeholder trap; adoption fixtures use `Bearer <token:<seeded-uuid>>`) · `access-control.md` §3.2 (identity validation runs **before** any audience derivation — an unconfirmed viewer or target yields an empty audience `Set`, never Self, never the Colleague floor) · `nestjs-di-tokens.md` (`AccessControlGuard` is the only sanctioned `ACCESS_CONTROL_PORT` consumer; it already maps a denied `isAllowedForTarget` to `403`) · `testing-strategy.md` AD-1 · `docs/test-cases/README.md`
 
 ## Scenario
 

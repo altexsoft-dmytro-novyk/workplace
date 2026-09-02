@@ -98,7 +98,7 @@ The narrowed Project-line cells (S2/S3 denied, S5 CV/certificates only), named-r
 For AD-19/AD-20, stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario still stops for its own human approval before stage 2.
 
 **Kernel MVP exception.** The scoped AD-20 amendment in
-`fr-architecture-amendment.md` defers request-time due/departure evaluation and
+`_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/fr-architecture-amendment.md` defers request-time due/departure evaluation and
 dismissed-target projection for the entire Access Control Kernel MVP, explicitly
 ACM-0 through ACM-5, because no Departure persistence seam exists; ACM-8 only
 composes and ACM-9 only measures. Stage-1 dispatches inside that package must
@@ -119,7 +119,7 @@ Separately from deterministic E2E automation, release validation must exercise t
 ### Scoped headless-facade gate — Access Control Kernel MVP
 
 The approved
-`sprint-change-proposal-2026-08-30-access-control-kernel-mvp.md` establishes one
+`_bmad-output/planning-artifacts/sprint-change-proposal-2026-08-30-access-control-kernel-mvp.md` establishes one
 scoped Stage-2 boundary for ACM-1, ACM-2, ACM-3, ACM-4, ACM-5, and ACM-8:
 
 - Invoke the public `AccessControlFacade` through a real Nest testing module
@@ -234,6 +234,12 @@ The 500-target absolute gate and representative graph coverage are binding.
 The exact depth sequence above may evolve as an operational protocol without
 changing CAP-7 product behavior, but any change creates a new protocol version
 and cannot be compared to an `ACM9-MVP-v1` baseline.
+
+**Ratification coverage (2026-09-02):** the 500-record / 2-second permission-resolution
+NFR is tracked as blocker `QUALITY-GATE-AC-NFR`. It closes only on an ACM9-MVP-v1
+**final** artifact with `status: PASS` at 500 requested active targets and warm p95
+plus worst case ≤ 2 seconds. ACM-8 composition is not a substitute. This is not a
+release-readiness claim.
 
 ## Test data isolation (DEC-UM-010)
 
