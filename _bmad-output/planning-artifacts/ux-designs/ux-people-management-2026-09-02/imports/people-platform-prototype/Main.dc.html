@@ -1,0 +1,401 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist','Geist Variable',system-ui,-apple-system,sans-serif;color:oklch(0.145 0.004 286);background:oklch(0.985 0 0);-webkit-font-smoothing:antialiased;font-size:13px;line-height:1.45;}
+    a{color:oklch(0.488 0.243 264.376);text-decoration:none;}
+    a:hover{color:oklch(0.42 0.20 264);text-decoration:underline;}
+    button{font-family:inherit;color:inherit;cursor:pointer;}
+    input,select{font-family:inherit;font-size:13px;}
+    .app{width:1440px;min-height:1040px;background:oklch(1 0 0);display:flex;flex-direction:column;}
+    .hdr{height:48px;flex:0 0 48px;border-bottom:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);display:flex;align-items:center;gap:16px;padding:0 14px;}
+    .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;width:214px;}
+    .brand .mk{width:22px;height:22px;border-radius:6px;background:oklch(0.488 0.243 264.376);display:flex;align-items:center;justify-content:center;color:#fff;}
+    .search{flex:1;max-width:400px;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 10px;color:oklch(0.556 0.012 286);background:oklch(1 0 0);}
+    .search input{border:0;outline:0;flex:1;background:transparent;color:oklch(0.145 0.004 286);}
+    .hdr-r{margin-left:auto;display:flex;align-items:center;gap:12px;color:oklch(0.556 0.012 286);}
+    .avatar{width:28px;height:28px;border-radius:999px;background:oklch(0.92 0.035 264);color:oklch(0.42 0.16 264);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:10.5px;}
+    .body{flex:1;display:flex;min-height:0;}
+    .sb{width:214px;flex:0 0 214px;border-right:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);padding:10px 8px;display:flex;flex-direction:column;gap:1px;}
+    .sb-h{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.62 0.012 286);padding:14px 10px 5px;}
+    .nav{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:oklch(0.32 0.008 286);font-weight:500;}
+    .nav:hover{background:oklch(0.955 0.003 286);}
+    .nav.on{background:oklch(0.205 0.008 286);color:oklch(0.985 0 0);}
+    .nav svg{width:16px;height:16px;flex:0 0 16px;stroke-width:2;}
+    .main{flex:1;min-width:0;padding:18px 22px 30px;overflow:auto;}
+    .ttl{display:flex;align-items:center;gap:10px;margin:0 0 3px;}
+    .ttl h1{font-size:19px;font-weight:600;margin:0;letter-spacing:-0.01em;}
+    .sub{color:oklch(0.556 0.012 286);font-size:12.5px;margin-bottom:14px;}
+    .tabs{display:flex;gap:2px;border-bottom:1px solid oklch(0.898 0.003 286);margin-bottom:14px;}
+    .tab{padding:8px 12px;font-weight:500;color:oklch(0.50 0.012 286);border-bottom:2px solid transparent;margin-bottom:-1px;background:none;border-left:0;border-right:0;border-top:0;}
+    .tab:hover{color:oklch(0.20 0.008 286);}
+    .tab.on{color:oklch(0.488 0.243 264.376);border-bottom-color:oklch(0.488 0.243 264.376);}
+    .tab.add{color:oklch(0.60 0.012 286);}
+    .bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+    .fld{height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;padding:0 8px;background:oklch(1 0 0);color:oklch(0.30 0.008 286);outline:none;}
+    .fld:focus{border-color:oklch(0.488 0.243 264.376);box-shadow:0 0 0 3px oklch(0.488 0.243 264.376 / 0.16);}
+    .qbox{display:flex;align-items:center;gap:7px;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;padding:0 9px;background:oklch(1 0 0);width:210px;}
+    .qbox input{border:0;outline:0;flex:1;background:transparent;}
+    .qbox svg{width:15px;height:15px;color:oklch(0.60 0.012 286);}
+    .spacer{flex:1;}
+    .btn{height:32px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;border-radius:8px;border:1px solid oklch(0.898 0.003 286);background:oklch(1 0 0);font-weight:500;color:oklch(0.28 0.008 286);}
+    .btn:hover{background:oklch(0.965 0.003 286);}
+    .btn svg{width:14px;height:14px;stroke-width:2;}
+    .btn.pri{background:oklch(0.488 0.243 264.376);border-color:transparent;color:oklch(0.985 0 0);}
+    .btn.pri:hover{background:oklch(0.44 0.24 264);}
+    .toggle{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 4px 0 10px;border-radius:8px;border:1px solid oklch(0.898 0.003 286);background:oklch(1 0 0);font-weight:500;color:oklch(0.30 0.008 286);}
+    .sw{width:34px;height:20px;border-radius:999px;background:oklch(0.87 0.004 286);position:relative;transition:background .15s;flex:0 0 34px;}
+    .sw.on{background:oklch(0.488 0.243 264.376);}
+    .sw i{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:999px;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2);}
+    .sw.on i{left:16px;}
+    .cw{border:1px solid oklch(0.898 0.003 286);border-radius:10px;overflow:hidden;}
+    table{width:100%;border-collapse:collapse;}
+    thead th{text-align:left;font-size:11px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.52 0.012 286);background:oklch(0.978 0.002 286);padding:9px 12px;border-bottom:1px solid oklch(0.898 0.003 286);white-space:nowrap;user-select:none;}
+    thead th.srt{cursor:pointer;}
+    thead th.srt:hover{color:oklch(0.20 0.008 286);}
+    .thc{display:inline-flex;align-items:center;gap:4px;}
+    .thc svg{width:12px;height:12px;color:oklch(0.488 0.243 264.376);}
+    tbody td{padding:9px 12px;border-bottom:1px solid oklch(0.93 0.003 286);vertical-align:middle;white-space:nowrap;}
+    tbody tr:last-child td{border-bottom:0;}
+    tbody tr:hover{background:oklch(0.983 0.002 286);}
+    th.ck,td.ck{width:36px;padding-left:14px;padding-right:0;}
+    input[type=checkbox]{width:15px;height:15px;accent-color:oklch(0.488 0.243 264.376);}
+    .who{display:inline-flex;align-items:center;gap:9px;}
+    .ini{width:26px;height:26px;border-radius:999px;background:oklch(0.945 0.02 264);color:oklch(0.42 0.14 264);display:inline-flex;align-items:center;justify-content:center;font-weight:600;font-size:10px;flex:0 0 26px;}
+    .pill{display:inline-flex;align-items:center;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:0.01em;text-transform:capitalize;}
+    .trend{display:inline-flex;vertical-align:middle;margin-left:5px;}
+    .trend svg{width:13px;height:13px;}
+    .up{color:oklch(0.55 0.20 25);}
+    .down{color:oklch(0.55 0.13 155);}
+    .muted{color:oklch(0.556 0.012 286);}
+    .selbar{display:flex;align-items:center;gap:12px;background:oklch(0.96 0.03 264);border:1px solid oklch(0.85 0.06 264);color:oklch(0.35 0.12 264);border-radius:9px;padding:8px 12px;margin-bottom:10px;font-weight:500;}
+    .selbar .lk{background:none;border:0;color:oklch(0.42 0.16 264);text-decoration:underline;padding:0;font-weight:500;}
+    .banner{display:flex;align-items:center;gap:9px;background:oklch(0.97 0.02 95);border:1px solid oklch(0.88 0.06 90);color:oklch(0.42 0.09 75);border-radius:9px;padding:9px 12px;margin-bottom:12px;font-size:12.5px;}
+    .banner svg{width:15px;height:15px;flex:0 0 15px;}
+    .foot{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;color:oklch(0.556 0.012 286);font-size:12px;border-top:1px solid oklch(0.93 0.003 286);}
+    .cfhead{color:oklch(0.488 0.243 264.376);}
+
+    /* ── stretch layer ─────────────────────────────── */
+    :root{
+      --mono:'Geist Mono',ui-monospace,'SFMono-Regular',monospace;
+      --line:oklch(0.912 0.004 286);
+      --ink-2:oklch(0.44 0.008 286);--ink-3:oklch(0.57 0.010 286);
+      --blue:oklch(0.52 0.20 264);--amber:oklch(0.58 0.12 66);
+      --green:oklch(0.55 0.13 155);--violet:oklch(0.54 0.17 300);
+      --accent:var(--blue);
+    }
+    @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+    .btn,.toggle,.tab,.fld,.sw,.sw i,tbody tr,thead th.srt{transition:all .14s ease;}
+    .pghd{position:relative;padding:0 0 14px 15px;margin-bottom:16px;border-bottom:1px solid var(--line);}
+    .pghd::before{content:"";position:absolute;left:0;top:1px;height:44px;width:3px;border-radius:2px;background:var(--accent);}
+    .eyebrow{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap;}
+    .eyebrow .sep{opacity:.4;}
+    .pgrow{display:flex;align-items:flex-start;gap:14px;}
+    .pgrow h1{font-size:22px;font-weight:600;letter-spacing:-0.02em;margin:0;line-height:1.15;}
+    .pglead{color:var(--ink-2);font-size:12.5px;margin-top:7px;max-width:720px;}
+    .prov{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px 2px 6px;border-radius:5px;border-left:2px solid currentColor;white-space:nowrap;}
+    .prov svg{width:10px;height:10px;stroke-width:2.2;}
+    .prov.synced{background:oklch(0.972 0.028 66);color:oklch(0.47 0.10 60);}
+    .prov.access{background:oklch(0.968 0.03 264);color:oklch(0.44 0.15 264);}
+    .foot span{font-family:var(--mono);letter-spacing:0.01em;}
+    tbody tr:hover{box-shadow:inset 2px 0 0 var(--accent);}
+  </style>
+</helmet>
+
+<div class="app">
+  <div class="hdr">
+    <div class="brand">
+      <span class="mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20v-6a8 8 0 0 1 16 0v6"/><circle cx="12" cy="7" r="3"/></svg></span>
+      PeoplePlatform
+    </div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input placeholder="Search people, projects, requests" />
+    </div>
+    <div class="hdr-r">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+      <span class="avatar">DN</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <nav class="sb">
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg> Home</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> My workspace</div>
+      <div class="nav on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg> All Employees</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Dashboards</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Resourcing</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Risks</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg> Mentorship</div>
+      <div class="sb-h">Administration</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Roles &amp; permissions</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg> Custom fields</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg> Departments</div>
+    </nav>
+
+    <div class="main">
+      <div class="pghd">
+        <div class="eyebrow">
+          People <span class="sep">/</span> All Employees
+          <span class="prov synced"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>Synced · leave &amp; projects</span>
+          <span class="prov access"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>Access per request</span>
+        </div>
+        <div class="pgrow"><h1>All Employees</h1></div>
+        <div class="pglead">512 people. Leave and project data comes from the timetracker; every request resolves what you're allowed to see, section by section.</div>
+      </div>
+
+      <div class="tabs">
+        <sc-for list="{{viewTabs}}" as="t" hint-placeholder-count="4">
+          <button class="tab {{t.cls}}" onClick="{{ t.onClick }}">{{t.label}}</button>
+        </sc-for>
+        <button class="tab add">+ New view</button>
+      </div>
+
+      <sc-if value="{{colleague}}" hint-placeholder-val="{{ false }}">
+        <div class="banner">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01"/><path d="M11 12h1v4h1"/></svg>
+          Colleague view — the API returns only the whitelist columns (identity, project name, away dates). Leave type, risk, grade and every closed section are never sent.
+        </div>
+      </sc-if>
+
+      <div class="bar">
+        <div class="qbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input placeholder="Filter by name" value="{{q}}" onInput="{{ onSearch }}" />
+        </div>
+        <select class="fld" value="{{fDept}}" onChange="{{ onDept }}">
+          <option value="">Department: any</option>
+          <option value="Platform">Platform</option>
+          <option value="Delivery">Delivery</option>
+          <option value="Data">Data</option>
+          <option value="People">People</option>
+          <option value="IT">IT</option>
+        </select>
+        <select class="fld" value="{{fRisk}}" onChange="{{ onRisk }}">
+          <option value="">Risk: any</option>
+          <option value="low">low</option>
+          <option value="need attention">need attention</option>
+          <option value="medium">medium</option>
+          <option value="high">high</option>
+          <option value="leaver">leaver</option>
+        </select>
+        <select class="fld" value="{{fType}}" onChange="{{ onType }}">
+          <option value="">Type: any</option>
+          <option value="FTE">FTE</option>
+          <option value="Subcontractor">Subcontractor</option>
+        </select>
+        <div class="spacer"></div>
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/></svg>Columns</button>
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Export .xlsx</button>
+        <button class="toggle" onClick="{{ onColleague }}">Colleague view <span class="sw {{swCls}}"><i></i></span></button>
+      </div>
+
+      <sc-if value="{{hasSel}}" hint-placeholder-val="{{ false }}">
+        <div class="selbar">
+          <span>{{selCount}} selected</span>
+          <button class="lk">Assign people partner</button>
+          <button class="lk">Add to campaign audience</button>
+          <button class="lk">Export selection</button>
+          <span class="spacer"></span>
+          <button class="lk" onClick="{{ onClearSel }}">Clear</button>
+        </div>
+      </sc-if>
+
+      <div class="cw">
+        <table>
+          <thead>
+            <tr>
+              <th class="ck"><input type="checkbox" checked="{{allChecked}}" onChange="{{ onToggleAll }}" /></th>
+              <sc-for list="{{columns}}" as="c" hint-placeholder-count="7">
+                <th class="srt" onClick="{{ c.onClick }}">
+                  <span class="thc">
+                    <span class="{{c.hcls}}">{{c.label}}</span>
+                    <sc-if value="{{c.asc}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 15 6-6 6 6"/></svg></sc-if>
+                    <sc-if value="{{c.desc}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m6 9 6 6 6-6"/></svg></sc-if>
+                  </span>
+                </th>
+              </sc-for>
+            </tr>
+          </thead>
+          <tbody>
+            <sc-for list="{{rows}}" as="r" hint-placeholder-count="9">
+              <tr>
+                <td class="ck"><input type="checkbox" checked="{{r.checked}}" onChange="{{ r.onToggle }}" /></td>
+                <sc-for list="{{r.cells}}" as="c" hint-placeholder-count="7">
+                  <td>
+                    <sc-if value="{{c.isName}}" hint-placeholder-val="{{ true }}">
+                      <span class="who"><span class="ini">{{c.ini}}</span><a href="#">{{c.text}}</a></span>
+                    </sc-if>
+                    <sc-if value="{{c.isRisk}}" hint-placeholder-val="{{ false }}">
+                      <span class="pill" style="{{c.style}}">{{c.text}}</span><sc-if value="{{c.up}}" hint-placeholder-val="{{ false }}"><span class="trend up"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span></sc-if><sc-if value="{{c.down}}" hint-placeholder-val="{{ false }}"><span class="trend down"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M7 7 17 17"/><path d="M17 8v9H8"/></svg></span></sc-if>
+                    </sc-if>
+                    <sc-if value="{{c.isText}}" hint-placeholder-val="{{ true }}">
+                      <span class="{{c.tcls}}">{{c.text}}</span>
+                    </sc-if>
+                  </td>
+                </sc-for>
+              </tr>
+            </sc-for>
+          </tbody>
+        </table>
+        <div class="foot">
+          <span>{{rowCount}} of 512 people · sorted by {{sortLabel}}</span>
+          <span>Rows per page: 25</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      view: 'all', q: '', sortKey: 'name', sortDir: 'asc',
+      fDept: '', fRisk: '', fType: '', colleague: false, sel: {}
+    };
+  }
+
+  data() {
+    return [
+      { id: 'e1',  name: 'Amelia Rho',      ini: 'AR', dept: 'Platform', position: 'Senior Engineer',   grade: 'D2', country: 'Poland',  risk: 'need attention', trend: 'up',   project: 'Atlas',  type: 'FTE',           english: 'C1', mentor: 'Mentor', joinYear: 2021, from: 'Aug 12', to: 'Aug 19', notice: '30 days' },
+      { id: 'e2',  name: 'Bohdan Serik',    ini: 'BS', dept: 'Delivery', position: 'Delivery Manager',   grade: 'M3', country: 'Ukraine', risk: 'low',            trend: 'none', project: 'Orbit',  type: 'FTE',           english: 'B2', mentor: '—',      joinYear: 2018, from: '',       to: '',       notice: '60 days' },
+      { id: 'e3',  name: 'Carla Mendes',    ini: 'CM', dept: 'Data',     position: 'Data Scientist',     grade: 'D1', country: 'Portugal',risk: 'medium',         trend: 'up',   project: 'Atlas',  type: 'FTE',           english: 'C1', mentor: 'Open',   joinYear: 2026, from: '',       to: '',       notice: '30 days' },
+      { id: 'e4',  name: 'Dmytro Novak',    ini: 'DN', dept: 'Delivery', position: 'Project Manager',    grade: 'M2', country: 'Poland',  risk: 'low',            trend: 'down', project: 'Orbit',  type: 'FTE',           english: 'B2', mentor: 'Mentor', joinYear: 2026, from: '',       to: '',       notice: '30 days' },
+      { id: 'e5',  name: 'Elena Costa',     ini: 'EC', dept: 'Platform', position: 'Staff Engineer',     grade: 'D3', country: 'Italy',   risk: 'high',           trend: 'up',   project: 'Bench',  type: 'FTE',           english: 'C2', mentor: 'Open',   joinYear: 2016, from: 'Sep 01', to: 'Sep 15', notice: '90 days' },
+      { id: 'e6',  name: 'Farid Aliyev',    ini: 'FA', dept: 'IT',       position: 'Security Lead',      grade: 'M2', country: 'Poland',  risk: 'low',            trend: 'none', project: 'Internal',type: 'FTE',          english: 'B2', mentor: '—',      joinYear: 2019, from: '',       to: '',       notice: '30 days' },
+      { id: 'e7',  name: 'Grace Owens',     ini: 'GO', dept: 'People',   position: 'People Partner',     grade: 'M2', country: 'UK',      risk: 'low',            trend: 'none', project: '—',      type: 'FTE',           english: 'C2', mentor: 'Mentor', joinYear: 2015, from: '',       to: '',       notice: '30 days' },
+      { id: 'e8',  name: 'Hassan Karim',    ini: 'HK', dept: 'Data',     position: 'Analytics Engineer', grade: 'D1', country: 'Poland',  risk: 'leaver',         trend: 'up',   project: 'Bench',  type: 'Subcontractor', english: 'B1', mentor: '—',      joinYear: 2023, from: 'Aug 05', to: 'Aug 09', notice: '14 days' },
+      { id: 'e9',  name: 'Ilaria Bruno',    ini: 'IB', dept: 'Platform', position: 'Engineer',           grade: 'D1', country: 'Portugal',risk: 'need attention', trend: 'down', project: 'Atlas',  type: 'FTE',           english: 'B2', mentor: 'Open',   joinYear: 2026, from: '',       to: '',       notice: '30 days' },
+      { id: 'e10', name: 'Jonas Weber',     ini: 'JW', dept: 'Delivery', position: 'Engineer',           grade: 'D2', country: 'Germany', risk: 'low',            trend: 'none', project: 'Orbit',  type: 'FTE',           english: 'C1', mentor: '—',      joinYear: 2020, from: '',       to: '',       notice: '30 days' },
+      { id: 'e11', name: 'Kateryna Bondar', ini: 'KB', dept: 'People',   position: 'HR Admin',           grade: 'M1', country: 'Ukraine', risk: 'low',            trend: 'none', project: '—',      type: 'FTE',           english: 'B2', mentor: '—',      joinYear: 2022, from: '',       to: '',       notice: '30 days' },
+      { id: 'e12', name: 'Lucas Pereira',   ini: 'LP', dept: 'Data',     position: 'Senior Data Scientist',grade: 'D2',country: 'Poland',  risk: 'medium',         trend: 'down', project: 'Atlas',  type: 'FTE',           english: 'C1', mentor: 'Open',   joinYear: 2026, from: '',       to: '',       notice: '30 days' }
+    ];
+  }
+
+  sort(k) {
+    const s = this.state;
+    if (s.sortKey === k) this.setState({ sortDir: s.sortDir === 'asc' ? 'desc' : 'asc' });
+    else this.setState({ sortKey: k, sortDir: 'asc' });
+  }
+  setView(v) { this.setState({ view: v }); }
+  setField(f, e) { const p = {}; p[f] = e.target.value; this.setState(p); }
+  toggleColleague() { this.setState({ colleague: !this.state.colleague }); }
+  toggleRow(id) {
+    const sel = Object.assign({}, this.state.sel);
+    if (sel[id]) delete sel[id]; else sel[id] = true;
+    this.setState({ sel });
+  }
+  clearSel() { this.setState({ sel: {} }); }
+
+  renderVals() {
+    const s = this.state;
+    const RANK = { 'low': 0, 'need attention': 1, 'medium': 2, 'high': 3, 'leaver': 4 };
+    const PILL = {
+      'low': 'background:oklch(0.95 0.012 220);color:oklch(0.46 0.03 220);',
+      'need attention': 'background:oklch(0.96 0.05 95);color:oklch(0.48 0.11 78);',
+      'medium': 'background:oklch(0.95 0.06 62);color:oklch(0.49 0.14 48);',
+      'high': 'background:oklch(0.95 0.055 25);color:oklch(0.52 0.20 25);',
+      'leaver': 'background:oklch(0.93 0.05 350);color:oklch(0.44 0.17 8);'
+    };
+    const LABELS = { name: 'name', dept: 'department', position: 'position', grade: 'grade', risk: 'risk', project: 'project', leave: 'leave status', type: 'type', english: 'English', mentor: 'mentorship', notice: 'notice period', away: 'away' };
+
+    let rows = this.data().map(r => Object.assign({}, r, {
+      leave: r.from ? ('Away ' + r.from + ' – ' + r.to) : 'In office'
+    }));
+    if (s.view === 'bench') rows = rows.filter(r => r.project === 'Bench');
+    if (s.view === 'poland') rows = rows.filter(r => r.country === 'Poland' && r.joinYear === 2026);
+    if (s.view === 'mentors') rows = rows.filter(r => r.mentor === 'Mentor' || r.mentor === 'Open');
+    if (s.fDept) rows = rows.filter(r => r.dept === s.fDept);
+    if (s.fRisk) rows = rows.filter(r => r.risk === s.fRisk);
+    if (s.fType) rows = rows.filter(r => r.type === s.fType);
+    if (s.q) { const q = s.q.toLowerCase(); rows = rows.filter(r => r.name.toLowerCase().indexOf(q) >= 0); }
+
+    const k = s.sortKey, dir = s.sortDir === 'asc' ? 1 : -1;
+    rows = rows.slice().sort((a, b) => {
+      let x = a[k], y = b[k];
+      if (k === 'risk') { x = RANK[a.risk]; y = RANK[b.risk]; }
+      if (typeof x === 'string') { x = x.toLowerCase(); y = ('' + y).toLowerCase(); }
+      if (x < y) return -1 * dir;
+      if (x > y) return 1 * dir;
+      return 0;
+    });
+
+    const keys = s.colleague
+      ? ['name', 'project', 'away']
+      : ['name', 'dept', 'position', 'grade', 'risk', 'project', 'leave', 'type', 'english', 'mentor', 'notice'];
+
+    const columns = keys.map(key => ({
+      key,
+      label: key === 'name' ? 'Employee' : (key === 'dept' ? 'Department' : (key.charAt(0).toUpperCase() + key.slice(1))),
+      onClick: () => this.sort(key),
+      asc: s.sortKey === key && s.sortDir === 'asc',
+      desc: s.sortKey === key && s.sortDir === 'desc',
+      hcls: key === 'notice' ? 'cfhead' : ''
+    }));
+    if (s.colleague) {
+      columns[1].label = 'Project';
+      columns[2].label = 'Away';
+    }
+
+    const outRows = rows.map(r => ({
+      id: r.id,
+      checked: !!s.sel[r.id],
+      onToggle: () => this.toggleRow(r.id),
+      cells: keys.map(key => {
+        if (key === 'name') return { isName: true, text: r.name, ini: r.ini };
+        if (key === 'risk') return { isRisk: true, text: r.risk, style: PILL[r.risk], up: r.trend === 'up', down: r.trend === 'down' };
+        if (key === 'away') return { isText: true, text: r.from ? (r.from + ' – ' + r.to) : '—', tcls: r.from ? '' : 'muted' };
+        if (key === 'leave') return { isText: true, text: r.leave, tcls: r.from ? '' : 'muted' };
+        if (key === 'project') return { isText: true, text: r.project, tcls: r.project === '—' || r.project === 'Bench' ? 'muted' : '' };
+        if (key === 'mentor') return { isText: true, text: r.mentor, tcls: r.mentor === '—' ? 'muted' : '' };
+        if (key === 'notice') return { isText: true, text: r.notice, tcls: 'cfhead' };
+        return { isText: true, text: r[key], tcls: '' };
+      })
+    }));
+
+    const selCount = Object.keys(s.sel).length;
+    const mk = (id, label) => ({ id, label, cls: s.view === id ? 'on' : '', onClick: () => this.setView(id) });
+
+    return {
+      viewTabs: [mk('all', 'All employees'), mk('bench', 'Bench'), mk('poland', 'Joined 2026 · Poland'), mk('mentors', 'Open to mentoring')],
+      columns,
+      rows: outRows,
+      rowCount: outRows.length,
+      sortLabel: (LABELS[s.sortKey] || s.sortKey) + ', ' + (s.sortDir === 'asc' ? 'ascending' : 'descending'),
+      q: s.q,
+      onSearch: (e) => this.setField('q', e),
+      fDept: s.fDept, fRisk: s.fRisk, fType: s.fType,
+      onDept: (e) => this.setField('fDept', e),
+      onRisk: (e) => this.setField('fRisk', e),
+      onType: (e) => this.setField('fType', e),
+      colleague: s.colleague,
+      swCls: s.colleague ? 'on' : '',
+      onColleague: () => this.toggleColleague(),
+      selCount, hasSel: selCount > 0,
+      onClearSel: () => this.clearSel(),
+      allChecked: outRows.length > 0 && selCount >= outRows.length,
+      onToggleAll: () => {
+        const cur = Object.keys(this.state.sel).length;
+        if (cur >= outRows.length) { this.setState({ sel: {} }); return; }
+        const all = {};
+        outRows.forEach(r => { all[r.id] = true; });
+        this.setState({ sel: all });
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

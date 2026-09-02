@@ -1,0 +1,311 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist','Geist Variable',system-ui,-apple-system,sans-serif;color:oklch(0.145 0.004 286);background:oklch(0.985 0 0);-webkit-font-smoothing:antialiased;font-size:13px;line-height:1.45;}
+    a{color:oklch(0.488 0.243 264.376);text-decoration:none;}
+    button{font-family:inherit;color:inherit;cursor:pointer;}
+    .app{width:1440px;min-height:1180px;background:oklch(1 0 0);display:flex;flex-direction:column;}
+    .hdr{height:48px;flex:0 0 48px;border-bottom:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);display:flex;align-items:center;gap:16px;padding:0 14px;}
+    .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;width:214px;}
+    .brand .mk{width:22px;height:22px;border-radius:6px;background:oklch(0.488 0.243 264.376);display:flex;align-items:center;justify-content:center;color:#fff;}
+    .search{flex:1;max-width:400px;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 10px;color:oklch(0.556 0.012 286);background:#fff;}
+    .search input{border:0;outline:0;flex:1;background:transparent;}
+    .hdr-r{margin-left:auto;display:flex;align-items:center;gap:12px;color:oklch(0.556 0.012 286);}
+    .avatar{width:28px;height:28px;border-radius:999px;background:oklch(0.92 0.035 264);color:oklch(0.42 0.16 264);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:10.5px;}
+    .body{flex:1;display:flex;min-height:0;}
+    .sb{width:214px;flex:0 0 214px;border-right:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);padding:10px 8px;display:flex;flex-direction:column;gap:1px;}
+    .sb-h{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.62 0.012 286);padding:14px 10px 5px;}
+    .nav{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:oklch(0.32 0.008 286);font-weight:500;}
+    .nav:hover{background:oklch(0.955 0.003 286);}
+    .nav.on{background:oklch(0.205 0.008 286);color:oklch(0.985 0 0);}
+    .nav svg{width:16px;height:16px;flex:0 0 16px;stroke-width:2;}
+    .main{flex:1;min-width:0;padding:20px 24px 34px;overflow:auto;}
+    .phead{display:flex;align-items:center;gap:16px;padding-bottom:16px;border-bottom:1px solid oklch(0.91 0.003 286);}
+    .pic{width:60px;height:60px;border-radius:14px;background:oklch(0.93 0.03 264);color:oklch(0.40 0.15 264);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:19px;flex:0 0 60px;}
+    .pn h1{font-size:20px;font-weight:600;margin:0;letter-spacing:-0.01em;}
+    .pn .role{color:oklch(0.50 0.012 286);font-size:13px;margin-top:1px;}
+    .prel{display:flex;gap:18px;margin-top:8px;font-size:12px;}
+    .prel div{color:oklch(0.556 0.012 286);}
+    .prel b{color:oklch(0.28 0.008 286);font-weight:600;}
+    .aud{margin:18px 0 6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .aud .cap{font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.55 0.012 286);}
+    .seg{display:inline-flex;border:1px solid oklch(0.898 0.003 286);border-radius:9px;overflow:hidden;}
+    .seg button{border:0;background:#fff;padding:7px 12px;font-weight:500;font-size:12px;color:oklch(0.42 0.008 286);border-right:1px solid oklch(0.92 0.003 286);}
+    .seg button:last-child{border-right:0;}
+    .seg button:hover{background:oklch(0.965 0.003 286);}
+    .seg button.on{background:oklch(0.488 0.243 264.376);color:#fff;}
+    .asum{color:oklch(0.556 0.012 286);font-size:12px;margin:8px 0 16px;}
+    .asum b{color:oklch(0.28 0.008 286);}
+    .sec{border:1px solid oklch(0.91 0.003 286);border-radius:11px;margin-bottom:9px;overflow:hidden;}
+    .sec.hidden{border-style:dashed;background:oklch(0.982 0.002 286);}
+    .sechd{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer;}
+    .sec.hidden .sechd{cursor:default;}
+    .sid{font-family:'Geist Mono','Geist',ui-monospace,monospace;font-size:11px;font-weight:500;color:oklch(0.55 0.012 286);width:30px;flex:0 0 30px;}
+    .snm{font-weight:600;font-size:13.5px;flex:1;}
+    .sec.hidden .snm{color:oklch(0.60 0.012 286);font-weight:500;}
+    .snote{font-size:11px;color:oklch(0.50 0.10 60);background:oklch(0.96 0.04 90);padding:2px 7px;border-radius:6px;font-weight:500;}
+    .acc{font-size:11px;font-weight:700;letter-spacing:0.02em;padding:2px 8px;border-radius:6px;}
+    .acc.rw{background:oklch(0.94 0.05 264);color:oklch(0.40 0.17 264);}
+    .acc.r{background:oklch(0.955 0.003 286);color:oklch(0.45 0.012 286);}
+    .acc.no{background:oklch(0.96 0.02 25);color:oklch(0.52 0.14 25);}
+    .lock{color:oklch(0.68 0.006 286);}
+    .lock svg{width:14px;height:14px;}
+    .chev{color:oklch(0.62 0.012 286);}
+    .chev svg{width:15px;height:15px;transition:transform .12s;}
+    .secbd{padding:0 14px 14px 55px;font-size:12.5px;color:oklch(0.38 0.008 286);}
+    .secbd .kv{display:flex;gap:8px;padding:3px 0;}
+    .secbd .kv span{color:oklch(0.556 0.012 286);min-width:130px;}
+    .hiddenbd{padding:2px 14px 12px 55px;font-size:11.5px;color:oklch(0.58 0.012 286);}
+    .apill{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.42 0.16 264);background:oklch(0.94 0.05 264);padding:3px 8px;border-radius:999px;vertical-align:middle;margin-left:9px;}
+    .apill svg{width:11px;height:11px;}
+    .adminbar{display:flex;gap:11px;align-items:flex-start;background:oklch(0.975 0.02 264);border:1px solid oklch(0.88 0.045 264);border-radius:11px;padding:12px 14px;margin:16px 0 6px;}
+    .adminbar .shield{color:oklch(0.45 0.16 264);flex:0 0 18px;margin-top:1px;}
+    .adminbar .shield svg{width:18px;height:18px;}
+    .adminbar b{font-size:13px;}
+    .adminbar p{margin:3px 0 0;color:oklch(0.42 0.05 264);font-size:11.5px;line-height:1.5;}
+
+    /* ── stretch layer ─────────────────────────────── */
+    :root{
+      --mono:'Geist Mono',ui-monospace,'SFMono-Regular',monospace;
+      --line:oklch(0.912 0.004 286);
+      --ink-2:oklch(0.44 0.008 286);--ink-3:oklch(0.57 0.010 286);
+      --violet:oklch(0.54 0.17 300);--accent:var(--violet);
+    }
+    @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+    .seg button,.sec,.chev svg{transition:all .14s ease;}
+    .eyebrow{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:9px;margin-bottom:12px;padding-left:15px;position:relative;flex-wrap:wrap;}
+    .eyebrow::before{content:"";position:absolute;left:0;top:-1px;height:15px;width:3px;border-radius:2px;background:var(--accent);}
+    .eyebrow .sep{opacity:.4;}
+    .prov{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px 2px 6px;border-radius:5px;border-left:2px solid currentColor;white-space:nowrap;background:oklch(0.969 0.022 300);color:oklch(0.46 0.13 300);}
+    .prov svg{width:10px;height:10px;stroke-width:2.2;}
+    .asum b{font-family:var(--mono);}
+    /* 6-audience access matrix on each section header */
+    .amx{display:inline-flex;gap:3px;align-items:center;margin-left:auto;}
+    .amx i{width:9px;height:9px;border-radius:2px;display:block;box-sizing:border-box;}
+    .amx i.rw{background:var(--violet);}
+    .amx i.r{background:oklch(0.74 0.006 286);}
+    .amx i.no{background:oklch(0.955 0.003 286);border:1px solid oklch(0.87 0.004 286);}
+    .amx i.cur{outline:2px solid oklch(0.54 0.17 300 / 0.4);outline-offset:1.5px;}
+    .amxleg{display:flex;align-items:center;gap:14px;font-family:var(--mono);font-size:9px;letter-spacing:0.05em;text-transform:uppercase;color:var(--ink-3);margin:2px 0 14px;padding-left:2px;}
+    .amxleg span{display:inline-flex;align-items:center;gap:5px;}
+    .amxleg i{width:9px;height:9px;border-radius:2px;display:block;}
+  </style>
+</helmet>
+
+<div class="app">
+  <div class="hdr">
+    <div class="brand"><span class="mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20v-6a8 8 0 0 1 16 0v6"/><circle cx="12" cy="7" r="3"/></svg></span> PeoplePlatform</div>
+    <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input placeholder="Search" /></div>
+    <div class="hdr-r"><span class="avatar">DN</span></div>
+  </div>
+  <div class="body">
+    <nav class="sb">
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg> Home</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> My workspace</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg> All Employees</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Dashboards</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Resourcing</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Risks</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg> Mentorship</div>
+      <div class="sb-h">Administration</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Roles &amp; permissions</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg> Custom fields</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/></svg> Departments</div>
+      <div class="nav on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Access preview</div>
+    </nav>
+
+    <div class="main">
+      <div class="eyebrow">
+        Administration <span class="sep">/</span> Access preview
+        <span class="prov"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>HR Admin only</span>
+      </div>
+      <div class="phead">
+        <div class="pic">AR</div>
+        <div class="pn">
+          <h1>Amelia Rho</h1>
+          <div class="role">Senior Engineer · Platform · Kraków, Poland</div>
+          <div class="prel">
+            <div>Manager <b>Bohdan Serik</b></div>
+            <div>People Partner <b>Grace Owens</b></div>
+            <div>Mentor <b>Grace Owens</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="adminbar">
+        <span class="shield"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-4"/></svg></span>
+        <div>
+          <b>Access preview — HR Admin only</b>
+          <p>An administration tool for verifying the access model: it resolves how the profile API assembles its response for each audience. Reachable only by HR Admin — every other user sees just their own relationship-resolved view, and there is no audience switch anywhere else in the product. Section content shown here is representative sample data, not the live record.</p>
+        </div>
+      </div>
+      <div class="aud">
+        <span class="cap">Resolve as audience</span>
+        <div class="seg">
+          <sc-for list="{{auds}}" as="a" hint-placeholder-count="6">
+            <button class="{{a.cls}}" onClick="{{ a.onClick }}">{{a.label}}</button>
+          </sc-for>
+        </div>
+      </div>
+      <div class="asum"><b>{{visibleCount}}</b> of 16 sections returned for <b>{{audLabel}}</b> · {{audDesc}} · the API assembles the response from entitled sections only — a closed section is never rendered and never sent.</div>
+      <div class="amxleg">
+        <span>Per audience</span>
+        <span><i style="background:oklch(0.54 0.17 300)"></i>Read / write</span>
+        <span><i style="background:oklch(0.74 0.006 286)"></i>Read</span>
+        <span><i style="background:oklch(0.955 0.003 286);border:1px solid oklch(0.87 0.004 286)"></i>Not returned</span>
+        <span>Ringed = current</span>
+      </div>
+
+      <sc-for list="{{sections}}" as="s" hint-placeholder-count="16">
+        <div class="sec {{s.wrapCls}}">
+          <div class="sechd" onClick="{{ s.onToggle }}">
+            <span class="sid">{{s.id}}</span>
+            <span class="snm">{{s.name}}</span>
+            <sc-if value="{{s.note}}" hint-placeholder-val="{{ false }}"><span class="snote">{{s.note}}</span></sc-if>
+            <span class="amx">
+              <sc-for list="{{s.matrix}}" as="m" hint-placeholder-count="6"><i class="{{m.cls}}" title="{{m.label}}"></i></sc-for>
+            </span>
+            <sc-if value="{{s.visible}}" hint-placeholder-val="{{ true }}">
+              <span class="acc {{s.accCls}}">{{s.acc}}</span>
+              <span class="chev">
+                <sc-if value="{{s.open}}" hint-placeholder-val="{{ false }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 15 6-6 6 6"/></svg></sc-if>
+                <sc-if value="{{s.closed}}" hint-placeholder-val="{{ true }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 9 6 6 6-6"/></svg></sc-if>
+              </span>
+            </sc-if>
+            <sc-if value="{{s.hidden}}" hint-placeholder-val="{{ false }}">
+              <span class="acc no">not returned</span>
+              <span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></span>
+            </sc-if>
+          </div>
+          <sc-if value="{{s.showBody}}" hint-placeholder-val="{{ false }}">
+            <div class="secbd">
+              <sc-for list="{{s.rows}}" as="r" hint-placeholder-count="3">
+                <div class="kv"><span>{{r.k}}</span>{{r.v}}</div>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{s.hidden}}" hint-placeholder-val="{{ false }}">
+            <div class="hiddenbd">{{s.hiddenReason}}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { aud: 'reporting', open: { S1: true, S6: true, S10: true } };
+    this.auds = [
+      { id: 'self', label: 'Self', desc: 'the employee, viewing themselves' },
+      { id: 'reporting', label: 'Reporting line', desc: 'manager via reports-to or department, and everyone above' },
+      { id: 'project', label: 'Project line', desc: 'PM and DM of the person’s projects — a narrower set' },
+      { id: 'pp', label: 'People Partner', desc: 'assigned PP and the HR line above them' },
+      { id: 'colleague', label: 'Colleague', desc: 'any authenticated employee with no other relationship' },
+      { id: 'full', label: 'Full access', desc: 'holders of the separate full-profile grant' }
+    ];
+    this.sections = [
+      { id: 'S1', name: 'Identity card', acc: { self: 'R', reporting: 'RW', project: 'RW', pp: 'RW', colleague: 'R', full: 'R' }, note: { self: 'photo RW' }, rows: [['Full name', 'Amelia Rho'], ['Position', 'Senior Engineer'], ['Work email', 'amelia.rho@company.com'], ['Manager', 'Bohdan Serik — changed elsewhere']] },
+      { id: 'S2', name: 'Personal contacts', acc: { self: 'RW', reporting: 'R', project: '—', pp: 'RW', colleague: '—', full: 'R' }, rows: [['Personal phone', '+48 ••• ••• 214'], ['Residential address', 'ul. Długa 12, Kraków'], ['Place of stay', 'Kraków']] },
+      { id: 'S3', name: 'Emergency contacts', acc: { self: 'RW', reporting: 'R', project: '—', pp: 'RW', colleague: '—', full: 'R' }, rows: [['Contact person', 'M. Rho'], ['Relationship', 'Parent'], ['Phone', '+48 ••• ••• 900']] },
+      { id: 'S4', name: 'Employment', acc: { self: 'R', reporting: 'RW', project: 'RW', pp: 'RW', colleague: '—', full: 'R' }, rows: [['Employee type', 'FTE'], ['Grade', 'D2'], ['Probation', 'Passed'], ['Contract type', 'B2B']] },
+      { id: 'S5', name: 'Documents', acc: { self: 'R', reporting: 'R', project: 'R', pp: 'RW', colleague: '—', full: 'R' }, note: { project: 'CV & certificates only', self: 'own + upload certs' }, rows: [['CV', 'amelia-rho-cv.pdf'], ['Certificates', '3 files'], ['Contract', 'restricted']] },
+      { id: 'S6', name: 'Risks', acc: { self: '—', reporting: 'RW', project: 'RW', pp: 'RW', colleague: '—', full: 'R' }, rows: [['Current level', 'need attention'], ['Trend', 'up from low'], ['Note', 'Considering external offer']] },
+      { id: 'S7', name: 'Management notes', acc: { self: 'R', reporting: 'RW', project: 'R', pp: 'RW', colleague: '—', full: 'R' }, note: { self: 'flagged records only', project: 'PM: flagged records only' }, rows: [['2026-07-14', 'Strong quarter — visible for employee'], ['2026-06-02', 'Retention conversation (management only)']] },
+      { id: 'S8', name: 'Feedbacks', acc: { self: 'R', reporting: 'RW', project: 'RW', pp: 'RW', colleague: '—', full: 'R' }, note: { self: 'shared records only' }, rows: [['Joining interview', 'shared with employee'], ['Project Atlas review', 'management only']] },
+      { id: 'S9', name: 'Career timeline', acc: { self: 'R', reporting: 'RW', project: 'RW', pp: 'RW', colleague: '—', full: 'R' }, rows: [['2021-03', 'Joined the company'], ['2023-09', 'Promoted to D2'], ['2025-01', 'Mentorship pair started']] },
+      { id: 'S10', name: 'Leaves and absences', acc: { self: 'R', reporting: 'R', project: 'R', pp: 'R', colleague: 'R', full: 'R' }, note: { colleague: 'dates only, type hidden' }, rows: [['Vacation', 'Aug 12 – Aug 19 · approved'], ['Sick leave', 'Jul 03 – Jul 04'], ['Parental leave', '2024 Feb – May · extended'], ['Source', 'timetracker sync · read-only, GET /users/:id/leaves']] },
+      { id: 'S11', name: 'Projects', acc: { self: 'R', reporting: 'R', project: 'R', pp: 'R', colleague: 'R', full: 'R' }, note: { colleague: 'project name only' }, rows: [['Atlas', 'PM Dmytro Novak · DM Bohdan Serik'], ['Period', 'since 2024-02']] },
+      { id: 'S12', name: 'CDS', acc: { self: 'R', reporting: 'RW', project: 'RW', pp: 'RW', colleague: '—', full: 'R' }, note: { self: '+ complete own IDP' }, rows: [['Skills matrix', 'Platform / Senior — v14'], ['Last assessment', '2026-02-11'], ['Open IDP', 'Leadership track — due 2026-09']] },
+      { id: 'S13', name: 'Mentorship', acc: { self: 'RW', reporting: 'RW', project: 'RW', pp: 'RW', colleague: '—', full: 'R' }, note: { self: 'own flag RW, pairs R' }, rows: [['Open to mentoring', 'Yes'], ['Mentees', 'Ilaria Bruno'], ['Status', 'mentor']] },
+      { id: 'S14', name: 'Action items and tasks', acc: { self: 'R', reporting: 'RW', project: 'RW', pp: 'RW', colleague: '—', full: 'R' }, note: { self: 'own + mark complete' }, rows: [['Security awareness form', 'due in 4 days'], ['Complete IDP check-in', 'open']] },
+      { id: 'S15', name: 'Request history', acc: { self: '—', reporting: 'R', project: 'R', pp: 'R', colleague: '—', full: 'R' }, rows: [['Orbit — Senior Engineer', 'proposed → approved'], ['Compensation band', 'never shown here']] },
+      { id: 'S16', name: 'Custom fields', acc: { self: 'R', reporting: 'RW', project: 'RW', pp: 'RW', colleague: 'R', full: 'R' }, note: { self: 'per field visibility', colleague: 'per field visibility' }, rows: [['Notice period', '30 days (management)'], ['T-shirt size', 'M (colleague)'], ['Spoken languages', 'EN, PL (employee)']] }
+    ];
+  }
+
+  setAud(id) { this.setState({ aud: id }); }
+  toggle(id) {
+    const open = Object.assign({}, this.state.open);
+    if (open[id]) delete open[id]; else open[id] = true;
+    this.setState({ open });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const cur = this.auds.find(a => a.id === s.aud);
+    const CLS = { 'RW': 'rw', 'R': 'r' };
+    const HIDE_REASON = {
+      colleague: 'Colleague view is a whitelist — the API returns only S1, the S10 dates, and the S11 project name.',
+      project: 'The project line gets a narrower set than the reporting line: no personal or emergency contacts.',
+      self: 'This section is deliberately closed to the employee (see §3.3).'
+    };
+
+    let visible = 0;
+    const sections = this.sections.map(sec => {
+      const v = sec.acc[s.aud];
+      const note = sec.note ? sec.note[s.aud] : null;
+      const hidden = v === '—';
+      if (!hidden) visible++;
+      const isOpen = !!s.open[sec.id];
+      let bodyRows = sec.rows;
+      if (sec.id === 'S10' && s.aud === 'colleague') {
+        bodyRows = [['Away', 'Aug 12 – Aug 19'], ['Away', 'Jul 03 – Jul 04'], ['Leave type', 'hidden from colleagues — dates only']];
+      }
+      if (sec.id === 'S16' && s.aud === 'colleague') {
+        bodyRows = [['T-shirt size', 'M — colleague-visible field'], ['Other custom fields', 'hidden — visibility is per field']];
+      }
+      const matrix = this.auds.map(a => {
+        const av = sec.acc[a.id];
+        return {
+          cls: (av === 'RW' ? 'rw' : (av === 'R' ? 'r' : 'no')) + (a.id === s.aud ? ' cur' : ''),
+          label: a.label + ' — ' + (av === '—' ? 'not returned' : av)
+        };
+      });
+      return {
+        id: sec.id,
+        name: sec.name,
+        note: note || '',
+        matrix,
+        acc: v,
+        accCls: CLS[v] || 'r',
+        visible: !hidden,
+        hidden,
+        wrapCls: hidden ? 'hidden' : '',
+        open: isOpen,
+        closed: !isOpen,
+        showBody: !hidden && isOpen,
+        onToggle: hidden ? (() => {}) : (() => this.toggle(sec.id)),
+        rows: bodyRows.map(r => ({ k: r[0], v: r[1] })),
+        hiddenReason: HIDE_REASON[s.aud] || 'Not rendered for this audience.'
+      };
+    });
+
+    return {
+      auds: this.auds.map(a => ({
+        id: a.id, label: a.label,
+        cls: s.aud === a.id ? 'on' : '',
+        onClick: () => this.setAud(a.id)
+      })),
+      audLabel: cur.label,
+      audDesc: cur.desc,
+      visibleCount: visible,
+      sections
+    };
+  }
+}
+</script>
+</body>
+</html>
