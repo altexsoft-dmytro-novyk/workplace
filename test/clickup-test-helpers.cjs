@@ -35,6 +35,13 @@ function validationResponse(url, init, options = {}) {
     });
   }
 
+  if (url.match(/\/folder\//)) {
+    return jsonResponse(200, {
+      id: 'mock-folder',
+      space: { id: options.spaceId || DEFAULT_SPACE_ID },
+    });
+  }
+
   const taskMatch = url.match(/\/task\/([^/?]+)$/);
   if (taskMatch && !url.includes('/field/')) {
     const taskId = taskMatch[1];

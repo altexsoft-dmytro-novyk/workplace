@@ -148,6 +148,14 @@ test('validation stops before POST when list belongs to another workspace', asyn
         if (url.match(new RegExp(`/list/${DEFAULT_LIST_ID}$`))) {
           return jsonResponse(200, { id: DEFAULT_LIST_ID, team_id: '99999999999' });
         }
+        const epicMatch = url.match(/\/task\/([^/?]+)$/);
+        if (epicMatch) {
+          return jsonResponse(200, {
+            id: epicMatch[1],
+            team_id: '90122019689',
+            list: { id: DEFAULT_LIST_ID },
+          });
+        }
         return jsonResponse(200, {});
       },
     }),

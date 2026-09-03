@@ -10,6 +10,7 @@
     "test:clickup": "node --test test/clickup-lib.test.cjs test/clickup-sync.test.cjs test/clickup-create.test.cjs test/clickup-safety.test.cjs",
     "debug:clickup-lookup": "node scripts/debug-clickup-lookup.cjs",
     "preflight:clickup": "node scripts/preflight-clickup-live.cjs",
+    "debug:clickup-list": "node scripts/debug-clickup-list.cjs",
     "services:init": "git submodule update --init --recursive",
     "services:status": "git submodule status",
     "services:sync": "git submodule update --remote",

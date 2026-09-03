@@ -136,10 +136,10 @@ function taskWorkspaceId(task) {
   return null;
 }
 
-async function fetchSpacesForWorkspace(fetchImpl, workspaceId, token) {
+async function fetchSpacesForWorkspace(fetchImpl, workspaceId, token, archived = false) {
   const response = await request(
     fetchImpl,
-    `${CLICKUP_API_BASE}/team/${encodeURIComponent(workspaceId)}/space?archived=false`,
+    `${CLICKUP_API_BASE}/team/${encodeURIComponent(workspaceId)}/space?archived=${archived ? 'true' : 'false'}`,
     { headers: { Authorization: token } },
     `spaces in workspace ${workspaceId}`,
     token,
@@ -147,16 +147,63 @@ async function fetchSpacesForWorkspace(fetchImpl, workspaceId, token) {
   return readResponseJson(response, `spaces in workspace ${workspaceId}`, token);
 }
 
+async function fetchFolderDetails(fetchImpl, folderId, token) {
+  const response = await request(
+    fetchImpl,
+    `${CLICKUP_API_BASE}/folder/${encodeURIComponent(folderId)}`,
+    { headers: { Authorization: token } },
+    `folder validation for ${folderId}`,
+    token,
+  );
+  return readResponseJson(response, `folder validation for ${folderId}`, token);
+}
+
+function spaceIdFromPayload(payload) {
+  if (!payload) return null;
+  if (payload?.space?.id !== undefined && payload?.space?.id !== null) {
+    return String(payload.space.id);
+  }
+  if (payload?.space_id !== undefined && payload?.space_id !== null) {
+    return String(payload.space_id);
+  }
+  return null;
+}
+
+async function spaceIdForList(fetchImpl, listPayload, token) {
+  const directSpaceId = spaceIdFromPayload(listPayload);
+  if (directSpaceId) return directSpaceId;
+
+  const folderId = listPayload?.folder?.id;
+  if (!folderId) return null;
+
+  const folderPayload = await fetchFolderDetails(fetchImpl, String(folderId), token);
+  return spaceIdFromPayload(folderPayload);
+}
+
+async function listSpaceBelongsToWorkspace(fetchImpl, spaceId, expectedWorkspaceId, token) {
+  for (const archived of [false, true]) {
+    const spacesPayload = await fetchSpacesForWorkspace(fetchImpl, expectedWorkspaceId, token, archived);
+    const spaces = Array.isArray(spacesPayload.spaces) ? spacesPayload.spaces : [];
+    if (spaces.some((space) => String(space.id) === spaceId)) {
+      return true;
+    }
+  }
+  return false;
+}
+
 async function resolveListWorkspaceId(fetchImpl, listPayload, expectedWorkspaceId, token) {
   const directWorkspaceId = taskWorkspaceId(listPayload);
   if (directWorkspaceId) return directWorkspaceId;
 
-  const spaceId = listSpaceId(listPayload);
+  const spaceId = await spaceIdForList(fetchImpl, listPayload, token);
   if (!spaceId) return null;
 
-  const spacesPayload = await fetchSpacesForWorkspace(fetchImpl, expectedWorkspaceId, token);
-  const spaces = Array.isArray(spacesPayload.spaces) ? spacesPayload.spaces : [];
-  const belongsToExpectedWorkspace = spaces.some((space) => String(space.id) === spaceId);
+  const belongsToExpectedWorkspace = await listSpaceBelongsToWorkspace(
+    fetchImpl,
+    spaceId,
+    expectedWorkspaceId,
+    token,
+  );
   return belongsToExpectedWorkspace ? String(expectedWorkspaceId) : null;
 }
 
@@ -164,19 +211,6 @@ async function validateClickUpTargets(fetchImpl, { listId, workspaceId, epicIds,
   const expectedWorkspaceId = String(workspaceId);
   const expectedListId = String(listId);
   const listPayload = await fetchListDetails(fetchImpl, expectedListId, token);
-  const listWorkspaceId = await resolveListWorkspaceId(
-    fetchImpl,
-    listPayload,
-    expectedWorkspaceId,
-    token,
-  );
-  if (listWorkspaceId !== expectedWorkspaceId) {
-    const spaceId = listSpaceId(listPayload);
-    throw new Error(
-      `ClickUp list ${expectedListId} belongs to workspace ${listWorkspaceId ?? 'unknown'}`
-      + `${spaceId ? ` (space ${spaceId})` : ''}, expected ${expectedWorkspaceId}`,
-    );
-  }
 
   for (const epicId of epicIds) {
     const epic = await fetchTaskDetails(fetchImpl, epicId, token);
@@ -192,6 +226,24 @@ async function validateClickUpTargets(fetchImpl, { listId, workspaceId, epicIds,
         `ClickUp epic ${epicId} belongs to list ${epicListId ?? 'unknown'}, expected ${expectedListId}`,
       );
     }
+  }
+
+  const listWorkspaceId = await resolveListWorkspaceId(
+    fetchImpl,
+    listPayload,
+    expectedWorkspaceId,
+    token,
+  );
+  if (listWorkspaceId === null) {
+    console.warn(
+      `ClickUp list ${expectedListId} workspace confirmed via epic parents (list API returned no workspace ID).`,
+    );
+  } else if (listWorkspaceId !== expectedWorkspaceId) {
+    const spaceId = await spaceIdForList(fetchImpl, listPayload, token);
+    throw new Error(
+      `ClickUp list ${expectedListId} belongs to workspace ${listWorkspaceId}`
+      + `${spaceId ? ` (space ${spaceId})` : ''}, expected ${expectedWorkspaceId}`,
+    );
   }
 
   return {
