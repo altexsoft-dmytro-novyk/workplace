@@ -16,6 +16,45 @@ Run its focused tests with:
 npm run test:clickup
 ```
 
+### GitHub Actions setup and mappings
+
+The repository workflow runs this one-way synchronization only when a BMad
+`sprint-status.yaml`, `clickup-sync.yaml`, or the synchronization script changes.
+It reads BMad status values and updates existing ClickUp tasks; it does not pull
+ClickUp data back into BMad or create ClickUp resources. The destination is always
+Workspace `90122019689`.
+
+To enable it in GitHub, add a repository Actions secret named
+`CLICKUP_API_TOKEN`. Give that secret access only to the existing ClickUp tasks it
+needs to update. Keep the token out of tracked files (including `.env`).
+
+Copy each existing ClickUp task ID into an explicit `clickup-sync.yaml` mapping.
+The mapping key is the BMad sprint-status file path relative to the repository,
+followed by `#` and its `development_status` key. The values written to ClickUp
+Custom Fields come from each mapping entry's `git_branch` and `validation_status`
+values, not from Git history or task discovery.
+
+```yaml
+workspace_id: "90122019689"
+status_map:
+  in-progress: "in progress"
+  review: "code review"
+custom_fields:
+  git_branch: "YOUR_GIT_BRANCH_FIELD_UUID"
+  validation_status: "YOUR_VALIDATION_STATUS_FIELD_UUID"
+tasks:
+  "_bmad-output/implementation-artifacts/example/sprint-status.yaml#example-story":
+    task_id: "EXISTING_CLICKUP_TASK_ID"
+    git_branch: "feature/example-story"
+    validation_status: "passed"
+```
+
+Replace the two `custom_fields` placeholder values with the UUIDs of existing
+ClickUp Custom Fields. Omit a field UUID, or omit that entry's value, to skip its
+update. Customize `status_map` to translate each BMad status used by a mapped
+entry into the matching existing ClickUp status. Keep every task mapping explicit:
+the synchronizer does not search for, infer, or create tasks.
+
 ## Getting started
 
 Clone the workspace and its submodules in one step:
