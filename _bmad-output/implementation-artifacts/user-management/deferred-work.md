@@ -28,6 +28,34 @@ deliverable; none is authorized by the current spec.
   summary: No per-route `document.title` for the standalone `/login` and `/auth/magic-link/consume` full-screen pages.
   evidence: The tab keeps whatever title the previous route set. A small `useDocumentTitle` hook applied on the auth pages (and later shell pages) fixes it.
 
+- source_spec: `spec-organisational-relationships.md`
+  summary: Department membership (add / move / remove) and department-manager (assign / remove) UI — deferred: no `GET /departments` list endpoint exists, so a department can't be chosen.
+  evidence: The only `/departments` routes are `PUT|DELETE /departments/:deptId/manager` (`departments.controller.ts`); `POST|DELETE /users/:id/departments` needs a `departmentId`. Departments are import-created and never listed over HTTP. Needs a backend `GET /departments` (and ideally `GET /users/:id/departments`) before the UI can be built.
+
+- source_spec: `spec-organisational-relationships.md`
+  summary: Manager reassignment and removal UI — deferred: `DELETE /users/:id/relationships/:relationshipId` needs a `relationshipId` that no read endpoint returns.
+  evidence: `relationshipId` is only in the `POST /users/:id/relationships` response body; there is no `GET /users/:id/relationships`. DEC-UM-005 makes reassignment an explicit DELETE-then-POST, so without the id the UI can only do a first assignment. Needs a backend relationship read.
+
+- source_spec: `spec-organisational-relationships.md`
+  summary: Authoritative "current organisation" display (manager, People Partner, departments, department manager) on the profile / org screen — deferred: `GET /users/:id` omits all derived fields and there is no other read.
+  evidence: `user-card.response.ts` ships only the 12 S1 scalar fields ("derived S1 display fields ... are out of scope for this route until those contexts land"). The org screen currently infers "current" values from the newest `access-journal` row per `kind`, and only when the journal is readable (the subject's manager/PP). Needs the derived-fields read (tracked on the access-control side as the `{ data, canEdit }` roll-out) or a dedicated relationships read.
+
+- source_spec: `spec-organisational-relationships.md`
+  summary: The person-picker can only see the first page of the directory and cannot substring-search — a target past row ~100 (or not matched by an exact filter) is unreachable.
+  evidence: `GET /users` returns one page (max `pageSize` 100) with exact-equality filters only and no `q`/search param (`list-users-query.dto.ts`). The picker fetches page 1 and filters client-side. Needs a backend substring/typeahead search (or the platform §4.1 directory) before the picker can reach an arbitrary person.
+
+- source_spec: `spec-organisational-relationships.md`
+  summary: Access journal is rendered unpaginated and unfiltered — an audit view with no kind/date filter and unbounded rows for a long-tenured employee.
+  evidence: `AccessJournalEnvelope` is `{ data }` with no pagination (`access-journal.response.ts`). Needs a backend pagination/filter contract before the frontend can page or filter it.
+
+- source_spec: `spec-organisational-relationships.md`
+  summary: Journal actor / before / after values render as raw user UUIDs — no id→name resolution.
+  evidence: The journal rows carry only ids, and there is no batch user-lookup endpoint; resolving each would be N× `GET /users/:id`. The subject's own name is shown (from the cached `GET /users/:id` S1 card); everything else stays a mono-styled UUID until a lookup endpoint exists.
+
+- source_spec: `spec-organisational-relationships.md`
+  summary: Optimistic-concurrency tokens (`expectedCurrentTargetId` / `expectedCurrentManagerId`) are not wired — the UI does unconditional replace/remove.
+  evidence: Using the token safely needs a current-PP / current-manager read to seed it; without that read the UI omits it (the backend treats an omitted token as an unconditional operation). Wire it once a current-state read exists.
+
 - source_spec: `spec-employee-directory.md`
   summary: Employee-directory affordances the prototype shows but `GET /users` cannot back — free-text (substring) search, a `department` filter, a server-side sort control, `.xlsx` export, per-viewer audience-filtered rows ("colleague view"), and row-select bulk actions.
   evidence: `list-users-query.dto.ts` accepts only exact-equality filters on the S1 fields + `employmentStatus`; the repository sorts by a fixed `lastName,firstName`; `toUserListItem` is one uniform projection for every viewer; there is no export route. The richer directory is platform §4.1 scope (`epics.md` FR-15) / the deferred §3.3.1 list projection (access-control deferred-work). Build these on the frontend once the list endpoint gains them.
