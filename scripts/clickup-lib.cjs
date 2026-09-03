@@ -1,3 +1,4 @@
+const crypto = require('node:crypto');
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const yaml = require('js-yaml');
@@ -8,6 +9,7 @@ const IMPLEMENTATION_ARTIFACTS_DIR = '_bmad-output/implementation-artifacts';
 const PLANNING_ARTIFACTS_DIR = '_bmad-output/planning-artifacts';
 const INCLUDED_TRACKS = ['platform', 'user-management'];
 const CREATE_DELAY_MS = 700;
+const SYNC_DELAY_MS = 350;
 
 const EPIC_BY_TRACK = {
   platform: [
@@ -435,6 +437,25 @@ function parseEpicStories(markdown) {
   return stories;
 }
 
+// ClickUp's GET /task does not return `markdown_description` unless asked, and
+// what it does return is a plain-text rendering that never compares equal to the
+// markdown we sent. So freshness is decided on a fingerprint we embed in the
+// footer instead: it survives the plain-text rendering as literal characters.
+const DESCRIPTION_FINGERPRINT = /bmad-sync:([0-9a-f]{12})/;
+
+function storyFingerprint(story, sourcePath) {
+  return crypto
+    .createHash('sha1')
+    .update([sourcePath, story.sprintKey, story.title, story.body].join('\u0000'))
+    .digest('hex')
+    .slice(0, 12);
+}
+
+function readDescriptionFingerprint(text) {
+  const match = String(text ?? '').match(DESCRIPTION_FINGERPRINT);
+  return match ? match[1] : null;
+}
+
 function buildStoryDescription(story, sourcePath) {
   return [
     `**${story.title}**`,
@@ -443,7 +464,7 @@ function buildStoryDescription(story, sourcePath) {
     '',
     '---',
     '',
-    `_Generated from \`${sourcePath}\` for BMad key \`${story.sprintKey}\`. The epic file is the source of truth._`,
+    `_Generated from \`${sourcePath}\` for BMad key \`${story.sprintKey}\`. The epic file is the source of truth. bmad-sync:${storyFingerprint(story, sourcePath)}_`,
   ].join('\n');
 }
 
@@ -457,8 +478,9 @@ async function collectStoryDescriptions(options = {}) {
     let markdown;
     try {
       markdown = await fs.readFile(path.join(rootDir, PLANNING_ARTIFACTS_DIR, track, 'epics.md'), 'utf8');
-    } catch {
-      continue;
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw new Error(`Unable to read epic stories at ${relativePath}: ${error.message}`);
     }
 
     for (const story of parseEpicStories(markdown)) {
@@ -470,6 +492,7 @@ async function collectStoryDescriptions(options = {}) {
         ...story,
         track,
         sourcePath: relativePath,
+        fingerprint: storyFingerprint(story, relativePath),
         markdown: buildStoryDescription(story, relativePath),
       });
     }
@@ -480,7 +503,7 @@ async function collectStoryDescriptions(options = {}) {
 
 function descriptionsConfig(config = {}) {
   const raw = config.descriptions;
-  if (raw === undefined) return { enabled: true, overwrite: false };
+  if (raw === undefined || raw === null) return { enabled: true, overwrite: false };
   if (raw === false) return { enabled: false, overwrite: false };
   const section = asObject(raw, 'descriptions in ClickUp sync configuration');
   return { enabled: section.enabled !== false, overwrite: section.overwrite === true };
@@ -600,6 +623,7 @@ module.exports = {
   EXPECTED_WORKSPACE_ID,
   CLICKUP_API_BASE,
   CREATE_DELAY_MS,
+  SYNC_DELAY_MS,
   EPIC_BY_TRACK,
   UNMAPPED_PREFIX_ACTION,
   asObject,
@@ -626,6 +650,7 @@ module.exports = {
   parseEpicStories,
   parseKeyFilter,
   readCustomFieldValue,
+  readDescriptionFingerprint,
   readTaskDescription,
   readYaml,
   readResponseJson,
@@ -638,6 +663,7 @@ module.exports = {
   shouldSkipStoryKey,
   sleep,
   slugifyStoryTitle,
+  storyFingerprint,
   taskListId,
   taskWorkspaceId,
   trackFromSourcePath,

@@ -45,7 +45,19 @@ const EPICS_MARKDOWN = [
   'Not a story, must not be captured.',
 ].join('\n');
 
-async function createFixture({ config, status = 'in-progress', storyKey = '1-99-test-story', epics = EPICS_MARKDOWN } = {}) {
+const OVERWRITE_CONFIG = [
+  'workspace_id: "90122019689"',
+  'list_id: "901221186877"',
+  'status_map:',
+  '  in-progress: "IN PROGRESS"',
+  'descriptions:',
+  '  overwrite: true',
+  'tasks:',
+  '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
+  '    task_id: "task-123"',
+].join('\n');
+
+async function createFixture({ config, status = 'in-progress', storyKey = '1-99-test-story', epics = EPICS_MARKDOWN, twoStories = false } = {}) {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'clickup-descriptions-'));
   temporaryDirectories.push(rootDir);
   const sourcePath = path.join(rootDir, '_bmad-output/implementation-artifacts/platform/sprint-status.yaml');
@@ -54,7 +66,10 @@ async function createFixture({ config, status = 'in-progress', storyKey = '1-99-
   const sourceKey = `_bmad-output/implementation-artifacts/platform/sprint-status.yaml#${storyKey}`;
   await fs.mkdir(path.dirname(sourcePath), { recursive: true });
   await fs.mkdir(path.dirname(epicsPath), { recursive: true });
-  await fs.writeFile(sourcePath, `development_status:\n  ${storyKey}: ${status}\n`);
+  const developmentStatus = twoStories
+    ? `  ${storyKey}: ${status}\n  1-98-derived-key-acm-7: ${status}\n`
+    : `  ${storyKey}: ${status}\n`;
+  await fs.writeFile(sourcePath, `development_status:\n${developmentStatus}`);
   if (epics !== null) await fs.writeFile(epicsPath, epics);
   await fs.writeFile(configPath, config ?? [
     'workspace_id: "90122019689"',
@@ -255,4 +270,124 @@ test('createMissingClickUpTasks sends the generated description on create', asyn
   const createBody = JSON.parse(recorded.find(({ init }) => init.method === 'POST' && init.body?.includes('parent')).init.body);
   assert.ok(createBody.markdown_description.includes('**Test Story With A Declared Key**'));
   assert.equal(createBody.name, '1-99-test-story');
+});
+
+test('syncClickUp leaves a description alone when its fingerprint is current, even in overwrite mode', async () => {
+  const fixture = await createFixture({ config: OVERWRITE_CONFIG });
+  const descriptions = await collectStoryDescriptions({ rootDir: fixture.rootDir, tracks: ['platform'] });
+  const current = descriptions.get('1-99-test-story');
+  const recorded = [];
+
+  // ClickUp renders the stored markdown back as plain text, so the round-tripped
+  // body never matches character for character. Only the fingerprint does.
+  const asPlainText = current.markdown.replace(/\*\*/g, '').replace(/`/g, '').replace(/_/g, '');
+  assert.notEqual(asPlainText, current.markdown);
+
+  const summary = await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: taskFetch({ description: asPlainText }, recorded),
+  });
+
+  assert.equal(summary.descriptionsUpdated, 0);
+  assert.deepEqual(descriptionWrites(recorded), []);
+});
+
+test('syncClickUp rewrites a description whose fingerprint is stale', async () => {
+  const fixture = await createFixture({ config: OVERWRITE_CONFIG });
+  const recorded = [];
+
+  const summary = await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: taskFetch({ description: 'older text bmad-sync:000000000000' }, recorded),
+  });
+
+  assert.equal(summary.descriptionsUpdated, 1);
+  assert.ok(descriptionWrites(recorded)[0].includes('bmad-sync:'));
+});
+
+test('syncClickUp survives a rejected description write and keeps going', async () => {
+  const fixture = await createFixture({
+    status: 'in-progress',
+    twoStories: true,
+    config: [
+      'workspace_id: "90122019689"',
+      'list_id: "901221186877"',
+      'status_map:',
+      '  in-progress: "IN PROGRESS"',
+      'custom_fields:',
+      '  git_branch: "git-branch-field"',
+      'tasks:',
+      '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
+      '    task_id: "task-123"',
+      '    git_branch: feature/story-1',
+      '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-98-derived-key-acm-7":',
+      '    task_id: "task-456"',
+    ].join('\n'),
+  });
+  const recorded = [];
+
+  const summary = await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    sleepImpl: async () => {},
+    fetchImpl: withClickUpValidation(async (url, init = {}) => {
+      recorded.push({ url, init });
+      if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+      if (url.includes('/task/') && !init.method) {
+        return jsonResponse(200, { id: 'task', team_id: '90122019689' });
+      }
+      if (url.includes('task-123') && String(init.body).includes('markdown_description')) {
+        return jsonResponse(400, { err: 'Description too long', ECODE: 'ITEM_099' });
+      }
+      return jsonResponse(200, {});
+    }),
+  });
+
+  assert.equal(summary.descriptionsFailed, 1);
+  assert.equal(summary.updated, 2, 'the second entry is still processed');
+  assert.equal(summary.descriptionsUpdated, 1, 'the second description is still written');
+  assert.ok(
+    recorded.some(({ url }) => url.includes('/task/task-123/field/git-branch-field')),
+    'the custom field write after the failed description still runs',
+  );
+});
+
+test('syncClickUp treats an empty descriptions block as the default rather than failing', async () => {
+  const fixture = await createFixture({
+    config: [
+      'workspace_id: "90122019689"',
+      'list_id: "901221186877"',
+      'status_map:',
+      '  in-progress: "IN PROGRESS"',
+      'descriptions:',
+      'tasks:',
+      '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
+      '    task_id: "task-123"',
+    ].join('\n'),
+  });
+  const recorded = [];
+
+  const summary = await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: taskFetch({}, recorded),
+  });
+
+  assert.equal(summary.descriptionsUpdated, 1);
+});
+
+test('collectStoryDescriptions reports a read error that is not a missing file', async () => {
+  const { rootDir } = await createFixture({ epics: null });
+  await fs.mkdir(path.join(rootDir, '_bmad-output/planning-artifacts/platform/epics.md'), { recursive: true });
+
+  await assert.rejects(
+    collectStoryDescriptions({ rootDir, tracks: ['platform'] }),
+    /Unable to read epic stories at _bmad-output\/planning-artifacts\/platform\/epics\.md/,
+  );
 });

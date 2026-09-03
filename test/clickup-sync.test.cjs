@@ -471,7 +471,7 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
     }, { listId: 'list-123' }),
   });
 
-  assert.deepEqual(summary, { updated: 1, skipped: 0, wouldUpdate: 0, descriptionsUpdated: 0, wouldUpdateDescriptions: 0 });
+  assert.deepEqual(summary, { updated: 1, skipped: 0, wouldUpdate: 0, descriptionsUpdated: 0, descriptionsFailed: 0, wouldUpdateDescriptions: 0 });
   assert.ok(requests.some(({ url }) => url.includes('/list/list-123/task?')));
   assert.ok(requests.some(({ url, init }) => url === 'https://api.clickup.com/api/v2/task/task-from-bmad-key' && init.method === 'PUT'));
 });
@@ -500,7 +500,7 @@ test('syncClickUp counts skipped entries when bmad_key lookup finds no task', as
     }, { listId: 'list-123' }),
   });
 
-  assert.deepEqual(summary, { updated: 0, skipped: 1, wouldUpdate: 0, descriptionsUpdated: 0, wouldUpdateDescriptions: 0 });
+  assert.deepEqual(summary, { updated: 0, skipped: 1, wouldUpdate: 0, descriptionsUpdated: 0, descriptionsFailed: 0, wouldUpdateDescriptions: 0 });
 });
 
 test('collectSyncEntries rejects a configured task mapping without an ID even when its source key is absent', async () => {

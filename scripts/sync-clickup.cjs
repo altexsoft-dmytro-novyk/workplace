@@ -7,6 +7,7 @@ const {
   bmadKeyLookupEnabled,
   collectDevelopmentStatusRecords,
   collectEpicIdsFromTrackMap,
+  SYNC_DELAY_MS,
   collectStoryDescriptions,
   descriptionsConfig,
   dryRunEnabled,
@@ -14,9 +15,11 @@ const {
   findTaskByBmadKey,
   readYaml,
   readResponseJson,
+  readDescriptionFingerprint,
   readTaskDescription,
   relativeSourceKey,
   request,
+  sleep,
   validateClickUpTargets,
 } = require('./clickup-lib.cjs');
 
@@ -141,10 +144,16 @@ async function syncClickUp(options = {}) {
     skipped: 0,
     wouldUpdate: 0,
     descriptionsUpdated: 0,
+    descriptionsFailed: 0,
     wouldUpdateDescriptions: 0,
   };
+  const pause = async () => {
+    if (isDryRun) return;
+    if (options.sleepImpl) await options.sleepImpl(SYNC_DELAY_MS);
+    else await sleep(SYNC_DELAY_MS);
+  };
 
-  for (const entry of entries) {
+  for (const [index, entry] of entries.entries()) {
     let taskId = entry.taskId;
     if (!taskId && entry.resolveViaBmadKey) {
       if (!listId || !bmadKeyFieldId) {
@@ -177,7 +186,7 @@ async function syncClickUp(options = {}) {
     const existingDescription = readTaskDescription(taskPayload).trim();
     const shouldWriteDescription = Boolean(story) && (
       descriptionSettings.overwrite
-        ? existingDescription !== story.markdown.trim()
+        ? readDescriptionFingerprint(existingDescription) !== story.fingerprint
         : existingDescription === ''
     );
 
@@ -198,12 +207,19 @@ async function syncClickUp(options = {}) {
     }, `status update for task ${taskId}`, token);
 
     if (shouldWriteDescription) {
-      await request(fetchImpl, taskUrl, {
-        method: 'PUT',
-        headers,
-        body: JSON.stringify({ markdown_description: story.markdown }),
-      }, `description update for task ${taskId}`, token);
-      summary.descriptionsUpdated += 1;
+      try {
+        await request(fetchImpl, taskUrl, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify({ markdown_description: story.markdown }),
+        }, `description update for task ${taskId}`, token);
+        summary.descriptionsUpdated += 1;
+      } catch (error) {
+        // A rejected description must not strand the custom-field writes below,
+        // nor abandon every entry still queued behind this one.
+        console.error(`Failed to write the description of task ${taskId}: ${error.message}`);
+        summary.descriptionsFailed += 1;
+      }
     }
     const fieldUpdates = [
       { fieldId: customFields.git_branch, value: entry.gitBranch, name: 'Git Branch' },
@@ -218,6 +234,7 @@ async function syncClickUp(options = {}) {
       }, `${fieldUpdate.name} update for task ${taskId}`, token);
     }
     summary.updated += 1;
+    if (index < entries.length - 1) await pause();
   }
 
   if (isDryRun) {
@@ -239,8 +256,9 @@ if (require.main === module) {
         return;
       }
       console.log(
-        `Sync finished: ${summary.updated} updated, ${summary.descriptionsUpdated} descriptions written, ${summary.skipped} skipped.`,
+        `Sync finished: ${summary.updated} updated, ${summary.descriptionsUpdated} descriptions written, ${summary.skipped} skipped, ${summary.descriptionsFailed} descriptions failed.`,
       );
+      if (summary.descriptionsFailed > 0) process.exitCode = 1;
     })
     .catch((error) => {
       console.error(`ClickUp synchronization failed: ${error.message}`);
