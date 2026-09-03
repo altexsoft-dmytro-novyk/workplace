@@ -612,3 +612,288 @@ approvals:
       (3.2), um-ct-05/06 (3.3) - all pending the FR-permission-matrix grant of
       profile:timeline:write to PP/UM roles (+ AC department-tree walk for the
       "direct UM" leg) and/or the kernel default seed.
+
+  - story_id: "4-1-change-manager-plus-access-journal-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/{um-rel-01,02,03,07,08,15}.md + README.md + spec-4-1-change-an-employee-s-manager.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T02:30:00Z"
+    note: >-
+      Epic 4 start. Reconciled against the 2026-09-02 arch ratification: PM/AD-29
+      AccessJournal design RATIFIED ("closes CC-07 design") -> journal-writing
+      stages design-unblocked; the "blocked until CC-07 approved" + "blank page"
+      language in spec-4-1 / um-rel-* is stale and removed. Story 4.1 stands up
+      for the epic: Relationship model + raw-SQL migration (multi-armed CHECK,
+      partial UNIQUE type='direct', self-target reject, hard-delete);
+      AccessJournal model + migration (append-only, before/after jsonb, unique
+      idempotencyKey, kind enum all 7 §3.4 values, writes 'manager' only);
+      POST /users/:id/relationships (direct) + DELETE .../:relationshipId;
+      same-tx journal writer; GET /users/:id/access-journal + reader authz.
+      Reconciled um-rel-01/02/03/07/08 (journal Then-clauses first-class,
+      um-rel-07 -> Ida DEC-UM-002); NEW um-rel-15 (append-only + idempotent
+      write + journal read-authz matrix). SCENARIO-STAGE DECISIONS: (1)
+      idempotencyKey = hash(actor,subject,kind,relationshipId,operation) -
+      interim, no client token; Idempotency-Key header deferred. (2) journal
+      read = { data: AccessJournalRow[] } envelope, no canEdit, newest-first;
+      row { id, occurredAt, actorUserId, subjectUserId, kind, before, after }.
+      (3) DELETE = /users/:id/relationships/:relationshipId (path param, AD-14
+      shape 4). (4) kind enum = manager|people_partner|department_membership|
+      department_manager|full_profile_grant|full_profile_revoke|
+      shared_link_access (database-schema.md wins over the context doc's
+      _change spellings - drift flagged). (5) interim journal-read gate =
+      resolveAudiences ∩ {reporting,pp}; Self + HR-Admin-by-FR NOT readers
+      (matches §3.4 exactly); // INTERIM, expiry = §2.4 full-audience resolver.
+      UNDER-SPEC IN RATIFIED AD-29 (flagged for PO/architect, non-blocking for
+      stage 2): kind spelling drift in epic-4-context.md; no retention/purge
+      policy; before/after semantics for non-state kinds (shared_link_access);
+      no read-endpoint pagination contract (matters for stage 3); per-kind
+      snapshot schema left to each story; api-conventions.md missing
+      GET /users/:id/access-journal (add before stage 2/3); epic-4-context.md
+      stale CC-07 language (refreshed by coordinator).
+
+  - story_id: "4-1-change-manager-plus-access-journal-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-4/manager-change.e2e-spec.ts + test/user-management/epic-4/access-journal.e2e-spec.ts + fixtures.ts (- deleted test/user-management/relationships.e2e-spec.ts)"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T03:15:00Z"
+    note: >-
+      Committed-red 14/14 (all route-missing 404). manager-change reconciled
+      (its 1 pre-existing TS2345 fixed -> 2 remain in dept/pp-change); new
+      access-journal.e2e-spec.ts (um-rel-15: append-only, idempotency, read-
+      authz matrix Bob200/Paula200/Self403/Eve403/HR-Admin-FR403/no-token401);
+      legacy pre-v1.5 relationships.e2e-spec.ts DELETED (retired mentorship
+      edges um-rel-04/05/06, AD-17). fixtures.ts: perm key -> org:relationships:
+      write, + accessJournalTableExists/queryAccessJournalRows/cleanupAccess
+      Journal (to_regclass-guarded). Full sweep 73 failed / 281 passed / 10
+      todo vs 76/281/10 - passed UNCHANGED, zero green->red (net -3 failed =
+      -11 deleted legacy + 8 new access-journal). tsc 2 pre-existing, lint clean.
+      PREMISE CORRECTION (spec updated): the Relationship model + ALL its
+      constraints (relationships_one_direct_per_user, _one_people_partner_per_
+      user, _shape_check, _no_self_endpoint_check, RelationshipType enum) ALREADY
+      SHIPPED in Epic 0 migration 20260830010000_access_control_relationships.
+      Story 4.1 Stage 3 does NOT re-author them - remaining deliverables:
+      AccessJournal table+enum+migration, 2 write routes + 1 read route, same-tx
+      journal writer, org:relationships:write gate wiring, api-conventions.md
+      route entry.
+      FLAGGED: access_journal column-naming (helpers assume camelCase quoted,
+      like user_events); self-assignment pinned 400 (spec allows 400|409);
+      RunFixtures.grantFunctionalRole targetRole collision for 2 uuidv7 ids in
+      one run (pre-existing fixture bug, worked around).
+
+  - story_id: "4-1-change-manager-plus-access-journal-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (relationships area + AccessJournal) + prisma/migrations/20260903011657_story_4_1_access_journal + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T02:45:00Z"
+    note: >-
+      AccessJournal model + AccessJournalKind enum + additive migration
+      20260903011657 (stripped the spurious PolicyPermissions_policy_fkey /
+      Policies_id_type_key drops - known footgun); new relationships.controller
+      (2nd @Controller('users')): POST/DELETE /users/:id/relationships
+      [/:relationshipId] @RequireFeature('org:relationships:write'), GET
+      /users/:id/access-journal (gate in action). org-relationship.repository
+      does both $transactions (edge + journal co-write); P2002 -> 409 whole-tx
+      rollback; P2025 double-revoke -> 404. access-journal-access-facade.adapter
+      // INTERIM resolveAudiences ∩ {reporting,pp} (no self, no isAllowed leg;
+      expiry = §2.4 full-audience resolver). idempotencyKey = sha256(actor|
+      subject|kind|relId|op) in infrastructure/. Journal INSERT via createMany
+      skipDuplicates inside the tx (catch-and-swallow would abort the pg tx).
+      DELETE -> 200 empty. api-conventions.md updated (routes + append-only rule).
+      TEST FIX: manager-change um-rel-02 post-revoke assertion 403 -> 200 +
+      canEdit:false (the colleague floor per UMAC-04 keeps GET /users/:id at 200;
+      the real revoke consequence is Bob dropping reporting-writer -> colleague).
+      COORDINATOR-VERIFIED: manager-change + access-journal 14/14 green;
+      acm1r-fr-foundation 39/39 (FR FKs intact); full sweep 59 failed / 295
+      passed / 10 todo vs baseline 73/281/10 = exactly 14 red->green, ZERO
+      green->red; tsc 2 known; lint clean. spec-4-1 status -> done.
+      Story 4.1 COMPLETE. Relationship model was already Epic-0 (not re-authored).
+
+  - story_id: "4-2-change-people-partner-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/{um-rel-09,10,11,16,07}.md + README.md + spec-4-2-change-an-employee-s-people-partner.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T03:30:00Z"
+    note: >-
+      Unblocked from CC-04/CC-07 per the 2026-09-02 ratification (both design-
+      resolved; AccessJournal built by Story 4.1). PUT/DELETE /users/:employeeId/
+      relationships/people-partner; atomic create-or-replace; kind:'people_partner'
+      journal same-tx (before/after = PP user-id snapshot). Only transitive PP
+      HR-line propagation stays deferred (Department-boundary gate / PM/AD-35).
+      um-rel-09 split Test A (replace) / Test B (first assignment, before:null);
+      um-rel-10 self-assign -> 400; um-rel-11 stale -> 409 + @concurrency + Test 3
+      (omitted token while PP exists -> 409); NEW um-rel-16 (DELETE 200 + journal
+      before/after:null, DELETE-no-PP -> 404, Ida -> 403, next-request audience
+      flip). um-rel-07 Test 2 de-stubbed.
+      DECISIONS: (1) DELETE takes expectedCurrentTargetId as OPTIONAL query param
+      (drop If-Match - no ETag source); omitted -> unconditional remove;
+      api-conventions.md shape-4 If-Match line needs architect reconcile. (2) PUT
+      without expectedCurrentTargetId while a PP exists -> 409. (3) PP target =
+      active User, NO functional-role req; unknown targetId -> 404, inactive ->
+      422 (404/422 split proposed, not sourced). (4) PUT -> 200 bare relationship
+      (create + replace both 200; 201-on-create flagged alt); DELETE -> 200 empty.
+      (5) idempotencyKey op ∈ {create,replace,delete}.
+      CONFIRM AT GATE: self-assignment 400 rests on §3.3 + suite convention, not a
+      direct citation (um-rel-03 is the 2nd-POST 409 case, not self-assign).
+
+  - story_id: "4-2-change-people-partner-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-4/people-partner-change.e2e-spec.ts + test/user-management/epic-4/pp-delete.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T03:50:00Z"
+    note: >-
+      Committed-red 10 failed / 2 passed (all failures = missing PUT/DELETE
+      /users/:id/relationships/people-partner -> 404). people-partner-change
+      reconciled from BLOCKED to first-class (real queryAccessJournalRows
+      checks); um-rel-09 split A/B; um-rel-11 +T2 @concurrency +T3 omitted-token;
+      self-assign pinned 400; its TS2345 fixed (1 known remains, department-
+      change:58). NEW pp-delete.e2e-spec.ts (um-rel-16 + um-rel-07 T2). 2 benign
+      green (DELETE-no-PP 404 coincides; Ida DELETE 403 short-circuits Story
+      4.1's shared @RequireFeature guard). Full sweep 65 failed / 297 passed /
+      10 todo vs baseline 59/295/10 (+6 red +2 green, no green->red). lint clean.
+      FLAG FOR STAGE 3: DELETE /users/:id/relationships/people-partner currently
+      matched by Story 4.1's @Delete(':id/relationships/:relationshipId') -
+      Stage 3 must register the static people-partner route BEFORE the
+      :relationshipId route.
+
+  - story_id: "4-2-change-people-partner-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (people-partner routes + repo/action extensions) + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T04:10:00Z"
+    note: >-
+      PUT/DELETE /users/:employeeId/relationships/people-partner on
+      RelationshipsController, declared BEFORE :relationshipId (route-collision
+      fix). ChangePeoplePartnerAction (self->400, target 404/422, stale->409),
+      RemovePeoplePartnerAction (not-found->404, stale->409). org-relationship.
+      repository extended: change/removePeoplePartner + private create/replace;
+      replace = delete-then-create in one $transaction (row id changes per
+      um-rel-09 A); conditional deleteMany(where reportsToUserId=expected) as the
+      optimistic-concurrency predicate, count!=1 -> StalePeoplePartnerPredicate
+      sentinel -> rollback -> 409/404; P2002 also -> stale. people_partner
+      AccessJournal row same-tx, createMany skipDuplicates. idempotency op +
+      'replace'. DELETE optional ?expectedCurrentTargetId= query. api-conventions
+      .md shape-4 rewritten (expectedCurrentTargetId body/query, If-Match
+      removed, 400/404/422/409 matrix). No new migration.
+      COORDINATOR-VERIFIED: people-partner-change + pp-delete 12/12 green;
+      epic-4 = 4 suites green (26 passed), department-change still 3 red (Story
+      4.3). Full sweep 55 failed / 307 passed / 10 todo vs baseline 65/297/10 =
+      exactly 10 red->green, ZERO green->red. tsc 1 known (department-change:58).
+      lint clean. spec-4-2 status -> done. Story 4.2 COMPLETE.
+      Inactive-target 422 implemented per spec, no committed test (unsourced).
+
+  - story_id: "4-3-change-department-or-department-manager-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/{um-rel-12,13,14,17}.md + README.md + spec-4-3-*.md + epic-4-context.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T04:40:00Z"
+    note: >-
+      SPLIT-GATE. LIVE (first-class stage-2): department membership add/atomic-
+      move/remove writes, >=1-department 409 floor, 404 on non-membership delete,
+      department-manager Policies+UserPolicies write + reassignment, self-assign
+      400, every same-tx department_change UserEvents row + department_membership/
+      department_manager AccessJournal row. DEFERRED it.todo: the access-
+      resolution consequences (um-rel-12 T3 "manager gains/loses Reporting-line
+      access", all of um-rel-13 T3 "Nina reaches Dept B + nested Dept C") -
+      gated solely on the AC resolveAudiences targetType:'department' +
+      Department.parentId walk (an AC-kernel increment, approver Anna). um-rel-12/
+      13/14 rewritten, um-rel-17 NEW (add/remove multi-membership). §4.17 "exactly
+      one department" -> "one or more" fixed everywhere.
+      DECISIONS: (1) move = named-source atomic POST /users/:id/departments
+      {departmentId, fromDepartmentId} (not replace-sole; the >=1 floor makes
+      DELETE-then-POST impossible for a single-dept employee). (2) >=1 enforced,
+      DELETE last -> 409. (3) membership route POST/DELETE /users/:id/departments;
+      dept-manager PUT/DELETE /departments/:deptId/manager (no /departments root
+      today - fallback /users/:managerId/policies; Department-edge contract
+      ratifies). (4) department_change details: add {"department":<id>}, remove
+      {"department":<id>,"removed":true}, move emits ONE add-form event. (5)
+      Policies row {operator:'==', targetType:'department', targetId:<deptId>,
+      targetRole:'unit-manager', type:'AR', managedBy:'admin'} + UserPolicies.
+      SCHEMA FLAG (for Stage 3): AccessJournal.subjectUserId is a User FK but a
+      department_manager change has a DEPARTMENT subject -> Stage 3 adds nullable
+      subjectDepartmentId + makes subjectUserId nullable + CHECK exactly-one
+      (AccessJournal still uncommitted so additive/clean).
+
+  - story_id: "4-3-change-department-or-department-manager-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-4/department-change.e2e-spec.ts + fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T05:15:00Z"
+    note: >-
+      Committed-red split-gate: 7 LIVE it (um-rel-12 move, um-rel-13 manager
+      change, um-rel-14 self-assign, um-rel-17 T1-T4) all red on missing routes
+      -> 404; 3 it.todo (um-rel-12 T3, um-rel-13 T3 whole recursive-access half,
+      um-rel-17 deferred) titled with the AC department-walk unblock trigger.
+      fixtures.ts + queryAccessJournalRowsByKind (department_manager subject col
+      is Stage 3). **tsc now 0 errors** - the last pre-existing epic-4 TS2345
+      (department-change:58) is fixed. Full sweep 59 failed / 307 passed / 13
+      todo vs baseline 55/307/10 (+4 failed +3 todo, passed UNCHANGED, zero
+      green->red). lint clean.
+      FLAG FOR STAGE 3: manager route body = { managerUserId, expectedCurrent
+      ManagerId? } per um-rel-13/14 + spec-4-3 (NOT managerId).
+
+  - story_id: "4-3-change-department-or-department-manager-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (department membership + department-manager) + prisma/migrations/20260903024004_story_4_3_department_edge_journal_subject + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T05:45:00Z"
+    note: >-
+      SPLIT-GATE LIVE half shipped. POST/DELETE /users/:id/departments (move via
+      fromDepartmentId; plain add; >=1 floor -> 409; non-membership -> 404 leak-
+      free). New DepartmentsController: PUT/DELETE /departments/:deptId/manager
+      (AR Policies + UserPolicies link swap; expectedCurrentManagerId optimistic
+      -> 409; self -> 400; keep Policies row, delete link on remove). Same-tx:
+      department_change UserEvents (membership only, source:'system', tx.userEvent
+      .create like the import path) + AccessJournal (department_membership / for
+      manager department_manager). Migration 20260903024004 additive: AccessJournal
+      .subjectUserId -> nullable, + subjectDepartmentId FK, CHECK num_nonnulls(
+      subjectUserId, subjectDepartmentId)=1 (current rows pass). idempotency ops
+      += dept_add/move/remove + dept_mgr_set/remove. access-journal.response
+      surfaces subjectDepartmentId only when non-null (keeps um-rel-15 key-set
+      assertion green). api-conventions.md updated.
+      DEFERRED (it.todo): department-derived access resolution (um-rel-12 T3,
+      um-rel-13 T3 recursive walk, um-rel-17 trailing) -> AC resolveAudiences
+      targetType:'department' + Department.parentId walk (AC-kernel increment).
+      COORDINATOR-VERIFIED: epic-4 5 suites green (33 passed / 3 todo); epic-3
+      4 suites green (31 / 7 todo); acm1r-fr-foundation 39/39; full sweep 52
+      failed / 314 passed / 13 todo vs baseline 59/307/13 = exactly 7 LIVE
+      red->green, ZERO green->red; tsc 0 errors; lint clean. spec-4-3 -> done.
+      DECISIONS: move stale fromDepartmentId -> 409; DELETE manager keeps
+      Policies row deletes UserPolicies link; department_manager journal subject
+      = subjectDepartmentId (schema route, not the interim). EPIC 4 COMPLETE
+      (within current infra; department-derived access deferred to the AC walk).

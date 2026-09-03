@@ -4,13 +4,16 @@
 
 ## Scenario
 
-**Given** Colin is an active session that does **not** hold the *change
-organisational relationships* permission (use **Ida** where a functional-role
-holder lacking *this specific* permission is needed — DEC-UM-002).
+**Given** Ida holds a custom functional role whose only permission is unrelated
+(*create form campaigns*) and therefore does **not** hold the *change
+organisational relationships* permission (DEC-UM-002 — the probe is a
+capability-negative, so the persona is Ida, not an unrelated bare session);
+Colin is an unrelated active session used for the same denial from the other
+direction.
 
-**When** Colin attempts to create a reports-to relationship for Alice (and, once
-Story 4.2 lands, to change Alice's People Partner, and once Story 4.3 lands, to
-change her department).
+**When** Ida (or Colin) attempts to create a reports-to relationship for Alice
+(and, once Story 4.2 lands, to change Alice's People Partner, and once Story 4.3
+lands, to change her department).
 
 **Then** every such request is denied with `403` and no relationship, journal, or
 career-event row is written. The gate is the `isAllowed(viewer, 'change
@@ -28,19 +31,21 @@ prohibit.
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Colin (and Ida) do not hold *change organisational relationships*.
 
-## Test 1 — reports-to denied
+## Test 1 — reports-to denied (Story 4.1, live)
 
 - **inputURL:** `POST /users/<aliceId>/relationships`
 - **inputRequest:**
   ```json
   {
-    "headers": { "authorization": "Bearer <token:Colin>" },
+    "headers": { "authorization": "Bearer <token:Ida>" },
     "body": { "type": "direct", "targetId": "<bobId>" }
   }
   ```
-- **expectedResult:** `403`.
+- **expectedResult:** `403` — the `isAllowed(viewer, 'change organisational relationships')` no-target facade check fails before any write.
+- **stateChange:** none. Stage 2 asserts no new `Relationship` row for Alice and no new `AccessJournal` row with `subjectUserId: aliceId` (the denial short-circuits before the transaction opens).
+- **variant:** repeat with `Bearer <token:Colin>` (unrelated bare session) → identical `403`.
 
-## Test 2 — People Partner change denied (Story 4.2 — stubbed, blocked on CC-04 + CC-07)
+## Test 2 — People Partner change denied (Story 4.2 — live; direct assigned-PP edge)
 
 - **inputURL:** `PUT /users/<aliceId>/relationships/people-partner`
 - **inputRequest:**
@@ -50,9 +55,9 @@ prohibit.
     "body": { "targetId": "<ninaId>", "expectedCurrentTargetId": "<paulaId>" }
   }
   ```
-- **expectedResult:** `403`; no PP edge change. Stage-2 for this test is blocked with `um-rel-09..11` until CC-04 defines PP persistence and CC-07 the journal.
+- **expectedResult:** `403`; no PP edge change, no `AccessJournal` row — the `isAllowed(viewer, 'change organisational relationships')` no-target facade check fails before the transaction opens. See `um-rel-16` Test 3 for the `PUT`/`DELETE` denial pair with the Ida persona. *(Story 4.2 reconciled 2026-09-03 — CC-07/PM/AD-29 done via Story 4.1, CC-04 design-resolved `P2`; only HR-line propagation above the directly assigned PP stays deferred.)*
 
-## Test 3 — department change denied (Story 4.3 — stubbed, blocked on CC-07 + Department edge contract)
+## Test 3 — department change denied (Story 4.3 — stubbed, blocked on the Department edge contract)
 
 - **inputURL:** `POST /users/<aliceId>/policies`
 - **inputRequest:**
@@ -62,4 +67,4 @@ prohibit.
     "body": { "type": "AR", "targetType": "department", "targetId": "<deptBId>", "targetRole": "member" }
   }
   ```
-- **expectedResult:** `403`; no department change. Stage-2 for this test is blocked with `um-rel-12..14` until CC-07 and the Department edge contract land.
+- **expectedResult:** `403`; no department change, no `AccessJournal` row. Stage-2 for this test is blocked with `um-rel-12..14` until the Department edge contract lands. *(The journal itself is unblocked — PM/AD-29 ratified 2026-09-02.)*

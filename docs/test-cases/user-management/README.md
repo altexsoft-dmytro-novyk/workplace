@@ -25,6 +25,33 @@ baseline" no longer holds for the changed files:
   cite, or approve).
 - `relationships/` was **split** to v1.5 Epic 4 — some files retraced (fresh
   approval required), three mentorship files retired (superseded header).
+  **Story 4.1 reconciled 2026-09-03** to the 2026-09-02 architecture ratification
+  (PM/AD-29 `AccessJournal` ratified — "closes CC-07 design"): the
+  same-transaction journal write is now a **first-class assertion** in
+  `um-rel-01/02/03/08`, not "stage-2 blocked on CC-07". New `um-rel-15`
+  (`AccessJournal` append-only + idempotent write + reader-authorized
+  `GET /users/:id/access-journal`). **Story 4.2 reconciled 2026-09-03** to the
+  same ratification: CC-07/PM/AD-29 done via Story 4.1, CC-04 design-resolved
+  (`P2`, "Not a design blocker on PM/AD-19"). `um-rel-09/10/11` lose the
+  BLOCKED box — `PUT/DELETE /users/:id/relationships/people-partner`, atomic
+  create-or-replace, self-assignment `400`, stale/omitted `expectedCurrentTargetId`
+  `409`, `people_partner` journal row first-class. New `um-rel-16` (`DELETE` +
+  PP-change authz `403` + new-PP audience on next request). **Deferred:**
+  HR-line propagation above the directly assigned PP (fail-closed).
+  **Story 4.3 reconciled 2026-09-03 to a split-gate:** the department membership
+  write (add / atomic named-source move / remove; ≥1-department floor → `DELETE`
+  of the last → `409`), the department-manager write (AR `Policies`
+  `targetType:'department'` `targetRole:'unit-manager'` + `UserPolicies`),
+  self-assignment `400`, and every same-transaction `department_change` event /
+  `AccessJournal` row (`department_membership` / `department_manager`) are
+  **first-class stage-2** (`um-rel-12` T1–T2, `um-rel-13` T1–T2, `um-rel-14`;
+  new `um-rel-17` department membership add/remove/last-→`409`). CC-07/PM/AD-29
+  done via 4.1; the `department_change` mechanism done via Epic 3 Story 3.1;
+  `Department.parentId` + `DepartmentMembership` schema present (Story 1.1).
+  Story 4.1 and 4.2's direct-edge scenarios and 4.3's write half leave "Blocked
+  = prose only"; **4.3's department-derived-access slice** (`um-rel-12` T3,
+  all of `um-rel-13`'s access half, `um-rel-17` `it.todo` — an
+  Access-Control-kernel increment) and 4.2's HR-line slice stay.
 - `career-timeline/` traces were **realigned** to DEC-UM-001 / Stories 3.2–3.3
   (fresh approval required); two dual-gate negatives added. **Story 3.2
   reconciled 2026-09-02** to the split-gate decision (Dmytro): manual backfill
@@ -142,14 +169,15 @@ gone with `registration/`.
 | `profile/` | FR-9 — S1 data correctness given an entitled actor (entitlement is Epic 0's): `um-pf-*` = Story 1.2 scalar `PATCH`; `um-photo-*` = Story 1.3 `PUT .../photo` + real object storage (AD-15). Folder `README.md` carries the photo cluster's in-scenario decisions. | 12 (+ `um-pf-02` retired pointer) | new/refreshed draft |
 | `list/` | FR-15 — `GET /users` pagination + metadata, permission-safe S1-field filters, dismissed-employee visibility via `employmentStatus`, endpoint authz, fixed fail-closed projection, unknown-filter rejection, empty page, deterministic sort, NFR-2 perf note (Epic 1 Story 1.5) | 12 | blank-page v1.5 rewrite (`um-list-01..04` retargeted, `um-list-05..12` reworked/new); folder README carries the in-scenario decisions |
 | `career-timeline/` | FR-5/FR-11/FR-12/FR-13 — system events; career-timeline read audience; Story 3.2 manual backfill + Story 3.3 soft-delete / correction (feature-permission gate, `hr-admin` only this stage; DEC-UM-001 PP/direct-UM audience scoping deferred to the FR-matrix grant); edit-immutability, no `PATCH` (Epic 3). Folder README carries the split-gate decision + the ⚠️-to-ratify tension. | 13 (+ folder `README.md`) | Story 3.2 reconciled 2026-09-02; **Story 3.3 reconciled 2026-09-03** (`um-ct-13` new; `um-ct-03/04/05/06/09` → `it.todo` deferred; `um-ct-07/08/10/12/13` live) |
-| `relationships/` | FR-10 — Epic 4 organisational facts: manager (4.1, retraced), PP (4.2, blocked stubs), department (4.3, blocked stubs) | 11 | split; see folder README |
+| `relationships/` | FR-10 — Epic 4 organisational facts: manager + the `AccessJournal` foundation (4.1, retraced/authored, journal assertions first-class per PM/AD-29), PP (4.2, reconciled 2026-09-03 — direct assigned-PP edge first-class; HR-line propagation deferred), department + department-manager (4.3, split-gate reconciled 2026-09-03 — membership/manager **writes** + `department_change` event + `department_membership`/`department_manager` journal rows first-class; department-derived **access resolution** deferred `it.todo` pending an AC-kernel increment) | 14 | split; see folder README |
 | `departure/` | FR-6 — Epic 5 employment lifecycle (record / blocked / apply / retry) | 4 | new draft, **all BLOCKED — CC-06** |
 | `registration/` | **RETIRED (v1.5)** — `um-reg-01..15` `POST /users` HTTP create. See folder README. | 15 | history only |
 | `deactivation/` | **RETIRED (v1.5)** — `um-deact-01..03` generic `DELETE /users/:id`. See folder README. | 3 | history only |
 
-**Live stage-1 scenario files (v1.5, subject to per-file approval):** 73
+**Live stage-1 scenario files (v1.5, subject to per-file approval):** 76
 (+8: the `um-photo-*` set replacing the single `um-pf-02`; +1: `um-ct-11`;
-+1: `um-ct-12`; +1: `um-ct-13`). `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06`,
++1: `um-ct-12`; +1: `um-ct-13`; +1: `um-rel-15`; +1: `um-rel-16`; +1: `um-rel-17`).
+`um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06`,
 `um-ct-09` stay on disk as **deferred `it.todo`** — target end-state prose
 retained, approved as such; they reactivate on the FR-permission-matrix grant of
 `profile:timeline:write` to the PP / Unit-Manager roles (`um-ct-06` also needs
@@ -167,8 +195,8 @@ the AC department-tree walk) (`career-timeline/README.md`).
 | FR-permission-matrix grant of `profile:timeline:write` to the PP / Unit-Manager roles (`fr-permission-matrix-draft-2026-09-02.md` §6 item 4, `?`) + the DEC-UM-001 audience narrowing being wired (`canAccessSection('profile:timeline', …) === 'write'`, scoped to assigned PP / direct UM) | `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06`, `um-ct-09` — held as deferred `it.todo` target prose. **Not** blocked: `um-ct-10` / `um-ct-12` (Story 3.2) and `um-ct-07` / `um-ct-08` / `um-ct-13` (Story 3.3) — the live paths' gate at this stage is `isAllowed(actor, 'profile:timeline:write')` alone, a no-target facade call; `career-timeline/README.md`. |
 | `profile:timeline` `canAccessSection` — a **pending Access Control increment** (ACM-5 ships the three legacy section strings only) | the reactivation of `um-ct-03/04/09` (Story 3.2) and `um-ct-05/06` (Story 3.3). **Story 3.2's** live paths (`um-ct-10/12`) and **Story 3.3's** live paths (`um-ct-07/08/13`) do **not** need it. The **read** gate (`um-ct-11`, Story 3.1 `GET /users/:id/events`) is **not** blocked — it uses the sanctioned `resolveAudiences`-derived interim (mentorship timeline-section precedent, `// INTERIM` + expiry trigger); `deferred-work.md` tracks the real increment. |
 | DEC-UM-001 direct-Unit-Manager leg needs the AC **department-tree walk** increment (`targetType:'department'` + recursion) | the direct-UM manual-write path in `um-ct-04` and the direct-UM soft-delete path in `um-ct-06` (both deferred `it.todo`; the assigned-PP leg in `um-ct-03`/`um-ct-05` is unaffected) |
-| CC-04 (PP persistence) + CC-07 (AD-19 journal) | `relationships/um-rel-09..11` (PP), and the atomic-journal Then-clause of `um-rel-01/02` |
-| CC-07 + Department edge contract | `relationships/um-rel-12..14` (department) |
+| Department contract / PM/AD-35 (nested `Department` parent/manager edge schema + recursive department-tree walk; spine Deferred) — the HR-boundary binding | **Story 4.2's HR-line-propagation slice only** (the HR chain *above* the directly assigned PP; fail-closed to the direct PP until then). The **direct assigned-PP edge** (`relationships/um-rel-09/10/11/16`) is **not** blocked — CC-07/PM/AD-29 done via Story 4.1, CC-04 design-resolved (`P2`, "Not a design blocker on PM/AD-19"). |
+| **AC `resolveAudiences` department-tree walk** — the `targetType:'department'` `Policies` leg + `Department.parentId` recursion; an **Access-Control-kernel increment** (`spec-access-control-kernel-mvp`, approver Anna Pikula), not User-Management work. Unblock trigger: *"reaches stage-3-production (`spec-access-control-kernel-mvp`)."* | `relationships/um-rel-12` T3, **all of `um-rel-13`'s access half** (T3 — the recursive walk over nested departments), `um-rel-17`'s deferred `it.todo` — the department-derived **access resolution** only. **Not** blocked: the department **membership** write + atomic move + ≥1-floor `409`, the department-**manager** `Policies`/`UserPolicies` write, self-assignment `400`, and every same-transaction `department_change` event / `AccessJournal` row — `um-rel-12` T1–T2, `um-rel-13` T1–T2, `um-rel-14`, `um-rel-17` T1–T4. `Department.parentId` + `DepartmentMembership` schema present (Story 1.1); CC-07/PM/AD-29 done via Story 4.1; the `department_change` mechanism done via Epic 3 Story 3.1. |
 | CC-06 (scheduled-departure state + executor) | all of `departure/` |
 
 ## Normative decisions
