@@ -21,6 +21,7 @@ const {
   readTaskDescription,
   readYaml,
   relativeSourceKey,
+  reportUnmappedPrefixes,
   request,
   sleep,
   validateClickUpTargets,
@@ -96,9 +97,11 @@ async function collectSyncEntries(options = {}) {
 
   // Epics are entries too: their task IDs come from EPIC_BY_TRACK rather than
   // the tasks map, so they need no per-epic configuration.
+  const unmappedEpics = [];
   for (const epic of await collectEpicStatusRecords({ ...options, rootDir, sprintStatusPaths: sourcePaths })) {
     if (!epic.taskId) {
       console.warn(`Skipped ${epic.sourceKey}: no ClickUp epic task is mapped for ${epic.track} ${epic.epicKey}.`);
+      unmappedEpics.push({ key: epic.epicKey, track: epic.track });
       continue;
     }
     if (!Object.hasOwn(statusMap, epic.sourceStatus)) {
@@ -115,6 +118,8 @@ async function collectSyncEntries(options = {}) {
       status: statusMap[epic.sourceStatus],
     });
   }
+
+  await reportUnmappedPrefixes(unmappedEpics, options.annotationOptions);
 
   for (const sourceKey of Object.keys(tasks)) {
     if (!discoveredSourceKeys.has(sourceKey)) {

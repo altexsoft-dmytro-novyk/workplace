@@ -581,3 +581,15 @@ test('collectSyncEntries rejects malformed configuration, missing source, unknow
     /1-99-test-story/,
   );
 });
+
+test('a workflow runs the ClickUp test suite on pull requests and on main', async () => {
+  const workflowPath = path.join(__dirname, '..', '.github', 'workflows', 'tests.yml');
+  const workflow = yaml.load(await fs.readFile(workflowPath, 'utf8'));
+
+  assert.ok(workflow.on.pull_request !== undefined, 'tests must run on pull requests');
+  assert.deepEqual(workflow.on.push.branches, ['main']);
+  assert.equal(workflow.permissions.contents, 'read');
+  const steps = workflow.jobs.clickup.steps;
+  assert.ok(steps.some((step) => step.run === 'npm ci'));
+  assert.ok(steps.some((step) => step.run === 'npm run test:clickup'));
+});

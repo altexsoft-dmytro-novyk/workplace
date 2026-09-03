@@ -426,6 +426,7 @@ function matchesKeyFilter(developmentStatusKey, keyFilter) {
 
 const STORY_HEADING = /^###\s+Story\s+(\d+)\.(\d+):\s*(.+?)\s*$/;
 const SPRINT_KEY_FIELD = /\*\*Sprint key:\*\*\s*`([^`]+)`/;
+const FENCE_DELIMITER = /^\s*(?:```|~~~)/;
 
 function slugifyStoryTitle(title) {
   return String(title)
@@ -456,16 +457,21 @@ function parseEpicStories(markdown) {
     current = null;
   };
 
+  let inFence = false;
   for (const line of String(markdown).split('\n')) {
-    const heading = line.match(STORY_HEADING);
-    if (heading) {
-      flush();
-      current = { epicNumber: heading[1], storyNumber: heading[2], title: heading[3], bodyLines: [] };
-      continue;
-    }
-    if (/^#{1,3}\s/.test(line)) {
-      flush();
-      continue;
+    if (FENCE_DELIMITER.test(line)) inFence = !inFence;
+
+    if (!inFence) {
+      const heading = line.match(STORY_HEADING);
+      if (heading) {
+        flush();
+        current = { epicNumber: heading[1], storyNumber: heading[2], title: heading[3], bodyLines: [] };
+        continue;
+      }
+      if (/^#{1,3}\s/.test(line)) {
+        flush();
+        continue;
+      }
     }
     if (current) current.bodyLines.push(line);
   }
@@ -516,16 +522,21 @@ function parseEpicOverviews(markdown) {
     current = null;
   };
 
+  let inFence = false;
   for (const line of String(markdown).split('\n')) {
-    const heading = line.match(EPIC_HEADING);
-    if (heading) {
-      flush();
-      current = { epicNumber: heading[1], title: heading[2], bodyLines: [] };
-      continue;
-    }
-    if (STORY_HEADING.test(line) || /^##\s/.test(line)) {
-      flush();
-      continue;
+    if (FENCE_DELIMITER.test(line)) inFence = !inFence;
+
+    if (!inFence) {
+      const heading = line.match(EPIC_HEADING);
+      if (heading) {
+        flush();
+        current = { epicNumber: heading[1], title: heading[2], bodyLines: [] };
+        continue;
+      }
+      if (STORY_HEADING.test(line) || /^##\s/.test(line)) {
+        flush();
+        continue;
+      }
     }
     if (current) current.bodyLines.push(line);
   }
@@ -567,6 +578,10 @@ async function collectStoryDescriptions(options = {}) {
     }
 
     for (const story of parseEpicStories(markdown)) {
+      if (story.body === '') {
+        console.warn(`Story "${story.sprintKey}" in ${relativePath} has no prose. Skipping its description.`);
+        continue;
+      }
       if (descriptions.has(story.sprintKey)) {
         console.warn(`Duplicate story sprint key "${story.sprintKey}" in ${relativePath}. Keeping the first.`);
         continue;
@@ -600,7 +615,16 @@ async function collectEpicDescriptions(options = {}) {
     }
 
     for (const epic of parseEpicOverviews(markdown)) {
-      descriptions.set(epicDescriptionKey(track, epic.epicNumber), {
+      const key = epicDescriptionKey(track, epic.epicNumber);
+      if (epic.body === '') {
+        console.warn(`Epic "${epic.epicKey}" in ${relativePath} has no prose. Skipping its description.`);
+        continue;
+      }
+      if (descriptions.has(key)) {
+        console.warn(`Duplicate epic heading "${epic.epicKey}" in ${relativePath}. Keeping the first.`);
+        continue;
+      }
+      descriptions.set(key, {
         ...epic,
         track,
         sourcePath: relativePath,
@@ -618,6 +642,7 @@ const EPIC_STATUS_KEY = /^epic-(\d+)$/;
 async function collectEpicStatusRecords(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
+  const keyFilter = keyFilterFromOptions(options);
   const records = [];
 
   for (const sourcePath of sourcePaths) {
@@ -632,6 +657,7 @@ async function collectEpicStatusRecords(options = {}) {
     for (const [key, sourceStatus] of Object.entries(developmentStatus)) {
       const match = key.match(EPIC_STATUS_KEY);
       if (!match) continue;
+      if (!matchesKeyFilter(key, keyFilter)) continue;
       records.push({
         track,
         epicKey: key,
@@ -648,7 +674,7 @@ async function collectEpicStatusRecords(options = {}) {
 
 function descriptionsConfig(config = {}) {
   const raw = config.descriptions;
-  if (raw === undefined || raw === null) return { enabled: true, overwrite: false };
+  if (raw === undefined || raw === null || raw === true) return { enabled: true, overwrite: false };
   if (raw === false) return { enabled: false, overwrite: false };
   const section = asObject(raw, 'descriptions in ClickUp sync configuration');
   return { enabled: section.enabled !== false, overwrite: section.overwrite === true };

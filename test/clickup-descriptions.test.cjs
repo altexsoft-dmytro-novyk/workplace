@@ -7,6 +7,7 @@ const path = require('node:path');
 const { syncClickUp } = require('../scripts/sync-clickup.cjs');
 const { createMissingClickUpTasks } = require('../scripts/create-clickup-task.cjs');
 const {
+  collectEpicDescriptions,
   collectEpicStatusRecords,
   collectStoryDescriptions,
   descriptionsConfig,
@@ -26,6 +27,8 @@ afterEach(async () => {
 
 const EPICS_MARKDOWN = [
   '## Epic 1: Some Epic',
+  '',
+  'Epic prose that belongs to the epic and not to any story under it.',
   '',
   '### Story 1.99: Test Story With A Declared Key',
   '',
@@ -140,6 +143,8 @@ test('collectStoryDescriptions tolerates a track with no epics file', async () =
 
 test('descriptionsConfig defaults to fill-empty and honours explicit settings', () => {
   assert.deepEqual(descriptionsConfig({}), { enabled: true, overwrite: false });
+  assert.deepEqual(descriptionsConfig({ descriptions: null }), { enabled: true, overwrite: false });
+  assert.deepEqual(descriptionsConfig({ descriptions: true }), { enabled: true, overwrite: false });
   assert.deepEqual(descriptionsConfig({ descriptions: false }), { enabled: false, overwrite: false });
   assert.deepEqual(descriptionsConfig({ descriptions: { enabled: false } }), { enabled: false, overwrite: false });
   assert.deepEqual(descriptionsConfig({ descriptions: { overwrite: true } }), { enabled: true, overwrite: true });
@@ -489,4 +494,133 @@ test('collectSyncEntries skips an epic whose BMad status has no ClickUp mapping'
 
   assert.deepEqual(entries.filter((entry) => entry.sourceKey.includes('#epic-')), []);
   assert.equal(entries.length, 1);
+});
+
+test('collectStoryDescriptions and collectEpicDescriptions ignore headings inside a fenced block', async () => {
+  const { rootDir } = await createFixture({
+    epics: [
+      '## Epic 1: Real Epic',
+      '',
+      'Prose.',
+      '',
+      '```markdown',
+      '## Epic 9: Documented Example',
+      '### Story 9.9: Documented Example Story',
+      '```',
+      '',
+      'More prose.',
+    ].join('\n'),
+  });
+
+  const epics = await collectEpicDescriptions({ rootDir, tracks: ['platform'] });
+  const stories = await collectStoryDescriptions({ rootDir, tracks: ['platform'] });
+
+  assert.deepEqual([...epics.keys()], ['platform:epic-1']);
+  assert.equal(stories.size, 0, 'the fenced story heading is an example, not a story');
+  assert.ok(epics.get('platform:epic-1').markdown.includes('## Epic 9: Documented Example'));
+});
+
+test('collectEpicDescriptions keeps the first of two identical epic headings', async () => {
+  const { rootDir } = await createFixture({
+    epics: ['## Epic 1: First', '', 'First body.', '', '## Epic 1: Second', '', 'Second body.'].join('\n'),
+  });
+
+  const epics = await collectEpicDescriptions({ rootDir, tracks: ['platform'] });
+
+  assert.equal(epics.size, 1);
+  assert.equal(epics.get('platform:epic-1').title, 'First');
+});
+
+test('descriptions are not generated for an epic or story with no prose', async () => {
+  const { rootDir } = await createFixture({
+    epics: ['## Epic 1: Bare Epic', '', '### Story 1.99: Bare Story', '', '## Epic 2: Next'].join('\n'),
+  });
+
+  const epics = await collectEpicDescriptions({ rootDir, tracks: ['platform'] });
+  const stories = await collectStoryDescriptions({ rootDir, tracks: ['platform'] });
+
+  assert.equal(epics.size, 0);
+  assert.equal(stories.size, 0);
+});
+
+test('collectEpicStatusRecords honours the BMad key filter', async () => {
+  const fixture = await createFixture({ epicStatus: 'in-progress' });
+
+  const unfiltered = await collectEpicStatusRecords({
+    rootDir: fixture.rootDir,
+    sprintStatusPaths: [fixture.sourcePath],
+  });
+  const filtered = await collectEpicStatusRecords({
+    rootDir: fixture.rootDir,
+    sprintStatusPaths: [fixture.sourcePath],
+    keyFilter: '1-99-test-story',
+  });
+
+  assert.equal(unfiltered.length, 1);
+  assert.deepEqual(filtered, [], 'a run targeted at one story must not rewrite every epic');
+});
+
+test('collectSyncEntries annotates an epic that has no ClickUp task', async () => {
+  const fixture = await createFixture();
+  await fs.writeFile(
+    fixture.sourcePath,
+    'development_status:\n  1-99-test-story: in-progress\n  epic-9: backlog\n',
+  );
+  const logged = [];
+  const originalLog = console.log;
+  console.log = (line) => logged.push(line);
+  try {
+    await collectSyncEntries({
+      ...fixture,
+      sprintStatusPaths: [fixture.sourcePath],
+      annotationOptions: { env: { GITHUB_ACTIONS: 'true' } },
+    });
+  } finally {
+    console.log = originalLog;
+  }
+
+  assert.equal(logged.length, 1);
+  assert.match(logged[0], /^::warning title=ClickUp epic mapping incomplete::/);
+  assert.match(logged[0], /platform: epic-9/);
+});
+
+test('createMissingClickUpTasks annotates the story prefixes it skipped', async () => {
+  const fixture = await createFixture({
+    status: 'backlog',
+    storyKey: '9-9-unmapped-prefix-story',
+    config: [
+      'workspace_id: "90122019689"',
+      'list_id: "901221186877"',
+      'status_map:',
+      '  backlog: "TO DO"',
+      'custom_fields:',
+      `  bmad_key: "${BMAD_KEY_FIELD_ID}"`,
+      'tasks: {}',
+    ].join('\n'),
+  });
+  const logged = [];
+  const originalLog = console.log;
+  console.log = (line) => logged.push(line);
+  let summary;
+  try {
+    summary = await createMissingClickUpTasks({
+      ...fixture,
+      token: 'secret-token',
+      sleepImpl: async () => {},
+      annotationOptions: { env: { GITHUB_ACTIONS: 'true' } },
+      fetchImpl: withClickUpValidation(async (url, init = {}) => {
+        if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+        if (url.includes('/task?')) return listTasksResponse([]);
+        return jsonResponse(200, {});
+      }),
+    });
+  } finally {
+    console.log = originalLog;
+  }
+
+  assert.equal(summary.unmapped, 1);
+  assert.equal(summary.created, 0);
+  const annotation = logged.find((line) => line.startsWith('::warning'));
+  assert.ok(annotation, 'the skipped story must reach the Annotations panel');
+  assert.match(annotation, /platform: 9-9-unmapped-prefix-story/);
 });
