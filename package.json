@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "sync:clickup": "node scripts/sync-clickup.cjs",
+    "test:clickup": "node --test test/clickup-sync.test.cjs",
     "services:init": "git submodule update --init --recursive",
     "services:status": "git submodule status",
     "services:sync": "git submodule update --remote",
@@ -23,5 +25,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"  
+  "license": "ISC",
+  "dependencies": {
+    "js-yaml": "^5.4.1"
+  }
 }
