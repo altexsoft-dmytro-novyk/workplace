@@ -28,6 +28,14 @@ deliverable; none is authorized by the current spec.
   summary: No per-route `document.title` for the standalone `/login` and `/auth/magic-link/consume` full-screen pages.
   evidence: The tab keeps whatever title the previous route set. A small `useDocumentTitle` hook applied on the auth pages (and later shell pages) fixes it.
 
+- source_spec: `spec-employee-directory.md`
+  summary: Employee-directory affordances the prototype shows but `GET /users` cannot back — free-text (substring) search, a `department` filter, a server-side sort control, `.xlsx` export, per-viewer audience-filtered rows ("colleague view"), and row-select bulk actions.
+  evidence: `list-users-query.dto.ts` accepts only exact-equality filters on the S1 fields + `employmentStatus`; the repository sorts by a fixed `lastName,firstName`; `toUserListItem` is one uniform projection for every viewer; there is no export route. The richer directory is platform §4.1 scope (`epics.md` FR-15) / the deferred §3.3.1 list projection (access-control deferred-work). Build these on the frontend once the list endpoint gains them.
+
+- source_spec: `spec-employee-directory.md`
+  summary: No combined "active + dismissed" employee view — `employmentStatus` is unset (active only) or `dismissed` (dismissed only).
+  evidence: `list-users-query.dto.ts` types it `'active' | 'dismissed'` and the repo builds mutually-exclusive `where` clauses. Needs a backend change (an `all` value, or dropping the implicit active-only default) before the directory's status filter can offer it.
+
 - source_spec: none
   status: split 2026-09-03 from the User Management frontend UI build run (Dmytro Novyk); deferred by the user pending backend.
   summary: Access preview screen (`Profile.dc.html`) — HR-Admin tool that resolves how the profile API assembles its response per audience (6-audience × 16-section matrix).
