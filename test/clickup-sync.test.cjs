@@ -56,7 +56,7 @@ async function createFixture({ config, status = 'in-progress', storyKey = '1-99-
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks:',
     `  "${sourceKey}":`,
     '    task_id: "task-123"',
@@ -85,7 +85,7 @@ test('collectSyncEntries maps configured BMad development status entries', async
   assert.deepEqual(entries, [{
     sourceKey: '_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story',
     taskId: 'task-123',
-    status: 'in progress',
+    status: 'IN PROGRESS',
     gitBranch: 'feature/story-1',
     validationStatus: 'passed',
   }]);
@@ -151,7 +151,7 @@ test('syncClickUp does not write tasks when every BMad entry is unmapped', async
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks: {}',
   ].join('\n') });
   const requests = [];
@@ -192,7 +192,7 @@ test('syncClickUp sends the mapped status with the expected request boundary', a
         Authorization: 'secret-token',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status: 'in progress' }),
+      body: JSON.stringify({ status: 'IN PROGRESS' }),
     },
   }]);
 });
@@ -202,7 +202,7 @@ test('syncClickUp writes mapped custom fields after the successful status update
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     '  validation_status: "validation-status-field"',
@@ -230,7 +230,7 @@ test('syncClickUp writes mapped custom fields after the successful status update
       init: {
         method: 'PUT',
         headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'in progress' }),
+        body: JSON.stringify({ status: 'IN PROGRESS' }),
       },
     },
     {
@@ -257,7 +257,7 @@ test('syncClickUp writes custom fields only with both a configured ID and mapped
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     '  validation_status: ""',
@@ -290,7 +290,7 @@ test('syncClickUp skips a configured custom field when its mapped value is empty
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     '  validation_status: "validation-status-field"',
@@ -323,7 +323,7 @@ test('syncClickUp reports custom field failures without revealing the token', as
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     'tasks:',
@@ -354,7 +354,7 @@ test('syncClickUp URL-encodes task and custom field IDs', async () => {
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "field/id"',
     'tasks:',
@@ -438,7 +438,7 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
       'workspace_id: "90122019689"',
       'list_id: "list-123"',
       'status_map:',
-      '  in-progress: "in progress"',
+      '  in-progress: "IN PROGRESS"',
       'custom_fields:',
       '  bmad_key: "bmad-key-field"',
       'tasks: {}',
@@ -480,7 +480,7 @@ test('syncClickUp counts skipped entries when bmad_key lookup finds no task', as
       'workspace_id: "90122019689"',
       'list_id: "list-123"',
       'status_map:',
-      '  in-progress: "in progress"',
+      '  in-progress: "IN PROGRESS"',
       'custom_fields:',
       '  bmad_key: "bmad-key-field"',
       'tasks: {}',
@@ -505,7 +505,7 @@ test('collectSyncEntries rejects a configured task mapping without an ID even wh
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks:',
     '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
@@ -522,7 +522,7 @@ test('collectSyncEntries rejects configured task mappings for source keys it did
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks:',
     '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
@@ -568,7 +568,7 @@ test('collectSyncEntries rejects malformed configuration, missing source, unknow
     config: [
       'workspace_id: "90122019689"',
       'status_map:',
-      '  in-progress: "in progress"',
+      '  in-progress: "IN PROGRESS"',
       'tasks:',
       '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story": {}',
     ].join('\n'),
