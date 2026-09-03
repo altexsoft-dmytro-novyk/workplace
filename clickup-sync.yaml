@@ -9,5 +9,13 @@ custom_fields:
   git_branch: "3ae4ce80-b2ee-4ab4-9eae-cc7c33224921"
   validation_status: "1b403e5c-f636-4d6f-9d57-4206d6292290"
 tasks:
+  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#epic-1":
+    task_id: "869eupgh3"
+  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#epic-2":
+    task_id: "869euphdh"
+  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#epic-3":
+    task_id: "869euphgj"
   "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-1-changelog-traceability-matrix":
     task_id: "869eup3kz"
+  "_bmad-output/implementation-artifacts/user-management/sprint-status.yaml#epic-0":
+    task_id: "869euphpm"
