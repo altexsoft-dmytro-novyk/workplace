@@ -40,7 +40,7 @@ async function createFixture({ developmentStatus = '1-99-test-auto-create: backl
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  backlog: "to do"',
+    '  backlog: "TO DO"',
     'custom_fields:',
     `  bmad_key: "${BMAD_KEY_FIELD_ID}"`,
     'tasks: {}',
@@ -130,7 +130,7 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
   assert.deepEqual(JSON.parse(createRequest.init.body), {
     name: '1-99-test-auto-create',
     parent: '869eupgh3',
-    status: 'to do',
+    status: 'TO DO',
     custom_fields: [{ id: BMAD_KEY_FIELD_ID, value: '1-99-test-auto-create' }],
   });
   assert.ok(requests.some(({ url, init }) => url.endsWith(`/field/${BMAD_KEY_FIELD_ID}`) && init.method === 'POST'));
