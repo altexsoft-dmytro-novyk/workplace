@@ -5,9 +5,17 @@ Run from _bmad-output/planning-artifacts/ :   python3 global-coverage/verify-cov
 Exit code 0 = all checks pass, 1 = at least one FAIL.
 
 Checks what a human cannot hold in their head: that every requirement has an
-owning slice, every story ID resolves in BOTH directions inside its OWN slice
-file, every gate resolves in blockers.yaml, and every normative section has at
-least one requirement. It does NOT check semantic adequacy — see README.md.
+owning slice and an owning epic, every story ID resolves in BOTH directions
+inside its OWN slice file, epics[] is neither missing nor narrower than the
+epics its stories imply, every gate resolves in blockers.yaml, and every
+normative section has at least one requirement. It does NOT check semantic
+adequacy — see README.md.
+
+Known limitation: check 7 reads only dotted subsection headings, so the
+top-level `## N.` sections of project-requirements.md — including §7
+Non-functional requirements and §8 Engineering process requirements
+[NORMATIVE] — are outside its scope. NFRs are not in this model at all;
+each slice asserts NFR-1..NFR-7 in its own epic file with no global rollup.
 """
 import yaml, re, os, sys, glob
 from collections import Counter, defaultdict
@@ -69,6 +77,49 @@ epic_refs = {e for r in reqs for e in (r.get('epics') or [])}
 text = {p: open(p).read() for p in reg.values()}
 unres = [e for e in sorted(epic_refs) if not any(re.search(rf'\b{re.escape(e)}\b', t) for t in text.values())]
 check("every epics[] reference resolves in a slice file", not unres, str(unres))
+
+# epics[] is the ONLY place epic-level coverage is recorded, so it must be present on
+# every requirement rather than inferred by a reader from story-ID prefixes.
+nokey = [r['id'] for r in reqs if 'epics' not in r]
+check("every requirement declares an epics[] key (may be empty)", not nokey, str(nokey))
+
+# A requirement claimed as specified or better must name an owning epic. uncovered and
+# deferred may be empty — that is the state those two statuses exist to record.
+noepic = [f"{r['id']} {r['coverage_status']}" for r in reqs
+          if r['coverage_status'] in ('specified', 'in-progress', 'implemented')
+          and not (r.get('epics') or [])]
+check("every specified/in-progress/implemented requirement names an epic", not noepic, str(noepic))
+
+# epics[] must not be narrower than stories[]: an epic that owns a mapped story and is
+# absent from epics[] makes the epic-level rollup silently wrong.
+epat = re.compile(r'^[A-Z]{1,5}-E\d+')
+narrow = {}
+for r in reqs:
+    implied = {epat.match(s['id']).group(0) for s in (r.get('stories') or []) if epat.match(s['id'])}
+    gap = sorted(implied - set(r.get('epics') or []))
+    if gap: narrow[r['id']] = gap
+check("epics[] covers every epic implied by stories[]", not narrow, str(narrow))
+
+# An epic assignment is not story coverage (PMC SD-7). Listed so the distinction stays
+# visible in the report; never failed, because it is a legitimate recorded state.
+epic_only = [f"{r['id']} {r['coverage_status']} {r['epics']}" for r in reqs
+             if (r.get('epics') or []) and not (r.get('stories') or [])]
+print("  INFO  epic-assigned but story-uncovered (an epic assignment is not coverage):")
+for x in epic_only: print(f"          {x}")
+
+# Coverage that rests entirely inside a slice whose own epic file is not final.
+# Not a failure — a standing risk the rollup does not otherwise show.
+def slice_status(path):
+    fm = open(path).read().split('---')[1] if open(path).read().startswith('---') else ''
+    m = re.search(r'^status:\s*(\S+)', fm, re.M)
+    return m.group(1) if m else 'none'
+sstat = {sid: slice_status(p) for sid, p in reg.items()}
+nonfinal = {sid for sid, st in sstat.items() if st != 'final'}
+draft_only = [r['id'] for r in reqs if (r.get('stories') or [])
+              and {s['id'].split('-E')[0] for s in r['stories']} <= nonfinal]
+print(f"  INFO  slice status: {sstat}")
+print(f"  INFO  {len(draft_only)} requirements whose entire story coverage sits in a "
+      f"non-final slice: {draft_only}")
 
 print("\n6. GATES")
 b = yaml.safe_load(open('architecture/architecture-people-management-ratification-2026-09-02/blockers.yaml'))

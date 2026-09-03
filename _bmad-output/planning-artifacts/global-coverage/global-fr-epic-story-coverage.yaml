@@ -25,6 +25,7 @@ namespace_rules:
   timetracker_epics: TT-E*
   cds_epics: CDS-E*
   profile_sharing_epics: PSH-E*
+  role_administration_epics: RA-E*
   stable_workboard_ids: [ACF-*, ACM-*, UMAC-*]
 source_slices:
   - id: PLAT
@@ -60,6 +61,9 @@ source_slices:
   - id: PSH
     path: _bmad-output/planning-artifacts/profile-sharing/epics.md
     role: draft-bounded-context-slice
+  - id: RA
+    path: _bmad-output/planning-artifacts/role-administration/epics.md
+    role: bounded-context-slice
 conflicts:
   - id: CONFLICT-UM-01
     status: resolved
@@ -75,6 +79,7 @@ requirements:
       - {id: PLAT-E3-S3.4, workboard_id: ACM-1, sprint_key: 3-4-minimal-functional-role-data-foundation-acm-1, status: implemented}
       - {id: PLAT-E4-S4.1, sprint_key: 4-1-project-line-derivation-from-explicit-pm-dm-attachments, status: specified}
       - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
+    epics: [PLAT-E3, PLAT-E4, UM-E0]
     notes: >
       Kernel separation exists; real consumer adoption remains incomplete.
       PLAT-E4-S4.1 carries one FR-1 testable consequence only — that holding the DM or PM
@@ -132,7 +137,7 @@ requirements:
       - {id: PLAT-E7-S7.2, sprint_key: 7-2-never-share-set-and-per-link-re-enablement, status: specified}
       - {id: PLAT-E7-S7.3, sprint_key: 7-3-full-profile-overlay-evaluation, status: specified}
       - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
-    epics: [PLAT-E3, PLAT-E6, PLAT-E7]
+    epics: [PLAT-E3, PLAT-E6, PLAT-E7, UM-E0]
     gates: [AC-S9-S13, AC-SECTION-MATRIX-01]
     notes: >
       Only the base S1/S10/S11 kernel slice is implemented; the facade returns 'none' for
@@ -157,6 +162,7 @@ requirements:
     aliases: [UM-FR-16, UM-FR-17]
     stories:
       - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
+    epics: [UM-E0]
     notes: >
       Current whole-row projection is transition debt; broader projections are deferred.
       Product denial oracle is 401/404/403; runtime still maps target deny to 403 and
@@ -170,18 +176,52 @@ requirements:
   - id: PM-FR-5
     normative_refs: ["§3.3.6", "§4.1"]
     summary: Preserve custom-field visibility in reads, filters, and columns
-    coverage_status: deferred
+    coverage_status: specified
     aliases: [UM-FR-17]
-    stories: []
-    notes: Visibility rule bound by PM/AD-32; EAV implementation absent.
+    stories:
+      - {id: UM-E6-S6.1, sprint_key: 6-1-define-a-custom-field-with-declared-visibility, status: specified}
+      - {id: UM-E6-S6.2, sprint_key: 6-2-set-and-store-custom-field-values, status: specified}
+      - {id: UM-E6-S6.3, sprint_key: 6-3-custom-field-values-respect-section-level-access, status: specified}
+      - {id: UM-E7-S7.1, sprint_key: 7-1-custom-field-columns-and-filters-read-only-entitled-values, status: specified}
+      - {id: UM-E7-S7.2, sprint_key: 7-2-s16-section-matrix-resolution-for-custom-fields, status: specified}
+    epics: [UM-E6, UM-E7]
+    gates: [AC-SECTION-MATRIX-01]
+    notes: >
+      2026-09-03 decomposition (bmad-create-epics-and-stories re-entry): visibility rule bound
+      by PM/AD-32; storage and declared-visibility half now specified as UM-E6, anti-inference
+      half as UM-E7. UM-E7 remains gated on AC-SECTION-MATRIX-01 (owns S16). PLAT-E6-S6.6 and
+      PMC-E1-S1.8 both gate on UM-E7 specifically, not UM-E6 alone — closing UM-E6 without UM-E7
+      would ship custom-field filtering ahead of anti-inference enforcement (NFR-1 leak); the two
+      must not be unblocked independently. This closes the S16 slice only of the UM-FR-17
+      "deferred Profile Projection story" placeholder in user-management/epics.md; the S10/S11
+      colleague-narrowing, S7/S8 flag, and S1 derived-field-immutability slices of that same
+      placeholder remain unwritten and are tracked under PM-FR-4's aliases, not by this row.
   - id: PM-FR-6
     normative_refs: ["§2.3"]
     summary: Runtime functional role and permission administration
-    coverage_status: deferred
-    stories: []
+    coverage_status: specified
+    stories:
+      - {id: RA-E1-S1.1, sprint_key: 1-1-the-permission-catalog-exists-as-queryable-data, status: specified}
+      - {id: RA-E1-S1.2, sprint_key: 1-2-create-and-name-a-functional-role-at-runtime, status: specified}
+      - {id: RA-E1-S1.3, sprint_key: 1-3-grant-and-revoke-permissions-effective-immediately, status: specified}
+      - {id: RA-E1-S1.4, sprint_key: 1-4-functional-permission-decision-isolated-from-audience-data, status: specified}
+      - {id: RA-E1-S1.5, sprint_key: 1-5-fail-closed-bootstrap-with-the-combined-kernel-seed, status: specified}
+      - {id: RA-E2-S2.1, sprint_key: 2-1-roles-permissions-screen-specified-and-dependency-blocked, status: specified}
+    epics: [RA-E1, RA-E2]
     specs: [_bmad-output/specs/spec-functional-roles-catalog/SPEC.md]
     gates: [OQ-PERM-01]
-    notes: Default role-to-permission matrix is not approved. Do not seed or infer grants.
+    notes: >
+      2026-09-03 decomposition (bmad-create-epics-and-stories re-entry): new bounded-context-slice
+      file role-administration/epics.md, registered above (role: bounded-context-slice — not draft,
+      since access-control is already AD-5-confirmed and this file proposes no new context; the code
+      lives inside that existing context alongside platform/epics.md's PLAT-E1-E7, which never
+      claimed this requirement). RA-E1 (engine/API) needs no default-assignment decision per AD-12
+      and is unblocked. RA-E2 (admin screen) stays gated on OQ-PERM-01 with no downstream
+      dependents of its own — PM-FR-6 reaches implemented only after RA-E2, not after RA-E1 alone.
+      RA-E1.5 proposes appending user-management:edit and mentorship:assign to the bootstrap seed
+      as a named Stage-1 decision (closing OQ-AC-EDIT once approved) — not pre-declared closed here.
+      Default role-to-permission matrix (OQ-PERM-01) is still not approved. Do not seed or infer
+      grants.
   - id: PM-FR-7
     normative_refs: ["§2.1", "§2.3"]
     summary: Assign functional roles and change organisational facts through dedicated controls
@@ -191,6 +231,7 @@ requirements:
       - {id: UM-E4-S4.1, sprint_key: 4-1-change-an-employee-s-manager, status: specified}
       - {id: UM-E4-S4.2, sprint_key: 4-2-change-an-employee-s-people-partner, status: specified}
       - {id: UM-E4-S4.3, sprint_key: 4-3-change-employee-department-or-department-manager, status: specified}
+    epics: [UM-E4]
     gates: [CC-04, CC-07, DEPARTMENT-EDGE]
   - id: PM-FR-8
     normative_refs: ["§4.1"]
@@ -202,23 +243,40 @@ requirements:
       - {id: PMC-E1-S1.4, status: specified}
       - {id: PMC-E1-S1.5, status: specified}
       - {id: PMC-E1-S1.8, status: specified}
-    gates: [OQ-PERM-01]
+    epics: [PMC-E1]
+    gates: [OQ-PERM-01, AC-SECTION-MATRIX-01]
     notes: >
       Storage design is PM/AD-32 typed EAV. User.customFields jsonb is transition debt.
       Standard and derived fields are covered. The custom-field clause is carried only by
-      PMC-E1-S1.8, which depends on PM-FR-5 (deferred, no stories); unblocking S1.8 without
-      closing that dependency risks an NFR-1 leak through the filter side channel UX-DR23 bans.
+      PMC-E1-S1.8, which depends on PM-FR-5 — now `specified` (2026-09-03) via UM-E6/UM-E7,
+      but UM-E7 itself stays gated on AC-SECTION-MATRIX-01; unblocking S1.8 before UM-E7 closes
+      risks an NFR-1 leak through the filter side channel UX-DR23 bans. AC-SECTION-MATRIX-01
+      added here as a transitive gate for that reason.
   - id: PM-FR-9
     normative_refs: ["§4.1"]
     summary: Permission-safe inline directory editing
-    coverage_status: uncovered
-    stories: []
+    coverage_status: specified
+    stories:
+      - {id: PMC-E4-S4.1, sprint_key: 4-1-inline-editable-columns-write-through-to-the-profile, status: specified}
+      - {id: PMC-E4-S4.2, sprint_key: 4-2-inline-edit-denial-and-conflict-states, status: specified}
+      - {id: PMC-E4-S4.3, sprint_key: 4-3-custom-field-columns-become-inline-editable, status: specified}
+    epics: [PMC-E4]
+    gates: [OQ-AC-EDIT]
+    notes: >
+      2026-09-03 decomposition (bmad-create-epics-and-stories re-entry): moved into
+      platform-capabilities/epics.md as Epic 4, which originally excluded it by name for
+      carrying no UX surface (EXPERIENCE.md still records "No surface" — that has not changed;
+      Story 4.2's denial/conflict states are specified directly, not inferred from a mock).
+      Depends on role-administration Epic RA-E1 (user-management:edit key + isAllowed) and,
+      for Story 4.3 only, user-management Epic UM-E7 (custom-field anti-inference). Record as
+      specified, not implemented, until RA-E1 and UM-E7 both close.
   - id: PM-FR-10
     normative_refs: ["§4.1"]
     summary: Saved and shared directory views
     coverage_status: specified
     stories:
       - {id: PMC-E1-S1.6, status: specified}
+    epics: [PMC-E1]
     gates: [OQ-PERM-01]
     notes: Includes per-recipient re-resolution of shared views (PMC SD-5).
   - id: PM-FR-11
@@ -227,6 +285,7 @@ requirements:
     coverage_status: specified
     stories:
       - {id: PMC-E1-S1.7, status: specified}
+    epics: [PMC-E1]
     gates: [OQ-PERM-01]
     notes: >
       Export flow is specified in-story. A green NFR-1 negative matrix at the shared
@@ -241,6 +300,7 @@ requirements:
       - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
       - {id: UM-E1-S1.2, sprint_key: 1-2-view-and-edit-an-employee-s-identity-card-fields, status: specified}
       - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    epics: [M-E1, UM-E0, UM-E1]
     notes: CONFLICT-UM-01 is resolved at product level (401/404/403); profile denial runtime still diverges.
   - id: PM-FR-13
     normative_refs: ["§4.3"]
@@ -250,6 +310,7 @@ requirements:
     stories:
       - {id: UM-E1-S1.3, sprint_key: 1-3-self-uploads-own-photo, status: specified}
       - {id: M-E1-S1.1, sprint_key: 1-1-open-to-mentoring-flag, status: specified}
+    epics: [M-E1, UM-E1]
     notes: Only selected User Management and Mentorship slices are decomposed
   - id: PM-FR-14
     normative_refs: ["§3.2 S1", "§4.2", "§5.1"]
@@ -258,6 +319,7 @@ requirements:
     aliases: [UM-FR-14, M-FR-16]
     stories:
       - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    epics: [M-E1]
     gates: [CC-10-MENTORSHIP, TT-IDENTITY-01, TT-PMDM-01]
     notes: Live TimeTracker gates are TT-IDENTITY-01 and TT-PMDM-01; TIMETRACKER-CONTRACT is superseded historical only.
   - id: PM-FR-15
@@ -267,6 +329,7 @@ requirements:
     stories:
       - {id: PMC-E2-S2.1, status: specified}
       - {id: PMC-E2-S2.2, status: specified}
+    epics: [PMC-E2]
     gates: [OQ-PERM-01]
     notes: >
       Composition design is PM/AD-33. No generic widget engine. Implementation absent.
@@ -306,6 +369,7 @@ requirements:
       - {id: PMC-E2-S2.2, status: specified}
       - {id: PMC-E2-S2.3, status: specified}
       - {id: PMC-E2-S2.4, status: specified}
+    epics: [PMC-E2]
     gates: [OQ-PERM-01, DEPARTMENT-EDGE]
     notes: >
       Composition design is PM/AD-33. No generic widget engine. Implementation absent.
@@ -322,6 +386,7 @@ requirements:
       - {id: ENG-E1-S1.2, sprint_key: 1-2-complete-cancel-and-overdue-state, status: specified}
       - {id: ENG-E1-S1.3, sprint_key: 1-3-s14-visibility-on-profile-and-self-service, status: specified}
       - {id: ENG-E1-S1.4, sprint_key: 1-4-departure-participant-cancel-assigned-open-items, status: specified}
+    epics: [ENG-E1]
     gates: [OQ-PERM-01, SEC-AUTH-01, CC-06, CC-08, CC-09]
     notes: >
       Departure cancels only open items assigned to the departing user; authored-for-others remain open.
@@ -344,6 +409,7 @@ requirements:
       - {id: ENG-E2-S2.2, sprint_key: 2-2-activate-freeze-the-audience-and-generate-action-items, status: specified}
       - {id: ENG-E2-S2.3, sprint_key: 2-3-sender-per-person-completion-table-exception, status: specified}
       - {id: ENG-E2-S2.4, sprint_key: 2-4-close-the-campaign-and-end-the-exception, status: specified}
+    epics: [ENG-E2]
     gates: [OQ-PERM-01, SEC-AUTH-01, CONFLICT-UM-01]
     notes: >
       Depends on ENG-E1 for the single action-item entity (ENG SD-4) and on the PMC-E1 directory filter
@@ -368,6 +434,7 @@ requirements:
       - {id: RISK-E1-S1.2, sprint_key: 1-2-read-current-level-and-full-history-on-s6, status: specified}
       - {id: RISK-E1-S1.3, sprint_key: 1-3-trend-against-the-previous-record, status: specified}
       - {id: RISK-E1-S1.4, sprint_key: 1-4-verify-the-s6-wall-across-every-employee-naming-endpoint, status: specified}
+    epics: [RISK-E1]
     gates: [OQ-PERM-01, SEC-AUTH-01, CONFLICT-UM-01, AC-SECTION-MATRIX-01]
     notes: >
       OWNERSHIP 2026-09-02: carved out of engagement into the risk slice by Product Owner decision.
@@ -409,6 +476,7 @@ requirements:
       - {id: RISK-E2-S2.1, sprint_key: 2-1-scoped-risk-dashboard-active-counts-and-worst-first-table, status: specified}
       - {id: RISK-E2-S2.2, sprint_key: 2-2-drill-through-from-count-to-table-and-row-to-profile-s6, status: specified}
       - {id: RISK-E2-S2.3, sprint_key: 2-3-risk-dashboard-filters-department-project-pp-manager, status: specified}
+    epics: [RISK-E2]
     gates: [OQ-PERM-01, SEC-AUTH-01, DEPARTMENT-EDGE, TT-IDENTITY-01, TT-PMDM-01, AC-SECTION-MATRIX-01]
     notes: >
       OWNERSHIP 2026-09-02: carved out of engagement into the risk slice by Product Owner decision.
@@ -440,6 +508,7 @@ requirements:
     stories:
       - {id: RS-E1-S1.1, sprint_key: 1-1-create-a-resourcing-request, status: specified}
       - {id: RS-E1-S1.2, sprint_key: 1-2-route-requests-and-scope-dm-visibility, status: specified}
+    epics: [RS-E1]
     gates: [DEPARTMENT-EDGE, OQ-PERM-01, TT-IDENTITY-01]
     notes: >
       No UX contract (EXPERIENCE.md No surface). RS-DR1..3 derived from PRD/UJ-1.
@@ -451,6 +520,7 @@ requirements:
     stories:
       - {id: RS-E1-S1.3, sprint_key: 1-3-propose-internal-and-external-candidates, status: specified}
       - {id: RS-E1-S1.4, sprint_key: 1-4-auto-generate-request-bound-share-link, status: specified}
+    epics: [RS-E1]
     gates: [DEPARTMENT-EDGE, OQ-PERM-01, SEC-AUTH-01]
     notes: >
       Story 1.4 depends on PM-FR-27 profile-sharing port (still uncovered).
@@ -462,6 +532,7 @@ requirements:
     stories:
       - {id: RS-E1-S1.5, sprint_key: 1-5-approve-or-reject-candidates-with-feedback, status: specified}
       - {id: RS-E1-S1.6, sprint_key: 1-6-explicitly-close-a-resourcing-request, status: specified}
+    epics: [RS-E1]
     gates: [OQ-PERM-01]
     notes: AD-31 — approval does not write Relationship type=project.
   - id: PM-FR-26
@@ -470,6 +541,7 @@ requirements:
     coverage_status: specified
     stories:
       - {id: RS-E2-S2.1, sprint_key: 2-1-s15-request-history-on-profile, status: specified}
+    epics: [RS-E2]
     gates: [AC-SECTION-MATRIX-01, SEC-AUTH-01]
     notes: >
       S15 facade beyond S1/S10/S11 kernel is a P1 gate (same class as mentorship S13).
@@ -534,6 +606,7 @@ requirements:
       - {id: UM-E3-S3.1, sprint_key: 3-1-system-auto-generates-career-timeline-events, status: specified}
       - {id: M-E1-S1.3, sprint_key: 1-3-create-a-mentorship-pair, status: specified}
       - {id: M-E1-S1.4, sprint_key: 1-4-end-a-mentorship-pair, status: specified}
+    epics: [M-E1, UM-E3]
     gates: [CC-09]
   - id: PM-FR-29
     normative_refs: ["§4.9"]
@@ -543,6 +616,7 @@ requirements:
     stories:
       - {id: UM-E3-S3.2, sprint_key: 3-2-authorized-actor-manually-adds-a-backfill-entry, status: specified}
       - {id: UM-E3-S3.3, sprint_key: 3-3-authorized-actor-edits-or-deletes-an-event, status: specified}
+    epics: [UM-E3]
     gates: [AC-S9-S13]
   - id: PM-FR-30
     normative_refs: ["§4.10"]
@@ -553,6 +627,7 @@ requirements:
       - {id: CDS-E1-S1.2, sprint_key: 1-2-assessment-log-with-date-assessor-result-link-and-conclusion, status: specified}
       - {id: CDS-E1-S1.3, sprint_key: 1-3-idp-record-and-the-employee-s-own-completion-tick, status: specified}
       - {id: CDS-E1-S1.4, sprint_key: 1-4-verify-the-s12-wall-across-every-employee-naming-endpoint, status: specified}
+    epics: [CDS-E1]
     gates: [SEC-AUTH-01, AC-S9-S13, OQ-PERM-01, CONFLICT-UM-01, DEPARTMENT-EDGE]
     notes: >
       2026-09-03: decomposed by the cds slice. The slice file existed from 2026-09-02 with
@@ -598,6 +673,7 @@ requirements:
       - {id: CDS-E2-S2.1, sprint_key: 2-1-date-of-last-assessment-filter-with-never-assessed, status: specified}
       - {id: CDS-E2-S2.2, sprint_key: 2-2-has-an-open-idp-filter, status: specified}
       - {id: CDS-E2-S2.3, sprint_key: 2-3-cds-filter-non-inference-over-colleague-tier-rows, status: specified}
+    epics: [CDS-E2]
     gates: [SEC-AUTH-01, AC-S9-S13, OQ-PERM-01, CONFLICT-UM-01]
     notes: >
       2026-09-03: decomposed by the cds slice alongside PM-FR-30. Depends on PM-FR-30 —
@@ -628,6 +704,7 @@ requirements:
     stories:
       - {id: M-E1-S1.1, sprint_key: 1-1-open-to-mentoring-flag, status: specified}
       - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    epics: [M-E1]
     gates: [CC-10-MENTORSHIP, AC-S9-S13]
     notes: Departure clears availability; rehire requires explicit opt-in.
   - id: PM-FR-33
@@ -639,6 +716,7 @@ requirements:
       - {id: M-E1-S1.3, sprint_key: 1-3-create-a-mentorship-pair, status: specified}
       - {id: M-E1-S1.4, sprint_key: 1-4-end-a-mentorship-pair, status: specified}
       - {id: M-E1-S1.6, sprint_key: 1-6-departure-auto-close, status: specified}
+    epics: [M-E1]
     gates: [CC-10-MENTORSHIP, OQ-PERM-01, AC-S9-S13, CC-09, CC-06]
   - id: PM-FR-34
     normative_refs: ["§4.11", "§4.1"]
@@ -648,6 +726,7 @@ requirements:
     stories:
       - {id: M-E1-S1.2, sprint_key: 1-2-the-willing-mentor-pool, status: specified}
       - {id: M-E1-S1.5, sprint_key: 1-5-s13-projection-profile-header-mentor-directory-filter, status: specified}
+    epics: [M-E1]
     gates: [CC-10-MENTORSHIP, OQ-PERM-01, AC-S9-S13]
     notes: Willing pool requires active employment; dismissed users are excluded.
   - id: PM-FR-35
@@ -658,6 +737,7 @@ requirements:
       - {id: FB-E1-S1.1, sprint_key: 1-1-create-a-feedback-record-with-explicit-visibility, status: specified}
       - {id: FB-E1-S1.2, sprint_key: 1-2-s8-read-projection-and-per-record-visibility-flag, status: specified}
       - {id: FB-E2-S2.1, sprint_key: 2-1-requested-feedback-through-a-form-campaign, status: specified}
+    epics: [FB-E1, FB-E2]
     gates: [OQ-PERM-01, AC-SECTION-MATRIX-01]
     notes: >
       Carved out of engagement ENG-E4 (2026-09-02). feedback/epics.md is the single owner.
@@ -710,6 +790,7 @@ requirements:
     summary: Optional PeopleForce profile prefill
     coverage_status: deferred
     stories: []
+    epics: []
   - id: PM-FR-39
     normative_refs: ["§2.4"]
     summary: Separate full-profile access grant lifecycle
@@ -741,6 +822,7 @@ requirements:
       - {id: UM-E4-S4.1, sprint_key: 4-1-change-an-employee-s-manager, status: specified}
       - {id: UM-E4-S4.2, sprint_key: 4-2-change-an-employee-s-people-partner, status: specified}
       - {id: UM-E4-S4.3, sprint_key: 4-3-change-employee-department-or-department-manager, status: specified}
+    epics: [UM-E4]
     gates: [CC-07]
   - id: PM-FR-41
     normative_refs: ["§4.16"]
@@ -751,6 +833,7 @@ requirements:
       - {id: UM-E5-S5.1, sprint_key: 5-1-record-a-departure, status: specified}
       - {id: UM-E5-S5.2, sprint_key: 5-2-apply-an-effective-departure, status: specified}
       - {id: M-E1-S1.6, sprint_key: 1-6-departure-auto-close, status: specified}
+    epics: [M-E1, UM-E5]
     gates: [CC-06]
     notes: Assignee-only action-item cancel; mentorship availability cleared and pool excludes dismissed; rehire opt-in. No production executor exists.
   - id: PM-FR-42
@@ -760,6 +843,7 @@ requirements:
     aliases: [UM-FR-10]
     stories:
       - {id: UM-E4-S4.3, sprint_key: 4-3-change-employee-department-or-department-manager, status: specified}
+    epics: [UM-E4]
     gates: [CC-07, DEPARTMENT-EDGE]
 superseded_work:
   - id: UMAC-3
