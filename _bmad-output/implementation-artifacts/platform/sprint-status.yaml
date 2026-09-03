@@ -66,3 +66,6 @@ development_status:
   3-7-compose-the-deployable-kernel-acm-8: done
   3-8-postgresql-500-target-performance-evidence-acm-9: done
   epic-3-retrospective: optional
+
+  # TEST ONLY — BMad→ClickUp sync smoke (ClickUp task 869euv7rn); remove after verification
+  9-9-clickup-sync-smoke-test: backlog
