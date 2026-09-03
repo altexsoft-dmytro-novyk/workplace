@@ -5,5 +5,7 @@ status_map:
   in-progress: "in progress"
   review: "code review"
   done: "done"
-custom_fields: {}
+custom_fields:
+  git_branch: "3ae4ce80-b2ee-4ab4-9eae-cc7c33224921"
+  validation_status: "1b403e5c-f636-4d6f-9d57-4206d6292290"
 tasks: {}
