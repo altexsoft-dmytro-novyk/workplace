@@ -30,6 +30,9 @@ const EPIC_BY_TRACK = {
 const UNMAPPED_PREFIX_ACTION =
   'Add epic parent ID to EPIC_BY_TRACK in scripts/clickup-lib.cjs and create the Epic task in ClickUp before the next sync.';
 
+const UNSTAMPED_TASK_ACTION =
+  'ClickUp refused the bmad_key custom field (ECODE FIELD_033 is the plan usage cap). Raise the plan or free up custom field usages, then rerun create:clickup to stamp them.';
+
 function asObject(value, context) {
   if (!value || Array.isArray(value) || typeof value !== 'object') {
     throw new Error(`${context} must be a YAML mapping`);
@@ -107,32 +110,44 @@ function warnUnmappedPrefix(key, track) {
 // of them went unnoticed. On GitHub the same fact goes to the Annotations panel
 // and the job summary, without failing the run — sync depends on this job, and
 // one unmapped epic must not stop the tasks that are mapped from syncing.
-function reportUnmappedPrefixes(unmapped, { env = process.env, appendFile } = {}) {
-  if (unmapped.length === 0) return;
+function reportAnnotation({ title, headline, lines, action }, { env = process.env, appendFile } = {}) {
+  if (lines.length === 0) return;
 
-  const lines = unmapped.map(({ key, track }) => `${track}: ${key}`);
   if (env.GITHUB_ACTIONS === 'true') {
-    const body = [
-      `${unmapped.length} BMad ${unmapped.length === 1 ? 'story has' : 'stories have'} no ClickUp epic parent and were skipped:`,
-      ...lines,
-      UNMAPPED_PREFIX_ACTION,
-    ].join('%0A');
-    console.log(`::warning title=ClickUp epic mapping incomplete::${body}`);
+    console.log(`::warning title=${title}::${[headline, ...lines, action].join('%0A')}`);
   }
 
   const summaryPath = env.GITHUB_STEP_SUMMARY;
   if (!summaryPath) return;
   const markdown = [
-    '### ClickUp epic mapping incomplete',
+    `### ${title}`,
     '',
-    `${unmapped.length} story key(s) resolved to no epic parent and were skipped:`,
+    headline,
     '',
     ...lines.map((line) => `- \`${line}\``),
     '',
-    UNMAPPED_PREFIX_ACTION,
+    action,
     '',
   ].join('\n');
   return (appendFile || fs.appendFile)(summaryPath, markdown);
+}
+
+function reportUnmappedPrefixes(unmapped, annotationOptions) {
+  return reportAnnotation({
+    title: 'ClickUp epic mapping incomplete',
+    headline: `${unmapped.length} BMad ${unmapped.length === 1 ? 'story has' : 'stories have'} no ClickUp epic parent and were skipped:`,
+    lines: unmapped.map(({ key, track }) => `${track}: ${key}`),
+    action: UNMAPPED_PREFIX_ACTION,
+  }, annotationOptions);
+}
+
+function reportUnstampedTasks(unstamped, annotationOptions) {
+  return reportAnnotation({
+    title: 'ClickUp tasks are missing their bmad_key',
+    headline: `${unstamped.length} ClickUp ${unstamped.length === 1 ? 'task exists but carries' : 'tasks exist but carry'} no bmad_key, so they are matched by name only:`,
+    lines: unstamped.map(({ key, taskId }) => `${key} -> ${taskId}`),
+    action: UNSTAMPED_TASK_ACTION,
+  }, annotationOptions);
 }
 
 function dryRunEnabled(options = {}) {
@@ -328,9 +343,14 @@ async function fetchTaskDetails(fetchImpl, taskId, token) {
   return readResponseJson(response, `task details for ${taskId}`, token);
 }
 
-async function buildBmadKeyTaskIndex(fetchImpl, { listId, fieldId, token }) {
+// A task whose bmad_key could not be stamped (ClickUp FIELD_033, the plan's
+// custom-field usage cap) is invisible to a key-only index, so the next run
+// creates it again. Story task names are the BMad key, so the name index finds
+// those orphans and lets the caller adopt them instead of duplicating them.
+async function buildTaskIndex(fetchImpl, { listId, fieldId, token }) {
   const headers = { Authorization: token };
-  const index = new Map();
+  const byBmadKey = new Map();
+  const byName = new Map();
   let page = 0;
   let lastPage = false;
 
@@ -347,19 +367,22 @@ async function buildBmadKeyTaskIndex(fetchImpl, { listId, fieldId, token }) {
 
     for (const listTask of tasks) {
       const taskId = String(listTask.id);
+      const name = typeof listTask.name === 'string' ? listTask.name.trim() : '';
+      if (name !== '' && !byName.has(name)) byName.set(name, taskId);
+
       let bmadKeyValue = readCustomFieldValue(listTask, fieldId);
       if (bmadKeyValue === null) {
         const fullTask = await fetchTaskDetails(fetchImpl, taskId, token);
         bmadKeyValue = readCustomFieldValue(fullTask, fieldId);
       }
       if (bmadKeyValue === null) continue;
-      if (index.has(bmadKeyValue)) {
+      if (byBmadKey.has(bmadKeyValue)) {
         console.warn(
-          `Duplicate bmad_key "${bmadKeyValue}" on tasks ${index.get(bmadKeyValue)} and ${taskId}; using ${index.get(bmadKeyValue)}.`,
+          `Duplicate bmad_key "${bmadKeyValue}" on tasks ${byBmadKey.get(bmadKeyValue)} and ${taskId}; using ${byBmadKey.get(bmadKeyValue)}.`,
         );
         continue;
       }
-      index.set(bmadKeyValue, taskId);
+      byBmadKey.set(bmadKeyValue, taskId);
     }
 
     lastPage = Boolean(payload.last_page);
@@ -367,7 +390,12 @@ async function buildBmadKeyTaskIndex(fetchImpl, { listId, fieldId, token }) {
     if (tasks.length === 0) break;
   }
 
-  return index;
+  return { byBmadKey, byName };
+}
+
+async function buildBmadKeyTaskIndex(fetchImpl, options) {
+  const { byBmadKey } = await buildTaskIndex(fetchImpl, options);
+  return byBmadKey;
 }
 
 async function setBmadKeyOnTask(fetchImpl, { taskId, fieldId, bmadKey, token, headers }) {
@@ -774,9 +802,15 @@ async function authorizeWorkspace(fetchImpl, token) {
 
 async function findTaskByBmadKey(fetchImpl, { listId, fieldId, bmadKey, token, listTaskIndex = {} }) {
   if (!listTaskIndex.byBmadKey) {
-    listTaskIndex.byBmadKey = await buildBmadKeyTaskIndex(fetchImpl, { listId, fieldId, token });
+    Object.assign(listTaskIndex, await buildTaskIndex(fetchImpl, { listId, fieldId, token }));
   }
-  return listTaskIndex.byBmadKey.get(bmadKey) ?? null;
+  const byKey = listTaskIndex.byBmadKey.get(bmadKey);
+  if (byKey) return byKey;
+  const byName = listTaskIndex.byName?.get(bmadKey) ?? null;
+  if (byName) {
+    console.warn(`Task ${byName} matched "${bmadKey}" by name because it carries no bmad_key.`);
+  }
+  return byName;
 }
 
 function sleep(ms) {
@@ -797,12 +831,14 @@ module.exports = {
   SYNC_DELAY_MS,
   EPIC_BY_TRACK,
   UNMAPPED_PREFIX_ACTION,
+  UNSTAMPED_TASK_ACTION,
   asObject,
   authorizeWorkspace,
   bmadKeyLookupEnabled,
   buildBmadKeyTaskIndex,
   buildListTasksUrl,
   buildStoryDescription,
+  buildTaskIndex,
   collectDevelopmentStatusRecords,
   collectEpicDescriptions,
   collectEpicIdsFromTrackMap,
@@ -830,7 +866,9 @@ module.exports = {
   readYaml,
   readResponseJson,
   relativeSourceKey,
+  reportAnnotation,
   reportUnmappedPrefixes,
+  reportUnstampedTasks,
   request,
   resolveEpicParentId,
   resolveListWorkspaceId,
