@@ -97,7 +97,7 @@ function warnUnmappedPrefix(key, track) {
 
 function buildListTasksUrl(listId, page = 0) {
   const params = new URLSearchParams({
-    include_subtasks: 'true',
+    subtasks: 'true',
     page: String(page),
   });
   return `${CLICKUP_API_BASE}/list/${encodeURIComponent(listId)}/task?${params.toString()}`;

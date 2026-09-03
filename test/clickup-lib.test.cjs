@@ -17,7 +17,7 @@ test('buildListTasksUrl requests subtasks without custom field filtering', () =>
 
   assert.match(url, /^https:\/\/api\.clickup\.com\/api\/v2\/list\/901221186877\/task\?/);
   const parsedUrl = new URL(url);
-  assert.equal(parsedUrl.searchParams.get('include_subtasks'), 'true');
+  assert.equal(parsedUrl.searchParams.get('subtasks'), 'true');
   assert.equal(parsedUrl.searchParams.get('page'), '0');
   assert.equal(parsedUrl.searchParams.get('custom_fields'), null);
 });

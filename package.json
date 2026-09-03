@@ -8,6 +8,7 @@
     "sync:clickup": "node scripts/sync-clickup.cjs",
     "create:clickup": "node scripts/create-clickup-task.cjs",
     "test:clickup": "node --test test/clickup-lib.test.cjs test/clickup-sync.test.cjs test/clickup-create.test.cjs",
+    "debug:clickup-lookup": "node scripts/debug-clickup-lookup.cjs",
     "services:init": "git submodule update --init --recursive",
     "services:status": "git submodule status",
     "services:sync": "git submodule update --remote",

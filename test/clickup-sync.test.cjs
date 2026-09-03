@@ -487,7 +487,7 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
       if (url.includes('/list/list-123/task?')) {
         const parsedUrl = new URL(url);
-        assert.equal(parsedUrl.searchParams.get('include_subtasks'), 'true');
+        assert.equal(parsedUrl.searchParams.get('subtasks'), 'true');
         assert.equal(parsedUrl.searchParams.get('custom_fields'), null);
         return jsonResponse(200, {
           tasks: [{
