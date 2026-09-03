@@ -195,7 +195,7 @@ These apply to **every** story in Epics 4, 5, 6, and 7. They are stated once and
 
 | Precondition | Severity / status | Effect on Epics 4–7 |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)` and the interim session resolver self-provisions a privileged account. **No story in Epics 4–7 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check widens the blast radius of the existing bypass rather than being protected by it. |
+| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)` and the interim session resolver self-provisions a privileged account. **No story in Epics 4–7 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check widens the blast radius of the existing bypass rather than being protected by it. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | `UMAC-1` / `UM-E0-S0.1` | **in-progress** | Kernel consumer adoption is incomplete. Epics 4–7 deliver facade decisions; they do not rebind `/users`. Not a deliverable of this pass. |
 | `OQ-PERM-01` | P1 open | Default role-to-permission matrix is unapproved. No story seeds, infers, or defaults a functional-role grant. |
 | `CC-07` / PM/AD-29 | **P0 open** | No `AccessJournal` table exists. Any story whose behaviour requires a journal entry (Epic 7 shared-link access) may specify the same-transaction contract but cannot produce closure evidence. |

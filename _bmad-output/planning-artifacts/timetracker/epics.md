@@ -68,7 +68,7 @@ Stories in this slice use **`TT-E{epic}-S{story}`**.
 | S10 facade support | **implemented (kernel)** | `AccessControlFacade` supports S1/S10/S11 in ACM-5; S10 read projection still needs leave data from this slice |
 | `TT-IDENTITY-01` | **P0 open** | Blocks Epic 2 only — no legitimate `Relationship type='project'` row without approved identity join |
 | `TT-PMDM-01` | **P1 open** | Blocks Epic 2 Story 2.3 production evidence — PM/DM edges cannot join on display name |
-| `SEC-AUTH-01` | **P0 open** | Interim target-auth permits every operation on every target; access-freshness stories inherit the hole |
+| `SEC-AUTH-01` | **P0 open** | Interim target-auth permits every operation on every target; access-freshness stories inherit the hole. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | Timetracker test environment | **external** | TT-Bootcamp Data per requirements §5.1; seeded user list delivered 26 August |
 
 Owner for sync adapters and identity join: **`timetracker`** (new bounded context — confirm layout before sprint entry, same pattern as `resourcing`/`action-items`). Owner for access-freshness integration: **`access-control`**. Owner for profile/directory read projections: **`user-management`** and **`PMC-E1`** consumers respectively.

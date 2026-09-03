@@ -61,7 +61,7 @@ Stories in this slice use **`RS-E{epic}-S{story}`**.
 
 | Precondition | Severity / status | Why it precedes every epic |
 |---|---|---|
-| `SEC-AUTH-01` — interim target-auth cutover | **P0 open** | Interim adapter permits every operation on every target |
+| `SEC-AUTH-01` — interim target-auth cutover | **P0 open** | Interim adapter permits every operation on every target. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | `DEPARTMENT-EDGE` | **P1 open** | Department entity and membership writer absent; routing is undefined without it |
 | `OQ-PERM-01` | **P1 open** | `create` / `fulfil` / `approve` / `close` resourcing permissions are FR-6 grants; default matrix unapproved — do not seed or infer |
 | S15 facade support | **P1 open** | `AccessControlFacade` supports S1/S10/S11 kernel only (ACM-5); S15 read projection needs an access-control increment |

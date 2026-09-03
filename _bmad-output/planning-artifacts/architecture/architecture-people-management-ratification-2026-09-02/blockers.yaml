@@ -423,6 +423,19 @@ blockers:
       not deployed, so there is no exploitable surface today. That is a reason to
       sequence the fix before the first shared-environment deploy, not a reason to
       downgrade it. Tracked as transition debt TD-02, re-scoped to P0.
+    status_note: >
+      Implementation evidence exists on the unmerged `dn-um-implementation` branch
+      (services/backend): both interim-session-resolver.adapter.ts and
+      interim-access-control.adapter.ts are deleted. jwt-session-resolver.adapter.ts
+      replaces the session resolver (real JWT verification; the
+      `Bearer <token:persona>` shorthand and `Root` self-provisioning survive only
+      behind ALLOW_TEST_SESSION_TOKENS, refused in production).
+      access-control-facade.adapter.ts replaces isAllowedForTarget with a real
+      per-feature audience/section check. Not merged into main or this docs branch;
+      not through this project's own verification process (cf. QUALITY-GATE-AC's
+      gate-decision.json). Status stays open until merged and independently
+      verified. Recorded 2026-09-03 via bmad-correct-course to pre-empt a
+      stale-status merge conflict.
 
   - id: CC-08
     owner: Architect

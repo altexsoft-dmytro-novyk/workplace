@@ -78,7 +78,7 @@ Not deliverables of any epic here. Every epic consumes them, so they are stated 
 
 | Precondition | Severity / status | Why it precedes every epic |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)`, permitting **every** operation on **every** target, and the interim session resolver self-provisions a privileged `position: 'HR Admin'` account. Every mutation in this slice — risk, feedback, action item, campaign — inherits both holes |
+| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)`, permitting **every** operation on **every** target, and the interim session resolver self-provisions a privileged `position: 'HR Admin'` account. Every mutation in this slice — risk, feedback, action item, campaign — inherits both holes. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | S6 / S8 / S14 facade support | **open, unregistered (SD-2)** | The `AccessControlFacade` supports S1/S10/S11 only (ACM-5). Risk (S6), feedback (S8), and action items (S14) each need an approved AD-1 section increment. **No blocker ID covers them** |
 | Audience-safe response projection | PM/AD-34 `partial`; ratification §4.2 `absent` | Whole-row `User` serialization can expose non-S1 fields on all six existing handlers. Every profile-hosted section in this slice is assembled through that envelope |
 | `OQ-PERM-01` | P1 open | *create action items*, *create form campaigns*, *create and edit risks*, and *create feedback* are all FR-6 grants. The default matrix is unapproved — **do not seed or infer grants** |

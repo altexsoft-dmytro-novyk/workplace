@@ -70,7 +70,7 @@ Not deliverables of any epic here. Every epic consumes them, so they are stated 
 
 | Precondition | Severity / status | Why it precedes every epic |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | A share link is the one path that grants profile access **outside** the relationship graph. While the production session resolver still provisions a privileged account on demand, "the authenticated named recipient" is not a trustworthy claim |
+| `SEC-AUTH-01` | **P0 open** | A share link is the one path that grants profile access **outside** the relationship graph. While the production session resolver still provisions a privileged account on demand, "the authenticated named recipient" is not a trustworthy claim. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | `CC-07` | **P0 open** | No `AccessJournal` table exists. §4.8 makes journaling every link access normative, so this is a **release blocker for the whole slice**, not one story's gate — see SD-6 in *Validation findings* |
 | `PLAT-E7-S7.1`, `S7.2` | `specified`, not built | The section policy this slice consumes. Without it there is no answer to "which sections may this link expose" |
 | `AC-S9-S13` · `AC-SECTION-MATRIX-01` | **P1 open** (both) | Every section a link exposes beyond S1 needs its facade increment. The facade returns `none` for all but S1/S10/S11 |

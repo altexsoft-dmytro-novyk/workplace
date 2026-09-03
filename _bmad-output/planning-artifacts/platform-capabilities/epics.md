@@ -57,7 +57,7 @@ These are **not** deliverables of any epic in this slice, and no epic is standal
 
 | Precondition | Severity / status | Why it precedes every epic |
 |---|---|---|
-| `SEC-AUTH-01` — interim target-auth cutover | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)`, permitting every operation on every target, and the interim session resolver self-provisions a privileged `position: 'HR Admin'` account. Any directory or dashboard read surface built on the interim adapter inherits both. |
+| `SEC-AUTH-01` — interim target-auth cutover | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)`, permitting every operation on every target, and the interim session resolver self-provisions a privileged `position: 'HR Admin'` account. Any directory or dashboard read surface built on the interim adapter inherits both. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | Audience-safe response projection | ratification §4.2 `absent`; PM/AD-34 `partial` | Whole-row `User` serialization can expose technical/non-S1 fields on **all six** existing handlers, **including `GET /users`** — the exact endpoint a directory engine extends and dashboard people-tables read through. |
 
 Owner: `user-management` / `access-control` contexts. This slice does not schedule the cutover; it declares the dependency and fails closed without it.
@@ -77,7 +77,7 @@ Owner: `user-management` / `access-control` contexts. This slice does not schedu
 
 | Precondition | Severity / status | Binds |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | Any new read surface on the interim adapter inherits `Boolean(userId)` target auth and whole-row `GET /users` serialization |
+| `SEC-AUTH-01` | **P0 open** | Any new read surface on the interim adapter inherits `Boolean(userId)` target auth and whole-row `GET /users` serialization. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | `QUALITY-GATE-AC` | **closed 2026-09-02** | Was P0. `gate-decision.json` shows `gate_status=PASS`, `p0_status=MET`, `critical_open=0`; ACM3-II-04/05/06 each carry independently approved Stage-2 evidence. No longer a precondition on any story here |
 | `QUALITY-GATE-AC-NFR` | **closed 2026-09-02** | Was P1. NFR-3 / SM-4 proven by ACM-9 final (`acm9-final-…ff94a3e685d1.json`, PASS, 500 targets, warm p95 11.603 ms). **Closure is pinned to resolver revision `f89e034`** — any change under `services/backend/src/access-control/**` invalidates it and requires an ACM-9 rerun |
 | `OQ-PERM-01` | P1 open | "view each dashboard type" is an FR-6 permission; default grants unapproved — **do not seed or infer grants** |
@@ -144,7 +144,7 @@ Architecture and delivery-state constraints from ARCHITECTURE-RATIFICATION.md th
 
 - Directory engine and dashboards are **confirmed absent**; People Management frontend features are **confirmed absent**. This slice is greenfield behaviour on a brownfield runtime.
 - **No starter/greenfield template is specified** by the architecture. Epic 1 Story 1 therefore carries **no** starter-template setup obligation; the frontend shell, shadcn/ui config, and 102 CSS variables already exist in `services/frontend`.
-- **P0 `SEC-AUTH-01`**: the interim target-authorization adapter returns `Boolean(userId)` — it permits **every** operation on **every** target — and the interim session resolver **self-provisions a privileged `position: 'HR Admin'` account**. Latent (not deployed), but any new read surface built on the interim adapter inherits the hole.
+- **P0 `SEC-AUTH-01`**: the interim target-authorization adapter returns `Boolean(userId)` — it permits **every** operation on **every** target — and the interim session resolver **self-provisions a privileged `position: 'HR Admin'` account**. Latent (not deployed), but any new read surface built on the interim adapter inherits the hole. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)*
 - **Whole-row `User` serialization** can expose technical/non-S1 fields on **all six** existing `User` handlers, **including `GET /users`** — the exact endpoint a directory engine would extend.
 
 **Fixed product facts already ratified for dashboards** *(`platform/epics.md` Story 1.5)*: the **Unassigned** bucket, risk "active" ≠ `low`, and project-line counter implications are fixed product facts, not open design.

@@ -1,5 +1,5 @@
 ---
-stepsCompleted: [1, 2, 3]
+stepsCompleted: [1, 2, 3, 4]
 inputDocuments:
   - _bmad-output/planning-artifacts/prds/prd-mentorship-2026-09-01/prd.md
   - _bmad-output/planning-artifacts/architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md
@@ -7,7 +7,7 @@ inputDocuments:
   - docs/architecture/access-control.md
   - docs/architecture/domain-driven-design.md
   - docs/project-requirements.md
-status: draft
+status: final
 slice: mentorship
 id_namespace: M-E{epic}-S{story}
 updated: 2026-09-03

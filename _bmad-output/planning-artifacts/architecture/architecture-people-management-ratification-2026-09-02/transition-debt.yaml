@@ -42,6 +42,11 @@ items:
       - services/backend/src/user-management/infrastructure/interim-session-resolver.adapter.ts:74-87
       - services/backend/src/user-management/infrastructure/interim-access-control.adapter.ts:11-14
       - services/backend/src/user-management/user-management.module.ts
+    status_note: >
+      2026-09-03: implementation evidence for the blocker's fix exists on the
+      unmerged dn-um-implementation branch — see blockers.yaml SEC-AUTH-01
+      status_note for detail. Not merged, not independently verified; this entry's
+      severity and deploy_gate are unchanged until then.
     rescope_reason: >
       The previous description covered only the persona-token path and omitted root
       self-provisioning entirely, which is the part that bypasses the Access Control
