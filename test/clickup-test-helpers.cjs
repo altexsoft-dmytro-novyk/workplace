@@ -1,7 +1,11 @@
 const WORKSPACE_ID = '90122019689';
 const DEFAULT_LIST_ID = '901221186877';
 const DEFAULT_SPACE_ID = '90122019689-space';
-const EPIC_IDS = ['869euphpm', '869eupgh3', '869euphdh', '869euphgj'];
+// Derived rather than listed, so adding an epic mapping does not silently
+// invalidate every fixture that validates epic parents.
+const { collectEpicIdsFromTrackMap } = require('../scripts/clickup-lib.cjs');
+
+const EPIC_IDS = collectEpicIdsFromTrackMap();
 
 function jsonResponse(status, body) {
   return {

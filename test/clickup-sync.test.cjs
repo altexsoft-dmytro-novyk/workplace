@@ -86,6 +86,7 @@ test('collectSyncEntries maps configured BMad development status entries', async
   assert.deepEqual(entries, [{
     sourceKey: '_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story',
     bmadKey: '1-99-test-story',
+    descriptionKey: '1-99-test-story',
     taskId: 'task-123',
     status: 'IN PROGRESS',
     gitBranch: 'feature/story-1',
@@ -579,4 +580,16 @@ test('collectSyncEntries rejects malformed configuration, missing source, unknow
     collectSyncEntries({ ...missingTaskId, sprintStatusPaths: [missingTaskId.sourcePath] }),
     /1-99-test-story/,
   );
+});
+
+test('a workflow runs the ClickUp test suite on pull requests and on main', async () => {
+  const workflowPath = path.join(__dirname, '..', '.github', 'workflows', 'tests.yml');
+  const workflow = yaml.load(await fs.readFile(workflowPath, 'utf8'));
+
+  assert.ok(workflow.on.pull_request !== undefined, 'tests must run on pull requests');
+  assert.deepEqual(workflow.on.push.branches, ['main']);
+  assert.equal(workflow.permissions.contents, 'read');
+  const steps = workflow.jobs.clickup.steps;
+  assert.ok(steps.some((step) => step.run === 'npm ci'));
+  assert.ok(steps.some((step) => step.run === 'npm run test:clickup'));
 });

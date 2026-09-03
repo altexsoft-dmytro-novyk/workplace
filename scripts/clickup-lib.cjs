@@ -19,6 +19,11 @@ const EPIC_BY_TRACK = {
   ],
   'user-management': [
     { prefix: '0-', epicId: '869euphpm' },
+    { prefix: '1-', epicId: '869evaraf' },
+    { prefix: '2-', epicId: '869evarr8' },
+    { prefix: '3-', epicId: '869evatht' },
+    { prefix: '4-', epicId: '869evau1q' },
+    { prefix: '5-', epicId: '869evau97' },
   ],
 };
 
@@ -96,6 +101,38 @@ function warnUnmappedPrefix(key, track) {
   console.warn(
     `No epic mapping for BMad key "${key}" in track "${track}". Skipping. Action: ${UNMAPPED_PREFIX_ACTION}`,
   );
+}
+
+// A skipped story used to be a console.warn inside a green job, which is how 14
+// of them went unnoticed. On GitHub the same fact goes to the Annotations panel
+// and the job summary, without failing the run — sync depends on this job, and
+// one unmapped epic must not stop the tasks that are mapped from syncing.
+function reportUnmappedPrefixes(unmapped, { env = process.env, appendFile } = {}) {
+  if (unmapped.length === 0) return;
+
+  const lines = unmapped.map(({ key, track }) => `${track}: ${key}`);
+  if (env.GITHUB_ACTIONS === 'true') {
+    const body = [
+      `${unmapped.length} BMad ${unmapped.length === 1 ? 'story has' : 'stories have'} no ClickUp epic parent and were skipped:`,
+      ...lines,
+      UNMAPPED_PREFIX_ACTION,
+    ].join('%0A');
+    console.log(`::warning title=ClickUp epic mapping incomplete::${body}`);
+  }
+
+  const summaryPath = env.GITHUB_STEP_SUMMARY;
+  if (!summaryPath) return;
+  const markdown = [
+    '### ClickUp epic mapping incomplete',
+    '',
+    `${unmapped.length} story key(s) resolved to no epic parent and were skipped:`,
+    '',
+    ...lines.map((line) => `- \`${line}\``),
+    '',
+    UNMAPPED_PREFIX_ACTION,
+    '',
+  ].join('\n');
+  return (appendFile || fs.appendFile)(summaryPath, markdown);
 }
 
 function dryRunEnabled(options = {}) {
@@ -389,6 +426,7 @@ function matchesKeyFilter(developmentStatusKey, keyFilter) {
 
 const STORY_HEADING = /^###\s+Story\s+(\d+)\.(\d+):\s*(.+?)\s*$/;
 const SPRINT_KEY_FIELD = /\*\*Sprint key:\*\*\s*`([^`]+)`/;
+const FENCE_DELIMITER = /^\s*(?:```|~~~)/;
 
 function slugifyStoryTitle(title) {
   return String(title)
@@ -419,16 +457,21 @@ function parseEpicStories(markdown) {
     current = null;
   };
 
+  let inFence = false;
   for (const line of String(markdown).split('\n')) {
-    const heading = line.match(STORY_HEADING);
-    if (heading) {
-      flush();
-      current = { epicNumber: heading[1], storyNumber: heading[2], title: heading[3], bodyLines: [] };
-      continue;
-    }
-    if (/^#{1,3}\s/.test(line)) {
-      flush();
-      continue;
+    if (FENCE_DELIMITER.test(line)) inFence = !inFence;
+
+    if (!inFence) {
+      const heading = line.match(STORY_HEADING);
+      if (heading) {
+        flush();
+        current = { epicNumber: heading[1], storyNumber: heading[2], title: heading[3], bodyLines: [] };
+        continue;
+      }
+      if (/^#{1,3}\s/.test(line)) {
+        flush();
+        continue;
+      }
     }
     if (current) current.bodyLines.push(line);
   }
@@ -446,7 +489,7 @@ const DESCRIPTION_FINGERPRINT = /bmad-sync:([0-9a-f]{12})/;
 function storyFingerprint(story, sourcePath) {
   return crypto
     .createHash('sha1')
-    .update([sourcePath, story.sprintKey, story.title, story.body].join('\u0000'))
+    .update([sourcePath, story.sprintKey ?? story.epicKey, story.title, story.body].join('\u0000'))
     .digest('hex')
     .slice(0, 12);
 }
@@ -456,7 +499,58 @@ function readDescriptionFingerprint(text) {
   return match ? match[1] : null;
 }
 
+const EPIC_HEADING = /^##\s+Epic\s+(\d+):\s*(.+?)\s*$/;
+
+function finalizeEpicOverview(epic) {
+  return {
+    epicKey: `epic-${epic.epicNumber}`,
+    epicNumber: epic.epicNumber,
+    title: epic.title,
+    body: epic.bodyLines.join('\n').trim(),
+  };
+}
+
+// An epic's own prose is everything between its "## Epic N:" heading and the
+// first "### Story" under it — subsections such as blocking gates belong to the
+// epic and are kept. The "### Epic N:" entries under "## Epic List" are
+// summaries, not headings, and do not match.
+function parseEpicOverviews(markdown) {
+  const epics = [];
+  let current = null;
+  const flush = () => {
+    if (current) epics.push(finalizeEpicOverview(current));
+    current = null;
+  };
+
+  let inFence = false;
+  for (const line of String(markdown).split('\n')) {
+    if (FENCE_DELIMITER.test(line)) inFence = !inFence;
+
+    if (!inFence) {
+      const heading = line.match(EPIC_HEADING);
+      if (heading) {
+        flush();
+        current = { epicNumber: heading[1], title: heading[2], bodyLines: [] };
+        continue;
+      }
+      if (STORY_HEADING.test(line) || /^##\s/.test(line)) {
+        flush();
+        continue;
+      }
+    }
+    if (current) current.bodyLines.push(line);
+  }
+  flush();
+
+  return epics;
+}
+
+function epicDescriptionKey(track, epicNumber) {
+  return `${track}:epic-${epicNumber}`;
+}
+
 function buildStoryDescription(story, sourcePath) {
+  const key = story.sprintKey ?? story.epicKey;
   return [
     `**${story.title}**`,
     '',
@@ -464,7 +558,7 @@ function buildStoryDescription(story, sourcePath) {
     '',
     '---',
     '',
-    `_Generated from \`${sourcePath}\` for BMad key \`${story.sprintKey}\`. The epic file is the source of truth. bmad-sync:${storyFingerprint(story, sourcePath)}_`,
+    `_Generated from \`${sourcePath}\` for BMad key \`${key}\`. The epic file is the source of truth. bmad-sync:${storyFingerprint(story, sourcePath)}_`,
   ].join('\n');
 }
 
@@ -484,6 +578,10 @@ async function collectStoryDescriptions(options = {}) {
     }
 
     for (const story of parseEpicStories(markdown)) {
+      if (story.body === '') {
+        console.warn(`Story "${story.sprintKey}" in ${relativePath} has no prose. Skipping its description.`);
+        continue;
+      }
       if (descriptions.has(story.sprintKey)) {
         console.warn(`Duplicate story sprint key "${story.sprintKey}" in ${relativePath}. Keeping the first.`);
         continue;
@@ -501,9 +599,82 @@ async function collectStoryDescriptions(options = {}) {
   return descriptions;
 }
 
+async function collectEpicDescriptions(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const tracks = options.tracks || INCLUDED_TRACKS;
+  const descriptions = new Map();
+
+  for (const track of tracks) {
+    const relativePath = `${PLANNING_ARTIFACTS_DIR}/${track}/epics.md`;
+    let markdown;
+    try {
+      markdown = await fs.readFile(path.join(rootDir, PLANNING_ARTIFACTS_DIR, track, 'epics.md'), 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw new Error(`Unable to read epic overviews at ${relativePath}: ${error.message}`);
+    }
+
+    for (const epic of parseEpicOverviews(markdown)) {
+      const key = epicDescriptionKey(track, epic.epicNumber);
+      if (epic.body === '') {
+        console.warn(`Epic "${epic.epicKey}" in ${relativePath} has no prose. Skipping its description.`);
+        continue;
+      }
+      if (descriptions.has(key)) {
+        console.warn(`Duplicate epic heading "${epic.epicKey}" in ${relativePath}. Keeping the first.`);
+        continue;
+      }
+      descriptions.set(key, {
+        ...epic,
+        track,
+        sourcePath: relativePath,
+        fingerprint: storyFingerprint(epic, relativePath),
+        markdown: buildStoryDescription(epic, relativePath),
+      });
+    }
+  }
+
+  return descriptions;
+}
+
+const EPIC_STATUS_KEY = /^epic-(\d+)$/;
+
+async function collectEpicStatusRecords(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
+  const keyFilter = keyFilterFromOptions(options);
+  const records = [];
+
+  for (const sourcePath of sourcePaths) {
+    const resolvedSourcePath = path.resolve(sourcePath);
+    const track = trackFromSourcePath(resolvedSourcePath);
+    const sprintStatus = await readYaml(resolvedSourcePath, 'BMad sprint status');
+    const developmentStatus = asObject(
+      sprintStatus.development_status,
+      `development_status in ${resolvedSourcePath}`,
+    );
+
+    for (const [key, sourceStatus] of Object.entries(developmentStatus)) {
+      const match = key.match(EPIC_STATUS_KEY);
+      if (!match) continue;
+      if (!matchesKeyFilter(key, keyFilter)) continue;
+      records.push({
+        track,
+        epicKey: key,
+        epicNumber: match[1],
+        sourceStatus,
+        sourceKey: relativeSourceKey(rootDir, resolvedSourcePath, key),
+        taskId: resolveEpicParentId(`${match[1]}-`, track),
+      });
+    }
+  }
+
+  return records;
+}
+
 function descriptionsConfig(config = {}) {
   const raw = config.descriptions;
-  if (raw === undefined || raw === null) return { enabled: true, overwrite: false };
+  if (raw === undefined || raw === null || raw === true) return { enabled: true, overwrite: false };
   if (raw === false) return { enabled: false, overwrite: false };
   const section = asObject(raw, 'descriptions in ClickUp sync configuration');
   return { enabled: section.enabled !== false, overwrite: section.overwrite === true };
@@ -633,7 +804,9 @@ module.exports = {
   buildListTasksUrl,
   buildStoryDescription,
   collectDevelopmentStatusRecords,
+  collectEpicDescriptions,
   collectEpicIdsFromTrackMap,
+  collectEpicStatusRecords,
   collectStoryDescriptions,
   descriptionsConfig,
   dryRunEnabled,
@@ -647,6 +820,8 @@ module.exports = {
   keyFilterFromOptions,
   matchesKeyFilter,
   listSpaceId,
+  epicDescriptionKey,
+  parseEpicOverviews,
   parseEpicStories,
   parseKeyFilter,
   readCustomFieldValue,
@@ -655,6 +830,7 @@ module.exports = {
   readYaml,
   readResponseJson,
   relativeSourceKey,
+  reportUnmappedPrefixes,
   request,
   resolveEpicParentId,
   resolveListWorkspaceId,
