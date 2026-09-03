@@ -32,6 +32,14 @@ deliverable; none is authorized by the current spec.
   summary: Employee-directory affordances the prototype shows but `GET /users` cannot back — free-text (substring) search, a `department` filter, a server-side sort control, `.xlsx` export, per-viewer audience-filtered rows ("colleague view"), and row-select bulk actions.
   evidence: `list-users-query.dto.ts` accepts only exact-equality filters on the S1 fields + `employmentStatus`; the repository sorts by a fixed `lastName,firstName`; `toUserListItem` is one uniform projection for every viewer; there is no export route. The richer directory is platform §4.1 scope (`epics.md` FR-15) / the deferred §3.3.1 list projection (access-control deferred-work). Build these on the frontend once the list endpoint gains them.
 
+- source_spec: `spec-employee-profile.md`
+  summary: Career timeline has no pagination or virtualization — the profile renders every event row for a long-tenured employee.
+  evidence: `GET /users/:id/events` returns the full set in one body (`user-event.response.ts`: "NOT a pagination envelope", a deliberate Stage-2 decision). Add a "show more" / windowed list once the endpoint gains pagination.
+
+- source_spec: `spec-employee-profile.md`
+  summary: No "remove photo" affordance and no pre-upload preview/confirm — picking a file uploads immediately, and a set photo can't be cleared.
+  evidence: `PUT /users/:id/photo` has no delete counterpart in the router tree; `User.photo` can be replaced but not nulled via the API. Needs a backend `DELETE /users/:id/photo` before the UI can offer removal.
+
 - source_spec: `spec-employee-directory.md`
   summary: No combined "active + dismissed" employee view — `employmentStatus` is unset (active only) or `dismissed` (dismissed only).
   evidence: `list-users-query.dto.ts` types it `'active' | 'dismissed'` and the repo builds mutually-exclusive `where` clauses. Needs a backend change (an `all` value, or dropping the implicit active-only default) before the directory's status filter can offer it.
