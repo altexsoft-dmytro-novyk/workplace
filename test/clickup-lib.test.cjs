@@ -2,28 +2,45 @@ const assert = require('node:assert/strict');
 const { test } = require('node:test');
 
 const {
-  buildBmadKeyFilterUrl,
+  buildListTasksUrl,
   findDuplicateStoryKeys,
+  findTaskIdByBmadKeyInTasks,
   formatDuplicateStoryKeys,
+  readCustomFieldValue,
   shouldSkipDevelopmentStatus,
 } = require('../scripts/clickup-lib.cjs');
 
-test('buildBmadKeyFilterUrl uses exact-match operator and URLSearchParams encoding', () => {
-  const url = buildBmadKeyFilterUrl(
-    '901221186877',
-    'd2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b',
-    '1-99-happy-path-test',
-  );
+const BMAD_KEY_FIELD_ID = 'd2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b';
+
+test('buildListTasksUrl requests subtasks without custom field filtering', () => {
+  const url = buildListTasksUrl('901221186877', 0);
 
   assert.match(url, /^https:\/\/api\.clickup\.com\/api\/v2\/list\/901221186877\/task\?/);
   const parsedUrl = new URL(url);
   assert.equal(parsedUrl.searchParams.get('include_subtasks'), 'true');
-  const query = parsedUrl.searchParams.get('custom_fields');
-  assert.deepEqual(JSON.parse(query), [{
-    field_id: 'd2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b',
-    operator: '==',
-    value: '1-99-happy-path-test',
-  }]);
+  assert.equal(parsedUrl.searchParams.get('page'), '0');
+  assert.equal(parsedUrl.searchParams.get('custom_fields'), null);
+});
+
+test('findTaskIdByBmadKeyInTasks matches bmad_key values locally', () => {
+  const tasks = [
+    {
+      id: '869euwxyc',
+      parent: '869eupgh3',
+      list: { id: '901221186877' },
+      custom_fields: [{ id: BMAD_KEY_FIELD_ID, value: '1-99-happy-path-test' }],
+    },
+    {
+      id: '869eup3kz',
+      parent: '869eupgh3',
+      list: { id: '901221186877' },
+      custom_fields: [{ id: BMAD_KEY_FIELD_ID, value: '1-1-changelog-traceability-matrix' }],
+    },
+  ];
+
+  assert.equal(findTaskIdByBmadKeyInTasks(tasks, BMAD_KEY_FIELD_ID, '1-99-happy-path-test'), '869euwxyc');
+  assert.equal(readCustomFieldValue(tasks[0], BMAD_KEY_FIELD_ID), '1-99-happy-path-test');
+  assert.equal(findTaskIdByBmadKeyInTasks(tasks, BMAD_KEY_FIELD_ID, 'missing-key'), null);
 });
 
 test('shouldSkipDevelopmentStatus skips retrospective and optional keys', () => {

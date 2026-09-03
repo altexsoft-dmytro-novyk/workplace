@@ -488,9 +488,14 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
       if (url.includes('/list/list-123/task?')) {
         const parsedUrl = new URL(url);
         assert.equal(parsedUrl.searchParams.get('include_subtasks'), 'true');
-        const query = JSON.parse(parsedUrl.searchParams.get('custom_fields'));
-        assert.equal(query[0].operator, '==');
-        return jsonResponse(200, { tasks: [{ id: 'task-from-bmad-key' }] });
+        assert.equal(parsedUrl.searchParams.get('custom_fields'), null);
+        return jsonResponse(200, {
+          tasks: [{
+            id: 'task-from-bmad-key',
+            custom_fields: [{ id: 'bmad-key-field', value: '1-99-test-story' }],
+          }],
+          last_page: true,
+        });
       }
       return successfulClickUpResponse(url, init);
     },
@@ -520,7 +525,7 @@ test('syncClickUp counts skipped entries when bmad_key lookup finds no task', as
     token: 'secret-token',
     fetchImpl: async (url, init = {}) => {
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/list-123/task?')) return jsonResponse(200, { tasks: [] });
+      if (url.includes('/list/list-123/task?')) return jsonResponse(200, { tasks: [], last_page: true });
       return successfulClickUpResponse(url, init);
     },
   });

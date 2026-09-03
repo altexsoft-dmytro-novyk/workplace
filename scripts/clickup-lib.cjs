@@ -95,16 +95,95 @@ function warnUnmappedPrefix(key, track) {
   );
 }
 
-function buildBmadKeyFilterUrl(listId, fieldId, bmadKey) {
+function buildListTasksUrl(listId, page = 0) {
   const params = new URLSearchParams({
     include_subtasks: 'true',
-    custom_fields: JSON.stringify([{
-      field_id: fieldId,
-      operator: '==',
-      value: bmadKey,
-    }]),
+    page: String(page),
   });
   return `${CLICKUP_API_BASE}/list/${encodeURIComponent(listId)}/task?${params.toString()}`;
+}
+
+function readCustomFieldValue(task, fieldId) {
+  if (!task || !Array.isArray(task.custom_fields)) return null;
+  const field = task.custom_fields.find((entry) => String(entry.id) === String(fieldId));
+  if (!field || field.value === undefined || field.value === null || field.value === '') return null;
+  return String(field.value);
+}
+
+function findTaskIdByBmadKeyInTasks(tasks, fieldId, bmadKey) {
+  for (const task of tasks) {
+    if (readCustomFieldValue(task, fieldId) === bmadKey) {
+      return String(task.id);
+    }
+  }
+  return null;
+}
+
+async function fetchTaskDetails(fetchImpl, taskId, token) {
+  const response = await request(
+    fetchImpl,
+    `${CLICKUP_API_BASE}/task/${encodeURIComponent(taskId)}`,
+    { headers: { Authorization: token } },
+    `task details for ${taskId}`,
+    token,
+  );
+  return readResponseJson(response, `task details for ${taskId}`, token);
+}
+
+async function buildBmadKeyTaskIndex(fetchImpl, { listId, fieldId, token }) {
+  const headers = { Authorization: token };
+  const index = new Map();
+  let page = 0;
+  let lastPage = false;
+
+  while (!lastPage) {
+    const response = await request(
+      fetchImpl,
+      buildListTasksUrl(listId, page),
+      { headers },
+      `list tasks page ${page}`,
+      token,
+    );
+    const payload = await readResponseJson(response, `list tasks page ${page}`, token);
+    const tasks = Array.isArray(payload.tasks) ? payload.tasks : [];
+
+    for (const listTask of tasks) {
+      const taskId = String(listTask.id);
+      let bmadKeyValue = readCustomFieldValue(listTask, fieldId);
+      if (bmadKeyValue === null) {
+        const fullTask = await fetchTaskDetails(fetchImpl, taskId, token);
+        bmadKeyValue = readCustomFieldValue(fullTask, fieldId);
+      }
+      if (bmadKeyValue === null) continue;
+      if (index.has(bmadKeyValue)) {
+        console.warn(
+          `Duplicate bmad_key "${bmadKeyValue}" on tasks ${index.get(bmadKeyValue)} and ${taskId}; using ${index.get(bmadKeyValue)}.`,
+        );
+        continue;
+      }
+      index.set(bmadKeyValue, taskId);
+    }
+
+    lastPage = Boolean(payload.last_page);
+    page += 1;
+    if (tasks.length === 0) break;
+  }
+
+  return index;
+}
+
+async function setBmadKeyOnTask(fetchImpl, { taskId, fieldId, bmadKey, token, headers }) {
+  await request(
+    fetchImpl,
+    `${CLICKUP_API_BASE}/task/${encodeURIComponent(taskId)}/field/${encodeURIComponent(fieldId)}`,
+    {
+      method: 'POST',
+      headers: headers || { Authorization: token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ value: bmadKey }),
+    },
+    `bmad_key update for ${bmadKey}`,
+    token,
+  );
 }
 
 function findDuplicateStoryKeys(records) {
@@ -224,18 +303,11 @@ async function authorizeWorkspace(fetchImpl, token) {
   return headers;
 }
 
-async function findTaskByBmadKey(fetchImpl, { listId, fieldId, bmadKey, token }) {
-  const url = buildBmadKeyFilterUrl(listId, fieldId, bmadKey);
-  const response = await request(
-    fetchImpl,
-    url,
-    { headers: { Authorization: token } },
-    `bmad_key lookup for ${bmadKey}`,
-    token,
-  );
-  const payload = await readResponseJson(response, `bmad_key lookup for ${bmadKey}`, token);
-  if (!Array.isArray(payload.tasks) || payload.tasks.length === 0) return null;
-  return String(payload.tasks[0].id);
+async function findTaskByBmadKey(fetchImpl, { listId, fieldId, bmadKey, token, listTaskIndex = {} }) {
+  if (!listTaskIndex.byBmadKey) {
+    listTaskIndex.byBmadKey = await buildBmadKeyTaskIndex(fetchImpl, { listId, fieldId, token });
+  }
+  return listTaskIndex.byBmadKey.get(bmadKey) ?? null;
 }
 
 function sleep(ms) {
@@ -258,20 +330,24 @@ module.exports = {
   asObject,
   authorizeWorkspace,
   bmadKeyLookupEnabled,
-  buildBmadKeyFilterUrl,
+  buildBmadKeyTaskIndex,
+  buildListTasksUrl,
   collectDevelopmentStatusRecords,
   findDuplicateStoryKeys,
   findSprintStatusPaths,
   findTaskByBmadKey,
+  findTaskIdByBmadKeyInTasks,
   formatDuplicateStoryKeys,
   keyFilterFromOptions,
   matchesKeyFilter,
   parseKeyFilter,
+  readCustomFieldValue,
   readYaml,
   readResponseJson,
   relativeSourceKey,
   request,
   resolveEpicParentId,
+  setBmadKeyOnTask,
   shouldSkipDevelopmentStatus,
   shouldSkipStoryKey,
   sleep,

@@ -10,6 +10,7 @@ const {
   readResponseJson,
   request,
   resolveEpicParentId,
+  setBmadKeyOnTask,
   sleep,
   warnUnmappedPrefix,
 } = require('./clickup-lib.cjs');
@@ -37,6 +38,7 @@ async function createMissingClickUpTasks(options = {}) {
 
   const headers = await authorizeWorkspace(fetchImpl, token);
   const records = await collectDevelopmentStatusRecords({ ...options, rootDir });
+  const listTaskIndex = options.listTaskIndex || {};
   const summary = { created: 0, existing: 0, skipped: 0, failed: 0 };
 
   for (const record of records) {
@@ -62,6 +64,7 @@ async function createMissingClickUpTasks(options = {}) {
         fieldId: bmadKeyFieldId,
         bmadKey: developmentStatusKey,
         token,
+        listTaskIndex,
       });
       if (existingTaskId) {
         console.log(`${developmentStatusKey} already exists: ${existingTaskId}`);
@@ -88,6 +91,16 @@ async function createMissingClickUpTasks(options = {}) {
         token,
       );
       const createdTask = await readResponseJson(createResponse, `task create for ${developmentStatusKey}`, token);
+      await setBmadKeyOnTask(fetchImpl, {
+        taskId: String(createdTask.id),
+        fieldId: bmadKeyFieldId,
+        bmadKey: developmentStatusKey,
+        token,
+        headers,
+      });
+      if (listTaskIndex.byBmadKey instanceof Map) {
+        listTaskIndex.byBmadKey.set(developmentStatusKey, String(createdTask.id));
+      }
       console.log(`Created task ${createdTask.id} for ${developmentStatusKey}`);
       summary.created += 1;
     } catch (error) {

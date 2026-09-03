@@ -106,6 +106,7 @@ async function syncClickUp(options = {}) {
   const bmadKeyFieldId = customFields.bmad_key;
   const entries = await collectSyncEntries({ ...options, rootDir, configPath });
   const headers = await authorizeWorkspace(fetchImpl, token);
+  const listTaskIndex = options.listTaskIndex || {};
   const summary = { updated: 0, skipped: 0 };
 
   for (const entry of entries) {
@@ -121,6 +122,7 @@ async function syncClickUp(options = {}) {
         fieldId: bmadKeyFieldId,
         bmadKey: entry.bmadKey,
         token,
+        listTaskIndex,
       });
       if (!taskId) {
         console.warn(`Skipped ${entry.sourceKey}: no ClickUp task found via bmad_key "${entry.bmadKey}".`);
