@@ -494,8 +494,50 @@ Committed-red 8 LIVE red / 2 guardrail green / 6 `it.todo` (incl. `um-dep-08` ×
 ### Story 5.2 Stage 3 — DISPATCHED 2026-09-03 (fresh subagent, no Monitor, wait-inline hardened)
 `@nestjs/schedule` (NEW dep, only one allowed) + `DepartureWorkerService` (`@Interval` guarded by `DEPARTURE_WORKER_ENABLED`; injectable `processDueDepartures()` / `applyDeparture(id, leaseToken)` — `FOR UPDATE SKIP LOCKED` claim, fencing token, lease reclaim, capped backoff → `retry_wait`, no abandoned state). Apply `$transaction`: `EmploymentStatus` close + `dismissed` insert (`sourceDepartureId` unique = idempotency), `isActive:false`, persisted-access sweep (+ `full_profile_revoke` journal for residual), `applyDepartureEffects({...tx})` real no-op seam (`NoopDepartureEffectsParticipant`), → `applied`. `POST .../retry` (202 `retry_wait`-only, synchronous apply for determinism). Request-time cutoff in `jwt-session-resolver.adapter.ts` — one PG-`now()` query, denies departed user's own token only. `GET /health/departures`. 2 new env vars (`DEPARTURE_WORKER_ENABLED` explicit, `DEPARTURE_WORKER_POLL_MS` default 60000). `api-conventions.md`. 8 LIVE green, `it.todo` stay, 0 green→red.
 
+### ☀️☀️ ALL SIX UM EPICS COMPLETE + COMMITTED 2026-09-03 ~10:00
+
+| Epic | Stories | Commit |
+|---|---|---|
+| 0 — Access Control Adoption | UMAC-1 read, UMAC-2 write (Variant A) | earlier (`cc3ef93` etc.) |
+| 1 — Employee Records | 1.1 import, 1.2 edit, 1.3 photo, 1.5 list | earlier |
+| 2 — Magic-Link Auth | 2.1 request, 2.2 consume + JWT session | earlier |
+| 3 — Career Timeline | 3.1 auto-events, 3.2 manual add, 3.3 edit/delete | backend `f54b729`/`3799bc1` |
+| 4 — Org Relationships | 4.1 manager + AccessJournal, 4.2 PP, 4.3 department | backend `ba80bf8`, ws `a48e479` |
+| 5 — Employment Lifecycle | 5.1 record departure, 5.2 apply (worker) | backend `ccf12c3`, ws `4b80e04` |
+
+Branch `dn-um-implementation`, **NOT pushed**. Full sweep: **341 passed / 42 failed / 20 todo**. The 42 failed are all pre-v1.5 legacy suites (`auth`/`deactivation`/`list`/`profile`/`registration` monoliths + `epic-1/seed` 2 documented-blocked) — TEA retires them. tsc 0 errors. New dep this run: `@nestjs/schedule@6.1.3` (Story 5.2).
+
+### ⚠️ USER — append to `.env` AND `.env.example` (harness blocked me from all three runs):
+```
+# Epic 2 — Magic-Link Auth
+MAGIC_LINK_TTL_MINUTES=15
+APP_BASE_URL=http://localhost:4200
+MAIL_HOST=localhost
+MAIL_PORT=1025
+MAIL_SECURE=false
+MAIL_USER=
+MAIL_PASSWORD=
+MAIL_FROM=no-reply@company.example
+SESSION_JWT_SECRET=dev-only-insecure-session-secret-change-me
+SESSION_TTL_HOURS=8
+ALLOW_TEST_SESSION_TOKENS=true
+# Epic 5 — Departure (AD-20)
+BUSINESS_TIME_ZONE=Europe/London
+DEPARTURE_WORKER_ENABLED=true
+DEPARTURE_WORKER_POLL_MS=60000
+```
+(Every var has a Joi default or non-prod default EXCEPT `DEPARTURE_WORKER_ENABLED` (required, explicit) and `BUSINESS_TIME_ZONE` (required, prod). `SESSION_JWT_SECRET` is prod-required.)
+
+### ~20 `it.todo` carried — three distinct unblocks, all NEEDING DMYTRO'S DIRECTION (cross-package):
+1. **AC `resolveAudiences` `targetType:'department'` + `Department.parentId` walk** — one AC-kernel AD-1 increment (`spec-access-control-kernel-mvp`, **approver Anna Pikula** — NOT my call to dispatch solo). Closes: Epic 3 `um-ct-04`/`um-ct-06` (DEC-UM-001 direct-UM), Epic 4 `um-rel-12` T3 + `um-rel-13` (department-derived access + recursive walk).
+2. **FR-permission-matrix grant of `profile:timeline:write` to PP / Unit-Manager roles** (+ the `hr-admin` default seed via `access-control-bootstrap.ts` `CANONICAL_PERMISSIONS`, blocked on the "exactly three" drift guard). Closes: Epic 3 `um-ct-03`/`um-ct-05`/`um-ct-09` + `um-ct-12` seed `it.todo`. ⚠️ **also needs the DEC-UM-001-vs-feature-action ratification.**
+3. **Action Items + Mentorship contexts** — brand-new bounded contexts that implement the PM/AD-23 `applyDepartureEffects` participant seam. Closes: Epic 5 `um-dep-03`/`um-dep-04` cross-context legs.
+
+### AD-29 / AD-20 doc-gaps flagged for the architect (non-blocking, from the story reports):
+AccessJournal retention/purge; non-state `kind` before/after; journal-read pagination; per-`kind` snapshot schema; the `subjectDepartmentId` addition (done); `api-conventions.md` If-Match line (Story 4.2 — reconcile to `expectedCurrentTargetId`); cross-process `BUSINESS_TIME_ZONE` consensus; AD-20 alerting/observability vendor.
+
 ### Next action
-Await Story 5.2 Stage 3 → verify + **hand user the `.env` block** (`BUSINESS_TIME_ZONE` from 5.1 + `DEPARTURE_WORKER_ENABLED` + `DEPARTURE_WORKER_POLL_MS`) → **EPIC 5 COMPLETE → coordinator commits Epic 5** to `dn-um-implementation` (no push). Then the AC department-walk increment (~18 accumulated `it.todo` across Epics 3/4/5).
+**HOLD — hand back to Dmytro.** All UM epics shipped. The remaining unblocks (1/2/3 above) each cross a package boundary (Anna's AC kernel / the FR-matrix PO ratification / two unbuilt contexts) and need his direction — not an autonomous "and so on".
 
 ---
 
