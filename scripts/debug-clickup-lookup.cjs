@@ -1,9 +1,13 @@
 const path = require('node:path');
 const {
+  authorizeWorkspace,
   buildBmadKeyTaskIndex,
+  collectEpicIdsFromTrackMap,
+  dryRunEnabled,
   keyFilterFromOptions,
   readYaml,
   asObject,
+  validateClickUpTargets,
 } = require('./clickup-lib.cjs');
 
 async function debugClickUpLookup(options = {}) {
@@ -17,23 +21,42 @@ async function debugClickUpLookup(options = {}) {
   const listId = config.list_id;
   const fieldId = customFields.bmad_key;
   const keyFilter = keyFilterFromOptions(options);
+  const isDryRun = dryRunEnabled(options);
 
   if (!listId || !fieldId) {
     throw new Error('clickup-sync.yaml must define list_id and custom_fields.bmad_key');
   }
 
+  await authorizeWorkspace(fetchImpl, token);
+  const validation = await validateClickUpTargets(fetchImpl, {
+    listId,
+    workspaceId: config.workspace_id,
+    epicIds: collectEpicIdsFromTrackMap(),
+    token,
+  });
+
+  if (isDryRun) {
+    console.log('DRY RUN');
+  }
+  console.log(`workspace validated: ${validation.workspaceId}`);
+  console.log(`list validated: ${validation.listId}`);
+
   const index = await buildBmadKeyTaskIndex(fetchImpl, { listId, fieldId, token });
-  const rows = [...index.entries()].map(([bmadKey, taskId]) => ({ bmadKey, taskId }));
   if (keyFilter) {
     for (const key of keyFilter) {
       console.log(`${key}: ${index.get(key) ?? 'NOT FOUND'}`);
     }
   } else {
-    console.log(`Indexed ${rows.length} bmad_key value(s) from list ${listId}:`);
-    for (const row of rows) {
-      console.log(`  ${row.bmadKey} -> ${row.taskId}`);
+    console.log(`Indexed ${index.size} bmad_key value(s) from list ${listId}:`);
+    for (const [bmadKey, taskId] of index.entries()) {
+      console.log(`  ${bmadKey} -> ${taskId}`);
     }
   }
+
+  if (isDryRun) {
+    console.log('No ClickUp changes made.');
+  }
+
   return index;
 }
 

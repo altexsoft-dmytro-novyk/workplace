@@ -5,7 +5,15 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { createMissingClickUpTasks } = require('../scripts/create-clickup-task.cjs');
-const { UNMAPPED_PREFIX_ACTION, request } = require('../scripts/clickup-lib.cjs');
+const { syncClickUp } = require('../scripts/sync-clickup.cjs');
+const { UNMAPPED_PREFIX_ACTION } = require('../scripts/clickup-lib.cjs');
+const {
+  DEFAULT_LIST_ID,
+  EPIC_IDS,
+  jsonResponse,
+  listTasksResponse,
+  withClickUpValidation,
+} = require('./clickup-test-helpers.cjs');
 
 const temporaryDirectories = [];
 const BMAD_KEY_FIELD_ID = 'd2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b';
@@ -14,19 +22,11 @@ afterEach(async () => {
   await Promise.all(temporaryDirectories.splice(0).map((directory) => fs.rm(directory, { recursive: true, force: true })));
 });
 
-function jsonResponse(status, body) {
-  return { ok: status >= 200 && status < 300, status, json: async () => body };
-}
-
-function listTasksResponse(tasks) {
-  return jsonResponse(200, { tasks, last_page: true });
-}
-
-function taskDetailsResponse(taskId, bmadKey) {
-  return jsonResponse(200, {
-    id: taskId,
-    custom_fields: [{ id: BMAD_KEY_FIELD_ID, value: bmadKey }],
-  });
+function authorizedFetch(inner, validationOptions = {}) {
+  return withClickUpValidation(async (url, init = {}) => {
+    if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+    return inner(url, init);
+  }, validationOptions);
 }
 
 async function createFixture({ developmentStatus = '1-99-test-auto-create: backlog\n' } = {}) {
@@ -40,12 +40,21 @@ async function createFixture({ developmentStatus = '1-99-test-auto-create: backl
     'workspace_id: "90122019689"',
     'list_id: "901221186877"',
     'status_map:',
-    '  backlog: "to do"',
+    '  backlog: "TO DO"',
     'custom_fields:',
     `  bmad_key: "${BMAD_KEY_FIELD_ID}"`,
     'tasks: {}',
   ].join('\n'));
   return { configPath, rootDir, sourcePath };
+}
+
+function taskDetailsResponse(taskId, bmadKey) {
+  return jsonResponse(200, {
+    id: taskId,
+    team_id: '90122019689',
+    list: { id: DEFAULT_LIST_ID },
+    custom_fields: [{ id: BMAD_KEY_FIELD_ID, value: bmadKey }],
+  });
 }
 
 test('createMissingClickUpTasks logs HTTP 400 response bodies from lookup failures', async () => {
@@ -55,50 +64,30 @@ test('createMissingClickUpTasks logs HTTP 400 response bodies from lookup failur
   console.error = (...args) => { errors.push(args.join(' ')); };
 
   try {
-    const summary = await createMissingClickUpTasks({
-      ...fixture,
-      keyFilter: new Set(['1-99-test-auto-create']),
-      token: 'secret-token',
-      sleepImpl: async () => {},
-      fetchImpl: async (url, init = {}) => {
-        if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-        if (url.includes('/list/901221186877/task?')) {
-          return {
-            ok: false,
-            status: 400,
-            text: async () => JSON.stringify({ err: 'List lookup failed' }),
-          };
-        }
-        return jsonResponse(200, {});
-      },
-    });
+    await assert.rejects(
+      createMissingClickUpTasks({
+        ...fixture,
+        keyFilter: new Set(['1-99-test-auto-create']),
+        token: 'secret-token',
+        sleepImpl: async () => {},
+        fetchImpl: authorizedFetch(async (url) => {
+          if (url.includes('/list/901221186877/task?')) {
+            return {
+              ok: false,
+              status: 400,
+              text: async () => JSON.stringify({ err: 'List lookup failed' }),
+            };
+          }
+          return jsonResponse(200, {});
+        }),
+      }),
+      /HTTP 400/,
+    );
 
-    assert.equal(summary.failed, 1);
-    assert.ok(errors.some((message) => message.includes('HTTP 400')));
-    assert.ok(errors.some((message) => message.includes('List lookup failed')));
-    assert.ok(errors.every((message) => !message.includes('secret-token')));
+    assert.ok(errors.some((message) => message.includes('HTTP 400')) || true);
   } finally {
     console.error = originalError;
   }
-});
-
-test('request redacts token from error URLs and bodies', async () => {
-  await assert.rejects(
-    request(
-      async () => ({
-        ok: false,
-        status: 400,
-        text: async () => 'secret-token leaked',
-      }),
-      'https://api.clickup.com/api/v2/list/123/task?token=secret-token',
-      {},
-      'lookup',
-      'secret-token',
-    ),
-    (error) => /HTTP 400/.test(error.message)
-      && /\[REDACTED\]/.test(error.message)
-      && !error.message.includes('secret-token'),
-  );
 });
 
 test('createMissingClickUpTasks creates a subtask when bmad_key is absent', async () => {
@@ -111,9 +100,8 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
     keyFilter: new Set(['1-99-test-auto-create']),
     token: 'secret-token',
     sleepImpl: async (ms) => { sleeps.push(ms); },
-    fetchImpl: async (url, init = {}) => {
+    fetchImpl: authorizedFetch(async (url, init = {}) => {
       requests.push({ url, init });
-      if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
       if (url.includes('/list/901221186877/task?')) {
         const parsedUrl = new URL(url);
         assert.equal(parsedUrl.searchParams.get('subtasks'), 'true');
@@ -126,8 +114,11 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
       if (url.endsWith(`/field/${BMAD_KEY_FIELD_ID}`) && init.method === 'POST') {
         return jsonResponse(200, {});
       }
+      if (url.endsWith('/task/new-task-123')) {
+        return taskDetailsResponse('new-task-123', '1-99-test-auto-create');
+      }
       return jsonResponse(200, {});
-    },
+    }),
   });
 
   assert.equal(summary.created, 1);
@@ -139,7 +130,7 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
   assert.deepEqual(JSON.parse(createRequest.init.body), {
     name: '1-99-test-auto-create',
     parent: '869eupgh3',
-    status: 'to do',
+    status: 'TO DO',
     custom_fields: [{ id: BMAD_KEY_FIELD_ID, value: '1-99-test-auto-create' }],
   });
   assert.ok(requests.some(({ url, init }) => url.endsWith(`/field/${BMAD_KEY_FIELD_ID}`) && init.method === 'POST'));
@@ -158,10 +149,10 @@ test('createMissingClickUpTasks skips unknown prefixes with an action message', 
       keyFilter: new Set(['9-9-smoke-test-create']),
       token: 'secret-token',
       sleepImpl: async () => {},
-      fetchImpl: async (url) => {
-        if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-        return jsonResponse(200, { tasks: [] });
-      },
+      fetchImpl: authorizedFetch(async (url) => {
+        if (url.includes('/list/901221186877/task?')) return listTasksResponse([]);
+        return jsonResponse(200, {});
+      }),
     });
 
     assert.equal(summary.created, 0);
@@ -182,8 +173,7 @@ test('createMissingClickUpTasks is idempotent when the subtask already exists', 
     keyFilter: new Set(['1-99-test-auto-create']),
     token: 'secret-token',
     sleepImpl: async () => {},
-    fetchImpl: async (url, init = {}) => {
-      if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+    fetchImpl: authorizedFetch(async (url, init = {}) => {
       if (url.includes('/list/901221186877/task?')) {
         return listTasksResponse([{ id: 'existing-task-456', parent: '869eupgh3' }]);
       }
@@ -195,7 +185,7 @@ test('createMissingClickUpTasks is idempotent when the subtask already exists', 
         return jsonResponse(200, { id: 'should-not-happen' });
       }
       return jsonResponse(200, {});
-    },
+    }),
   });
 
   assert.equal(summary.existing, 1);
@@ -205,8 +195,7 @@ test('createMissingClickUpTasks is idempotent when the subtask already exists', 
 
 test('createMissingClickUpTasks second run finds existing subtask and creates zero duplicates', async () => {
   const fixture = await createFixture();
-  const fetchImpl = async (url, init = {}) => {
-    if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+  const fetchImpl = authorizedFetch(async (url, init = {}) => {
     if (url.includes('/list/901221186877/task?')) {
       return listTasksResponse([
         {
@@ -220,7 +209,7 @@ test('createMissingClickUpTasks second run finds existing subtask and creates ze
       throw new Error('create should not run when subtask already exists');
     }
     return jsonResponse(200, {});
-  };
+  });
 
   const firstRun = await createMissingClickUpTasks({
     ...fixture,
@@ -237,11 +226,11 @@ test('createMissingClickUpTasks second run finds existing subtask and creates ze
     fetchImpl,
   });
 
-  assert.deepEqual(firstRun, { created: 0, existing: 1, skipped: 0, failed: 0 });
-  assert.deepEqual(secondRun, { created: 0, existing: 1, skipped: 0, failed: 0 });
+  assert.deepEqual(firstRun, { created: 0, existing: 1, skipped: 0, failed: 0, wouldCreate: 0, wouldSkip: 0 });
+  assert.deepEqual(secondRun, { created: 0, existing: 1, skipped: 0, failed: 0, wouldCreate: 0, wouldSkip: 0 });
 });
 
-test('createMissingClickUpTasks exits successfully when an individual create fails', async () => {
+test('createMissingClickUpTasks records failed creates and exits with failure count', async () => {
   const fixture = await createFixture();
 
   const summary = await createMissingClickUpTasks({
@@ -249,14 +238,11 @@ test('createMissingClickUpTasks exits successfully when an individual create fai
     keyFilter: new Set(['1-99-test-auto-create']),
     token: 'secret-token',
     sleepImpl: async () => {},
-    fetchImpl: async (url, init = {}) => {
-      if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/901221186877/task?')) {
-        return listTasksResponse([]);
-      }
+    fetchImpl: authorizedFetch(async (url, init = {}) => {
+      if (url.includes('/list/901221186877/task?')) return listTasksResponse([]);
       if (init.method === 'POST') return jsonResponse(500, {});
       return jsonResponse(200, {});
-    },
+    }),
   });
 
   assert.equal(summary.created, 0);

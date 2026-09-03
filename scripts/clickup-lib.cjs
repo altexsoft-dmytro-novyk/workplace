@@ -95,6 +95,164 @@ function warnUnmappedPrefix(key, track) {
   );
 }
 
+function dryRunEnabled(options = {}) {
+  if (options.dryRun === true) return true;
+  const raw = options.dryRun ?? process.env.CLICKUP_DRY_RUN;
+  return raw === 'true' || raw === '1';
+}
+
+function collectEpicIdsFromTrackMap(trackMap = EPIC_BY_TRACK) {
+  const epicIds = new Set();
+  for (const mappings of Object.values(trackMap)) {
+    for (const entry of mappings) {
+      epicIds.add(entry.epicId);
+    }
+  }
+  return [...epicIds];
+}
+
+async function fetchListDetails(fetchImpl, listId, token) {
+  const response = await request(
+    fetchImpl,
+    `${CLICKUP_API_BASE}/list/${encodeURIComponent(listId)}`,
+    { headers: { Authorization: token } },
+    `list validation for ${listId}`,
+    token,
+  );
+  return readResponseJson(response, `list validation for ${listId}`, token);
+}
+
+function taskListId(task) {
+  return task?.list?.id ? String(task.list.id) : null;
+}
+
+function listSpaceId(listPayload) {
+  return listPayload?.space?.id ? String(listPayload.space.id) : null;
+}
+
+function taskWorkspaceId(task) {
+  if (task?.team_id !== undefined && task?.team_id !== null) return String(task.team_id);
+  if (task?.workspace_id !== undefined && task?.workspace_id !== null) return String(task.workspace_id);
+  return null;
+}
+
+async function fetchSpacesForWorkspace(fetchImpl, workspaceId, token, archived = false) {
+  const response = await request(
+    fetchImpl,
+    `${CLICKUP_API_BASE}/team/${encodeURIComponent(workspaceId)}/space?archived=${archived ? 'true' : 'false'}`,
+    { headers: { Authorization: token } },
+    `spaces in workspace ${workspaceId}`,
+    token,
+  );
+  return readResponseJson(response, `spaces in workspace ${workspaceId}`, token);
+}
+
+async function fetchFolderDetails(fetchImpl, folderId, token) {
+  const response = await request(
+    fetchImpl,
+    `${CLICKUP_API_BASE}/folder/${encodeURIComponent(folderId)}`,
+    { headers: { Authorization: token } },
+    `folder validation for ${folderId}`,
+    token,
+  );
+  return readResponseJson(response, `folder validation for ${folderId}`, token);
+}
+
+function spaceIdFromPayload(payload) {
+  if (!payload) return null;
+  if (payload?.space?.id !== undefined && payload?.space?.id !== null) {
+    return String(payload.space.id);
+  }
+  if (payload?.space_id !== undefined && payload?.space_id !== null) {
+    return String(payload.space_id);
+  }
+  return null;
+}
+
+async function spaceIdForList(fetchImpl, listPayload, token) {
+  const directSpaceId = spaceIdFromPayload(listPayload);
+  if (directSpaceId) return directSpaceId;
+
+  const folderId = listPayload?.folder?.id;
+  if (!folderId) return null;
+
+  const folderPayload = await fetchFolderDetails(fetchImpl, String(folderId), token);
+  return spaceIdFromPayload(folderPayload);
+}
+
+async function listSpaceBelongsToWorkspace(fetchImpl, spaceId, expectedWorkspaceId, token) {
+  for (const archived of [false, true]) {
+    const spacesPayload = await fetchSpacesForWorkspace(fetchImpl, expectedWorkspaceId, token, archived);
+    const spaces = Array.isArray(spacesPayload.spaces) ? spacesPayload.spaces : [];
+    if (spaces.some((space) => String(space.id) === spaceId)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+async function resolveListWorkspaceId(fetchImpl, listPayload, expectedWorkspaceId, token) {
+  const directWorkspaceId = taskWorkspaceId(listPayload);
+  if (directWorkspaceId) return directWorkspaceId;
+
+  const spaceId = await spaceIdForList(fetchImpl, listPayload, token);
+  if (!spaceId) return null;
+
+  const belongsToExpectedWorkspace = await listSpaceBelongsToWorkspace(
+    fetchImpl,
+    spaceId,
+    expectedWorkspaceId,
+    token,
+  );
+  return belongsToExpectedWorkspace ? String(expectedWorkspaceId) : null;
+}
+
+async function validateClickUpTargets(fetchImpl, { listId, workspaceId, epicIds, token }) {
+  const expectedWorkspaceId = String(workspaceId);
+  const expectedListId = String(listId);
+  const listPayload = await fetchListDetails(fetchImpl, expectedListId, token);
+
+  for (const epicId of epicIds) {
+    const epic = await fetchTaskDetails(fetchImpl, epicId, token);
+    const epicWorkspaceId = taskWorkspaceId(epic);
+    if (epicWorkspaceId !== expectedWorkspaceId) {
+      throw new Error(
+        `ClickUp epic ${epicId} belongs to workspace ${epicWorkspaceId ?? 'unknown'}, expected ${expectedWorkspaceId}`,
+      );
+    }
+    const epicListId = taskListId(epic);
+    if (epicListId !== expectedListId) {
+      throw new Error(
+        `ClickUp epic ${epicId} belongs to list ${epicListId ?? 'unknown'}, expected ${expectedListId}`,
+      );
+    }
+  }
+
+  const listWorkspaceId = await resolveListWorkspaceId(
+    fetchImpl,
+    listPayload,
+    expectedWorkspaceId,
+    token,
+  );
+  if (listWorkspaceId === null) {
+    console.warn(
+      `ClickUp list ${expectedListId} workspace confirmed via epic parents (list API returned no workspace ID).`,
+    );
+  } else if (listWorkspaceId !== expectedWorkspaceId) {
+    const spaceId = await spaceIdForList(fetchImpl, listPayload, token);
+    throw new Error(
+      `ClickUp list ${expectedListId} belongs to workspace ${listWorkspaceId}`
+      + `${spaceId ? ` (space ${spaceId})` : ''}, expected ${expectedWorkspaceId}`,
+    );
+  }
+
+  return {
+    listId: expectedListId,
+    workspaceId: expectedWorkspaceId,
+    epicIds: [...epicIds],
+  };
+}
+
 function buildListTasksUrl(listId, page = 0) {
   const params = new URLSearchParams({
     subtasks: 'true',
@@ -184,6 +342,14 @@ async function setBmadKeyOnTask(fetchImpl, { taskId, fieldId, bmadKey, token, he
     `bmad_key update for ${bmadKey}`,
     token,
   );
+}
+
+async function verifyBmadKeyOnTask(fetchImpl, { taskId, fieldId, bmadKey, token }) {
+  const task = await fetchTaskDetails(fetchImpl, taskId, token);
+  const value = readCustomFieldValue(task, fieldId);
+  if (value !== bmadKey) {
+    throw new Error(`ClickUp task ${taskId} bmad_key is "${value ?? ''}", expected "${bmadKey}"`);
+  }
 }
 
 function findDuplicateStoryKeys(records) {
@@ -333,13 +499,18 @@ module.exports = {
   buildBmadKeyTaskIndex,
   buildListTasksUrl,
   collectDevelopmentStatusRecords,
+  collectEpicIdsFromTrackMap,
+  dryRunEnabled,
   findDuplicateStoryKeys,
   findSprintStatusPaths,
   findTaskByBmadKey,
   findTaskIdByBmadKeyInTasks,
+  fetchListDetails,
+  fetchTaskDetails,
   formatDuplicateStoryKeys,
   keyFilterFromOptions,
   matchesKeyFilter,
+  listSpaceId,
   parseKeyFilter,
   readCustomFieldValue,
   readYaml,
@@ -347,10 +518,15 @@ module.exports = {
   relativeSourceKey,
   request,
   resolveEpicParentId,
+  resolveListWorkspaceId,
   setBmadKeyOnTask,
   shouldSkipDevelopmentStatus,
   shouldSkipStoryKey,
   sleep,
+  taskListId,
+  taskWorkspaceId,
   trackFromSourcePath,
+  validateClickUpTargets,
+  verifyBmadKeyOnTask,
   warnUnmappedPrefix,
 };

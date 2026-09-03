@@ -39,8 +39,8 @@ values, not from Git history or task discovery.
 ```yaml
 workspace_id: "90122019689"
 status_map:
-  in-progress: "in progress"
-  review: "code review"
+  in-progress: "IN PROGRESS"
+  review: "CODE REVIEW"
 custom_fields:
   git_branch: "YOUR_GIT_BRANCH_FIELD_UUID"
   validation_status: "YOUR_VALIDATION_STATUS_FIELD_UUID"

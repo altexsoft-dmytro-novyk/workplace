@@ -6,6 +6,7 @@ const path = require('node:path');
 const yaml = require('js-yaml');
 
 const { collectSyncEntries, syncClickUp } = require('../scripts/sync-clickup.cjs');
+const { jsonResponse, withClickUpValidation } = require('./clickup-test-helpers.cjs');
 
 const temporaryDirectories = [];
 
@@ -29,6 +30,7 @@ test('workflow creates missing tasks before syncing sprint status', async () => 
   assert.deepEqual(workflow.on.push.branches, ['main']);
   assert.equal(workflow.permissions.contents, 'read');
   assert.equal(workflow.jobs.sync.needs, 'create-if-missing');
+  assert.deepEqual(workflow.concurrency, { group: 'clickup-sync-main', 'cancel-in-progress': false });
 
   const createSteps = workflow.jobs['create-if-missing'].steps;
   assert.ok(createSteps.some((step) => step.run === 'npm run create:clickup'));
@@ -52,8 +54,9 @@ async function createFixture({ config, status = 'in-progress', storyKey = '1-99-
   await fs.writeFile(sourcePath, `development_status:\n  ${storyKey}: ${status}\n`);
   await fs.writeFile(configPath, config ?? [
     'workspace_id: "90122019689"',
+    'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks:',
     `  "${sourceKey}":`,
     '    task_id: "task-123"',
@@ -63,14 +66,15 @@ async function createFixture({ config, status = 'in-progress', storyKey = '1-99-
   return { configPath, rootDir, sourcePath, sourceKey, storyKey };
 }
 
-function jsonResponse(status, body) {
-  return { ok: status >= 200 && status < 300, status, json: async () => body };
-}
-
-function successfulClickUpResponse(url, init = {}) {
-  if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-  if (url.includes('/task/') && !init.method) return jsonResponse(200, { team_id: '90122019689' });
-  return jsonResponse(200, {});
+function successfulClickUpResponse(url, init = {}, validationOptions = {}) {
+  const inner = (url, init = {}) => {
+    if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+    if (url.includes('/task/') && !init.method && !url.includes('/field/')) {
+      return jsonResponse(200, { team_id: '90122019689' });
+    }
+    return jsonResponse(200, {});
+  };
+  return withClickUpValidation(inner, validationOptions)(url, init);
 }
 
 test('collectSyncEntries maps configured BMad development status entries', async () => {
@@ -81,7 +85,7 @@ test('collectSyncEntries maps configured BMad development status entries', async
   assert.deepEqual(entries, [{
     sourceKey: '_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story',
     taskId: 'task-123',
-    status: 'in progress',
+    status: 'IN PROGRESS',
     gitBranch: 'feature/story-1',
     validationStatus: 'passed',
   }]);
@@ -106,28 +110,19 @@ test('syncClickUp stops after team authorization when expected workspace is abse
 test('syncClickUp rejects a task from another workspace before any task write', async () => {
   const fixture = await createFixture();
   const requests = [];
-  const fetchImpl = async (url, init = {}) => {
+  const fetchImpl = withClickUpValidation(async (url, init = {}) => {
     requests.push({ url, init });
-    return url.endsWith('/team')
-      ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-      : jsonResponse(200, { team_id: 'different-workspace' });
-  };
+    if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+    if (url.endsWith('/task/task-123')) return jsonResponse(200, { team_id: 'different-workspace' });
+    return jsonResponse(200, {});
+  });
 
   await assert.rejects(
     syncClickUp({ ...fixture, sprintStatusPaths: [fixture.sourcePath], token: 'secret-token', fetchImpl }),
     /task-123.*90122019689/,
   );
 
-  assert.deepEqual(requests, [
-    {
-      url: 'https://api.clickup.com/api/v2/team',
-      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
-    },
-    {
-      url: 'https://api.clickup.com/api/v2/task/task-123',
-      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
-    },
-  ]);
+  assert.ok(!requests.some(({ init }) => init.method === 'PUT' || init.method === 'POST'));
 });
 
 test('syncClickUp compares the task workspace ID without type coercion before writing', async () => {
@@ -139,25 +134,24 @@ test('syncClickUp compares the task workspace ID without type coercion before wr
       ...fixture,
       sprintStatusPaths: [fixture.sourcePath],
       token: 'secret-token',
-      fetchImpl: async (url, init = {}) => {
+      fetchImpl: withClickUpValidation(async (url, init = {}) => {
         requests.push({ url, init });
-        return url.endsWith('/team')
-          ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-          : jsonResponse(200, { team_id: 90122019689 });
-      },
+        if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+        if (url.endsWith('/task/task-123')) return jsonResponse(200, { team_id: 90122019689 });
+        return jsonResponse(200, {});
+      }),
     }),
     /task-123.*90122019689/,
   );
 
-  assert.equal(requests.length, 2);
-  assert.equal(requests.some(({ init }) => init.method === 'PUT' || init.method === 'POST'), false);
+  assert.ok(!requests.some(({ init }) => init.method === 'PUT' || init.method === 'POST'));
 });
 
 test('syncClickUp does not write tasks when every BMad entry is unmapped', async () => {
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks: {}',
   ].join('\n') });
   const requests = [];
@@ -189,25 +183,8 @@ test('syncClickUp sends the mapped status with the expected request boundary', a
     },
   });
 
-  assert.deepEqual(requests[0], {
-    url: 'https://api.clickup.com/api/v2/team',
-    init: {
-      headers: {
-        Authorization: 'secret-token',
-        'Content-Type': 'application/json',
-      },
-    },
-  });
-  assert.deepEqual(requests[1], {
-    url: 'https://api.clickup.com/api/v2/task/task-123',
-    init: {
-      headers: {
-        Authorization: 'secret-token',
-        'Content-Type': 'application/json',
-      },
-    },
-  });
-  assert.deepEqual(requests[2], {
+  const writeRequests = requests.filter(({ init }) => init.method === 'PUT' || init.method === 'POST');
+  assert.deepEqual(writeRequests, [{
     url: 'https://api.clickup.com/api/v2/task/task-123',
     init: {
       method: 'PUT',
@@ -215,16 +192,17 @@ test('syncClickUp sends the mapped status with the expected request boundary', a
         Authorization: 'secret-token',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ status: 'in progress' }),
+      body: JSON.stringify({ status: 'IN PROGRESS' }),
     },
-  });
+  }]);
 });
 
 test('syncClickUp writes mapped custom fields after the successful status update', async () => {
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
+    'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     '  validation_status: "validation-status-field"',
@@ -246,21 +224,13 @@ test('syncClickUp writes mapped custom fields after the successful status update
     },
   });
 
-  assert.deepEqual(requests, [
-    {
-      url: 'https://api.clickup.com/api/v2/team',
-      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
-    },
-    {
-      url: 'https://api.clickup.com/api/v2/task/task-123',
-      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
-    },
+  assert.deepEqual(requests.filter(({ init }) => init.method === 'PUT' || init.method === 'POST'), [
     {
       url: 'https://api.clickup.com/api/v2/task/task-123',
       init: {
         method: 'PUT',
         headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'in progress' }),
+        body: JSON.stringify({ status: 'IN PROGRESS' }),
       },
     },
     {
@@ -285,8 +255,9 @@ test('syncClickUp writes mapped custom fields after the successful status update
 test('syncClickUp writes custom fields only with both a configured ID and mapped value', async () => {
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
+    'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     '  validation_status: ""',
@@ -308,9 +279,7 @@ test('syncClickUp writes custom fields only with both a configured ID and mapped
     },
   });
 
-  assert.deepEqual(requests.map(({ url }) => url), [
-    'https://api.clickup.com/api/v2/team',
-    'https://api.clickup.com/api/v2/task/task-123',
+  assert.deepEqual(requests.filter(({ init }) => init.method === 'PUT' || init.method === 'POST').map(({ url }) => url), [
     'https://api.clickup.com/api/v2/task/task-123',
     'https://api.clickup.com/api/v2/task/task-123/field/git-branch-field',
   ]);
@@ -319,8 +288,9 @@ test('syncClickUp writes custom fields only with both a configured ID and mapped
 test('syncClickUp skips a configured custom field when its mapped value is empty', async () => {
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
+    'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     '  validation_status: "validation-status-field"',
@@ -342,9 +312,7 @@ test('syncClickUp skips a configured custom field when its mapped value is empty
     },
   });
 
-  assert.deepEqual(requests.map(({ url }) => url), [
-    'https://api.clickup.com/api/v2/team',
-    'https://api.clickup.com/api/v2/task/task-123',
+  assert.deepEqual(requests.filter(({ init }) => init.method === 'PUT' || init.method === 'POST').map(({ url }) => url), [
     'https://api.clickup.com/api/v2/task/task-123',
     'https://api.clickup.com/api/v2/task/task-123/field/validation-status-field',
   ]);
@@ -353,8 +321,9 @@ test('syncClickUp skips a configured custom field when its mapped value is empty
 test('syncClickUp reports custom field failures without revealing the token', async () => {
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
+    'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     'tasks:',
@@ -368,12 +337,12 @@ test('syncClickUp reports custom field failures without revealing the token', as
       ...fixture,
       sprintStatusPaths: [fixture.sourcePath],
       token: 'secret-token',
-      fetchImpl: async (url, init = {}) => {
+      fetchImpl: withClickUpValidation(async (url, init = {}) => {
         if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
         if (!init.method) return jsonResponse(200, { team_id: '90122019689' });
         if (url.includes('/field/')) return jsonResponse(422, {});
         return jsonResponse(200, {});
-      },
+      }),
     }),
     (error) => /Git Branch/.test(error.message) && /task-123/.test(error.message) && /422/.test(error.message)
       && !error.message.includes('secret-token'),
@@ -383,8 +352,9 @@ test('syncClickUp reports custom field failures without revealing the token', as
 test('syncClickUp URL-encodes task and custom field IDs', async () => {
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
+    'list_id: "901221186877"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'custom_fields:',
     '  git_branch: "field/id"',
     'tasks:',
@@ -404,9 +374,7 @@ test('syncClickUp URL-encodes task and custom field IDs', async () => {
     },
   });
 
-  assert.deepEqual(requests.map(({ url }) => url), [
-    'https://api.clickup.com/api/v2/team',
-    'https://api.clickup.com/api/v2/task/task%2Fid',
+  assert.deepEqual(requests.filter(({ init }) => init.method === 'PUT' || init.method === 'POST').map(({ url }) => url), [
     'https://api.clickup.com/api/v2/task/task%2Fid',
     'https://api.clickup.com/api/v2/task/task%2Fid/field/field%2Fid',
   ]);
@@ -420,11 +388,11 @@ test('syncClickUp reports API failures without revealing the token', async () =>
       ...fixture,
       sprintStatusPaths: [fixture.sourcePath],
       token: 'secret-token',
-      fetchImpl: async (url, init = {}) => {
+      fetchImpl: withClickUpValidation(async (url, init = {}) => {
         if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
         if (!init.method) return jsonResponse(200, { team_id: '90122019689' });
         return jsonResponse(500, {});
-      },
+      }),
     }),
     (error) => /task-123/.test(error.message) && /500/.test(error.message) && !error.message.includes('secret-token'),
   );
@@ -470,7 +438,7 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
       'workspace_id: "90122019689"',
       'list_id: "list-123"',
       'status_map:',
-      '  in-progress: "in progress"',
+      '  in-progress: "IN PROGRESS"',
       'custom_fields:',
       '  bmad_key: "bmad-key-field"',
       'tasks: {}',
@@ -482,7 +450,7 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
     ...fixture,
     sprintStatusPaths: [fixture.sourcePath],
     token: 'secret-token',
-    fetchImpl: async (url, init = {}) => {
+    fetchImpl: withClickUpValidation(async (url, init = {}) => {
       requests.push({ url, init });
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
       if (url.includes('/list/list-123/task?')) {
@@ -497,11 +465,11 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
           last_page: true,
         });
       }
-      return successfulClickUpResponse(url, init);
-    },
+      return successfulClickUpResponse(url, init, { listId: 'list-123' });
+    }, { listId: 'list-123' }),
   });
 
-  assert.deepEqual(summary, { updated: 1, skipped: 0 });
+  assert.deepEqual(summary, { updated: 1, skipped: 0, wouldUpdate: 0 });
   assert.ok(requests.some(({ url }) => url.includes('/list/list-123/task?')));
   assert.ok(requests.some(({ url, init }) => url === 'https://api.clickup.com/api/v2/task/task-from-bmad-key' && init.method === 'PUT'));
 });
@@ -512,7 +480,7 @@ test('syncClickUp counts skipped entries when bmad_key lookup finds no task', as
       'workspace_id: "90122019689"',
       'list_id: "list-123"',
       'status_map:',
-      '  in-progress: "in progress"',
+      '  in-progress: "IN PROGRESS"',
       'custom_fields:',
       '  bmad_key: "bmad-key-field"',
       'tasks: {}',
@@ -523,21 +491,21 @@ test('syncClickUp counts skipped entries when bmad_key lookup finds no task', as
     ...fixture,
     sprintStatusPaths: [fixture.sourcePath],
     token: 'secret-token',
-    fetchImpl: async (url, init = {}) => {
+    fetchImpl: withClickUpValidation(async (url, init = {}) => {
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
       if (url.includes('/list/list-123/task?')) return jsonResponse(200, { tasks: [], last_page: true });
-      return successfulClickUpResponse(url, init);
-    },
+      return successfulClickUpResponse(url, init, { listId: 'list-123' });
+    }, { listId: 'list-123' }),
   });
 
-  assert.deepEqual(summary, { updated: 0, skipped: 1 });
+  assert.deepEqual(summary, { updated: 0, skipped: 1, wouldUpdate: 0 });
 });
 
 test('collectSyncEntries rejects a configured task mapping without an ID even when its source key is absent', async () => {
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks:',
     '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
@@ -554,7 +522,7 @@ test('collectSyncEntries rejects configured task mappings for source keys it did
   const fixture = await createFixture({ config: [
     'workspace_id: "90122019689"',
     'status_map:',
-    '  in-progress: "in progress"',
+    '  in-progress: "IN PROGRESS"',
     'tasks:',
     '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
@@ -600,7 +568,7 @@ test('collectSyncEntries rejects malformed configuration, missing source, unknow
     config: [
       'workspace_id: "90122019689"',
       'status_map:',
-      '  in-progress: "in progress"',
+      '  in-progress: "IN PROGRESS"',
       'tasks:',
       '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story": {}',
     ].join('\n'),
