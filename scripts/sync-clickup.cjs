@@ -137,7 +137,13 @@ async function syncClickUp(options = {}) {
     && teamPayload.teams.some((team) => String(team.id) === EXPECTED_WORKSPACE_ID);
   if (!authorized) throw new Error(`Authorized ClickUp teams do not include required Workspace ${EXPECTED_WORKSPACE_ID}`);
   for (const entry of entries) {
-    await request(fetchImpl, `${CLICKUP_API_BASE}/task/${encodeURIComponent(entry.taskId)}`, {
+    const taskUrl = `${CLICKUP_API_BASE}/task/${encodeURIComponent(entry.taskId)}`;
+    const taskResponse = await request(fetchImpl, taskUrl, { headers }, `workspace validation for task ${entry.taskId}`, token);
+    const taskPayload = await readResponseJson(taskResponse, `workspace validation for task ${entry.taskId}`, token);
+    if (taskPayload.team_id !== EXPECTED_WORKSPACE_ID) {
+      throw new Error(`ClickUp task ${entry.taskId} does not belong to required Workspace ${EXPECTED_WORKSPACE_ID}`);
+    }
+    await request(fetchImpl, taskUrl, {
       method: 'PUT',
       headers,
       body: JSON.stringify({ status: entry.status }),

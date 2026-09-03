@@ -23,6 +23,7 @@ test('workflow syncs only when ClickUp inputs or its definition change', async (
     'scripts/sync-clickup.cjs',
     '.github/workflows/sync-clickup.yml',
   ]);
+  assert.deepEqual(workflow.on.push.branches, ['main']);
   assert.equal(workflow.permissions.contents, 'read');
 
   const steps = workflow.jobs.sync.steps;
@@ -58,6 +59,12 @@ function jsonResponse(status, body) {
   return { ok: status >= 200 && status < 300, status, json: async () => body };
 }
 
+function successfulClickUpResponse(url, init = {}) {
+  if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+  if (url.includes('/task/') && !init.method) return jsonResponse(200, { team_id: '90122019689' });
+  return jsonResponse(200, {});
+}
+
 test('collectSyncEntries maps configured BMad development status entries', async () => {
   const fixture = await createFixture();
 
@@ -86,6 +93,56 @@ test('syncClickUp stops after team authorization when expected workspace is abse
   );
 
   assert.deepEqual(requests.map(({ url }) => url), ['https://api.clickup.com/api/v2/team']);
+});
+
+test('syncClickUp rejects a task from another workspace before any task write', async () => {
+  const fixture = await createFixture();
+  const requests = [];
+  const fetchImpl = async (url, init = {}) => {
+    requests.push({ url, init });
+    return url.endsWith('/team')
+      ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
+      : jsonResponse(200, { team_id: 'different-workspace' });
+  };
+
+  await assert.rejects(
+    syncClickUp({ ...fixture, sprintStatusPaths: [fixture.sourcePath], token: 'secret-token', fetchImpl }),
+    /task-123.*90122019689/,
+  );
+
+  assert.deepEqual(requests, [
+    {
+      url: 'https://api.clickup.com/api/v2/team',
+      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
+    },
+    {
+      url: 'https://api.clickup.com/api/v2/task/task-123',
+      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
+    },
+  ]);
+});
+
+test('syncClickUp compares the task workspace ID without type coercion before writing', async () => {
+  const fixture = await createFixture();
+  const requests = [];
+
+  await assert.rejects(
+    syncClickUp({
+      ...fixture,
+      sprintStatusPaths: [fixture.sourcePath],
+      token: 'secret-token',
+      fetchImpl: async (url, init = {}) => {
+        requests.push({ url, init });
+        return url.endsWith('/team')
+          ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
+          : jsonResponse(200, { team_id: 90122019689 });
+      },
+    }),
+    /task-123.*90122019689/,
+  );
+
+  assert.equal(requests.length, 2);
+  assert.equal(requests.some(({ init }) => init.method === 'PUT' || init.method === 'POST'), false);
 });
 
 test('syncClickUp does not write tasks when every BMad entry is unmapped', async () => {
@@ -120,9 +177,7 @@ test('syncClickUp sends the mapped status with the expected request boundary', a
     token: 'secret-token',
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
-      return url.endsWith('/team')
-        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-        : jsonResponse(200, {});
+      return successfulClickUpResponse(url, init);
     },
   });
 
@@ -136,6 +191,15 @@ test('syncClickUp sends the mapped status with the expected request boundary', a
     },
   });
   assert.deepEqual(requests[1], {
+    url: 'https://api.clickup.com/api/v2/task/task-123',
+    init: {
+      headers: {
+        Authorization: 'secret-token',
+        'Content-Type': 'application/json',
+      },
+    },
+  });
+  assert.deepEqual(requests[2], {
     url: 'https://api.clickup.com/api/v2/task/task-123',
     init: {
       method: 'PUT',
@@ -170,15 +234,17 @@ test('syncClickUp writes mapped custom fields after the successful status update
     token: 'secret-token',
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
-      return url.endsWith('/team')
-        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-        : jsonResponse(200, {});
+      return successfulClickUpResponse(url, init);
     },
   });
 
   assert.deepEqual(requests, [
     {
       url: 'https://api.clickup.com/api/v2/team',
+      init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
+    },
+    {
+      url: 'https://api.clickup.com/api/v2/task/task-123',
       init: { headers: { Authorization: 'secret-token', 'Content-Type': 'application/json' } },
     },
     {
@@ -230,14 +296,13 @@ test('syncClickUp writes custom fields only with both a configured ID and mapped
     token: 'secret-token',
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
-      return url.endsWith('/team')
-        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-        : jsonResponse(200, {});
+      return successfulClickUpResponse(url, init);
     },
   });
 
   assert.deepEqual(requests.map(({ url }) => url), [
     'https://api.clickup.com/api/v2/team',
+    'https://api.clickup.com/api/v2/task/task-123',
     'https://api.clickup.com/api/v2/task/task-123',
     'https://api.clickup.com/api/v2/task/task-123/field/git-branch-field',
   ]);
@@ -265,14 +330,13 @@ test('syncClickUp skips a configured custom field when its mapped value is empty
     token: 'secret-token',
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
-      return url.endsWith('/team')
-        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-        : jsonResponse(200, {});
+      return successfulClickUpResponse(url, init);
     },
   });
 
   assert.deepEqual(requests.map(({ url }) => url), [
     'https://api.clickup.com/api/v2/team',
+    'https://api.clickup.com/api/v2/task/task-123',
     'https://api.clickup.com/api/v2/task/task-123',
     'https://api.clickup.com/api/v2/task/task-123/field/validation-status-field',
   ]);
@@ -296,8 +360,9 @@ test('syncClickUp reports custom field failures without revealing the token', as
       ...fixture,
       sprintStatusPaths: [fixture.sourcePath],
       token: 'secret-token',
-      fetchImpl: async (url) => {
+      fetchImpl: async (url, init = {}) => {
         if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+        if (!init.method) return jsonResponse(200, { team_id: '90122019689' });
         if (url.includes('/field/')) return jsonResponse(422, {});
         return jsonResponse(200, {});
       },
@@ -327,14 +392,13 @@ test('syncClickUp URL-encodes task and custom field IDs', async () => {
     token: 'secret-token',
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
-      return url.endsWith('/team')
-        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-        : jsonResponse(200, {});
+      return successfulClickUpResponse(url, init);
     },
   });
 
   assert.deepEqual(requests.map(({ url }) => url), [
     'https://api.clickup.com/api/v2/team',
+    'https://api.clickup.com/api/v2/task/task%2Fid',
     'https://api.clickup.com/api/v2/task/task%2Fid',
     'https://api.clickup.com/api/v2/task/task%2Fid/field/field%2Fid',
   ]);
@@ -348,9 +412,11 @@ test('syncClickUp reports API failures without revealing the token', async () =>
       ...fixture,
       sprintStatusPaths: [fixture.sourcePath],
       token: 'secret-token',
-      fetchImpl: async (url) => url.endsWith('/team')
-        ? jsonResponse(200, { teams: [{ id: '90122019689' }] })
-        : jsonResponse(500, {}),
+      fetchImpl: async (url, init = {}) => {
+        if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+        if (!init.method) return jsonResponse(200, { team_id: '90122019689' });
+        return jsonResponse(500, {});
+      },
     }),
     (error) => /task-123/.test(error.message) && /500/.test(error.message) && !error.message.includes('secret-token'),
   );
