@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The Split That Stayed Split</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #171a21;
+    --ink: #e9ecf1;
+    --muted: #8891a5;
+    --line: #2a2f3a;
+    --winston: #7fb2e5;
+    --john: #e5a15c;
+    --sally: #e57fb0;
+    --amelia: #7fe5a1;
+    --mary: #d6c96b;
+    --accent: #e5555a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(1200px 600px at 20% -10%, #1b2030 0%, var(--bg) 60%);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+    padding: 40px 20px 80px;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 44px; }
+  header .eyebrow {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  header h1 {
+    font-size: 30px;
+    margin: 10px 0 6px;
+    background: linear-gradient(90deg, var(--winston), var(--sally));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .cast {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin: 28px 0 44px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 7px 14px 7px 10px;
+    font-size: 13px;
+  }
+  .chip .dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .scene {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 28px 30px;
+    margin-bottom: 28px;
+  }
+  .scene h2 {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin: 0 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scene h2::before {
+    content: "";
+    width: 18px; height: 2px;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  .line { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+  .line .icon {
+    font-size: 20px;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: #12141a;
+    border: 1px solid var(--line);
+    flex-shrink: 0;
+  }
+  .line .who { font-weight: 600; margin-right: 6px; }
+  .line .say { color: #cfd4e0; }
+  .line.stage { color: var(--muted); font-style: italic; font-size: 13px; margin: 4px 0 4px 46px; }
+
+  .name-winston { color: var(--winston); }
+  .name-john { color: var(--john); }
+  .name-sally { color: var(--sally); }
+  .name-amelia { color: var(--amelia); }
+  .name-mary { color: var(--mary); }
+
+  .verdict {
+    text-align: center;
+    margin: 40px 0;
+    padding: 26px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(229,85,90,0.12), rgba(127,178,229,0.08));
+    border: 1px solid rgba(229,85,90,0.3);
+  }
+  .verdict .label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+  .verdict .word {
+    font-size: 34px;
+    font-weight: 700;
+    margin: 6px 0 4px;
+    color: var(--accent);
+  }
+  .verdict small { color: var(--muted); font-size: 13px; }
+
+  .receipts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 10px;
+  }
+  @media (max-width: 600px) { .receipts { grid-template-columns: 1fr; } }
+  .receipt {
+    background: #12141a;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+  }
+  .receipt .tag {
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .receipt p { margin: 0; font-size: 13.5px; color: #cfd4e0; }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 50px;
+  }
+
+  svg.crest { display: block; margin: 0 auto 18px; }
+  .pulse { animation: pulse 3s ease-in-out infinite; transform-origin: center; }
+  @keyframes pulse { 0%,100% { opacity: 0.55; } 50% { opacity: 1; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <svg class="crest" width="72" height="72" viewBox="0 0 72 72" fill="none">
+      <circle cx="36" cy="36" r="34" stroke="#7fb2e5" stroke-width="1.5" opacity="0.4"/>
+      <circle class="pulse" cx="36" cy="36" r="24" stroke="#e5555a" stroke-width="1.5"/>
+      <path d="M36 16 L36 56 M16 36 L56 36" stroke="#e9ecf1" stroke-width="1" opacity="0.3"/>
+      <circle cx="36" cy="36" r="5" fill="#e5555a"/>
+    </svg>
+    <div class="eyebrow">Party Mode · Session Keepsake</div>
+    <h1>The Split That Stayed Split</h1>
+    <p>2026-09-03 · Epic review: role-administration, custom fields, inline editing</p>
+  </header>
+
+  <div class="cast">
+    <div class="chip"><span class="dot" style="background:var(--mary)"></span>📊 Mary — Analyst</div>
+    <div class="chip"><span class="dot" style="background:var(--john)"></span>📋 John — PM</div>
+    <div class="chip"><span class="dot" style="background:var(--sally)"></span>🎨 Sally — UX</div>
+    <div class="chip"><span class="dot" style="background:var(--winston)"></span>🏗️ Winston — Architect</div>
+    <div class="chip"><span class="dot" style="background:var(--amelia)"></span>💻 Amelia — Dev</div>
+  </div>
+
+  <div class="scene">
+    <h2>The Reopened Fight</h2>
+    <div class="line"><div class="icon">🏗️</div><div><span class="who name-winston">Winston</span><span class="say"> Same bounded context. Seven epics already live there. Why does the eighth need its own file?</span></div></div>
+    <div class="line"><div class="icon">📋</div><div><span class="who name-john">John</span><span class="say"> Here we go.</span></div></div>
+    <div class="line stage">— John reminds Winston he lost this exact argument in August —</div>
+    <div class="line"><div class="icon">📊</div><div><span class="who name-mary">Mary</span><span class="say"> I checked. Zero mentions of PM-FR-6 in platform/epics.md. Not gated — never claimed.</span></div></div>
+    <div class="line"><div class="icon">🎨</div><div><span class="who name-sally">Sally</span><span class="say"> Nobody's asking if RA-E2 — permanently gated — is even a user outcome yet.</span></div></div>
+    <div class="line"><div class="icon">💻</div><div><span class="who name-amelia">Amelia</span><span class="say"> "No cache" in prose is exactly the sentence that already broke once. TD-11 taught us that.</span></div></div>
+  </div>
+
+  <div class="verdict">
+    <div class="label">The Ruling</div>
+    <div class="word">SPLIT — with conditions</div>
+    <small>role-administration/epics.md stays its own file. The cost gets named, not assumed.</small>
+  </div>
+
+  <div class="scene">
+    <h2>Receipts Filed</h2>
+    <div class="receipts">
+      <div class="receipt">
+        <span class="tag">WINSTON'S CONDITION</span>
+        <p>The "one context, two documents" trade-off is now stated explicitly in role-administration/epics.md — not implied, not assumed away.</p>
+      </div>
+      <div class="receipt">
+        <span class="tag">AMELIA'S CATCH</span>
+        <p>RA-E1.3's revocation AC now forbids caching at every layer — client, request-scoped, in-process TTL — not just "the row changed." The exact bar the old S1.6 wording missed.</p>
+      </div>
+      <div class="receipt">
+        <span class="tag">MARY'S PATTERN</span>
+        <p>Third reopened "deferred" drawer this month. Nothing in this workspace's backlog stays closed — it comes back with a requirement ID attached.</p>
+      </div>
+      <div class="receipt">
+        <span class="tag">SALLY'S OPEN THREAD</span>
+        <p>Inline-edit conflict states are specified at the backend layer with no UX design behind them yet — flagged, not fixed, for whoever designs that screen.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="scene">
+    <h2>Running Bits, Still Running</h2>
+    <div class="line"><div class="icon">📋</div><div><span class="who name-john">John</span><span class="say"> Is this round earning its keep?</span></div></div>
+    <div class="line"><div class="icon">🎨</div><div><span class="who name-sally">Sally</span><span class="say"> He's going to say it.</span></div></div>
+    <div class="line"><div class="icon">📊</div><div><span class="who name-mary">Mary</span><span class="say"> Nine months and counting.</span></div></div>
+    <div class="line stage">— Winston and John remain the cold pair; splitting an epic is still the trigger —</div>
+  </div>
+
+  <footer>Room memory updated · installed party · people-management workspace</footer>
+</div>
+</body>
+</html>

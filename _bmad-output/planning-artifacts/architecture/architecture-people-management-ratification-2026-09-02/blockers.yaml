@@ -1,6 +1,6 @@
 version: 2
 baseline_date: 2026-09-02
-revision: 2026-09-02-reviewer-gate-correction
+revision: 2026-09-03-section-matrix-gate-registration
 rule: Open blockers remain fail-closed and are not resolved by ratification
 status_enums:
   - open
@@ -339,10 +339,11 @@ blockers:
   - id: AC-S9-S13
     owner: Access Control
     severity: P1
-    blocks: [Career timeline writes, Mentorship profile projection and closure-note visibility]
+    blocks: [Career timeline writes (S9), Mentorship profile projection and closure-note visibility (S13), CDS registry and CDS directory filters (S12)]
     status: open
     design_status: target-approved-increment-not-approved
     implementation_status: absent
+    decision_refs: [PM/AD-1]
     evidence:
       - docs/project-requirements.md
       - services/backend/src/access-control/application/access-control.facade.ts
@@ -351,6 +352,46 @@ blockers:
       Two different things, reported separately: the target section matrix is approved,
       the increment is not. The facade returns 'none' for every section other than
       S1/S10/S11.
+      2026-09-03 SCOPE RESOLUTION: S12 is owned by THIS entry, not by AC-SECTION-MATRIX-01.
+      The blocks: list previously named only S9 and S13 while the id and closure_condition
+      spanned S9-S13, leaving S12 inside the range and outside the list; PLAT-E6-S6.5 gated
+      S12 on AC-SECTION-MATRIX-01 and platform/epics.md's Gate binding table listed S12 in no
+      row at all. Resolved in favour of this entry's own id and closure condition, which are
+      the registered statement. S12 added to blocks: above; PLAT-E6-S6.5 and the Gate binding
+      table corrected to match. cds/epics.md already used this ID and needed no change.
+      Sections S2-S8 and S14-S16 belong to AC-SECTION-MATRIX-01, registered the same day.
+      Closing this entry unblocks S9, S12 and S13 only, and must never be reported as
+      unblocking any section owned by AC-SECTION-MATRIX-01.
+
+  - id: AC-SECTION-MATRIX-01
+    owner: Access Control
+    severity: P1
+    blocks: [Section resolution for S2-S8 and S14-S16, Risk section S6, Feedback section S8, Action items section S14, Request history section S15]
+    status: open
+    design_status: target-approved-increment-not-approved
+    implementation_status: absent
+    depends_on: []
+    decision_refs: [PM/AD-1]
+    evidence:
+      - docs/project-requirements.md
+      - services/backend/src/access-control/application/access-control.facade.ts
+      - _bmad-output/planning-artifacts/platform/epics.md
+    closure_condition: >
+      An approved AD-1 increment covering S2-S8 and S14-S16, then production evidence.
+      Same shape and same evidence bar as AC-S9-S13; this entry exists because that one's
+      declared scope is S9-S13 and cannot be stretched over the remaining sections.
+    note: >
+      Registered 2026-09-03 to close a gap, not to add a new constraint: the facade already
+      returns 'none' for every section other than S1/S10/S11, so these sections were always
+      blocked - they simply had no ID to cite, and PLAT-E1-S1.1 forbids a coverage gates: ID
+      that does not resolve here. Proposed and used in story text by platform/epics.md
+      (SD-3, PLAT-E6-S6.3..S6.6) since 2026-09-02.
+      Delivered by PLAT-E6. On registration, PM-FR-21, PM-FR-22, PM-FR-26 and PM-FR-35 were
+      repointed here from the AC-S9-S13 stand-in they had carried for S6, S15 and S8, and
+      their GATE SCOPE DEFECT annotations were retired. PM-FR-3 carries both entries because
+      it owns the whole section matrix.
+      Closing AC-S9-S13 unblocks S9, S12 and S13 only and must never be reported as
+      unblocking any section here.
 
   # --- NEW: PREVIOUSLY UNTRACKED (Reviewer Gate 2026-09-02) ---
 
@@ -382,6 +423,36 @@ blockers:
       not deployed, so there is no exploitable surface today. That is a reason to
       sequence the fix before the first shared-environment deploy, not a reason to
       downgrade it. Tracked as transition debt TD-02, re-scoped to P0.
+    status_note: >
+      Implementation evidence exists on the unmerged `dn-um-implementation` branch
+      (services/backend): both interim-session-resolver.adapter.ts and
+      interim-access-control.adapter.ts are deleted. jwt-session-resolver.adapter.ts
+      replaces the session resolver (real JWT verification; the
+      `Bearer <token:persona>` shorthand and `Root` self-provisioning survive only
+      behind ALLOW_TEST_SESSION_TOKENS, refused in production).
+      access-control-facade.adapter.ts replaces isAllowedForTarget with a real
+      per-feature audience/section check. Not merged into main or this docs branch;
+      not through this project's own verification process (cf. QUALITY-GATE-AC's
+      gate-decision.json). Status stays open until merged and independently
+      verified. Recorded 2026-09-03 via bmad-correct-course to pre-empt a
+      stale-status merge conflict.
+
+      Correction, 2026-09-03: the `note` above is partly stale for the backend
+      this docs branch itself points at (gitlink 25afb15), not only for
+      dn-um-implementation. Verified there: path (3) is closed —
+      interim-access-control.adapter.ts is deleted by this branch's own commit
+      979f225 and access-control-facade.adapter.ts implements isAllowedForTarget
+      with real audience resolution for reads and fail-closed for write-path
+      target features. Path (2) is half closed — the Root persona still creates
+      the position 'HR Admin' User row, but the automatic grant of
+      user-management:create|deactivate|list is gone, because isAllowed now
+      delegates to the real FR grant chain with no User.position shortcut.
+      Path (1) is live and unchanged: interim-session-resolver.adapter.ts is
+      still present, so any `Bearer <token:persona>` resolves to a session.
+      Status stays open on path (1) alone. The two
+      interim-access-control.adapter.ts entries in `evidence` no longer resolve
+      at 25afb15; they are kept because they still resolve at the pre-979f225
+      revisions the original assessment was written against.
 
   - id: CC-08
     owner: Architect

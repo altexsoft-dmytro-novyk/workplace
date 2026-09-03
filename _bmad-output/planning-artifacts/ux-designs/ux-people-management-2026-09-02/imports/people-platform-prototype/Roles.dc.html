@@ -1,0 +1,352 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist','Geist Variable',system-ui,-apple-system,sans-serif;color:oklch(0.145 0.004 286);background:oklch(0.985 0 0);-webkit-font-smoothing:antialiased;font-size:13px;line-height:1.45;}
+    a{color:oklch(0.488 0.243 264.376);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    button{font-family:inherit;color:inherit;cursor:pointer;}
+    input{font-family:inherit;font-size:13px;}
+    .app{width:1440px;min-height:1040px;background:oklch(1 0 0);display:flex;flex-direction:column;}
+    .hdr{height:48px;flex:0 0 48px;border-bottom:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);display:flex;align-items:center;gap:16px;padding:0 14px;}
+    .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;width:214px;}
+    .brand .mk{width:22px;height:22px;border-radius:6px;background:oklch(0.488 0.243 264.376);display:flex;align-items:center;justify-content:center;color:#fff;}
+    .search{flex:1;max-width:400px;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 10px;color:oklch(0.556 0.012 286);background:#fff;}
+    .search input{border:0;outline:0;flex:1;background:transparent;}
+    .hdr-r{margin-left:auto;display:flex;align-items:center;gap:12px;color:oklch(0.556 0.012 286);}
+    .avatar{width:28px;height:28px;border-radius:999px;background:oklch(0.92 0.035 264);color:oklch(0.42 0.16 264);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:10.5px;}
+    .body{flex:1;display:flex;min-height:0;}
+    .sb{width:214px;flex:0 0 214px;border-right:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);padding:10px 8px;display:flex;flex-direction:column;gap:1px;}
+    .sb-h{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.62 0.012 286);padding:14px 10px 5px;}
+    .nav{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:oklch(0.32 0.008 286);font-weight:500;}
+    .nav:hover{background:oklch(0.955 0.003 286);}
+    .nav.on{background:oklch(0.205 0.008 286);color:oklch(0.985 0 0);}
+    .nav svg{width:16px;height:16px;flex:0 0 16px;stroke-width:2;}
+    .main{flex:1;min-width:0;display:flex;overflow:hidden;}
+    .rolecol{width:288px;flex:0 0 288px;border-right:1px solid oklch(0.898 0.003 286);padding:16px 14px;overflow:auto;}
+    .rolecol h2{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.52 0.012 286);margin:4px 4px 8px;}
+    .role{padding:10px 11px;border-radius:9px;border:1px solid transparent;cursor:pointer;margin-bottom:3px;}
+    .role:hover{background:oklch(0.965 0.003 286);}
+    .role.on{background:oklch(0.96 0.03 264);border-color:oklch(0.86 0.05 264);}
+    .role .rn{font-weight:600;font-size:13px;display:flex;align-items:center;gap:7px;}
+    .role .rm{color:oklch(0.556 0.012 286);font-size:11.5px;margin-top:2px;}
+    .tag{font-size:9.5px;font-weight:700;letter-spacing:0.03em;text-transform:uppercase;padding:1px 6px;border-radius:999px;background:oklch(0.93 0.05 264);color:oklch(0.40 0.16 264);}
+    .addrole{margin-top:8px;display:flex;gap:6px;}
+    .addrole input{flex:1;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;padding:0 9px;outline:none;}
+    .addrole input:focus{border-color:oklch(0.488 0.243 264.376);box-shadow:0 0 0 3px oklch(0.488 0.243 264.376 / 0.16);}
+    .mini{width:100%;height:32px;border:1px dashed oklch(0.80 0.02 264);border-radius:8px;background:oklch(0.985 0.01 264);color:oklch(0.42 0.12 264);font-weight:600;margin-top:8px;display:flex;align-items:center;justify-content:center;gap:6px;}
+    .mini svg{width:14px;height:14px;}
+    .btn{height:32px;display:inline-flex;align-items:center;gap:6px;padding:0 11px;border-radius:8px;border:1px solid oklch(0.898 0.003 286);background:#fff;font-weight:500;color:oklch(0.28 0.008 286);}
+    .btn:hover{background:oklch(0.965 0.003 286);}
+    .btn.pri{background:oklch(0.488 0.243 264.376);border-color:transparent;color:#fff;}
+    .btn.pri:hover{background:oklch(0.44 0.24 264);}
+    .btn.pri:disabled{opacity:.45;cursor:default;}
+    .perm{flex:1;min-width:0;padding:18px 22px 30px;overflow:auto;}
+    .ph{display:flex;align-items:flex-start;gap:12px;margin-bottom:3px;}
+    .ph h1{font-size:19px;font-weight:600;margin:0;letter-spacing:-0.01em;}
+    .ph .pa{margin-left:auto;display:flex;align-items:center;gap:10px;}
+    .dirty{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:oklch(0.50 0.13 60);}
+    .dot{width:7px;height:7px;border-radius:999px;background:oklch(0.65 0.16 60);}
+    .psub{color:oklch(0.556 0.012 286);font-size:12.5px;margin-bottom:14px;}
+    .assigned{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+    .chip{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 9px 0 4px;border-radius:999px;background:oklch(0.965 0.003 286);border:1px solid oklch(0.91 0.003 286);font-size:11.5px;font-weight:500;}
+    .chip .ini{width:19px;height:19px;border-radius:999px;background:oklch(0.94 0.02 264);color:oklch(0.42 0.14 264);display:inline-flex;align-items:center;justify-content:center;font-weight:700;font-size:8.5px;}
+    .note{display:flex;gap:9px;align-items:flex-start;background:oklch(0.97 0.015 264);border:1px solid oklch(0.90 0.03 264);color:oklch(0.38 0.09 264);border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:18px;}
+    .note svg{width:15px;height:15px;flex:0 0 15px;margin-top:1px;}
+    .grp{margin-bottom:20px;}
+    .grp h3{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.52 0.012 286);margin:0 0 8px;padding-bottom:6px;border-bottom:1px solid oklch(0.92 0.003 286);}
+    .prow{display:flex;align-items:flex-start;gap:11px;padding:8px 6px;border-radius:8px;}
+    .prow:hover{background:oklch(0.978 0.002 286);}
+    .prow input{width:16px;height:16px;margin-top:1px;accent-color:oklch(0.488 0.243 264.376);flex:0 0 16px;}
+    .prow .pt{font-weight:500;}
+    .prow .pk{font-family:'Geist Mono','Geist',ui-monospace,monospace;font-size:10.5px;color:oklch(0.60 0.012 286);margin-left:7px;}
+    .prow .pd{color:oklch(0.556 0.012 286);font-size:11.5px;margin-top:1px;}
+    .derived{display:grid;grid-template-columns:repeat(3, minmax(0,1fr));gap:10px;margin-top:4px;}
+    .dcard{border:1px solid oklch(0.91 0.003 286);border-radius:10px;padding:11px 12px;background:oklch(0.984 0.002 286);}
+    .dcard b{font-size:12.5px;}
+    .dcard p{margin:4px 0 0;color:oklch(0.556 0.012 286);font-size:11px;}
+
+    /* ── stretch layer ─────────────────────────────── */
+    :root{
+      --mono:'Geist Mono',ui-monospace,'SFMono-Regular',monospace;
+      --line:oklch(0.912 0.004 286);
+      --ink-2:oklch(0.44 0.008 286);--ink-3:oklch(0.57 0.010 286);
+      --blue:oklch(0.52 0.20 264);--amber:oklch(0.58 0.12 66);
+      --green:oklch(0.55 0.13 155);--violet:oklch(0.54 0.17 300);
+      --accent:var(--blue);
+    }
+    @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+    .btn,.role,.prow,.mini{transition:all .14s ease;}
+    .pghd{position:relative;padding:0 0 14px 15px;margin-bottom:16px;border-bottom:1px solid var(--line);}
+    .pghd::before{content:"";position:absolute;left:0;top:1px;height:44px;width:3px;border-radius:2px;background:var(--accent);}
+    .eyebrow{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap;}
+    .eyebrow .sep{opacity:.4;}
+    .pgrow{display:flex;align-items:flex-start;gap:14px;}
+    .pgrow h1{font-size:22px;font-weight:600;letter-spacing:-0.02em;margin:0;line-height:1.15;}
+    .pgacts{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+    .pglead{color:var(--ink-2);font-size:12.5px;margin-top:7px;max-width:640px;}
+    .prov{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px 2px 6px;border-radius:5px;border-left:2px solid currentColor;white-space:nowrap;}
+    .prov svg{width:10px;height:10px;stroke-width:2.2;}
+    .prov.derived{background:oklch(0.969 0.022 300);color:oklch(0.46 0.13 300);}
+    .prov.feature{background:oklch(0.968 0.03 264);color:oklch(0.44 0.15 264);}
+    .role.on{box-shadow:inset 2px 0 0 var(--accent);}
+    .tag{font-family:var(--mono);letter-spacing:0.04em;}
+    .grantcount{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:0.02em;}
+    .zerogrant{display:flex;gap:9px;align-items:flex-start;background:oklch(0.975 0.03 78);border:1px dashed oklch(0.85 0.06 78);color:oklch(0.44 0.10 68);border-radius:10px;padding:10px 12px;font-size:12px;margin-bottom:16px;}
+    .zerogrant svg{width:15px;height:15px;flex:0 0 15px;margin-top:1px;}
+  </style>
+</helmet>
+
+<div class="app">
+  <div class="hdr">
+    <div class="brand"><span class="mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20v-6a8 8 0 0 1 16 0v6"/><circle cx="12" cy="7" r="3"/></svg></span> PeoplePlatform</div>
+    <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input placeholder="Search" /></div>
+    <div class="hdr-r"><span class="avatar">DN</span></div>
+  </div>
+  <div class="body">
+    <nav class="sb">
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg> Home</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> My workspace</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg> All Employees</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Dashboards</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Resourcing</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Risks</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg> Mentorship</div>
+      <div class="sb-h">Administration</div>
+      <div class="nav on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Roles &amp; permissions</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg> Custom fields</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/></svg> Departments</div>
+    </nav>
+
+    <div class="main">
+      <div class="rolecol">
+        <h2>Functional roles</h2>
+        <sc-for list="{{roles}}" as="r" hint-placeholder-count="6">
+          <div class="role {{r.cls}}" onClick="{{ r.onClick }}">
+            <div class="rn">{{r.name}}<sc-if value="{{r.custom}}" hint-placeholder-val="{{ false }}"><span class="tag">Custom</span></sc-if></div>
+            <div class="rm">{{r.meta}}</div>
+          </div>
+        </sc-for>
+        <sc-if value="{{adding}}" hint-placeholder-val="{{ false }}">
+          <div class="addrole">
+            <input placeholder="New role name" value="{{newName}}" onInput="{{ onNewName }}" />
+            <button class="btn pri" onClick="{{ onCreateRole }}">Add</button>
+          </div>
+        </sc-if>
+        <sc-if value="{{notAdding}}" hint-placeholder-val="{{ true }}">
+          <button class="mini" onClick="{{ onStartAdd }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14"/><path d="M5 12h14"/></svg>New functional role</button>
+        </sc-if>
+
+        <h2 style="margin-top:22px;display:flex;align-items:center;gap:8px;">Access roles <span class="prov derived"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 15 15 9"/><path d="M12 6.5 13.6 4.9a4 4 0 0 1 5.6 5.6L17.6 12"/><path d="M12 17.5 10.4 19.1a4 4 0 0 1-5.6-5.6L6.4 12"/></svg>Derived</span></h2>
+        <div class="derived">
+          <div class="dcard"><b>Employee</b><p>Everyone. Self + colleague view.</p></div>
+          <div class="dcard"><b>Manager</b><p>Reports-to, department, project closure.</p></div>
+          <div class="dcard"><b>People Partner</b><p>Assignment + HR reporting line.</p></div>
+        </div>
+        <p style="color:oklch(0.60 0.012 286);font-size:10.5px;margin:8px 4px 0;">Derived from relationships on every request. Not editable here.</p>
+      </div>
+
+      <div class="perm">
+        <div class="pghd">
+          <div class="eyebrow">
+            Administration <span class="sep">/</span> Roles &amp; permissions
+            <span class="prov feature"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg>Unlocks features, not data</span>
+          </div>
+          <div class="pgrow">
+            <h1>{{roleName}}</h1>
+            <div class="pgacts">
+              <sc-if value="{{dirty}}" hint-placeholder-val="{{ false }}"><span class="dirty"><span class="dot"></span>Unsaved changes</span></sc-if>
+              <button class="btn">Duplicate</button>
+              <button class="btn pri" disabled="{{saveDisabled}}" onClick="{{ onSave }}">Save role</button>
+            </div>
+          </div>
+          <div class="pglead">{{roleDesc}}</div>
+        </div>
+
+        <div class="assigned">
+          <span class="grantcount">{{grantLabel}}</span>
+          <span style="width:1px;height:14px;background:var(--line);"></span>
+          <span style="font-size:11.5px;font-weight:600;color:oklch(0.45 0.008 286);">{{assignCount}} people assigned</span>
+          <sc-for list="{{assignees}}" as="a" hint-placeholder-count="3">
+            <span class="chip"><span class="ini">{{a.ini}}</span>{{a.name}}</span>
+          </sc-for>
+          <button class="btn" style="height:26px;font-size:11.5px;">Manage assignments</button>
+        </div>
+
+        <sc-if value="{{noGrants}}" hint-placeholder-val="{{ false }}">
+          <div class="zerogrant">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4"/><path d="M12 16h.01"/></svg>
+            This role grants no features yet. Its holders keep their derived data access, but see nothing extra until you turn on permissions below.
+          </div>
+        </sc-if>
+
+        <div class="note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+          A functional role unlocks features only — it never widens what data its holders can see. Where a feature needs data it operates inside the holder's derived access tier. Removing a permission takes effect immediately for everyone holding this role.
+        </div>
+
+        <sc-for list="{{groups}}" as="g" hint-placeholder-count="4">
+          <div class="grp">
+            <h3>{{g.title}}</h3>
+            <sc-for list="{{g.perms}}" as="p" hint-placeholder-count="4">
+              <label class="prow">
+                <input type="checkbox" checked="{{p.on}}" onChange="{{ p.onToggle }}" />
+                <span>
+                  <span class="pt">{{p.label}}<span class="pk">{{p.key}}</span></span>
+                  <span class="pd">{{p.desc}}</span>
+                </span>
+              </label>
+            </sc-for>
+          </div>
+        </sc-for>
+
+        <p style="color:oklch(0.60 0.012 286);font-size:11px;margin-top:4px;">Default grants are drafted from the requirements and confirmed with the PO before launch — three points still open: who manages custom fields, who assigns mentors, and the defaults for candidate approval, timeline edits and feedback.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.roleDefs = [
+      { id: 'hr-admin', name: 'HR Admin', custom: false, desc: 'Administration of the platform itself. Grants no data access.', meta: 'Feature admin · no data access', assignees: [{ ini: 'KB', name: 'Kateryna Bondar' }] },
+      { id: 'unit-manager', name: 'Unit Manager', custom: false, desc: 'Department dashboard grouped by people. Resourcing fulfilment, risks, action items, mentorship, CDS for their people.', meta: 'Department managers', assignees: [{ ini: 'BS', name: 'Bohdan Serik' }, { ini: 'EC', name: 'Elena Costa' }] },
+      { id: 'delivery-manager', name: 'Delivery Manager', custom: false, desc: 'Delivery dashboard grouped by project. Creates requests, reviews candidates, closes requests.', meta: 'Delivery leads', assignees: [{ ini: 'BS', name: 'Bohdan Serik' }] },
+      { id: 'project-manager', name: 'Project Manager', custom: false, desc: 'Delivery dashboard scoped to own projects. Creates requests for their projects.', meta: 'Project leads', assignees: [{ ini: 'DN', name: 'Dmytro Novak' }] },
+      { id: 'people-partner', name: 'People Partner', custom: false, desc: 'People Partner dashboard. Profiles, timeline, CDS, feedback, campaigns, risks, departures. No resourcing.', meta: 'HR partners', assignees: [{ ini: 'GO', name: 'Grace Owens' }] },
+      { id: 'it-campaigns', name: 'IT Security Campaigns', custom: true, desc: 'Created through the UI so the IT team can run security-awareness campaigns without managerial access.', meta: 'Custom · created 2026-08-28', assignees: [{ ini: 'FA', name: 'Farid Aliyev' }] }
+    ];
+    this.groups = [
+      {
+        title: 'Resourcing', perms: [
+          { key: 'resourcing:request-create', label: 'Create resourcing requests', desc: 'DM and PM raise vacancy requests routed to a department.' },
+          { key: 'resourcing:request-fulfil', label: 'Fulfil resourcing requests', desc: 'Propose internal or external candidates for a routed request.' },
+          { key: 'resourcing:candidate-decide', label: 'Approve or reject proposed candidates', desc: 'Fills one headcount slot, or rejects with a written reason.' },
+          { key: 'resourcing:request-close', label: 'Close resourcing requests', desc: 'Only an explicit close ends a request.' }
+        ]
+      },
+      {
+        title: 'People operations', perms: [
+          { key: 'campaign:create', label: 'Create form campaigns', desc: 'Build an audience with the All Employees filter engine.' },
+          { key: 'action-item:create', label: 'Create action items', desc: 'Within the holder’s own access scope.' },
+          { key: 'risk:write', label: 'Create and edit risks', desc: 'Risk levels move freely between states; never visible to the employee.' },
+          { key: 'mentorship:assign', label: 'Assign and end mentorships', desc: 'Company-wide mentor pool; mentee selection stays in access scope.' },
+          { key: 'cds:maintain', label: 'Maintain CDS records', desc: 'Assessment log, conclusions, IDPs.' },
+          { key: 'timeline:edit', label: 'Edit the career timeline', desc: 'Manual add, edit and delete of generated events.' },
+          { key: 'feedback:create', label: 'Create feedback', desc: 'Management-only by default, or shared with the employee.' },
+          { key: 'departure:record', label: 'Record a departure', desc: 'Sets employment status; blocked while the person still manages or partners anyone.' }
+        ]
+      },
+      {
+        title: 'Administration', perms: [
+          { key: 'custom-field:manage', label: 'Manage custom fields', desc: 'Define profile fields usable immediately as filters and columns.' },
+          { key: 'department:manage', label: 'Manage departments', desc: 'Departments nest; changes are an access switch.' },
+          { key: 'org-relationship:change', label: 'Change organisational relationships', desc: 'Manager, people partner, department, department manager. Dedicated screen, no self-assignment, journaled.' }
+        ]
+      },
+      {
+        title: 'Dashboards', perms: [
+          { key: 'dashboard:view', label: 'View a given dashboard', desc: 'Independently grantable per dashboard; data stays bounded by the viewer’s tier.' }
+        ]
+      }
+    ];
+    this.state = {
+      sel: 'unit-manager',
+      grants: {
+        'hr-admin': this.set(['custom-field:manage', 'department:manage']),
+        'unit-manager': this.set(['resourcing:request-fulfil', 'action-item:create', 'risk:write', 'mentorship:assign', 'cds:maintain', 'feedback:create', 'dashboard:view']),
+        'delivery-manager': this.set(['resourcing:request-create', 'resourcing:candidate-decide', 'resourcing:request-close', 'action-item:create', 'risk:write', 'cds:maintain', 'feedback:create', 'dashboard:view']),
+        'project-manager': this.set(['resourcing:request-create', 'action-item:create', 'risk:write', 'cds:maintain', 'dashboard:view']),
+        'people-partner': this.set(['campaign:create', 'action-item:create', 'risk:write', 'mentorship:assign', 'cds:maintain', 'timeline:edit', 'feedback:create', 'departure:record', 'org-relationship:change', 'dashboard:view']),
+        'it-campaigns': this.set(['campaign:create'])
+      },
+      dirty: false,
+      adding: false,
+      newName: '',
+      extra: []
+    };
+  }
+
+  set(keys) { const o = {}; keys.forEach(k => { o[k] = true; }); return o; }
+
+  select(id) { this.setState({ sel: id }); }
+  toggle(key) {
+    const grants = Object.assign({}, this.state.grants);
+    const r = Object.assign({}, grants[this.state.sel] || {});
+    if (r[key]) delete r[key]; else r[key] = true;
+    grants[this.state.sel] = r;
+    this.setState({ grants, dirty: true });
+  }
+  save() { this.setState({ dirty: false }); }
+  startAdd() { this.setState({ adding: true }); }
+  createRole() {
+    const name = this.state.newName.trim();
+    if (!name) return;
+    const id = 'custom-' + (this.state.extra.length + 1);
+    const grants = Object.assign({}, this.state.grants);
+    grants[id] = {};
+    this.setState({
+      extra: this.state.extra.concat([{ id, name, custom: true, desc: 'Custom functional role created through the UI. No deploy, no schema change.', meta: 'Custom · just now', assignees: [] }]),
+      grants, adding: false, newName: '', sel: id, dirty: true
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const allRoles = this.roleDefs.concat(s.extra);
+    const cur = allRoles.find(r => r.id === s.sel) || allRoles[0];
+    const g = s.grants[s.sel] || {};
+    const grantN = Object.keys(g).filter(k => g[k]).length;
+    let totalPerms = 0;
+    this.groups.forEach(grp => { totalPerms += grp.perms.length; });
+
+    return {
+      grantLabel: grantN + ' / ' + totalPerms + ' permissions',
+      noGrants: grantN === 0,
+      roles: allRoles.map(r => ({
+        id: r.id, name: r.name, custom: r.custom,
+        meta: r.meta,
+        cls: s.sel === r.id ? 'on' : '',
+        onClick: () => this.select(r.id)
+      })),
+      adding: s.adding,
+      notAdding: !s.adding,
+      newName: s.newName,
+      onNewName: (e) => this.setState({ newName: e.target.value }),
+      onStartAdd: () => this.startAdd(),
+      onCreateRole: () => this.createRole(),
+
+      roleName: cur.name,
+      roleDesc: cur.desc,
+      assignCount: (cur.assignees || []).length,
+      assignees: cur.assignees || [],
+
+      dirty: s.dirty,
+      saveDisabled: !s.dirty,
+      onSave: () => this.save(),
+
+      groups: this.groups.map(grp => ({
+        title: grp.title,
+        perms: grp.perms.map(p => ({
+          key: p.key, label: p.label, desc: p.desc,
+          on: !!g[p.key],
+          onToggle: () => this.toggle(p.key)
+        }))
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

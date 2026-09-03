@@ -7,6 +7,9 @@ inputDocuments:
   - docs/architecture/database-schema.md
   - docs/test-cases/user-management/README.md
   - docs/project-requirements.md
+slice: user-management
+id_namespace: UM-E{epic}-S{story}
+updated: 2026-09-03
 ---
 
 # people management - Epic Breakdown
@@ -97,6 +100,9 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 | FR-10 | Epic 4 — manager, PP, employee-department, and department-manager changes |
 | FR-6 | Epic 5 — record and apply departure |
 | FR-14 | Handoff — dedicated Mentorship epic, outside User Management |
+| FR-17 (custom-field clause only) | Epic 6, Epic 7 — see note below |
+
+> **Note (2026-09-03, `bmad-create-epics-and-stories` re-entry for `PM-FR-5`).** `FR-17`'s row above names five things as one deferred "Profile Projection story": S10/S11 colleague narrowing, S16 per-field custom-field visibility, S7/S8 flags, and S1 derived-field immutability. That placeholder predates this document's own Epic 0 sequencing note ("the FR-17 Profile Projection story owns only the S10/S11/S16 colleague views... and is decoupled from this epic") and has never been written as an actual epic — no story body for it exists anywhere in this file. This pass writes the **S16 custom-field-visibility** slice of that placeholder as Epic 6 and Epic 7, closing that portion. The S10/S11 colleague-narrowing, S7/S8 flag, and S1 derived-field-immutability portions remain unwritten and out of this pass's requested scope (`PM-FR-5`, `PM-FR-6`, `PM-FR-9` only) — they stay a real, recorded gap under the global coverage model's `PM-FR-4` alias (`aliases: [UM-FR-16, UM-FR-17]`), not silently closed by Epic 6/7's existence.
 
 ## Epic List
 
@@ -128,6 +134,22 @@ Holders of the dedicated permission change manager, People Partner, employee dep
 Authorized HR actors record departure and the platform applies its complete effective-date outcome. Implementation remains blocked until CC-06 defines the scheduled state and executor.
 **FRs covered:** FR-6
 
+### Epic 6: Custom Fields as Data
+*(added 2026-09-03, `bmad-create-epics-and-stories` re-entry — closes the S16 custom-field-visibility slice of the `FR-17` "deferred Profile Projection story" placeholder; see the FR Coverage Map note above)*
+
+A holder of `manage custom fields` (role-administration's catalog) defines a new custom field with a declared visibility level, values are set on profiles through typed EAV storage (PM/AD-32), and a viewer's profile response includes a field's value only when both their resolved section access and the field's own visibility permit it.
+**FRs covered:** PM-FR-5 (storage + declared visibility half)
+**Depends on (outside this file):** `role-administration/epics.md` Epic RA-E1 — the `manage custom fields` permission key and a working `isAllowed` must exist before this epic's enforcement has anything to check. **Do not stub the check** — `interim-access-control.adapter.ts`'s `Boolean(userId)` pattern (`SEC-AUTH-01`) is the negative example this epic must not repeat.
+**Cross-boundary note:** visibility is *declared* here and *stored* here, but it is *enforced* by `access-control`'s facade before filter/sort execution (PM/AD-32) — this epic supplies data, not the enforcement point. `PLAT-E6-S6.6` (S16 section-matrix resolution) consumes `CustomFieldDefinition.visibility` from this epic's storage.
+
+### Epic 7: Visibility-Safe Filtering and Columns
+*(same addition)*
+
+A directory user's columns, sort options, filter options, and filter results for any custom field are limited to values their resolved tier actually permits — no combination of filters, including result-count differencing, lets a viewer infer a value they cannot see.
+**FRs covered:** PM-FR-5 (anti-inference completion)
+**Depends on:** Epic 6 (this file)
+**Gate note:** `PMC-E1-S1.8` (`platform-capabilities/epics.md`) and `PLAT-E6-S6.6` (`platform/epics.md`) both gate specifically on **this epic**, not on Epic 6 alone — closing Epic 6 without Epic 7 would ship custom-field filtering ahead of anti-inference enforcement, the exact NFR-1 critical leak both of those stories were sequenced last to avoid. Per their own recorded text, the two must not be unblocked independently of each other.
+
 ### Epic Sequencing / Parallelization
 
 Per project-requirements.md §8.2 (NORMATIVE, graded): "a situation where one person waits for another is unacceptable." Reading the epic list top-to-bottom as one dependency chain would violate that — but the real build-time dependency is looser than the product narrative suggests, per AD-3 (stage-2 E2E tests bind against fixture-seeded data in the real test DB, not against another epic's live HTTP endpoint):
@@ -150,6 +172,8 @@ The Access Control Kernel MVP is built and headless: `AppModule` resolves `Acces
 **Sequencing:** Story 0.1 can start now (ACM-8 done). Story 0.2 is conditional on the missing-`user-management:edit`-permission decision. There is no Story 0.3.
 
 ### Story 0.1: Adopt the Read Path and Rebind the Port (UMAC-1)
+
+**ID:** `UM-E0-S0.1` · **Sprint key:** `0-1-adopt-read-path-and-rebind-port`
 
 As the platform,
 I want `/users/:id` target-scoped authorization resolved by the real `AccessControlFacade` and `GET /users/:id` to return the S1 identity card,
@@ -175,6 +199,8 @@ So that a session reads an identity card only when it resolves to an active audi
 
 ### Story 0.2: Adopt the Write Path Dual Gate (UMAC-2) — CONDITIONAL
 
+**ID:** `UM-E0-S0.2` · **Sprint key:** `0-2-adopt-write-path-dual-gate`
+
 As the platform,
 I want `PATCH /users/:id` and `PUT /users/:id/photo` gated by both the functional permission and `write` S1 section access,
 So that identity mutation obeys the §2.2 dual gate.
@@ -199,6 +225,8 @@ Entitled actors manage identity records over the imported population (§4.17): p
 **FRs covered:** FR-1, FR-4, FR-5a, FR-7, FR-9, FR-15
 
 ### Story 1.1: Import Seeded Population
+
+**ID:** `UM-E1-S1.1` · **Sprint key:** `1-1-import-seeded-population`
 
 As the system operator,
 I want the employee population imported from the delivered timetracker export (`docs/Accounts_template.csv`),
@@ -234,6 +262,8 @@ So that all features operate over a fixed set of users without any creation, AD,
 
 ### Story 1.2: View and Edit an Employee's Identity-Card Fields
 
+**ID:** `UM-E1-S1.2` · **Sprint key:** `1-2-view-and-edit-an-employee-s-identity-card-fields`
+
 As an actor whose access audience and functional capability both permit the operation,
 I want to read and edit an employee's S1 identity-card fields,
 So that identity data stays accurate without bypassing the two-dimensional access model.
@@ -260,6 +290,8 @@ Self reads S1 and can write only their photo through Story 1.3. Manager, People 
 
 ### Story 1.3: Self Uploads Own Photo
 
+**ID:** `UM-E1-S1.3` · **Sprint key:** `1-3-self-uploads-own-photo`
+
 As an employee,
 I want to upload my own profile photo,
 So that my identity card shows an accurate photo without anyone else's help.
@@ -272,6 +304,8 @@ So that my identity card shows an accurate photo without anyone else's help.
 **And** a subsequent `GET /users/<aliceId>` reflects the same value (FR-9; traces `um-pf-02`)
 
 ### Story 1.5: List Employees with Pagination and Filters
+
+**ID:** `UM-E1-S1.5` · **Sprint key:** `1-5-list-employees-with-pagination-and-filters`
 
 As an entitled actor,
 I want to list employees with pagination and filters on identity-card fields,
@@ -303,6 +337,8 @@ Any active employee in the imported population can request a magic link and log 
 
 ### Story 2.1: Request a Magic Link by Work Email
 
+**ID:** `UM-E2-S2.1` · **Sprint key:** `2-1-request-a-magic-link-by-work-email`
+
 As an employee,
 I want to request a magic link sent to my work email,
 So that I can log in without ever needing a password.
@@ -319,6 +355,8 @@ So that I can log in without ever needing a password.
 **And** no email is actually dispatched, asserted against the email-adapter fake at stage 2 (traces `um-auth-02`)
 
 ### Story 2.2: Consume a Magic-Link Token to Establish a Session
+
+**ID:** `UM-E2-S2.2` · **Sprint key:** `2-2-consume-a-magic-link-token-to-establish-a-session`
 
 As an employee,
 I want to consume my magic-link token,
@@ -353,6 +391,8 @@ The system records every v1.5 career event through the owning context. Manual ad
 
 ### Story 3.1: System Auto-Generates Career Timeline Events
 
+**ID:** `UM-E3-S3.1` · **Sprint key:** `3-1-system-auto-generates-career-timeline-events`
+
 As the system,
 I want to write a career-timeline event whenever any tracked change occurs,
 So that every audience entitled to S9 sees an accurate history without manual duplication.
@@ -377,6 +417,8 @@ So that every audience entitled to S9 sees an accurate history without manual du
 
 ### Story 3.2: Authorized Actor Manually Adds a Backfill Entry
 
+**ID:** `UM-E3-S3.2` · **Sprint key:** `3-2-authorized-actor-manually-adds-a-backfill-entry`
+
 As an actor with S9 write access and the *edit the career timeline* permission,
 I want to manually add a career-timeline entry,
 So that I can backfill history that predates the system (the legacy Excel headcount record).
@@ -397,6 +439,8 @@ So that I can backfill history that predates the system (the legacy Excel headco
 **Then** the request is denied and no event is written
 
 ### Story 3.3: Authorized Actor Edits or Deletes an Event
+
+**ID:** `UM-E3-S3.3` · **Sprint key:** `3-3-authorized-actor-edits-or-deletes-an-event`
 
 As an actor with S9 write access and the *edit the career timeline* permission,
 I want to correct a wrongly-inferred event or delete one that shouldn't exist,
@@ -424,6 +468,8 @@ Holders of the dedicated permission change the four organisational facts that al
 
 ### Story 4.1: Change an Employee's Manager
 
+**ID:** `UM-E4-S4.1` · **Sprint key:** `4-1-change-an-employee-s-manager`
+
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's manager on the dedicated screen,
 So that reports-to access reflects the current organisation without being editable through S1.
@@ -446,6 +492,8 @@ So that reports-to access reflects the current organisation without being editab
 
 ### Story 4.2: Change an Employee's People Partner
 
+**ID:** `UM-E4-S4.2` · **Sprint key:** `4-2-change-an-employee-s-people-partner`
+
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's People Partner,
 So that PP access and the HR-line chain reflect the current assignment.
@@ -464,6 +512,8 @@ So that PP access and the HR-line chain reflect the current assignment.
 **Then** self-assignment is rejected and the current assignment remains
 
 ### Story 4.3: Change Employee Department or Department Manager
+
+**ID:** `UM-E4-S4.3` · **Sprint key:** `4-3-change-employee-department-or-department-manager`
 
 As a holder of the *change organisational relationships* permission,
 I want to change an employee's department or a department's manager,
@@ -492,6 +542,8 @@ Authorized HR actors record departure and the platform applies the complete effe
 
 ### Story 5.1: Record a Departure
 
+**ID:** `UM-E5-S5.1` · **Sprint key:** `5-1-record-a-departure`
+
 As an actor with the *record a departure* permission,
 I want to record an employee's effective departure date and reason,
 So that the lifecycle change is scheduled without changing current status early.
@@ -510,6 +562,8 @@ So that the lifecycle change is scheduled without changing current status early.
 
 ### Story 5.2: Apply an Effective Departure
 
+**ID:** `UM-E5-S5.2` · **Sprint key:** `5-2-apply-an-effective-departure`
+
 As the platform,
 I want to apply a recorded departure exactly once on its effective date,
 So that the employee and every access they hold leave the active system consistently.
@@ -525,6 +579,132 @@ So that the employee and every access they hold leave the active system consiste
 **Given** the executor retries the same departure after a partial or uncertain failure
 **When** processing resumes
 **Then** the outcome is idempotent and no duplicate status, cancellation, closure, or journal effect is created
+
+## Epic 6: Custom Fields as Data
+
+*(added 2026-09-03 — see FR Coverage Map note)*
+
+### Story 6.1: Define a Custom Field with Declared Visibility
+
+**ID:** `UM-E6-S6.1` · **Sprint key:** `6-1-define-a-custom-field-with-declared-visibility`
+
+As a holder of the *manage custom fields* permission,
+I want to define a new custom field with a type and a visibility level,
+So that organisational data the product didn't ship with can be captured without a deploy or migration.
+
+**Acceptance Criteria:**
+
+**Given** an actor holds `manage custom fields` (role-administration's catalog, via `isAllowed`)
+**When** they submit a field definition (type: text/number/date/single-select/multi-select/boolean; visibility: management/employee/colleague)
+**Then** a `CustomFieldDefinition` row is created with no schema migration (PM/AD-32)
+
+**Given** an actor without `manage custom fields`
+**When** they attempt to create a field
+**Then** the request is denied via role-administration's `isAllowed` — the check is never stubbed or bypassed
+
+**Given** no visibility is specified
+**When** the field is created
+**Then** it defaults to `management` (§3.3.6)
+
+### Story 6.2: Set and Store Custom Field Values
+
+**ID:** `UM-E6-S6.2` · **Sprint key:** `6-2-set-and-store-custom-field-values`
+
+As a user entitled to edit a profile's custom field,
+I want to set its value,
+So that the field carries real organisational data.
+
+**Acceptance Criteria:**
+
+**Given** a `CustomFieldDefinition` exists
+**When** a value is set for a user
+**Then** it is written to typed `CustomFieldValue` storage (`valueText`/`valueNumber`/`valueDate`/`valueBool`/`valueJson` per type; multi-select uses `valueJson`) — never to the `User.customFields` jsonb bag (TD-12)
+
+**Given** the partial unique constraint `(userId, fieldId)`
+**When** a value is set twice for the same user and field
+**Then** the second write updates the existing row rather than creating a duplicate
+
+### Story 6.3: Custom Field Values Respect Section-Level Access
+
+**ID:** `UM-E6-S6.3` · **Sprint key:** `6-3-custom-field-values-respect-section-level-access`
+
+As a viewer of a profile,
+I want a custom field's value to appear only when my resolved access and the field's visibility both permit it,
+So that a field never leaks through the section it happens to render in.
+
+**Acceptance Criteria:**
+
+**Given** a field with visibility `colleague`
+**When** a colleague-tier viewer opens the profile
+**Then** the value is present in the response
+
+**Given** a field with visibility `management` (default)
+**When** a Self- or colleague-tier viewer opens the profile
+**Then** the value is absent from the response body entirely — not hidden client-side (§3.3 rule 1)
+
+**Given** this story
+**When** `access-control`'s facade is consulted for the section decision
+**Then** this epic supplies data and declared visibility only; the enforcement point itself belongs to `access-control`, consumed here read-only
+
+## Epic 7: Visibility-Safe Filtering and Columns
+
+*(added 2026-09-03 — see FR Coverage Map note)*
+
+### Story 7.1: S16 Section-Matrix Resolution for Custom Fields
+
+**ID:** `UM-E7-S7.1` · **Sprint key:** `7-1-s16-section-matrix-resolution-for-custom-fields`
+
+As the access-control facade,
+I want the S16 section decision to resolve per-field visibility rather than one uniform rule,
+So that the one section whose permission is not uniform across its own audience is handled correctly.
+
+*(Reordered ahead of "Columns and Filters" at Step 4 — the filter/column story reads a per-field visibility signal that only this story's facade change produces; sequencing it second would have been a forward dependency.)*
+
+**Acceptance Criteria:**
+
+**Given** each §3.2 audience
+**When** S16 is resolved
+**Then** Reporting line, Project line, and PP resolve `RW`, while Self and Colleague resolve **per-field visibility** — the only matrix cell whose permission is not uniform across the section (mirrors `PLAT-E6-S6.6`'s own framing)
+
+**Given** `AC-SECTION-MATRIX-01` (P1, registered 2026-09-03, owns S16 among other sections)
+**When** this story is scheduled
+**Then** it stays gated on that registration closing — this story does not attempt to bypass or duplicate the gate, which remains architect-owned per Platform SD-3
+
+**Given** this story and Story 7.2 both ship
+**When** `PLAT-E6-S6.6` and `PMC-E1-S1.8` are re-evaluated
+**Then** both may be unblocked — but **only together**, matching their own recorded "must not be unblocked independently" constraint
+
+### Story 7.2: Custom-Field Columns and Filters Read Only Entitled Values
+
+**ID:** `UM-E7-S7.2` · **Sprint key:** `7-2-custom-field-columns-and-filters-read-only-entitled-values`
+
+As a directory user,
+I want custom-field columns and filters to show me only values I'm entitled to see,
+So that I can never infer a hidden value through a filter side channel.
+
+**Depends on:** Story 7.1 — the per-field visibility signal this story filters on is what 7.1's facade resolution produces.
+
+**Acceptance Criteria:**
+
+**Given** a custom field whose visibility excludes a viewer
+**When** they inspect columns, sort options, and filter options
+**Then** the field is absent from all three
+
+**Given** a custom field whose visibility excludes a viewer for a specific target
+**When** any combination of filters is applied
+**Then** no combination — enumerated mechanically, not sampled — lets the viewer infer that target's value, including by comparing result counts across filter permutations
+
+**Given** a select-type custom field
+**When** a viewer filters on it
+**Then** the offered option list contains only values they are entitled to see
+
+**Given** a filter or sort reads a custom field
+**When** storage is accessed
+**Then** it reads typed `CustomFieldValue` (PM/AD-32), never `User.customFields` (TD-12)
+
+**Given** visibility enforcement
+**When** it runs relative to filter and sort execution
+**Then** it runs **before** — not after, not concurrently (PM/AD-32's explicit ordering rule, §3.3.6)
 
 ## Mentorship Handoff
 

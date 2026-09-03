@@ -1,0 +1,128 @@
+{
+  "artboards": [
+    {
+      "file": "Main.dc.html",
+      "title": "All Employees",
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1140,
+      "is_interactive": true
+    },
+    {
+      "file": "Dashboards.dc.html",
+      "title": "Configurable dashboards",
+      "x": 1560,
+      "y": 0,
+      "w": 1440,
+      "h": 1240,
+      "is_interactive": true
+    },
+    {
+      "file": "Roles.dc.html",
+      "title": "Roles & permissions",
+      "x": 3120,
+      "y": 0,
+      "w": 1440,
+      "h": 1140,
+      "is_interactive": true
+    },
+    {
+      "file": "CustomFields.dc.html",
+      "title": "Custom fields",
+      "x": 4680,
+      "y": 0,
+      "w": 1440,
+      "h": 1100,
+      "is_interactive": true
+    },
+    {
+      "file": "Profile.dc.html",
+      "title": "Access preview (HR Admin)",
+      "x": 6240,
+      "y": 0,
+      "w": 1440,
+      "h": 1360,
+      "is_interactive": true
+    },
+    {
+      "file": "MyLeaves.dc.html",
+      "title": "Self-service — My time off",
+      "x": 7800,
+      "y": 0,
+      "w": 1440,
+      "h": 1200,
+      "is_interactive": true
+    },
+    {
+      "file": "TeamCalendar.dc.html",
+      "title": "Absence calendar (organisation)",
+      "x": 9360,
+      "y": 0,
+      "w": 1440,
+      "h": 1160,
+      "is_interactive": true
+    }
+  ],
+  "annotations": [
+    {
+      "id": "intro",
+      "x": 0,
+      "y": -150,
+      "w": 640,
+      "text": "People Management Platform — interactive prototype\nZinc + Blue / shadcn / Geist, matching services/frontend tokens. Each artboard is independently clickable; cross-screen navigation is not wired."
+    },
+    {
+      "id": "n-main",
+      "x": 0,
+      "y": 1180,
+      "w": 460,
+      "text": "All Employees: click column headers to sort, use the filter selects and name search, switch saved-view tabs, toggle Colleague view to see the API whitelist, select rows for the bulk bar. Leave status is a synced column."
+    },
+    {
+      "id": "n-dash",
+      "x": 1560,
+      "y": 1280,
+      "w": 460,
+      "text": "Dashboards: switch UM/DM/PM/PP presets, hit Customize to add widgets from the catalog or remove them, and New dashboard to create one from a preset with a visibility choice. People widgets carry risk, project and leave status."
+    },
+    {
+      "id": "n-roles",
+      "x": 3120,
+      "y": 1180,
+      "w": 460,
+      "text": "Roles & permissions: pick a functional role, toggle feature permissions (Save enables when dirty), add a new role. Access roles stay derived, shown read-only."
+    },
+    {
+      "id": "n-cf",
+      "x": 4680,
+      "y": 1140,
+      "w": 460,
+      "text": "Custom fields: Add field opens the form (options appear for select types), toggle the per-row Column switch, delete a field. Visibility drives who can filter on it."
+    },
+    {
+      "id": "n-profile",
+      "x": 6240,
+      "y": 1400,
+      "w": 480,
+      "text": "Access preview: an HR Admin-only tool for checking the access model. Switch the audience to watch sections appear, drop to read-only, or fall out of the response entirely. S10 shows the colleague dates-only narrowing when you pick Colleague."
+    },
+    {
+      "id": "n-leaves",
+      "x": 7800,
+      "y": 1240,
+      "w": 480,
+      "text": "Self-service time off: leaves are synced read-only from the timetracker (dates, type, status) with a link-out. Flip the Demo toggle to 'Sync down' to see the stale-data banner and the 4h project-access fallback. The 'Request time off' panel (vacation / sick / move a working day) is marked Proposed — it is beyond the current pull-only spec and would need a documented write path."
+    },
+    {
+      "id": "n-cal",
+      "x": 9360,
+      "y": 1200,
+      "w": 480,
+      "text": "Absence calendar: the org-wide counterpart to My time off — same synced source (timetracker, read-only), a month grid with multi-day bars per person coloured by leave type, cancelled leave shown dashed and struck through, moved working days as single-day markers. Page through months, filter by department or name, hit Today to return to the current month. Same 'Sync down' demo toggle and stale banner as the self-service screen."
+    }
+  ],
+  "launch": {
+    "view": "canvas"
+  }
+}

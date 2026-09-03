@@ -4,3 +4,8 @@
 .env
 .worktrees/
 **/.DS_Store
+
+# BMAD Dashboard extension expects flat paths; these are symlinks into the per-context slices
+_bmad-output/implementation-artifacts/sprint-status.yaml
+_bmad-output/planning-artifacts/epics.md
+_bmad-output/planning-artifacts/prd.md
