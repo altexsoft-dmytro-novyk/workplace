@@ -10,12 +10,12 @@ const {
 
 test('buildBmadKeyFilterUrl uses exact-match operator and URLSearchParams encoding', () => {
   const url = buildBmadKeyFilterUrl(
-    '7012056981667022142',
+    '901221186877',
     'd2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b',
     '1-99-happy-path-test',
   );
 
-  assert.match(url, /^https:\/\/api\.clickup\.com\/api\/v2\/list\/7012056981667022142\/task\?/);
+  assert.match(url, /^https:\/\/api\.clickup\.com\/api\/v2\/list\/901221186877\/task\?/);
   const query = new URL(url).searchParams.get('custom_fields');
   assert.deepEqual(JSON.parse(query), [{
     field_id: 'd2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b',

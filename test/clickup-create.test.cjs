@@ -26,7 +26,7 @@ async function createFixture({ developmentStatus = '1-99-test-auto-create: backl
   await fs.writeFile(sourcePath, `development_status:\n  ${developmentStatus}`);
   await fs.writeFile(configPath, [
     'workspace_id: "90122019689"',
-    'list_id: "7012056981667022142"',
+    'list_id: "901221186877"',
     'status_map:',
     '  backlog: "to do"',
     'custom_fields:',
@@ -50,7 +50,7 @@ test('createMissingClickUpTasks logs HTTP 400 response bodies from lookup failur
       sleepImpl: async () => {},
       fetchImpl: async (url, init = {}) => {
         if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-        if (url.includes('/list/7012056981667022142/task?')) {
+        if (url.includes('/list/901221186877/task?')) {
           return {
             ok: false,
             status: 400,
@@ -102,12 +102,12 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/7012056981667022142/task?')) {
+      if (url.includes('/list/901221186877/task?')) {
         const query = JSON.parse(new URL(url).searchParams.get('custom_fields'));
         assert.equal(query[0].operator, '==');
         return jsonResponse(200, { tasks: [] });
       }
-      if (url.endsWith('/list/7012056981667022142/task') && init.method === 'POST') {
+      if (url.endsWith('/list/901221186877/task') && init.method === 'POST') {
         return jsonResponse(200, { id: 'new-task-123' });
       }
       return jsonResponse(200, {});
@@ -167,7 +167,7 @@ test('createMissingClickUpTasks is idempotent when the task already exists', asy
     sleepImpl: async () => {},
     fetchImpl: async (url, init = {}) => {
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/7012056981667022142/task?')) {
+      if (url.includes('/list/901221186877/task?')) {
         return jsonResponse(200, { tasks: [{ id: 'existing-task-456' }] });
       }
       if (init.method === 'POST') {
@@ -193,7 +193,7 @@ test('createMissingClickUpTasks exits successfully when an individual create fai
     sleepImpl: async () => {},
     fetchImpl: async (url, init = {}) => {
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/7012056981667022142/task?')) {
+      if (url.includes('/list/901221186877/task?')) {
         return jsonResponse(200, { tasks: [] });
       }
       if (init.method === 'POST') return jsonResponse(500, {});
