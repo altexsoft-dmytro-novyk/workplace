@@ -323,7 +323,9 @@ An authenticated employee with edit rights on a field changes it directly from t
 
 **Why this epic exists.** `PM-FR-9` was recorded in this slice's own original scope decisions as explicitly out of scope, because EXPERIENCE.md's prototype table is read-only and the requirement carried no surface. That gap has not been designed since; this epic covers the requirement's data and access-control behaviour and states plainly where the UX contract still has nothing to say.
 
-**Depends on (outside this slice):** `role-administration/epics.md` Epic RA-E1 — the permission catalog and `isAllowed` must exist, carrying the `user-management:edit` key, before this epic's dual-gate check has anything to evaluate. `user-management/epics.md` Epic UM-E7 — custom-field columns must be visibility-safe before they can also become editable (Story 4.3).
+**Depends on (outside this slice):** `role-administration/epics.md` Epic RA-E1 — the permission catalog and `isAllowed` must exist before this epic's dual-gate check has anything to evaluate. `user-management/epics.md` Epic UM-E7 — custom-field columns must be visibility-safe before they can also become editable (Story 4.3).
+
+> **Note (2026-09-04) — `user-management:edit` key status is unsettled, not resolved.** `RA-E1.5` no longer proposes seeding this key: `user-management-edit-permission-options.md` (PR #20, Dmytro Novyk) resolved `PATCH /users/:id` (the identity-card route) to a pure section-access gate with no FR permission at all. Directory inline-editing is a **different route/surface** than `PATCH /users/:id`, so whether it needs its own key, reuses a differently-named one, or also resolves to a pure section-access gate is not decided by that resolution — it needs its own explicit answer before Story 4.1's dual-gate AC below is implementable as written.
 
 **Standalone:** partially. Stories 4.1–4.2 (standard and derived field editing) require only RA-E1. Story 4.3 (custom-field editing) additionally requires UM-E7.
 

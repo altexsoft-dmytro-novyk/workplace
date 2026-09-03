@@ -237,12 +237,38 @@ So that no access ever originates from a default nobody confirmed.
 
 **Given** `OQ-AC-EDIT`'s open status and the decision-package's recorded recommendation (SD-3)
 **When** the Stage-1 scenario document for this story is authored
-**Then** it explicitly proposes appending `user-management:edit` and `mentorship:assign` to this bootstrap seed as a named decision requiring the same independent human approval AD-1 already mandates for the scenario document as a whole
+**Then** it explicitly proposes appending `mentorship:assign` to this bootstrap seed as a named decision requiring the same independent human approval AD-1 already mandates for the scenario document as a whole
 **And** the seed change ships only inside an approved Stage-1 document — this story does not itself declare `OQ-AC-EDIT` closed; closure is recorded separately once approval lands
+
+> **`user-management:edit` removed from this story's seed proposal (2026-09-04).** `user-management-edit-permission-options.md` (PR #20, Dmytro Novyk) resolved 2026-09-02 on **Variant A**: `PATCH /users/:id` is gated entirely by `canAccessSection(viewer, 'S1', target) === 'write'` — no separate FR permission, no kernel seed for this specific key. That resolution stands unless Dmytro reopens it; this story does not seed a key his own decision says should not exist. `mentorship:assign` is unaffected and still proposed here.
 
 **Given** §2.3's three explicitly unsettled points — who may manage custom fields, who may assign mentors, and the defaults for approve/reject candidates, edit timeline, and create feedback
 **When** this seed is written
 **Then** none receives a default grant — `OQ-PERM-01` stays open and this story does not pre-empt it
+
+### Story RA-E1.6: Standalone Capability-Check Endpoint for Target-Less Actions
+
+**ID:** `RA-E1-S1.6` · **Sprint key:** `1-6-standalone-capability-check-endpoint-for-target-less-actions`
+
+*(Added 2026-09-04 — agreed synthesis with Dmytro Novyk over the `OQ-AC-EDIT` discussion on PR #20: `canEdit`-in-response and a standalone capability-check endpoint are not competing designs, they cover two different halves of §2.2's functional axis.)*
+
+As a client rendering an action with no existing target object (create a form campaign, view a dashboard, import the population),
+I want to check whether the current user holds a given permission directly,
+So that a target-less feature can be gated without inventing a fake object to hang `canEdit` on.
+
+**Acceptance Criteria:**
+
+**Given** a feature action that has no per-object response to embed a decision in (RA-E1.4's `isAllowed`, exposed here over HTTP)
+**When** a client needs to know whether the current user may perform it
+**Then** a standalone endpoint answers directly from `isAllowed(userId, feature)`, with no relationship or audience query (same CAP-4 isolation as RA-E1.4)
+
+**Given** a target *does* exist for the action (e.g. editing a specific profile field)
+**When** the client renders that object
+**Then** the decision travels in that object's own `canEdit` envelope (AD-34, consumed by `PMC-E4`) — this endpoint is not used, and clients do not fall back to it just because it also happens to work, to avoid the "hundred one-off permission requests" pattern this split exists to prevent
+
+**Given** permission keys are exposed to any client (this endpoint, `canEdit`, and the `/roles` catalog)
+**When** a key is named
+**Then** it is domain-meaningful (`profile:identity:write`-style — coordinate the exact scheme with `fr-permission-matrix-draft-2026-09-02.md`, PR #20), never a raw section identifier (`s1`, `s2`) — those identify access-role sections on a different axis (§3.2) and must not leak into functional-permission naming
 
 ---
 
