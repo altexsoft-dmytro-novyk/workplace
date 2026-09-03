@@ -3,6 +3,7 @@ const { afterEach, test } = require('node:test');
 const fs = require('node:fs/promises');
 const os = require('node:os');
 const path = require('node:path');
+const yaml = require('js-yaml');
 
 const { collectSyncEntries, syncClickUp } = require('../scripts/sync-clickup.cjs');
 
@@ -10,6 +11,27 @@ const temporaryDirectories = [];
 
 afterEach(async () => {
   await Promise.all(temporaryDirectories.splice(0).map((directory) => fs.rm(directory, { recursive: true, force: true })));
+});
+
+test('workflow syncs only when ClickUp inputs or its definition change', async () => {
+  const workflowPath = path.join(__dirname, '..', '.github', 'workflows', 'sync-clickup.yml');
+  const workflow = yaml.load(await fs.readFile(workflowPath, 'utf8'));
+
+  assert.deepEqual(workflow.on.push.paths, [
+    '_bmad-output/implementation-artifacts/**/sprint-status.yaml',
+    'clickup-sync.yaml',
+    'scripts/sync-clickup.cjs',
+    '.github/workflows/sync-clickup.yml',
+  ]);
+  assert.equal(workflow.permissions.contents, 'read');
+
+  const steps = workflow.jobs.sync.steps;
+  assert.ok(steps.some((step) => step.uses === 'actions/setup-node@v4' && step.with?.['node-version'] === '20'));
+  assert.ok(steps.some((step) => step.run === 'npm ci'));
+  assert.deepEqual(steps.find((step) => step.run === 'npm run sync:clickup'), {
+    run: 'npm run sync:clickup',
+    env: { CLICKUP_API_TOKEN: '${{ secrets.CLICKUP_API_TOKEN }}' },
+  });
 });
 
 async function createFixture({ config, status = 'in-progress' } = {}) {

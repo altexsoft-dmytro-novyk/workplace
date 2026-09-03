@@ -1,6 +1,7 @@
 # Локальні секрети — ключі партнерів TimeTracker External API.
 # Ніколи не комітити. Шаблон без значень: .tt-keys.env.example
 .tt-keys.env
+.env
 .worktrees/
 **/.DS_Store
 
