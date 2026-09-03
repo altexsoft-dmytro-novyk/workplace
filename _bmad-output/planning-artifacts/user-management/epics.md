@@ -9,6 +9,7 @@ inputDocuments:
   - docs/project-requirements.md
 slice: user-management
 id_namespace: UM-E{epic}-S{story}
+updated: 2026-09-03
 ---
 
 # people management - Epic Breakdown
@@ -99,6 +100,9 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 | FR-10 | Epic 4 — manager, PP, employee-department, and department-manager changes |
 | FR-6 | Epic 5 — record and apply departure |
 | FR-14 | Handoff — dedicated Mentorship epic, outside User Management |
+| FR-17 (custom-field clause only) | Epic 6, Epic 7 — see note below |
+
+> **Note (2026-09-03, `bmad-create-epics-and-stories` re-entry for `PM-FR-5`).** `FR-17`'s row above names five things as one deferred "Profile Projection story": S10/S11 colleague narrowing, S16 per-field custom-field visibility, S7/S8 flags, and S1 derived-field immutability. That placeholder predates this document's own Epic 0 sequencing note ("the FR-17 Profile Projection story owns only the S10/S11/S16 colleague views... and is decoupled from this epic") and has never been written as an actual epic — no story body for it exists anywhere in this file. This pass writes the **S16 custom-field-visibility** slice of that placeholder as Epic 6 and Epic 7, closing that portion. The S10/S11 colleague-narrowing, S7/S8 flag, and S1 derived-field-immutability portions remain unwritten and out of this pass's requested scope (`PM-FR-5`, `PM-FR-6`, `PM-FR-9` only) — they stay a real, recorded gap under the global coverage model's `PM-FR-4` alias (`aliases: [UM-FR-16, UM-FR-17]`), not silently closed by Epic 6/7's existence.
 
 ## Epic List
 
@@ -129,6 +133,22 @@ Holders of the dedicated permission change manager, People Partner, employee dep
 ### Epic 5: Employment Lifecycle
 Authorized HR actors record departure and the platform applies its complete effective-date outcome. Implementation remains blocked until CC-06 defines the scheduled state and executor.
 **FRs covered:** FR-6
+
+### Epic 6: Custom Fields as Data
+*(added 2026-09-03, `bmad-create-epics-and-stories` re-entry — closes the S16 custom-field-visibility slice of the `FR-17` "deferred Profile Projection story" placeholder; see the FR Coverage Map note above)*
+
+A holder of `manage custom fields` (role-administration's catalog) defines a new custom field with a declared visibility level, values are set on profiles through typed EAV storage (PM/AD-32), and a viewer's profile response includes a field's value only when both their resolved section access and the field's own visibility permit it.
+**FRs covered:** PM-FR-5 (storage + declared visibility half)
+**Depends on (outside this file):** `role-administration/epics.md` Epic RA-E1 — the `manage custom fields` permission key and a working `isAllowed` must exist before this epic's enforcement has anything to check. **Do not stub the check** — `interim-access-control.adapter.ts`'s `Boolean(userId)` pattern (`SEC-AUTH-01`) is the negative example this epic must not repeat.
+**Cross-boundary note:** visibility is *declared* here and *stored* here, but it is *enforced* by `access-control`'s facade before filter/sort execution (PM/AD-32) — this epic supplies data, not the enforcement point. `PLAT-E6-S6.6` (S16 section-matrix resolution) consumes `CustomFieldDefinition.visibility` from this epic's storage.
+
+### Epic 7: Visibility-Safe Filtering and Columns
+*(same addition)*
+
+A directory user's columns, sort options, filter options, and filter results for any custom field are limited to values their resolved tier actually permits — no combination of filters, including result-count differencing, lets a viewer infer a value they cannot see.
+**FRs covered:** PM-FR-5 (anti-inference completion)
+**Depends on:** Epic 6 (this file)
+**Gate note:** `PMC-E1-S1.8` (`platform-capabilities/epics.md`) and `PLAT-E6-S6.6` (`platform/epics.md`) both gate specifically on **this epic**, not on Epic 6 alone — closing Epic 6 without Epic 7 would ship custom-field filtering ahead of anti-inference enforcement, the exact NFR-1 critical leak both of those stories were sequenced last to avoid. Per their own recorded text, the two must not be unblocked independently of each other.
 
 ### Epic Sequencing / Parallelization
 
@@ -559,6 +579,128 @@ So that the employee and every access they hold leave the active system consiste
 **Given** the executor retries the same departure after a partial or uncertain failure
 **When** processing resumes
 **Then** the outcome is idempotent and no duplicate status, cancellation, closure, or journal effect is created
+
+## Epic 6: Custom Fields as Data
+
+*(added 2026-09-03 — see FR Coverage Map note)*
+
+### Story 6.1: Define a Custom Field with Declared Visibility
+
+**ID:** `UM-E6-S6.1` · **Sprint key:** `6-1-define-a-custom-field-with-declared-visibility`
+
+As a holder of the *manage custom fields* permission,
+I want to define a new custom field with a type and a visibility level,
+So that organisational data the product didn't ship with can be captured without a deploy or migration.
+
+**Acceptance Criteria:**
+
+**Given** an actor holds `manage custom fields` (role-administration's catalog, via `isAllowed`)
+**When** they submit a field definition (type: text/number/date/single-select/multi-select/boolean; visibility: management/employee/colleague)
+**Then** a `CustomFieldDefinition` row is created with no schema migration (PM/AD-32)
+
+**Given** an actor without `manage custom fields`
+**When** they attempt to create a field
+**Then** the request is denied via role-administration's `isAllowed` — the check is never stubbed or bypassed
+
+**Given** no visibility is specified
+**When** the field is created
+**Then** it defaults to `management` (§3.3.6)
+
+### Story 6.2: Set and Store Custom Field Values
+
+**ID:** `UM-E6-S6.2` · **Sprint key:** `6-2-set-and-store-custom-field-values`
+
+As a user entitled to edit a profile's custom field,
+I want to set its value,
+So that the field carries real organisational data.
+
+**Acceptance Criteria:**
+
+**Given** a `CustomFieldDefinition` exists
+**When** a value is set for a user
+**Then** it is written to typed `CustomFieldValue` storage (`valueText`/`valueNumber`/`valueDate`/`valueBool`/`valueJson` per type; multi-select uses `valueJson`) — never to the `User.customFields` jsonb bag (TD-12)
+
+**Given** the partial unique constraint `(userId, fieldId)`
+**When** a value is set twice for the same user and field
+**Then** the second write updates the existing row rather than creating a duplicate
+
+### Story 6.3: Custom Field Values Respect Section-Level Access
+
+**ID:** `UM-E6-S6.3` · **Sprint key:** `6-3-custom-field-values-respect-section-level-access`
+
+As a viewer of a profile,
+I want a custom field's value to appear only when my resolved access and the field's visibility both permit it,
+So that a field never leaks through the section it happens to render in.
+
+**Acceptance Criteria:**
+
+**Given** a field with visibility `colleague`
+**When** a colleague-tier viewer opens the profile
+**Then** the value is present in the response
+
+**Given** a field with visibility `management` (default)
+**When** a Self- or colleague-tier viewer opens the profile
+**Then** the value is absent from the response body entirely — not hidden client-side (§3.3 rule 1)
+
+**Given** this story
+**When** `access-control`'s facade is consulted for the section decision
+**Then** this epic supplies data and declared visibility only; the enforcement point itself belongs to `access-control`, consumed here read-only
+
+## Epic 7: Visibility-Safe Filtering and Columns
+
+*(added 2026-09-03 — see FR Coverage Map note)*
+
+### Story 7.1: Custom-Field Columns and Filters Read Only Entitled Values
+
+**ID:** `UM-E7-S7.1` · **Sprint key:** `7-1-custom-field-columns-and-filters-read-only-entitled-values`
+
+As a directory user,
+I want custom-field columns and filters to show me only values I'm entitled to see,
+So that I can never infer a hidden value through a filter side channel.
+
+**Acceptance Criteria:**
+
+**Given** a custom field whose visibility excludes a viewer
+**When** they inspect columns, sort options, and filter options
+**Then** the field is absent from all three
+
+**Given** a custom field whose visibility excludes a viewer for a specific target
+**When** any combination of filters is applied
+**Then** no combination — enumerated mechanically, not sampled — lets the viewer infer that target's value, including by comparing result counts across filter permutations
+
+**Given** a select-type custom field
+**When** a viewer filters on it
+**Then** the offered option list contains only values they are entitled to see
+
+**Given** a filter or sort reads a custom field
+**When** storage is accessed
+**Then** it reads typed `CustomFieldValue` (PM/AD-32), never `User.customFields` (TD-12)
+
+**Given** visibility enforcement
+**When** it runs relative to filter and sort execution
+**Then** it runs **before** — not after, not concurrently (PM/AD-32's explicit ordering rule, §3.3.6)
+
+### Story 7.2: S16 Section-Matrix Resolution for Custom Fields
+
+**ID:** `UM-E7-S7.2` · **Sprint key:** `7-2-s16-section-matrix-resolution-for-custom-fields`
+
+As the access-control facade,
+I want the S16 section decision to resolve per-field visibility rather than one uniform rule,
+So that the one section whose permission is not uniform across its own audience is handled correctly.
+
+**Acceptance Criteria:**
+
+**Given** each §3.2 audience
+**When** S16 is resolved
+**Then** Reporting line, Project line, and PP resolve `RW`, while Self and Colleague resolve **per-field visibility** — the only matrix cell whose permission is not uniform across the section (mirrors `PLAT-E6-S6.6`'s own framing)
+
+**Given** `AC-SECTION-MATRIX-01` (P1, registered 2026-09-03, owns S16 among other sections)
+**When** this story is scheduled
+**Then** it stays gated on that registration closing — this story does not attempt to bypass or duplicate the gate, which remains architect-owned per Platform SD-3
+
+**Given** this story and Story 7.1 both ship
+**When** `PLAT-E6-S6.6` and `PMC-E1-S1.8` are re-evaluated
+**Then** both may be unblocked — but **only together**, matching their own recorded "must not be unblocked independently" constraint
 
 ## Mentorship Handoff
 

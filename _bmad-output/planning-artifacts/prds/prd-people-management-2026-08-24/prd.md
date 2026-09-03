@@ -2,7 +2,7 @@
 title: People Management Platform
 status: canonical
 created: 2026-08-24
-updated: 2026-09-02
+updated: 2026-09-03
 normative_source: docs/project-requirements.md@v1.5
 rebaseline: sprint-change-proposal-2026-09-02-people-management-rebaseline.md
 ---
@@ -58,6 +58,7 @@ remaining product requirements and reuse no `ACF-*`, `ACM-*`, or `UMAC-*` identi
 | TimeTracker | `timetracker/epics.md` | `TT-E{epic}-S{story}` | TimeTracker integration (`PM-FR-36`, `PM-FR-37`) |
 | CDS | `cds/epics.md` | `CDS-E{epic}-S{story}` | CDS registry on profile S12 and the two directory filters (`PM-FR-30`, `PM-FR-31`). Registered `draft-bounded-context-slice`: the `cds` bounded context is still *pending confirmation* in PM/AD-5 and must be confirmed before Epic 1 enters a sprint |
 | Profile Sharing | `profile-sharing/epics.md` | `PSH-E{epic}-S{story}` | Authenticated named-recipient profile sharing (`PM-FR-27`). Registered `draft-bounded-context-slice`: PM/AD-5's context map has no `profile-sharing` context and it must be confirmed before Epic 1 enters a sprint. `PLAT-E7` delivers the consumed section-policy port only — a port is not the capability (platform SD-5) |
+| Role Administration | `role-administration/epics.md` | `RA-E{epic}-S{story}` | Runtime functional-role and permission administration (`PM-FR-6`). Registered `bounded-context-slice` (not draft) — the code lives inside the already-AD-5-confirmed `access-control` context, alongside `platform/epics.md`'s `PLAT-E1`–`E7`, which never claimed this requirement. `RA-E2` (admin screen) stays gated on `OQ-PERM-01` with no downstream dependents |
 
 The global cross-product rollup is `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml`, which is authoritative for which slice owns each requirement and is the register of record when this table and the model disagree. **A requirement has exactly one owning slice**; a second decomposition of an already-owned `PM-FR-*` is a defect, not an alternative. Moving ownership between slices means re-pointing the requirement's `stories:` and marking the vacating epic superseded — never leaving two live decompositions.
 
@@ -66,7 +67,7 @@ Identifiers are always namespaced outside their source document:
 - `PM-FR-*` — canonical product requirements in this PRD.
 - `UM-FR-*` — historical User Management requirement aliases.
 - `M-FR-*` — historical Mentorship requirement aliases.
-- `PLAT-E*`, `UM-E*`, `M-E*`, `PMC-E*`, `RS-E*`, `ENG-E*`, `RISK-E*`, `FB-E*`, `TT-E*`, `CDS-E*`, `PSH-E*` — context-qualified epic and story identifiers.
+- `PLAT-E*`, `UM-E*`, `M-E*`, `PMC-E*`, `RS-E*`, `ENG-E*`, `RISK-E*`, `FB-E*`, `TT-E*`, `CDS-E*`, `PSH-E*`, `RA-E*` — context-qualified epic and story identifiers.
 - Retired identifiers are never reused: `ENG-E3-S3.1`–`S3.5` (superseded by `RISK-E*`) and `ENG-E4-S4.1`–`S4.3` (superseded by `FB-E*`).
 - `ACF-*`, `ACM-*`, `UMAC-*` — stable workboard identifiers; never reassigned.
 
@@ -737,8 +738,8 @@ The machine-readable row-level model is `_bmad-output/planning-artifacts/global-
 
 | Normative source | Canonical product FRs | Primary domain/capability | Owning slice | Current delivery posture |
 |---|---|---|---|---|
-| §2–§3 | PM-FR-1–7, PM-FR-39–40 | Access Control | PLAT, UM | Kernel implemented; broader matrix/adoption partial or gated. PM-FR-1–4 `in-progress`, PM-FR-7/40 `specified`, PM-FR-5/6/39 `deferred` |
-| §4.1 | PM-FR-8–11 | Directory | PMC | PM-FR-8, 10, 11 `specified`; **PM-FR-9 `uncovered`** — inline directory editing has no slice |
+| §2–§3 | PM-FR-1–7, PM-FR-39–40 | Access Control | PLAT, UM, RA | Kernel implemented; broader matrix/adoption partial or gated. PM-FR-1–4 `in-progress`, PM-FR-7/40 `specified`, PM-FR-5 `specified` (`UM-E6`/`UM-E7`, gated on `AC-SECTION-MATRIX-01`), PM-FR-6 `specified` (`RA-E1`; `RA-E2` gated on `OQ-PERM-01`), PM-FR-39 `deferred` |
+| §4.1 | PM-FR-8–11 | Directory | PMC | PM-FR-8, 10, 11 `specified`; PM-FR-9 `specified` (`PMC-E4`, added 2026-09-03 — depends on `RA-E1` and, for its custom-field clause, `UM-E7`) |
 | §4.2–§4.3 | PM-FR-12–14 | User Management | UM | PM-FR-12 `in-progress`; PM-FR-13, 14 `specified` |
 | §4.4 | PM-FR-15–18 | Dashboards | PMC | PM-FR-15, 18 `specified`; **PM-FR-16, 17 `uncovered`** — `PMC-E3` carries no stories, gated on `TT-IDENTITY-01` |
 | §4.5, §4.12 | PM-FR-19–20 | Tasks/Campaigns | ENG | `specified` (`ENG-E1`, `ENG-E2`); partial by gate |
@@ -754,7 +755,7 @@ The machine-readable row-level model is `_bmad-output/planning-artifacts/global-
 | §4.16 | PM-FR-41 | User Management | UM, M | `specified`/blocked |
 | §4.17 | PM-FR-42 | User Management/Departments | UM | `specified`; partial and gated |
 
-Requirement-level rollup: `in-progress` 5 · `specified` 30 · `uncovered` 3 · `deferred` 4 · `implemented` 0. The three `uncovered` are PM-FR-9 (no UX surface), and PM-FR-16 / PM-FR-17 (epic-assigned to `PMC-E3`, story-uncovered by ruling PMC SD-7 until `TT-IDENTITY-01` closes).
+Requirement-level rollup (2026-09-03, after the `role-administration` slice and the `PM-FR-5`/`PM-FR-9` decompositions): `in-progress` 5 · `specified` 33 · `uncovered` 2 · `deferred` 2 · `implemented` 0. The two remaining `uncovered` are PM-FR-16 / PM-FR-17 (epic-assigned to `PMC-E3`, story-uncovered by ruling PMC SD-7 until `TT-IDENTITY-01` closes). The two remaining `deferred` are PM-FR-38 (PeopleForce prefill, good-to-have) and PM-FR-39 (full-profile access grant lifecycle — `platform` SD-6 confirms `PLAT-E7-S7.3` creates no grant/revoke/seed path).
 
 ## 14. Product Definition of Done
 

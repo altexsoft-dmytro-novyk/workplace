@@ -9,14 +9,16 @@ inputDocuments:
 status: final
 slice: platform-capabilities
 id_namespace: PMC-E{epic}-S{story}
-updated: 2026-09-02
+updated: 2026-09-03
 ---
 
 # People Management — Platform Capabilities (Directory + Dashboards) — Epic Breakdown
 
 ## Overview
 
-This document is a **new bounded-context slice** decomposing exactly **7 canonical PRD requirements** into implementable stories: the All Employees directory (`PM-FR-8`, `PM-FR-10`, `PM-FR-11`) and the four role-configured dashboards (`PM-FR-15`, `PM-FR-16`, `PM-FR-17`, `PM-FR-18`).
+This document is a **new bounded-context slice** decomposing **8 canonical PRD requirements** into implementable stories: the All Employees directory (`PM-FR-8`, `PM-FR-10`, `PM-FR-11`, `PM-FR-9`) and the four role-configured dashboards (`PM-FR-15`, `PM-FR-16`, `PM-FR-17`, `PM-FR-18`).
+
+> **Amendment (2026-09-03, `bmad-create-epics-and-stories` re-entry).** `PM-FR-9` (inline directory editing) was originally recorded **out of scope** below because it carried `coverage_status: uncovered` **and no committed UX surface** — the opposite of this slice's own selection rule, which required *both* conditions. EXPERIENCE.md still records "No surface" for it; that has not changed. It enters this slice now as **Epic 4** because covering the three remaining unowned PM-FRs (`PM-FR-5`, `PM-FR-6`, `PM-FR-9`) was requested directly, and `PM-FR-9`'s data/access-control behaviour genuinely belongs on this directory surface rather than anywhere else. The UX gap is not resolved by this amendment — Epic 4 states plainly, per story, where it had to specify interaction and error states with no mock to draw from.
 
 **Canonical requirement source:** [prd.md](../prds/prd-people-management-2026-08-24/prd.md) — `PM-FR-*` IDs and §-refs are taken from there and nowhere else.
 
@@ -34,7 +36,7 @@ Stories in this slice use **`PMC-E{epic}-S{story}`**.
 
 `ACF-*`, `ACM-*`, `UMAC-*` are stable workboard identifiers (PRD §0.2) and are **never** reassigned or reused by this slice. No story here claims one.
 
-**Out of scope for this slice:** `PM-FR-9` (inline directory editing — EXPERIENCE.md records **No surface**; prototype table is read-only); all resourcing, risk-management, campaign, action-item, CDS, feedback, sharing, and departure *lifecycle* FRs; the Roles, Custom fields, Access preview, My time off, and Absence calendar surfaces.
+**Out of scope for this slice:** all resourcing, risk-management, campaign, action-item, CDS, feedback, sharing, and departure *lifecycle* FRs; the Roles, Custom fields, Access preview, My time off, and Absence calendar surfaces. *(`PM-FR-9` moved into scope as Epic 4 — see the 2026-09-03 amendment in Overview above; it no longer belongs in this list.)*
 
 ### Scope decisions (product owner, 2026-09-02)
 
@@ -230,7 +232,7 @@ Extracted from EXPERIENCE.md §Information Architecture, §Component Patterns, �
 
 ## Epic List
 
-Three epics, split on two product-sourced boundaries rather than on delivery readiness (SD-6).
+Four epics. The first three split on two product-sourced boundaries rather than on delivery readiness (SD-6); the fourth (added 2026-09-03) is a write capability layered onto Epic 1's read surface.
 
 **Boundary 1 — audience.** PRD §4.3 makes the directory a "single list page for **all authenticated employees**", serving every tier down to Colleague. PRD §4.5 dashboards serve only functional-role holders (UM/DM/PM/PP). Different user populations with different jobs-to-be-done (§2.1), so the directory is its own epic.
 
@@ -311,14 +313,35 @@ A Delivery Manager or Project Manager opens a dashboard grouped by **project** �
 
 > **Coverage-model honesty requirement.** As Epic 2, and stronger: with `TT-IDENTITY-01` open, `PM-FR-16` and `PM-FR-17` cannot reach even partial *runtime* coverage. Until that P0 closes, this epic's artifacts are specification evidence only.
 
+### Epic 4: Inline Directory Editing
+
+*(added 2026-09-03 — see the Overview amendment above)*
+
+An authenticated employee with edit rights on a field changes it directly from the All Employees table, without opening the full profile, and the write is enforced by the same access matrix that governs reading it.
+
+**FRs covered:** `PM-FR-9`
+
+**Why this epic exists.** `PM-FR-9` was recorded in this slice's own original scope decisions as explicitly out of scope, because EXPERIENCE.md's prototype table is read-only and the requirement carried no surface. That gap has not been designed since; this epic covers the requirement's data and access-control behaviour and states plainly where the UX contract still has nothing to say.
+
+**Depends on (outside this slice):** `role-administration/epics.md` Epic RA-E1 — the permission catalog and `isAllowed` must exist, carrying the `user-management:edit` key, before this epic's dual-gate check has anything to evaluate. `user-management/epics.md` Epic UM-E7 — custom-field columns must be visibility-safe before they can also become editable (Story 4.3).
+
+**Standalone:** partially. Stories 4.1–4.2 (standard and derived field editing) require only RA-E1. Story 4.3 (custom-field editing) additionally requires UM-E7.
+
+**Implementation notes:** the write path reuses Epic 1's `canEdit` envelope contract (AD-34) for section-level gating, but the three access-switch fields (manager, People Partner, department — PM-FR-7) are excluded by an explicit, hard-coded rule independent of section `RW` — AD-34 as adopted expresses section-granularity only, and this epic must not assume it silently produces field-level carve-outs. Denial follows the platform's single HTTP oracle (PM-FR-4): `404` for a field absent from the response body entirely, `403` for a field that is visible but not editable, revealing nothing about the actor's own permission set beyond that. No UX flow exists for this epic's interaction, error, or conflict states — EXPERIENCE.md records the prototype table as read-only — so Story 4.2 specifies them directly rather than inferring them from a mock, matching the standard this slice already applied to Story 1.7's export flow (UX-DR8).
+
+> **Coverage-model note.** Completing Epic 4 alone does not make `PM-FR-9` fully evidenced end-to-end: it depends on RA-E1 (permission catalog) existing and, for the custom-field clause specifically, on UM-E7 (anti-inference) as well. Record `PM-FR-9` as `specified`, not `implemented`, until both dependencies close.
+
 ### Epic Dependency Graph
 
 - Slice-level preconditions (`SEC-AUTH-01`, audience-safe projection) → **all epics**
 - Epic 1 → delivers shared chrome → consumed read-only by Epic 2, Epic 3
 - Epic 1 → delivers the **shared row read model** + its single NFR-3 evidence run → consumed by Epic 2's people-table
+- Epic 1 → delivers the `canEdit` envelope contract (AD-34) → consumed by Epic 4
 - Epic 2 → establishes the PM/AD-33 read-model contract → extended by Epic 3
 - `TT-IDENTITY-01` (P0) + project-membership writer → **Epic 3 only — hard sprint-entry block**
 - `DEPARTMENT-EDGE` → Epic 2's PP department-grouping story and UM department-managed scope only
+- `role-administration/epics.md` Epic RA-E1 (external slice) → **Epic 4 — hard dependency**, catalog and `isAllowed` must exist before any dual-gate check has an evaluator
+- `user-management/epics.md` Epic UM-E7 (external slice) → **Epic 4 Story 4.3 only**
 
 No epic requires a later epic to function. Epic 3 is not startable while its P0 is open.
 
@@ -992,6 +1015,90 @@ Epic-level scope, rationale, and preconditions are specified in the *Epic List* 
 
 ---
 
+## Epic 4: Inline Directory Editing
+
+*(added 2026-09-03 — see the Overview amendment and Epic List section above for scope, rationale, and dependencies)*
+
+### Story 4.1: Inline-Editable Columns Write Through to the Profile
+
+**ID:** `PMC-E4-S4.1` · **Sprint key:** `4-1-inline-editable-columns-write-through-to-the-profile`
+
+As an employee viewing the All Employees table with edit rights on a field,
+I want to edit that field's value directly in the table,
+So that I don't have to open the full profile to make a small change.
+
+**Acceptance Criteria:**
+
+**Given** a column is marked inline-editable for the viewer's resolved tier
+**When** the viewer edits a cell
+**Then** the write goes through the same `data`/`canEdit` envelope (AD-34) the full profile uses — not a separate write path
+
+**Given** the manager, People Partner, or department column
+**When** rendered in the directory table for any viewer
+**Then** it is never inline-editable, regardless of the section it would otherwise fall under (§2.1, §4.1, PM-FR-7) — these change only through the dedicated organisational-relationships screen
+
+**Given** manager, People Partner, and department are access-switch fields (PM-FR-7) that may sit inside an otherwise section-write-entitled row
+**When** `canEdit` is computed for any column
+**Then** these three are forced non-editable by an explicit exclusion independent of the section-level dual gate AD-34 defines — their inline editability is never derived from section `RW`, only ever hard-denied
+
+**Given** the `user-management:edit` permission key
+**When** a write is attempted
+**Then** it is denied unless the actor holds that permission (role-administration's catalog) **and** the target field is within the actor's resolved access tier for that section — both halves of the §2.2 dual gate are enforced, neither substitutes for the other
+
+### Story 4.2: Inline Edit Denial and Conflict States
+
+**ID:** `PMC-E4-S4.2` · **Sprint key:** `4-2-inline-edit-denial-and-conflict-states`
+
+As a viewer attempting an inline edit I'm not entitled to make,
+I want a clear, leak-free denial rather than a silent failure,
+So that I understand the edit didn't apply without learning anything I'm not entitled to know.
+
+**Acceptance Criteria:**
+
+**Given** a field the viewer cannot see at all
+**When** they load the directory row
+**Then** the field and its edit affordance are both absent from the response — consistent with the leak-free-body rule for entitlement (PM-FR-4, §3.3 rule 1)
+
+**Given** a field the viewer can see but not edit
+**When** they attempt an inline edit
+**Then** the response is `403` (a visible resource, a forbidden action) per the platform's single denial oracle, revealing nothing about the actor's own permission set beyond that
+
+**Given** a due departure on the target employee (AD-20 cutoff)
+**When** an inline edit targets that profile
+**Then** the write is denied regardless of the actor's own permissions
+
+**Given** two viewers edit the same cell concurrently
+**When** the second write commits
+**Then** the conflict is resolved by last-write-wins with the row's current value returned in the response, so the second editor sees what actually persisted rather than their own stale assumption
+
+**Given** no UX source flow exists for this interaction (EXPERIENCE.md records the prototype table as read-only — "No surface")
+**When** these denial and conflict states are designed
+**Then** they are specified here directly, not inferred from a mock, and recorded as an addition beyond the UX spine — the same standard this slice already applied to Story 1.7's export flow (UX-DR8)
+
+### Story 4.3: Custom-Field Columns Become Inline-Editable
+
+**ID:** `PMC-E4-S4.3` · **Sprint key:** `4-3-custom-field-columns-become-inline-editable`
+
+As a viewer entitled to a custom field,
+I want to inline-edit it the same way as a standard field,
+So that custom fields aren't second-class citizens in the directory.
+
+**Acceptance Criteria:**
+
+**Given** `user-management/epics.md` Epic UM-E7 has shipped (custom-field columns exist and respect visibility)
+**When** a custom field is also marked inline-editable
+**Then** editing it writes through to typed `CustomFieldValue` storage (PM/AD-32) under the same dual gate as Story 4.1
+
+**Given** a custom field whose visibility excludes the viewer
+**When** the directory renders
+**Then** no edit affordance for that field exists — extending UM-E7's "absent from all three" rule to editability as a fourth surface
+
+**Given** this story
+**When** it is scheduled
+**Then** it is sequenced strictly after `UM-E7` — editing a field the viewer cannot even see would be a leak this story must not create
+
+---
+
 ## Story Coverage Status
 
 Honest state of story-level coverage for the 7 in-scope FRs at the end of Step 3.
@@ -1005,8 +1112,11 @@ Honest state of story-level coverage for the 7 in-scope FRs at the end of Step 3
 | `PM-FR-18` | 2 | 2.3, 2.2, **2.4 (gated)** | **Partial by construction (SD-2).** PP scope and resourcing-absent covered. **Department grouping gated** on `DEPARTMENT-EDGE`; project grouping belongs to Epic 3's axis |
 | `PM-FR-16` | 3 | **none** | **Epic-assigned, story-uncovered (SD-7).** Blocked on `TT-IDENTITY-01` P0 |
 | `PM-FR-17` | 3 | **none** | **Epic-assigned, story-uncovered (SD-7).** Blocked on `TT-IDENTITY-01` P0 |
+| `PM-FR-9` | 4 | 4.1, 4.2, 4.3 | Covered at data/access-control level. **Depends on `role-administration` Epic RA-E1 (catalog) and `user-management` Epic UM-E7 (custom-field clause), both outside this slice** |
 
-**Totals:** 3 epics · 13 stories · 107 acceptance criteria · 3 stories gated (1.8, 2.4, and all of Epic 3 by absence).
+**Totals (through Epic 3, at Step 3 close 2026-09-02):** 3 epics · 13 stories · 107 acceptance criteria · 3 stories gated (1.8, 2.4, and all of Epic 3 by absence).
+
+**Epic 4 addition (2026-09-03, `bmad-create-epics-and-stories` re-entry for `PM-FR-9`):** +3 stories, +12 acceptance criteria. None gated on an in-slice blocker; two of three carry hard cross-slice dependencies (RA-E1; RA-E1 + UM-E7) recorded above rather than a `blockers.yaml` gate. **Updated totals: 4 epics · 16 stories · 119 acceptance criteria.**
 
 ## Step 4 Validation Results
 
