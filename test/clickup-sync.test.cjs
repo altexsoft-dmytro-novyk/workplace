@@ -42,24 +42,25 @@ test('workflow creates missing tasks before syncing sprint status', async () => 
   });
 });
 
-async function createFixture({ config, status = 'in-progress' } = {}) {
+async function createFixture({ config, status = 'in-progress', storyKey = '1-99-test-story' } = {}) {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'clickup-sync-'));
   temporaryDirectories.push(rootDir);
-  const sourcePath = path.join(rootDir, 'status', 'sprint-status.yaml');
+  const sourcePath = path.join(rootDir, '_bmad-output/implementation-artifacts/platform/sprint-status.yaml');
   const configPath = path.join(rootDir, 'clickup-sync.yaml');
+  const sourceKey = `_bmad-output/implementation-artifacts/platform/sprint-status.yaml#${storyKey}`;
   await fs.mkdir(path.dirname(sourcePath), { recursive: true });
-  await fs.writeFile(sourcePath, `development_status:\n  story-1: ${status}\n`);
+  await fs.writeFile(sourcePath, `development_status:\n  ${storyKey}: ${status}\n`);
   await fs.writeFile(configPath, config ?? [
     'workspace_id: "90122019689"',
     'status_map:',
     '  in-progress: "in progress"',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    `  "${sourceKey}":`,
     '    task_id: "task-123"',
     '    git_branch: feature/story-1',
     '    validation_status: passed',
   ].join('\n'));
-  return { configPath, rootDir, sourcePath };
+  return { configPath, rootDir, sourcePath, sourceKey, storyKey };
 }
 
 function jsonResponse(status, body) {
@@ -78,7 +79,7 @@ test('collectSyncEntries maps configured BMad development status entries', async
   const entries = await collectSyncEntries({ ...fixture, sprintStatusPaths: [fixture.sourcePath] });
 
   assert.deepEqual(entries, [{
-    sourceKey: 'status/sprint-status.yaml#story-1',
+    sourceKey: '_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story',
     taskId: 'task-123',
     status: 'in progress',
     gitBranch: 'feature/story-1',
@@ -228,7 +229,7 @@ test('syncClickUp writes mapped custom fields after the successful status update
     '  git_branch: "git-branch-field"',
     '  validation_status: "validation-status-field"',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
     '    git_branch: "feature/story-1"',
     '    validation_status: "passed"',
@@ -290,7 +291,7 @@ test('syncClickUp writes custom fields only with both a configured ID and mapped
     '  git_branch: "git-branch-field"',
     '  validation_status: ""',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
     '    git_branch: "feature/story-1"',
     '    validation_status: "passed"',
@@ -324,7 +325,7 @@ test('syncClickUp skips a configured custom field when its mapped value is empty
     '  git_branch: "git-branch-field"',
     '  validation_status: "validation-status-field"',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
     '    git_branch: ""',
     '    validation_status: "passed"',
@@ -357,7 +358,7 @@ test('syncClickUp reports custom field failures without revealing the token', as
     'custom_fields:',
     '  git_branch: "git-branch-field"',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
     '    git_branch: "feature/story-1"',
   ].join('\n') });
@@ -387,7 +388,7 @@ test('syncClickUp URL-encodes task and custom field IDs', async () => {
     'custom_fields:',
     '  git_branch: "field/id"',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task/id"',
     '    git_branch: "feature/story-1"',
   ].join('\n') });
@@ -484,14 +485,16 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/list-123/task?custom_fields=')) {
+      if (url.includes('/list/list-123/task?')) {
+        const query = JSON.parse(new URL(url).searchParams.get('custom_fields'));
+        assert.equal(query[0].operator, '==');
         return jsonResponse(200, { tasks: [{ id: 'task-from-bmad-key' }] });
       }
       return successfulClickUpResponse(url, init);
     },
   });
 
-  assert.ok(requests.some(({ url }) => url.includes('/list/list-123/task?custom_fields=')));
+  assert.ok(requests.some(({ url }) => url.includes('/list/list-123/task?')));
   assert.ok(requests.some(({ url, init }) => url === 'https://api.clickup.com/api/v2/task/task-from-bmad-key' && init.method === 'PUT'));
 });
 
@@ -501,7 +504,7 @@ test('collectSyncEntries rejects a configured task mapping without an ID even wh
     'status_map:',
     '  in-progress: "in progress"',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
     '  "status/missing.yaml#story-2": {}',
   ].join('\n') });
@@ -518,7 +521,7 @@ test('collectSyncEntries rejects configured task mappings for source keys it did
     'status_map:',
     '  in-progress: "in progress"',
     'tasks:',
-    '  "status/sprint-status.yaml#story-1":',
+    '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
     '    task_id: "task-123"',
     '  "status/missing.yaml#story-2":',
     '    task_id: "task-456"',
@@ -549,13 +552,13 @@ test('collectSyncEntries rejects malformed configuration, missing source, unknow
       'workspace_id: "90122019689"',
       'status_map: {}',
       'tasks:',
-      '  "status/sprint-status.yaml#story-1":',
+      '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story":',
       '    task_id: "task-123"',
     ].join('\n'),
   });
   await assert.rejects(
     collectSyncEntries({ ...unknownStatus, sprintStatusPaths: [unknownStatus.sourcePath] }),
-    /status\/sprint-status\.yaml#story-1/,
+    /1-99-test-story/,
   );
 
   const missingTaskId = await createFixture({
@@ -564,11 +567,11 @@ test('collectSyncEntries rejects malformed configuration, missing source, unknow
       'status_map:',
       '  in-progress: "in progress"',
       'tasks:',
-      '  "status/sprint-status.yaml#story-1": {}',
+      '  "_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story": {}',
     ].join('\n'),
   });
   await assert.rejects(
     collectSyncEntries({ ...missingTaskId, sprintStatusPaths: [missingTaskId.sourcePath] }),
-    /status\/sprint-status\.yaml#story-1/,
+    /1-99-test-story/,
   );
 });

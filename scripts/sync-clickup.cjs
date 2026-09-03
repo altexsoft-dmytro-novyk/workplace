@@ -5,14 +5,30 @@ const {
   asObject,
   authorizeWorkspace,
   bmadKeyLookupEnabled,
+  collectDevelopmentStatusRecords,
   findSprintStatusPaths,
   findTaskByBmadKey,
   readYaml,
   readResponseJson,
   relativeSourceKey,
   request,
-  shouldSkipStoryKey,
 } = require('./clickup-lib.cjs');
+
+async function collectDiscoveredSourceKeys(rootDir, sourcePaths) {
+  const discoveredSourceKeys = new Set();
+  for (const sourcePath of sourcePaths) {
+    const resolvedSourcePath = path.resolve(sourcePath);
+    const sprintStatus = await readYaml(resolvedSourcePath, 'BMad sprint status');
+    const developmentStatus = asObject(
+      sprintStatus.development_status,
+      `development_status in ${resolvedSourcePath}`,
+    );
+    for (const developmentStatusKey of Object.keys(developmentStatus)) {
+      discoveredSourceKeys.add(relativeSourceKey(rootDir, resolvedSourcePath, developmentStatusKey));
+    }
+  }
+  return discoveredSourceKeys;
+}
 
 async function collectSyncEntries(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
@@ -20,10 +36,11 @@ async function collectSyncEntries(options = {}) {
   const config = await readYaml(configPath, 'ClickUp sync configuration');
   const tasks = asObject(config.tasks, `tasks in ${configPath}`);
   const statusMap = asObject(config.status_map, `status_map in ${configPath}`);
-  const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
-  const entries = [];
-  const discoveredSourceKeys = new Set();
   const lookupByBmadKey = bmadKeyLookupEnabled(config);
+  const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
+  const records = await collectDevelopmentStatusRecords({ ...options, rootDir, sprintStatusPaths: sourcePaths });
+  const discoveredSourceKeys = await collectDiscoveredSourceKeys(rootDir, sourcePaths);
+  const entries = [];
 
   for (const [sourceKey, taskMapping] of Object.entries(tasks)) {
     const task = asObject(taskMapping, `task mapping for ${sourceKey}`);
@@ -32,42 +49,33 @@ async function collectSyncEntries(options = {}) {
     }
   }
 
-  for (const sourcePath of sourcePaths) {
-    const resolvedSourcePath = path.resolve(sourcePath);
-    const sprintStatus = await readYaml(resolvedSourcePath, 'BMad sprint status');
-    const developmentStatus = asObject(sprintStatus.development_status, `development_status in ${resolvedSourcePath}`);
-    for (const [developmentStatusKey, sourceStatus] of Object.entries(developmentStatus)) {
-      const sourceKey = relativeSourceKey(rootDir, resolvedSourcePath, developmentStatusKey);
-      discoveredSourceKeys.add(sourceKey);
+  for (const record of records) {
+    const { sourceKey, sourceStatus, bmadKey } = record;
 
-      if (!Object.hasOwn(statusMap, sourceStatus)) {
-        if (Object.hasOwn(tasks, sourceKey) || lookupByBmadKey) {
-          throw new Error(`No ClickUp status mapping for ${sourceKey} with BMad status ${String(sourceStatus)}`);
-        }
-        continue;
-      }
+    if (!Object.hasOwn(statusMap, sourceStatus)) {
+      throw new Error(`No ClickUp status mapping for ${sourceKey} with BMad status ${String(sourceStatus)}`);
+    }
 
-      if (Object.hasOwn(tasks, sourceKey)) {
-        const task = tasks[sourceKey];
-        entries.push({
-          sourceKey,
-          taskId: task.task_id,
-          status: statusMap[sourceStatus],
-          ...(task.git_branch ? { gitBranch: task.git_branch } : {}),
-          ...(task.validation_status ? { validationStatus: task.validation_status } : {}),
-        });
-        continue;
-      }
+    if (Object.hasOwn(tasks, sourceKey)) {
+      const task = tasks[sourceKey];
+      entries.push({
+        sourceKey,
+        taskId: task.task_id,
+        status: statusMap[sourceStatus],
+        ...(task.git_branch ? { gitBranch: task.git_branch } : {}),
+        ...(task.validation_status ? { validationStatus: task.validation_status } : {}),
+      });
+      continue;
+    }
 
-      if (lookupByBmadKey && !shouldSkipStoryKey(developmentStatusKey)) {
-        entries.push({
-          sourceKey,
-          bmadKey: developmentStatusKey,
-          taskId: null,
-          status: statusMap[sourceStatus],
-          resolveViaBmadKey: true,
-        });
-      }
+    if (lookupByBmadKey) {
+      entries.push({
+        sourceKey,
+        bmadKey,
+        taskId: null,
+        status: statusMap[sourceStatus],
+        resolveViaBmadKey: true,
+      });
     }
   }
 

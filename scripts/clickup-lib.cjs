@@ -8,15 +8,19 @@ const IMPLEMENTATION_ARTIFACTS_DIR = '_bmad-output/implementation-artifacts';
 const INCLUDED_TRACKS = ['platform', 'user-management'];
 const CREATE_DELAY_MS = 700;
 
-const EPIC_BY_PREFIX = [
-  { prefix: '0-', epicId: '869euphpm' },
-  { prefix: '1-', epicId: '869eupgh3' },
-  { prefix: '2-', epicId: '869euphdh' },
-  { prefix: '3-', epicId: '869euphgj' },
-];
+const EPIC_BY_TRACK = {
+  platform: [
+    { prefix: '1-', epicId: '869eupgh3' },
+    { prefix: '2-', epicId: '869euphdh' },
+    { prefix: '3-', epicId: '869euphgj' },
+  ],
+  'user-management': [
+    { prefix: '0-', epicId: '869euphpm' },
+  ],
+};
 
 const UNMAPPED_PREFIX_ACTION =
-  'Add epic parent ID to EPIC_BY_PREFIX in scripts/clickup-lib.cjs and create the Epic task in ClickUp before the next sync.';
+  'Add epic parent ID to EPIC_BY_TRACK in scripts/clickup-lib.cjs and create the Epic task in ClickUp before the next sync.';
 
 function asObject(value, context) {
   if (!value || Array.isArray(value) || typeof value !== 'object') {
@@ -54,6 +58,15 @@ async function findSprintStatusPaths(rootDir) {
   return results;
 }
 
+function trackFromSourcePath(sourcePath) {
+  const normalized = sourcePath.split(path.sep).join('/');
+  const match = normalized.match(/\/implementation-artifacts\/([^/]+)\/sprint-status\.yaml$/);
+  if (!match) {
+    throw new Error(`Unable to determine track for sprint status file: ${sourcePath}`);
+  }
+  return match[1];
+}
+
 function relativeSourceKey(rootDir, sourcePath, developmentStatusKey) {
   return `${path.relative(rootDir, sourcePath).split(path.sep).join('/')}#${developmentStatusKey}`;
 }
@@ -64,20 +77,104 @@ function shouldSkipStoryKey(key) {
   return false;
 }
 
-function resolveEpicParentId(key) {
-  const match = EPIC_BY_PREFIX.find((entry) => key.startsWith(entry.prefix));
+function shouldSkipDevelopmentStatus(key, sourceStatus) {
+  if (shouldSkipStoryKey(key)) return true;
+  if (sourceStatus === 'optional') return true;
+  return false;
+}
+
+function resolveEpicParentId(key, track) {
+  const mappings = EPIC_BY_TRACK[track] || [];
+  const match = mappings.find((entry) => key.startsWith(entry.prefix));
   return match?.epicId ?? null;
 }
 
-function warnUnmappedPrefix(key) {
+function warnUnmappedPrefix(key, track) {
   console.warn(
-    `No epic mapping for BMad key "${key}". Skipping. Action: ${UNMAPPED_PREFIX_ACTION}`,
+    `No epic mapping for BMad key "${key}" in track "${track}". Skipping. Action: ${UNMAPPED_PREFIX_ACTION}`,
   );
 }
 
 function buildBmadKeyFilterUrl(listId, fieldId, bmadKey) {
-  const customFields = JSON.stringify([{ field_id: fieldId, operator: '=', value: bmadKey }]);
-  return `${CLICKUP_API_BASE}/list/${encodeURIComponent(listId)}/task?custom_fields=${encodeURIComponent(customFields)}`;
+  const params = new URLSearchParams({
+    custom_fields: JSON.stringify([{
+      field_id: fieldId,
+      operator: '==',
+      value: bmadKey,
+    }]),
+  });
+  return `${CLICKUP_API_BASE}/list/${encodeURIComponent(listId)}/task?${params.toString()}`;
+}
+
+function findDuplicateStoryKeys(records) {
+  const sourcesByKey = new Map();
+  for (const record of records) {
+    if (!sourcesByKey.has(record.developmentStatusKey)) {
+      sourcesByKey.set(record.developmentStatusKey, []);
+    }
+    sourcesByKey.get(record.developmentStatusKey).push(record.sourceKey);
+  }
+  return [...sourcesByKey.entries()].filter(([, sourceKeys]) => sourceKeys.length > 1);
+}
+
+function formatDuplicateStoryKeys(duplicates) {
+  return duplicates
+    .map(([key, sourceKeys]) => `${key} (${sourceKeys.join(', ')})`)
+    .join('; ');
+}
+
+function parseKeyFilter(rawValue) {
+  if (!rawValue || typeof rawValue !== 'string') return null;
+  const keys = rawValue.split(',').map((value) => value.trim()).filter(Boolean);
+  return keys.length > 0 ? new Set(keys) : null;
+}
+
+function keyFilterFromOptions(options = {}) {
+  if (options.keyFilter instanceof Set) return options.keyFilter;
+  return parseKeyFilter(options.keyFilter || process.env.CLICKUP_BMAD_KEYS);
+}
+
+function matchesKeyFilter(developmentStatusKey, keyFilter) {
+  return !keyFilter || keyFilter.has(developmentStatusKey);
+}
+
+async function collectDevelopmentStatusRecords(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
+  const keyFilter = keyFilterFromOptions(options);
+  const records = [];
+
+  for (const sourcePath of sourcePaths) {
+    const resolvedSourcePath = path.resolve(sourcePath);
+    const track = trackFromSourcePath(resolvedSourcePath);
+    const sprintStatus = await readYaml(resolvedSourcePath, 'BMad sprint status');
+    const developmentStatus = asObject(
+      sprintStatus.development_status,
+      `development_status in ${resolvedSourcePath}`,
+    );
+
+    for (const [developmentStatusKey, sourceStatus] of Object.entries(developmentStatus)) {
+      if (shouldSkipDevelopmentStatus(developmentStatusKey, sourceStatus)) continue;
+      if (!matchesKeyFilter(developmentStatusKey, keyFilter)) continue;
+      records.push({
+        sourcePath: resolvedSourcePath,
+        track,
+        sourceKey: relativeSourceKey(rootDir, resolvedSourcePath, developmentStatusKey),
+        developmentStatusKey,
+        sourceStatus,
+        bmadKey: developmentStatusKey,
+      });
+    }
+  }
+
+  const duplicates = findDuplicateStoryKeys(records);
+  if (duplicates.length > 0) {
+    throw new Error(
+      `Duplicate BMad story keys across sprint-status files: ${formatDuplicateStoryKeys(duplicates)}`,
+    );
+  }
+
+  return records;
 }
 
 function redactToken(message, token) {
@@ -92,7 +189,16 @@ async function request(fetchImpl, url, init, context, token) {
     throw new Error(`ClickUp ${context} request failed: ${redactToken(error.message, token)}`);
   }
   if (!response.ok) {
-    throw new Error(`ClickUp ${context} request failed with HTTP ${response.status}`);
+    let detail = '';
+    try {
+      const body = await response.text();
+      if (body) detail = ` body: ${redactToken(body, token)}`;
+    } catch {
+      // Ignore unreadable error bodies.
+    }
+    throw new Error(
+      `ClickUp ${context} request failed with HTTP ${response.status} url: ${redactToken(url, token)}${detail}`,
+    );
   }
   return response;
 }
@@ -146,20 +252,28 @@ module.exports = {
   EXPECTED_WORKSPACE_ID,
   CLICKUP_API_BASE,
   CREATE_DELAY_MS,
-  EPIC_BY_PREFIX,
+  EPIC_BY_TRACK,
   UNMAPPED_PREFIX_ACTION,
   asObject,
   authorizeWorkspace,
   bmadKeyLookupEnabled,
   buildBmadKeyFilterUrl,
+  collectDevelopmentStatusRecords,
+  findDuplicateStoryKeys,
   findSprintStatusPaths,
   findTaskByBmadKey,
+  formatDuplicateStoryKeys,
+  keyFilterFromOptions,
+  matchesKeyFilter,
+  parseKeyFilter,
   readYaml,
   readResponseJson,
   relativeSourceKey,
   request,
   resolveEpicParentId,
+  shouldSkipDevelopmentStatus,
   shouldSkipStoryKey,
   sleep,
+  trackFromSourcePath,
   warnUnmappedPrefix,
 };

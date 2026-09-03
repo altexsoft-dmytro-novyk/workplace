@@ -4,13 +4,12 @@ const {
   CREATE_DELAY_MS,
   asObject,
   authorizeWorkspace,
-  findSprintStatusPaths,
+  collectDevelopmentStatusRecords,
   findTaskByBmadKey,
   readYaml,
   readResponseJson,
   request,
   resolveEpicParentId,
-  shouldSkipStoryKey,
   sleep,
   warnUnmappedPrefix,
 } = require('./clickup-lib.cjs');
@@ -37,80 +36,67 @@ async function createMissingClickUpTasks(options = {}) {
   }
 
   const headers = await authorizeWorkspace(fetchImpl, token);
-  const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
+  const records = await collectDevelopmentStatusRecords({ ...options, rootDir });
   const summary = { created: 0, existing: 0, skipped: 0, failed: 0 };
 
-  for (const sourcePath of sourcePaths) {
-    const resolvedSourcePath = path.resolve(sourcePath);
-    const sprintStatus = await readYaml(resolvedSourcePath, 'BMad sprint status');
-    const developmentStatus = asObject(
-      sprintStatus.development_status,
-      `development_status in ${resolvedSourcePath}`,
-    );
-
-    for (const [developmentStatusKey, sourceStatus] of Object.entries(developmentStatus)) {
-      if (shouldSkipStoryKey(developmentStatusKey)) {
-        summary.skipped += 1;
-        continue;
-      }
-
-      const epicParentId = resolveEpicParentId(developmentStatusKey);
-      if (!epicParentId) {
-        warnUnmappedPrefix(developmentStatusKey);
-        summary.skipped += 1;
-        continue;
-      }
-
-      if (!Object.hasOwn(statusMap, sourceStatus)) {
-        console.warn(
-          `No ClickUp status mapping for ${developmentStatusKey} with BMad status ${String(sourceStatus)}. Skipping create.`,
-        );
-        summary.skipped += 1;
-        continue;
-      }
-
-      try {
-        const existingTaskId = await findTaskByBmadKey(fetchImpl, {
-          listId,
-          fieldId: bmadKeyFieldId,
-          bmadKey: developmentStatusKey,
-          token,
-        });
-        if (existingTaskId) {
-          console.log(`${developmentStatusKey} already exists: ${existingTaskId}`);
-          summary.existing += 1;
-          if (options.sleepImpl) await options.sleepImpl(CREATE_DELAY_MS);
-          else await sleep(CREATE_DELAY_MS);
-          continue;
-        }
-
-        const createResponse = await request(
-          fetchImpl,
-          `${CLICKUP_API_BASE}/list/${encodeURIComponent(listId)}/task`,
-          {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              name: developmentStatusKey,
-              parent: epicParentId,
-              status: statusMap[sourceStatus],
-              custom_fields: [{ id: bmadKeyFieldId, value: developmentStatusKey }],
-            }),
-          },
-          `task create for ${developmentStatusKey}`,
-          token,
-        );
-        const createdTask = await readResponseJson(createResponse, `task create for ${developmentStatusKey}`, token);
-        console.log(`Created task ${createdTask.id} for ${developmentStatusKey}`);
-        summary.created += 1;
-      } catch (error) {
-        console.error(`Failed to create ClickUp task for ${developmentStatusKey}: ${error.message}`);
-        summary.failed += 1;
-      }
-
-      if (options.sleepImpl) await options.sleepImpl(CREATE_DELAY_MS);
-      else await sleep(CREATE_DELAY_MS);
+  for (const record of records) {
+    const { developmentStatusKey, sourceStatus, track } = record;
+    const epicParentId = resolveEpicParentId(developmentStatusKey, track);
+    if (!epicParentId) {
+      warnUnmappedPrefix(developmentStatusKey, track);
+      summary.skipped += 1;
+      continue;
     }
+
+    if (!Object.hasOwn(statusMap, sourceStatus)) {
+      console.warn(
+        `No ClickUp status mapping for ${record.sourceKey} with BMad status ${String(sourceStatus)}. Skipping create.`,
+      );
+      summary.skipped += 1;
+      continue;
+    }
+
+    try {
+      const existingTaskId = await findTaskByBmadKey(fetchImpl, {
+        listId,
+        fieldId: bmadKeyFieldId,
+        bmadKey: developmentStatusKey,
+        token,
+      });
+      if (existingTaskId) {
+        console.log(`${developmentStatusKey} already exists: ${existingTaskId}`);
+        summary.existing += 1;
+        if (options.sleepImpl) await options.sleepImpl(CREATE_DELAY_MS);
+        else await sleep(CREATE_DELAY_MS);
+        continue;
+      }
+
+      const createResponse = await request(
+        fetchImpl,
+        `${CLICKUP_API_BASE}/list/${encodeURIComponent(listId)}/task`,
+        {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            name: developmentStatusKey,
+            parent: epicParentId,
+            status: statusMap[sourceStatus],
+            custom_fields: [{ id: bmadKeyFieldId, value: developmentStatusKey }],
+          }),
+        },
+        `task create for ${developmentStatusKey}`,
+        token,
+      );
+      const createdTask = await readResponseJson(createResponse, `task create for ${developmentStatusKey}`, token);
+      console.log(`Created task ${createdTask.id} for ${developmentStatusKey}`);
+      summary.created += 1;
+    } catch (error) {
+      console.error(`Failed to create ClickUp task for ${developmentStatusKey}: ${error.message}`);
+      summary.failed += 1;
+    }
+
+    if (options.sleepImpl) await options.sleepImpl(CREATE_DELAY_MS);
+    else await sleep(CREATE_DELAY_MS);
   }
 
   return summary;

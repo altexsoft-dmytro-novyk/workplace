@@ -5,7 +5,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const { createMissingClickUpTasks } = require('../scripts/create-clickup-task.cjs');
-const { UNMAPPED_PREFIX_ACTION } = require('../scripts/clickup-lib.cjs');
+const { UNMAPPED_PREFIX_ACTION, request } = require('../scripts/clickup-lib.cjs');
 
 const temporaryDirectories = [];
 
@@ -36,6 +36,59 @@ async function createFixture({ developmentStatus = '1-99-test-auto-create: backl
   return { configPath, rootDir, sourcePath };
 }
 
+test('createMissingClickUpTasks logs HTTP 400 response bodies from lookup failures', async () => {
+  const fixture = await createFixture();
+  const errors = [];
+  const originalError = console.error;
+  console.error = (...args) => { errors.push(args.join(' ')); };
+
+  try {
+    const summary = await createMissingClickUpTasks({
+      ...fixture,
+      keyFilter: new Set(['1-99-test-auto-create']),
+      token: 'secret-token',
+      sleepImpl: async () => {},
+      fetchImpl: async (url, init = {}) => {
+        if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+        if (url.includes('/list/7012056981667022142/task?')) {
+          return {
+            ok: false,
+            status: 400,
+            text: async () => JSON.stringify({ err: 'Invalid custom field filter' }),
+          };
+        }
+        return jsonResponse(200, {});
+      },
+    });
+
+    assert.equal(summary.failed, 1);
+    assert.ok(errors.some((message) => message.includes('HTTP 400')));
+    assert.ok(errors.some((message) => message.includes('Invalid custom field filter')));
+    assert.ok(errors.every((message) => !message.includes('secret-token')));
+  } finally {
+    console.error = originalError;
+  }
+});
+
+test('request redacts token from error URLs and bodies', async () => {
+  await assert.rejects(
+    request(
+      async () => ({
+        ok: false,
+        status: 400,
+        text: async () => 'secret-token leaked',
+      }),
+      'https://api.clickup.com/api/v2/list/123/task?token=secret-token',
+      {},
+      'lookup',
+      'secret-token',
+    ),
+    (error) => /HTTP 400/.test(error.message)
+      && /\[REDACTED\]/.test(error.message)
+      && !error.message.includes('secret-token'),
+  );
+});
+
 test('createMissingClickUpTasks creates a subtask when bmad_key is absent', async () => {
   const fixture = await createFixture();
   const requests = [];
@@ -43,12 +96,15 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
 
   const summary = await createMissingClickUpTasks({
     ...fixture,
+    keyFilter: new Set(['1-99-test-auto-create']),
     token: 'secret-token',
     sleepImpl: async (ms) => { sleeps.push(ms); },
     fetchImpl: async (url, init = {}) => {
       requests.push({ url, init });
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/7012056981667022142/task?custom_fields=')) {
+      if (url.includes('/list/7012056981667022142/task?')) {
+        const query = JSON.parse(new URL(url).searchParams.get('custom_fields'));
+        assert.equal(query[0].operator, '==');
         return jsonResponse(200, { tasks: [] });
       }
       if (url.endsWith('/list/7012056981667022142/task') && init.method === 'POST') {
@@ -82,6 +138,7 @@ test('createMissingClickUpTasks skips unknown prefixes with an action message', 
   try {
     const summary = await createMissingClickUpTasks({
       ...fixture,
+      keyFilter: new Set(['9-9-smoke-test-create']),
       token: 'secret-token',
       sleepImpl: async () => {},
       fetchImpl: async (url) => {
@@ -105,11 +162,12 @@ test('createMissingClickUpTasks is idempotent when the task already exists', asy
 
   const summary = await createMissingClickUpTasks({
     ...fixture,
+    keyFilter: new Set(['1-99-test-auto-create']),
     token: 'secret-token',
     sleepImpl: async () => {},
     fetchImpl: async (url, init = {}) => {
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/7012056981667022142/task?custom_fields=')) {
+      if (url.includes('/list/7012056981667022142/task?')) {
         return jsonResponse(200, { tasks: [{ id: 'existing-task-456' }] });
       }
       if (init.method === 'POST') {
@@ -130,11 +188,12 @@ test('createMissingClickUpTasks exits successfully when an individual create fai
 
   const summary = await createMissingClickUpTasks({
     ...fixture,
+    keyFilter: new Set(['1-99-test-auto-create']),
     token: 'secret-token',
     sleepImpl: async () => {},
     fetchImpl: async (url, init = {}) => {
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
-      if (url.includes('/list/7012056981667022142/task?custom_fields=')) {
+      if (url.includes('/list/7012056981667022142/task?')) {
         return jsonResponse(200, { tasks: [] });
       }
       if (init.method === 'POST') return jsonResponse(500, {});
