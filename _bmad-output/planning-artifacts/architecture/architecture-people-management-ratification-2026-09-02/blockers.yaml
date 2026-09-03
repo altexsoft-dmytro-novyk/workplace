@@ -437,6 +437,23 @@ blockers:
       verified. Recorded 2026-09-03 via bmad-correct-course to pre-empt a
       stale-status merge conflict.
 
+      Correction, 2026-09-03: the `note` above is partly stale for the backend
+      this docs branch itself points at (gitlink 25afb15), not only for
+      dn-um-implementation. Verified there: path (3) is closed —
+      interim-access-control.adapter.ts is deleted by this branch's own commit
+      979f225 and access-control-facade.adapter.ts implements isAllowedForTarget
+      with real audience resolution for reads and fail-closed for write-path
+      target features. Path (2) is half closed — the Root persona still creates
+      the position 'HR Admin' User row, but the automatic grant of
+      user-management:create|deactivate|list is gone, because isAllowed now
+      delegates to the real FR grant chain with no User.position shortcut.
+      Path (1) is live and unchanged: interim-session-resolver.adapter.ts is
+      still present, so any `Bearer <token:persona>` resolves to a session.
+      Status stays open on path (1) alone. The two
+      interim-access-control.adapter.ts entries in `evidence` no longer resolve
+      at 25afb15; they are kept because they still resolve at the pre-979f225
+      revisions the original assessment was written against.
+
   - id: CC-08
     owner: Architect
     severity: P0
