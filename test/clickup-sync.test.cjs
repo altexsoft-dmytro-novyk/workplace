@@ -13,23 +13,30 @@ afterEach(async () => {
   await Promise.all(temporaryDirectories.splice(0).map((directory) => fs.rm(directory, { recursive: true, force: true })));
 });
 
-test('workflow syncs only when ClickUp inputs or its definition change', async () => {
+test('workflow creates missing tasks before syncing sprint status', async () => {
   const workflowPath = path.join(__dirname, '..', '.github', 'workflows', 'sync-clickup.yml');
   const workflow = yaml.load(await fs.readFile(workflowPath, 'utf8'));
 
+  assert.ok(workflow.on.workflow_dispatch);
   assert.deepEqual(workflow.on.push.paths, [
     '_bmad-output/implementation-artifacts/**/sprint-status.yaml',
     'clickup-sync.yaml',
+    'scripts/clickup-lib.cjs',
+    'scripts/create-clickup-task.cjs',
     'scripts/sync-clickup.cjs',
     '.github/workflows/sync-clickup.yml',
   ]);
   assert.deepEqual(workflow.on.push.branches, ['main']);
   assert.equal(workflow.permissions.contents, 'read');
+  assert.equal(workflow.jobs.sync.needs, 'create-if-missing');
 
-  const steps = workflow.jobs.sync.steps;
-  assert.ok(steps.some((step) => step.uses === 'actions/setup-node@v4' && step.with?.['node-version'] === '20'));
-  assert.ok(steps.some((step) => step.run === 'npm ci'));
-  assert.deepEqual(steps.find((step) => step.run === 'npm run sync:clickup'), {
+  const createSteps = workflow.jobs['create-if-missing'].steps;
+  assert.ok(createSteps.some((step) => step.run === 'npm run create:clickup'));
+
+  const syncSteps = workflow.jobs.sync.steps;
+  assert.ok(syncSteps.some((step) => step.uses === 'actions/setup-node@v4' && step.with?.['node-version'] === '20'));
+  assert.ok(syncSteps.some((step) => step.run === 'npm ci'));
+  assert.deepEqual(syncSteps.find((step) => step.run === 'npm run sync:clickup'), {
     run: 'npm run sync:clickup',
     env: { CLICKUP_API_TOKEN: '${{ secrets.CLICKUP_API_TOKEN }}' },
   });
@@ -454,6 +461,38 @@ test('syncClickUp redacts malformed team response errors before any task write',
   );
 
   assert.deepEqual(requests.map(({ url }) => url), ['https://api.clickup.com/api/v2/team']);
+});
+
+test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', async () => {
+  const fixture = await createFixture({
+    config: [
+      'workspace_id: "90122019689"',
+      'list_id: "list-123"',
+      'status_map:',
+      '  in-progress: "in progress"',
+      'custom_fields:',
+      '  bmad_key: "bmad-key-field"',
+      'tasks: {}',
+    ].join('\n'),
+  });
+  const requests = [];
+
+  await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: async (url, init = {}) => {
+      requests.push({ url, init });
+      if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+      if (url.includes('/list/list-123/task?custom_fields=')) {
+        return jsonResponse(200, { tasks: [{ id: 'task-from-bmad-key' }] });
+      }
+      return successfulClickUpResponse(url, init);
+    },
+  });
+
+  assert.ok(requests.some(({ url }) => url.includes('/list/list-123/task?custom_fields=')));
+  assert.ok(requests.some(({ url, init }) => url === 'https://api.clickup.com/api/v2/task/task-from-bmad-key' && init.method === 'PUT'));
 });
 
 test('collectSyncEntries rejects a configured task mapping without an ID even when its source key is absent', async () => {

@@ -69,3 +69,5 @@ development_status:
 
   # TEST ONLY — BMad→ClickUp sync smoke (ClickUp task 869euv7rn); remove after verification
   9-9-clickup-sync-smoke-test: backlog
+  # TEST ONLY — Phase 2 create-if-missing happy path; remove after verification
+  1-99-happy-path-test: backlog

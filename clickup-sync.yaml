@@ -1,4 +1,5 @@
 workspace_id: "90122019689"
+list_id: "7012056981667022142"
 status_map:
   backlog: "to do"
   ready-for-dev: "to do"
@@ -6,6 +7,7 @@ status_map:
   review: "code review"
   done: "done"
 custom_fields:
+  bmad_key: "d2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b"
   git_branch: "3ae4ce80-b2ee-4ab4-9eae-cc7c33224921"
   validation_status: "1b403e5c-f636-4d6f-9d57-4206d6292290"
 tasks:

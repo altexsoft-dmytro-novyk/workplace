@@ -7,14 +7,30 @@ on:
     paths:
       - _bmad-output/implementation-artifacts/**/sprint-status.yaml
       - clickup-sync.yaml
+      - scripts/clickup-lib.cjs
+      - scripts/create-clickup-task.cjs
       - scripts/sync-clickup.cjs
       - .github/workflows/sync-clickup.yml
+  workflow_dispatch: {}
 
 permissions:
   contents: read
 
 jobs:
+  create-if-missing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run create:clickup
+        env:
+          CLICKUP_API_TOKEN: ${{ secrets.CLICKUP_API_TOKEN }}
+
   sync:
+    needs: create-if-missing
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

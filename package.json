@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync:clickup": "node scripts/sync-clickup.cjs",
-    "test:clickup": "node --test test/clickup-sync.test.cjs",
+    "create:clickup": "node scripts/create-clickup-task.cjs",
+    "test:clickup": "node --test test/clickup-sync.test.cjs test/clickup-create.test.cjs",
     "services:init": "git submodule update --init --recursive",
     "services:status": "git submodule status",
     "services:sync": "git submodule update --remote",
