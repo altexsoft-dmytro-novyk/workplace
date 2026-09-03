@@ -897,3 +897,219 @@ approvals:
       Policies row deletes UserPolicies link; department_manager journal subject
       = subjectDepartmentId (schema route, not the interim). EPIC 4 COMPLETE
       (within current infra; department-derived access deferred to the AC walk).
+
+  - story_id: "5-1-record-a-departure-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/departure/{um-dep-01,02,05,06}.md + README.md + spec-5-1-record-a-departure.md + epic-5-context.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T06:20:00Z"
+    note: >-
+      Unblocked from CC-06 - Departure aggregate schema IS ratified
+      (database-schema.md §Departure), CC-06 "design approved". Story 5.1
+      (record) proceeds. um-dep-01/02 de-blocked + new um-dep-05 (reparenting +
+      retry) + um-dep-06 (idempotency + authz). um-dep-03/04 stay BLOCKED
+      (Story 5.2 executor). DECISIONS: (1) expectedBlockerVersion =
+      "v1:"+base64url(sha256({userId, blockers:[sorted platform-owned identity
+      tuples]})); external_pm_dm excluded. (2) reparenting reuses Epic 4's
+      application-layer relationship-write services in ONE prisma.$transaction
+      (shared tx) - COORDINATION: Epic 4 repos currently open their own
+      $transaction, Story 5.1 Stage 3 must add optional tx param to them
+      (additive). (3) BUSINESS_TIME_ZONE = new REQUIRED startup-validated IANA
+      env var, no UTC fallback, example Europe/London; .env.example harness-
+      blocked -> coordinator hands the user the block. (4) post-schedule
+      "reject new responsibility for the departing actor" guard lives in Epic
+      4's relationship-write path, reads Epic 5 via hasNonAppliedDeparture(
+      userId); confirm 409 vs 422. (5) POST /users/:id/departures 201 body =
+      {departureId, userId, state:'scheduled', effectiveDate, effectiveTimeZone,
+      dueAt, reason, createdAt} - NO worker internals ever. 409 blocker body =
+      {error, blockers[{kind, summary, targets?}], expectedBlockerVersion,
+      defaultReparentTargetId}. Perm employee:departure:record (grant in-test).
+      DEFERRED: Story 5.2 executor (um-dep-03/04); applyDepartureEffects cross-
+      context (Action Items + Mentorship - unbuilt); um-dep-02 T4 external
+      PM/DM (it.todo - no timetracker sync seam).
+
+  - story_id: "5-1-record-a-departure-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-5/record-departure.e2e-spec.ts + test/user-management/epic-5/fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T06:50:00Z"
+    note: >-
+      Committed-red 17 failed / 1 todo (all route/model-missing 404). um-dep-01
+      (record+GET), um-dep-02 T1-3+T5 (blocker 409), um-dep-05 (reparenting),
+      um-dep-06 (idempotency+authz). um-dep-02 T4 external PM/DM -> it.todo.
+      fixtures.ts: RECORD_A_DEPARTURE_PERMISSION -> employee:departure:record
+      (was stale user-management:record-a-departure), + to_regclass-guarded
+      departureTableExists/queryDepartureRows/cleanupDepartures. apply-departure
+      .e2e-spec.ts untouched (Story 5.2, 4 red). tsc 0, lint clean. Full sweep:
+      passed 314 UNCHANGED (zero green->red), failed +11 todo +1 all additive
+      from the expanded suite. Coordinator spot-check: epic-1/2/3/4 + adoption =
+      18 suites green / 1 seed known-blocked red (baseline, not a regression).
+      Stage 3 pins: exact expectedBlockerVersion digest, dueAt instant, 409
+      error-code strings, reparent response body, BUSINESS_TIME_ZONE env.
+
+  - story_id: "5-1-record-a-departure-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (departure area) + prisma/migrations/20260903032945_story_5_1_departure + src/config/env.validation.ts + test/jest.setup-env.ts + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T07:20:00Z"
+    note: >-
+      Departure model + DepartureState enum + additive migration 20260903032945
+      (partial UNIQUE departures_one_non_applied_per_user WHERE state<>'applied';
+      due-at-tz-present + applied-state raw-SQL CHECKs; FK footgun stripped;
+      acm1r 39/39 verified). BUSINESS_TIME_ZONE = Joi.required() IANA-validated,
+      no UTC fallback; jest default via new test/jest.setup-env.ts (setupFiles,
+      ??= Europe/London). DeparturesController @Controller('users'): POST
+      /users/:id/departures (blocker check -> 409 {error:'departure_blocked_by_
+      responsibilities', blockers, expectedBlockerVersion, defaultReparentTargetId};
+      idempotency by idempotencyKey+requestHash, 'idempotency_key_payload_
+      mismatch' / 'departure_already_scheduled'; dueAt = local-midnight-in-zone
+      two-pass Intl fixpoint, never host local; clean 201 projection no worker
+      internals), GET .../:departureId, POST .../departure-reparenting (recompute
+      digest, pg_advisory_xact_lock serialize, reassign 3 blocker kinds + 1
+      AccessJournal row each in one $transaction, 'blocker_version_stale' on
+      mismatch, no Departure row). Epic 4 tx-refactor: chose the FALLBACK -
+      reparent repo re-implements the 3 edge+journal writes inline; org-
+      relationship.repository/port/service UNTOUCHED (lower risk). Post-schedule
+      guard on assign-manager / change-people-partner / set-department-manager
+      actions -> 409 'target_has_scheduled_departure' via DepartureService.
+      hasNonAppliedDeparture. idempotencyKey column stays uuid; header coerced
+      (well-formed uuid as-is else sha256->uuid). api-conventions.md updated.
+      COORDINATOR-VERIFIED: record-departure 17 green / 1 todo; epic-4 all green
+      (post-schedule guard no regression); acm1r 39/39; tsc 0 errors; lint clean;
+      full sweep 331 passed (314 + 17) / 46 failed / 14 todo - ZERO green->red.
+      spec-5-1 -> done. Story 5.1 COMPLETE.
+      USER ACTION: add to .env + .env.example (harness-blocked):
+        BUSINESS_TIME_ZONE=Europe/London
+
+  - story_id: "5-2-apply-an-effective-departure-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/departure/{um-dep-03,04,07,08}.md + README.md + spec-5-2-apply-an-effective-departure.md + epic-5-context.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T07:50:00Z"
+    note: >-
+      SPLIT-GATE. LIVE (first-class stage-2): the PG-polling DepartureWorker
+      (skip-locked claim + leaseToken/leaseUntil fencing + reclaim + capped-
+      backoff retry, no terminal abandoned state); the apply $transaction for
+      every UM-owned effect (EmploymentStatus close validTo=effectiveDate +
+      dismissed insert sourceDepartureId unique FK + departureReason,
+      User.isActive=false, persisted-access sweep w/ idempotent full_profile_
+      revoke journal for residual, applied+appliedAt); request-time auth cutoff
+      (um-dep-07 - session resolver runs SELECT 1 FROM Departure WHERE userId=
+      actor AND dueAt<=now() PG-time -> 401, worker-independent); POST .../retry
+      202 retry_wait-only / 409 else; stale-executor no-op (um-dep-08); LIVE
+      health subset GET /health/departures via @nestjs/terminus; per-process
+      startup check; no departure career event. DEFERRED it.todo (PM/AD-23,
+      participants absent): um-dep-03 action-item cancellation (assigned-to only
+      per PM/AD-5) + mentorship auto-close; um-dep-04 "no double-cancel / no
+      double-close" legs. applyDepartureEffects({departureId, departingUserId,
+      effectiveDate, leaseToken, tx}) call site is a real no-op seam.
+      DECISIONS: (1) @nestjs/schedule @Interval worker - NEW production dep +
+      ScheduleModule.forRoot(); DEPARTURE_WORKER_POLL_MS 60s prod;
+      DEPARTURE_WORKER_ENABLED explicit true/false no default. (2) test-invoke =
+      injectable method via Nest testing module + back-dated dueAt; NO test-only
+      HTTP endpoint (testing-strategy.md forbids). (3) cutoff in JwtSession
+      ResolverAdapter/SessionGuard, one uncached PG-now() query/request; AC
+      actor-check is layer 2. (4) GET /health/departures LIVE {oldestDueLag
+      Seconds, retryWaitCount, processingCount, reclaimedLeaseCount, request
+      TimeCutoffDenialsTotal, workerConfig}; alerts/vendor/remediation-incident
+      DEFERRED. (5) retry auth = employee:departure:record (no new perm). (6)
+      per-process startup check LIVE; cross-process BUSINESS_TIME_ZONE consensus
+      DEFERRED. NEW um-dep-07 (cutoff independence), um-dep-08 (fencing no-op).
+      um-dep-04 filename kept (4 inbound links).
+      NEW ENV (three-places, harness-blocked .env*): DEPARTURE_WORKER_ENABLED,
+      DEPARTURE_WORKER_POLL_MS -> coordinator hands user the block at Stage 3.
+
+  - story_id: "5-2-apply-an-effective-departure-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-5/apply-departure.e2e-spec.ts + test/user-management/epic-5/fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T09:40:00Z"
+    note: >-
+      Committed-red split-gate: 8 LIVE it red (no worker: EmploymentStatus stays
+      active / no dismissed row / state scheduled; no POST .../retry route ->
+      404; no request-time cutoff -> self-read 200; no GET /health/departures ->
+      404), 2 guardrail it green (um-dep-07 T2/T3 - denial not materialisation-
+      dependent, cutoff must not fire early), 6 DEFERRED it.todo (um-dep-03 x2
+      action-items/mentorship applyDepartureEffects; um-dep-04 x2 no-double-
+      cancel/close; um-dep-08 x2 worker fencing - flagged: stale-executor no-op
+      un-committed-red-able without the worker). fixtures += backdateDeparture
+      DueAt + queryEmploymentStatusRows. Departure seeded via real POST /users/
+      :id/departures then dueAt back-dated; retry_wait seeded by raw enum-cast
+      UPDATE. Full sweep 333 passed (was 331, +2 guardrail) / 50 failed / 20
+      todo, suites 7 failed / 33 passed UNCHANGED - zero green->red. tsc 0, lint
+      clean. record-departure unchanged 17/1todo.
+
+  - story_id: "5-2-apply-an-effective-departure-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (departure worker + retry + cutoff + health) + package.json (@nestjs/schedule) + src/config/env.validation.ts + src/app.module.ts + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T10:00:00Z"
+    note: >-
+      SPLIT-GATE LIVE half. @nestjs/schedule@6.1.3 added (only new dep; Nest
+      10/11 peer). DepartureWorkerService: processDueDepartures / applyDeparture
+      / requestRetry; claim = SELECT ... WHERE (scheduled AND dueAt<=now()) OR
+      (retry_wait AND nextAttemptAt<=now()) OR (processing AND leaseUntil<now())
+      ORDER BY effectiveDate,id FOR UPDATE SKIP LOCKED -> processing + fresh
+      leaseToken + leaseUntil now()+120s. Apply = one $transaction: re-read FOR
+      UPDATE + fence on state='processing' AND leaseToken; close active
+      EmploymentStatus + insert dismissed (ON CONFLICT (sourceDepartureId) DO
+      NOTHING; dates stay in SQL); users.isActive=false; persisted-access sweep
+      (+full_profile_revoke journal, sha256 idempotency key, no rows in LIVE
+      tests); applyDepartureEffects({...tx}) real seam bound to Noop
+      DepartureEffectsParticipant (zero participants, PM/AD-23); state='applied'
+      fenced. On throw -> separate fenced tx -> retry_wait, attempts+1,
+      lastError = apply_failed[:prisma_<code>|:<Class>] (no msg/stack/PII),
+      backoff min(60*2^attempts, 3600)s, no abandoned state. Expired-lease
+      reclaim bumps reclaimedLeaseCount. Interval via SchedulerRegistry.
+      addInterval in onApplicationBootstrap guarded by DEPARTURE_WORKER_ENABLED
+      (env can't be a decorator arg; nest-config.md no-process.env rule).
+      POST /users/:id/departures/:departureId/retry @HttpCode(202)
+      @RequireFeature(employee:departure:record): retry_wait->202 (targeted
+      claimOne + synchronous applyDeparture, deterministic; two parallel -> one
+      claims other no-ops), other->409 departure_not_retryable, unknown/foreign
+      ->404. Request-time cutoff in jwt-session-resolver.adapter: after userId
+      resolve, SELECT 1 FROM departures WHERE userId=$1 AND dueAt<=now() AND
+      state IN (scheduled,processing,retry_wait,applied) -> resolve returns null
+      -> 401; requestTimeCutoffDenialsTotal++; not cached; JWT + Bearer<token:
+      uuid> both funnel through; other users unaffected. GET /health/departures
+      unauthenticated -> {oldestDueLagSeconds, retryWaitCount, processingCount,
+      reclaimedLeaseCount, requestTimeCutoffDenialsTotal, workerConfig}.
+      user.repository: ?employmentStatus=dismissed no longer forces isActive:true.
+      env: DEPARTURE_WORKER_ENABLED Joi.boolean().required() (no default),
+      DEPARTURE_WORKER_POLL_MS default 60000. api-conventions.md updated.
+      TEST FIX (necessary, per scenario docs um-dep-03/04): added runDeparture
+      Worker(app) helper + 3 call sites (um-dep-03 T1/T3, um-dep-04 T4);
+      retry-endpoint tests need no call (synchronous apply).
+      COORDINATOR-VERIFIED: apply-departure 10 passed (8 LIVE + 2 guardrail) /
+      6 it.todo; record-departure 17/1 unchanged; acm1r 39/39; epic-3/4 all
+      green; tsc 0; npm build passes; lint clean; full sweep 341 passed (was
+      333) / 42 failed / 20 todo - exactly 8 LIVE red->green, ZERO green->red.
+      spec-5-2 -> done. EPIC 5 COMPLETE (within current infra).
+      USER ACTION: append to .env + .env.example (harness-blocked):
+        BUSINESS_TIME_ZONE=Europe/London   (Story 5.1)
+        DEPARTURE_WORKER_ENABLED=true
+        DEPARTURE_WORKER_POLL_MS=60000

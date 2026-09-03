@@ -19,10 +19,41 @@ event** (§4.9) — employment status is the sole source of truth for a departur
 
 ## Requirements & Constraints — GATE FIRST
 
-- **CC-06 blocks implementation.** CC-06 must define the scheduled-departure
-  representation, the effective-date executor, retries, and idempotency before
-  stage-2 or production work on either story. Scenario prose (AD-1 stage 1) may
-  proceed.
+- **GATE — updated 2026-09-03 (2026-09-02 architecture ratification).** The
+  **`Departure` aggregate schema is ratified** (`database-schema.md` §Departure,
+  AD-20) and **CC-06 is design approved** (P1 open = *implementation* absent, not
+  design). Consequences:
+  - **Story 5.1 (record) proceeds to stage-2 / production.** The `Departure`
+    Prisma model + migration are hand-authored to the ratified §Departure shape;
+    `POST /users/:id/departures` (`201` + blocker `409` + `expectedBlockerVersion`
+    digest), `POST /users/:id/departure-reparenting`, `GET .../:departureId`, and
+    the `Idempotency-Key` / `requestHash` semantics are first-class. The stale
+    *"CC-06 blocks implementation"* / *"scenario prose only"* language is
+    **removed** from `spec-5-1`, `um-dep-01`, `um-dep-02`.
+  - **Story 5.2 (apply) — SPLIT-GATE (reconciled 2026-09-03).** CC-06 being
+    **design approved**, Story 5.2's **effective-date executor / worker** and
+    every **UM-owned local effect** now **proceed to stage-2 / production** as
+    this story's build: the DB-polling worker + skip-locked claim + fencing
+    token + capped-backoff retry + no-terminal-abandoned-state; the apply
+    `prisma.$transaction` (`EmploymentStatus` close+insert with
+    `sourceDepartureId`, `User.isActive = false`, the persisted-access sweep +
+    idempotent `AccessJournal`, `applied` mark); the request-time auth cutoff
+    (`dueAt` vs PostgreSQL `now()`, worker-independent); `POST …/retry`
+    (`202` from `retry_wait` only); local-effect idempotency; the
+    stale-executor no-op; the LIVE AD-20 health subset
+    (`GET /health/departures`); the per-process mixed-config startup check.
+    `um-dep-03` / `um-dep-04` lose the *"BLOCKED — CC-06"* framing; new
+    `um-dep-07` (worker-independent cutoff) and `um-dep-08` (fencing no-op).
+  - **Still deferred (`it.todo` only):** the two **cross-context**
+    `applyDepartureEffects` legs (`PM/AD-23` — *"signature approved, no
+    participant implements it"*): **action-item cancellation** (unblock: *the
+    Action Items context implements `applyDepartureEffects`*; assigned-to rule,
+    PM/AD-5) and **mentorship auto-close** (unblock: *the Mentorship context
+    implements `applyDepartureEffects`*). The call site is a **real no-op
+    seam** — no stubbed participant behaviour.
+  - The departure scenario folder **exists** (`docs/test-cases/user-management/departure/`,
+    `um-dep-01/02/03/04/05/06/07/08` + README) — Epic 5 stage 1 is
+    reconciliation, not a blank page.
 - **AD-20 is the binding future target** and must not be redefined at BA/spec
   level: `Departure` is a durable aggregate created by idempotent
   `POST /users/:userId/departures` with `Idempotency-Key` and
@@ -47,18 +78,26 @@ event** (§4.9) — employment status is the sole source of truth for a departur
   scheduled, new direct-report / department-manager / PP responsibility for that
   actor is rejected and new synced PM/DM grants are quarantined with an
   incident.
-- **Story 5.2 (apply).** On `dueAt`, one cross-context PostgreSQL transaction:
-  close the active employment interval, insert the idempotent `dismissed` fact,
-  deactivate account/profile (read-only, out of the default list but still
-  filterable), cancel only open action items **assigned to** the departing
-  person as *cancelled — departed* (items they authored for other, still-active
-  assignees remain open), system-close active mentorship pairs with a system
-  note (bypassing the closure-note gate), and end every persisted access
-  assignment the actor holds. **All access the departed person held ends
-  immediately**, overriding the project 15-minute
-  window (`access-control.md` revocation timing / AD-20). Request-time
-  auth/AccessControl denies the actor from `00:00` effective regardless of
-  worker lag. **No departure event is added to the career timeline.**
+- **Story 5.2 (apply) — SPLIT-GATE.** On `dueAt`, one PostgreSQL transaction.
+  **LIVE (UM-owned local effects, this story's build):** close the active
+  employment interval, insert the idempotent `dismissed` fact
+  (`sourceDepartureId` `unique` FK), deactivate account/profile (`isActive`
+  false, read-only, out of the default list but still filterable via
+  `?employmentStatus=dismissed`), run the persisted-access sweep (a no-op after
+  Story 5.1 re-parenting; any residual overlay grant → idempotent
+  `full_profile_revoke` `AccessJournal` row keyed by `departure.id`), mark
+  `applied`. **DEFERRED (`it.todo`, `PM/AD-23` — participants unbuilt):**
+  cancel only open action items **assigned to** the departing person as
+  *cancelled — departed* (items they authored for other, still-active assignees
+  remain open), and system-close active mentorship pairs with the fixed system
+  note (bypassing the closure-note gate) — both invoked through the real no-op
+  `applyDepartureEffects({ …, tx })` seam. **All access the departed person held
+  ends immediately**, overriding the project 15-minute window
+  (`access-control.md` revocation timing / AD-20): the **request-time** cutoff
+  (session resolver / `SessionGuard`, `dueAt` vs PostgreSQL `now()`) denies the
+  actor from `00:00` effective **regardless of worker state** — LIVE, proven
+  worker-independent by `um-dep-07`. **No departure event is added to the career
+  timeline** (no such `UserEvents` type).
 - **Idempotency.** The executor retrying after a partial/uncertain failure
   produces no duplicate status, cancellation, closure, or journal effect.
   PostgreSQL-backed workers claim rows with skip-locked selection and a fencing
@@ -76,24 +115,39 @@ event** (§4.9) — employment status is the sole source of truth for a departur
   `POST /users/:id/departures/:departureId/retry` (`202`, `retry_wait` only),
   `POST /users/:id/departure-reparenting`. No `PATCH`/`DELETE`, no cancel or
   reschedule route (spine Deferred — needs a product decision).
-- `Departure` aggregate + `EmploymentStatus` interval table — **schema owned by
-  CC-06/AD-20**; do not hand-author against a guessed shape. Additive migrations
+- `Departure` aggregate + `EmploymentStatus` interval table — **schema RATIFIED**
+  in `database-schema.md` §Departure / §EmploymentStatus (AD-20, 2026-09-02). No
+  longer a guessed shape: Story 5.1 hand-authors the Prisma model + migration to
+  that spec (raw-SQL partial-unique + state-machine + `dueAt` CHECK).
+  `EmploymentStatus.sourceDepartureId` FK → `Departure`. Additive migrations
   land before worker enablement (AD-21 operational release gate).
 - States `scheduled | processing | retry_wait | applied`, capped exponential
   retry, sanitized diagnostics, alert threshold, manual retry, no terminal
   abandoned state.
 - **Operational release gate (AD-20):** every deployed environment validates the
   same `BUSINESS_TIME_ZONE`, runs ≥1 worker against the same PostgreSQL source,
-  and exposes health signals (oldest-due lag, retry-wait count,
-  expired/reclaimed leases, request-time cutoff failures, remediation
-  incidents). Mixed process config is a startup failure. Hosting/observability
-  vendor is Deferred.
+  and exposes health signals. **LIVE for Story 5.2:** `GET /health/departures`
+  (`@nestjs/terminus`, already a dependency) →
+  `{ oldestDueLagSeconds, retryWaitCount, processingCount, reclaimedLeaseCount,
+  requestTimeCutoffDenialsTotal, workerConfig: { enabled, businessTimeZone } }`;
+  and a per-process fail-fast startup check (`BUSINESS_TIME_ZONE` valid +
+  `DEPARTURE_WORKER_ENABLED` explicitly set). **Deferred:** alert thresholds,
+  paging, the observability-vendor push, cross-process config consensus, and
+  the `remediation incident` counter (needs the timetracker-sync seam).
+  **Worker mechanism:** injectable `DepartureWorkerService.processDueDepartures()`
+  on a DB-polling loop via `@nestjs/schedule` `@Interval` (**a new production
+  dependency** — coordination flag), ~60 s in production; no in-memory
+  effective-date timer. E2E drives the method directly with a back-dated
+  `Departure.dueAt` (no test-only HTTP endpoint — `testing-strategy.md`).
 - Standard hexagonal layout; domain imports nothing from Prisma/NestJS/HTTP.
 
 ## Cross-Story / Cross-Epic Dependencies
 
-- Story 5.2 depends on Story 5.1 (a recorded departure to apply) and on the
-  CC-06 executor contract.
+- Story 5.2 depends on Story 5.1 (a recorded departure to apply). CC-06 is
+  **design approved** — the executor is Story 5.2's own build, not an external
+  blocker. The only remaining external dependency is the `applyDepartureEffects`
+  **participants** (`action-items`, `mentorship`), which gate the two
+  cross-context `it.todo` legs only.
 - Epic 1 Story 1.5's default-list exclusion reads `EmploymentStatus`.
 - Epic 2 Story 2.2's `um-auth-06` asserts a departed account establishes no
   session.

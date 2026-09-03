@@ -52,6 +52,31 @@ baseline" no longer holds for the changed files:
   = prose only"; **4.3's department-derived-access slice** (`um-rel-12` T3,
   all of `um-rel-13`'s access half, `um-rel-17` `it.todo` — an
   Access-Control-kernel increment) and 4.2's HR-line slice stay.
+- `departure/` — **Story 5.1 reconciled 2026-09-03** to the 2026-09-02
+  architecture ratification (`Departure` aggregate schema ratified —
+  `database-schema.md` §Departure, AD-20; **CC-06 design approved**). `um-dep-01`,
+  `um-dep-02` lose the *"BLOCKED — CC-06"* box; new `um-dep-05` (`POST
+  /users/:id/departure-reparenting` — atomic blocker reassignment + journal;
+  stale digest `409`; follow-up record `201`) and `um-dep-06` (`Idempotency-Key`
+  replay / payload-mismatch `409` / one-non-applied-per-user `409` /
+  unauthorized `403`). Recording, the blocker check + `409` body, the
+  `expectedBlockerVersion` digest, and `dueAt` resolution in `BUSINESS_TIME_ZONE`
+  are **first-class stage-2**. **Story 5.2 reconciled 2026-09-03 as a
+  SPLIT-GATE:** CC-06 being **design approved**, the effective-date
+  executor/worker and every **UM-owned local effect** are now first-class
+  stage-2 — `um-dep-03` / `um-dep-04` lose the *"BLOCKED — CC-06"* framing, plus
+  new `um-dep-07` (request-time cutoff proven worker-independent — `dueAt` vs PG
+  `now()`, row still `scheduled`) and `um-dep-08` (stale-executor `leaseToken`
+  fence no-op). **Deferred `it.todo` only:** the cross-context
+  `applyDepartureEffects` legs — action-item cancellation (unblock: *the Action
+  Items context implements `applyDepartureEffects`*) and mentorship auto-close
+  (unblock: *the Mentorship context implements `applyDepartureEffects`*); the
+  `PM/AD-23` call site is real (a no-op seam), no stubbed participant behaviour.
+  Folder `README.md` carries the 12 scenario-stage decisions (5.1: digest
+  derivation, re-parent transaction reuse, `BUSINESS_TIME_ZONE`, post-schedule
+  guard, `201` body; 5.2: worker mechanism + poll interval, test-invocation
+  seam, request-time cutoff, health surface, `retry` auth, mixed-config startup
+  check, local-effect idempotency keys). Fresh approval required.
 - `career-timeline/` traces were **realigned** to DEC-UM-001 / Stories 3.2–3.3
   (fresh approval required); two dual-gate negatives added. **Story 3.2
   reconciled 2026-09-02** to the split-gate decision (Dmytro): manual backfill
@@ -170,13 +195,15 @@ gone with `registration/`.
 | `list/` | FR-15 — `GET /users` pagination + metadata, permission-safe S1-field filters, dismissed-employee visibility via `employmentStatus`, endpoint authz, fixed fail-closed projection, unknown-filter rejection, empty page, deterministic sort, NFR-2 perf note (Epic 1 Story 1.5) | 12 | blank-page v1.5 rewrite (`um-list-01..04` retargeted, `um-list-05..12` reworked/new); folder README carries the in-scenario decisions |
 | `career-timeline/` | FR-5/FR-11/FR-12/FR-13 — system events; career-timeline read audience; Story 3.2 manual backfill + Story 3.3 soft-delete / correction (feature-permission gate, `hr-admin` only this stage; DEC-UM-001 PP/direct-UM audience scoping deferred to the FR-matrix grant); edit-immutability, no `PATCH` (Epic 3). Folder README carries the split-gate decision + the ⚠️-to-ratify tension. | 13 (+ folder `README.md`) | Story 3.2 reconciled 2026-09-02; **Story 3.3 reconciled 2026-09-03** (`um-ct-13` new; `um-ct-03/04/05/06/09` → `it.todo` deferred; `um-ct-07/08/10/12/13` live) |
 | `relationships/` | FR-10 — Epic 4 organisational facts: manager + the `AccessJournal` foundation (4.1, retraced/authored, journal assertions first-class per PM/AD-29), PP (4.2, reconciled 2026-09-03 — direct assigned-PP edge first-class; HR-line propagation deferred), department + department-manager (4.3, split-gate reconciled 2026-09-03 — membership/manager **writes** + `department_change` event + `department_membership`/`department_manager` journal rows first-class; department-derived **access resolution** deferred `it.todo` pending an AC-kernel increment) | 14 | split; see folder README |
-| `departure/` | FR-6 — Epic 5 employment lifecycle (record / blocked / apply / retry) | 4 | new draft, **all BLOCKED — CC-06** |
+| `departure/` | FR-6 — Epic 5 employment lifecycle: record + blocker check + re-parent + idempotency (Story 5.1); apply + retry + request-time cutoff + fencing (Story 5.2) | 8 | **Story 5.1 reconciled 2026-09-03** (`um-dep-01/02/05/06` first-class stage-2). **Story 5.2 reconciled 2026-09-03 as a SPLIT-GATE:** `um-dep-03/04/07/08` — worker + UM-owned local effects LIVE first-class stage-2; only the Action-Items + Mentorship `applyDepartureEffects` legs stay deferred `it.todo` |
 | `registration/` | **RETIRED (v1.5)** — `um-reg-01..15` `POST /users` HTTP create. See folder README. | 15 | history only |
 | `deactivation/` | **RETIRED (v1.5)** — `um-deact-01..03` generic `DELETE /users/:id`. See folder README. | 3 | history only |
 
-**Live stage-1 scenario files (v1.5, subject to per-file approval):** 76
+**Live stage-1 scenario files (v1.5, subject to per-file approval):** 80
 (+8: the `um-photo-*` set replacing the single `um-pf-02`; +1: `um-ct-11`;
-+1: `um-ct-12`; +1: `um-ct-13`; +1: `um-rel-15`; +1: `um-rel-16`; +1: `um-rel-17`).
++1: `um-ct-12`; +1: `um-ct-13`; +1: `um-rel-15`; +1: `um-rel-16`; +1: `um-rel-17`;
++2: `um-dep-05`, `um-dep-06` — Story 5.1 reconciliation 2026-09-03;
++2: `um-dep-07`, `um-dep-08` — Story 5.2 SPLIT-GATE reconciliation 2026-09-03).
 `um-ct-03`, `um-ct-04`, `um-ct-05`, `um-ct-06`,
 `um-ct-09` stay on disk as **deferred `it.todo`** — target end-state prose
 retained, approved as such; they reactivate on the FR-permission-matrix grant of
@@ -197,7 +224,7 @@ the AC department-tree walk) (`career-timeline/README.md`).
 | DEC-UM-001 direct-Unit-Manager leg needs the AC **department-tree walk** increment (`targetType:'department'` + recursion) | the direct-UM manual-write path in `um-ct-04` and the direct-UM soft-delete path in `um-ct-06` (both deferred `it.todo`; the assigned-PP leg in `um-ct-03`/`um-ct-05` is unaffected) |
 | Department contract / PM/AD-35 (nested `Department` parent/manager edge schema + recursive department-tree walk; spine Deferred) — the HR-boundary binding | **Story 4.2's HR-line-propagation slice only** (the HR chain *above* the directly assigned PP; fail-closed to the direct PP until then). The **direct assigned-PP edge** (`relationships/um-rel-09/10/11/16`) is **not** blocked — CC-07/PM/AD-29 done via Story 4.1, CC-04 design-resolved (`P2`, "Not a design blocker on PM/AD-19"). |
 | **AC `resolveAudiences` department-tree walk** — the `targetType:'department'` `Policies` leg + `Department.parentId` recursion; an **Access-Control-kernel increment** (`spec-access-control-kernel-mvp`, approver Anna Pikula), not User-Management work. Unblock trigger: *"reaches stage-3-production (`spec-access-control-kernel-mvp`)."* | `relationships/um-rel-12` T3, **all of `um-rel-13`'s access half** (T3 — the recursive walk over nested departments), `um-rel-17`'s deferred `it.todo` — the department-derived **access resolution** only. **Not** blocked: the department **membership** write + atomic move + ≥1-floor `409`, the department-**manager** `Policies`/`UserPolicies` write, self-assignment `400`, and every same-transaction `department_change` event / `AccessJournal` row — `um-rel-12` T1–T2, `um-rel-13` T1–T2, `um-rel-14`, `um-rel-17` T1–T4. `Department.parentId` + `DepartmentMembership` schema present (Story 1.1); CC-07/PM/AD-29 done via Story 4.1; the `department_change` mechanism done via Epic 3 Story 3.1. |
-| CC-06 (scheduled-departure state + executor) | all of `departure/` |
+| The shared `applyDepartureEffects` **participants** (`PM/AD-23` — the `action-items` and `mentorship` contexts are unbuilt; *"signature approved, no participant implements it"*) | The **cross-context legs only** of `departure/um-dep-03` and `um-dep-04` — held as `it.todo` titled with the unblock trigger. **Not** blocked (SPLIT-GATE, 2026-09-02 ratification: CC-06 **design approved**): the effective-date worker + claim/lease/fencing, the apply `prisma.$transaction` for every UM-owned local effect (`EmploymentStatus` close+insert, `User.isActive`, the persisted-access sweep + `AccessJournal`, `applied` mark), the request-time cutoff (`um-dep-07`), `POST …/retry` + local-effect idempotency (`um-dep-04`), the stale-executor no-op (`um-dep-08`), and the LIVE health subset — all first-class stage-2. `um-dep-02` T4 (external PM/DM item) remains `it.todo` pending the timetracker sync seam. |
 
 ## Normative decisions
 

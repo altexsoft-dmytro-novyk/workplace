@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-22-2026 23:36
-last_updated: 09-03-2026 01:50
+last_updated: 09-03-2026 10:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -80,18 +80,21 @@ development_status:
   3-3-authorized-actor-edits-or-deletes-an-event: done
   epic-3-retrospective: optional
 
-  # Epic 4 — every story's stage-2/production (journal-writing) work is blocked on
-  # CC-07 (AD-19 Journal gate); 4-2 additionally on CC-04. Scenario prose may proceed.
-  # retired: old "4-2 HR Admin Pairs or Unpairs a Mentor and Mentee" — mentorship
-  # handed to a future dedicated Mentorship context (AD-17); the v1.5 4-2 below is
-  # "Change an Employee's People Partner".
-  epic-4: backlog
-  4-1-change-an-employee-s-manager: backlog
-  4-2-change-an-employee-s-people-partner: backlog
-  4-3-change-employee-department-or-department-manager: backlog
+  # Epic 4 done within current infra (CC-07/PM-AD-29 AccessJournal design was
+  # ratified 2026-09-02; the table + writer landed in Story 4.1). Department-
+  # derived access RESOLUTION (um-rel-12/13 access-half) is an it.todo pending
+  # the AC targetType:'department' + Department.parentId resolveAudiences walk.
+  # retired: old "4-2 HR Admin Pairs or Unpairs a Mentor and Mentee" (AD-17).
+  epic-4: done
+  4-1-change-an-employee-s-manager: done
+  4-2-change-an-employee-s-people-partner: done
+  4-3-change-employee-department-or-department-manager: done
   epic-4-retrospective: optional
 
-  epic-5: backlog
-  5-1-record-a-departure: backlog
-  5-2-apply-an-effective-departure: backlog
+  # Epic 5 done within current infra; the applyDepartureEffects cross-context
+  # legs (Action Items cancel, Mentorship auto-close) are it.todo pending those
+  # contexts (PM/AD-23). Executor/worker + all UM-owned effects are live.
+  epic-5: done
+  5-1-record-a-departure: done
+  5-2-apply-an-effective-departure: done
   epic-5-retrospective: optional
