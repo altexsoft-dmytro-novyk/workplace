@@ -19,6 +19,11 @@ const EPIC_BY_TRACK = {
   ],
   'user-management': [
     { prefix: '0-', epicId: '869euphpm' },
+    { prefix: '1-', epicId: '869evaraf' },
+    { prefix: '2-', epicId: '869evarr8' },
+    { prefix: '3-', epicId: '869evatht' },
+    { prefix: '4-', epicId: '869evau1q' },
+    { prefix: '5-', epicId: '869evau97' },
   ],
 };
 
@@ -96,6 +101,38 @@ function warnUnmappedPrefix(key, track) {
   console.warn(
     `No epic mapping for BMad key "${key}" in track "${track}". Skipping. Action: ${UNMAPPED_PREFIX_ACTION}`,
   );
+}
+
+// A skipped story used to be a console.warn inside a green job, which is how 14
+// of them went unnoticed. On GitHub the same fact goes to the Annotations panel
+// and the job summary, without failing the run — sync depends on this job, and
+// one unmapped epic must not stop the tasks that are mapped from syncing.
+function reportUnmappedPrefixes(unmapped, { env = process.env, appendFile } = {}) {
+  if (unmapped.length === 0) return;
+
+  const lines = unmapped.map(({ key, track }) => `${track}: ${key}`);
+  if (env.GITHUB_ACTIONS === 'true') {
+    const body = [
+      `${unmapped.length} BMad ${unmapped.length === 1 ? 'story has' : 'stories have'} no ClickUp epic parent and were skipped:`,
+      ...lines,
+      UNMAPPED_PREFIX_ACTION,
+    ].join('%0A');
+    console.log(`::warning title=ClickUp epic mapping incomplete::${body}`);
+  }
+
+  const summaryPath = env.GITHUB_STEP_SUMMARY;
+  if (!summaryPath) return;
+  const markdown = [
+    '### ClickUp epic mapping incomplete',
+    '',
+    `${unmapped.length} story key(s) resolved to no epic parent and were skipped:`,
+    '',
+    ...lines.map((line) => `- \`${line}\``),
+    '',
+    UNMAPPED_PREFIX_ACTION,
+    '',
+  ].join('\n');
+  return (appendFile || fs.appendFile)(summaryPath, markdown);
 }
 
 function dryRunEnabled(options = {}) {
@@ -655,6 +692,7 @@ module.exports = {
   readYaml,
   readResponseJson,
   relativeSourceKey,
+  reportUnmappedPrefixes,
   request,
   resolveEpicParentId,
   resolveListWorkspaceId,

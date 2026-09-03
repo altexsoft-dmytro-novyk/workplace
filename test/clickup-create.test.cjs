@@ -226,8 +226,8 @@ test('createMissingClickUpTasks second run finds existing subtask and creates ze
     fetchImpl,
   });
 
-  assert.deepEqual(firstRun, { created: 0, existing: 1, skipped: 0, failed: 0, wouldCreate: 0, wouldSkip: 0 });
-  assert.deepEqual(secondRun, { created: 0, existing: 1, skipped: 0, failed: 0, wouldCreate: 0, wouldSkip: 0 });
+  assert.deepEqual(firstRun, { created: 0, existing: 1, skipped: 0, failed: 0, wouldCreate: 0, wouldSkip: 0, unmapped: 0 });
+  assert.deepEqual(secondRun, { created: 0, existing: 1, skipped: 0, failed: 0, wouldCreate: 0, wouldSkip: 0, unmapped: 0 });
 });
 
 test('createMissingClickUpTasks records failed creates and exits with failure count', async () => {

@@ -14,6 +14,7 @@ const {
   readYaml,
   readResponseJson,
   request,
+  reportUnmappedPrefixes,
   resolveEpicParentId,
   setBmadKeyOnTask,
   sleep,
@@ -83,8 +84,10 @@ async function createMissingClickUpTasks(options = {}) {
     failed: 0,
     wouldCreate: 0,
     wouldSkip: 0,
+    unmapped: 0,
   };
   const seenKeys = new Set();
+  const unmappedKeys = [];
 
   for (const record of records) {
     const { developmentStatusKey, sourceStatus, track } = record;
@@ -99,6 +102,8 @@ async function createMissingClickUpTasks(options = {}) {
     const epicParentId = resolveEpicParentId(developmentStatusKey, track);
     if (!epicParentId) {
       warnUnmappedPrefix(developmentStatusKey, track);
+      unmappedKeys.push({ key: developmentStatusKey, track });
+      summary.unmapped += 1;
       if (isDryRun) {
         console.log(`${developmentStatusKey}: would skip (unknown prefix)`);
         summary.wouldSkip += 1;
@@ -189,6 +194,8 @@ async function createMissingClickUpTasks(options = {}) {
     if (options.sleepImpl) await options.sleepImpl(CREATE_DELAY_MS);
     else await sleep(CREATE_DELAY_MS);
   }
+
+  await reportUnmappedPrefixes(unmappedKeys, options.annotationOptions);
 
   if (isDryRun) {
     console.log('No ClickUp changes made.');
