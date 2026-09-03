@@ -650,13 +650,39 @@ So that a field never leaks through the section it happens to render in.
 
 *(added 2026-09-03 — see FR Coverage Map note)*
 
-### Story 7.1: Custom-Field Columns and Filters Read Only Entitled Values
+### Story 7.1: S16 Section-Matrix Resolution for Custom Fields
 
-**ID:** `UM-E7-S7.1` · **Sprint key:** `7-1-custom-field-columns-and-filters-read-only-entitled-values`
+**ID:** `UM-E7-S7.1` · **Sprint key:** `7-1-s16-section-matrix-resolution-for-custom-fields`
+
+As the access-control facade,
+I want the S16 section decision to resolve per-field visibility rather than one uniform rule,
+So that the one section whose permission is not uniform across its own audience is handled correctly.
+
+*(Reordered ahead of "Columns and Filters" at Step 4 — the filter/column story reads a per-field visibility signal that only this story's facade change produces; sequencing it second would have been a forward dependency.)*
+
+**Acceptance Criteria:**
+
+**Given** each §3.2 audience
+**When** S16 is resolved
+**Then** Reporting line, Project line, and PP resolve `RW`, while Self and Colleague resolve **per-field visibility** — the only matrix cell whose permission is not uniform across the section (mirrors `PLAT-E6-S6.6`'s own framing)
+
+**Given** `AC-SECTION-MATRIX-01` (P1, registered 2026-09-03, owns S16 among other sections)
+**When** this story is scheduled
+**Then** it stays gated on that registration closing — this story does not attempt to bypass or duplicate the gate, which remains architect-owned per Platform SD-3
+
+**Given** this story and Story 7.2 both ship
+**When** `PLAT-E6-S6.6` and `PMC-E1-S1.8` are re-evaluated
+**Then** both may be unblocked — but **only together**, matching their own recorded "must not be unblocked independently" constraint
+
+### Story 7.2: Custom-Field Columns and Filters Read Only Entitled Values
+
+**ID:** `UM-E7-S7.2` · **Sprint key:** `7-2-custom-field-columns-and-filters-read-only-entitled-values`
 
 As a directory user,
 I want custom-field columns and filters to show me only values I'm entitled to see,
 So that I can never infer a hidden value through a filter side channel.
+
+**Depends on:** Story 7.1 — the per-field visibility signal this story filters on is what 7.1's facade resolution produces.
 
 **Acceptance Criteria:**
 
@@ -679,28 +705,6 @@ So that I can never infer a hidden value through a filter side channel.
 **Given** visibility enforcement
 **When** it runs relative to filter and sort execution
 **Then** it runs **before** — not after, not concurrently (PM/AD-32's explicit ordering rule, §3.3.6)
-
-### Story 7.2: S16 Section-Matrix Resolution for Custom Fields
-
-**ID:** `UM-E7-S7.2` · **Sprint key:** `7-2-s16-section-matrix-resolution-for-custom-fields`
-
-As the access-control facade,
-I want the S16 section decision to resolve per-field visibility rather than one uniform rule,
-So that the one section whose permission is not uniform across its own audience is handled correctly.
-
-**Acceptance Criteria:**
-
-**Given** each §3.2 audience
-**When** S16 is resolved
-**Then** Reporting line, Project line, and PP resolve `RW`, while Self and Colleague resolve **per-field visibility** — the only matrix cell whose permission is not uniform across the section (mirrors `PLAT-E6-S6.6`'s own framing)
-
-**Given** `AC-SECTION-MATRIX-01` (P1, registered 2026-09-03, owns S16 among other sections)
-**When** this story is scheduled
-**Then** it stays gated on that registration closing — this story does not attempt to bypass or duplicate the gate, which remains architect-owned per Platform SD-3
-
-**Given** this story and Story 7.1 both ship
-**When** `PLAT-E6-S6.6` and `PMC-E1-S1.8` are re-evaluated
-**Then** both may be unblocked — but **only together**, matching their own recorded "must not be unblocked independently" constraint
 
 ## Mentorship Handoff
 

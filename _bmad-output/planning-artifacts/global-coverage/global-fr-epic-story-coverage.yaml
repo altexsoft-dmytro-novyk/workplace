@@ -182,8 +182,8 @@ requirements:
       - {id: UM-E6-S6.1, sprint_key: 6-1-define-a-custom-field-with-declared-visibility, status: specified}
       - {id: UM-E6-S6.2, sprint_key: 6-2-set-and-store-custom-field-values, status: specified}
       - {id: UM-E6-S6.3, sprint_key: 6-3-custom-field-values-respect-section-level-access, status: specified}
-      - {id: UM-E7-S7.1, sprint_key: 7-1-custom-field-columns-and-filters-read-only-entitled-values, status: specified}
-      - {id: UM-E7-S7.2, sprint_key: 7-2-s16-section-matrix-resolution-for-custom-fields, status: specified}
+      - {id: UM-E7-S7.1, sprint_key: 7-1-s16-section-matrix-resolution-for-custom-fields, status: specified}
+      - {id: UM-E7-S7.2, sprint_key: 7-2-custom-field-columns-and-filters-read-only-entitled-values, status: specified}
     epics: [UM-E6, UM-E7]
     gates: [AC-SECTION-MATRIX-01]
     notes: >

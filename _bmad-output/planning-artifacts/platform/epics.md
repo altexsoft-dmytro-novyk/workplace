@@ -62,7 +62,7 @@ Exactly the FRs this file owns or extends. Verbatim-sourced from PRD §4.1 / §4
 - **PM-FR-39** *[PRD §4.1 FR-39; requirements §2.4]*: `coverage_status: deferred`. Epic 7 evaluates the AD-28 **overlay** given a grant; it implements no grant, revoke, seeding, or last-holder rule (SD-6).
 - **PM-FR-42** *[requirements §4.17]*: owned by `user-management` (PRD §4.0) and covered by `UM-E4-S4.3`. Epic 5 **reads** department structure for audience derivation and claims no part of PM-FR-42 (SD-4).
 - **PM-FR-4** *[PRD §4.1 FR-4]*: runtime owner remains `UM-E0-S0.1` (UMAC-1, **in-progress**). No Epic 4–7 story claims it (SD-7).
-- **PM-FR-5** *[PRD §4.1 FR-5; requirements §3.3.6]*: `coverage_status: deferred`, no stories. Blocking dependency for S16 (Epic 6 Story 6.6).
+- **PM-FR-5** *[PRD §4.1 FR-5; requirements §3.3.6]*: `coverage_status: specified` (2026-09-03, `user-management/epics.md` `UM-E6`/`UM-E7`) — no longer unowned, but `UM-E7` has not shipped and remains the blocking dependency for S16 (Epic 6 Story 6.6).
 - **UMAC-1 / UM-E0-S0.1**: in-progress consumer adoption of the kernel. Precondition, not a deliverable of Epics 4–7.
 
 ### Non-Functional Requirements (platform slice)
@@ -119,7 +119,7 @@ None — no `bmad-ux` contract exists for platform scope.
 | PM-FR-39 | PLAT-E7 | **Not covered — deferred.** Epic 7 bounds the AD-28 overlay; grant lifecycle is not implemented |
 | PM-FR-42 | — | Owned by `user-management` (`UM-E4-S4.3`). Epic 5 reads department structure and claims no part of it |
 | PM-FR-4 | — | Runtime owner remains `UM-E0-S0.1` (UMAC-1). **No Epic 4–7 story claims PM-FR-4** |
-| PM-FR-5 | — | Deferred, no stories. Blocking dependency for Epic 6 Story 6.6 (S16) |
+| PM-FR-5 | — | Owned by `user-management` (`UM-E6`/`UM-E7`, `specified` 2026-09-03). `UM-E7` unshipped remains the blocking dependency for Epic 6 Story 6.6 (S16) |
 
 ## Epic List
 
@@ -1272,8 +1272,8 @@ As a planner,
 I want S16's section decision specified and its blocking dependency stated,
 So that the matrix is not silently reported complete while a per-field side channel remains open.
 
-**Gates:** `PM-FR-5` (**deferred, no stories** — this story is not schedulable until it has an owner); `AC-SECTION-MATRIX-01` (**P1 open**, registered 2026-09-03 — SD-3); PM/AD-32 (design closed, implementation is transition debt).
-**Dependency:** ACM-5.
+**Gates:** `AC-SECTION-MATRIX-01` (**P1 open**, registered 2026-09-03 — SD-3); PM/AD-32 (design closed, implementation is transition debt).
+**Dependency:** ACM-5; `user-management/epics.md` Epic `UM-E7` (2026-09-03 — `PM-FR-5` moved `deferred`→`specified` via `UM-E6`/`UM-E7`, so this story's own blocker is no longer "no owner exists" but "the owning epic hasn't shipped yet"; see the updated Given below).
 
 **Acceptance Criteria:**
 
@@ -1287,9 +1287,9 @@ So that the matrix is not silently reported complete while a per-field side chan
 **Then** `CustomFieldDefinition.visibility` from PM/AD-32 typed EAV is required
 **And** the `User.customFields` jsonb bag (transition debt TD-12) is not queried — it carries no per-field visibility
 
-**Given** `PM-FR-5` still `deferred` with no stories
+**Given** `PM-FR-5` is now `specified` (`UM-E6`/`UM-E7`, 2026-09-03) but `UM-E7` has not shipped and `AC-SECTION-MATRIX-01` has not closed
 **When** scheduling is considered
-**Then** this story is **not schedulable** — scheduling S16 without an owner means inventing a business rule
+**Then** this story is **still not schedulable** — a specified owner is not a shipped dependency, and scheduling S16 ahead of either means inventing a business rule this story exists to avoid
 
 **Given** a filter or sort over a hidden custom-field value
 **When** Access Control field visibility is applied
@@ -1509,7 +1509,7 @@ External gates, none of which any story here can close:
 - `DEPARTMENT-EDGE` + unassigned PM/AD-35 schema ownership → PLAT-E5-S5.1, S5.3 reaching capability coverage
 - `AC-S9-S13` → PLAT-E6-S6.1, S6.2, and the S12 clause of S6.5
 - `AC-SECTION-MATRIX-01` (registered 2026-09-03) → PLAT-E6-S6.3 … S6.6
-- `PM-FR-5` (deferred, unowned) → PLAT-E6-S6.6
+- `PM-FR-5` (`specified` 2026-09-03 via `user-management` `UM-E6`/`UM-E7`; `UM-E7` unshipped) → PLAT-E6-S6.6
 - `CC-07` (P0) → PLAT-E7-S7.1 journal enrolment evidence
 - `SEC-AUTH-01` (P0) → production evidence for every story in Epics 4–7
 - `UMAC-1` in-progress → consumer adoption; not this pass
@@ -1542,7 +1542,7 @@ External gates, none of which any story here can close:
 | `TT-IDENTITY-01` | P0 open | Epic 4 cannot close it. Completing E4 must not promote PM-FR-2 to `implemented`. |
 | `DEPARTMENT-EDGE` | P1 open | Epic 5 cannot close it (PM/AD-35 schema unowned, SD-4). |
 | `AC-SECTION-MATRIX-01` | **registered 2026-09-03**, P1 open | Live coverage `gates:` ID on PM-FR-3, 21, 22, 26, 35. Increment still unapproved. |
-| `PM-FR-5` | deferred | Blocks S16 (S6.6). PM-FR-3 cannot reach `implemented` while S16 is open. |
+| `PM-FR-5` | deferred *(superseded 2026-09-03 — `specified` via `user-management` `UM-E6`/`UM-E7`, but `UM-E7` unshipped)* | Blocks S16 (S6.6). PM-FR-3 cannot reach `implemented` while S16 is open. |
 | `CC-07` | P0 open | S7.1 journal enrolment cannot produce closure evidence. |
 | PLAT-E2-S2.1 status conflict | tracking | Coverage `in-progress` vs sprint-status `done`. Left to Platform Story 1.1. |
 

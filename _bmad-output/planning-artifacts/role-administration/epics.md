@@ -37,6 +37,8 @@ This document decomposes exactly **one canonical PRD requirement** — runtime f
 | Context | Responsibility in this slice |
 |---|---|
 | `access-control` | Owns this slice's code (`Policies`, `Permissions`, `UserPolicies`, `isAllowed`) — **not a new bounded context**. AD-5 already confirms `access-control`; this is a new decomposition *file* for an orthogonal capability inside that same confirmed context, exactly as `platform/epics.md`'s PLAT-E1–E7 already do for the audience-resolution half. |
+
+> **Cost, named explicitly (product owner ruling, 2026-09-03).** One context, two decomposition documents, is a cost this pass consciously pays, not a default nobody examined. `platform/epics.md` decomposes access-control's audience-*resolution* half (Phase-0 tiers, project-line, department walk, section matrix, shared-link policy) across 1500+ lines and never claims `PM-FR-6` anywhere in that text — folding runtime role/permission administration in as `PLAT-E8`/`PLAT-E9` was considered and rejected specifically to avoid rewriting that document's own scope statement to retroactively admit an eighth concern it never claimed. The trade-off accepted in exchange: `RA-E1`/`RA-E2` and `PLAT-E1`–`E7` both touch `src/access-control/` without one file's index knowing the other exists, so a future reader auditing "everything access-control owns" must check both files — the same convention `spec-functional-roles-catalog/SPEC.md` itself already accepted for the *code* layer ("one context now holds a read-only hot path and a mutating admin surface... the cost is accepted"), extended here to the *planning-document* layer for the same reason.
 | `user-management` | Owns the `/users/:id/policies` HTTP route (role↔user attachment) per AD-2 — this slice supplies the attachment *capability* at the domain/port level and claims no route under `/users`. Also owns `user-management:edit` enforcement once RA-E1 seeds the key (consumed, not defined, here). |
 | `mentorship` | Owns `mentorship:assign` enforcement once RA-E1 seeds the key (consumed, not defined, here). |
 
@@ -188,6 +190,10 @@ So that revoking a permission stops the feature for every holder with no re-logi
 **Given** a policy row is written
 **When** its operator and provenance are set
 **Then** only `==` and `managedBy: 'admin'` are used — never `IN`, never `!=`, never `'sync'` (AD-8, AD-13)
+
+**Given** `PM/AD-25`'s TD-11 already produced exactly this bug once — a saved-view revocation criterion worded "no cache" in prose was satisfiable by a five-minute `staleTime`, and `PMC-E1-S1.6` had to be rewritten to require server-side revalidation before it actually proved anything
+**When** this story's "no cache, no memoized decision" claim is tested
+**Then** the test asserts there is no cache at **any** layer between the write and the next `isAllowed` call — no client `staleTime`, no request-scoped memoization, no short-lived in-process TTL cache — not only that the database row changed; a passing test that only checks the row, the way the old S1.6 wording did, does not prove this AC
 
 ### Story RA-E1.4: Functional Permission Decision, Isolated from Audience Data
 

@@ -86,7 +86,7 @@ Owner: `user-management` / `access-control` contexts. This slice does not schedu
 | `PM/AD-33` | design closed, impl **`absent`** | The four dashboard read models |
 | `PM/AD-35` | design closed, impl **`absent`** (no table) | Department entity behind `PM-FR-18` grouping |
 
-**Additional leak precondition (finding, not a registered gate):** `PM-FR-8` requires custom-field columns and filters, UX-DR23 bans inferring hidden custom-field values through filter side channels, but `PM-FR-5` (custom-field visibility inheritance) is `deferred` with `stories: []`. Custom-field filtering cannot ship ahead of `PM-FR-5` visibility enforcement without a NFR-1 critical leak.
+**Additional leak precondition (finding, not a registered gate):** `PM-FR-8` requires custom-field columns and filters, UX-DR23 bans inferring hidden custom-field values through filter side channels, but `PM-FR-5` (custom-field visibility inheritance) — `specified` 2026-09-03 via `user-management/epics.md` `UM-E6`/`UM-E7` — has not shipped `UM-E7` yet. Custom-field filtering cannot ship ahead of `UM-E7`'s visibility enforcement without a NFR-1 critical leak.
 
 ## Requirements Inventory
 
@@ -207,7 +207,7 @@ Extracted from EXPERIENCE.md §Information Architecture, §Component Patterns, �
 
 | Requirement | Epic | Coverage in this slice |
 |---|---|---|
-| `PM-FR-8` — Universal filter and column model | Epic 1 | Sortable columns, multi-select filters, name search, column picker over entitled standard and derived fields; custom-field columns/filters sequenced last behind the `PM-FR-5` visibility precondition |
+| `PM-FR-8` — Universal filter and column model | Epic 1 | Sortable columns, multi-select filters, name search, column picker over entitled standard and derived fields; custom-field columns/filters sequenced last behind the `PM-FR-5` visibility precondition (`specified` 2026-09-03 via `UM-E6`/`UM-E7`; unshipped `UM-E7` is the live blocker) |
 | `PM-FR-10` — Saved and shared directory views | Epic 1 | Named owner-scoped view tabs, "New view", share-with-manager, per-viewer re-resolution on open |
 | `PM-FR-11` — Visibility-safe XLSX export | Epic 1 | `.xlsx` of the current view containing only exporter-entitled columns; flow specified in-story (UX-DR8 records the mock as button-only) |
 | `PM-FR-15` — Unit Manager dashboard | Epic 2 | People-grouped shell over existing reporting-line traversal + read-model contract + source-backed widgets; absent sources render explicit degraded/empty states (SD-2) |
@@ -269,7 +269,7 @@ Any authenticated employee — down to Colleague tier — can find and review pe
 
 **Implementation notes:** custom-field columns and filters are ordered **last**, behind the `PM-FR-5` visibility precondition — `PM-FR-8` filtering on custom fields ahead of visibility enforcement is an NFR-1 critical leak via the side channel UX-DR23 bans. Export must be specified in-story rather than inferred from the mock, which is button-only (UX-DR8). Shared views transport configuration and re-resolve per recipient (SD-5). The bulk action bar exposes no organisational-relationship mutation (SD-4).
 
-> **Coverage-model note.** Epic 1 can plausibly carry `PM-FR-10` and `PM-FR-11` to full coverage. `PM-FR-8` reaches full coverage only for standard and derived fields; its custom-field clause stays partial while `PM-FR-5` is `deferred`.
+> **Coverage-model note.** Epic 1 can plausibly carry `PM-FR-10` and `PM-FR-11` to full coverage. `PM-FR-8` reaches full coverage only for standard and derived fields; its custom-field clause stays partial until `user-management`'s `UM-E7` ships (`PM-FR-5` itself moved `deferred`→`specified` 2026-09-03, but a specified owner is not a shipped dependency).
 
 ### Epic 2: People-Grouped Dashboards (Unit Manager, People Partner)
 
@@ -702,7 +702,7 @@ So that I can work with the list outside the platform without exporting anything
 
 **ID:** `PMC-E1-S1.8` · **Sprint key:** `1-8-custom-field-columns-and-filters`
 
-> 🛑 **GATED — do not start.** Requires `PM-FR-5` custom-field visibility enforcement to exist (currently `deferred`, `stories: []`) **and** PM/AD-32 typed EAV storage to have replaced the TD-12 `User.customFields` jsonb bag. Shipping custom-field filtering ahead of visibility enforcement is an NFR-1 critical leak through the side channel UX-DR23 bans. Sequenced last in the epic for this reason.
+> 🛑 **GATED — do not start.** Requires `user-management/epics.md` Epic `UM-E7` (visibility-safe filtering) to ship — `PM-FR-5` moved `deferred`→`specified` 2026-09-03 via `UM-E6`/`UM-E7`, but `UM-E7` itself is unshipped — **and** PM/AD-32 typed EAV storage to have replaced the TD-12 `User.customFields` jsonb bag. Shipping custom-field filtering ahead of visibility enforcement is an NFR-1 critical leak through the side channel UX-DR23 bans. Sequenced last in the epic for this reason.
 
 As an HR Admin who has added a custom field,
 I want that field usable as a directory column and filter without developer involvement,
@@ -1105,7 +1105,7 @@ Honest state of story-level coverage for the 7 in-scope FRs at the end of Step 3
 
 | FR | Epic | Stories | Story coverage |
 |---|---|---|---|
-| `PM-FR-8` | 1 | 1.1, 1.3, 1.4, 1.5, **1.8 (gated)** | Standard + derived fields covered. **Custom-field clause gated** behind `PM-FR-5` |
+| `PM-FR-8` | 1 | 1.1, 1.3, 1.4, 1.5, **1.8 (gated)** | Standard + derived fields covered. **Custom-field clause gated** behind `user-management`'s `UM-E7` (`PM-FR-5` itself `specified` 2026-09-03, but `UM-E7` unshipped) |
 | `PM-FR-10` | 1 | 1.6 | Covered, including per-recipient re-resolution (SD-5) |
 | `PM-FR-11` | 1 | 1.7 | Covered, with the export flow specified in-story rather than inferred from the mock |
 | `PM-FR-15` | 2 | 2.1, 2.2 | **Partial by construction (SD-2).** Headcount, people table, navigation covered. Risk, action items, resourcing, campaigns, project and leave columns render explicit unavailable states pending `PM-FR-19`–`21`, `23`, `36`, `37` |
