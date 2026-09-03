@@ -9,25 +9,37 @@ verdict: no — 3 real gaps, 3 recorded deferrals, 1 structural blind spot (now 
 
 # Epic coverage review — 2026-09-03
 
-## Addendum — written after the review, same day
+## Addendum — closed the same day
 
-While this review was being written, a `bmad-create-epics-and-stories` re-entry landed
-decompositions on disk for two of the three gaps below. **None of it is registered in the
-coverage model**, so every statement this document makes about the model remains true, and
-`PM-FR-5` and `PM-FR-6` still read `deferred` with `epics: []`.
+While this review was being written, a `bmad-create-epics-and-stories` re-entry closed all
+three gaps below, and the coverage model was updated to match. The findings are kept as
+written — they are what the model looked like when the review ran — and this addendum records
+the outcome.
 
-| Gap | What landed | Registered? |
+| Gap | Now | Owning epics |
 |---|---|---|
-| `PM-FR-6` | new slice `role-administration/epics.md`, `RA-E*`, `status: draft`, `stepsCompleted: [1, 2, 3]`, 2 epics | **No** — no `namespace_rules` entry, no `source_slices` entry, no PRD §0.2 row |
-| `PM-FR-5` | `user-management/epics.md` Epic 6 (storage + declared visibility) and Epic 7 (anti-inference completion) | **No** — `PM-FR-5` still `deferred`, `stories: []` |
-| `PM-FR-9` | nothing | — still the open gap |
+| `PM-FR-5` | `specified` | `UM-E6` (storage + declared visibility), `UM-E7` (anti-inference completion) |
+| `PM-FR-6` | `specified` | new `role-administration` slice — `RA-E1`, `RA-E2` (gated on `OQ-PERM-01`) |
+| `PM-FR-9` | `specified` | `PMC-E4` |
 
-`verify-coverage.py` check 3 now FAILs on `role-administration/epics.md` being unregistered.
-That is the check working, not a regression.
+`RA-E*` is registered in `namespace_rules` and `source_slices` as `bounded-context-slice` —
+not draft, because the code lives inside the already-AD-5-confirmed `access-control` context.
+PRD §0.2 gained the Role Administration row and §13 was updated for all three.
 
-Registering `RA-E*` needs the same sequence CDS and Profile Sharing needed — `namespace_rules`
-plus `source_slices` plus a PRD §0.2 row and a §13 update — and flipping `PM-FR-5`/`PM-FR-6` off
-`deferred` is a coverage decision, not a mechanical fill. Neither was done here.
+Rollup moved from `in-progress` 5 · `specified` 30 · `uncovered` 3 · `deferred` 4
+to `in-progress` 5 · `specified` 33 · `uncovered` 2 · `deferred` 2. The remaining `uncovered`
+two are `PM-FR-16` and `PM-FR-17`, epic-assigned to `PMC-E3` and deliberately story-uncovered
+by ruling PMC SD-7; the remaining `deferred` two are `PM-FR-38` (`[GOOD TO HAVE]`) and
+`PM-FR-39`. `verify-coverage.py` passes all checks over 12 registered slices.
+
+**Still open from this review:** the stale `REGISTRATION GAP` block, the uneven draft-status
+disclosure, the two identifier collisions in `user-management/epics.md`, check 7's heading
+regex, and the absence of NFRs from the model. None of those were touched.
+
+Not closed by the decomposition pass: the S10/S11 colleague-narrowing, S7/S8 flag, and S1
+derived-field-immutability portions of the historical `FR-17` "Profile Projection" placeholder.
+They remain a recorded gap under the model's `PM-FR-4` aliases rather than being absorbed by
+Epic 6/7's existence.
 
 ## Question
 
