@@ -1,3 +1,5 @@
+node_modules/
+
 # Local secrets for TimeTracker External API partners.
 # Never commit these. Use .tt-keys.env.example as the value-free template.
 .tt-keys.env
