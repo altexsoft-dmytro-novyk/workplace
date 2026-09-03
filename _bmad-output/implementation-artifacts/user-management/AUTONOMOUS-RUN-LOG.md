@@ -536,8 +536,18 @@ DEPARTURE_WORKER_POLL_MS=60000
 ### AD-29 / AD-20 doc-gaps flagged for the architect (non-blocking, from the story reports):
 AccessJournal retention/purge; non-state `kind` before/after; journal-read pagination; per-`kind` snapshot schema; the `subjectDepartmentId` addition (done); `api-conventions.md` If-Match line (Story 4.2 — reconcile to `expectedCurrentTargetId`); cross-process `BUSINESS_TIME_ZONE` consensus; AD-20 alerting/observability vendor.
 
+### 2026-09-03 — post-run cleanup (Dmytro: "прибери все легасі, перевір ще раз")
+- **Deleted 5 pre-v1.5 legacy e2e suites** (all always-red, superseded): `test/user-management/{auth,deactivation,list,profile,registration}.e2e-spec.ts` (`um-auth-01..05` → epic-2; `um-deact-*` retired AD-16; `um-list-01..04` → epic-1/list-v15; `um-pf-01..04` → epic-1/edit-identity + adoption; `um-reg-*` retired AD-21). No production or v1.5-test code referenced them.
+- **Env-validation bug fixed** — the user set real `MAIL_FROM=People Platform <…@gmail.com>` (RFC 5322 display-name form) and `ROOT_WORK_EMAIL=…@altexsoft.com`; `Joi.string().email()` rejected the display-name form (a `.default()` value is trusted unvalidated, so it only bit once set in `.env`). `MAIL_FROM` → `Joi.string().min(3)` (nodemailer takes both forms); `ROOT_WORK_EMAIL` → `.email({ tlds: { allow: false } })`. **Without this every e2e suite failed at ConfigModule boot.**
+- **Unresolved-session denials reconciled 403 → 401** (the `umac-05` "target end state", now reachable since Epic 2 retired the interim resolver): `jwt-session-resolver.adapter.ts` `resolveTestShorthand` now verifies the persona is an **active `User`** (else `null` → `401`). Test assertions updated: `read-denial` UMAC-05 T1/T2, `write-adoption` UMAC-07 T5, `photo-v15` um-photo-04 T3, `seed` um-seed-11 T3, `acm8-kernel-composition` ACM8-KC-03. `um-seed-11` T3 was the last real red → now green.
+  - ⚠️ `acm8-kernel-composition.e2e-spec.ts` is in **Anna's kernel package** — the 403→401 change is a mechanical follow-on of a UM-side normative decision (`umac-05`); scenario intent ("deny") preserved. Flag for Anna.
+  - The `umac-05` scenario doc's `expectedResult` still reads "`403` under the interim resolver / target end state `401`" (frozen-after-approval) — the doc predicted this transition; tests now match the target. No doc edit (frozen).
+
+### ☀️ FINAL STATE 2026-09-03 — 35 e2e suites, **339 passed / 0 failed / 20 todo**, tsc 0 errors
+The 20 `todo` are the documented cross-package unblocks (see the 3-item list above). Nothing is red. All six UM epics + Epic 0 shipped and committed on `dn-um-implementation` (not pushed).
+
 ### Next action
-**HOLD — hand back to Dmytro.** All UM epics shipped. The remaining unblocks (1/2/3 above) each cross a package boundary (Anna's AC kernel / the FR-matrix PO ratification / two unbuilt contexts) and need his direction — not an autonomous "and so on".
+**HOLD — hand back to Dmytro.** UM backend is done and clean. The 20 `it.todo` need his direction on the 3 cross-package unblocks (Anna's AC kernel walk / the FR-matrix PO ratification / the Action-Items + Mentorship contexts).
 
 ---
 
