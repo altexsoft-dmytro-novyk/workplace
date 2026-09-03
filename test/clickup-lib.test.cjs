@@ -8,6 +8,7 @@ const {
   buildListTasksUrl,
   collectDevelopmentStatusRecords,
   findDuplicateStoryKeys,
+  findTaskByBmadKey,
   findTaskIdByBmadKeyInTasks,
   formatDuplicateStoryKeys,
   readCustomFieldValue,
@@ -142,4 +143,18 @@ test('reportUnmappedPrefixes emits no annotation outside GitHub Actions', async 
   }
 
   assert.deepEqual(logged, []);
+});
+
+test('findTaskByBmadKey falls back to the task name when no bmad_key is set', async () => {
+  const listTaskIndex = {
+    byBmadKey: new Map([['1-1-stamped', 'task-stamped']]),
+    byName: new Map([['1-2-orphan', 'task-orphan']]),
+  };
+  const fetchImpl = async () => {
+    throw new Error('the index is already built; no request should be made');
+  };
+
+  assert.equal(await findTaskByBmadKey(fetchImpl, { bmadKey: '1-1-stamped', listTaskIndex }), 'task-stamped');
+  assert.equal(await findTaskByBmadKey(fetchImpl, { bmadKey: '1-2-orphan', listTaskIndex }), 'task-orphan');
+  assert.equal(await findTaskByBmadKey(fetchImpl, { bmadKey: '1-3-absent', listTaskIndex }), null);
 });

@@ -5,7 +5,7 @@ const {
   EXPECTED_WORKSPACE_ID,
   asObject,
   authorizeWorkspace,
-  buildBmadKeyTaskIndex,
+  buildTaskIndex,
   collectDevelopmentStatusRecords,
   collectEpicIdsFromTrackMap,
   collectStoryDescriptions,
@@ -15,6 +15,7 @@ const {
   readResponseJson,
   request,
   reportUnmappedPrefixes,
+  reportUnstampedTasks,
   resolveEpicParentId,
   setBmadKeyOnTask,
   sleep,
@@ -70,12 +71,13 @@ async function createMissingClickUpTasks(options = {}) {
   const records = await collectDevelopmentStatusRecords({ ...options, rootDir });
   const listTaskIndex = options.listTaskIndex || {};
   if (!listTaskIndex.byBmadKey) {
-    listTaskIndex.byBmadKey = await buildBmadKeyTaskIndex(fetchImpl, {
+    Object.assign(listTaskIndex, await buildTaskIndex(fetchImpl, {
       listId,
       fieldId: bmadKeyFieldId,
       token,
-    });
+    }));
   }
+  if (!listTaskIndex.byName) listTaskIndex.byName = new Map();
 
   const summary = {
     created: 0,
@@ -85,9 +87,18 @@ async function createMissingClickUpTasks(options = {}) {
     wouldCreate: 0,
     wouldSkip: 0,
     unmapped: 0,
+    adopted: 0,
+    unstamped: 0,
   };
   const seenKeys = new Set();
   const unmappedKeys = [];
+  const unstampedTasks = [];
+
+  const stampBmadKey = async (taskId, bmadKey) => {
+    await setBmadKeyOnTask(fetchImpl, { taskId, fieldId: bmadKeyFieldId, bmadKey, token, headers });
+    await verifyBmadKeyOnTask(fetchImpl, { taskId, fieldId: bmadKeyFieldId, bmadKey, token });
+    listTaskIndex.byBmadKey.set(bmadKey, taskId);
+  };
 
   for (const record of records) {
     const { developmentStatusKey, sourceStatus, track } = record;
@@ -127,9 +138,26 @@ async function createMissingClickUpTasks(options = {}) {
     }
 
     const existingTaskId = listTaskIndex.byBmadKey?.get(developmentStatusKey) ?? null;
-    if (existingTaskId) {
-      console.log(`${developmentStatusKey} already exists: ${existingTaskId}`);
-      summary.existing += 1;
+    const orphanTaskId = existingTaskId ? null : (listTaskIndex.byName?.get(developmentStatusKey) ?? null);
+
+    if (existingTaskId || orphanTaskId) {
+      if (existingTaskId) {
+        console.log(`${developmentStatusKey} already exists: ${existingTaskId}`);
+        summary.existing += 1;
+      } else if (isDryRun) {
+        console.log(`${developmentStatusKey}: would adopt task ${orphanTaskId} matched by name and stamp its bmad_key`);
+        summary.existing += 1;
+      } else {
+        try {
+          await stampBmadKey(orphanTaskId, developmentStatusKey);
+          console.log(`Adopted task ${orphanTaskId} for ${developmentStatusKey} and stamped its bmad_key`);
+          summary.adopted += 1;
+        } catch (error) {
+          console.warn(`Task ${orphanTaskId} for ${developmentStatusKey} still has no bmad_key: ${error.message}`);
+          unstampedTasks.push({ key: developmentStatusKey, taskId: orphanTaskId });
+          summary.unstamped += 1;
+        }
+      }
       if (!isDryRun) {
         if (options.sleepImpl) await options.sleepImpl(CREATE_DELAY_MS);
         else await sleep(CREATE_DELAY_MS);
@@ -170,22 +198,18 @@ async function createMissingClickUpTasks(options = {}) {
       );
       const createdTask = await readResponseJson(createResponse, `task create for ${developmentStatusKey}`, token);
       const createdTaskId = String(createdTask.id);
-      await setBmadKeyOnTask(fetchImpl, {
-        taskId: createdTaskId,
-        fieldId: bmadKeyFieldId,
-        bmadKey: developmentStatusKey,
-        token,
-        headers,
-      });
-      await verifyBmadKeyOnTask(fetchImpl, {
-        taskId: createdTaskId,
-        fieldId: bmadKeyFieldId,
-        bmadKey: developmentStatusKey,
-        token,
-      });
-      listTaskIndex.byBmadKey.set(developmentStatusKey, createdTaskId);
       console.log(`Created task ${createdTaskId} for ${developmentStatusKey}`);
       summary.created += 1;
+      listTaskIndex.byName.set(developmentStatusKey, createdTaskId);
+      try {
+        await stampBmadKey(createdTaskId, developmentStatusKey);
+      } catch (error) {
+        // The task exists with its name, parent, status and description; only the
+        // key is missing. Failing the run here would block the sync job behind it.
+        console.warn(`Task ${createdTaskId} for ${developmentStatusKey} was created without a bmad_key: ${error.message}`);
+        unstampedTasks.push({ key: developmentStatusKey, taskId: createdTaskId });
+        summary.unstamped += 1;
+      }
     } catch (error) {
       console.error(`Failed to create ClickUp task for ${developmentStatusKey}: ${error.message}`);
       summary.failed += 1;
@@ -196,6 +220,7 @@ async function createMissingClickUpTasks(options = {}) {
   }
 
   await reportUnmappedPrefixes(unmappedKeys, options.annotationOptions);
+  await reportUnstampedTasks(unstampedTasks, options.annotationOptions);
 
   if (isDryRun) {
     console.log('No ClickUp changes made.');
@@ -216,7 +241,7 @@ if (require.main === module) {
         return;
       }
       console.log(
-        `Create-if-missing finished: ${summary.created} created, ${summary.existing} existing, ${summary.skipped} skipped, ${summary.failed} failed.`,
+        `Create-if-missing finished: ${summary.created} created, ${summary.adopted} adopted, ${summary.existing} existing, ${summary.skipped} skipped, ${summary.unstamped} without a bmad_key, ${summary.failed} failed.`,
       );
       if (summary.failed > 0) process.exitCode = 1;
     })
