@@ -106,12 +106,14 @@ async function syncClickUp(options = {}) {
   const bmadKeyFieldId = customFields.bmad_key;
   const entries = await collectSyncEntries({ ...options, rootDir, configPath });
   const headers = await authorizeWorkspace(fetchImpl, token);
+  const summary = { updated: 0, skipped: 0 };
 
   for (const entry of entries) {
     let taskId = entry.taskId;
     if (!taskId && entry.resolveViaBmadKey) {
       if (!listId || !bmadKeyFieldId) {
         console.warn(`No ClickUp task mapping for ${entry.sourceKey} and bmad_key lookup is not configured. Skipping.`);
+        summary.skipped += 1;
         continue;
       }
       taskId = await findTaskByBmadKey(fetchImpl, {
@@ -121,7 +123,8 @@ async function syncClickUp(options = {}) {
         token,
       });
       if (!taskId) {
-        console.warn(`No ClickUp task found for ${entry.sourceKey} via bmad_key "${entry.bmadKey}". Skipping status update.`);
+        console.warn(`Skipped ${entry.sourceKey}: no ClickUp task found via bmad_key "${entry.bmadKey}".`);
+        summary.skipped += 1;
         continue;
       }
     }
@@ -149,16 +152,19 @@ async function syncClickUp(options = {}) {
         body: JSON.stringify({ value: fieldUpdate.value }),
       }, `${fieldUpdate.name} update for task ${taskId}`, token);
     }
+    summary.updated += 1;
   }
 
-  return entries;
+  return summary;
 }
 
 module.exports = { collectSyncEntries, syncClickUp };
 
 if (require.main === module) {
   syncClickUp()
-    .then((entries) => console.log(`Synchronized ${entries.length} ClickUp task status update(s).`))
+    .then((summary) => {
+      console.log(`Sync finished: ${summary.updated} updated, ${summary.skipped} skipped.`);
+    })
     .catch((error) => {
       console.error(`ClickUp synchronization failed: ${error.message}`);
       process.exitCode = 1;

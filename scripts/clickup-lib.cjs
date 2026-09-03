@@ -97,6 +97,7 @@ function warnUnmappedPrefix(key, track) {
 
 function buildBmadKeyFilterUrl(listId, fieldId, bmadKey) {
   const params = new URLSearchParams({
+    include_subtasks: 'true',
     custom_fields: JSON.stringify([{
       field_id: fieldId,
       operator: '==',

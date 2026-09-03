@@ -103,7 +103,9 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
       requests.push({ url, init });
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
       if (url.includes('/list/901221186877/task?')) {
-        const query = JSON.parse(new URL(url).searchParams.get('custom_fields'));
+        const parsedUrl = new URL(url);
+        assert.equal(parsedUrl.searchParams.get('include_subtasks'), 'true');
+        const query = JSON.parse(parsedUrl.searchParams.get('custom_fields'));
         assert.equal(query[0].operator, '==');
         return jsonResponse(200, { tasks: [] });
       }

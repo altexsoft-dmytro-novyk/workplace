@@ -478,7 +478,7 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
   });
   const requests = [];
 
-  await syncClickUp({
+  const summary = await syncClickUp({
     ...fixture,
     sprintStatusPaths: [fixture.sourcePath],
     token: 'secret-token',
@@ -486,7 +486,9 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
       requests.push({ url, init });
       if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
       if (url.includes('/list/list-123/task?')) {
-        const query = JSON.parse(new URL(url).searchParams.get('custom_fields'));
+        const parsedUrl = new URL(url);
+        assert.equal(parsedUrl.searchParams.get('include_subtasks'), 'true');
+        const query = JSON.parse(parsedUrl.searchParams.get('custom_fields'));
         assert.equal(query[0].operator, '==');
         return jsonResponse(200, { tasks: [{ id: 'task-from-bmad-key' }] });
       }
@@ -494,8 +496,36 @@ test('syncClickUp resolves task ID via bmad_key when no YAML mapping exists', as
     },
   });
 
+  assert.deepEqual(summary, { updated: 1, skipped: 0 });
   assert.ok(requests.some(({ url }) => url.includes('/list/list-123/task?')));
   assert.ok(requests.some(({ url, init }) => url === 'https://api.clickup.com/api/v2/task/task-from-bmad-key' && init.method === 'PUT'));
+});
+
+test('syncClickUp counts skipped entries when bmad_key lookup finds no task', async () => {
+  const fixture = await createFixture({
+    config: [
+      'workspace_id: "90122019689"',
+      'list_id: "list-123"',
+      'status_map:',
+      '  in-progress: "in progress"',
+      'custom_fields:',
+      '  bmad_key: "bmad-key-field"',
+      'tasks: {}',
+    ].join('\n'),
+  });
+
+  const summary = await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    fetchImpl: async (url, init = {}) => {
+      if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
+      if (url.includes('/list/list-123/task?')) return jsonResponse(200, { tasks: [] });
+      return successfulClickUpResponse(url, init);
+    },
+  });
+
+  assert.deepEqual(summary, { updated: 0, skipped: 1 });
 });
 
 test('collectSyncEntries rejects a configured task mapping without an ID even when its source key is absent', async () => {
