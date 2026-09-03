@@ -8,6 +8,8 @@ const {
   buildBmadKeyTaskIndex,
   collectDevelopmentStatusRecords,
   collectEpicIdsFromTrackMap,
+  collectStoryDescriptions,
+  descriptionsConfig,
   dryRunEnabled,
   readYaml,
   readResponseJson,
@@ -58,6 +60,11 @@ async function createMissingClickUpTasks(options = {}) {
     console.log(`workspace validated: ${validation.workspaceId}`);
     console.log(`list validated: ${validation.listId}`);
   }
+
+  const descriptionSettings = descriptionsConfig(config);
+  const storyDescriptions = descriptionSettings.enabled
+    ? await collectStoryDescriptions({ rootDir })
+    : new Map();
 
   const records = await collectDevelopmentStatusRecords({ ...options, rootDir });
   const listTaskIndex = options.listTaskIndex || {};
@@ -125,8 +132,15 @@ async function createMissingClickUpTasks(options = {}) {
       continue;
     }
 
+    const story = storyDescriptions.get(developmentStatusKey) ?? null;
+    if (descriptionSettings.enabled && !story) {
+      console.warn(`No epic story found for BMad key "${developmentStatusKey}". Creating without a description.`);
+    }
+
     if (isDryRun) {
-      console.log(`${developmentStatusKey}: would create subtask under epic ${epicParentId}`);
+      console.log(
+        `${developmentStatusKey}: would create subtask under epic ${epicParentId}${story ? ' with description' : ''}`,
+      );
       summary.wouldCreate += 1;
       continue;
     }
@@ -142,6 +156,7 @@ async function createMissingClickUpTasks(options = {}) {
             name: developmentStatusKey,
             parent: epicParentId,
             status: statusMap[sourceStatus],
+            ...(story ? { markdown_description: story.markdown } : {}),
             custom_fields: [{ id: bmadKeyFieldId, value: developmentStatusKey }],
           }),
         },

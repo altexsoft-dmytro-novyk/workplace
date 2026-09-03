@@ -6,6 +6,12 @@ status_map:
   in-progress: "IN PROGRESS"
   review: "CODE REVIEW"
   done: "DONE"
+# Story descriptions are generated from _bmad-output/planning-artifacts/<track>/epics.md.
+# overwrite: false writes only into tasks whose description is empty, so anything
+# typed in ClickUp by hand survives. Set it to true to make the epic file win.
+descriptions:
+  enabled: true
+  overwrite: false
 custom_fields:
   bmad_key: "d2d74782-2c7c-4c71-8fe8-eb7f7d7fb18b"
   git_branch: "3ae4ce80-b2ee-4ab4-9eae-cc7c33224921"

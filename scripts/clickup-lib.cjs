@@ -5,6 +5,7 @@ const yaml = require('js-yaml');
 const EXPECTED_WORKSPACE_ID = '90122019689';
 const CLICKUP_API_BASE = 'https://api.clickup.com/api/v2';
 const IMPLEMENTATION_ARTIFACTS_DIR = '_bmad-output/implementation-artifacts';
+const PLANNING_ARTIFACTS_DIR = '_bmad-output/planning-artifacts';
 const INCLUDED_TRACKS = ['platform', 'user-management'];
 const CREATE_DELAY_MS = 700;
 
@@ -384,6 +385,114 @@ function matchesKeyFilter(developmentStatusKey, keyFilter) {
   return !keyFilter || keyFilter.has(developmentStatusKey);
 }
 
+const STORY_HEADING = /^###\s+Story\s+(\d+)\.(\d+):\s*(.+?)\s*$/;
+const SPRINT_KEY_FIELD = /\*\*Sprint key:\*\*\s*`([^`]+)`/;
+
+function slugifyStoryTitle(title) {
+  return String(title)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function finalizeEpicStory(story) {
+  const body = story.bodyLines.join('\n').trim();
+  const declared = body.match(SPRINT_KEY_FIELD);
+  return {
+    sprintKey: declared ? declared[1] : `${story.epicNumber}-${story.storyNumber}-${slugifyStoryTitle(story.title)}`,
+    sprintKeySource: declared ? 'declared' : 'derived',
+    title: story.title,
+    body,
+  };
+}
+
+// Stories carry an explicit "**Sprint key:** `...`" field in the newer epics;
+// the older ones do not, and their sprint-status key is the heading number and
+// title slugified. Both shapes resolve to the same key space.
+function parseEpicStories(markdown) {
+  const stories = [];
+  let current = null;
+  const flush = () => {
+    if (current) stories.push(finalizeEpicStory(current));
+    current = null;
+  };
+
+  for (const line of String(markdown).split('\n')) {
+    const heading = line.match(STORY_HEADING);
+    if (heading) {
+      flush();
+      current = { epicNumber: heading[1], storyNumber: heading[2], title: heading[3], bodyLines: [] };
+      continue;
+    }
+    if (/^#{1,3}\s/.test(line)) {
+      flush();
+      continue;
+    }
+    if (current) current.bodyLines.push(line);
+  }
+  flush();
+
+  return stories;
+}
+
+function buildStoryDescription(story, sourcePath) {
+  return [
+    `**${story.title}**`,
+    '',
+    story.body,
+    '',
+    '---',
+    '',
+    `_Generated from \`${sourcePath}\` for BMad key \`${story.sprintKey}\`. The epic file is the source of truth._`,
+  ].join('\n');
+}
+
+async function collectStoryDescriptions(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const tracks = options.tracks || INCLUDED_TRACKS;
+  const descriptions = new Map();
+
+  for (const track of tracks) {
+    const relativePath = `${PLANNING_ARTIFACTS_DIR}/${track}/epics.md`;
+    let markdown;
+    try {
+      markdown = await fs.readFile(path.join(rootDir, PLANNING_ARTIFACTS_DIR, track, 'epics.md'), 'utf8');
+    } catch {
+      continue;
+    }
+
+    for (const story of parseEpicStories(markdown)) {
+      if (descriptions.has(story.sprintKey)) {
+        console.warn(`Duplicate story sprint key "${story.sprintKey}" in ${relativePath}. Keeping the first.`);
+        continue;
+      }
+      descriptions.set(story.sprintKey, {
+        ...story,
+        track,
+        sourcePath: relativePath,
+        markdown: buildStoryDescription(story, relativePath),
+      });
+    }
+  }
+
+  return descriptions;
+}
+
+function descriptionsConfig(config = {}) {
+  const raw = config.descriptions;
+  if (raw === undefined) return { enabled: true, overwrite: false };
+  if (raw === false) return { enabled: false, overwrite: false };
+  const section = asObject(raw, 'descriptions in ClickUp sync configuration');
+  return { enabled: section.enabled !== false, overwrite: section.overwrite === true };
+}
+
+function readTaskDescription(task) {
+  const markdown = task?.markdown_description;
+  if (typeof markdown === 'string' && markdown.trim() !== '') return markdown;
+  const plain = task?.description;
+  return typeof plain === 'string' ? plain : '';
+}
+
 async function collectDevelopmentStatusRecords(options = {}) {
   const rootDir = path.resolve(options.rootDir || process.cwd());
   const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
@@ -498,8 +607,11 @@ module.exports = {
   bmadKeyLookupEnabled,
   buildBmadKeyTaskIndex,
   buildListTasksUrl,
+  buildStoryDescription,
   collectDevelopmentStatusRecords,
   collectEpicIdsFromTrackMap,
+  collectStoryDescriptions,
+  descriptionsConfig,
   dryRunEnabled,
   findDuplicateStoryKeys,
   findSprintStatusPaths,
@@ -511,8 +623,10 @@ module.exports = {
   keyFilterFromOptions,
   matchesKeyFilter,
   listSpaceId,
+  parseEpicStories,
   parseKeyFilter,
   readCustomFieldValue,
+  readTaskDescription,
   readYaml,
   readResponseJson,
   relativeSourceKey,
@@ -523,6 +637,7 @@ module.exports = {
   shouldSkipDevelopmentStatus,
   shouldSkipStoryKey,
   sleep,
+  slugifyStoryTitle,
   taskListId,
   taskWorkspaceId,
   trackFromSourcePath,

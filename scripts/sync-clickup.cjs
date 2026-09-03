@@ -7,11 +7,14 @@ const {
   bmadKeyLookupEnabled,
   collectDevelopmentStatusRecords,
   collectEpicIdsFromTrackMap,
+  collectStoryDescriptions,
+  descriptionsConfig,
   dryRunEnabled,
   findSprintStatusPaths,
   findTaskByBmadKey,
   readYaml,
   readResponseJson,
+  readTaskDescription,
   relativeSourceKey,
   request,
   validateClickUpTargets,
@@ -63,6 +66,7 @@ async function collectSyncEntries(options = {}) {
       const task = tasks[sourceKey];
       entries.push({
         sourceKey,
+        bmadKey,
         taskId: task.task_id,
         status: statusMap[sourceStatus],
         ...(task.git_branch ? { gitBranch: task.git_branch } : {}),
@@ -126,8 +130,19 @@ async function syncClickUp(options = {}) {
     console.log(`list validated: ${listId}`);
   }
 
+  const descriptionSettings = descriptionsConfig(config);
+  const storyDescriptions = descriptionSettings.enabled
+    ? await collectStoryDescriptions({ rootDir })
+    : new Map();
+
   const listTaskIndex = options.listTaskIndex || {};
-  const summary = { updated: 0, skipped: 0, wouldUpdate: 0 };
+  const summary = {
+    updated: 0,
+    skipped: 0,
+    wouldUpdate: 0,
+    descriptionsUpdated: 0,
+    wouldUpdateDescriptions: 0,
+  };
 
   for (const entry of entries) {
     let taskId = entry.taskId;
@@ -158,9 +173,21 @@ async function syncClickUp(options = {}) {
       throw new Error(`ClickUp task ${taskId} does not belong to required Workspace ${EXPECTED_WORKSPACE_ID}`);
     }
 
+    const story = descriptionSettings.enabled ? storyDescriptions.get(entry.bmadKey) : undefined;
+    const existingDescription = readTaskDescription(taskPayload).trim();
+    const shouldWriteDescription = Boolean(story) && (
+      descriptionSettings.overwrite
+        ? existingDescription !== story.markdown.trim()
+        : existingDescription === ''
+    );
+
     if (isDryRun) {
       console.log(`${entry.sourceKey}: would update task ${taskId} to status "${entry.status}"`);
       summary.wouldUpdate += 1;
+      if (shouldWriteDescription) {
+        console.log(`${entry.sourceKey}: would ${existingDescription === '' ? 'set' : 'replace'} the description of task ${taskId}`);
+        summary.wouldUpdateDescriptions += 1;
+      }
       continue;
     }
 
@@ -169,6 +196,15 @@ async function syncClickUp(options = {}) {
       headers,
       body: JSON.stringify({ status: entry.status }),
     }, `status update for task ${taskId}`, token);
+
+    if (shouldWriteDescription) {
+      await request(fetchImpl, taskUrl, {
+        method: 'PUT',
+        headers,
+        body: JSON.stringify({ markdown_description: story.markdown }),
+      }, `description update for task ${taskId}`, token);
+      summary.descriptionsUpdated += 1;
+    }
     const fieldUpdates = [
       { fieldId: customFields.git_branch, value: entry.gitBranch, name: 'Git Branch' },
       { fieldId: customFields.validation_status, value: entry.validationStatus, name: 'Validation Status' },
@@ -197,10 +233,14 @@ if (require.main === module) {
   syncClickUp()
     .then((summary) => {
       if (dryRunEnabled()) {
-        console.log(`Dry-run finished: ${summary.wouldUpdate} would update, ${summary.skipped} skipped.`);
+        console.log(
+          `Dry-run finished: ${summary.wouldUpdate} would update, ${summary.wouldUpdateDescriptions} descriptions would change, ${summary.skipped} skipped.`,
+        );
         return;
       }
-      console.log(`Sync finished: ${summary.updated} updated, ${summary.skipped} skipped.`);
+      console.log(
+        `Sync finished: ${summary.updated} updated, ${summary.descriptionsUpdated} descriptions written, ${summary.skipped} skipped.`,
+      );
     })
     .catch((error) => {
       console.error(`ClickUp synchronization failed: ${error.message}`);
