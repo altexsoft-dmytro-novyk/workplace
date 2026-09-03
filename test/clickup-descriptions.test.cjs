@@ -7,11 +7,14 @@ const path = require('node:path');
 const { syncClickUp } = require('../scripts/sync-clickup.cjs');
 const { createMissingClickUpTasks } = require('../scripts/create-clickup-task.cjs');
 const {
+  collectEpicStatusRecords,
   collectStoryDescriptions,
   descriptionsConfig,
+  parseEpicOverviews,
   parseEpicStories,
   readTaskDescription,
 } = require('../scripts/clickup-lib.cjs');
+const { collectSyncEntries } = require('../scripts/sync-clickup.cjs');
 const { jsonResponse, listTasksResponse, withClickUpValidation } = require('./clickup-test-helpers.cjs');
 
 const temporaryDirectories = [];
@@ -57,7 +60,7 @@ const OVERWRITE_CONFIG = [
   '    task_id: "task-123"',
 ].join('\n');
 
-async function createFixture({ config, status = 'in-progress', storyKey = '1-99-test-story', epics = EPICS_MARKDOWN, twoStories = false } = {}) {
+async function createFixture({ config, status = 'in-progress', storyKey = '1-99-test-story', epics = EPICS_MARKDOWN, twoStories = false, epicStatus = null } = {}) {
   const rootDir = await fs.mkdtemp(path.join(os.tmpdir(), 'clickup-descriptions-'));
   temporaryDirectories.push(rootDir);
   const sourcePath = path.join(rootDir, '_bmad-output/implementation-artifacts/platform/sprint-status.yaml');
@@ -66,9 +69,12 @@ async function createFixture({ config, status = 'in-progress', storyKey = '1-99-
   const sourceKey = `_bmad-output/implementation-artifacts/platform/sprint-status.yaml#${storyKey}`;
   await fs.mkdir(path.dirname(sourcePath), { recursive: true });
   await fs.mkdir(path.dirname(epicsPath), { recursive: true });
-  const developmentStatus = twoStories
-    ? `  ${storyKey}: ${status}\n  1-98-derived-key-acm-7: ${status}\n`
-    : `  ${storyKey}: ${status}\n`;
+  const developmentStatus = [
+    twoStories
+      ? `  ${storyKey}: ${status}\n  1-98-derived-key-acm-7: ${status}\n`
+      : `  ${storyKey}: ${status}\n`,
+    epicStatus ? `  epic-1: ${epicStatus}\n  epic-1-retrospective: optional\n` : '',
+  ].join('');
   await fs.writeFile(sourcePath, `development_status:\n${developmentStatus}`);
   if (epics !== null) await fs.writeFile(epicsPath, epics);
   await fs.writeFile(configPath, config ?? [
@@ -390,4 +396,97 @@ test('collectStoryDescriptions reports a read error that is not a missing file',
     collectStoryDescriptions({ rootDir, tracks: ['platform'] }),
     /Unable to read epic stories at _bmad-output\/planning-artifacts\/platform\/epics\.md/,
   );
+});
+
+test('parseEpicOverviews captures the epic prose and stops at its first story', () => {
+  const epics = parseEpicOverviews(EPICS_MARKDOWN);
+
+  assert.deepEqual(epics.map((epic) => epic.epicKey), ['epic-1', 'epic-2']);
+  assert.equal(epics[0].title, 'Some Epic');
+  assert.ok(!epics[0].body.includes('Test Story With A Declared Key'), 'story content belongs to the story');
+  assert.ok(epics[1].body.includes('Not a story, must not be captured.'));
+});
+
+test('parseEpicOverviews ignores the "### Epic N:" entries of an epic list', () => {
+  const epics = parseEpicOverviews([
+    '## Epic List',
+    '',
+    '### Epic 1: Summary Entry',
+    '',
+    '## Epic 1: The Real Heading',
+    '',
+    'Body.',
+  ].join('\n'));
+
+  assert.equal(epics.length, 1);
+  assert.equal(epics[0].title, 'The Real Heading');
+});
+
+test('collectEpicStatusRecords resolves the ClickUp epic task and skips retrospectives', async () => {
+  const fixture = await createFixture({ epicStatus: 'in-progress' });
+
+  const records = await collectEpicStatusRecords({
+    rootDir: fixture.rootDir,
+    sprintStatusPaths: [fixture.sourcePath],
+  });
+
+  assert.deepEqual(records.map((record) => record.epicKey), ['epic-1']);
+  assert.equal(records[0].track, 'platform');
+  assert.equal(records[0].sourceStatus, 'in-progress');
+  assert.equal(records[0].taskId, '869eupgh3');
+});
+
+test('collectSyncEntries carries epics alongside stories', async () => {
+  const fixture = await createFixture({ epicStatus: 'in-progress' });
+
+  const entries = await collectSyncEntries({ ...fixture, sprintStatusPaths: [fixture.sourcePath] });
+  const epicEntry = entries.find((entry) => entry.sourceKey.endsWith('#epic-1'));
+
+  assert.ok(epicEntry, 'the epic is an entry of its own');
+  assert.equal(epicEntry.taskId, '869eupgh3');
+  assert.equal(epicEntry.status, 'IN PROGRESS');
+  assert.equal(epicEntry.descriptionKey, 'platform:epic-1');
+});
+
+test('syncClickUp writes the epic status and its description', async () => {
+  const fixture = await createFixture({ epicStatus: 'in-progress' });
+  const recorded = [];
+
+  const summary = await syncClickUp({
+    ...fixture,
+    sprintStatusPaths: [fixture.sourcePath],
+    token: 'secret-token',
+    sleepImpl: async () => {},
+    fetchImpl: taskFetch({}, recorded),
+  });
+
+  assert.equal(summary.updated, 2, 'the story and the epic are both updated');
+  assert.equal(summary.descriptionsUpdated, 2);
+  const epicStatusWrite = recorded.find(
+    ({ url, init }) => url.includes('869eupgh3') && init.method === 'PUT' && String(init.body).includes('status'),
+  );
+  assert.equal(JSON.parse(epicStatusWrite.init.body).status, 'IN PROGRESS');
+  assert.ok(descriptionWrites(recorded).some((body) => body.includes('**Some Epic**')));
+});
+
+test('collectSyncEntries skips an epic that has no ClickUp task rather than failing', async () => {
+  const fixture = await createFixture();
+  await fs.writeFile(
+    fixture.sourcePath,
+    'development_status:\n  1-99-test-story: in-progress\n  epic-9: backlog\n',
+  );
+
+  const entries = await collectSyncEntries({ ...fixture, sprintStatusPaths: [fixture.sourcePath] });
+
+  assert.deepEqual(entries.filter((entry) => entry.sourceKey.includes('#epic-')), []);
+  assert.equal(entries.length, 1, 'the story is still synced');
+});
+
+test('collectSyncEntries skips an epic whose BMad status has no ClickUp mapping', async () => {
+  const fixture = await createFixture({ epicStatus: 'archived' });
+
+  const entries = await collectSyncEntries({ ...fixture, sprintStatusPaths: [fixture.sourcePath] });
+
+  assert.deepEqual(entries.filter((entry) => entry.sourceKey.includes('#epic-')), []);
+  assert.equal(entries.length, 1);
 });

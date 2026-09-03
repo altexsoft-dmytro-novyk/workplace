@@ -86,6 +86,7 @@ test('collectSyncEntries maps configured BMad development status entries', async
   assert.deepEqual(entries, [{
     sourceKey: '_bmad-output/implementation-artifacts/platform/sprint-status.yaml#1-99-test-story',
     bmadKey: '1-99-test-story',
+    descriptionKey: '1-99-test-story',
     taskId: 'task-123',
     status: 'IN PROGRESS',
     gitBranch: 'feature/story-1',

@@ -483,7 +483,7 @@ const DESCRIPTION_FINGERPRINT = /bmad-sync:([0-9a-f]{12})/;
 function storyFingerprint(story, sourcePath) {
   return crypto
     .createHash('sha1')
-    .update([sourcePath, story.sprintKey, story.title, story.body].join('\u0000'))
+    .update([sourcePath, story.sprintKey ?? story.epicKey, story.title, story.body].join('\u0000'))
     .digest('hex')
     .slice(0, 12);
 }
@@ -493,7 +493,53 @@ function readDescriptionFingerprint(text) {
   return match ? match[1] : null;
 }
 
+const EPIC_HEADING = /^##\s+Epic\s+(\d+):\s*(.+?)\s*$/;
+
+function finalizeEpicOverview(epic) {
+  return {
+    epicKey: `epic-${epic.epicNumber}`,
+    epicNumber: epic.epicNumber,
+    title: epic.title,
+    body: epic.bodyLines.join('\n').trim(),
+  };
+}
+
+// An epic's own prose is everything between its "## Epic N:" heading and the
+// first "### Story" under it — subsections such as blocking gates belong to the
+// epic and are kept. The "### Epic N:" entries under "## Epic List" are
+// summaries, not headings, and do not match.
+function parseEpicOverviews(markdown) {
+  const epics = [];
+  let current = null;
+  const flush = () => {
+    if (current) epics.push(finalizeEpicOverview(current));
+    current = null;
+  };
+
+  for (const line of String(markdown).split('\n')) {
+    const heading = line.match(EPIC_HEADING);
+    if (heading) {
+      flush();
+      current = { epicNumber: heading[1], title: heading[2], bodyLines: [] };
+      continue;
+    }
+    if (STORY_HEADING.test(line) || /^##\s/.test(line)) {
+      flush();
+      continue;
+    }
+    if (current) current.bodyLines.push(line);
+  }
+  flush();
+
+  return epics;
+}
+
+function epicDescriptionKey(track, epicNumber) {
+  return `${track}:epic-${epicNumber}`;
+}
+
 function buildStoryDescription(story, sourcePath) {
+  const key = story.sprintKey ?? story.epicKey;
   return [
     `**${story.title}**`,
     '',
@@ -501,7 +547,7 @@ function buildStoryDescription(story, sourcePath) {
     '',
     '---',
     '',
-    `_Generated from \`${sourcePath}\` for BMad key \`${story.sprintKey}\`. The epic file is the source of truth. bmad-sync:${storyFingerprint(story, sourcePath)}_`,
+    `_Generated from \`${sourcePath}\` for BMad key \`${key}\`. The epic file is the source of truth. bmad-sync:${storyFingerprint(story, sourcePath)}_`,
   ].join('\n');
 }
 
@@ -536,6 +582,68 @@ async function collectStoryDescriptions(options = {}) {
   }
 
   return descriptions;
+}
+
+async function collectEpicDescriptions(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const tracks = options.tracks || INCLUDED_TRACKS;
+  const descriptions = new Map();
+
+  for (const track of tracks) {
+    const relativePath = `${PLANNING_ARTIFACTS_DIR}/${track}/epics.md`;
+    let markdown;
+    try {
+      markdown = await fs.readFile(path.join(rootDir, PLANNING_ARTIFACTS_DIR, track, 'epics.md'), 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') continue;
+      throw new Error(`Unable to read epic overviews at ${relativePath}: ${error.message}`);
+    }
+
+    for (const epic of parseEpicOverviews(markdown)) {
+      descriptions.set(epicDescriptionKey(track, epic.epicNumber), {
+        ...epic,
+        track,
+        sourcePath: relativePath,
+        fingerprint: storyFingerprint(epic, relativePath),
+        markdown: buildStoryDescription(epic, relativePath),
+      });
+    }
+  }
+
+  return descriptions;
+}
+
+const EPIC_STATUS_KEY = /^epic-(\d+)$/;
+
+async function collectEpicStatusRecords(options = {}) {
+  const rootDir = path.resolve(options.rootDir || process.cwd());
+  const sourcePaths = options.sprintStatusPaths || await findSprintStatusPaths(rootDir);
+  const records = [];
+
+  for (const sourcePath of sourcePaths) {
+    const resolvedSourcePath = path.resolve(sourcePath);
+    const track = trackFromSourcePath(resolvedSourcePath);
+    const sprintStatus = await readYaml(resolvedSourcePath, 'BMad sprint status');
+    const developmentStatus = asObject(
+      sprintStatus.development_status,
+      `development_status in ${resolvedSourcePath}`,
+    );
+
+    for (const [key, sourceStatus] of Object.entries(developmentStatus)) {
+      const match = key.match(EPIC_STATUS_KEY);
+      if (!match) continue;
+      records.push({
+        track,
+        epicKey: key,
+        epicNumber: match[1],
+        sourceStatus,
+        sourceKey: relativeSourceKey(rootDir, resolvedSourcePath, key),
+        taskId: resolveEpicParentId(`${match[1]}-`, track),
+      });
+    }
+  }
+
+  return records;
 }
 
 function descriptionsConfig(config = {}) {
@@ -670,7 +778,9 @@ module.exports = {
   buildListTasksUrl,
   buildStoryDescription,
   collectDevelopmentStatusRecords,
+  collectEpicDescriptions,
   collectEpicIdsFromTrackMap,
+  collectEpicStatusRecords,
   collectStoryDescriptions,
   descriptionsConfig,
   dryRunEnabled,
@@ -684,6 +794,8 @@ module.exports = {
   keyFilterFromOptions,
   matchesKeyFilter,
   listSpaceId,
+  epicDescriptionKey,
+  parseEpicOverviews,
   parseEpicStories,
   parseKeyFilter,
   readCustomFieldValue,

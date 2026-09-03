@@ -2,21 +2,24 @@ const path = require('node:path');
 const {
   CLICKUP_API_BASE,
   EXPECTED_WORKSPACE_ID,
+  SYNC_DELAY_MS,
   asObject,
   authorizeWorkspace,
   bmadKeyLookupEnabled,
   collectDevelopmentStatusRecords,
+  collectEpicDescriptions,
   collectEpicIdsFromTrackMap,
-  SYNC_DELAY_MS,
+  collectEpicStatusRecords,
   collectStoryDescriptions,
   descriptionsConfig,
   dryRunEnabled,
+  epicDescriptionKey,
   findSprintStatusPaths,
   findTaskByBmadKey,
-  readYaml,
-  readResponseJson,
   readDescriptionFingerprint,
+  readResponseJson,
   readTaskDescription,
+  readYaml,
   relativeSourceKey,
   request,
   sleep,
@@ -70,6 +73,7 @@ async function collectSyncEntries(options = {}) {
       entries.push({
         sourceKey,
         bmadKey,
+        descriptionKey: bmadKey,
         taskId: task.task_id,
         status: statusMap[sourceStatus],
         ...(task.git_branch ? { gitBranch: task.git_branch } : {}),
@@ -82,11 +86,34 @@ async function collectSyncEntries(options = {}) {
       entries.push({
         sourceKey,
         bmadKey,
+        descriptionKey: bmadKey,
         taskId: null,
         status: statusMap[sourceStatus],
         resolveViaBmadKey: true,
       });
     }
+  }
+
+  // Epics are entries too: their task IDs come from EPIC_BY_TRACK rather than
+  // the tasks map, so they need no per-epic configuration.
+  for (const epic of await collectEpicStatusRecords({ ...options, rootDir, sprintStatusPaths: sourcePaths })) {
+    if (!epic.taskId) {
+      console.warn(`Skipped ${epic.sourceKey}: no ClickUp epic task is mapped for ${epic.track} ${epic.epicKey}.`);
+      continue;
+    }
+    if (!Object.hasOwn(statusMap, epic.sourceStatus)) {
+      console.warn(
+        `No ClickUp status mapping for ${epic.sourceKey} with BMad status ${String(epic.sourceStatus)}. Skipping.`,
+      );
+      continue;
+    }
+    entries.push({
+      sourceKey: epic.sourceKey,
+      bmadKey: epic.epicKey,
+      descriptionKey: epicDescriptionKey(epic.track, epic.epicNumber),
+      taskId: epic.taskId,
+      status: statusMap[epic.sourceStatus],
+    });
   }
 
   for (const sourceKey of Object.keys(tasks)) {
@@ -135,7 +162,10 @@ async function syncClickUp(options = {}) {
 
   const descriptionSettings = descriptionsConfig(config);
   const storyDescriptions = descriptionSettings.enabled
-    ? await collectStoryDescriptions({ rootDir })
+    ? new Map([
+      ...await collectStoryDescriptions({ rootDir }),
+      ...await collectEpicDescriptions({ rootDir }),
+    ])
     : new Map();
 
   const listTaskIndex = options.listTaskIndex || {};
@@ -182,7 +212,7 @@ async function syncClickUp(options = {}) {
       throw new Error(`ClickUp task ${taskId} does not belong to required Workspace ${EXPECTED_WORKSPACE_ID}`);
     }
 
-    const story = descriptionSettings.enabled ? storyDescriptions.get(entry.bmadKey) : undefined;
+    const story = descriptionSettings.enabled ? storyDescriptions.get(entry.descriptionKey) : undefined;
     const existingDescription = readTaskDescription(taskPayload).trim();
     const shouldWriteDescription = Boolean(story) && (
       descriptionSettings.overwrite
