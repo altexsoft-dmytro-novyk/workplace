@@ -2,6 +2,8 @@ name: Sync ClickUp sprint status
 
 on:
   push:
+    branches:
+      - main
     paths:
       - _bmad-output/implementation-artifacts/**/sprint-status.yaml
       - clickup-sync.yaml

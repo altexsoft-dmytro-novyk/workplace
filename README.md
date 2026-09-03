@@ -7,8 +7,9 @@ This workspace repository ties together the `services/backend` and `services/fro
 `npm run sync:clickup` is a one-way synchronization from BMad `sprint-status.yaml`
 files to existing ClickUp tasks. It never creates ClickUp tasks, Lists, folders, or
 Custom Fields. The synchronizer requires a `CLICKUP_API_TOKEN` and refuses to write
-unless that token is authorized for Workspace `90122019689`; this Workspace ID is
-mandatory. Configure only existing ClickUp task IDs in `clickup-sync.yaml`.
+unless that token is authorized for Workspace `90122019689` and each mapped task's
+`team_id` identifies that same Workspace; this Workspace ID is mandatory. Configure
+only existing ClickUp task IDs in `clickup-sync.yaml`.
 
 Run its focused tests with:
 
@@ -18,11 +19,12 @@ npm run test:clickup
 
 ### GitHub Actions setup and mappings
 
-The repository workflow runs this one-way synchronization only when a BMad
-`sprint-status.yaml`, `clickup-sync.yaml`, or the synchronization script changes.
-It reads BMad status values and updates existing ClickUp tasks; it does not pull
-ClickUp data back into BMad or create ClickUp resources. The destination is always
-Workspace `90122019689`.
+The repository workflow runs this one-way synchronization only on pushes to the
+trusted default branch, `main`, when a BMad `sprint-status.yaml`,
+`clickup-sync.yaml`, or the synchronization script changes. It reads BMad status
+values and updates existing ClickUp tasks; it does not pull ClickUp data back into
+BMad or create ClickUp resources. The destination is always Workspace
+`90122019689`.
 
 To enable it in GitHub, add a repository Actions secret named
 `CLICKUP_API_TOKEN`. Give that secret access only to the existing ClickUp tasks it
