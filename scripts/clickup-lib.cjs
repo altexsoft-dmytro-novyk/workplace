@@ -505,6 +505,8 @@ module.exports = {
   findSprintStatusPaths,
   findTaskByBmadKey,
   findTaskIdByBmadKeyInTasks,
+  fetchListDetails,
+  fetchTaskDetails,
   formatDuplicateStoryKeys,
   keyFilterFromOptions,
   matchesKeyFilter,
