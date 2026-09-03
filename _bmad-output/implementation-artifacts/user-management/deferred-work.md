@@ -40,6 +40,14 @@ deliverable; none is authorized by the current spec.
   summary: Authoritative "current organisation" display (manager, People Partner, departments, department manager) on the profile / org screen — deferred: `GET /users/:id` omits all derived fields and there is no other read.
   evidence: `user-card.response.ts` ships only the 12 S1 scalar fields ("derived S1 display fields ... are out of scope for this route until those contexts land"). The org screen currently infers "current" values from the newest `access-journal` row per `kind`, and only when the journal is readable (the subject's manager/PP). Needs the derived-fields read (tracked on the access-control side as the `{ data, canEdit }` roll-out) or a dedicated relationships read.
 
+- source_spec: `spec-departure-workflow.md`
+  summary: No "view / manage the current scheduled departure" — if `POST /users/:id/departures` returns `departure_already_scheduled`, the UI can only say so.
+  evidence: There is no "list departures for a user" read; `GET /users/:id/departures/:departureId` needs an id only the record `POST` returns, and there is no cancel/reschedule route (a product decision, `api-conventions.md`). Needs a backend departure-list (and, for management, a lifecycle route) first.
+
+- source_spec: `spec-departure-workflow.md`
+  summary: Blocker-panel and status-view user ids (re-parent default target, `lastError` references) render without name resolution beyond what the blocker body itself carries.
+  evidence: `buildBlockedResponse` includes `targets[].name` for reports/PP but `defaultReparentTargetId` is a bare id; there is no batch user lookup. Same gap as the access-journal id→name item.
+
 - source_spec: `spec-organisational-relationships.md`
   summary: The person-picker can only see the first page of the directory and cannot substring-search — a target past row ~100 (or not matched by an exact filter) is unreachable.
   evidence: `GET /users` returns one page (max `pageSize` 100) with exact-equality filters only and no `q`/search param (`list-users-query.dto.ts`). The picker fetches page 1 and filters client-side. Needs a backend substring/typeahead search (or the platform §4.1 directory) before the picker can reach an arbitrary person.
