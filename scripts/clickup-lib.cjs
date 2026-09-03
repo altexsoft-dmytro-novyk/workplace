@@ -126,20 +126,55 @@ function taskListId(task) {
   return task?.list?.id ? String(task.list.id) : null;
 }
 
+function listSpaceId(listPayload) {
+  return listPayload?.space?.id ? String(listPayload.space.id) : null;
+}
+
 function taskWorkspaceId(task) {
   if (task?.team_id !== undefined && task?.team_id !== null) return String(task.team_id);
   if (task?.workspace_id !== undefined && task?.workspace_id !== null) return String(task.workspace_id);
   return null;
 }
 
+async function fetchSpacesForWorkspace(fetchImpl, workspaceId, token) {
+  const response = await request(
+    fetchImpl,
+    `${CLICKUP_API_BASE}/team/${encodeURIComponent(workspaceId)}/space?archived=false`,
+    { headers: { Authorization: token } },
+    `spaces in workspace ${workspaceId}`,
+    token,
+  );
+  return readResponseJson(response, `spaces in workspace ${workspaceId}`, token);
+}
+
+async function resolveListWorkspaceId(fetchImpl, listPayload, expectedWorkspaceId, token) {
+  const directWorkspaceId = taskWorkspaceId(listPayload);
+  if (directWorkspaceId) return directWorkspaceId;
+
+  const spaceId = listSpaceId(listPayload);
+  if (!spaceId) return null;
+
+  const spacesPayload = await fetchSpacesForWorkspace(fetchImpl, expectedWorkspaceId, token);
+  const spaces = Array.isArray(spacesPayload.spaces) ? spacesPayload.spaces : [];
+  const belongsToExpectedWorkspace = spaces.some((space) => String(space.id) === spaceId);
+  return belongsToExpectedWorkspace ? String(expectedWorkspaceId) : null;
+}
+
 async function validateClickUpTargets(fetchImpl, { listId, workspaceId, epicIds, token }) {
   const expectedWorkspaceId = String(workspaceId);
   const expectedListId = String(listId);
   const listPayload = await fetchListDetails(fetchImpl, expectedListId, token);
-  const listWorkspaceId = taskWorkspaceId(listPayload);
+  const listWorkspaceId = await resolveListWorkspaceId(
+    fetchImpl,
+    listPayload,
+    expectedWorkspaceId,
+    token,
+  );
   if (listWorkspaceId !== expectedWorkspaceId) {
+    const spaceId = listSpaceId(listPayload);
     throw new Error(
-      `ClickUp list ${expectedListId} belongs to workspace ${listWorkspaceId ?? 'unknown'}, expected ${expectedWorkspaceId}`,
+      `ClickUp list ${expectedListId} belongs to workspace ${listWorkspaceId ?? 'unknown'}`
+      + `${spaceId ? ` (space ${spaceId})` : ''}, expected ${expectedWorkspaceId}`,
     );
   }
 
@@ -421,6 +456,7 @@ module.exports = {
   formatDuplicateStoryKeys,
   keyFilterFromOptions,
   matchesKeyFilter,
+  listSpaceId,
   parseKeyFilter,
   readCustomFieldValue,
   readYaml,
@@ -428,6 +464,7 @@ module.exports = {
   relativeSourceKey,
   request,
   resolveEpicParentId,
+  resolveListWorkspaceId,
   setBmadKeyOnTask,
   shouldSkipDevelopmentStatus,
   shouldSkipStoryKey,

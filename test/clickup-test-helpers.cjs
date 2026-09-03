@@ -1,5 +1,6 @@
 const WORKSPACE_ID = '90122019689';
 const DEFAULT_LIST_ID = '901221186877';
+const DEFAULT_SPACE_ID = '90122019689-space';
 const EPIC_IDS = ['869euphpm', '869eupgh3', '869euphdh', '869euphgj'];
 
 function jsonResponse(status, body) {
@@ -22,7 +23,16 @@ function validationResponse(url, init, options = {}) {
   const epicListId = options.epicListId || listId;
 
   if (url.match(new RegExp(`/list/${listId}$`))) {
-    return jsonResponse(200, { id: listId, team_id: workspaceId });
+    return jsonResponse(200, {
+      id: listId,
+      space: { id: options.spaceId || DEFAULT_SPACE_ID },
+    });
+  }
+
+  if (url.match(new RegExp(`/team/${workspaceId}/space`))) {
+    return jsonResponse(200, {
+      spaces: [{ id: options.spaceId || DEFAULT_SPACE_ID }],
+    });
   }
 
   const taskMatch = url.match(/\/task\/([^/?]+)$/);
@@ -51,6 +61,7 @@ function withClickUpValidation(innerFetch, options = {}) {
 module.exports = {
   WORKSPACE_ID,
   DEFAULT_LIST_ID,
+  DEFAULT_SPACE_ID,
   EPIC_IDS,
   jsonResponse,
   listTasksResponse,
