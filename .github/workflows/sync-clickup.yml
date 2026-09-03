@@ -1,5 +1,9 @@
 name: Sync ClickUp sprint status
 
+concurrency:
+  group: clickup-sync-main
+  cancel-in-progress: false
+
 on:
   push:
     branches:

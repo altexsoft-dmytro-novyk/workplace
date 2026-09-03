@@ -6,12 +6,15 @@ const {
   authorizeWorkspace,
   bmadKeyLookupEnabled,
   collectDevelopmentStatusRecords,
+  collectEpicIdsFromTrackMap,
+  dryRunEnabled,
   findSprintStatusPaths,
   findTaskByBmadKey,
   readYaml,
   readResponseJson,
   relativeSourceKey,
   request,
+  validateClickUpTargets,
 } = require('./clickup-lib.cjs');
 
 async function collectDiscoveredSourceKeys(rootDir, sourcePaths) {
@@ -106,8 +109,25 @@ async function syncClickUp(options = {}) {
   const bmadKeyFieldId = customFields.bmad_key;
   const entries = await collectSyncEntries({ ...options, rootDir, configPath });
   const headers = await authorizeWorkspace(fetchImpl, token);
+  const isDryRun = dryRunEnabled(options);
+
+  if (listId) {
+    await validateClickUpTargets(fetchImpl, {
+      listId,
+      workspaceId: config.workspace_id,
+      epicIds: collectEpicIdsFromTrackMap(),
+      token,
+    });
+  }
+
+  if (isDryRun) {
+    console.log('DRY RUN');
+    console.log(`workspace validated: ${config.workspace_id}`);
+    console.log(`list validated: ${listId}`);
+  }
+
   const listTaskIndex = options.listTaskIndex || {};
-  const summary = { updated: 0, skipped: 0 };
+  const summary = { updated: 0, skipped: 0, wouldUpdate: 0 };
 
   for (const entry of entries) {
     let taskId = entry.taskId;
@@ -137,6 +157,13 @@ async function syncClickUp(options = {}) {
     if (taskPayload.team_id !== EXPECTED_WORKSPACE_ID) {
       throw new Error(`ClickUp task ${taskId} does not belong to required Workspace ${EXPECTED_WORKSPACE_ID}`);
     }
+
+    if (isDryRun) {
+      console.log(`${entry.sourceKey}: would update task ${taskId} to status "${entry.status}"`);
+      summary.wouldUpdate += 1;
+      continue;
+    }
+
     await request(fetchImpl, taskUrl, {
       method: 'PUT',
       headers,
@@ -157,6 +184,10 @@ async function syncClickUp(options = {}) {
     summary.updated += 1;
   }
 
+  if (isDryRun) {
+    console.log('No ClickUp changes made.');
+  }
+
   return summary;
 }
 
@@ -165,6 +196,10 @@ module.exports = { collectSyncEntries, syncClickUp };
 if (require.main === module) {
   syncClickUp()
     .then((summary) => {
+      if (dryRunEnabled()) {
+        console.log(`Dry-run finished: ${summary.wouldUpdate} would update, ${summary.skipped} skipped.`);
+        return;
+      }
       console.log(`Sync finished: ${summary.updated} updated, ${summary.skipped} skipped.`);
     })
     .catch((error) => {
