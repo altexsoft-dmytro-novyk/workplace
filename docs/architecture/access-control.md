@@ -48,6 +48,25 @@ due/departure enforcement is deferred from ACM-1/ACM-2 until the Departure
 persistence seam exists. In particular, `position === 'HR Admin'` is
 prohibited as an authorization rule or fallback.
 
+> **Decided 2026-09-04 (SCP `sprint-change-proposal-2026-09-04-section-access-consolidation.md` D2 — Platform Epic 4 Story 4.1).**
+> `isAllowed` gains a **code-defined baseline** for the per-person
+> section-write keys (`profile:identity:write`, `profile:employment:write`, …):
+> `DEFAULT_PERMISSIONS`, a constant every **active** user implicitly holds.
+> `isAllowed(user, key)` = `key ∈ DEFAULT_PERMISSIONS` (active user) **∪** the
+> data-driven grant chain above. It is therefore no longer *purely*
+> data-driven for those keys — but the check is still FR-tier only, reads no
+> relationship row, is an in-memory set membership test, and adds no hot-path
+> scan. There is **no `employee` `Policies` row, no `PolicyPermissions`, no
+> `UserPolicies` attachment, and no seed/bootstrap/migration change** — the
+> ACM-1 seed and its invariant suite are untouched. Changing the baseline is a
+> code deploy; **narrowing** a section = remove the key from
+> `DEFAULT_PERMISSIONS` and grant it explicitly to a tighter FR role (the
+> grant-chain path still serves it). The engine stays allow-only: there is no
+> per-individual subtraction from the baseline. This is the recorded
+> confirmation the "do not hard-code defaults" changelog line was waiting for,
+> **for the per-person section-write keys only** — global-feature default
+> holders (`directory:*`, `admin:*`) remain a separate §2.3 follow-up.
+
 The seed contains exactly one `hr-admin` role, exactly these three permission
 rows, exactly the corresponding three grants, and one attachment to the active
 user matching `ROOT_WORK_EMAIL` after DEC-UM-007 normalization:
@@ -172,7 +191,9 @@ trigger. Tracked in
 
 **Both dimensions must permit a mutating operation.** A write requires `isAllowed(viewerId, feature)` **and** matrix write access for that section on the target (via `canAccessSection` and §3.3 exceptions). Matrix-only or feature-only checks are insufficient.
 
-Matrix exceptions (§3.3, DEC-UM-001) further narrow write paths — for example, S9 manual mutation is limited to assigned PP and direct Unit Manager even when the matrix cell shows RW for broader reporting-line viewers.
+The **identity card is a dual gate like every other section** (decided 2026-09-04, SCP `sprint-change-proposal-2026-09-04-section-access-consolidation.md` D1 — reversing the 2026-09-02 "Variant A / audience-only" resolution). Its feature half is `isAllowed(viewer, 'profile:identity:write')`, satisfied by the `DEFAULT_PERMISSIONS` baseline above; its audience half is `canAccessSection(viewer, 'profile:identity', target) === 'write'` — reporting-line manager or assigned PP. Because the baseline holds the feature half for every active employee, the **audience half is what discriminates** in practice. All per-person section gates follow this one shape; Platform Epic 4 Story 4.1 replaces the per-section adapter predicates with a single `@RequireSectionAccess('<key>', 'read' | 'write')` gate.
+
+Matrix exceptions (§3.3, DEC-UM-001) further narrow write paths — for example, `profile:timeline` manual mutation is limited to assigned PP and direct Unit Manager even when the matrix cell shows RW for broader reporting-line viewers.
 
 ### List, filter, export, and search (§3.3.1, §4.1)
 

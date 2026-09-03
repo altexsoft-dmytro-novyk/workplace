@@ -120,7 +120,16 @@ separately tracked FR-17 Profile Projection story.
     `EditUserAction`/`UpdateUserDto`, tested) plus the photo narrower rule
     (photo write is Self-only per FR-9 / DEC unless Product widens it).
   - **NOTE 2026-09-02 (Dmytro Novyk) — write half is "Variant A"
-    (audience-only).** The employee identity card (S1) has **no separate
+    (audience-only).** *(SUPERSEDED 2026-09-04 — SCP
+    `sprint-change-proposal-2026-09-04-section-access-consolidation.md` D1/D2,
+    carried by Platform Epic 4 Story 4.1: the identity card **is** a §2.2 dual
+    gate; the feature half `isAllowed(viewer, 'profile:identity:write')` is
+    satisfied by the code baseline `DEFAULT_PERMISSIONS`, the audience half
+    `canAccessSection(viewer, 'profile:identity', target) === 'write'` still
+    discriminates. This adoption package stays `done` as shipped; Epic 4 is the
+    follow-on. Section key: `profile:identity`, not `'S1'`. The paragraph below
+    is the original Variant A write-up, kept as the record.)* The employee
+    identity card (S1) has **no separate
     functional permission**. The whole `PATCH /users/:id` gate is
     `AccessControlFacade.canAccessSection(viewer, 'S1', target) === 'write'` —
     the target's reporting-line manager or assigned People Partner. §2.2's

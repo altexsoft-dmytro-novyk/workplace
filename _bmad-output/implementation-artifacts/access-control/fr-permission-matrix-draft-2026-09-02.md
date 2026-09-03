@@ -103,7 +103,7 @@ draft is naming it.
 ### Per-person section writes (axis B half of the Â§3.2 `RW` cells)
 | Key | Â§3.2 section | Source |
 | --- | --- | --- |
-| ~~`profile:identity:write`~~ | S1 identity card (scalar fields) | **RESOLVED 2026-09-02 (Variant A): NO functional permission.** Identity-card edit is gated by S1 write-audience alone (`canAccessSection('S1') === 'write'` â reporting-line manager or assigned PP). Line 49's functional half is deliberately not applied to this one section. A narrower FR grant may be added later via the roles admin. See `user-management-edit-permission-options.md`. |
+| `profile:identity:write` | S1 identity card (scalar fields) | **SUPERSEDED 2026-09-04 (SCP `sprint-change-proposal-2026-09-04-section-access-consolidation.md` §2 D1/D2): in `DEFAULT_PERMISSIONS`; identity-card edit is a §2.2 dual gate (`isAllowed('profile:identity:write')` AND `canAccessSection('profile:identity') === 'write'`). Every key in this table is a `DEFAULT_PERMISSIONS` member unless a narrowing decision moves it to an explicit tighter role.** Historical (2026-09-02, now reversed): **RESOLVED (Variant A): NO functional permission.** Identity-card edit is gated by S1 write-audience alone (`canAccessSection('S1') === 'write'` â reporting-line manager or assigned PP). Line 49's functional half is deliberately not applied to this one section. A narrower FR grant may be added later via the roles admin. See `user-management-edit-permission-options.md`. |
 | `profile:personal-contacts:write` | S2 | [S] Â§3.2 S2 `RW` = Self, PP only |
 | `profile:emergency-contacts:write` | S3 | [S] Â§3.2 S3 `RW` = Self, PP only |
 | `profile:employment:write` | S4 employment / grade / seniority | [S] Â§3.2 S4 `RW` = reporting / project / PP |

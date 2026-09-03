@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(npm run *)",
-      "Bash(uv run *)"
+      "Bash(uv run *)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(sed:*)"
     ]
   }
 }
