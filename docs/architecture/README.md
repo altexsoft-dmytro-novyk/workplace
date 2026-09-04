@@ -19,7 +19,7 @@ Every rule cites a spine decision ID. To change a rule: change the spine first (
 | File | Covers | Spine IDs |
 | --- | --- | --- |
 | [domain-driven-design.md](domain-driven-design.md) | Bounded contexts, folder layout, entities, naming, fakes/mocks scope | PM/AD-2, AD-5, AD-6, AD-15…AD-23 |
-| [testing-strategy.md](testing-strategy.md) | Three-stage gate, no self-certification, E2E definition, test data, ACM-9 NFR protocol | PM/AD-1, AD-3, AD-4, AD-10, AD-15, AD-19, AD-20 |
+| [testing-strategy.md](testing-strategy.md) | Three-stage ordering (approval gate removed 2026-09-04), E2E definition, test data, ACM-9 NFR protocol | PM/AD-1, AD-3, AD-4, AD-10, AD-15, AD-19, AD-20 |
 | [access-control.md](access-control.md) | Policy engine, audience resolution, PP source, departure cutoff, denial oracle | PM/AD-6…AD-13, AD-19, AD-20, AD-24 |
 | [database-schema.md](database-schema.md) | Core tables, constraints, ID/edge/lifecycle rules | PM/AD-7, AD-11, AD-16, AD-17, AD-19, AD-20, AD-22 |
 | [api-conventions.md](api-conventions.md) | Router tree, PP relationship, departure, and seeded-import contracts | PM/AD-14, AD-16, AD-17, AD-19, AD-20 |
