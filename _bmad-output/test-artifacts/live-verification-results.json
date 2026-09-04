@@ -1,8 +1,8 @@
 {
   "schema_version": "0.1.0",
-  "source_sha": "c954d136744d9f5e5562b34a4f680f6ba849e529",
-  "observed_at": "2026-09-04T20:29:49Z",
-  "producer": "local run (backend unit + frontend e2e; backend e2e absent — needs docker)",
+  "source_sha": "27881d3cb8fea223a0a341b3fb250f17b2cd6d3f",
+  "observed_at": "2026-09-04T21:57:25Z",
+  "producer": "local run 2026-09-05 (backend unit + epic-5/apply-departure e2e + frontend e2e)",
   "results": [
     {
       "id": "repo-LIVE-001",
@@ -97,867 +97,993 @@
     },
     {
       "id": "repo-LIVE-014",
+      "requirement_id": "UM-DEP-03",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-03 · on the effective date the full UM-owned outcome materialises › Test 1 (LIVE) — worker applies: active EmploymentStatus closed + dismissed row inserted, account deactivated, off the default list (still filterable), Departure applied, no career event",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-015",
+      "requirement_id": "UM-DEP-03",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-03 · on the effective date the full UM-owned outcome materialises › Test 3 (LIVE) — the persisted-access sweep runs inside the apply tx and is a no-op after Story 5.1 re-parenting (zero AccessJournal rows), idempotent on retry",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-016",
+      "requirement_id": "UM-DEP-03",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-03 · on the effective date the full UM-owned outcome materialises › um-dep-03 · DEFERRED — the Action Items context implements `applyDepartureEffects`: open Action Items assigned to the departing person become `cancelled — departed` (PM/AD-5: authored-for-active-assignee items stay open)",
+      "status": "skipped",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-017",
+      "requirement_id": "UM-DEP-03",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-03 · on the effective date the full UM-owned outcome materialises › um-dep-03 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: active `MentorshipPair`s auto-close with a system note, bypassing the FR-M9 gate",
+      "status": "skipped",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-018",
+      "requirement_id": "UM-DEP-04",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › Test 1 (LIVE) — POST …/:departureId/retry on a `retry_wait` row → 202",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-019",
+      "requirement_id": "UM-DEP-04",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › Test 2 (LIVE) — POST …/retry from a non-`retry_wait` state (`scheduled`) → 409, no additional effect",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-020",
+      "requirement_id": "UM-DEP-04",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › Test 3 (LIVE) — @concurrency: two parallel POST …/retry on a `retry_wait` row → each 202 or 409, never a double apply",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-021",
+      "requirement_id": "UM-DEP-04",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › Test 4 (LIVE) — worker resume convergence: exactly one `dismissed` interval, one account-deactivate, no duplicate AccessJournal row",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-022",
+      "requirement_id": "UM-DEP-04",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › um-dep-04 · DEFERRED — the Action Items context implements `applyDepartureEffects`: a resume after partial failure cancels no Action Item twice",
+      "status": "skipped",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-023",
+      "requirement_id": "UM-DEP-04",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › um-dep-04 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: a resume after partial failure closes no Mentorship pair twice",
+      "status": "skipped",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-024",
+      "requirement_id": "UM-DEP-07",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-07 · request-time cutoff is dueAt-vs-PostgreSQL-now(), not worker-state dependent › Test 1 (LIVE) — Alice, with a due (back-dated) `scheduled` Departure and the worker never run, is denied at request time → 401",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-025",
+      "requirement_id": "UM-DEP-07",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-07 · request-time cutoff is dueAt-vs-PostgreSQL-now(), not worker-state dependent › Test 2 (guardrail) — the denial is not materialisation-dependent: the row is still `scheduled`, employment still `active`, `User.isActive` still true",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-026",
+      "requirement_id": "UM-DEP-07",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-07 · request-time cutoff is dueAt-vs-PostgreSQL-now(), not worker-state dependent › Test 3 (guardrail) — just before `dueAt` (future, not back-dated) the same request still resolves → 200",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-027",
+      "requirement_id": "UM-DEP-08",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-08 · stale-executor fencing › um-dep-08 Test 1 — a stale-token apply attempt is a no-op: no effect, no retry-state mutation",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-028",
+      "requirement_id": "UM-DEP-08",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-08 · stale-executor fencing › um-dep-08 Test 2 — the current-token executor applies exactly once; a later stale-A retry still no-ops",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-029",
+      "requirement_id": "UM-DEP-08",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-08 · stale-executor fencing › um-dep-08 Test 3 · @concurrency — A and B apply in parallel: exactly one commits, the effect lands once",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-030",
+      "requirement_id": "UM-DEP-08",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-08 · stale-executor fencing › um-dep-08 Test 4 — reclaiming an expired lease bumps `reclaimedLeaseCount` and leaves one in-flight lease, not two",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-031",
+      "requirement_id": "UM-DEP-03",
+      "title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-03 · GET /health/departures · AD-20 health surface (LIVE subset) › LIVE — returns 200 with the AD-20 counter shape while a due row is unprocessed",
+      "status": "pass",
+      "evidence": "backend-e2e-departure: services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-032",
       "requirement_id": "FE-SHELL-01",
       "title": "App › fe-shell-01 · renders the app shell and sends anonymous visitors to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/app.spec.ts"
     },
     {
-      "id": "repo-LIVE-015",
+      "id": "repo-LIVE-033",
       "requirement_id": "FE-SHELL-01",
       "title": "App › fe-shell-01 · routes unknown paths back through the guard to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/app.spec.ts"
     },
     {
-      "id": "repo-LIVE-016",
+      "id": "repo-LIVE-034",
       "requirement_id": "FE-AUTH-01",
       "title": "Magic-link authentication › fe-auth-01 · unauthenticated visit to a protected route lands on /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-017",
+      "id": "repo-LIVE-035",
       "requirement_id": "FE-AUTH-02",
       "title": "Magic-link authentication › fe-auth-02 · an expired stored token is treated as logged out",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-018",
+      "id": "repo-LIVE-036",
       "requirement_id": "FE-AUTH-03",
       "title": "Magic-link authentication › fe-auth-03 · requesting a link shows the enumeration-safe confirmation",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-019",
+      "id": "repo-LIVE-037",
       "requirement_id": "FE-AUTH-03",
       "title": "Magic-link authentication › fe-auth-03 · a failed link request shows a generic error and re-enables the form",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-020",
+      "id": "repo-LIVE-038",
       "requirement_id": "FE-AUTH-03",
       "title": "Magic-link authentication › fe-auth-03 · an invalid email is blocked client-side with no request sent",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-021",
+      "id": "repo-LIVE-039",
       "requirement_id": "FE-AUTH-04",
       "title": "Magic-link authentication › fe-auth-04 · consuming a valid token establishes a session, lands on Home, and consumes once",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-022",
+      "id": "repo-LIVE-040",
       "requirement_id": "FE-AUTH-04",
       "title": "Magic-link authentication › fe-auth-04 · consuming an invalid token shows one generic error and stores no session",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-023",
+      "id": "repo-LIVE-041",
       "requirement_id": "FE-AUTH-04",
       "title": "Magic-link authentication › fe-auth-04 · visiting the consume route with no token shows the generic error",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-024",
+      "id": "repo-LIVE-042",
       "requirement_id": "FE-AUTH-02",
       "title": "Magic-link authentication › fe-auth-02 · a stored, unexpired session survives a reload",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-025",
+      "id": "repo-LIVE-043",
       "requirement_id": "FE-AUTH-02",
       "title": "Magic-link authentication › fe-auth-02 · an authenticated user visiting /login is redirected to Home",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-026",
+      "id": "repo-LIVE-044",
       "requirement_id": "FE-AUTH-05",
       "title": "Magic-link authentication › fe-auth-05 · signing out clears the session and returns to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-027",
+      "id": "repo-LIVE-045",
       "requirement_id": "FE-DEP-01",
       "title": "Departure workflow › fe-dep-01 · records a clean departure: Idempotency-Key header + body, 201 → status view + ?departure=",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-028",
+      "id": "repo-LIVE-046",
       "requirement_id": "FE-DEP-02",
       "title": "Departure workflow › fe-dep-02 · a past effective date is blocked client-side — no request is sent",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-029",
+      "id": "repo-LIVE-047",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · a 409 blocked-by-responsibilities response renders the blocker panel with names",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-030",
+      "id": "repo-LIVE-048",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · re-parent to the default clears blockers and \"record now\" resubmits with a NEW key",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-031",
+      "id": "repo-LIVE-049",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · re-parenting that leaves external blockers shows the timetracker message and does not resubmit",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-032",
+      "id": "repo-LIVE-050",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · a stale blocker version reloads the blockers (a fresh record POST) and shows a note",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-033",
+      "id": "repo-LIVE-051",
       "requirement_id": "FE-DEP-06",
       "title": "Departure workflow › fe-dep-06 · a 409 departure_already_scheduled shows the \"already has a scheduled departure\" copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-034",
+      "id": "repo-LIVE-052",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · a retry_wait status shows attempts + last error and \"Retry now\" calls the retry route",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-035",
+      "id": "repo-LIVE-053",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · an applied status renders the terminal panel with no retry action",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-036",
+      "id": "repo-LIVE-054",
       "requirement_id": "FE-DEP-07",
       "title": "Departure workflow › fe-dep-07 · a write 403 collapses the form to a permission notice",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-037",
+      "id": "repo-LIVE-055",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · an unknown ?departure= id shows \"no longer available\" with a path back to the form",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-038",
+      "id": "repo-LIVE-056",
       "requirement_id": "FE-DEP-02",
       "title": "Departure workflow › fe-dep-02 · the confirm dialog Cancel sends no request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-039",
+      "id": "repo-LIVE-057",
       "requirement_id": "FE-DEP-04",
       "title": "Departure workflow › fe-dep-04 · a 409 idempotency_key_payload_mismatch shows the reload copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-040",
+      "id": "repo-LIVE-058",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · the blocker panel \"choose someone else\" path re-parents to a picked target",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-041",
+      "id": "repo-LIVE-059",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · a re-parent 404 shows the unknown-target copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-042",
+      "id": "repo-LIVE-060",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · a status GET 403 shows the forbidden panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-043",
+      "id": "repo-LIVE-061",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · retry returning departure_not_retryable shows the note and refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-044",
+      "id": "repo-LIVE-062",
       "requirement_id": "FE-DEP-04",
       "title": "Departure workflow › fe-dep-04 · an unchanged resubmit reuses the idempotency key; a changed value mints a new one",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-045",
+      "id": "repo-LIVE-063",
       "requirement_id": "FE-DEP-07",
       "title": "Departure workflow › fe-dep-07 · a 401 anywhere triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-046",
+      "id": "repo-LIVE-064",
       "requirement_id": "FE-DEP-08",
       "title": "Departure workflow › fe-dep-08 · the profile screen links through to the Departure screen",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-047",
+      "id": "repo-LIVE-065",
       "requirement_id": "FE-EMP-01",
       "title": "Employee directory › fe-emp-01 · default load renders the roster, cells, footer count and a clean request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-048",
+      "id": "repo-LIVE-066",
       "requirement_id": "FE-EMP-02",
       "title": "Employee directory › fe-emp-02 · the sidebar \"All Employees\" link opens the directory",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-049",
+      "id": "repo-LIVE-067",
       "requirement_id": "FE-EMP-03",
       "title": "Employee directory › fe-emp-03 · applying a filter reflects it in the URL, refetches, and resets the page",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-050",
+      "id": "repo-LIVE-068",
       "requirement_id": "FE-EMP-03",
       "title": "Employee directory › fe-emp-03 · forwards a valid birth-month filter but drops an out-of-range one",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-051",
+      "id": "repo-LIVE-069",
       "requirement_id": "FE-EMP-04",
       "title": "Employee directory › fe-emp-04 · paginates through the results and disables the pager at the bounds",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-052",
+      "id": "repo-LIVE-070",
       "requirement_id": "FE-EMP-03",
       "title": "Employee directory › fe-emp-03 · filtering by dismissed status shows dismissed rows with a badge",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-053",
+      "id": "repo-LIVE-071",
       "requirement_id": "FE-EMP-05",
       "title": "Employee directory › fe-emp-05 · an empty result renders the empty state with a clear-filters action",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-054",
+      "id": "repo-LIVE-072",
       "requirement_id": "FE-EMP-06",
       "title": "Employee directory › fe-emp-06 · a 400 keeps the filter bar and shows the bad-request panel without a retry",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-055",
+      "id": "repo-LIVE-073",
       "requirement_id": "FE-EMP-06",
       "title": "Employee directory › fe-emp-06 · a 403 renders the no-access panel with no retry loop",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-056",
+      "id": "repo-LIVE-074",
       "requirement_id": "FE-EMP-06",
       "title": "Employee directory › fe-emp-06 · a 500 renders the error panel and the retry button refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-057",
+      "id": "repo-LIVE-075",
       "requirement_id": "FE-EMP-07",
       "title": "Employee directory › fe-emp-07 · a 401 on the list request triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-058",
+      "id": "repo-LIVE-076",
       "requirement_id": "FE-IMP-01",
       "title": "Population import › fe-imp-01 · a picked CSV is POSTed as multipart with a single \"file\" part and the 200 summary renders",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-059",
+      "id": "repo-LIVE-077",
       "requirement_id": "FE-IMP-02",
       "title": "Population import › fe-imp-02 · a 200 with skipped rows shows the errors table (with a copy action) and is not an error panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-060",
+      "id": "repo-LIVE-078",
       "requirement_id": "FE-IMP-01",
       "title": "Population import › fe-imp-01 · a clean 200 shows the \"everything imported\" copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-061",
+      "id": "repo-LIVE-079",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · a 400 shows the backend message verbatim, no summary, and the picker stays usable",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-062",
+      "id": "repo-LIVE-080",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · the fix-and-re-upload loop: picking a corrected file clears the 400 and resubmits to a 200",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-063",
+      "id": "repo-LIVE-081",
       "requirement_id": "FE-IMP-03",
       "title": "Population import › fe-imp-03 · picking a second, different file replaces the shown selection",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-064",
+      "id": "repo-LIVE-082",
       "requirement_id": "FE-IMP-03",
       "title": "Population import › fe-imp-03 · a non-.csv name shows the soft hint but still allows submitting",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-065",
+      "id": "repo-LIVE-083",
       "requirement_id": "FE-IMP-03",
       "title": "Population import › fe-imp-03 · an empty file is blocked before any request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-066",
+      "id": "repo-LIVE-084",
       "requirement_id": "FE-IMP-04",
       "title": "Population import › fe-imp-04 · the confirm dialog: Cancel sends nothing, Confirm proceeds",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-067",
+      "id": "repo-LIVE-085",
       "requirement_id": "FE-IMP-06",
       "title": "Population import › fe-imp-06 · a 403 shows the permission notice and disables the upload control",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-068",
+      "id": "repo-LIVE-086",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · a 500 shows the generic server error and re-enables the picker",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-069",
+      "id": "repo-LIVE-087",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · a 200 with a malformed body is treated as a server error, not a result",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-070",
+      "id": "repo-LIVE-088",
       "requirement_id": "FE-IMP-07",
       "title": "Population import › fe-imp-07 · a 401 triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-071",
+      "id": "repo-LIVE-089",
       "requirement_id": "FE-IMP-08",
       "title": "Population import › fe-imp-08 · the directory empty state (no filters) leads with the Import population CTA",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-072",
+      "id": "repo-LIVE-090",
       "requirement_id": "FE-IMP-08",
       "title": "Population import › fe-imp-08 · the directory toolbar Import population button routes to the import screen",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-073",
+      "id": "repo-LIVE-091",
       "requirement_id": "FE-IMP-08",
       "title": "Population import › fe-imp-08 · the directory 403 panel hides the toolbar Import population button",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-074",
+      "id": "repo-LIVE-092",
       "requirement_id": "FE-IMP-09",
       "title": "Population import › fe-imp-09 · a successful import invalidates the directory query so the next visit refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-075",
+      "id": "repo-LIVE-093",
       "requirement_id": "FE-ORG-01",
       "title": "Organisational relationships › fe-org-01 · renders the journal newest-first with formatted cells and shows the authoritative current manager / PP by name",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-076",
+      "id": "repo-LIVE-094",
       "requirement_id": "FE-ORG-01",
       "title": "Organisational relationships › fe-org-01 · shows the loading state for the current value while the relationships read is in flight",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-077",
+      "id": "repo-LIVE-095",
       "requirement_id": "FE-ORG-02",
       "title": "Organisational relationships › fe-org-02 · the subject header shows the person name when the S1 card is readable",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-078",
+      "id": "repo-LIVE-096",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a journal 403 shows the explanatory panel once and the sections fall back to \"not available\"",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-079",
+      "id": "repo-LIVE-097",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a journal 404 shows a non-retryable \"not found\" panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-080",
+      "id": "repo-LIVE-098",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a malformed journal body (200, no data array) renders the error panel, not the empty state",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-081",
+      "id": "repo-LIVE-099",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · an empty journal (200, data: []) plus an empty relationships read shows the empty state and \"none assigned\" hints",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-082",
+      "id": "repo-LIVE-100",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a journal 500 renders the error panel and retry refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-083",
+      "id": "repo-LIVE-101",
       "requirement_id": "FE-ORG-04",
       "title": "Organisational relationships › fe-org-04 · assigns a manager: POST body is exactly { type, targetId } and the journal refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-084",
+      "id": "repo-LIVE-102",
       "requirement_id": "FE-ORG-04",
       "title": "Organisational relationships › fe-org-04 · the reassign picker excludes the subject and the current manager",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-085",
+      "id": "repo-LIVE-103",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a plain 409 on manager assignment shows the \"already has a manager\" copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-086",
+      "id": "repo-LIVE-104",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a 409 target_has_scheduled_departure on manager assignment shows its own copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-087",
+      "id": "repo-LIVE-105",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a non-self 400 on manager assignment shows the generic copy, not the self copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-088",
+      "id": "repo-LIVE-106",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a transport failure on manager assignment shows the network copy and does not refetch the journal",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-089",
+      "id": "repo-LIVE-107",
       "requirement_id": "FE-ORG-09",
       "title": "Organisational relationships › fe-org-09 · assigns a first People Partner (no current one): no confirm, PUT body { targetId }, journal refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-090",
+      "id": "repo-LIVE-108",
       "requirement_id": "FE-ORG-10",
       "title": "Organisational relationships › fe-org-10 · replacing an existing People Partner routes through a confirm step",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-091",
+      "id": "repo-LIVE-109",
       "requirement_id": "FE-ORG-10",
       "title": "Organisational relationships › fe-org-10 · cancelling the People Partner replace confirm sends no PUT",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-092",
+      "id": "repo-LIVE-110",
       "requirement_id": "FE-ORG-11",
       "title": "Organisational relationships › fe-org-11 · removes a People Partner: DELETE is sent and the section shows none",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-093",
+      "id": "repo-LIVE-111",
       "requirement_id": "FE-ORG-11",
       "title": "Organisational relationships › fe-org-11 · cancelling the People Partner remove confirm sends no DELETE",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-094",
+      "id": "repo-LIVE-112",
       "requirement_id": "FE-ORG-11",
       "title": "Organisational relationships › fe-org-11 · a 404 on People Partner removal explains there is nothing to remove",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-095",
+      "id": "repo-LIVE-113",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a write 403 on the manager POST disables both sections and shows the permission notice",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-096",
+      "id": "repo-LIVE-114",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a write 403 on the People Partner PUT disables both sections",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-097",
+      "id": "repo-LIVE-115",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a write 403 on the People Partner DELETE disables both sections",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-098",
+      "id": "repo-LIVE-116",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a 403 from the directory disables the person picker",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-099",
+      "id": "repo-LIVE-117",
       "requirement_id": "FE-ORG-15",
       "title": "Organisational relationships › fe-org-15 · a 401 anywhere triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-100",
+      "id": "repo-LIVE-118",
       "requirement_id": "FE-ORG-16",
       "title": "Organisational relationships › fe-org-16 · the profile screen links through to the Organisation screen and shows the name",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-101",
+      "id": "repo-LIVE-119",
       "requirement_id": "FE-ORG-06",
       "title": "Organisational relationships › fe-org-06 · reassigns a manager: DELETE (current relationshipId) then POST (new target), and both reads refetch",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-102",
+      "id": "repo-LIVE-120",
       "requirement_id": "FE-ORG-06",
       "title": "Organisational relationships › fe-org-06 · a reassignment that fails after the delete shows the recovery copy; retry re-POSTs only",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-103",
+      "id": "repo-LIVE-121",
       "requirement_id": "FE-ORG-07",
       "title": "Organisational relationships › fe-org-07 · an authoritative manager offers Remove; removing shows \"none\"",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-104",
+      "id": "repo-LIVE-122",
       "requirement_id": "FE-ORG-08",
       "title": "Organisational relationships › fe-org-08 · relationships 403 falls back to the journal-derived hint (assign only, no reassign)",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-105",
+      "id": "repo-LIVE-123",
       "requirement_id": "FE-ORG-12",
       "title": "Organisational relationships › fe-org-12 · a People Partner change and removal carry expectedCurrentTargetId",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-106",
+      "id": "repo-LIVE-124",
       "requirement_id": "FE-ORG-12",
       "title": "Organisational relationships › fe-org-12 · removing a People Partner sends the expectedCurrentTargetId query param",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-107",
+      "id": "repo-LIVE-125",
       "requirement_id": "FE-ORG-12",
       "title": "Organisational relationships › fe-org-12 · a 409 on a People Partner change shows the stale-token copy with a refresh action",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-108",
+      "id": "repo-LIVE-126",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · 404 → unknown-target copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-109",
+      "id": "repo-LIVE-127",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · 422 → inactive-target copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-110",
+      "id": "repo-LIVE-128",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · plain 409 → generic copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-111",
+      "id": "repo-LIVE-129",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · 409 target_has_scheduled_departure → its own copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-112",
+      "id": "repo-LIVE-130",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · non-self 400 → generic copy, not the self copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-113",
+      "id": "repo-LIVE-131",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · transport failure → network copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-114",
+      "id": "repo-LIVE-132",
       "requirement_id": "FE-PROF-01",
       "title": "Employee profile › fe-prof-01 · read-only view renders the identity card, dashes for nulls and no edit affordance",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-115",
+      "id": "repo-LIVE-133",
       "requirement_id": "FE-PROF-01",
       "title": "Employee profile › fe-prof-01 · my own profile shows the photo-upload control",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-116",
+      "id": "repo-LIVE-134",
       "requirement_id": "FE-PROF-02",
       "title": "Employee profile › fe-prof-02 · an editable card edits one field and PATCHes only the changed key",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-117",
+      "id": "repo-LIVE-135",
       "requirement_id": "FE-PROF-03",
       "title": "Employee profile › fe-prof-03 · a 409 on the email edit shows a conflict error and leaves the card unchanged",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-118",
+      "id": "repo-LIVE-136",
       "requirement_id": "FE-PROF-05",
       "title": "Employee profile › fe-prof-05 · uploads a valid photo and rejects a bad type client-side",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-119",
+      "id": "repo-LIVE-137",
       "requirement_id": "FE-PROF-06",
       "title": "Employee profile › fe-prof-06 · shows the empty timeline state, then adds an event and refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-120",
+      "id": "repo-LIVE-138",
       "requirement_id": "FE-PROF-07",
       "title": "Employee profile › fe-prof-07 · deletes an event through the confirm dialog",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-121",
+      "id": "repo-LIVE-139",
       "requirement_id": "FE-PROF-07",
       "title": "Employee profile › fe-prof-07 · a failed delete keeps the row and shows an inline error",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-122",
+      "id": "repo-LIVE-140",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 404 on the card renders the unavailable panel with a link back to the directory",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-123",
+      "id": "repo-LIVE-141",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 500 on the card renders the error panel and retry refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-124",
+      "id": "repo-LIVE-142",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 403 on the card also renders the unavailable panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-125",
+      "id": "repo-LIVE-143",
       "requirement_id": "FE-PROF-10",
       "title": "Employee profile › fe-prof-10 · the \"My profile\" account-menu item resolves to /employees/<my user id>",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-126",
+      "id": "repo-LIVE-144",
       "requirement_id": "FE-PROF-11",
       "title": "Employee profile › fe-prof-11 · a 401 anywhere on the profile triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-127",
+      "id": "repo-LIVE-145",
       "requirement_id": "FE-PROF-09",
       "title": "Employee profile › fe-prof-09 · a timeline 403 is requested exactly once — no retry",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-128",
+      "id": "repo-LIVE-146",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 200 with no data body renders the error panel, never a blank screen",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-129",
+      "id": "repo-LIVE-147",
       "requirement_id": "FE-PROF-02",
       "title": "Employee profile › fe-prof-02 · editing the birth day PATCHes a numeric value",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-130",
+      "id": "repo-LIVE-148",
       "requirement_id": "FE-PROF-05",
       "title": "Employee profile › fe-prof-05 · a 6 MiB photo is rejected client-side with no request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-131",
+      "id": "repo-LIVE-149",
       "requirement_id": "FE-PROF-05",
       "title": "Employee profile › fe-prof-05 · a 503 on the photo upload shows the storage-specific message",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-132",
+      "id": "repo-LIVE-150",
       "requirement_id": "FE-PROF-06",
       "title": "Employee profile › fe-prof-06 · invalid JSON in the add-event details blocks the POST",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-133",
+      "id": "repo-LIVE-151",
       "requirement_id": "FE-PROF-06",
       "title": "Employee profile › fe-prof-06 · valid details JSON is carried in the add-event POST body",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-134",
+      "id": "repo-LIVE-152",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · a malformed email shows a field error and sends no PATCH",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-135",
+      "id": "repo-LIVE-153",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · birth month 13 shows a range error and sends no PATCH",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-136",
+      "id": "repo-LIVE-154",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · clearing only the birth month shows the pair error and sends no PATCH",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-137",
+      "id": "repo-LIVE-155",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · clearing both birthday halves is blocked with an inline message",
       "status": "pass",
@@ -972,6 +1098,11 @@
         "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/ae88cfca-e91c-48c4-b35f-3da27e90ef1e/scratchpad/reports/backend-unit.json"
       },
       {
+        "kind": "jest",
+        "suite": "backend-e2e-departure",
+        "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/ae88cfca-e91c-48c4-b35f-3da27e90ef1e/scratchpad/dep.json"
+      },
+      {
         "kind": "playwright",
         "suite": "frontend-e2e",
         "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/ae88cfca-e91c-48c4-b35f-3da27e90ef1e/scratchpad/reports/frontend-e2e.json"
@@ -980,14 +1111,15 @@
     "missing_reports": [],
     "matrix_used": "_bmad-output/test-artifacts/tea-trace-coverage-matrix-repo-2026-09-04b.json",
     "oracle_ids_known": 294,
-    "cases_seen": 143,
-    "cases_mapped": 137,
+    "cases_seen": 161,
+    "cases_mapped": 155,
     "mapped_via": {
-      "matrix": 134,
+      "matrix": 152,
       "title": 3
     },
     "status_counts": {
-      "pass": 137
+      "pass": 151,
+      "skipped": 4
     },
     "untraceable_count": 6
   },

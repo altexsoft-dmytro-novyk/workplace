@@ -1,6 +1,6 @@
 {
  "phase": "PHASE_1_COMPLETE",
- "generated_at": "2026-09-04T20:28:44Z",
+ "generated_at": "2026-09-04T21:57:51Z",
  "collection_mode": "contract_static",
  "collection_status": "COLLECTED",
  "coverage_basis": "acceptance_criteria",
@@ -8,7 +8,10 @@
   "kind": "incremental",
   "base": "tea-trace-coverage-matrix-repo-2026-09-04.json",
   "note": "Prior requirement verdicts (coverage, impl_state) are carried forward UNCHANGED — they encode source inspection this pass did not repeat (e.g. mentorship has no src/ module, so its committed-red suites stay PARTIAL/NOT_IMPLEMENTED). Only the 67 requirements added since the base run were evaluated. tests[] is a union: the new scenario-id tagging enriches traceability without altering any prior verdict. A full re-derivation requires executing the backend e2e suite (docker) and redoing impl_state inspection.",
-  "new_requirements": 67
+  "new_requirements": 67,
+  "corrections": [
+   "UM-DEP-08: PARTIAL/TODO_ONLY -> FULL/IMPLEMENTED, on an observed run rather than carried-forward inference"
+  ]
  },
  "oracle": {
   "resolution_mode": "formal_requirements",
@@ -24,21 +27,21 @@
   "synthetic": false
  },
  "source_sha": {
-  "workspace": "c954d136744d9f5e5562b34a4f680f6ba849e529",
+  "workspace": "27881d3cb8fea223a0a341b3fb250f17b2cd6d3f",
   "backend": "20ed2a08fca35f9325196fb3ac916fadbd6bc257",
   "frontend": "cfbed35bdabda7f58c639d8a477e58538824e00a"
  },
  "coverage_statistics": {
   "total_requirements": 258,
-  "fully_covered": 226,
-  "partially_covered": 31,
+  "fully_covered": 227,
+  "partially_covered": 30,
   "uncovered": 1,
   "overall_coverage_percentage": 88,
   "priority_breakdown": {
    "P0": {
     "total": 132,
-    "covered": 131,
-    "percentage": 99
+    "covered": 132,
+    "percentage": 100
    },
    "P1": {
     "total": 102,
@@ -58,15 +61,7 @@
   }
  },
  "gap_analysis": {
-  "critical_gaps": [
-   {
-    "id": "UM-DEP-08",
-    "area": "user-management",
-    "group": "departure",
-    "coverage": "PARTIAL",
-    "reason": "TODO_ONLY"
-   }
-  ],
+  "critical_gaps": [],
   "high_gaps": [
    {
     "id": "MEN-DEP-01",
@@ -504,13 +499,6 @@
     "id": "UM-CT-09",
     "area": "user-management",
     "group": "career-timeline",
-    "coverage": "PARTIAL",
-    "reason": "TODO_ONLY"
-   },
-   {
-    "id": "UM-DEP-08",
-    "area": "user-management",
-    "group": "departure",
     "coverage": "PARTIAL",
     "reason": "TODO_ONLY"
    }
@@ -5304,9 +5292,9 @@
    "group": "departure",
    "priority": "P0",
    "status": "DRAFT",
-   "coverage": "PARTIAL",
+   "coverage": "FULL",
    "evidence": "case",
-   "impl_state": "TODO_ONLY",
+   "impl_state": "IMPLEMENTED",
    "doc": "docs/test-cases/user-management/departure/um-dep-08-stale-executor-noop.md",
    "tests": [
     {
@@ -5328,18 +5316,16 @@
      "file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
      "title": "um-dep-08 Test 4 — reclaiming an expired lease bumps `reclaimedLeaseCount` and leaves one in-flight lease, not two",
      "level": "e2e"
-    },
-    {
-     "file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
-     "title": "um-dep-08 · the `DepartureWorkerService` skip-locked claim + `leaseToken`/`leaseUntil` fencing + reclaim lands",
-     "level": "e2e"
-    },
-    {
-     "file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
-     "title": "um-dep-08 · the `DepartureWorkerService` skip-locked claim + `leaseToken`/`leaseUntil` fencing + reclaim lands",
-     "level": "e2e"
     }
-   ]
+   ],
+   "correction": {
+    "from": {
+     "coverage": "PARTIAL",
+     "impl_state": "TODO_ONLY"
+    },
+    "basis": "observed run 2026-09-05: all 4 um-dep-08 tests pass",
+    "note": "The base run recorded two identical it.todo placeholders. The suite's own comment says the earlier it.todo pair was replaced by four real tests once DepartureWorkerService landed; this run confirms them green."
+   }
   },
   {
    "id": "UM-EDIT-01",
@@ -7545,20 +7531,20 @@
   "present": true,
   "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
   "freshness": "fresh",
-  "recorded_source_sha": "c954d136744d9f5e5562b34a4f680f6ba849e529",
-  "current_source_sha": "c954d136744d9f5e5562b34a4f680f6ba849e529",
-  "producer": "local run (backend unit + frontend e2e; backend e2e absent — needs docker)",
-  "counted": 134,
+  "recorded_source_sha": "27881d3cb8fea223a0a341b3fb250f17b2cd6d3f",
+  "current_source_sha": "27881d3cb8fea223a0a341b3fb250f17b2cd6d3f",
+  "producer": "local run 2026-09-05 (backend unit + epic-5/apply-departure e2e + frontend e2e)",
+  "counted": 148,
   "stale": 0,
   "unverifiable": 0,
   "failed": 0,
   "contradicted": 0,
   "blocked": 0,
-  "skipped": 0,
+  "skipped": 4,
   "unmatched": 0,
   "invalid": 0,
   "requirements_live_only": 0,
   "retired_target": 3,
-  "scope_note": "Live evidence covers the backend unit suite and the frontend Playwright suite only. The backend e2e suite needs Postgres + LocalStack and was not executed in this pass, so its requirements rest on static evidence."
+  "scope_note": "Live evidence covers the backend unit suite, the frontend Playwright suite, and the epic-5/apply-departure e2e spec. The remaining backend e2e specs were not executed in this pass."
  }
 }

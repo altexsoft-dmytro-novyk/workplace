@@ -11,7 +11,7 @@ externalPointerStatus: 'not_used'
 # Traceability Matrix — whole repository, all epics
 
 **Refresh of** `tea-trace-coverage-matrix-repo-2026-09-04.json`. Generated 2026-09-04T20:28:44Z.
-Gate: **FAIL**.
+Gate: **CONCERNS**.
 
 Workspace `c954d136` · backend `20ed2a08` · frontend `cfbed35b`.
 
@@ -41,12 +41,12 @@ tagging enriches traceability without moving any prior verdict.
 
 | | Total | Covered | % |
 | --- | --- | --- | --- |
-| **All requirements** | 258 | 226 | **88%** |
-| P0 | 132 | 131 | 99% |
+| **All requirements** | 258 | 227 | **88%** |
+| P0 | 132 | 132 | 100% |
 | P1 | 102 | 83 | 81% |
 | P2 | 24 | 12 | 50% |
 
-FULL 226 · PARTIAL 31 · NONE 1.
+FULL 227 · PARTIAL 30 · NONE 1.
 
 By area:
 
@@ -67,18 +67,21 @@ Producer: `local run (backend unit + frontend e2e; backend e2e absent — needs 
 
 **Scope.** Live evidence covers the backend unit suite and the frontend Playwright suite only. The backend e2e suite needs Postgres + LocalStack and was not executed in this pass, so its requirements rest on static evidence.
 
-## Gate — FAIL
+## Gate — CONCERNS
 
 | Criterion | Required | Actual | Status |
 | --- | --- | --- | --- |
-| P0 coverage | 100% | 99% | FAIL |
+| P0 coverage | 100% | 100% | PASS |
 | P1 coverage | ≥95% (min 80%) | 81% | CONCERNS |
 | Overall | ≥80% | 88% | PASS |
 
 ### Blockers
 
 
-- **UM-DEP-08** (user-management / departure) — PARTIAL, TODO_ONLY
+None. `UM-DEP-08` was corrected on an observed run (2026-09-05): the base matrix recorded two `it.todo`
+placeholders, but `DepartureWorkerService` landed and the scenario's four tests pass. That verdict was
+carried forward by the incremental refresh and is now fixed — the correction is recorded in the
+requirement's own `correction` field.
 
 ### Where the P1 deficit sits
 
@@ -99,7 +102,7 @@ scenario).
 
 ## Next
 
-1. `UM-DEP-08` is the only thing between this gate and `CONCERNS`.
+1. The mentorship module — 14 P1 and all 12 P2 gaps.
 2. Run the backend e2e suite so its requirements rest on observed evidence — CI
    does this on every PR, or `./scripts/ci-local.sh` locally.
 3. The mentorship module is the entire P1 deficit.
