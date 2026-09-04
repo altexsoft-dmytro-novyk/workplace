@@ -83,7 +83,7 @@ Automation candidates:
 - Architecture test that no context outside `access-control` reads `Policies`, `Permissions`, or `UserPolicies` directly, and that no FR decision is reached outside the facade.
 - Seed idempotency and uniqueness for the single bootstrap HR Admin attachment, plus an assertion that the seed creates **no other** FR grant — the test that keeps an unapproved default from arriving quietly.
 - Database assertion that a request persists no FR decision.
-- Consistency with the three existing draft scenarios under `docs/test-cases/access-control/functional-permission/` (AC-FP-01 dual gate, AC-FP-02 FR-is-not-audience, AC-FP-03 HR Admin has no data access). Do not re-author them.
+- The three draft scenarios that stood here (AC-FP-01 dual gate, AC-FP-02 FR-is-not-audience, AC-FP-03 HR Admin has no data access) were deleted 2026-09-04 with the unapproved Phase-1 suite. Author them fresh under the AD-1 gate if still needed.
 
 Manual validation:
 

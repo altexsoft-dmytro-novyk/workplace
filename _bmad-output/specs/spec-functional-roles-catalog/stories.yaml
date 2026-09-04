@@ -29,7 +29,7 @@
     GET/POST /roles, PATCH /roles/:roleId/permissions, DELETE /roles/:roleId
     only — the top-level catalog, never a /users-nested route (AD-2, OQ-1).
     Follow the authoring pattern in docs/test-cases/README.md and the
-    conventions in docs/test-cases/access-control/README.md, using the canonical
+    conventions in docs/test-cases/README.md, using the canonical
     personas. Stay consistent with the three existing draft files in
     functional-permission/ and do not duplicate them. Human approves each file;
     the authoring agent may not self-approve.

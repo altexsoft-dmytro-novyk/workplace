@@ -29,9 +29,9 @@ before any E2E test or production code. This suite is the stage-1 artifact for
 the `User` entity's own lifecycle and workflow correctness **and** for the
 adoption of the real Access Control facade by the `/users/:id` routes (Epic 0).
 The base access-control model (who is entitled: audience derivation, §3.2 matrix
-cells, fail-closed) is proved in `docs/test-cases/access-control/` and
-`docs/test-cases/access-control-kernel/` — **both now exist on disk** (the
-earlier "not yet authored" boundary is closed). Entitlement for `/users/:id`
+cells, fail-closed) is proved in `docs/test-cases/access-control-kernel/`. (The Phase-1
+`docs/test-cases/access-control/` draft suite was deleted on 2026-09-04 —
+171 unapproved, never-executed scenarios; see the traceability report.) Entitlement for `/users/:id`
 *specifically* is CAP-0 here, against the real facade.
 
 ## Capabilities
@@ -177,8 +177,7 @@ earlier "not yet authored" boundary is closed). Entitlement for `/users/:id`
 ## Constraints
 
 - **The base access-matrix is not re-tested here.** Audience resolution and §3.2
-  matrix cells belong to `docs/test-cases/access-control/` and
-  `docs/test-cases/access-control-kernel/`. CAP-0 is the exception: it proves the
+  matrix cells belong to `docs/test-cases/access-control-kernel/`. CAP-0 is the exception: it proves the
   `/users/:id`-specific *adoption* of the facade (per-route feature → audience
   mapping, the minimal S1 identity-card projection, the port rebind) — not the
   facade's own internals.

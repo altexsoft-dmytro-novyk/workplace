@@ -79,7 +79,7 @@ Deployment order (binding): `db:deploy` → `db:seed` (ACM-0) → `db:bootstrap:
 
 ## §3.2 section → route mapping
 
-Human-readable names, taken from the section folders' own existing names (`docs/test-cases/access-control/matrix/`) — never the `sNN` id in a URL. `sNN` survives only inside the tier→section mapping table (`access-control.md`) as a cross-reference to the requirements doc.
+Human-readable names, taken from the section names in §3.2 — never the `sNN` id in a URL. `sNN` survives only inside the tier→section mapping table (`access-control.md`) as a cross-reference to the requirements doc.
 
 | § | Name | Read | Write |
 | --- | --- | --- | --- |
