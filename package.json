@@ -20,7 +20,7 @@
     "services:test": "npm --prefix services/backend test && npm --prefix services/frontend test",
     "services:db:up": "npm --prefix services/backend run db:up",
     "services:db:down": "npm --prefix services/backend run db:down",
-    "services:first-run": "npm run services:db:up && npm --prefix services/backend run create:root",
+    "services:first-run": "npm run services:db:up && npm --prefix services/backend run db:deploy && npm --prefix services/backend run create:root",
     "services:dev:backend": "npm --prefix services/backend run start:dev",
     "services:dev:frontend": "npm --prefix services/frontend run dev"
   },
