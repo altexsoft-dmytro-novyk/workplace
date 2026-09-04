@@ -1,0 +1,125 @@
+# AD-1 stage-approval ledger — User Management test cases
+#
+# Append-only. A superseding decision is APPENDED; no entry is ever edited or
+# removed. This file is the persisted, independently verifiable form of the
+# AD-1 gate: a claim in a report that "a human approved this" is not an
+# approval, this record is.
+#
+# Schema — every entry carries all eight fields:
+#
+#   - story_id:      dispatch entry id (e.g. "UM-6-1-scenarios")
+#     stage:         stage-1-scenarios | stage-2-tests | stage-3-production
+#     repo:          workspace | services/backend
+#     artifact_path: path to the artifact, relative to THAT repo's root
+#     commit:        revision in THAT repo at which the artifact was read
+#     author:        who produced the artifact
+#     approver:      who approved it
+#     decision:      approved | rejected
+#     timestamp:     ISO-8601
+#
+# Rules that make the record enforceable:
+#   1. author != approver (no self-certification).
+#   2. A dispatch may not start until the PRIOR stage's record exists and
+#      VERIFIES — `commit` resolves and `artifact_path` is present at it.
+#
+# Verify:
+#   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
+#   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
+#
+# Status: Story 6.1 (read the current manager and People Partner) Stage-1
+# scenarios are recorded below. NOTE the ordering: the Stage-2 suite
+# (services/backend test/user-management/epic-4/relationships-read.e2e-spec.ts)
+# was authored and green BEFORE these scenarios existed — an AD-1 inversion,
+# reconciled on 2026-09-04. No stage-2 record is claimed here; approving these
+# scenarios ratifies behaviour that already ships.
+
+approvals:
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-18-read-manager-and-pp-both-set.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-19-read-pp-only.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-20-read-no-edges-is-200-empty.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-21-read-denied-not-entitled.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-22-read-entitled-by-capability.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-23-read-unknown-or-inactive-subject-404.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-24-read-unresolved-session-401.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-25-read-project-edge-never-projected.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
+
+  - story_id: "UM-6-1-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/um-rel-26-read-edge-to-deactivated-target-not-current.md"
+    commit: "2f7d4e01d1b40e0467e1d5455e6dd815830306b5"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"
