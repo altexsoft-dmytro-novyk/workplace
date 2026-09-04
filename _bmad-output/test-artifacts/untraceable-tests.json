@@ -42,7 +42,7 @@
     {
       "file": "services/backend/test/user-management/epic-2/consume-magic-link.e2e-spec.ts",
       "titles": [
-        "um-auth-consume-malformed · empty body, empty token, non-string token → 400 [RED: POST /auth/magic-link/consume does not exist yet]"
+        "um-auth-consume-malformed · empty body, empty token, non-string token → 400 [RED: POST /auth/magic-link/consume → 404; no ConsumeMagicLinkDto]"
       ],
       "reason": "Malformed-input handling is a standing route-family rule in docs/test-cases/user-management/auth/README.md (§ token malformed → 400), deliberately not a numbered scenario — so there is no id to resolve to"
     },
