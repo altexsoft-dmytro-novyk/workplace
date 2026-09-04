@@ -16,6 +16,7 @@ const EPIC_BY_TRACK = {
     { prefix: '1-', epicId: '869eupgh3' },
     { prefix: '2-', epicId: '869euphdh' },
     { prefix: '3-', epicId: '869euphgj' },
+    { prefix: '4-', epicId: '869ew04c9' },
   ],
   'user-management': [
     { prefix: '0-', epicId: '869euphpm' },
@@ -24,6 +25,7 @@ const EPIC_BY_TRACK = {
     { prefix: '3-', epicId: '869evatht' },
     { prefix: '4-', epicId: '869evau1q' },
     { prefix: '5-', epicId: '869evau97' },
+    { prefix: '6-', epicId: '869ew04uk' },
   ],
 };
 
