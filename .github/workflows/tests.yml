@@ -71,7 +71,10 @@ jobs:
 
       - name: Lint
         continue-on-error: true
-        run: npm run lint
+        # Not `npm run lint`: that script carries `--fix`, so in CI it would
+        # rewrite files on the runner, exit 0 for every autofixable rule and
+        # throw the fixes away with the workspace.
+        run: npx eslint "{src,apps,libs,test}/**/*.ts"
 
       - name: Unit tests
         continue-on-error: true
@@ -130,6 +133,10 @@ jobs:
         run: mkdir -p "$GITHUB_WORKSPACE/reports"
 
       - name: Apply migrations
+        # Soft, like the compose step above it: when the database never came up
+        # the e2e suite should still run and report red, because a red report is
+        # evidence and a skipped step is a hole in it.
+        continue-on-error: true
         run: npm run db:deploy
 
       - name: E2E tests
@@ -252,6 +259,10 @@ jobs:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
+          # The producer is piped into tee, and the default shell is `bash -e`
+          # without pipefail — without this line the step would take tee's exit
+          # code and a crashed producer would report as green with no evidence.
+          set -o pipefail
           # Security: event context passed through env: to prevent script injection
           SOURCE_SHA="${PR_HEAD_SHA:-${GITHUB_SHA}}"
           node scripts/build-live-verification-results.cjs \
