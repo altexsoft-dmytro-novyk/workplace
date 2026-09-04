@@ -37,11 +37,13 @@ deliverable; none is authorized by the current spec.
   summary: Manager reassignment and removal UI — deferred: `DELETE /users/:id/relationships/:relationshipId` needs a `relationshipId` that no read endpoint returns.
   evidence: `relationshipId` is only in the `POST /users/:id/relationships` response body; there is no `GET /users/:id/relationships`. DEC-UM-005 makes reassignment an explicit DELETE-then-POST, so without the id the UI can only do a first assignment. Needs a backend relationship read.
   unblocked_by: backend UM Epic 6 Story 6.1 (`GET /users/:id/relationships` — current manager + PP edges with ids), drafted 2026-09-04.
+  resolved: 2026-09-04 — Story 6.1 backend shipped (spec `done`) + frontend wired: `useRelationships` hook, `useReassignManager` (DEC-UM-005 DELETE-then-POST with partial-failure recovery), `useRemoveManager`, authoritative current-manager render in `ManagerSection`. Not committed.
 
 - source_spec: `spec-organisational-relationships.md`
   summary: Authoritative "current organisation" display (manager, People Partner, departments, department manager) on the profile / org screen — deferred: `GET /users/:id` omits all derived fields and there is no other read.
   evidence: `user-card.response.ts` ships only the 12 S1 scalar fields ("derived S1 display fields ... are out of scope for this route until those contexts land"). The org screen currently infers "current" values from the newest `access-journal` row per `kind`, and only when the journal is readable (the subject's manager/PP). Needs the derived-fields read (tracked on the access-control side as the `{ data, canEdit }` roll-out) or a dedicated relationships read.
   unblocked_by: partially by backend UM Epic 6 Stories 6.1 (relationships) + 6.2 (departments) — dedicated reads the org screen can compose; the full audience-filtered rollup ONTO `GET /users/:id` stays the Access-Control `{ data, canEdit }` roll-out item. Drafted 2026-09-04.
+  progress: 2026-09-04 — the MANAGER + PP halves are now authoritative (Story 6.1 shipped + `useEmployeeOrganisationPage` composes `useRelationships`, names rendered from `target`). Journal-derived inference kept only as the `403` fallback. Department + department-manager halves still await Story 6.2. Not committed.
 
 - source_spec: `spec-departure-workflow.md`
   summary: No "view / manage the current scheduled departure" — if `POST /users/:id/departures` returns `departure_already_scheduled`, the UI can only say so.
@@ -72,6 +74,7 @@ deliverable; none is authorized by the current spec.
   summary: Optimistic-concurrency tokens (`expectedCurrentTargetId` / `expectedCurrentManagerId`) are not wired — the UI does unconditional replace/remove.
   evidence: Using the token safely needs a current-PP / current-manager read to seed it; without that read the UI omits it (the backend treats an omitted token as an unconditional operation). Wire it once a current-state read exists.
   unblocked_by: backend UM Epic 6 Story 6.1 (relationships read supplies the current manager/PP id to seed the token), drafted 2026-09-04.
+  resolved: 2026-09-04 — `usePeoplePartnerSection` now forwards `expectedCurrentTargetId` from the authoritative PP edge into change/remove; a stale-token `409` renders the "PP changed since this screen loaded — refresh" copy. Not committed.
 
 - source_spec: `spec-employee-directory.md`
   summary: Employee-directory affordances the prototype shows but `GET /users` cannot back — free-text (substring) search, a `department` filter, a server-side sort control, `.xlsx` export, per-viewer audience-filtered rows ("colleague view"), and row-select bulk actions.
