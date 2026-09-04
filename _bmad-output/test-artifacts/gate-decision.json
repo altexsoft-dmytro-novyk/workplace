@@ -1,28 +1,86 @@
 {
   "schema_version": "0.1.0",
-  "evaluated_at": "2026-09-04T12:50:43Z",
-  "repo": "people management",
+  "snapshot_at": "2026-09-04T17:18:29.314Z",
   "target": {
     "type": "release",
-    "id": "whole-repo-all-epics",
-    "label": "Whole repository \u2014 all epics (Access Control Kernel MVP, User Management, Mentorship)"
+    "id": "whole-repo",
+    "label": "All epics — AC Foundation, AC Kernel MVP, User Management, Mentorship"
   },
-  "collection_status": "COLLECTED",
-  "gate_basis": "priority_thresholds",
   "gate_status": "FAIL",
-  "rationale": "P0 coverage is 99% (required: 100%). One P0 criterion (UM-DEP-08) is declared only as an it.todo \u2014 a named but unwritten test.",
-  "p0_status": "NOT_MET",
-  "p1_status": "NOT_MET",
-  "overall_status": "MET",
-  "critical_open": 1,
-  "links": {
-    "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",
-    "trace_report_url": "",
-    "artifact_url": "",
-    "journey_evidence_url": ""
+  "decision_mode": "deterministic",
+  "evaluator": "TEA Agent",
+  "collection_mode": "contract_static",
+  "collection_status": "COLLECTED",
+  "source_sha": "b074364",
+  "backend_sha": "53894d7",
+  "frontend_sha": "a0decb9",
+  "rationale": "P0 coverage is 100% (met). P1 coverage is 70% against an 80% minimum: all 27 mentorship criteria are PARTIAL for want of a module and a MentorshipPair model. P1 is the only breach.",
+  "gate_criteria": {
+    "p0_coverage_required": 100,
+    "p0_coverage_actual": 100,
+    "p0_status": "MET",
+    "p1_coverage_target": 90,
+    "p1_coverage_minimum": 80,
+    "p1_coverage_actual": 70,
+    "p1_status": "NOT_MET",
+    "overall_coverage_minimum": 80,
+    "overall_coverage_actual": 85,
+    "overall_status": "MET"
   },
-  "supersedes": {
-    "previous_snapshot": "2026-09-04 run over a 398-document oracle",
-    "note": "The 171-document Phase-1 access-control draft suite was deleted 2026-09-04 (no AD-1 approval, no test ever referenced it). Oracle is now 227."
-  }
+  "coverage": {
+    "inventory": {
+      "covered": 175,
+      "total": 207,
+      "pct": 85
+    },
+    "priority_breakdown": {
+      "P0": {
+        "total": 128,
+        "full": 128,
+        "pct": 100
+      },
+      "P1": {
+        "total": 67,
+        "full": 47,
+        "pct": 70
+      },
+      "P2": {
+        "total": 12,
+        "full": 0,
+        "pct": 0
+      }
+    },
+    "by_level": {
+      "e2e": 0,
+      "api": 0,
+      "component": 0,
+      "unit": 0,
+      "live": 0,
+      "other": 0
+    }
+  },
+  "blockers": [
+    {
+      "id": "MENTORSHIP",
+      "severity": "high",
+      "reason": "All 27 live mentorship criteria PARTIAL — no src/mentorship/ and no MentorshipPair model. Sole cause of P1 70% and the only remaining gate failure."
+    },
+    {
+      "id": "UM-CT-03/04/05/06/09",
+      "severity": "medium",
+      "reason": "Five P1 criteria rest on it.todo only, deferred pending the FR-matrix grant.",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts"
+    },
+    {
+      "id": "FRONTEND-UNTRACED",
+      "severity": "medium",
+      "reason": "7 frontend spec files / 124 cases cite zero oracle IDs; no scenario describes a UI journey."
+    },
+    {
+      "id": "CI-DOES-NOT-RUN-SUITES",
+      "severity": "low",
+      "reason": ".github/workflows/tests.yml runs only npm run test:clickup; neither submodule has a workflow. Mode capped at contract_static."
+    }
+  ],
+  "note": "Submodule pins were corrected to each service main during this run (backend ebf7f2b->53894d7, frontend 25bd71c->a0decb9), resolving the former P0 blocker UM-DEP-08 and the ACF 403/200 contradiction."
 }
