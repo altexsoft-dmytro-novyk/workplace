@@ -138,36 +138,36 @@ Two defects were found and fixed during that verification:
   which also matches `domain/services/` inside the backend source tree and
   truncated every backend path there. Anchors now come from `.gitmodules`.
 
-## Step 3c — Unmatched triage (static, ahead of the first CI run)
+## Step 3c — Unmatched triage and remediation
 
-The mapping was run statically over the AST of all 53 spec files, so the
-`by_file` ranking exists without waiting for CI. **546 cases, 157 unmatched,
-18 `it.todo`, 33 files fully matched.**
+Mapping was run statically over the AST of all 53 spec files. Starting point:
+**546 cases, 160 unmatched, 18 `it.todo`.**
 
-| Count | Where | Verdict |
-| ----- | ----- | ------- |
-| 133 | `services/frontend/e2e/**` (7 files) | **No oracle exists.** Already recorded by trace as `untraced_test_suites`. Blocked on a design decision — the oracle is backend-shaped (`inputURL`, `inputRequest`, HTTP status) and nothing of that shape describes a UI. |
-| 18 | `relationships-read.e2e-spec.ts` (12) + `get-relationships.action.spec.ts` (6) | **Story 6.1 / Epic 6 has no Stage-1 oracle document.** The suite cites `_bmad-output/implementation-artifacts/.../spec-6-1-…md`, and `docs/test-cases/user-management/relationships/` runs `um-rel-01`…`17` — all writes, no read endpoint. Titles use a local `T1`…`T9` scheme. This is a process gap (Stage-2 exists without an approved Stage-1), not a labelling gap. |
-| 3 | `write-adoption.e2e-spec.ts` — "grant holder" cases | **Correctly unmatched.** `umac-07-write-dual-gate.md` is explicitly "Variant A" and defers the FR-grant path ("can be introduced later"). Labelling these `UMAC-07` would claim coverage the doc disclaims. |
-| 3 | `audience-resolver.service.spec.ts` | Assertions about internals (one graph call, dedup), not about a requirement. |
-| 3 | `health.controller.spec.ts` (2), `app.e2e-spec.ts` (1) | Framework scaffold (`should be defined`). Untraceable by nature. |
-| 5 | singles across otherwise well-labelled files | Packaging assertion (npm script exists), test hygiene (no rows left behind), shared malformed-body tests spanning a whole endpoint, a `DEC-UM-001` decision-record trace, an AD-20 health-counter check. |
+### Fixed
 
-**Net: nothing here is a mechanical labelling fix.** The hypothesis that a
-high-count file is merely a suite that forgot to name IDs did not survive
-contact with the repo — every high-count file is a place where the suite has
-moved ahead of the oracle.
+| Was | Fix | Now |
+| --- | --- | --- |
+| 3 — `men-end-04a/b/c` | **Producer defect.** The token-boundary check rejected any trailing letter, so lettered sub-cases of one scenario never resolved. A single trailing letter now merges (`MEN-END-04`); a trailing **digit** still rejects (`UM-REL-1` ≠ `UM-REL-15`); longest-match still prefers a lettered document where the oracle has one (`UM-AUTH-02B`). | 0 |
+| 11 — scaffold, internals, packaging, hygiene | **`untraceable-tests.json` registry.** These can never resolve to a requirement; left in `unmatched` the list would never shrink and would stop being read. The producer buckets them as `untraceable` with a stated reason. | 0 (bucketed) |
+| 18 — Story 6.1 | **Nine Stage-1 documents authored** (`um-rel-18`…`um-rel-26`) covering T1–T9 with sub-cases grouped per folder convention, plus the folder README updated. Both suites now name the ids in their titles. The 6th unit case (asserts the reader-gate mock's arguments) went to the registry as wiring. | 0 |
 
-### One producer defect found and fixed by this triage
+The Story 6.1 documents are an **AD-1 inversion recorded, not hidden**: the
+Stage-2 suite was already green, so the scenarios were authored from it. Both
+the README and each file say so, because approving them ratifies shipped
+behaviour. They need per-file human approval like any Stage-1 document.
 
-`men-end-04a` / `04b` / `04c` failed to resolve to `MEN-END-04`: the token
-boundary check rejected any trailing letter. The oracle carries one document for
-the scenario and the suite splits it into lettered sub-cases, so a single
-trailing letter is part of the reference. Fixed, with a trailing **digit** still
-rejecting (`UM-REL-1` must not match inside `UM-REL-15`) and longest-match still
-preferring a lettered document where one exists (`UM-AUTH-02B`). Verified on a
-synthetic report covering all four cases; unmatched went 160 → 157 with no other
-file's count changing.
+Verified: backend unit suite 19/19 green and `tsc --noEmit` clean after the
+title edits; producer on the real reports went from 8 mapped / 13 unmatched to
+**13 mapped / 2 unmatched / 6 untraceable** — every backend unit case now
+accounted for.
+
+### Remaining: 133, all frontend
+
+| Count | Where | Why it stays |
+| ----- | ----- | ------------ |
+| 133 | `services/frontend/e2e/**` (7 files) | No oracle exists in either direction. Blocked on one decision — per-flow behavioural documents (~15-25) or per-case mirrors of the backend shape (~133). Put to the operator; not yet answered. |
+| 6 | `write-adoption` (3), `audience-resolver` (3) | `umac-07` is explicitly "Variant A" and defers the FR-grant path, so labelling those three would claim coverage the document disclaims. The audience-resolver three assert batching/dedup — candidates for the registry once confirmed. |
+| 5 | singles across well-labelled files | Shared malformed-body tests spanning a whole endpoint, a `DEC-UM-001` decision-record trace, an AD-20 health-counter check. Each needs a judgement call, none is mechanical. |
 
 ## Step 4 — Validation
 

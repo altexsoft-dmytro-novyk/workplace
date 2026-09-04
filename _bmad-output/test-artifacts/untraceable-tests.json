@@ -1,0 +1,43 @@
+{
+  "$comment": "Tests that must never resolve to a requirement. Read by scripts/build-live-verification-results.cjs, which buckets them as `untraceable` instead of `unmatched`, so the unmatched list stays a to-do rather than a permanent backlog. `file` matches a repo-relative path, exactly or with a trailing /** prefix. Omit `titles` to cover the whole file.",
+  "rules": [
+    {
+      "file": "services/backend/src/modules/health/**",
+      "reason": "Nest scaffold — `should be defined` asserts the framework wired a provider, not a requirement"
+    },
+    {
+      "file": "services/backend/test/app.e2e-spec.ts",
+      "reason": "Nest scaffold smoke test for /health"
+    },
+    {
+      "file": "services/backend/src/access-control/domain/services/audience-resolver.service.spec.ts",
+      "titles": [
+        "returns a key for every requested target in one graph call",
+        "deduplicates repeated target ids without extra graph calls",
+        "returns both reporting and PP when a viewer holds both audiences"
+      ],
+      "reason": "Asserts the resolver's internal call shape (batching, dedup), not an ACF audience outcome — the outcome cases in this file do carry ACF-AU/ACF-FC ids"
+    },
+    {
+      "file": "services/backend/test/access-control/acm1r-fr-foundation.e2e-spec.ts",
+      "titles": [
+        "exposes db:bootstrap:access-control as an npm script"
+      ],
+      "reason": "Packaging assertion — the script exists in package.json; no behavioural requirement behind it"
+    },
+    {
+      "file": "services/backend/test/access-control/audience-resolution.e2e-spec.ts",
+      "titles": [
+        "leaves no relationship rows behind after resolution"
+      ],
+      "reason": "Test-hygiene assertion about fixture teardown"
+    },
+    {
+      "file": "services/backend/src/user-management/application/actions/__tests__/get-relationships.action.spec.ts",
+      "titles": [
+        "passes viewer + subject through to the reader gate"
+      ],
+      "reason": "Interaction assertion on the reader-gate mock's arguments — wiring, not an outcome; the outcome cases in this file carry um-rel-18/20/21/23"
+    }
+  ]
+}
