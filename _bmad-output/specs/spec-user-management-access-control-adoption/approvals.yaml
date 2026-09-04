@@ -226,3 +226,17 @@ approvals:
     approver: "Dmytro Novyk"
     decision: "approved"
     timestamp: "2026-09-01T15:30:00Z"
+
+  # UMAC-10 — the user-management:edit FR-grant OR-override on the S1 section
+  # gate. Authored 2026-09-04 from shipped behaviour that umac-07 (Variant A)
+  # had deferred; see that file's stage-ordering note.
+
+  - story_id: "UMAC-10-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/access-control-adoption/umac-10-write-fr-grant-override.md"
+    commit: "834f2af587400553c2bacef63bcb80cad6ccbde8"
+    author: "Claude Code (agent)"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-04T00:00:00Z"

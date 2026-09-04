@@ -5,12 +5,25 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: tests-${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Node 24 is what services/backend/.nvmrc pins; the frontend has no .nvmrc and
+  # runs on the same major.
+  SERVICE_NODE_VERSION: '24'
+
 jobs:
+  # ── Blocking gate ────────────────────────────────────────────────────────
+  # The workspace ClickUp sync suite is green today and stays a real gate.
   clickup:
+    name: Workspace · ClickUp sync
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -19,3 +32,268 @@ jobs:
           node-version: '20'
       - run: npm ci
       - run: npm run test:clickup
+
+  # ── Informational suites ─────────────────────────────────────────────────
+  # AD-1 commits Stage-2 tests red on purpose: the test lands before the
+  # production code. Mentorship (~29 cases) has no module under src/ at all.
+  # These jobs therefore report, they do not gate — `continue-on-error` keeps
+  # their conclusion neutral so no branch protection rule can block a merge on
+  # a red that the process asked for. Promote one to blocking by deleting its
+  # `continue-on-error` line once its suite is meant to be green.
+
+  backend-unit:
+    name: Backend · unit (informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: services/backend
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          # services/* are private submodules; the default GITHUB_TOKEN cannot
+          # clone another private repo. SUBMODULES_TOKEN is a PAT with `repo`
+          # scope on backend + frontend.
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.SERVICE_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: services/backend/package-lock.json
+
+      - name: Install
+        run: npm ci # postinstall runs `prisma generate`
+
+      - name: Prepare report directory
+        run: mkdir -p "$GITHUB_WORKSPACE/reports"
+
+      - name: Lint
+        continue-on-error: true
+        # Not `npm run lint`: that script carries `--fix`, so in CI it would
+        # rewrite files on the runner, exit 0 for every autofixable rule and
+        # throw the fixes away with the workspace.
+        run: npx eslint "{src,apps,libs,test}/**/*.ts"
+
+      - name: Unit tests
+        continue-on-error: true
+        run: npm test -- --ci --json --outputFile="$GITHUB_WORKSPACE/reports/backend-unit.json"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-backend-unit
+          path: reports/backend-unit.json
+          if-no-files-found: warn
+          retention-days: 30
+
+  backend-e2e:
+    name: Backend · e2e (informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: services/backend
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.SERVICE_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: services/backend/package-lock.json
+
+      - name: Materialise .env for docker compose
+        # docker-compose.yml declares `env_file: .env`, which is gitignored. The
+        # committed template carries every value the compose stack needs except
+        # the LocalStack token, which is a repository secret.
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: |
+          cp .env.example .env
+          if [ -n "$LOCALSTACK_AUTH_TOKEN" ]; then
+            # Security: secret passed through env: to prevent script injection
+            printf '\nLOCALSTACK_AUTH_TOKEN=%s\n' "$LOCALSTACK_AUTH_TOKEN" >> .env
+          else
+            echo "::warning::LOCALSTACK_AUTH_TOKEN secret is not set — LocalStack will not start and S3-backed specs will fail."
+          fi
+
+      - name: Start Postgres + LocalStack
+        continue-on-error: true
+        run: docker compose up -d --wait
+
+      - name: Install
+        run: npm ci
+
+      - name: Prepare report directory
+        run: mkdir -p "$GITHUB_WORKSPACE/reports"
+
+      - name: Apply migrations
+        # Soft, like the compose step above it: when the database never came up
+        # the e2e suite should still run and report red, because a red report is
+        # evidence and a skipped step is a hole in it.
+        continue-on-error: true
+        run: npm run db:deploy
+
+      - name: E2E tests
+        continue-on-error: true
+        run: npm run test:e2e -- --ci --json --outputFile="$GITHUB_WORKSPACE/reports/backend-e2e.json"
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=200
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-backend-e2e
+          path: reports/backend-e2e.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down -v
+
+  frontend-e2e:
+    name: Frontend · Playwright (informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: services/frontend
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.SERVICE_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: services/frontend/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Lint
+        continue-on-error: true
+        run: npm run lint
+
+      - name: Prepare report directory
+        run: mkdir -p "$GITHUB_WORKSPACE/reports"
+
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          # The browser build is pinned by the @playwright/test version, so the
+          # lockfile hash is the correct key.
+          key: playwright-${{ runner.os }}-${{ hashFiles('services/frontend/package-lock.json') }}
+          restore-keys: playwright-${{ runner.os }}-
+
+      - name: Install Playwright browsers
+        # `--with-deps` installs OS libraries outside the cached directory, so it
+        # runs on a cache hit too; only the browser download is skipped.
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        continue-on-error: true
+        # The suite mocks the API at the network layer and starts Vite itself
+        # (playwright.config.ts `webServer`), so no backend is needed here.
+        env:
+          PLAYWRIGHT_JSON_OUTPUT_NAME: ${{ github.workspace }}/reports/frontend-e2e.json
+        run: npm test -- --reporter=list,json,html
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-frontend-e2e
+          path: reports/frontend-e2e.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-html-report
+          path: services/frontend/playwright-report/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # ── Evidence aggregation ─────────────────────────────────────────────────
+  # Turns the three runs into the file /bmad-testarch-trace reads as `live`
+  # evidence, which is what moves a trace run out of `contract_static`.
+  live-verification:
+    name: Live verification evidence
+    runs-on: ubuntu-latest
+    needs: [backend-unit, backend-e2e, frontend-e2e]
+    if: always()
+    steps:
+      - uses: actions/checkout@v5
+        # The workspace alone carries docs/test-cases/** (the oracle) and
+        # _bmad-output/test-artifacts/** (the coverage matrix). Submodules are
+        # not needed: the reports already name their own files.
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - uses: actions/download-artifact@v4
+        with:
+          path: reports
+          pattern: report-*
+          merge-multiple: true
+
+      - name: Build live-verification-results.json
+        # `git rev-parse HEAD` on a pull_request event resolves to the ephemeral
+        # merge commit, which no local trace run will ever match. The branch head
+        # is the commit a reviewer actually has checked out.
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          # The producer is piped into tee, and the default shell is `bash -e`
+          # without pipefail — without this line the step would take tee's exit
+          # code and a crashed producer would report as green with no evidence.
+          set -o pipefail
+          # Security: event context passed through env: to prevent script injection
+          SOURCE_SHA="${PR_HEAD_SHA:-${GITHUB_SHA}}"
+          node scripts/build-live-verification-results.cjs \
+            --jest reports/backend-unit.json --suite backend-unit \
+            --jest reports/backend-e2e.json --suite backend-e2e \
+            --playwright reports/frontend-e2e.json --suite frontend-e2e \
+            --source-sha "$SOURCE_SHA" \
+            --producer "GitHub Actions · $RUN_URL" \
+            | tee summary.txt
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo '## Live verification evidence'
+            echo
+            echo 'These suites run informationally — a red result never blocks a merge.'
+            echo
+            echo '```'
+            cat summary.txt 2>/dev/null || echo 'producer did not run'
+            echo '```'
+            echo
+            echo 'Download the `live-verification-results` artifact into'
+            echo '`_bmad-output/test-artifacts/` and re-run `/bmad-testarch-trace`'
+            echo 'to trace against observed evidence instead of `contract_static`.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: live-verification-results
+          path: _bmad-output/test-artifacts/live-verification-results.json
+          if-no-files-found: warn
+          retention-days: 30

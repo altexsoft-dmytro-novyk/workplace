@@ -1,0 +1,93 @@
+{
+ "schema_version": "0.1.0",
+ "snapshot_at": "2026-09-04T20:28:44Z",
+ "target": {
+  "type": "release",
+  "id": "whole-repo-all-epics",
+  "label": "Whole repository — all epics (Access Control Kernel MVP, User Management, Mentorship, Frontend flows)"
+ },
+ "gate_status": "FAIL",
+ "decision_mode": "deterministic",
+ "evaluator": "TEA Agent (bmad-testarch-trace)",
+ "source_sha": {
+  "workspace": "c954d136744d9f5e5562b34a4f680f6ba849e529",
+  "backend": "20ed2a08fca35f9325196fb3ac916fadbd6bc257",
+  "frontend": "cfbed35bdabda7f58c639d8a477e58538824e00a"
+ },
+ "gate_criteria": {
+  "p0_coverage_required": 100,
+  "p0_coverage_actual": 99,
+  "p0_coverage_status": "FAIL",
+  "p1_coverage_target": 95,
+  "p1_coverage_minimum": 80,
+  "p1_coverage_actual": 81,
+  "p1_coverage_status": "CONCERNS",
+  "overall_coverage_minimum": 80,
+  "overall_coverage_actual": 88,
+  "overall_coverage_status": "PASS"
+ },
+ "blockers": [
+  {
+   "id": "UM-DEP-08",
+   "severity": "critical",
+   "reason": "TODO_ONLY"
+  }
+ ],
+ "coverage": {
+  "inventory": {
+   "covered": 226,
+   "total": 258,
+   "pct": 88
+  },
+  "priority_breakdown": {
+   "P0": {
+    "total": 132,
+    "covered": 131,
+    "percentage": 99
+   },
+   "P1": {
+    "total": 102,
+    "covered": 83,
+    "percentage": 81
+   },
+   "P2": {
+    "total": 24,
+    "covered": 12,
+    "percentage": 50
+   },
+   "P3": {
+    "total": 0,
+    "covered": 0,
+    "percentage": 100
+   }
+  },
+  "by_level": {
+   "e2e": 522,
+   "api": 0,
+   "component": 0,
+   "unit": 13,
+   "live": 134,
+   "other": 0
+  }
+ },
+ "live_evidence": {
+  "present": true,
+  "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
+  "freshness": "fresh",
+  "recorded_source_sha": "c954d136744d9f5e5562b34a4f680f6ba849e529",
+  "current_source_sha": "c954d136744d9f5e5562b34a4f680f6ba849e529",
+  "producer": "local run (backend unit + frontend e2e; backend e2e absent — needs docker)",
+  "counted": 134,
+  "stale": 0,
+  "unverifiable": 0,
+  "failed": 0,
+  "contradicted": 0,
+  "blocked": 0,
+  "skipped": 0,
+  "unmatched": 0,
+  "invalid": 0,
+  "requirements_live_only": 0,
+  "retired_target": 3,
+  "scope_note": "Live evidence covers the backend unit suite and the frontend Playwright suite only. The backend e2e suite needs Postgres + LocalStack and was not executed in this pass, so its requirements rest on static evidence."
+ }
+}
