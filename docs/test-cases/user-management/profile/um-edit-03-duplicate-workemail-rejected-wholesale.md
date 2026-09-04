@@ -6,8 +6,9 @@
 > [../../README.md](../../README.md)). Adds the **wholesale-rollback** assertion:
 > a sibling field in the same body is also not applied.
 >
-> **Scope (v1.5).** Entitlement is Epic 0's. Data correctness only. Blocked past
-> Stage 1 on the `user-management:edit` seed.
+> **Scope (v1.5).** Entitlement is Epic 0's (Variant A: audience-only edit gate —
+> `canAccessSection(v, 'S1', t) === 'write'`, no functional permission, no kernel
+> seed). Data correctness only. Pending only Story 1.2's own Stage 2 / Stage 3.
 
 ## Scenario
 
@@ -23,9 +24,9 @@ request is rolled back — **neither** `workEmail` **nor** `position` changes.
 There is no partial update.
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice and Colin
-seeded as above; real `Relationship` Alice→Bob `type='direct'`;
-`user-management:edit` seeded and held; port rebound. Stage 2 resolves ids from
-the seeded fixture id table.
+seeded as above; real `Relationship` Alice→Bob `type='direct'` (Bob's
+`canAccessSection(Bob, 'S1', Alice)` is `write`); port rebound. Stage 2 resolves
+ids from the seeded fixture id table.
 
 ## Test
 

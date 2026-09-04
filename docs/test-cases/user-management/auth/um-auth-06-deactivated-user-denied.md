@@ -1,43 +1,66 @@
-# UM-AUTH-06 · Deactivated user cannot establish a session via magic link
+# UM-AUTH-06 · Deactivated / departed user cannot establish a session via magic link
 
-**Trace:** epics.md Story 2.2 · [DEC-UM-004](../../../architecture/user-management-test-decisions.md) · [DEC-UM-012](../../../architecture/user-management-test-decisions.md) (proposed — pending confirmation)
+**Trace:** epics.md Story 2.2 · PRD FR-6 (once a departure effective date has
+passed and the account is inactive, no usable session is established) ·
+[DEC-UM-004](../../../architecture/user-management-test-decisions.md) (generic
+`401`) · [DEC-UM-012](../../../architecture/user-management-test-decisions.md)
+(proposed — request-side enumeration safety, owned by
+[`um-auth-02b`](um-auth-02b-request-magic-link-deactivated-email.md))
+
+> **Scope note (2026-09-02).** The **request half** (a deactivated address is
+> enumeration-safe on `POST /auth/magic-link`) lives in its own Story 2.1 file
+> [`um-auth-02b`](um-auth-02b-request-magic-link-deactivated-email.md). This
+> file owns **only** the consume half: a token minted *before* deactivation
+> must not yield a session, because the account-state check happens **at
+> consume time** against the current `User.isActive` / current
+> `EmploymentStatus` — independent of the DEC-UM-012 draft.
+
+> **Reconciled 2026-09-02 (Story 2.2 Stage 1).** Real token. Because a
+> deactivated address gets **zero** dispatch (`um-auth-02b`), the token cannot
+> be minted after deactivation — so the suite mints it while Colin is still
+> active, reads the raw value from the recording dispatcher, then flips
+> `isActive: false` **and** seeds a current `EmploymentStatus{dismissed}`
+> directly (the applied-departure convergence; in production an Epic 5 outcome,
+> CC-06-blocked). The pre-existing token is then submitted to `/consume`.
 
 ## Scenario
 
-**Given** Colin's account is inactive (`isActive: false`) — in v1.5 this state is
-reached through the Epic 5 departure workflow (`departure/um-dep-03`), not the
-retired generic `DELETE /users/:id`; stage 2 seeds the inactive state directly.
+**Given** Colin was an active employee who requested a magic link
+(`POST /auth/magic-link` minted and dispatched a real token), and **after that**
+his departure took effect: his `User` row is now `isActive: false` **and** he
+has a current `EmploymentStatus{status: 'dismissed'}` (both seeded directly at
+Stage 2).
 
-**When** Colin requests a magic link for his `workEmail`, and separately, someone attempts to consume a token that was issued for that address before he was deactivated.
+**When** someone submits Colin's still-unexpired, still-unconsumed
+pre-deactivation token to `POST /auth/magic-link/consume`.
 
-**Then** no usable session is established — deactivated accounts must not authenticate through the magic-link path. Per DEC-UM-012, the request side is enumeration-safe: a deactivated account's email is treated exactly like an unknown one, so the endpoint reveals nothing about deactivation status either.
+**Then** no usable session is established — a deactivated / departed account must
+not authenticate through the magic-link path, and the denial is
+enumeration-safe (the generic `401`, revealing nothing about account state).
 
-**Preconditions:** [fixture](../README.md#canonical-personas); a magic-link token for `colin@company.example` was issued before deactivation (analogous to `um-auth-01`); Colin's row is `isActive: false` afterward (seeded directly in stage 2).
-
-> **v1.5 fixture note (2026-09-01).** Colin comes from the seeded population
-> import (Story 1.1), not `POST /users`. The inactive state is an Epic 5 outcome
-> (CC-06-blocked) — stage 2 seeds it directly; this scenario does not depend on
-> the departure executor.
+**Preconditions:** [fixture](README.md#canonical-personas) (Colin); a real
+`magic_link_token` for Colin, minted while active, `consumedAt` null,
+`expiresAt` in the future; Colin's row flipped to `isActive: false` with a
+current `dismissed` employment status afterward.
 
 ## Test
 
-- **Test 1 — request is enumeration-safe (DEC-UM-012, proposed)**
-  - **inputURL:** `POST /auth/magic-link`
-  - **inputRequest:**
-    ```json
-    {
-      "headers": { "authorization": "" },
-      "body": { "email": "colin@company.example" }
-    }
-    ```
-  - **expectedResult:** `200`; same generic response shape as `um-auth-01`/`um-auth-02` (e.g. `{ "sent": true }`); **zero** email dispatch, asserted at the email-adapter fake in stage 2.
+- **Test 1 — request is enumeration-safe (DEC-UM-012, proposed) — MOVED**
+  - Owned by Story 2.1's [`um-auth-02b`](um-auth-02b-request-magic-link-deactivated-email.md):
+    `POST /auth/magic-link` for a deactivated address → byte-identical
+    `200 { sent: true }`, zero dispatch, no token minted. Not re-asserted here.
 - **Test 2 — a pre-deactivation token must not yield a session**
   - **inputURL:** `POST /auth/magic-link/consume`
   - **inputRequest:**
     ```json
     {
       "headers": { "authorization": "" },
-      "body": { "token": "<magic-link-token:colin-deactivated>" }
+      "body": { "token": "<the raw token minted for Colin while active>" }
     }
     ```
-  - **expectedResult:** `401` (or equivalent denial); no session/access token in body or `Set-Cookie` headers.
+  - **expectedResult:**
+    - `401` (the generic denial — DEC-UM-004).
+    - **No** session/access token in the body **and no** `Set-Cookie` header —
+      no session material leaves the endpoint by any channel.
+    - Enumeration-safe: the response is indistinguishable from the not-found /
+      expired / already-consumed cases.

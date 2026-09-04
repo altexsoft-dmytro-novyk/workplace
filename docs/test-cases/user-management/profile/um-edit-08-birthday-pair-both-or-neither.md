@@ -21,8 +21,8 @@ is already whole.
 another valid value is allowed `200` because the pair stays whole.
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded with
-both birthday fields `null`; real `Relationship` Alice→Bob `type='direct'`;
-`user-management:edit` seeded and held; port rebound.
+both birthday fields `null`; real `Relationship` Alice→Bob `type='direct'` (Bob's
+`canAccessSection(Bob, 'S1', Alice)` is `write`); port rebound.
 
 ## Test
 

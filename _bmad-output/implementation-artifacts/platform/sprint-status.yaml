@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-02-2026 11:20
+last_updated: 09-04-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -67,3 +67,22 @@ development_status:
   3-8-postgresql-500-target-performance-evidence-acm-9: done
   epic-3-retrospective: optional
 
+  # Epic 4 — Access Control Authorization Consolidation. New scope from the
+  # 2026-09-03 dn-um-implementation code review (supersedes epics.md line 32
+  # "No Epic 4" for this addition only). Kernel + UM-adoption cross-cut: one
+  # section-parameterised gate driven by canAccessSection, human section keys
+  # (profile:identity, never S1), one recorded FR-composition rule.
+  epic-4: backlog
+  # 4-1 composition decision RESOLVED 2026-09-04 (SCP
+  # sprint-change-proposal-2026-09-04-section-access-consolidation.md D1/D2:
+  # dual gate; feature half = code constant DEFAULT_PERMISSIONS union explicit
+  # grants; no employee policy row, no seed change). Stays backlog until the
+  # architect gate-shape / section-endpoint-map design pass.
+  4-1-generalise-section-access-authorisation: backlog
+  # 4-2 recorded decision (Winston + Dmytro 2026-09-03/04): seeded root = boss
+  # (hr-admin FR + tree root + §2.4 first holder); a delegated HR Admin = full
+  # feature set, zero data access. Deletes the canEditS1 OR-override, seeds a
+  # two-level reporting spine, switches the audience resolver to walk upward
+  # from targets. Blocked on the upward-walk solution-design (AC AD-1).
+  4-2-default-org-relationship-seed: backlog
+  epic-4-retrospective: optional

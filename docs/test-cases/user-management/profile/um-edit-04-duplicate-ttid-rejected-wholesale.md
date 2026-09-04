@@ -5,8 +5,9 @@
 > **Supersedes `um-pf-04`** (retired in place). Adds the wholesale-rollback and
 > `null`-vs-`null` assertions.
 >
-> **Scope (v1.5).** Entitlement is Epic 0's. Data correctness only. Blocked past
-> Stage 1 on the `user-management:edit` seed.
+> **Scope (v1.5).** Entitlement is Epic 0's (Variant A: audience-only edit gate —
+> `canAccessSection(v, 'S1', t) === 'write'`, no functional permission, no kernel
+> seed). Data correctness only. Pending only Story 1.2's own Stage 2 / Stage 3.
 
 ## Scenario
 
@@ -24,9 +25,9 @@ holding `ttId: null` is **not** a uniqueness conflict.
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded with
 `ttId: null`; Colin seeded with `ttId: "tt-1042"`; Nina seeded with
-`ttId: null`; real `Relationship` Alice→Bob `type='direct'`;
-`user-management:edit` seeded and held; port rebound. Stage 2 resolves ids from
-the seeded fixture id table.
+`ttId: null`; real `Relationship` Alice→Bob `type='direct'` (Bob's
+`canAccessSection(Bob, 'S1', Alice)` is `write`); port rebound. Stage 2 resolves
+ids from the seeded fixture id table.
 
 ## Test
 

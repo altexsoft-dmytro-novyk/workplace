@@ -3,8 +3,10 @@
 **Trace:** epics.md Story 1.2 ("`PATCH /users/:id` never touches `photo` (Story 1.3) or `isActive`") · Epic 1 context (`isActive` is an internal account/row-retention flag only, AD-16; `customFields` S16 has its own route; employment status is Epic 5 departure) · [api-conventions.md](../../../architecture/api-conventions.md) (`photo` → `PUT /users/:id/photo`; `custom-fields` → `PATCH /users/:id/custom-fields`) · [DEC-UM-006](../../../architecture/user-management-test-decisions.md) (writer owns `id` / `createdAt` / `createdBy`) · cross-ref `profile/um-photo-09` Test 1
 
 > **Scope (v1.5).** DTO-shape / data-correctness. The rejection is
-> audience-independent. Blocked past Stage 1 on the `user-management:edit` seed
-> only so the request reaches the DTO.
+> audience-independent. No kernel-seed dependency under Variant A — the Epic 0
+> edit gate is audience-only (`canAccessSection(v, 'S1', t) === 'write'`), which
+> Bob's reporting-line edge satisfies, so the request reaches the DTO. Pending
+> only Story 1.2's own Stage 2 / Stage 3.
 
 ## Scenario
 
@@ -23,9 +25,9 @@ photo `PUT` (Story 1.3), the Epic 5 departure workflow, the S16 custom-fields
 route — or never (audit fields are writer-owned).
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded as
-above; real `Relationship` Alice→Bob `type='direct'`; `user-management:edit`
-seeded and held; port rebound. Stage 2 resolves ids from the seeded fixture id
-table.
+above; real `Relationship` Alice→Bob `type='direct'` (Bob's
+`canAccessSection(Bob, 'S1', Alice)` is `write`); port rebound. Stage 2 resolves
+ids from the seeded fixture id table.
 
 ## Test
 

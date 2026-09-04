@@ -1,5 +1,37 @@
 # `user-management:edit` — who holds it?
 
+> **SUPERSEDED 2026-09-04 (SCP `sprint-change-proposal-2026-09-04-section-access-consolidation.md`,
+> Dmytro + Winston).** Variant A is reversed. The identity card **is** a §2.2
+> dual gate: `isAllowed(viewer, 'profile:identity:write')` **AND**
+> `canAccessSection(viewer, 'profile:identity', target) === 'write'`. The
+> feature half is satisfied by the code constant `DEFAULT_PERMISSIONS` — the
+> per-person section-write keys every active employee implicitly holds — union'd
+> with the explicit FR grant chain (SCP §2 D1/D2). This is **Option 2 below,
+> realised as a code baseline rather than a DB `employee` policy row** (no
+> policy row, no `UserPolicies` attachment, no seed/bootstrap change). The
+> audience half still does all the narrowing; a holder with only
+> `colleague`/`self` audience cannot edit. Carried by Platform Epic 4 Story 4.1.
+> The Variant A write-up and Options 1–4 stay as the historical record of how
+> the decision moved.
+
+> **RESOLVED 2026-09-02 (Dmytro) — Variant A: there is NO separate functional
+> permission for the identity card.** *(Superseded 2026-09-04 — see the banner
+> above.)* The whole gate on `GET /users/:id`
+> `canEdit` and on `PATCH /users/:id` is `canAccessSection(viewer, 'S1',
+> target) === 'write'` — i.e. the reporting-line manager or the assigned People
+> Partner. §2.2's functional half is not applied to this section. No kernel-seed
+> AD-1 sequence for `user-management:edit`; the string `user-management:edit`
+> survives only as the adapter's routing key for the `PATCH` gate (mapping to
+> the S1 write-access check, not to `isAllowed`). HR Admin can introduce a
+> *narrower* FR grant later through the roles admin screen if finer control is
+> ever needed (§2.3). This supersedes adoption Open Decision (i) option (a) for
+> the identity-card section — the S9 career-timeline and other sections that
+> §2.3 flags may still carry a functional layer; that is the FR-matrix draft's
+> concern (`fr-permission-matrix-draft-2026-09-02.md`).
+>
+> The options analysis below is kept as the record of how the decision was
+> reached. Options 1–4 and the "recommended Option 2" are HISTORICAL.
+
 **Status:** decision doc for Dmytro. Prose only — no schema, no `seed.ts`, no
 `approvals.yaml`, no code. **Not an AD-1 approval.**
 

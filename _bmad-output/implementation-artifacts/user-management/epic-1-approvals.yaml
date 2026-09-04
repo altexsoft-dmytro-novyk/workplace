@@ -191,15 +191,925 @@ approvals:
     artifact_path: "docs/test-cases/user-management/profile/"
     commit: "UNCOMMITTED-2026-09-02"
     author: "Claude Code (agent)"
-    approver: "PENDING - Dmytro must decide the user-management:edit holder first"
-    decision: "authored, NOT approved"
-    timestamp: "2026-09-02T09:30:00Z"
+    approver: "Dmytro Novyk (Variant A decision 2026-09-02 + autonomous authorization)"
+    decision: "approved"
+    timestamp: "2026-09-02T10:30:00Z"
     note: >-
-      8 um-edit-01..08 scenarios + README; um-pf-01/03/04 -> pointer stubs
-      (superseded). PATCH /users/:id data-correctness only (entitlement is
-      Epic 0's). Stages 2-3 BLOCKED on the user-management:edit holder
-      decision - see
-      _bmad-output/implementation-artifacts/access-control/user-management-edit-permission-options.md
-      (recommends Option 2: universal baseline `employee` FR role holds the
-      key; the §2.2 section gate does the audience narrowing). NOT recorded as
-      approved - this one needs a real Dmytro decision, not autonomous auth.
+      8 um-edit-01..08 scenarios + README; um-pf-01/03/04 -> pointer stubs.
+      PATCH /users/:id DATA-CORRECTNESS ONLY (partial-merge; 409 wholesale on
+      workEmail/ttId dup; 400 on org fields §3.2 fn 1; 400 on
+      photo/isActive/employmentStatus/customFields; birthday pair). Entitlement
+      is Epic 0's = Variant A: canAccessSection('S1') === 'write' (reporting
+      manager / assigned PP), NO functional permission, NO kernel seed.
+      Dmytro decided Variant A 2026-09-02 ("по дефолту най буде варіант А");
+      scenarios reconciled to it. Stage 2/3 no longer blocked.
+
+  - story_id: "UMAC-2-write-path"
+    stage: "stage-1-scenarios+stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/access-control-adoption/write-adoption.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (Variant A + autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T10:30:00Z"
+    note: >-
+      Variant A collapses UMAC-2's "dual gate" to a write-audience check.
+      Adapter branch (isAllowedForTarget EDIT_USER_FEATURE ->
+      canAccessSection('S1') === 'write') done by the coordinator. Scenarios
+      umac-07/08/09 + write-adoption.e2e-spec.ts reconciled: UMAC-07 (5) green
+      (reporting mgr + PP PATCH scalar S1 -> 200), UMAC-09 (3) green (photo
+      Self-only), UMAC-08 (3) RED pending Epic 1 Story 1.2 Stage 3 (@IsEmpty
+      on org fields). No kernel-seed dependency. stories.yaml UMAC-2 entries
+      still carry stale dual-gate language - reconcile in a follow-up.
+
+  - story_id: "1-2-edit-identity-card-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-1/edit-identity.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T11:00:00Z"
+    note: >-
+      New edit-identity.e2e-spec.ts (24 tests, 16 green / 8 red). Deleted the
+      stale all-403 profile-v15.e2e-spec.ts (superseded by um-edit-* +
+      um-photo-*). Red (all Story 1.2 Stage 3): um-edit-05 org fields ->400
+      (4), um-edit-06 T3/T4 employmentStatus/customFields ->400 (2), um-edit-08
+      T1/T5 birthday half-pair ->400 (2). Already green: partial-merge write,
+      {data,canEdit:true} readback, workEmail normalize-before-check, 409
+      wholesale rollback (atomic prisma update). tsc = 3 known epic-4 errors.
+
+  - story_id: "1-2-edit-identity-card-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/dtos/update-user.dto.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T11:30:00Z"
+    note: >-
+      UpdateUserDto @IsEmpty on manager/managerId/reportsToUserId/peoplePartner/
+      peoplePartnerId/department/departmentId/employmentStatus/customFields.
+      EditUserAction: birthday-pair invariant (resulting pair both-or-neither).
+      Gate / normalization / atomic 409 rollback untouched. edit-identity
+      24/24 green; write-adoption 11/11 (umac-08 green); adoption dir 23/23.
+      Delta +11 green, 0 regressions. tsc = 3 known epic-4. Completes UMAC-2
+      §3.2 fn 1.
+
+  - story_id: "2-1-request-magic-link-scenarios+red-tests"
+    stage: "stage-1-scenarios+stage-2-tests"
+    repo: "workspace+services/backend"
+    artifact_path: "docs/test-cases/user-management/auth/ + test/user-management/epic-2/request-magic-link.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T12:30:00Z"
+    note: >-
+      um-auth-01/02 reconciled + um-auth-02b NEW (deactivated=unknown,
+      DEC-UM-012 draft) + auth/README.md. Body settled `{ sent: true }`,
+      byte-identical enumeration guard. request-magic-link.e2e-spec.ts 4/4 red
+      (route 404, no magic_link_token table). Flagged for architect:
+      MagicLinkToken uses `tokenHash` (SHA-256, unique) NOT raw `token`
+      (epic-2-context draft said `token`) — store a hash, raw secret only in
+      the emailed link. 15-min TTL config-owned (MAGIC_LINK_TTL_MINUTES).
+      Dispatcher port widens to dispatch(workEmail, token). Deactivated keyed
+      on User.isActive (recommendation). tsc = 3 known epic-4.
+
+  - story_id: "2-1-request-magic-link-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/services/magic-link.service.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T13:30:00Z"
+    note: >-
+      MagicLinkToken model + migration 20260902124244_story_2_1_magic_link_token
+      (additive, tokenHash unique, userId FK cascade). Config
+      MAGIC_LINK_TTL_MINUTES(15)/APP_BASE_URL/MAIL_*. /auth area in
+      src/user-management/ (controller/action/dto/service/2 repos/SMTP adapter).
+      nodemailer dep added (was extraneous). POST /auth/magic-link ->
+      {sent:true}, enumeration-safe, real SMTP adapter (NFR-3 swallows errors).
+      request-magic-link.e2e-spec.ts 4/4 green. tsc = 3 known epic-4.
+      MIGRATION INCIDENT recovered: prisma migrate dev auto-dropped the
+      access-control PolicyPermissions FK; agent rewrote migration additive +
+      restored the FK; coordinator verified acm1r-fr-foundation green again
+      (66/66 across acm1r + magic-link + adoption).
+      ARCHITECT FLAGS: (1) tokenHash vs raw token; (2) /auth in user-management
+      not a new context; (3) node:crypto direct in domain service;
+      (4) .env.example NOT editable by the harness - user must add MAIL_*/
+      MAGIC_LINK_* entries (listed in the agent report).
+
+  - story_id: "2-2-consume-magic-link-scenarios+red-tests"
+    stage: "stage-1-scenarios+stage-2-tests"
+    repo: "workspace+services/backend"
+    artifact_path: "docs/test-cases/user-management/auth/um-auth-03..06 + test/user-management/epic-2/consume-magic-link.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T14:00:00Z"
+    note: >-
+      um-auth-03/04/05/06 reconciled (real minted tokens, no placeholders) +
+      um-auth-consume-malformed. consume-magic-link.e2e-spec.ts 5/5 red
+      (route 404, no session issuance, SESSION_RESOLVER_PORT still interim).
+      request-magic-link stays 4/4 green. PROPOSED (Stage 3 + architect):
+      session body {sessionToken, tokenType:"Bearer", expiresIn}; format
+      signed JWT HS256 sub=userId (config SESSION_JWT_SECRET, no Session
+      table); lifetime 8h (SESSION_TTL_HOURS); one generic 401 for all
+      failure shapes; SessionResolverPort AD-21 cutover folds the
+      Bearer <token:<uuid>> shorthand into the real adapter behind a non-prod
+      env flag, interim adapter retired (not dual-run). tsc = 3 known epic-4.
+
+  - story_id: "2-2-consume-magic-link-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/infrastructure/jwt-session-resolver.adapter.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk (autonomous authorization 2026-09-02)"
+    decision: "approved"
+    timestamp: "2026-09-02T15:00:00Z"
+    note: >-
+      POST /auth/magic-link/consume + ConsumeMagicLinkAction + MagicLinkService.
+      consume (atomic conditional UPDATE, generic 401, no session material on
+      failure). Hand-rolled HS256 JWT (jwt.util.ts, node:crypto, NO new dep),
+      SessionTokenIssuerPort/adapter. JwtSessionResolverAdapter: verifies JWT
+      + ALLOW_TEST_SESSION_TOKENS gates the Bearer <token:persona> shorthand
+      (Root self-provision ported verbatim). interim-session-resolver.adapter.ts
+      DELETED, SESSION_RESOLVER_PORT rebound. Config SESSION_JWT_SECRET (prod-
+      required)/SESSION_TTL_HOURS(8)/ALLOW_TEST_SESSION_TOKENS(!prod).
+      consume 5/5 + request 4/4 green. FULL sweep: 0 regressions (comm -23 of
+      failing lists = empty; all Bearer <token:uuid> suites stay green).
+      Coordinator verified: 9 suites / 98 green (epic-2 + adoption + edit-
+      identity + list-v15 + acm2). tsc = 3 known epic-4.
+      .env.example NOT editable - user adds SESSION_JWT_SECRET/SESSION_TTL_HOURS/
+      ALLOW_TEST_SESSION_TOKENS. Architect flag: hand-rolled JWT vs @nestjs/jwt;
+      stateless JWT / no Session table / no revocation (fine for Epic 2, revisit
+      if "sign out everywhere" lands).
+
+  - story_id: "3-1-auto-career-timeline-events-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/career-timeline/um-ct-01, um-ct-02, um-ct-11 + _bmad-output/implementation-artifacts/user-management/spec-3-1-system-auto-generates-career-timeline-events.md"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T16:30:00Z"
+    note: >-
+      Story 3.1 scope = um-ct-01 (joined_company at import, same-tx AD-11),
+      um-ct-02 (position_change on PATCH; details = NEW VALUE ONLY
+      { "position": <new> }; eventDate = server now UTC; no-op PATCH writes
+      nothing; trigger chained off profile/um-edit-01, not a placeholder),
+      um-ct-11 NEW (GET /users/:id/events read gate: Self/Reporting/Project/PP
+      -> 200, Colleague -> 403, unresolved -> 401). Section identifier is
+      'profile:timeline' (S9 is the requirements matrix row id only).
+      canAccessSection does not answer profile:timeline yet -> Story 3.1 uses
+      the sanctioned resolveAudiences-derived INTERIM (mentorship timeline-
+      section precedent): allow on resolveAudiences ∩ {self,reporting,pp} != ∅,
+      // INTERIM + expiry trigger, deferred-work.md item added for the real AC
+      increment. um-ct-03..10 untouched (Stories 3.2/3.3, DEC-UM-001 dual gate).
+      Supporting reconciliation: deferred-work.md, docs/test-cases/user-
+      management/README.md (counts + blocks table).
+
+  - story_id: "3-1-auto-career-timeline-events-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-3/auto-events.e2e-spec.ts + test/user-management/epic-3/timeline-read-audience.e2e-spec.ts (+ deleted test/user-management/career-timeline.e2e-spec.ts)"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T21:45:00Z"
+    note: >-
+      Committed-red: 9 failed / 2 passed (the 2 green = Story 1.1's already-
+      shipped joined_company DB-state). Red for the right reasons: no
+      position_change hook in EditUserAction, no GET /users/:id/events route.
+      um-ct-02 details realigned to new-value-only { position: <new> }; eventDate
+      = today's UTC date (column is @db.Date); +no-op-edit case. New
+      timeline-read-audience.e2e-spec.ts for um-ct-11 (Self/reporting/PP -> 200,
+      colleague -> 403, no-token -> 401). Legacy career-timeline.e2e-spec.ts
+      deleted (retired POST /users). tsc clean (3 known epic-4), lint clean, no
+      src/ or git changes. STAGE-2 GATE DECISION (Dmytro): GET /users/:id/events
+      response shape = { data: UserEvent[], canEdit: boolean } envelope (option
+      b) — the established UM section-read convention; canEdit = the Story
+      3.2/3.3 manual-mutation gate, false for everyone until 3.2 lands. Red
+      tests + scenario docs + spec updated to this shape post-gate (mechanical).
+
+  - story_id: "3-1-auto-career-timeline-events-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (8 new + 6 modified — see AUTONOMOUS-RUN-LOG.md Story 3.1 Stage 3 entry)"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T22:30:00Z"
+    note: >-
+      Approved together with the Stage-3 gate; Dmytro also authorized continuing
+      into Story 3.2 without pausing at each sub-gate. GET /users/:id/events ->
+      { data: UserEventResponse[], canEdit } ; read gate =
+      CareerTimelineAccessFacadeAdapter // INTERIM resolveAudiences ∩
+      {self,reporting,pp,project} + verbatim expiry trigger to
+      canAccessSection('profile:timeline'); colleague + nonexistent target ->
+      403 (no 404 enumeration); 401 from class-level SessionGuard.
+      canEdit = isAllowed('profile:timeline:write') (unseeded -> false for all)
+      && S9 write audience. AD-11 same-tx position_change via
+      UserRepository.update(id,patch,systemEvents?) $transaction; empty path
+      unchanged (edit-identity stays green). EditUserAction gains viewerId
+      (controller passes session.userId). details={position:<new>},
+      eventDate=today UTC date, createdBy=editing viewer.
+      COORDINATOR-VERIFIED (independent re-run): Story 3.1 e2e 11/11 green,
+      jest exit 0; full test/user-management + test/access-control sweep
+      91 failed / 262 passed / 3 todo (was 100 / 253) - exactly the 9 Story 3.1
+      tests flipping green, 0 new failures, no AC movement; tsc clean (3 known
+      epic-4); ESLint clean on all touched files.
+      SCENARIO DEVIATION (corrected + doc updated): um-ct-01 Stage-1 Test said
+      Bearer <token:Root> -> 200; wrong under the real S9 gate (HR Admin has no
+      data audience per §2.2 NORMATIVE -> Root resolves Colleague -> 403, per
+      um-ct-11 Test 4). Stage 3 switched um-ct-01 reader to Self (S9 Self = R).
+      SUBAGENT DECISIONS: joined_company left writing through the import's own
+      $transaction (not the shared descriptor - reshaping writeRow risked the
+      pre-existing-red seed suite); event order eventDate ASC, createdAt ASC;
+      canReadTimeline audience set includes 'project' (no effect today).
+      Story 3.1 is COMPLETE - all 3 AD-1 stages.
+
+  - story_id: "3-2-manual-backfill-add-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/career-timeline/{um-ct-03,04,09,10,12}.md + career-timeline/README.md + spec-3-2-authorized-actor-manually-adds-a-backfill-entry.md"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T23:30:00Z"
+    note: >-
+      Approved together with the ongoing Epic 3 push; Dmytro drove the gate
+      design directly (feature-action gate, hr-admin-only grant, edit-implies-
+      read). Story 3.2 ships: profile:timeline:write is a real functional
+      permission (NOT Variant A - keeps requirements §2.3/§4.9/§132), seeded +
+      granted to the hr-admin role only for now; the FR-permission-matrix adds
+      PP + Unit Manager holders later. Manual-write gate at this stage =
+      isAllowed(actor,'profile:timeline:write') alone - a feature action, no
+      data-audience half (HR Admin has no S9 audience, so requiring it would
+      close the gate to everyone; HR-Admin Excel backfill is a feature action
+      like directory:import). DEC-UM-001 audience narrowing (assigned PP +
+      direct UM, per-assignee scoped) is a DEFERRED refinement, activates with
+      the matrix grant. Read gate widened: canReadTimeline = <S9 read audience>
+      OR isAllowed(viewer,'profile:timeline:write') - "edit implies read" - so
+      HR Admin GETs the timeline back (200, canEdit:true observable). Broader
+      "HR Admin sees everything" = §2.4 Full profile access, a deferred AC
+      resolver item; edit-implies-read is its timeline-scoped interim.
+      LIVE this story: um-ct-10 (no permission -> 403), um-ct-12 NEW (HR Admin
+      Root POST -> 201 bare UserEventResponse, source:"manual" server-stamped,
+      whitelist strips id/deletedAt/source/createdBy, 400 on bad type/eventDate,
+      Test 2 = Root reads back 200 {data,canEdit:true}). DEFERRED it.todo:
+      um-ct-03 (PP add), um-ct-04 (UM add), um-ct-09 (permission-without-
+      audience denial) - reactivate when the matrix grants the permission to
+      PP/UM roles (+ AC department-tree walk for um-ct-04's "direct UM").
+      POST 201 = bare resource (matches PATCH /users/:id). New folder README
+      docs/test-cases/user-management/career-timeline/README.md carries the
+      split-gate table + the two ratify boxes.
+      OPEN / TO RATIFY (unresolved, flagged in the spec + folder README):
+      DEC-UM-001 scopes manual mutation by data audience (PP + direct UM);
+      Story 3.2 ships it as an HR-Admin feature action. Reconcile at the FR
+      matrix grant.
+      Stage 3 will touch src/access-control/infrastructure/bootstrap/access-
+      control-bootstrap.ts to seed profile:timeline:write + grant it to
+      hr-admin (Anna's kernel package - flag for her review; UM-owned seed is
+      the fallback).
+
+  - story_id: "3-2-manual-backfill-add-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-3/manual-events.e2e-spec.ts + test/user-management/epic-3/fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-02T23:55:00Z"
+    note: >-
+      Committed-red, 7 failed / 5 todo. All 7 failures = no POST /users/:id/events
+      route (404). LIVE: um-ct-10 (Bob, no profile:timeline:write -> 403),
+      um-ct-12 (6 its: Root granted profile:timeline:write in-test -> POST 201
+      bare UserEventResponse / source:manual server-stamped / whitelist strips
+      id,deletedAt,source,createdBy / 400 missing|empty type / 400 bad eventDate
+      / Ida 403 / no-token 401; Test 2 Root reads back 200 {data,canEdit:true} +
+      Alice-Self canEdit:false). it.todo x5: um-ct-03/04/09 + DEC-UM-001
+      narrowing + hr-admin-default-seed. fixtures key -> profile:timeline:write.
+      Full sweep 93 failed / 262 passed / 8 todo (zero green->red). tsc clean
+      (3 known epic-4), lint clean. Coordinator re-verified.
+
+  - story_id: "3-2-manual-backfill-add-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (2 new + 7 modified — POST /users/:id/events, AddManualUserEventAction, CreateUserEventDto, gate changes)"
+    commit: "UNCOMMITTED-2026-09-02"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T00:20:00Z"
+    note: >-
+      POST /users/:id/events + AddManualUserEventAction + CreateUserEventDto
+      (type @IsString/@IsNotEmpty, eventDate @IsDateString, details @IsObject
+      optional; whitelist strips server-owned keys). canEditTimeline ->
+      isAllowed('profile:timeline:write') ALONE (dropped && canReadTimeline).
+      canReadTimeline -> <audience> OR isAllowed('profile:timeline:write')
+      (edit-implies-read). UserEventRepositoryPort.add + repo impl +
+      CareerTimelineService.addManualEvent (server-stamps source:'manual').
+      Missing target -> 403 (explicit findById, no 404 enumeration, no FK 500).
+      access-control-bootstrap.ts DELIBERATELY NOT TOUCHED: a 4th canonical
+      permission would break acm1r-fr-foundation ACM1-FB-01/03 ("exactly three")
+      -> green->red. Default hr-admin seed of profile:timeline:write stays an
+      it.todo; suites grant it in-test; README "What blocks Stage-2" updated.
+      COORDINATOR-VERIFIED: manual-events 7 pass / 5 todo; epic-3 full = 3
+      suites green (auto/manual/read), edit-delete still 6 red (Story 3.3).
+      Full sweep 82 failed / 273 passed / 8 todo vs baseline 93/262/8 =
+      11 red->green (7 Story 3.2 + 4 Story 3.3 POST-precondition steps),
+      ZERO green->red. tsc clean (3 known epic-4), lint clean.
+      spec-3-2 status -> done. Story 3.2 COMPLETE (all 3 AD-1 stages).
+      CARRIED: um-ct-12 default-seed it.todo; ⚠️-to-ratify DEC-UM-001 tension.
+
+  - story_id: "3-3-edit-delete-event-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/career-timeline/{um-ct-05,06,07,08,13}.md + README.md + spec-3-3-authorized-actor-edits-or-deletes-an-event.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T00:45:00Z"
+    note: >-
+      Same split-gate shape as Story 3.2. DELETE /users/:id/events/:eventId =
+      soft-delete (deletedAt set, row persists, never exposed); gate =
+      isAllowed(actor,'profile:timeline:write') alone (hr-admin only now);
+      DEC-UM-001 audience narrowing deferred; NO PATCH on a single event;
+      correction = DELETE + POST (no "correct" endpoint). LIVE: um-ct-07
+      (soft-deleted absent from read, actor Root), um-ct-08 (direct PATCH
+      rejected 404/405, actor Root), um-ct-13 NEW (HR Admin happy path, 6 tests:
+      seed+DELETE 204, absent from read, full DELETE+POST correction, unknown/
+      already-deleted -> 404, Bob -> 403 / no token -> 401, cross-timeline
+      DELETE -> 404). DEFERRED it.todo: um-ct-05 (PP corrects), um-ct-06 (UM
+      deletes; two-part unblock = FR-matrix UM grant + AC department-tree walk).
+      DECISIONS: DELETE success -> 204 No Content (nothing to echo; fallback
+      200+empty if the team wants uniformity with the deactivate route);
+      unknown eventId -> 404; already-soft-deleted -> 404 (absence is absence,
+      not idempotent 204); cross-timeline (event.userId != :id) -> 404; gate
+      order = permission 403 first (covers nonexistent :id, no enumeration),
+      then scoped event lookup 404. spec-3-3 status stays draft.
+      INHERITED ratify item: DEC-UM-001 audience-scoping vs HR-Admin
+      feature-action (now covers delete too). No new tension from 3.3.
+
+  - story_id: "3-3-edit-delete-event-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-3/edit-delete-events.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T01:15:00Z"
+    note: >-
+      Committed-red 7 failed / 6 passed / 2 todo. All 7 failures targeted on the
+      missing DELETE /users/:id/events/:eventId route (404 instead of 204; gate
+      never reached). GREEN already: um-ct-08 (no PATCH route, by design),
+      um-ct-13 Test 6 cross-timeline (coincidental now, stays green post-scoped-
+      lookup), seed POST + baseline GET steps. it.todo x2: um-ct-05 (PP),
+      um-ct-06 (UM). GET assertions moved to res.body.data envelope; DELETE
+      expectations 204 / 404. Full sweep 83 failed / 274 passed / 10 todo vs
+      82/273/8 baseline - delta entirely this one file, zero green->red.
+      tsc clean (3 known epic-4), lint clean. Coordinator re-verified 7f/6p/2todo.
+
+  - story_id: "3-3-edit-delete-event-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (2 new + 5 modified — DELETE /users/:id/events/:eventId soft-delete)"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T01:45:00Z"
+    note: >-
+      DELETE /users/:id/events/:eventId @HttpCode(204) + SoftDeleteUserEventAction:
+      canEdit gate -> 403 (covers nonexistent :id); CareerTimelineService.
+      softDeleteEvent(userId,eventId) does the scoped (id,userId,deletedAt:null)
+      lookup, returns boolean, action maps false -> NotFoundException 404
+      (unknown / cross-timeline / already-soft-deleted; non-idempotent).
+      UserEventRepositoryPort.findActiveOnTimeline + softDelete. No PATCH route
+      (absence = correct). domain/ stays HTTP-free.
+      COORDINATOR-VERIFIED: epic-3 all 4 suites green (31 passed / 7 todo / 0
+      failed); full sweep 76 failed / 281 passed / 10 todo vs baseline 83/274/10
+      = 7 red->green, ZERO green->red; tsc clean (3 known epic-4), lint clean.
+      spec-3-3 status -> done. Story 3.3 COMPLETE (all 3 AD-1 stages).
+      EPIC 3 COMPLETE within current infra (Stories 3.1/3.2/3.3). Carried
+      it.todo (7): um-ct-03/04/09 + DEC-UM-001 narrowing + hr-admin default seed
+      (3.2), um-ct-05/06 (3.3) - all pending the FR-permission-matrix grant of
+      profile:timeline:write to PP/UM roles (+ AC department-tree walk for the
+      "direct UM" leg) and/or the kernel default seed.
+
+  - story_id: "4-1-change-manager-plus-access-journal-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/{um-rel-01,02,03,07,08,15}.md + README.md + spec-4-1-change-an-employee-s-manager.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T02:30:00Z"
+    note: >-
+      Epic 4 start. Reconciled against the 2026-09-02 arch ratification: PM/AD-29
+      AccessJournal design RATIFIED ("closes CC-07 design") -> journal-writing
+      stages design-unblocked; the "blocked until CC-07 approved" + "blank page"
+      language in spec-4-1 / um-rel-* is stale and removed. Story 4.1 stands up
+      for the epic: Relationship model + raw-SQL migration (multi-armed CHECK,
+      partial UNIQUE type='direct', self-target reject, hard-delete);
+      AccessJournal model + migration (append-only, before/after jsonb, unique
+      idempotencyKey, kind enum all 7 §3.4 values, writes 'manager' only);
+      POST /users/:id/relationships (direct) + DELETE .../:relationshipId;
+      same-tx journal writer; GET /users/:id/access-journal + reader authz.
+      Reconciled um-rel-01/02/03/07/08 (journal Then-clauses first-class,
+      um-rel-07 -> Ida DEC-UM-002); NEW um-rel-15 (append-only + idempotent
+      write + journal read-authz matrix). SCENARIO-STAGE DECISIONS: (1)
+      idempotencyKey = hash(actor,subject,kind,relationshipId,operation) -
+      interim, no client token; Idempotency-Key header deferred. (2) journal
+      read = { data: AccessJournalRow[] } envelope, no canEdit, newest-first;
+      row { id, occurredAt, actorUserId, subjectUserId, kind, before, after }.
+      (3) DELETE = /users/:id/relationships/:relationshipId (path param, AD-14
+      shape 4). (4) kind enum = manager|people_partner|department_membership|
+      department_manager|full_profile_grant|full_profile_revoke|
+      shared_link_access (database-schema.md wins over the context doc's
+      _change spellings - drift flagged). (5) interim journal-read gate =
+      resolveAudiences ∩ {reporting,pp}; Self + HR-Admin-by-FR NOT readers
+      (matches §3.4 exactly); // INTERIM, expiry = §2.4 full-audience resolver.
+      UNDER-SPEC IN RATIFIED AD-29 (flagged for PO/architect, non-blocking for
+      stage 2): kind spelling drift in epic-4-context.md; no retention/purge
+      policy; before/after semantics for non-state kinds (shared_link_access);
+      no read-endpoint pagination contract (matters for stage 3); per-kind
+      snapshot schema left to each story; api-conventions.md missing
+      GET /users/:id/access-journal (add before stage 2/3); epic-4-context.md
+      stale CC-07 language (refreshed by coordinator).
+
+  - story_id: "4-1-change-manager-plus-access-journal-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-4/manager-change.e2e-spec.ts + test/user-management/epic-4/access-journal.e2e-spec.ts + fixtures.ts (- deleted test/user-management/relationships.e2e-spec.ts)"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T03:15:00Z"
+    note: >-
+      Committed-red 14/14 (all route-missing 404). manager-change reconciled
+      (its 1 pre-existing TS2345 fixed -> 2 remain in dept/pp-change); new
+      access-journal.e2e-spec.ts (um-rel-15: append-only, idempotency, read-
+      authz matrix Bob200/Paula200/Self403/Eve403/HR-Admin-FR403/no-token401);
+      legacy pre-v1.5 relationships.e2e-spec.ts DELETED (retired mentorship
+      edges um-rel-04/05/06, AD-17). fixtures.ts: perm key -> org:relationships:
+      write, + accessJournalTableExists/queryAccessJournalRows/cleanupAccess
+      Journal (to_regclass-guarded). Full sweep 73 failed / 281 passed / 10
+      todo vs 76/281/10 - passed UNCHANGED, zero green->red (net -3 failed =
+      -11 deleted legacy + 8 new access-journal). tsc 2 pre-existing, lint clean.
+      PREMISE CORRECTION (spec updated): the Relationship model + ALL its
+      constraints (relationships_one_direct_per_user, _one_people_partner_per_
+      user, _shape_check, _no_self_endpoint_check, RelationshipType enum) ALREADY
+      SHIPPED in Epic 0 migration 20260830010000_access_control_relationships.
+      Story 4.1 Stage 3 does NOT re-author them - remaining deliverables:
+      AccessJournal table+enum+migration, 2 write routes + 1 read route, same-tx
+      journal writer, org:relationships:write gate wiring, api-conventions.md
+      route entry.
+      FLAGGED: access_journal column-naming (helpers assume camelCase quoted,
+      like user_events); self-assignment pinned 400 (spec allows 400|409);
+      RunFixtures.grantFunctionalRole targetRole collision for 2 uuidv7 ids in
+      one run (pre-existing fixture bug, worked around).
+
+  - story_id: "4-1-change-manager-plus-access-journal-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (relationships area + AccessJournal) + prisma/migrations/20260903011657_story_4_1_access_journal + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T02:45:00Z"
+    note: >-
+      AccessJournal model + AccessJournalKind enum + additive migration
+      20260903011657 (stripped the spurious PolicyPermissions_policy_fkey /
+      Policies_id_type_key drops - known footgun); new relationships.controller
+      (2nd @Controller('users')): POST/DELETE /users/:id/relationships
+      [/:relationshipId] @RequireFeature('org:relationships:write'), GET
+      /users/:id/access-journal (gate in action). org-relationship.repository
+      does both $transactions (edge + journal co-write); P2002 -> 409 whole-tx
+      rollback; P2025 double-revoke -> 404. access-journal-access-facade.adapter
+      // INTERIM resolveAudiences ∩ {reporting,pp} (no self, no isAllowed leg;
+      expiry = §2.4 full-audience resolver). idempotencyKey = sha256(actor|
+      subject|kind|relId|op) in infrastructure/. Journal INSERT via createMany
+      skipDuplicates inside the tx (catch-and-swallow would abort the pg tx).
+      DELETE -> 200 empty. api-conventions.md updated (routes + append-only rule).
+      TEST FIX: manager-change um-rel-02 post-revoke assertion 403 -> 200 +
+      canEdit:false (the colleague floor per UMAC-04 keeps GET /users/:id at 200;
+      the real revoke consequence is Bob dropping reporting-writer -> colleague).
+      COORDINATOR-VERIFIED: manager-change + access-journal 14/14 green;
+      acm1r-fr-foundation 39/39 (FR FKs intact); full sweep 59 failed / 295
+      passed / 10 todo vs baseline 73/281/10 = exactly 14 red->green, ZERO
+      green->red; tsc 2 known; lint clean. spec-4-1 status -> done.
+      Story 4.1 COMPLETE. Relationship model was already Epic-0 (not re-authored).
+
+  - story_id: "4-2-change-people-partner-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/{um-rel-09,10,11,16,07}.md + README.md + spec-4-2-change-an-employee-s-people-partner.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T03:30:00Z"
+    note: >-
+      Unblocked from CC-04/CC-07 per the 2026-09-02 ratification (both design-
+      resolved; AccessJournal built by Story 4.1). PUT/DELETE /users/:employeeId/
+      relationships/people-partner; atomic create-or-replace; kind:'people_partner'
+      journal same-tx (before/after = PP user-id snapshot). Only transitive PP
+      HR-line propagation stays deferred (Department-boundary gate / PM/AD-35).
+      um-rel-09 split Test A (replace) / Test B (first assignment, before:null);
+      um-rel-10 self-assign -> 400; um-rel-11 stale -> 409 + @concurrency + Test 3
+      (omitted token while PP exists -> 409); NEW um-rel-16 (DELETE 200 + journal
+      before/after:null, DELETE-no-PP -> 404, Ida -> 403, next-request audience
+      flip). um-rel-07 Test 2 de-stubbed.
+      DECISIONS: (1) DELETE takes expectedCurrentTargetId as OPTIONAL query param
+      (drop If-Match - no ETag source); omitted -> unconditional remove;
+      api-conventions.md shape-4 If-Match line needs architect reconcile. (2) PUT
+      without expectedCurrentTargetId while a PP exists -> 409. (3) PP target =
+      active User, NO functional-role req; unknown targetId -> 404, inactive ->
+      422 (404/422 split proposed, not sourced). (4) PUT -> 200 bare relationship
+      (create + replace both 200; 201-on-create flagged alt); DELETE -> 200 empty.
+      (5) idempotencyKey op ∈ {create,replace,delete}.
+      CONFIRM AT GATE: self-assignment 400 rests on §3.3 + suite convention, not a
+      direct citation (um-rel-03 is the 2nd-POST 409 case, not self-assign).
+
+  - story_id: "4-2-change-people-partner-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-4/people-partner-change.e2e-spec.ts + test/user-management/epic-4/pp-delete.e2e-spec.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T03:50:00Z"
+    note: >-
+      Committed-red 10 failed / 2 passed (all failures = missing PUT/DELETE
+      /users/:id/relationships/people-partner -> 404). people-partner-change
+      reconciled from BLOCKED to first-class (real queryAccessJournalRows
+      checks); um-rel-09 split A/B; um-rel-11 +T2 @concurrency +T3 omitted-token;
+      self-assign pinned 400; its TS2345 fixed (1 known remains, department-
+      change:58). NEW pp-delete.e2e-spec.ts (um-rel-16 + um-rel-07 T2). 2 benign
+      green (DELETE-no-PP 404 coincides; Ida DELETE 403 short-circuits Story
+      4.1's shared @RequireFeature guard). Full sweep 65 failed / 297 passed /
+      10 todo vs baseline 59/295/10 (+6 red +2 green, no green->red). lint clean.
+      FLAG FOR STAGE 3: DELETE /users/:id/relationships/people-partner currently
+      matched by Story 4.1's @Delete(':id/relationships/:relationshipId') -
+      Stage 3 must register the static people-partner route BEFORE the
+      :relationshipId route.
+
+  - story_id: "4-2-change-people-partner-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (people-partner routes + repo/action extensions) + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T04:10:00Z"
+    note: >-
+      PUT/DELETE /users/:employeeId/relationships/people-partner on
+      RelationshipsController, declared BEFORE :relationshipId (route-collision
+      fix). ChangePeoplePartnerAction (self->400, target 404/422, stale->409),
+      RemovePeoplePartnerAction (not-found->404, stale->409). org-relationship.
+      repository extended: change/removePeoplePartner + private create/replace;
+      replace = delete-then-create in one $transaction (row id changes per
+      um-rel-09 A); conditional deleteMany(where reportsToUserId=expected) as the
+      optimistic-concurrency predicate, count!=1 -> StalePeoplePartnerPredicate
+      sentinel -> rollback -> 409/404; P2002 also -> stale. people_partner
+      AccessJournal row same-tx, createMany skipDuplicates. idempotency op +
+      'replace'. DELETE optional ?expectedCurrentTargetId= query. api-conventions
+      .md shape-4 rewritten (expectedCurrentTargetId body/query, If-Match
+      removed, 400/404/422/409 matrix). No new migration.
+      COORDINATOR-VERIFIED: people-partner-change + pp-delete 12/12 green;
+      epic-4 = 4 suites green (26 passed), department-change still 3 red (Story
+      4.3). Full sweep 55 failed / 307 passed / 10 todo vs baseline 65/297/10 =
+      exactly 10 red->green, ZERO green->red. tsc 1 known (department-change:58).
+      lint clean. spec-4-2 status -> done. Story 4.2 COMPLETE.
+      Inactive-target 422 implemented per spec, no committed test (unsourced).
+
+  - story_id: "4-3-change-department-or-department-manager-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/relationships/{um-rel-12,13,14,17}.md + README.md + spec-4-3-*.md + epic-4-context.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T04:40:00Z"
+    note: >-
+      SPLIT-GATE. LIVE (first-class stage-2): department membership add/atomic-
+      move/remove writes, >=1-department 409 floor, 404 on non-membership delete,
+      department-manager Policies+UserPolicies write + reassignment, self-assign
+      400, every same-tx department_change UserEvents row + department_membership/
+      department_manager AccessJournal row. DEFERRED it.todo: the access-
+      resolution consequences (um-rel-12 T3 "manager gains/loses Reporting-line
+      access", all of um-rel-13 T3 "Nina reaches Dept B + nested Dept C") -
+      gated solely on the AC resolveAudiences targetType:'department' +
+      Department.parentId walk (an AC-kernel increment, approver Anna). um-rel-12/
+      13/14 rewritten, um-rel-17 NEW (add/remove multi-membership). §4.17 "exactly
+      one department" -> "one or more" fixed everywhere.
+      DECISIONS: (1) move = named-source atomic POST /users/:id/departments
+      {departmentId, fromDepartmentId} (not replace-sole; the >=1 floor makes
+      DELETE-then-POST impossible for a single-dept employee). (2) >=1 enforced,
+      DELETE last -> 409. (3) membership route POST/DELETE /users/:id/departments;
+      dept-manager PUT/DELETE /departments/:deptId/manager (no /departments root
+      today - fallback /users/:managerId/policies; Department-edge contract
+      ratifies). (4) department_change details: add {"department":<id>}, remove
+      {"department":<id>,"removed":true}, move emits ONE add-form event. (5)
+      Policies row {operator:'==', targetType:'department', targetId:<deptId>,
+      targetRole:'unit-manager', type:'AR', managedBy:'admin'} + UserPolicies.
+      SCHEMA FLAG (for Stage 3): AccessJournal.subjectUserId is a User FK but a
+      department_manager change has a DEPARTMENT subject -> Stage 3 adds nullable
+      subjectDepartmentId + makes subjectUserId nullable + CHECK exactly-one
+      (AccessJournal still uncommitted so additive/clean).
+
+  - story_id: "4-3-change-department-or-department-manager-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-4/department-change.e2e-spec.ts + fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T05:15:00Z"
+    note: >-
+      Committed-red split-gate: 7 LIVE it (um-rel-12 move, um-rel-13 manager
+      change, um-rel-14 self-assign, um-rel-17 T1-T4) all red on missing routes
+      -> 404; 3 it.todo (um-rel-12 T3, um-rel-13 T3 whole recursive-access half,
+      um-rel-17 deferred) titled with the AC department-walk unblock trigger.
+      fixtures.ts + queryAccessJournalRowsByKind (department_manager subject col
+      is Stage 3). **tsc now 0 errors** - the last pre-existing epic-4 TS2345
+      (department-change:58) is fixed. Full sweep 59 failed / 307 passed / 13
+      todo vs baseline 55/307/10 (+4 failed +3 todo, passed UNCHANGED, zero
+      green->red). lint clean.
+      FLAG FOR STAGE 3: manager route body = { managerUserId, expectedCurrent
+      ManagerId? } per um-rel-13/14 + spec-4-3 (NOT managerId).
+
+  - story_id: "4-3-change-department-or-department-manager-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (department membership + department-manager) + prisma/migrations/20260903024004_story_4_3_department_edge_journal_subject + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T05:45:00Z"
+    note: >-
+      SPLIT-GATE LIVE half shipped. POST/DELETE /users/:id/departments (move via
+      fromDepartmentId; plain add; >=1 floor -> 409; non-membership -> 404 leak-
+      free). New DepartmentsController: PUT/DELETE /departments/:deptId/manager
+      (AR Policies + UserPolicies link swap; expectedCurrentManagerId optimistic
+      -> 409; self -> 400; keep Policies row, delete link on remove). Same-tx:
+      department_change UserEvents (membership only, source:'system', tx.userEvent
+      .create like the import path) + AccessJournal (department_membership / for
+      manager department_manager). Migration 20260903024004 additive: AccessJournal
+      .subjectUserId -> nullable, + subjectDepartmentId FK, CHECK num_nonnulls(
+      subjectUserId, subjectDepartmentId)=1 (current rows pass). idempotency ops
+      += dept_add/move/remove + dept_mgr_set/remove. access-journal.response
+      surfaces subjectDepartmentId only when non-null (keeps um-rel-15 key-set
+      assertion green). api-conventions.md updated.
+      DEFERRED (it.todo): department-derived access resolution (um-rel-12 T3,
+      um-rel-13 T3 recursive walk, um-rel-17 trailing) -> AC resolveAudiences
+      targetType:'department' + Department.parentId walk (AC-kernel increment).
+      COORDINATOR-VERIFIED: epic-4 5 suites green (33 passed / 3 todo); epic-3
+      4 suites green (31 / 7 todo); acm1r-fr-foundation 39/39; full sweep 52
+      failed / 314 passed / 13 todo vs baseline 59/307/13 = exactly 7 LIVE
+      red->green, ZERO green->red; tsc 0 errors; lint clean. spec-4-3 -> done.
+      DECISIONS: move stale fromDepartmentId -> 409; DELETE manager keeps
+      Policies row deletes UserPolicies link; department_manager journal subject
+      = subjectDepartmentId (schema route, not the interim). EPIC 4 COMPLETE
+      (within current infra; department-derived access deferred to the AC walk).
+
+  - story_id: "5-1-record-a-departure-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/departure/{um-dep-01,02,05,06}.md + README.md + spec-5-1-record-a-departure.md + epic-5-context.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T06:20:00Z"
+    note: >-
+      Unblocked from CC-06 - Departure aggregate schema IS ratified
+      (database-schema.md §Departure), CC-06 "design approved". Story 5.1
+      (record) proceeds. um-dep-01/02 de-blocked + new um-dep-05 (reparenting +
+      retry) + um-dep-06 (idempotency + authz). um-dep-03/04 stay BLOCKED
+      (Story 5.2 executor). DECISIONS: (1) expectedBlockerVersion =
+      "v1:"+base64url(sha256({userId, blockers:[sorted platform-owned identity
+      tuples]})); external_pm_dm excluded. (2) reparenting reuses Epic 4's
+      application-layer relationship-write services in ONE prisma.$transaction
+      (shared tx) - COORDINATION: Epic 4 repos currently open their own
+      $transaction, Story 5.1 Stage 3 must add optional tx param to them
+      (additive). (3) BUSINESS_TIME_ZONE = new REQUIRED startup-validated IANA
+      env var, no UTC fallback, example Europe/London; .env.example harness-
+      blocked -> coordinator hands the user the block. (4) post-schedule
+      "reject new responsibility for the departing actor" guard lives in Epic
+      4's relationship-write path, reads Epic 5 via hasNonAppliedDeparture(
+      userId); confirm 409 vs 422. (5) POST /users/:id/departures 201 body =
+      {departureId, userId, state:'scheduled', effectiveDate, effectiveTimeZone,
+      dueAt, reason, createdAt} - NO worker internals ever. 409 blocker body =
+      {error, blockers[{kind, summary, targets?}], expectedBlockerVersion,
+      defaultReparentTargetId}. Perm employee:departure:record (grant in-test).
+      DEFERRED: Story 5.2 executor (um-dep-03/04); applyDepartureEffects cross-
+      context (Action Items + Mentorship - unbuilt); um-dep-02 T4 external
+      PM/DM (it.todo - no timetracker sync seam).
+
+  - story_id: "5-1-record-a-departure-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-5/record-departure.e2e-spec.ts + test/user-management/epic-5/fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T06:50:00Z"
+    note: >-
+      Committed-red 17 failed / 1 todo (all route/model-missing 404). um-dep-01
+      (record+GET), um-dep-02 T1-3+T5 (blocker 409), um-dep-05 (reparenting),
+      um-dep-06 (idempotency+authz). um-dep-02 T4 external PM/DM -> it.todo.
+      fixtures.ts: RECORD_A_DEPARTURE_PERMISSION -> employee:departure:record
+      (was stale user-management:record-a-departure), + to_regclass-guarded
+      departureTableExists/queryDepartureRows/cleanupDepartures. apply-departure
+      .e2e-spec.ts untouched (Story 5.2, 4 red). tsc 0, lint clean. Full sweep:
+      passed 314 UNCHANGED (zero green->red), failed +11 todo +1 all additive
+      from the expanded suite. Coordinator spot-check: epic-1/2/3/4 + adoption =
+      18 suites green / 1 seed known-blocked red (baseline, not a regression).
+      Stage 3 pins: exact expectedBlockerVersion digest, dueAt instant, 409
+      error-code strings, reparent response body, BUSINESS_TIME_ZONE env.
+
+  - story_id: "5-1-record-a-departure-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (departure area) + prisma/migrations/20260903032945_story_5_1_departure + src/config/env.validation.ts + test/jest.setup-env.ts + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T07:20:00Z"
+    note: >-
+      Departure model + DepartureState enum + additive migration 20260903032945
+      (partial UNIQUE departures_one_non_applied_per_user WHERE state<>'applied';
+      due-at-tz-present + applied-state raw-SQL CHECKs; FK footgun stripped;
+      acm1r 39/39 verified). BUSINESS_TIME_ZONE = Joi.required() IANA-validated,
+      no UTC fallback; jest default via new test/jest.setup-env.ts (setupFiles,
+      ??= Europe/London). DeparturesController @Controller('users'): POST
+      /users/:id/departures (blocker check -> 409 {error:'departure_blocked_by_
+      responsibilities', blockers, expectedBlockerVersion, defaultReparentTargetId};
+      idempotency by idempotencyKey+requestHash, 'idempotency_key_payload_
+      mismatch' / 'departure_already_scheduled'; dueAt = local-midnight-in-zone
+      two-pass Intl fixpoint, never host local; clean 201 projection no worker
+      internals), GET .../:departureId, POST .../departure-reparenting (recompute
+      digest, pg_advisory_xact_lock serialize, reassign 3 blocker kinds + 1
+      AccessJournal row each in one $transaction, 'blocker_version_stale' on
+      mismatch, no Departure row). Epic 4 tx-refactor: chose the FALLBACK -
+      reparent repo re-implements the 3 edge+journal writes inline; org-
+      relationship.repository/port/service UNTOUCHED (lower risk). Post-schedule
+      guard on assign-manager / change-people-partner / set-department-manager
+      actions -> 409 'target_has_scheduled_departure' via DepartureService.
+      hasNonAppliedDeparture. idempotencyKey column stays uuid; header coerced
+      (well-formed uuid as-is else sha256->uuid). api-conventions.md updated.
+      COORDINATOR-VERIFIED: record-departure 17 green / 1 todo; epic-4 all green
+      (post-schedule guard no regression); acm1r 39/39; tsc 0 errors; lint clean;
+      full sweep 331 passed (314 + 17) / 46 failed / 14 todo - ZERO green->red.
+      spec-5-1 -> done. Story 5.1 COMPLETE.
+      USER ACTION: add to .env + .env.example (harness-blocked):
+        BUSINESS_TIME_ZONE=Europe/London
+
+  - story_id: "5-2-apply-an-effective-departure-scenarios"
+    stage: "stage-1-scenarios"
+    repo: "workspace"
+    artifact_path: "docs/test-cases/user-management/departure/{um-dep-03,04,07,08}.md + README.md + spec-5-2-apply-an-effective-departure.md + epic-5-context.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T07:50:00Z"
+    note: >-
+      SPLIT-GATE. LIVE (first-class stage-2): the PG-polling DepartureWorker
+      (skip-locked claim + leaseToken/leaseUntil fencing + reclaim + capped-
+      backoff retry, no terminal abandoned state); the apply $transaction for
+      every UM-owned effect (EmploymentStatus close validTo=effectiveDate +
+      dismissed insert sourceDepartureId unique FK + departureReason,
+      User.isActive=false, persisted-access sweep w/ idempotent full_profile_
+      revoke journal for residual, applied+appliedAt); request-time auth cutoff
+      (um-dep-07 - session resolver runs SELECT 1 FROM Departure WHERE userId=
+      actor AND dueAt<=now() PG-time -> 401, worker-independent); POST .../retry
+      202 retry_wait-only / 409 else; stale-executor no-op (um-dep-08); LIVE
+      health subset GET /health/departures via @nestjs/terminus; per-process
+      startup check; no departure career event. DEFERRED it.todo (PM/AD-23,
+      participants absent): um-dep-03 action-item cancellation (assigned-to only
+      per PM/AD-5) + mentorship auto-close; um-dep-04 "no double-cancel / no
+      double-close" legs. applyDepartureEffects({departureId, departingUserId,
+      effectiveDate, leaseToken, tx}) call site is a real no-op seam.
+      DECISIONS: (1) @nestjs/schedule @Interval worker - NEW production dep +
+      ScheduleModule.forRoot(); DEPARTURE_WORKER_POLL_MS 60s prod;
+      DEPARTURE_WORKER_ENABLED explicit true/false no default. (2) test-invoke =
+      injectable method via Nest testing module + back-dated dueAt; NO test-only
+      HTTP endpoint (testing-strategy.md forbids). (3) cutoff in JwtSession
+      ResolverAdapter/SessionGuard, one uncached PG-now() query/request; AC
+      actor-check is layer 2. (4) GET /health/departures LIVE {oldestDueLag
+      Seconds, retryWaitCount, processingCount, reclaimedLeaseCount, request
+      TimeCutoffDenialsTotal, workerConfig}; alerts/vendor/remediation-incident
+      DEFERRED. (5) retry auth = employee:departure:record (no new perm). (6)
+      per-process startup check LIVE; cross-process BUSINESS_TIME_ZONE consensus
+      DEFERRED. NEW um-dep-07 (cutoff independence), um-dep-08 (fencing no-op).
+      um-dep-04 filename kept (4 inbound links).
+      NEW ENV (three-places, harness-blocked .env*): DEPARTURE_WORKER_ENABLED,
+      DEPARTURE_WORKER_POLL_MS -> coordinator hands user the block at Stage 3.
+
+  - story_id: "5-2-apply-an-effective-departure-red-tests"
+    stage: "stage-2-tests"
+    repo: "services/backend"
+    artifact_path: "test/user-management/epic-5/apply-departure.e2e-spec.ts + test/user-management/epic-5/fixtures.ts"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T09:40:00Z"
+    note: >-
+      Committed-red split-gate: 8 LIVE it red (no worker: EmploymentStatus stays
+      active / no dismissed row / state scheduled; no POST .../retry route ->
+      404; no request-time cutoff -> self-read 200; no GET /health/departures ->
+      404), 2 guardrail it green (um-dep-07 T2/T3 - denial not materialisation-
+      dependent, cutoff must not fire early), 6 DEFERRED it.todo (um-dep-03 x2
+      action-items/mentorship applyDepartureEffects; um-dep-04 x2 no-double-
+      cancel/close; um-dep-08 x2 worker fencing - flagged: stale-executor no-op
+      un-committed-red-able without the worker). fixtures += backdateDeparture
+      DueAt + queryEmploymentStatusRows. Departure seeded via real POST /users/
+      :id/departures then dueAt back-dated; retry_wait seeded by raw enum-cast
+      UPDATE. Full sweep 333 passed (was 331, +2 guardrail) / 50 failed / 20
+      todo, suites 7 failed / 33 passed UNCHANGED - zero green->red. tsc 0, lint
+      clean. record-departure unchanged 17/1todo.
+
+  - story_id: "5-2-apply-an-effective-departure-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/ (departure worker + retry + cutoff + health) + package.json (@nestjs/schedule) + src/config/env.validation.ts + src/app.module.ts + docs/architecture/api-conventions.md"
+    commit: "UNCOMMITTED-2026-09-03"
+    author: "Claude Code (agent)"
+    approver: "Dmytro Novyk"
+    decision: "approved"
+    timestamp: "2026-09-03T10:00:00Z"
+    note: >-
+      SPLIT-GATE LIVE half. @nestjs/schedule@6.1.3 added (only new dep; Nest
+      10/11 peer). DepartureWorkerService: processDueDepartures / applyDeparture
+      / requestRetry; claim = SELECT ... WHERE (scheduled AND dueAt<=now()) OR
+      (retry_wait AND nextAttemptAt<=now()) OR (processing AND leaseUntil<now())
+      ORDER BY effectiveDate,id FOR UPDATE SKIP LOCKED -> processing + fresh
+      leaseToken + leaseUntil now()+120s. Apply = one $transaction: re-read FOR
+      UPDATE + fence on state='processing' AND leaseToken; close active
+      EmploymentStatus + insert dismissed (ON CONFLICT (sourceDepartureId) DO
+      NOTHING; dates stay in SQL); users.isActive=false; persisted-access sweep
+      (+full_profile_revoke journal, sha256 idempotency key, no rows in LIVE
+      tests); applyDepartureEffects({...tx}) real seam bound to Noop
+      DepartureEffectsParticipant (zero participants, PM/AD-23); state='applied'
+      fenced. On throw -> separate fenced tx -> retry_wait, attempts+1,
+      lastError = apply_failed[:prisma_<code>|:<Class>] (no msg/stack/PII),
+      backoff min(60*2^attempts, 3600)s, no abandoned state. Expired-lease
+      reclaim bumps reclaimedLeaseCount. Interval via SchedulerRegistry.
+      addInterval in onApplicationBootstrap guarded by DEPARTURE_WORKER_ENABLED
+      (env can't be a decorator arg; nest-config.md no-process.env rule).
+      POST /users/:id/departures/:departureId/retry @HttpCode(202)
+      @RequireFeature(employee:departure:record): retry_wait->202 (targeted
+      claimOne + synchronous applyDeparture, deterministic; two parallel -> one
+      claims other no-ops), other->409 departure_not_retryable, unknown/foreign
+      ->404. Request-time cutoff in jwt-session-resolver.adapter: after userId
+      resolve, SELECT 1 FROM departures WHERE userId=$1 AND dueAt<=now() AND
+      state IN (scheduled,processing,retry_wait,applied) -> resolve returns null
+      -> 401; requestTimeCutoffDenialsTotal++; not cached; JWT + Bearer<token:
+      uuid> both funnel through; other users unaffected. GET /health/departures
+      unauthenticated -> {oldestDueLagSeconds, retryWaitCount, processingCount,
+      reclaimedLeaseCount, requestTimeCutoffDenialsTotal, workerConfig}.
+      user.repository: ?employmentStatus=dismissed no longer forces isActive:true.
+      env: DEPARTURE_WORKER_ENABLED Joi.boolean().required() (no default),
+      DEPARTURE_WORKER_POLL_MS default 60000. api-conventions.md updated.
+      TEST FIX (necessary, per scenario docs um-dep-03/04): added runDeparture
+      Worker(app) helper + 3 call sites (um-dep-03 T1/T3, um-dep-04 T4);
+      retry-endpoint tests need no call (synchronous apply).
+      COORDINATOR-VERIFIED: apply-departure 10 passed (8 LIVE + 2 guardrail) /
+      6 it.todo; record-departure 17/1 unchanged; acm1r 39/39; epic-3/4 all
+      green; tsc 0; npm build passes; lint clean; full sweep 341 passed (was
+      333) / 42 failed / 20 todo - exactly 8 LIVE red->green, ZERO green->red.
+      spec-5-2 -> done. EPIC 5 COMPLETE (within current infra).
+      USER ACTION: append to .env + .env.example (harness-blocked):
+        BUSINESS_TIME_ZONE=Europe/London   (Story 5.1)
+        DEPARTURE_WORKER_ENABLED=true
+        DEPARTURE_WORKER_POLL_MS=60000

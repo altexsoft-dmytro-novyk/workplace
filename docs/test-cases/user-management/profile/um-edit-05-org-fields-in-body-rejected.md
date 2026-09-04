@@ -5,9 +5,10 @@
 > **Scope (v1.5).** This is a **DTO-shape / data-correctness** assertion, not an
 > entitlement one — the rejection fires for **every** audience, including a
 > fully-entitled writer, and is enforced in `UpdateUserDto` / `EditUserAction`,
-> **not** the guard (`umac-08`). Blocked past Stage 1 on the
-> `user-management:edit` seed only because Test 1 needs the request to reach the
-> DTO (the guard runs first).
+> **not** the guard (`umac-08`). No kernel-seed dependency under Variant A — the
+> Epic 0 edit gate is audience-only (`canAccessSection(v, 'S1', t) === 'write'`),
+> which Bob's reporting-line edge already satisfies, so the request reaches the
+> DTO. Pending only Story 1.2's own Stage 2 / Stage 3.
 
 > **Current-state note (for the code stage).** `UpdateUserDto` today declares
 > **no** `manager` / `peoplePartner` / `department` fields, so the global
@@ -23,7 +24,8 @@
 
 **Given** Alice, a seeded employee (`position: "Engineer"`, reports to Bob,
 assigned PP Paula, in department `<deptId>`); and Bob, Alice's entitled
-reporting-line editor — the umac-07 dual gate passes for him.
+reporting-line editor — `canAccessSection(Bob, 'S1', Alice) === 'write'`, so the
+umac-07 gate passes for him.
 
 **When** Bob submits a `PATCH` whose body pairs a legitimate S1 change
 (`position`) with an organisational fact — `manager` / `reportsToUserId` /
@@ -37,8 +39,8 @@ through Epic 4's dedicated screen.
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded with
 a `direct` edge to Bob, a `people_partner` edge to Paula, and a
-`DepartmentMembership`; `user-management:edit` seeded and held by Bob; port
-rebound. Stage 2 resolves ids from the seeded fixture id table.
+`DepartmentMembership`; Bob's `canAccessSection(Bob, 'S1', Alice)` is `write`;
+port rebound. Stage 2 resolves ids from the seeded fixture id table.
 
 ## Test
 

@@ -141,6 +141,12 @@ Deliver a deployable, headless Access Control kernel proven on real PostgreSQL w
 
 **FRs covered:** PM-FR-1, PM-FR-2, PM-FR-3, NFR-AC-1
 
+### Epic 4: Access Control Authorization Consolidation
+
+Collapse the per-section authorisation predicates into one section-parameterised gate driven by `canAccessSection`, rename section keys to human names, and record one functional-permission composition rule. New scope from the 2026-09-03 `dn-um-implementation` code review (this addition supersedes the "No Epic 4" note above, which scoped the 2026-09-02 ratification CE pass only).
+
+**FRs covered:** PM-FR-3 (hardening), NFR-AC-1
+
 ### Epic 4: Project-Line Audience
 
 Derive the Project-line matrix audience from explicit PM/DM project attachments, keeping it narrower than and separate from the Reporting line.
@@ -658,6 +664,108 @@ state, not free-text ordering:
 Every new behavior follows AD-1 in separate dispatches: Stage-1 scenario prose,
 human approval, Stage-2 approved red kernel integration evidence, then
 production. No dispatch may span two stages.
+
+## Epic 4: Access Control Authorization Consolidation
+
+**Production code (kernel + UM adoption).** Crosses the AC/UM boundary
+deliberately — unlike Epic 3, which was headless.
+**Status:** backlog
+**Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
+**Raised by:** `dn-um-implementation` code review, 2026-09-03 (Dmytro Novyk)
+
+`AccessControlFacadeAdapter` hand-writes one authorisation predicate per
+section/feature. Almost every target-scoped route asks the same question that
+`canAccessSection` already answers. The 2026-09-03 review made the drift
+concrete: a `user-management:edit` OR-override was added to `canEditS1` that
+contradicts Variant A, the §2.2 dual gate, and the `{ data, canEdit }` roll-out
+spec at once. Separately, `canAccessSection` still takes legacy `S1`/`S10`/`S11`
+strings — section keys must be human names (`profile:identity`, …).
+
+### Story 4.1: Generalise section-access authorisation + human section keys
+
+As a consuming context and a reviewer of authorisation code,
+I want one section-parameterised gate (`@RequireSectionAccess`) driven by
+`canAccessSection`, human-named section keys, and a single recorded
+functional-permission composition rule,
+So that route authorisation is declared once per endpoint, cannot drift between
+sections, and reads the same as the §3.2 matrix it enforces.
+
+**Composition decision — RESOLVED** 2026-09-04 (SCP
+`sprint-change-proposal-2026-09-04-section-access-consolidation.md` D1/D2):
+identity-card edit is a §2.2 dual gate; the feature half is a code constant
+`DEFAULT_PERMISSIONS` (per-person section-write keys every active employee
+holds), union'd with the explicit FR grant chain in the `isAllowed` evaluator.
+No `employee` policy row, no seed/bootstrap change. **Blocked on:** the
+architect solution-design pass only — the `@RequireSectionAccess` decorator/guard
+shape and the section→endpoint map.
+
+**Full ticket:**
+`_bmad-output/implementation-artifacts/platform/story-4-1-generalise-section-access-authorisation.md`
+
+**Acceptance Criteria (summary — see the ticket for the full list):**
+
+- No `S<n>` string is passed as a section identifier anywhere in `src/` or
+  `test/`; `canAccessSection` takes the human keys.
+- Exactly one place composes the functional half with the section half, matching
+  the ratified decision.
+- `PATCH /users/:id` and the `GET /users/:id` `canEdit` hint use
+  `@RequireSectionAccess('profile:identity', 'write')`; `canEditS1` and the
+  `EDIT_USER_FEATURE` / `READ_USER_FEATURE` branches are gone.
+- `scripts/dev-grant-root.ts` still gives root `canEdit: true` on every active
+  card, with no adapter special case.
+- Closes the two access-control deferred-work entries ("Generalise
+  section-access authorisation"; the `profile:timeline` rename follow-up).
+
+**Story split:** decided during the architect pass. Do not move 4.1 to
+`ready-for-dev` before that design and the composition decision exist. Follows
+AD-1 in separate dispatches per stage.
+
+### Story 4.2: Default org-relationship seed + retire the identity-card FR override
+
+As the person running a fresh deployment (and as a developer on a seeded dev DB),
+I want the seed to place the root identity at the top of a real reporting tree
+and hold the §2.4 full-profile grant,
+So that root administers and edits the organisation through the ordinary
+audience-resolution path, with no functional-role override anywhere in the
+authorisation code.
+
+**Recorded decision (Winston + Dmytro, 2026-09-03/04):** the ACM-0 seeded root
+identity is the organisation's boss — `hr-admin` functional role **+** top of
+the `reports-to` tree **+** first §2.4 full-profile-access holder, all by seed.
+A *delegated* HR Admin holds the complete functional-role feature set and may
+delegate the role onward, but gets **zero data access** from it — reads/writes a
+profile only where they are that person's reporting-line manager or assigned PP
+(`access-control.md:19`, `project-requirements.md:100`, NORMATIVE). The
+`canEditS1` `user-management:edit` OR-override from the 2026-09-03 review is
+deleted — an `isAllowed` that widens the audience is the invariant violation.
+
+**Known boundary (out of scope, no routes today):** the reporting-line audience
+is read-only on `profile:personal-contacts`, `profile:emergency-contacts`, and
+`profile:documents` (read-write for Self and PP only, by design). Even the
+seeded root cannot write those without being the person's PP; §2.4 is read-only
+(PM/AD-28). Accept the boundary; revisit if a concrete need appears.
+
+**Full ticket:**
+`_bmad-output/implementation-artifacts/platform/story-4-2-default-org-relationship-seed.md`
+
+**Acceptance Criteria (summary):**
+
+- `canEditS1` carries no FR-permission branch; the OR-override pinning test is
+  deleted.
+- On a seeded dev DB, root resolves `reporting` → `write` on `profile:identity`
+  for every active user, `canEdit: true` on every card, no adapter special case.
+- A delegated HR Admin (FR only, no relationship): global FR-gated routes
+  allowed; `PATCH /users/:id` on an unrelated person → `403`; `canEdit: false`.
+- `resolveAudiences` walks upward from targets — a tree-root viewer opening one
+  profile queries bounded by chain depth, not org size (ACM-9 measurement
+  pattern).
+- `db:dev:seed-org` throws under `NODE_ENV=production`, absent from
+  `prisma/seed.ts` and `bootstrap-access-control.ts`; ACM-1 invariant suite
+  green.
+
+**Depends on:** 4.1's composition decision (land alongside; 4.2 is not
+hard-blocked). **Blocked on:** architect solution-design for the upward-walk
+resolver change (AC-owned, its own AD-1). Follows AD-1 per stage.
 
 ---
 

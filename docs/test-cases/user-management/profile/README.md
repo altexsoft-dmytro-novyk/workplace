@@ -30,8 +30,16 @@ compiled spec
 (`status: draft`), the Epic 1 context, `umac-07`/`umac-08` (the entitlement
 side — cross-referenced, not duplicated), and DEC-UM-007. Per-file human
 approval under the AD-1 stage-1 gate is required; **no `approvals.yaml` records
-this set.** Stages 2-3 additionally block on the `user-management:edit` holder
-decision + kernel seed (above).
+this set.**
+
+> **Variant A (product decision 2026-09-02, Dmytro Novyk).** The employee
+> identity card (S1) has **no separate functional permission**. The Epic 0 edit
+> gate on `PATCH /users/:id` is `canAccessSection(viewer, 'S1', target) ===
+> 'write'` alone — the target's reporting-line manager or assigned People
+> Partner. Consequently **Story 1.2 is no longer blocked on a `user-management:edit`
+> holder decision or a kernel-seed sequence**; it is pending only its own
+> Stage 2 / Stage 3. `user-management:edit` survives only as the Epic 0 adapter's
+> internal routing key for the PATCH-gate branch.
 
 The `um-photo-*` set was authored 2026-09-02 for Epic 1 Story 1.3 against the
 compiled spec
@@ -47,44 +55,41 @@ never the approval ([../../../architecture/testing-strategy.md](../../../archite
 
 **Story 1.2 is `PATCH /users/:id` data-correctness only.** `GET /users/:id`
 already shipped (UMAC-1 / Epic 0 Story 0.1). *Who* is entitled to `PATCH` —
-Self `403` on S1 scalars, reporting / PP allowed via the §2.2 dual gate,
-colleague `403`, `401` unresolved — is asserted **canonically by Epic 0**
+reporting-line manager / assigned PP allowed, self `403` on S1 scalars,
+colleague `403`, `401`/`403` unresolved — is asserted **canonically by Epic 0**
 against the real `AccessControlFacade` in `access-control-adoption/umac-07`
-(dual gate) and `umac-08` (org-field rejection). The `um-edit-*` files do
-**not** duplicate those; every `um-edit-*` Stage-2 test **seeds an
-already-entitled actor** (real seeded-UUID token + real `Relationship` edge +
-the `user-management:edit` grant) and asserts only what the write does to the
-data.
+(Variant A: `canAccessSection('S1') === 'write'`) and `umac-08` (org-field
+rejection). The `um-edit-*` files do **not** duplicate those; every `um-edit-*`
+Stage-2 test **seeds an already-entitled actor** (real seeded-UUID token + real
+`Relationship` edge giving `canAccessSection('S1') === 'write'`) and asserts only
+what the write does to the data.
 
-### Blocked past Stage 1
+### Stage 2 / Stage 3 state
 
-`um-edit-*` Stages 2-3 stay **blocked** on two things:
+Under Variant A the Epic 0 edit gate is audience-only
+(`canAccessSection('S1') === 'write'`), which Epic 0 Story 0.1 already ships — so
+`um-edit-*` is **not** blocked on any kernel seed or permission-holder decision.
+Bob's seeded reporting-line edge to Alice satisfies the gate, so a Stage-2
+`PATCH` reaches `EditUserAction` / `UpdateUserDto`. The set is pending only its
+own Stage 2 (committed-red E2E) and Stage 3 (production) dispatches under the
+AD-1 gate.
 
-1. the **`user-management:edit` holder decision** —
-   `_bmad-output/implementation-artifacts/access-control/user-management-edit-permission-options.md`
-   (recommended: a universal baseline `employee` FR role); and
-2. the **Access Control kernel-seed AD-1 sequence** for `user-management:edit`
-   (adoption SPEC Open Decision (i) = option (a)) reaching `stage-3-production`.
+### Also settled by Variant A
 
-Until then no Stage-2 `PATCH` can pass the dual gate's functional half. The
-**data-correctness assertions that need no entitled actor** (`409` wholesale
-reject on duplicate `workEmail` / `ttId`, read-back, DTO `400` rejections) can
-be written **red now** — flagged per file.
-
-### Also unblocked by the same seed
-
-`access-control-adoption/umac-07` (CONDITIONAL → translatable), the
-`write-adoption.e2e-spec.ts` UMAC-07 / UMAC-08 reds, and Story 1.3's
+`access-control-adoption/umac-07` (CONDITIONAL → reframed and green), the
+`write-adoption.e2e-spec.ts` UMAC-07 group (green), and Story 1.3's
 `um-photo-09` Test 1 (`PATCH` + `photo` → `400`, which needs the guard to pass
-first).
+first — a reporting-line manager now clears the audience-only gate). The
+`write-adoption.e2e-spec.ts` UMAC-08 group stays **red** until Story 1.2 Stage 3
+adds the `@IsEmpty()` rejection on the org keys.
 
 ### Canonical personas (`um-edit-*`)
 
 Reconcile against [../README.md](../README.md#canonical-personas): **Alice**
 (seeded subject; reports to Bob; PP Paula), **Bob** (Alice's direct Unit
-Manager — reporting-line `write` on Alice's S1 via the umac-07 dual gate;
-holds `user-management:edit`), **Paula** (Alice's assigned PP — second entitled
-writer), **Colin** (unrelated seeded employee holding the in-use
+Manager — `canAccessSection(Bob, 'S1', Alice) === 'write'`, which under Variant A
+is the whole umac-07 edit gate), **Paula** (Alice's assigned PP — second entitled
+writer, same gate), **Colin** (unrelated seeded employee holding the in-use
 `workEmail` / `ttId` the uniqueness cases collide against), **Nina** (fresh
 target / second `ttId: null` row). Token convention: `Bearer <token:<bobId>>`
 resolves to a **real seeded UUID** (Epic 0 fixture convention, `um-integration-contract-response.md`
@@ -106,8 +111,9 @@ The `PATCH` response is the plain `toUserResponse` shape (whole-row spread),
 **not** the `{ data, canEdit }` envelope — only `GET /users/:id` returns the
 CAP-3 envelope (`access-control-adoption/README.md` "Response-body scope",
 `um-photo` README decision 9). The follow-up `GET` in `um-edit-01` asserts the
-envelope; `canEdit` is `true` for a reporting-line / PP viewer once the seed
-lands, `false` for Self / colleague (`canAccessSection(v,'S1',t)` → `read`).
+envelope; under Variant A `canEdit` is `true` for a reporting-line / PP viewer
+(`canAccessSection(v,'S1',t)` → `write`, the whole gate), `false` for Self /
+colleague (`canAccessSection(v,'S1',t)` → `read`).
 
 ### One "produce the new state" call site (AD-11 / Epic 3 hook)
 

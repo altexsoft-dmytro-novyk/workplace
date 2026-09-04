@@ -2,11 +2,12 @@
 
 **Trace:** [DEC-UM-007](../../../architecture/user-management-test-decisions.md#dec-um-007--workemail-normalization-oq2--kept-reconciled-to-kernel-reality) (trim + lowercase before validation, storage, lookup, and **uniqueness comparison**; identity canonical *at write* — the writer stores the normalized value) · [database-schema.md](../../../architecture/database-schema.md) §User (`workEmail` unique, normalized-stored) · epics.md Story 1.2 · Epic 1 context ("`workEmail` normalized on write before the uniqueness check, consistent with the import writer")
 
-> **Scope (v1.5).** Entitlement is Epic 0's. This file asserts **data
-> correctness**: normalization is applied to `workEmail` on the edit path and it
-> happens **before** the uniqueness comparison, so a value that only collides
-> *after* normalization is still rejected. Blocked past Stage 1 on the
-> `user-management:edit` seed (see [README](README.md) / Deliverable A).
+> **Scope (v1.5).** Entitlement is Epic 0's (Variant A: the edit gate is
+> `canAccessSection(v, 'S1', t) === 'write'` alone — no functional permission,
+> no kernel seed). This file asserts **data correctness**: normalization is
+> applied to `workEmail` on the edit path and it happens **before** the
+> uniqueness comparison, so a value that only collides *after* normalization is
+> still rejected. Pending only Story 1.2's own Stage 2 / Stage 3.
 
 ## Scenario
 
@@ -26,8 +27,8 @@ proving normalization runs before the uniqueness check, not after.
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded with
 `workEmail: "alice@company.example"`; Colin seeded with
 `workEmail: "colin@company.example"`; real `Relationship` Alice→Bob
-`type='direct'`; `user-management:edit` seeded and held; port rebound. Stage 2
-resolves ids from the seeded fixture id table.
+`type='direct'` (Bob's `canAccessSection(Bob, 'S1', Alice)` is `write`); port
+rebound. Stage 2 resolves ids from the seeded fixture id table.
 
 ## Test
 
