@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-22-2026 23:36
-last_updated: 09-03-2026 10:00
+last_updated: 09-04-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -98,3 +98,18 @@ development_status:
   5-1-record-a-departure: done
   5-2-apply-an-effective-departure: done
   epic-5-retrospective: optional
+
+  # Epic 6 — Current-State Read Endpoints. Drafted 2026-09-04 from the frontend
+  # deferred-work list: Epics 4/5 shipped writes but no reads of current org /
+  # departure state, the ids follow-up mutations need, or UUID→name resolution.
+  # Six independent UM-owned read endpoints. Each runs the full AD-1 gate;
+  # `epics.md` Epic 6 carries the summary, per-route contracts land in each
+  # story's Stage-1 scenario.
+  epic-6: backlog
+  6-1-read-current-manager-and-people-partner: backlog
+  6-2-read-department-catalog-and-memberships: backlog
+  6-3-list-an-employees-departures: backlog
+  6-4-batch-user-identity-lookup: backlog
+  6-5-remove-an-employees-photo: backlog
+  6-6-combined-active-and-dismissed-directory-view: backlog
+  epic-6-retrospective: optional

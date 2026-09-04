@@ -5,10 +5,25 @@
       "Bash(uv run *)",
       "Bash(grep:*)",
       "Bash(rg:*)",
+      "Bash(cd:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(xargs:*)",
+      "Bash(sed:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(echo:*)",
+      "Bash(true)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git show:*)",
-      "Bash(sed:*)"
+      "Bash(git status:*)",
+      "Bash(git ls-files:*)"
     ]
   }
 }

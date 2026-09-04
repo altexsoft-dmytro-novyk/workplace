@@ -128,6 +128,10 @@ Holders of the dedicated permission change manager, People Partner, employee dep
 Authorized HR actors record departure and the platform applies its complete effective-date outcome. Implementation remains blocked until CC-06 defines the scheduled state and executor.
 **FRs covered:** FR-6
 
+### Epic 6: Current-State Read Endpoints
+Epics 4–5 shipped the write paths for organisational facts and departure but no way to read the current value, the ids a follow-up mutation needs, or names for the UUIDs the access journal and blocker panel render. Six independent UM-owned read endpoints (relationships, department catalog + memberships, departure list, batch identity lookup, photo delete, combined active+dismissed list) so the already-built G4/G5 frontend stops working around gaps.
+**FRs covered:** read completeness for FR-6, FR-9, FR-10, FR-15, §3.4 — no new product behaviour.
+
 ### Epic Sequencing / Parallelization
 
 Per project-requirements.md §8.2 (NORMATIVE, graded): "a situation where one person waits for another is unacceptable." Reading the epic list top-to-bottom as one dependency chain would violate that — but the real build-time dependency is looser than the product narrative suggests, per AD-3 (stage-2 E2E tests bind against fixture-seeded data in the real test DB, not against another epic's live HTTP endpoint):
@@ -525,6 +529,144 @@ So that the employee and every access they hold leave the active system consiste
 **Given** the executor retries the same departure after a partial or uncertain failure
 **When** processing resumes
 **Then** the outcome is idempotent and no duplicate status, cancellation, closure, or journal effect is created
+
+## Epic 6: Current-State Read Endpoints
+
+Epics 4 and 5 shipped the **write** paths for organisational facts and departure,
+but the only way to read a current value is the response body of the mutation
+that set it. The frontend (G4/G5, landed 2026-09-03) can therefore change a
+manager, People Partner, department, or departure but cannot show the current
+one, cannot get the `relationshipId` / `departureId` a follow-up mutation needs,
+and renders every actor/subject id in the access journal and the departure
+blocker panel as a raw UUID. This epic adds the missing read endpoints so the
+already-built UI stops working around gaps (`_bmad-output/implementation-artifacts/user-management/deferred-work.md`).
+
+**FRs covered:** read completeness for FR-6, FR-9, FR-10, FR-15 and §3.4 — no new product behaviour, only reads of state Epics 1–5 already persist.
+
+**Ownership / boundary:** all six stories are User-Management-owned reads of
+User-Management resources. Three related gaps are **out of this epic** and stay
+their own items: (a) rolling the current manager / PP / department / projects
+**onto `GET /users/:id`** as audience-filtered derived fields — Access-Control-owned
+projection, the `{ data, canEdit }` roll-out in the access-control deferred-work;
+(b) **substring / typeahead search on `GET /users`** — platform §4.1 directory
+scope (FR-15); (c) **pagination + filtering on `GET /users/:id/events` and
+`/access-journal`** — needs a pagination contract first. Each 6.x story runs the
+full AD-1 gate; every route's request/response shape and denial oracle is fixed
+in its Stage-1 scenario, and `docs/architecture/api-conventions.md` is updated in
+the same increment (the routes are named there today only as "not specified yet").
+
+### Story 6.1: Read an Employee's Current Reporting-Line Manager and People Partner
+
+As an actor who may edit an employee's organisation,
+I want to read the employee's current manager edge(s) and People-Partner edge,
+each with its `relationshipId` and the target's identity,
+So that the UI can display the current organisation and drive a reassignment
+(DEC-UM-005 DELETE-then-POST) or a PP replace/remove with a valid
+optimistic-concurrency token.
+
+**Acceptance Criteria:**
+
+**Given** an employee with a current `type='direct'` manager edge and an assigned People Partner
+**When** an entitled viewer reads the employee's relationships
+**Then** the response returns each current edge with its id, type, and the target user's id + display name, and omits closed/historical edges
+
+**Given** a viewer with no entitlement to the employee's organisation section
+**When** they read the relationships
+**Then** the denial follows the §2.2 / PM-AD-24 oracle (`403` or leak-free `404`), returning nothing about the edges
+
+### Story 6.2: Read the Department Catalog and an Employee's Current Memberships
+
+As an actor assigning a department or a department manager,
+I want to list the departments and read an employee's current memberships,
+So that the UI can offer a real department to pick and show where the employee
+currently sits.
+
+**Acceptance Criteria:**
+
+**Given** departments created by the population import
+**When** an entitled viewer lists departments
+**Then** the response returns each department's id, name, external id, and current manager (id + name) if one is set
+
+**Given** an employee with one or more current `DepartmentMembership` rows
+**When** an entitled viewer reads the employee's departments
+**Then** only current memberships (`validTo IS NULL`) are returned, each with the department id + name and `validFrom`
+
+### Story 6.3: List an Employee's Departures
+
+As an actor managing an employee's lifecycle,
+I want to list the employee's departures with their ids, effective dates, and
+execution status,
+So that when `POST /users/:id/departures` returns `departure_already_scheduled`
+the UI can show the scheduled departure and reach its retry / diagnostics route.
+
+**Acceptance Criteria:**
+
+**Given** an employee with a scheduled (and/or applied, and/or failed) departure
+**When** an entitled viewer lists the employee's departures
+**Then** each departure is returned with its id, effective date, reason, state, and — for a failed one — the sanitized diagnostics already exposed by `GET /users/:id/departures/:departureId`
+
+**Given** an employee with no departure on record
+**When** an entitled viewer lists departures
+**Then** the response is an empty collection, not a `404`
+
+### Story 6.4: Batch User Identity Lookup
+
+As the frontend rendering the access journal and the departure blocker panel,
+I want to resolve many user ids to their display identity in one request,
+So that actor / subject / before / after / re-parent-target values render as
+names instead of raw UUIDs without an N-call fan-out.
+
+**Acceptance Criteria:**
+
+**Given** a set of user ids (some active, some dismissed, some unknown)
+**When** an authenticated viewer requests the batch lookup
+**Then** the response returns `{ id, firstName, lastName }` (the always-visible identity minimum, §3.3.4) for every id that resolves, and silently omits unknown ids — never a `404` for the batch
+
+**Given** a batch larger than the documented cap
+**When** it is requested
+**Then** the request is rejected `400` with the cap stated, not truncated silently
+
+### Story 6.5: Remove an Employee's Photo
+
+As the employee (Self),
+I want to remove my profile photo,
+So that a mistaken upload can be cleared, not only replaced.
+
+**Acceptance Criteria:**
+
+**Given** an employee with a photo set
+**When** the employee removes their own photo (`DELETE /users/:id/photo`, Self-only per FR-9 / the photo write rule)
+**Then** `User.photo` becomes `null`, the response mirrors the `PUT` shape, and the object-store cleanup follows the same decision-7 semantics as upload failure
+
+**Given** a non-Self viewer, or an employee with no photo
+**When** they call the delete
+**Then** the result is `403` (non-Self) or a leak-free `404` / no-op (no photo) per the oracle
+
+### Story 6.6: Combined Active + Dismissed Directory View
+
+As an actor auditing the whole population,
+I want `GET /users?employmentStatus=all`,
+So that the directory can show active and dismissed employees together instead
+of one or the other.
+
+**Acceptance Criteria:**
+
+**Given** a population with both active and dismissed employees
+**When** the list is requested with `employmentStatus=all`
+**Then** both are returned in one page, each row carrying its `employmentStatus`, with the existing pagination and permission-safe projection unchanged
+
+**Given** `employmentStatus` is omitted
+**When** the list is requested
+**Then** the current default (active only) is unchanged — `all` is opt-in
+
+### Epic 6 Sequencing
+
+All six stories are independent (different resources, no shared write path).
+6.1–6.4 unblock the largest frontend gaps and should go first; 6.5 and 6.6 are
+small. None is blocked on Epic 4 (the reads only observe state Epic 4 already
+persists). 6.4's identity-minimum projection must match §3.3.4 — coordinate its
+Stage-1 with whoever owns the colleague-view field rules. Each story's
+production stage writes no data and adds no journal row.
 
 ## Mentorship Handoff
 
