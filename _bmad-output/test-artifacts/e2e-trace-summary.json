@@ -1,118 +1,96 @@
 {
   "schema_version": "0.2.0",
-  "snapshot_at": "2026-09-04T12:50:43Z",
-  "repo": "people management",
+  "snapshot_at": "2026-09-04T17:18:29.314Z",
+  "repo": "people-management",
   "collection_mode": "contract_static",
   "collection_status": "COLLECTED",
-  "inventory_basis": "static_spec_files",
-  "gate_basis": "priority_thresholds",
-  "source_sha": {
-    "workspace": "65b59b87aa1313d302d6b62e1cbc9e0454529e15",
-    "backend": "ebf7f2bd491e30594efcc81371d32851d83350e3",
-    "frontend": "25bd71ce7508073e38ed26b9e9494940c77648e5"
-  },
+  "inventory_basis": "docs/test-cases scenario documents (live only)",
+  "gate_basis": "deterministic",
+  "source_sha": "b074364",
+  "backend_sha": "53894d7",
+  "frontend_sha": "a0decb9",
   "target": {
     "type": "release",
-    "id": "whole-repo-all-epics",
-    "label": "Whole repository \u2014 all epics (Access Control Kernel MVP, User Management, Mentorship)"
+    "id": "whole-repo",
+    "label": "All epics — AC Foundation, AC Kernel MVP, User Management, Mentorship"
   },
   "decision_mode": "deterministic",
-  "evaluator": "TEA Agent (bmad-testarch-trace)",
+  "evaluator": "TEA Agent",
   "confidence": "high",
   "oracle": {
     "resolution_mode": "formal_requirements",
     "confidence": "high",
     "sources": [
-      "docs/test-cases/** (227 AD-1 Stage-1 scenario documents)",
-      "_bmad-output/specs/*/SPEC.md",
-      "_bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml",
-      "_bmad-output/specs/spec-user-management-access-control-adoption/approvals.yaml"
+      "docs/test-cases/**",
+      "docs/architecture/testing-strategy.md"
     ],
     "external_pointer_status": "not_used",
-    "synthetic": false
+    "synthetic": false,
+    "documents_on_disk": 227,
+    "documents_live": 201,
+    "documents_retired": 26,
+    "criteria": 207
   },
   "gate_status": "FAIL",
   "coverage": {
     "inventory": {
-      "covered": 159,
-      "total": 191,
-      "pct": 83
+      "covered": 175,
+      "total": 207,
+      "pct": 85
     },
     "priority_breakdown": {
       "P0": {
-        "total": 113,
-        "covered": 112,
-        "percentage": 99
+        "total": 128,
+        "full": 128,
+        "pct": 100
       },
       "P1": {
-        "total": 66,
-        "covered": 47,
-        "percentage": 71
+        "total": 67,
+        "full": 47,
+        "pct": 70
       },
       "P2": {
         "total": 12,
-        "covered": 0,
-        "percentage": 0
-      },
-      "P3": {
-        "total": 0,
-        "covered": 0,
-        "percentage": 100
+        "full": 0,
+        "pct": 0
       }
     },
     "by_level": {
-      "e2e": {
-        "tests": 43,
-        "criteria_covered": 387
-      },
-      "api": {
-        "tests": 0,
-        "criteria_covered": 0
-      },
-      "component": {
-        "tests": 0,
-        "criteria_covered": 0
-      },
-      "unit": {
-        "tests": 3,
-        "criteria_covered": 5
-      },
-      "live": {
-        "tests": 0,
-        "criteria_covered": 0
-      },
-      "other": {
-        "tests": 8,
-        "criteria_covered": 0
-      }
+      "e2e": 0,
+      "api": 0,
+      "component": 0,
+      "unit": 0,
+      "live": 0,
+      "other": 0
     }
   },
   "tests": {
-    "files": 54,
-    "cases": 560,
-    "skipped_cases": 20,
+    "files": 59,
+    "cases": 627,
+    "skipped_cases": 0,
     "fixme_cases": 0,
-    "pending_cases": 20
+    "pending_cases": 18
   },
   "risk_summary": {
-    "critical_open": 1,
-    "high_open": 19,
-    "medium_open": 0,
-    "low_open": 0
+    "critical_open": 0,
+    "high_open": 1,
+    "medium_open": 2,
+    "low_open": 1
   },
   "heuristics": {
-    "endpoint_gaps": [
-      "no mentorship module and no MentorshipPair model at HEAD"
-    ],
+    "endpoint_gaps": "mentorship routes unimplemented",
     "auth_negative_path_status": "covered",
-    "error_path_status": "covered for implemented surfaces",
-    "ui_journey_status": "UNTRACED \u2014 services/frontend/e2e has 7 files / 133 cases and no oracle scenario in either direction",
-    "ui_state_status": "UNTRACED"
+    "error_path_status": "covered",
+    "ui_journey_status": "absent from oracle",
+    "ui_state_status": "untraced (frontend not in oracle)"
   },
   "live_evidence": {
     "present": false,
-    "results_file": "",
-    "freshness": "not_present",
+    "results_file": null,
+    "freshness": null,
+    "recorded_source_sha": null,
+    "current_source_sha": "b074364",
+    "producer": null,
     "counted": 0,
     "stale": 0,
     "unverifiable": 0,
@@ -125,42 +103,77 @@
     "requirements_live_only": 0
   },
   "gate_criteria": {
-    "p0_coverage_required": "100%",
-    "p0_coverage_actual": "99%",
-    "p0_status": "NOT_MET",
-    "p1_coverage_target": "90%",
-    "p1_coverage_minimum": "80%",
-    "p1_coverage_actual": "71%",
+    "p0_coverage_required": 100,
+    "p0_coverage_actual": 100,
+    "p0_status": "MET",
+    "p1_coverage_target": 90,
+    "p1_coverage_minimum": 80,
+    "p1_coverage_actual": 70,
     "p1_status": "NOT_MET",
-    "overall_coverage_minimum": "80%",
-    "overall_coverage_actual": "83%",
+    "overall_coverage_minimum": 80,
+    "overall_coverage_actual": 85,
     "overall_status": "MET"
   },
   "blockers": [
     {
-      "id": "UM-DEP-08",
-      "severity": "critical",
-      "reason": "P0 criterion covered only by an it.todo (TODO_ONLY)"
+      "id": "MENTORSHIP",
+      "severity": "high",
+      "reason": "All 27 live mentorship criteria PARTIAL — no src/mentorship/ and no MentorshipPair model. Sole cause of P1 70% and the only remaining gate failure."
+    },
+    {
+      "id": "UM-CT-03/04/05/06/09",
+      "severity": "medium",
+      "reason": "Five P1 criteria rest on it.todo only, deferred pending the FR-matrix grant.",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts"
+    },
+    {
+      "id": "FRONTEND-UNTRACED",
+      "severity": "medium",
+      "reason": "7 frontend spec files / 124 cases cite zero oracle IDs; no scenario describes a UI journey."
+    },
+    {
+      "id": "CI-DOES-NOT-RUN-SUITES",
+      "severity": "low",
+      "reason": ".github/workflows/tests.yml runs only npm run test:clickup; neither submodule has a workflow. Mode capped at contract_static."
     }
   ],
   "recommendations": [
     {
-      "priority": "P0",
-      "action": "Write UM-DEP-08 (stale-executor no-op, departure). It is the only P0 not FULL, and its sole evidence is an it.todo. One test moves P0 to 100%.",
+      "priority": "P1",
+      "action": "Build mentorship module + MentorshipPair model",
       "requirements": [
-        "UM-DEP-08"
+        "MEN-DEP-01",
+        "MEN-DEP-02",
+        "MEN-END-01",
+        "MEN-END-02",
+        "MEN-END-03",
+        "MEN-END-04",
+        "MEN-END-05",
+        "MEN-END-06",
+        "MEN-END-07",
+        "MEN-END-08",
+        "MEN-FLAG-01",
+        "MEN-FLAG-02",
+        "MEN-FLAG-03",
+        "MEN-FLAG-04",
+        "MEN-PAIR-01",
+        "MEN-PAIR-02",
+        "MEN-PAIR-03",
+        "MEN-PAIR-04",
+        "MEN-PAIR-05",
+        "MEN-POOL-01",
+        "MEN-POOL-02",
+        "MEN-POOL-03",
+        "MEN-VIEW-01",
+        "MEN-VIEW-02",
+        "MEN-VIEW-03",
+        "MEN-VIEW-04",
+        "MEN-VIEW-05"
       ]
     },
     {
       "priority": "P1",
-      "action": "Build the mentorship module and MentorshipPair model. 25 P1 criteria are PARTIAL because the contract is complete and ID-traced but no production code exists. This is what holds P1 at 71% against an 80% minimum.",
-      "requirements": [
-        "MEN-*"
-      ]
-    },
-    {
-      "priority": "P1",
-      "action": "Resolve the remaining 18 it.todo cases in user-management epics 1/3/4/5 \u2014 5 further criteria rest on them alone.",
+      "action": "Resolve the 5 UM-CT it.todo criteria",
       "requirements": [
         "UM-CT-03",
         "UM-CT-04",
@@ -171,23 +184,49 @@
     },
     {
       "priority": "P1",
-      "action": "Bring services/frontend/e2e (7 files, 133 cases) into the oracle, or write frontend acceptance criteria. Today it is invisible from both directions: no scenario names it, and it names no scenario.",
+      "action": "Decide frontend oracle scope",
       "requirements": []
     },
     {
       "priority": "P2",
-      "action": "Extend .github/workflows/tests.yml beyond npm run test:clickup \u2014 the 427 backend and 133 frontend cases run in no CI, so red/green is inferred from source rather than observed.",
+      "action": "Execute backend and frontend suites in CI",
       "requirements": []
+    },
+    {
+      "priority": "P3",
+      "action": "Rewrite the 3 ACF scenario docs whose expected results are superseded; delete 4 stale EXPECTED RED headers",
+      "requirements": [
+        "ACF-AU-05",
+        "ACF-FC-01",
+        "ACF-FC-02"
+      ]
     }
   ],
   "links": {
-    "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",
-    "trace_report_url": "",
-    "artifact_url": "",
-    "journey_evidence_url": ""
+    "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md"
   },
-  "supersedes": {
-    "previous_snapshot": "2026-09-04 run over a 398-document oracle",
-    "note": "The 171-document Phase-1 access-control draft suite was deleted 2026-09-04 (no AD-1 approval, no test ever referenced it). Oracle is now 227."
+  "resolved_this_run": [
+    {
+      "id": "UM-DEP-08",
+      "by": "461d480",
+      "effect": "P0 99% -> 100%"
+    },
+    {
+      "id": "ACF-AU-05/FC-01/FC-02",
+      "by": "da7d1fa",
+      "effect": "403/200 contradiction removed"
+    }
+  ],
+  "pin_correction": {
+    "applied": true,
+    "backend": {
+      "from": "ebf7f2b",
+      "to": "53894d7"
+    },
+    "frontend": {
+      "from": "25bd71c",
+      "to": "a0decb9"
+    },
+    "content_loss": "none — verified: frontend trees identical, backend 4 files changed, 0 deleted"
   }
 }
