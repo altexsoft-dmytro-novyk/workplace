@@ -1,0 +1,3870 @@
+[
+ {
+  "path": "docs/test-cases/access-control-foundation/audience/acf-au-01-self.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/audience/acf-au-02-reporting-direct.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/audience/acf-au-03-reporting-transitive.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/audience/acf-au-04-pp-direct.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/audience/acf-au-05-colleague-denied.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/fail-closed/acf-fc-01-broken-reports-to-edge.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/fail-closed/acf-fc-02-pp-hr-line-withheld.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/fail-closed/acf-fc-03-empty-bulk.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-foundation/fail-closed/acf-fc-04-cyclic-reporting-chain.md",
+  "area": "access-control-foundation",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-04-exactly-one-root-attachment.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-05-rerun-seed-no-duplicates.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-06-no-other-role-attachment-or-grant.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-07-fr-policy-has-no-target.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-08-ar-fr-shape-violations-rejected.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1-fb-09-duplicate-keys-and-joins-rejected.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-10-partial-fr-role-key.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-11-grant-type-separation-boundary.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-12-permission-fk-and-permission-first-index.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-13-userpolicies-referential-integrity.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-14-bootstrap-singleton-constraints.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-15-on-delete-restrict-four-foreign-keys.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-16-permission-key-immutability.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-17-dec-um-007-normalization-at-lookup.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-18-advisory-lock-and-timeout.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-19-revalidate-before-writes-and-before-commit.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-20-absent-singleton-adopts-existing-fr-policy.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-21-absent-singleton-attachment-adoption-and-preservation.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-22-absent-singleton-adopts-changed-root.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-23-singleton-present-email-drift-fails.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-24-cross-type-ar-hr-admin-preserved.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-25-concurrent-runs.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-26-per-field-drift-restore-preserve-fail.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-27-atomic-rollback-no-partial-state.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-01-inactive-viewer-chain-top.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-02-inactive-bridge-stops-traversal.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-03-inactive-target-below-active-manager.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-04-empty-bulk-short-circuit.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-05-duplicate-targets-collapse-to-one-key.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-06-repeat-before-viewer-proof.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-07-repeat-after-viewer-proof.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-08-viewer-inside-the-cycle.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-09-absent-edge-is-a-clean-end.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-10-inactive-endpoint-after-viewer-proof.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-11-inactive-pp-endpoint.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-12-path-local-visited-state.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-13-infrastructure-error-propagates.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/inactive-identity/acm3-ii-14-missing-viewer-and-target.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-01-live-fr-grant-allows.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-02-revocation-is-immediate.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-03-inactive-user-denies.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-04-missing-user-denies.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-05-unknown-key-denies.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-06-case-variant-denies.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-07-ar-policy-never-grants.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-08-nonmatching-join-denies.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-09-infrastructure-error-propagates.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/is-allowed/acm2-ia-10-empty-key-denies.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-01-facade-resolves-from-real-container.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-05-corrected-module-header-comment.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-01-reporting-and-pp-retained.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-03-colleague-is-floor.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-04-duplicate-target-does-not-duplicate-audiences.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-05-fr-permission-excluded-from-audiences.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-06-mixed-postgresql-fixture.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/root-user-prerequisite/acm0-ru-root-user-prerequisite.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-01-s1-self-or-colleague-read.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-02-s1-reporting-or-pp-write.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-03-s10-all-phase-zero-audiences-read.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-04-s11-all-phase-zero-audiences-read.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-05-strongest-merged-audience-wins.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-06-unsupported-section-returns-none.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-07-missing-target-returns-none.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-08-empty-audiences-return-none.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control-kernel/section-access/acm5-sa-09-audience-resolution-error-propagates.md",
+  "area": "access-control-kernel",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-01-self-exclusivity.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-02-reporting-direct.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-03-reporting-transitive.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-04-pp-direct.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-05-colleague-fallback.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-06-project-withheld.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-07-no-cross-kind-inheritance.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-08-broken-reports-to-edge.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-09-orphan-policy.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-10-department-policy-withheld.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-11-pp-hr-line-withheld.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-12-empty-bulk.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-13-audience-merge.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-14-due-actor.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-15-due-target.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-16-due-manager-endpoint.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-17-due-recursion-node.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/audience-derivation/ac-ad-18-integration-unavailable.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/auth/ac-au-01-profile-read-unauthenticated.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/auth/ac-au-02-section-read-unauthenticated.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/auth/ac-au-03-section-write-unauthenticated.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/fail-closed/ac-fc-01-empty-reports-to.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/fail-closed/ac-fc-02-orphaned-policy-row.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/fail-closed/ac-fc-03-bootstrap-admin-revocable.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/functional-permission/ac-fp-01-dual-gate-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/functional-permission/ac-fp-02-fr-without-audience.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/functional-permission/ac-fp-03-root-no-default-profile-access.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/ac-m-s16-colleague-hidden.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/ac-m-s16-colleague.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s1-colleague-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s1-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s10-colleague-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s10-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s11-colleague-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s11-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s12-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s12-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s13-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s13-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s14-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s14-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s15-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s15-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s16-colleague-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s16-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s2-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s2-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s3-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s3-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s4-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s4-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s5-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s5-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s6-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s6-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s7-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s7-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s8-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s8-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s9-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/colleague/s9-colleague-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s1-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s1-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s10-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s10-pp-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s11-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s11-pp-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s12-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s12-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s13-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s13-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s14-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s14-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s15-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s15-pp-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s16-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s16-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s2-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s2-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s3-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s3-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s4-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s4-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s5-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s5-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s6-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s6-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s7-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s7-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s8-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s8-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s9-pp-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/pp/s9-pp-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/project-line-gate/s02-pm-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/project-line-gate/s03-pm-colleague-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/project-line-gate/s05-pm-no-project-audience.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/project-line-gate/s06-frank-no-cross-kind-inheritance.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/ac-m-s16-management.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s01-reporting-line-write-derived-field-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s07-unflagged-note-absent-for-employee.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s07-unflagged-note-visible-to-reporting-line.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s1-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s1-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s10-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s10-reporting-line-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s11-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s11-reporting-line-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s12-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s12-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s13-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s13-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s14-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s14-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s15-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s15-reporting-line-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s16-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s16-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s2-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s2-reporting-line-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s3-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s3-reporting-line-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s4-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s4-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s5-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s5-reporting-line-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s6-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s6-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s7-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s7-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s8-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s8-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s9-reporting-line-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/reporting-line/s9-reporting-line-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/ac-m-s16-employee.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s01-self-write-photo.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s1-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s1-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s10-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s10-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s11-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s11-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s12-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s12-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s12-self-write-idp-complete.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s13-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s13-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s13-self-write-mentor-flag.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s14-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s14-self-write-complete.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s14-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s15-self-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s15-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s16-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s16-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s2-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s2-self-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s3-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s3-self-write.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s4-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s4-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s5-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s5-self-write-certificate.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s5-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s6-self-read-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s6-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s7-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s7-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s8-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s8-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s9-self-read.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/access-control/matrix/self/s9-self-write-denied.md",
+  "area": "access-control",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/mentorship/departure/men-dep-01-departure-auto-closes-active-pairs.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-6",
+   "FR-M14"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-33"
+   ],
+   "FR-M14": [
+    "PM-FR-33",
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33",
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/departure/men-dep-02-system-note-bypasses-mandatory-note-gate.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M14"
+  ],
+  "resolved": {
+   "FR-M14": [
+    "PM-FR-33",
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33",
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-01-end-pair-with-closure-note.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M9"
+  ],
+  "resolved": {
+   "FR-M9": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-02-end-without-note-rejected.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M9"
+  ],
+  "resolved": {
+   "FR-M9": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-03-closure-note-visible-to-reporting-project-pp.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M10"
+  ],
+  "resolved": {
+   "FR-M10": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-04-closure-note-hidden-from-mentor-mentee-colleague.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M10"
+  ],
+  "resolved": {
+   "FR-M10": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-05-status-returns-to-open-when-no-active-mentee.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M13"
+  ],
+  "resolved": {
+   "FR-M13": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-06-status-does-not-return-when-flag-cleared.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M13"
+  ],
+  "resolved": {
+   "FR-M13": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-07-mentorship-end-career-event.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M11"
+  ],
+  "resolved": {
+   "FR-M11": [
+    "PM-FR-28",
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-28",
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/end/men-end-08-ended-pair-stays-in-history-both-profiles.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M12"
+  ],
+  "resolved": {
+   "FR-M12": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/flag/men-flag-01-self-sets-open-to-mentoring.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M1"
+  ],
+  "resolved": {
+   "FR-M1": [
+    "PM-FR-13",
+    "PM-FR-32"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-13",
+   "PM-FR-32"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/flag/men-flag-02-self-clears-flag.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M1"
+  ],
+  "resolved": {
+   "FR-M1": [
+    "PM-FR-13",
+    "PM-FR-32"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-13",
+   "PM-FR-32"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/flag/men-flag-03-clear-flag-with-active-mentee.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M3"
+  ],
+  "resolved": {
+   "FR-M3": [
+    "PM-FR-13",
+    "PM-FR-32"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-13",
+   "PM-FR-32"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/flag/men-flag-04-non-self-cannot-set-flag.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M1"
+  ],
+  "resolved": {
+   "FR-M1": [
+    "PM-FR-13",
+    "PM-FR-32"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-13",
+   "PM-FR-32"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pair/men-pair-01-create-pair-scoped-mentee.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M5",
+   "FR-M6"
+  ],
+  "resolved": {
+   "FR-M5": [
+    "PM-FR-33"
+   ],
+   "FR-M6": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pair/men-pair-02-mentee-outside-access-scope-rejected.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M5"
+  ],
+  "resolved": {
+   "FR-M5": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pair/men-pair-03-first-pair-status-transition.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M6"
+  ],
+  "resolved": {
+   "FR-M6": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pair/men-pair-04-mentorship-start-career-event.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-11",
+   "FR-5",
+   "FR-M7"
+  ],
+  "resolved": {
+   "FR-11": [
+    "PM-FR-28",
+    "PM-FR-33"
+   ],
+   "FR-5": [
+    "PM-FR-33"
+   ],
+   "FR-M7": [
+    "PM-FR-28",
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-28",
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pair/men-pair-05-create-denied-without-permission.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M5"
+  ],
+  "resolved": {
+   "FR-M5": [
+    "PM-FR-33"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-33"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pool/men-pool-01-company-wide-pool-s1-and-flag.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M4"
+  ],
+  "resolved": {
+   "FR-M4": [
+    "PM-FR-34"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-34"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pool/men-pool-02-pool-never-exposes-s13.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M4"
+  ],
+  "resolved": {
+   "FR-M4": [
+    "PM-FR-34"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-34"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/pool/men-pool-03-pool-denied-without-permission.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M4"
+  ],
+  "resolved": {
+   "FR-M4": [
+    "PM-FR-34"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-34"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/view/men-view-01-self-sees-own-mentor-and-mentees.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M2"
+  ],
+  "resolved": {
+   "FR-M2": [
+    "PM-FR-13",
+    "PM-FR-32"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-13",
+   "PM-FR-32"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/view/men-view-02-all-pairs-view-active-and-ended.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M8"
+  ],
+  "resolved": {
+   "FR-M8": [
+    "PM-FR-34"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-34"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/view/men-view-03-profile-header-shows-mentor.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-12",
+   "FR-14",
+   "FR-M16"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-33"
+   ],
+   "FR-14": [
+    "PM-FR-33",
+    "PM-FR-41"
+   ],
+   "FR-M16": [
+    "PM-FR-12",
+    "PM-FR-14",
+    "PM-FR-34"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-14",
+   "PM-FR-33",
+   "PM-FR-34",
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/view/men-view-04-s13-inline-summary-on-profile.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M17"
+  ],
+  "resolved": {
+   "FR-M17": [
+    "PM-FR-34"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-34"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/mentorship/view/men-view-05-mentorship-status-directory-filter.md",
+  "area": "mentorship",
+  "cited": [
+   "FR-M15"
+  ],
+  "resolved": {
+   "FR-M15": [
+    "PM-FR-34"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-34"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-01-self-read-s1-card.md",
+  "area": "user-management",
+  "cited": [
+   "FR-16"
+  ],
+  "resolved": {
+   "FR-16": [
+    "PM-FR-1",
+    "PM-FR-4",
+    "PM-FR-12"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-1",
+   "PM-FR-12",
+   "PM-FR-4"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-02-reporting-line-viewer-read.md",
+  "area": "user-management",
+  "cited": [
+   "FR-16"
+  ],
+  "resolved": {
+   "FR-16": [
+    "PM-FR-1",
+    "PM-FR-4",
+    "PM-FR-12"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-1",
+   "PM-FR-12",
+   "PM-FR-4"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-03-assigned-pp-read.md",
+  "area": "user-management",
+  "cited": [
+   "FR-16"
+  ],
+  "resolved": {
+   "FR-16": [
+    "PM-FR-1",
+    "PM-FR-4",
+    "PM-FR-12"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-1",
+   "PM-FR-12",
+   "PM-FR-4"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-04-colleague-read-s1-card.md",
+  "area": "user-management",
+  "cited": [
+   "FR-16",
+   "FR-17"
+  ],
+  "resolved": {
+   "FR-16": [
+    "PM-FR-1",
+    "PM-FR-4",
+    "PM-FR-12"
+   ],
+   "FR-17": [
+    "PM-FR-4",
+    "PM-FR-5"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-1",
+   "PM-FR-12",
+   "PM-FR-4",
+   "PM-FR-5"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-05-unresolved-session-read-denied.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-06-no-target-isallowed-delegates-to-facade.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-07-write-dual-gate.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-08-write-rejects-org-fields.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/access-control-adoption/umac-09-photo-write-self-only.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/auth/um-auth-01-request-magic-link-success.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/auth/um-auth-02-request-magic-link-unknown-email.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/auth/um-auth-03-consume-magic-link-success.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/auth/um-auth-04-consume-expired-token-denied.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/auth/um-auth-05-consume-token-single-use.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/auth/um-auth-06-deactivated-user-denied.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-01-system-generates-joined-company-on-create.md",
+  "area": "user-management",
+  "cited": [
+   "FR-5"
+  ],
+  "resolved": {
+   "FR-5": [
+    "PM-FR-28"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-28"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-02-system-generates-position-change-on-edit.md",
+  "area": "user-management",
+  "cited": [
+   "FR-5"
+  ],
+  "resolved": {
+   "FR-5": [
+    "PM-FR-28"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-28"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-03-pp-manual-add-backfill.md",
+  "area": "user-management",
+  "cited": [
+   "FR-12",
+   "FR-5"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-29"
+   ],
+   "FR-5": [
+    "PM-FR-28"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-28",
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-04-um-manual-add-backfill.md",
+  "area": "user-management",
+  "cited": [
+   "FR-12",
+   "FR-5"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-29"
+   ],
+   "FR-5": [
+    "PM-FR-28"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-28",
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-05-pp-correct-event-soft-delete-and-append.md",
+  "area": "user-management",
+  "cited": [
+   "FR-12",
+   "FR-13"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-29"
+   ],
+   "FR-13": [
+    "PM-FR-29"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-06-um-delete-event.md",
+  "area": "user-management",
+  "cited": [
+   "FR-12",
+   "FR-13"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-29"
+   ],
+   "FR-13": [
+    "PM-FR-29"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-07-deleted-event-excluded-from-read.md",
+  "area": "user-management",
+  "cited": [
+   "FR-13"
+  ],
+  "resolved": {
+   "FR-13": [
+    "PM-FR-29"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-08-direct-edit-rejected.md",
+  "area": "user-management",
+  "cited": [
+   "FR-12",
+   "FR-13"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-29"
+   ],
+   "FR-13": [
+    "PM-FR-29"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-09-permission-without-s9-write-denied.md",
+  "area": "user-management",
+  "cited": [
+   "FR-12"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-29"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/career-timeline/um-ct-10-s9-write-without-permission-denied.md",
+  "area": "user-management",
+  "cited": [
+   "FR-12"
+  ],
+  "resolved": {
+   "FR-12": [
+    "PM-FR-29"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-29"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/deactivation/um-deact-01-hr-admin-deactivate-success.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/deactivation/um-deact-02-deactivated-user-excluded-from-active-list.md",
+  "area": "user-management",
+  "cited": [
+   "FR-16"
+  ],
+  "resolved": {
+   "FR-16": [
+    "PM-FR-1",
+    "PM-FR-4",
+    "PM-FR-12"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-1",
+   "PM-FR-12",
+   "PM-FR-4"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/deactivation/um-deact-03-deactivate-without-permission.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/departure/um-dep-01-record-a-departure.md",
+  "area": "user-management",
+  "cited": [
+   "FR-6"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/departure/um-dep-02-blocked-while-managing-or-partnering.md",
+  "area": "user-management",
+  "cited": [
+   "FR-6"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/departure/um-dep-03-apply-on-effective-date.md",
+  "area": "user-management",
+  "cited": [
+   "FR-6"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/departure/um-dep-04-idempotent-retry.md",
+  "area": "user-management",
+  "cited": [
+   "FR-6"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-01-pagination-and-metadata.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-02-filter-country.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-03-compound-filters.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-04-filter-remaining-identity-fields.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-05-dismissed-hidden-by-default.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15",
+   "FR-6"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-06-dismissed-findable-via-authorized-filter.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15",
+   "FR-6"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-07-endpoint-authorization.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-08-fixed-fail-closed-projection.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-09-unsafe-and-unknown-filters-rejected.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-10-empty-result-set.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-11-deterministic-default-sort.md",
+  "area": "user-management",
+  "cited": [
+   "FR-15"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/list/um-list-12-perf-nfr2-stage2-note.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-01-entitled-actor-edits-identity-fields.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-02-workemail-normalized-before-uniqueness-check.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-03-duplicate-workemail-rejected-wholesale.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-04-duplicate-ttid-rejected-wholesale.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-05-org-fields-in-body-rejected.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-06-forbidden-technical-fields-rejected.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-07-empty-or-no-op-patch.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-edit-08-birthday-pair-both-or-neither.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-pf-01-manager-update-identity-fields.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-pf-02-self-upload-photo.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-pf-03-update-work-email-duplicate-denied.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-pf-04-update-tt-id-duplicate-denied.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-01-self-first-upload.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-02-self-replace.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-03-non-self-denied.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-04-unauthenticated.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-05-target-not-active-user.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-06-validation.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-07-storage-failure.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-08-real-storage-assertion.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/profile/um-photo-09-patch-never-touches-photo.md",
+  "area": "user-management",
+  "cited": [
+   "FR-9"
+  ],
+  "resolved": {
+   "FR-9": [
+    "PM-FR-12",
+    "PM-FR-13"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-12",
+   "PM-FR-13"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-01-hr-admin-create-success.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2",
+   "FR-4"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-02-create-unauthenticated.md",
+  "area": "user-management",
+  "cited": [
+   "FR-4"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-03-create-without-permission.md",
+  "area": "user-management",
+  "cited": [
+   "FR-4"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-04-duplicate-work-email-denied.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-05-registration-does-not-log-in.md",
+  "area": "user-management",
+  "cited": [
+   "FR-3"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-06-create-missing-required-field-rejected.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-07-duplicate-tt-id-denied.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-08-concurrent-duplicate-work-email.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-09-create-malformed-work-email-rejected.md",
+  "area": "user-management",
+  "cited": [
+   "FR-2"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-10-server-owned-fields-rejected.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-11-email-normalization.md",
+  "area": "user-management",
+  "cited": [
+   "FR-6"
+  ],
+  "resolved": {
+   "FR-6": [
+    "PM-FR-41"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-41"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-12-rehire-identity-preservation.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-13-dispatch-failure-graceful.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-14-birthday-day-and-month-persist.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/registration/um-reg-15-birthday-incomplete-pair-rejected.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-01-assign-reports-to.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-02-revoke-reports-to.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-03-second-reports-to-denied.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-04-mentorship-pair.md",
+  "area": "user-management",
+  "cited": [
+   "FR-14"
+  ],
+  "resolved": {
+   "FR-14": [
+    "PM-FR-14"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-14"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-05-mentorship-unpair.md",
+  "area": "user-management",
+  "cited": [
+   "FR-14"
+  ],
+  "resolved": {
+   "FR-14": [
+    "PM-FR-14"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-14"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-06-multiple-mentors-allowed.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-07-non-hr-admin-denied.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-08-concurrent-reports-to-assign.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-09-pp-atomic-replace.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-10-pp-self-assignment-rejected.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-11-pp-stale-expected-target-409.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-12-change-department.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-13-change-department-manager.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/relationships/um-rel-14-department-self-assignment-rejected.md",
+  "area": "user-management",
+  "cited": [
+   "FR-10"
+  ],
+  "resolved": {
+   "FR-10": [
+    "PM-FR-7",
+    "PM-FR-40",
+    "PM-FR-42"
+   ]
+  },
+  "pm_fr": [
+   "PM-FR-40",
+   "PM-FR-42",
+   "PM-FR-7"
+  ],
+  "status": "RESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-01-import-success.md",
+  "area": "user-management",
+  "cited": [
+   "FR-1",
+   "FR-4",
+   "FR-5a",
+   "FR-7"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-02-no-post-users-create-path.md",
+  "area": "user-management",
+  "cited": [
+   "FR-4"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-03-bootstrap-hr-admin-and-root-id-reuse.md",
+  "area": "user-management",
+  "cited": [
+   "FR-1"
+  ],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "UNRESOLVED"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-04-department-create-on-import.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-05-employment-status-mapping.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-06-birthday-split.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-07-null-source-fields.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-08-idempotent-re-import.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-09-malformed-rows-skipped.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-10-import-without-capability-forbidden.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-11-import-unauthenticated.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-12-deploy-script-entrypoint.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ },
+ {
+  "path": "docs/test-cases/user-management/seed/um-seed-13-joined-company-event-in-row-transaction.md",
+  "area": "user-management",
+  "cited": [],
+  "resolved": {},
+  "pm_fr": [],
+  "status": "NO_TOKENS"
+ }
+]

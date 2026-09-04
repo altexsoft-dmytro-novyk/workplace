@@ -342,7 +342,7 @@ Separate from HR Admin (configuration-only, §2.2) and from relationship-derived
 - Holders are the **backstop** for shared-link revocation when the relationship holder cannot revoke.
 - Full-profile resolution: Self first, then the read-only overlay (PM/AD-28).
 
-> **Resolved 2026-09-02 (PM/AD-28).** Overlay is not a matrix column. AD-28 full-profile-access scenarios are **not yet authored** — `docs/test-cases/access-control/` marks the matrix folder deferred; do not invent scenarios. Authoring requires an AD-1 Stage-1 dispatch. Historical “unresolved column mapping” notes are stale, not rewritten.
+> **Resolved 2026-09-02 (PM/AD-28).** Overlay is not a matrix column. AD-28 full-profile-access scenarios are **not yet authored** — no scenario folder exists for them (the Phase-1 `docs/test-cases/access-control/` draft suite was deleted 2026-09-04 (171 unapproved, never-executed scenarios)); do not invent scenarios. Authoring requires an AD-1 Stage-1 dispatch. Historical “unresolved column mapping” notes are stale, not rewritten.
 
 ### Relationship and access journal (§3.4)
 

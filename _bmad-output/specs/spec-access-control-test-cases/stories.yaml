@@ -4,7 +4,7 @@
     Extend the backend seed so canonical personas (Alice, Bob, Carol, Paula,
     Pete, Dave, Frank, Hana, Colin, Root, Ida, Eve, Morgan, DueDan, DueBob,
     DueMid, TopLee) and static graph edges match
-    docs/test-cases/access-control/README.md — shared project membership,
+    docs/test-cases/README.md — shared project membership,
     S7/S16 seed rows, and AD-20 due-departure variants included.
   spec_checkpoint: true
   done_checkpoint: false

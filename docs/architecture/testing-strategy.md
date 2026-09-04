@@ -12,59 +12,45 @@ Every feature, every developer, in this order:
    method call, typed input, typed result, and absent result members instead of
    inventing an endpoint.
    Every scenario cites the requirements section it implements (e.g. `§3.2 S6 / Project line`, `§2.3 removing a permission`).
-   The authoring pattern — folder structure, file skeleton (`inputURL` / `inputRequest` / `expectedResult`), granularity and status-code conventions — is defined in [/docs/test-cases/README.md](../test-cases/README.md); [access-control/](../test-cases/access-control/) is the reference implementation.
-   → **Approved by a developer** before anything else is written.
-2. **Stage-2 test** translated from the approved scenario — normally real HTTP
+   The authoring pattern — folder structure, file skeleton (`inputURL` / `inputRequest` / `expectedResult`), granularity and status-code conventions — is defined in [/docs/test-cases/README.md](../test-cases/README.md); [access-control-kernel/](../test-cases/access-control-kernel/) is the reference implementation.
+   → Written and committed before anything else. No approval step.
+2. **Stage-2 test** translated from the scenario — normally real HTTP
    E2E; only an explicitly approved headless application-facade gate may use
    direct integration evidence as defined under AD-3 below. The scenario is the
    script and the test follows it line by line.
-   → **Approved by a developer.** Committed red.
+   → Committed red.
 3. **Production code**, written until that test passes. No production code
-   lands without its preceding approved red Stage-2 test in history.
+   lands without its preceding red Stage-2 test in history.
 
-### No self-certification — a stage is never approved by the agent that wrote it
+### Stage approval was removed on 2026-09-04
 
-This already went wrong once: a single agent dispatch wrote the scenario doc, the E2E tests, and the production code back to back, then wrote in its own report that it had "reviewed the scenario docs against the spec" and treated that self-review as the stage-1 approval. No human saw the tests before code existed. That is a gate violation even though every file technically appeared in the documented order.
+**AD-1 no longer requires a human approval between stages.** The three-stage
+ordering above still holds — scenario first, then a red Stage-2 test, then
+production written until that test passes — but a stage no longer waits on a
+developer signing off the previous one, and a dispatch may span more than one
+stage.
 
-- **"Approved by a developer" means a human sees the actual artifact and says so.** An agent's review of its own prior output is never a substitute, no matter how the report phrases it ("reviewed," "validated," "confirmed against spec," etc.).
-- **No single dispatch may span more than one stage.** Write the scenario doc, then stop. Surface the full scenario text and wait for an explicit human approval. Write the E2E test, then stop. Surface the actual test file content and wait for explicit human approval. Only then write production code.
-- This holds under time or token pressure, and even when the workflow you're following doesn't itself force a pause between steps — AD-1 overrides the default cadence of any generic build workflow, every time, for every feature.
+What this changes, stated plainly so nobody has to infer it:
 
-#### An approval is a persisted record, not a claim in prose
+- **`docs/test-cases/` scenario documents no longer carry an approval status.**
+  "Draft", "pending approval" and "unapproved" are no longer meaningful states
+  for them. A scenario is either present or absent.
+- **Nothing blocks a Stage-2 test or production code.** The previous rule —
+  *"a dispatch may not start until the prior stage's record exists and
+  verifies"* — is withdrawn.
+- **No new ledger entries are written.** The two existing ledgers
+  (`spec-access-control-kernel-mvp/approvals.yaml`,
+  `spec-user-management-access-control-adoption/approvals.yaml`) are **kept as
+  history**. Their 113 entries record decisions that were genuinely made, and
+  all 113 still resolve; they are not deleted and not edited. They simply stop
+  being a precondition for anything.
 
-"A human approved this" written in a report is not an approval. Every AD-1 stage
-approval is appended to a ledger — for the Access Control Kernel MVP,
-`_bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml` — with:
-
-| Field | Meaning |
-| --- | --- |
-| `story_id` | the dispatch entry the approval belongs to |
-| `stage` | `stage-1-scenarios`, `stage-2-tests`, or `stage-3-production` |
-| `repo` | `workspace` or `services/backend` — which repository the revision belongs to |
-| `artifact_path` | the exact artifact the approver read, relative to that repo's root |
-| `commit` | the revision **in that repository** at which the artifact was read |
-| `author` | who produced the artifact |
-| `approver` | who approved it |
-| `decision` | `approved` or `rejected` |
-| `timestamp` | when the decision was made |
-
-Two rules make the record enforceable rather than decorative:
-
-1. **`author` and `approver` must differ.** This is the persisted form of the
-   no-self-certification rule above.
-2. **A dispatch may not start until the prior stage's record exists and
-   verifies** — the `commit` resolves **in the repository `repo` names** and
-   `artifact_path` is present at that revision. An unverifiable record blocks
-   the next stage exactly as a missing one does.
-
-`repo` is load-bearing, not bookkeeping: this workspace spans two git
-repositories — planning artifacts here, tests and production code in the
-`services/backend` submodule — so a bare revision cannot say which one it
-belongs to. Without it the record cannot be resolved, and an approval nobody
-can check is the failure this ledger exists to prevent.
-
-The ledger is append-only. A superseding decision is appended; no entry is
-edited or removed.
+The control this removes was real: it existed because a single agent dispatch
+once wrote the scenario, the tests and the production code back to back, then
+cited its own review as the approval. Removing the gate removes that safeguard.
+What now stands in its place is ordinary review — the pull request, and CI
+actually executing the suites. Neither is automatic, so if the suites are not
+run in CI, nothing checks stage separation at all.
 
 #### Validation-only evidence exception (AD-1)
 

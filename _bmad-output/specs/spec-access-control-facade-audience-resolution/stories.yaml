@@ -10,7 +10,7 @@
   done_checkpoint: false
   invoke_dev_with: >-
     services/backend only. One E2E test per approved scenario file in the four
-    foundation folders under docs/test-cases/access-control/. Cite AC-* id in
+    foundation folders under docs/test-cases/access-control-foundation/. Cite the scenario id in
     test title. Use seed from test-cases spec story 1; no mocked AccessControl.
     Source prose: spec-access-control-test-cases (stage-1 only).
 

@@ -9,7 +9,7 @@ owning slice and an owning epic, every story ID resolves in BOTH directions
 inside its OWN slice file, epics[] is neither missing nor narrower than the
 epics its stories imply, every gate resolves in blockers.yaml, and every
 normative section has at least one requirement. It does NOT check semantic
-adequacy — see README.md.
+adequacy — see README.md.\n\nCheck 8 adds the missing direction: every scenario document must resolve to a\ncanonical requirement. Checks 1-7 are all top-down and cannot see a capability\nthat exists in code and tests but in no PM-FR.
 
 Known limitation: check 7 reads only dotted subsection headings, so the
 top-level `## N.` sections of project-requirements.md — including §7
@@ -65,12 +65,21 @@ for r in reqs:
 orphans = {sid: sorted(in_yaml.get(sid, set()) - own[sid]) for sid in reg}
 orphans = {k: v for k, v in orphans.items() if v}
 check("every yaml story ID has an ID literal in its own slice file", not orphans, str(orphans))
-# the reverse direction is informational: infra/evidence/superseded stories legitimately
-# live in a slice without an FR mapping. Listed, never failed.
+# The reverse direction: a story in a slice file that no requirement maps to.
+# Infra/evidence/superseded stories legitimately live here — but only when SAID SO.
+# An unexplained entry is a real coverage hole (UM-E2, the magic-link login epic,
+# sat in this bucket unnoticed), so it fails rather than prints.
+exempt = set(d.get('unmapped_story_exemptions') or [])
 extra = {sid: sorted(own[sid] - in_yaml.get(sid, set())) for sid in reg}
 extra = {k: v for k, v in extra.items() if v}
-print(f"  INFO  stories in a slice with no FR mapping (expected: infra, evidence, superseded):")
-for k, v in sorted(extra.items()): print(f"          {k:5} {v}")
+declared = {k: [s for s in v if s in exempt] for k, v in extra.items()}
+unexplained = {k: [s for s in v if s not in exempt] for k, v in extra.items()}
+unexplained = {k: v for k, v in unexplained.items() if v}
+print("  INFO  stories in a slice with no FR mapping, declared exempt:")
+for k, v in sorted(declared.items()):
+    if v: print(f"          {k:5} {v}")
+check("every unmapped story is declared in unmapped_story_exemptions",
+      not unexplained, str(unexplained))
 
 print("\n5. EPIC REFERENCES")
 epic_refs = {e for r in reqs for e in (r.get('epics') or [])}
@@ -139,6 +148,44 @@ un = [(s, t) for s, t in heads if not covered(s)]
 allowed = all('GOOD TO HAVE' in t or 'OPTIONAL' in t.upper() for _, t in un)
 check("every normative section has >=1 requirement (or is GOOD TO HAVE)", allowed,
       "; ".join(f"§{s} {t[:40]}" for s, t in un) or f"{len(heads)} sections")
+
+print("\n8. BOTTOM-UP — SCENARIO DOCUMENTS RESOLVE TO A REQUIREMENT")
+# Top-down checks (1-7) prove every PM-FR has an epic and a story. They never ask the
+# reverse: that an acceptance-criteria document resolves back to a canonical requirement.
+# Nothing else in the repo asks it either, which is how 244 of 387 scenario documents
+# came to cite vocabularies (AD-n, CAP-n, bare FR-n) the model cannot resolve.
+alias_map = defaultdict(set)
+for r in reqs:
+    for a in (r.get('aliases') or []): alias_map[a].add(r['id'])
+
+# Documented normalizations: scenario prose and the model disagree on where the slice
+# letter sits. Declared here so the rewrite is auditable rather than implicit.
+def candidates(tok, area):
+    yield tok
+    m = re.fullmatch(r'FR-M(\d+)', tok)
+    if m: yield f"M-FR-{m.group(1)}"                      # FR-M1  -> M-FR-1
+    m = re.fullmatch(r'FR-(\d+[a-z]?)', tok)
+    if m:
+        pfx = {'user-management': 'UM', 'mentorship': 'M'}.get(area)
+        if pfx: yield f"{pfx}-FR-{m.group(1)}"            # FR-16  -> UM-FR-16
+
+TOK = re.compile(r'\b(?:PM-FR-\d+|FR-M?\d+[a-z]?)\b')
+docs = sorted(glob.glob('../../docs/test-cases/**/*.md', recursive=True))
+docs = [p for p in docs if os.path.basename(p).upper() != 'README.MD']
+unresolved = defaultdict(list)
+for p in docs:
+    area = p.split('docs/test-cases/')[1].split('/')[0]
+    head = open(p, errors='replace').read().split('## Scenario')[0]
+    hit = False
+    for tok in TOK.findall(head):
+        if tok.startswith('PM-FR-') or any(c in alias_map for c in candidates(tok, area)):
+            hit = True; break
+    if not hit: unresolved[area].append(os.path.basename(p))
+tot = sum(len(v) for v in unresolved.values())
+check("every scenario document resolves to >=1 PM-FR",
+      not unresolved,
+      f"{tot} of {len(docs)} unresolved: " +
+      ", ".join(f"{k}={len(v)}" for k, v in sorted(unresolved.items())))
 
 print("\n" + "=" * 60)
 print(f"{'ALL CHECKS PASS' if not FAIL else 'FAILED: ' + ', '.join(FAIL)}")

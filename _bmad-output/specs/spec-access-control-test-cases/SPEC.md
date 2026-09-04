@@ -1,12 +1,17 @@
 ---
 id: SPEC-access-control-test-cases
 companions:
-  - ../../../docs/test-cases/access-control/README.md
   - ../spec-access-control-facade-audience-resolution/facade-contract.md
   - ../../../docs/architecture/access-control.md
   - ../../implementation-artifacts/access-control/deferred-work.md
 sources: []
 ---
+
+> **RETIRED 2026-09-04.** The suite this SPEC governed — the 171 Phase-1 draft
+> scenarios under `docs/test-cases/access-control/` — was deleted. None had an
+> AD-1 approval and none was referenced by any test. The generators
+> (`_generate_matrix.py`, `_generate_hand.py`) were deleted with it. This file is
+> kept as the record of what was authored and why, not as an active contract.
 
 > **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. **171 Phase 1 scenario files are drafted** under `docs/test-cases/access-control/` — pending per-file AD-1 approval before stage-2 E2E.
 
