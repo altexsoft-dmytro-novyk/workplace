@@ -113,7 +113,9 @@ Requirement resolution, in order:
 
 Unmatched tests are summarised in `unmatched_summary` and kept **out** of
 `results`, because trace records every unmatched entry as a blocker and the
-frontend's 133 cases carry no oracle IDs at all.
+frontend suite carried no oracle IDs at all before the `fe-*` scenarios landed.
+Tests that can never resolve are declared in `untraceable-tests.json` and
+bucketed as `untraceable`, so `unmatched` stays a to-do list.
 
 `source_sha` is recorded as the PR branch head rather than GitHub's ephemeral
 merge commit, so the artifact matches a workspace checked out at that branch.
@@ -161,13 +163,51 @@ title edits; producer on the real reports went from 8 mapped / 13 unmatched to
 **13 mapped / 2 unmatched / 6 untraceable** — every backend unit case now
 accounted for.
 
-### Remaining: 133, all frontend
+### Frontend oracle — authored 2026-09-04
 
-| Count | Where | Why it stays |
-| ----- | ----- | ------------ |
-| 133 | `services/frontend/e2e/**` (7 files) | No oracle exists in either direction. Blocked on one decision — per-flow behavioural documents (~15-25) or per-case mirrors of the backend shape (~133). Put to the operator; not yet answered. |
-| 6 | `write-adoption` (3), `audience-resolver` (3) | `umac-07` is explicitly "Variant A" and defers the FR-grant path, so labelling those three would claim coverage the document disclaims. The audience-resolver three assert batching/dedup — candidates for the registry once confirmed. |
-| 5 | singles across well-labelled files | Shared malformed-body tests spanning a whole endpoint, a `DEC-UM-001` decision-record trace, an AD-20 health-counter check. Each needs a judgement call, none is mechanical. |
+The suite had no oracle in either direction. Granularity was the open question:
+per-case mirrors of the backend shape (~124 documents) or per-behaviour. Chosen:
+**per behaviour**, because the backend oracle is per-contract only because each
+HTTP contract is genuinely distinct, whereas six error copies for one failed
+assignment are one behaviour, not six requirements.
+
+`docs/test-cases/frontend/` — 7 flow folders, **57 documents covering 124
+cases** (≈2.2 each, slightly coarser than the backend's ≈1.8). Ids `fe-shell-*`,
+`fe-auth-*`, `fe-dep-*`, `fe-emp-*`, `fe-imp-*`, `fe-org-*`, `fe-prof-*`. Shape
+is behavioural — Given app state, When the user acts, Then this is visible or
+this request is (or is not) sent — not `inputURL`/HTTP status, which the backend
+documents already own. Every one of the 124 `test(...)` titles now names its
+scenario id, so traceability resolves from titles alone and does not depend on
+the coverage matrix staying fresh.
+
+Same AD-1 inversion as Story 6.1, recorded in the folder README: these were read
+off a shipped suite. The prose is a faithful reading of the assertions, but it
+is a reading — where a document states intent the tests only imply, that intent
+is the reviewer's to confirm.
+
+**Count correction.** The 2026-09-04 coverage matrix records this suite as 133
+cases. It is 124 — `npx playwright test --list` and the AST of the seven files
+agree. The matrix overstates by 9.
+
+### Final state
+
+| | Start | End |
+| --- | --- | --- |
+| Unmatched | 160 | **0** |
+| Untraceable (registry-declared, with reasons) | — | 11 |
+| Oracle ids | 227 | 294 |
+| Fully matched spec files | 33 | 43 of 53 |
+
+The 11 in the registry: Nest scaffold (3), resolver-internals assertions (3),
+a reader-gate mock-argument assertion (1), a packaging check (1), a fixture
+teardown check (1), and two malformed-input cases whose oracle is a **standing
+route-family rule** in the auth README rather than a numbered scenario.
+
+Two more backend cases resolved on inspection rather than by authoring: the
+DEC-UM-001 narrowing `it.todo` belongs to `um-ct-09` (permission held, narrowed
+S9 write audience absent), and the AD-20 health-surface check belongs to
+`um-dep-03` §4, which already declares `GET /health/departures` LIVE for Story
+5.2.
 
 ## Step 4 — Validation
 

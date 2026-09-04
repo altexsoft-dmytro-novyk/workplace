@@ -54,13 +54,14 @@ schema trace expects. It maps each executed test to a requirement two ways:
 
 Tests that match neither are counted in `unmatched_summary` and deliberately
 kept **out** of `results`: trace records every unmatched entry as a blocker, and
-the 133-case frontend suite carries no oracle IDs at all today.
+the frontend suite carried no oracle IDs at all until the `fe-*` scenarios landed.
 
 `unmatched_summary` is the triage input, so it is complete rather than sampled:
 `by_file` ranks the files with the most unmatched cases, and `cases` lists every
 one. Expect three kinds in there — tests that should carry an oracle ID and
 don't, tests asserting internals rather than a requirement, and framework
-scaffold tests (`should be defined`). Only the first kind is worth acting on.
+scaffold tests (`should be defined`). Only the first kind is worth acting on;
+the other two belong in `untraceable-tests.json`.
 
 ### Using it
 

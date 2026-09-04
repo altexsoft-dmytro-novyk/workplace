@@ -38,6 +38,20 @@
         "passes viewer + subject through to the reader gate"
       ],
       "reason": "Interaction assertion on the reader-gate mock's arguments — wiring, not an outcome; the outcome cases in this file carry um-rel-18/20/21/23"
+    },
+    {
+      "file": "services/backend/test/user-management/epic-2/consume-magic-link.e2e-spec.ts",
+      "titles": [
+        "um-auth-consume-malformed · empty body, empty token, non-string token → 400 [RED: POST /auth/magic-link/consume does not exist yet]"
+      ],
+      "reason": "Malformed-input handling is a standing route-family rule in docs/test-cases/user-management/auth/README.md (§ token malformed → 400), deliberately not a numbered scenario — so there is no id to resolve to"
+    },
+    {
+      "file": "services/backend/test/user-management/epic-2/request-magic-link.e2e-spec.ts",
+      "titles": [
+        "um-auth · empty body / non-email `email` → 400, nothing dispatched, no token [RED: POST /auth/magic-link → 404]"
+      ],
+      "reason": "Same standing route-family rule (auth README §7, malformed/missing email → 400 from the global ValidationPipe) — a rule, not a scenario"
     }
   ]
 }
