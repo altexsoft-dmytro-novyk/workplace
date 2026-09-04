@@ -1,0 +1,59 @@
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created, ready for development
+#   - in-progress: Developer actively working on implementation
+#   - review: Implementation complete, ready for review
+#   - done: Story completed
+
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when its first story starts (via build's sprint sync)
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; the status view surfaces open ones
+generated: 09-02-2026 14:20
+last_updated: 09-02-2026 14:20
+project: people management
+project_key: NOKEY
+tracking_system: file-system
+story_location: 
+  /Users/home/bootcamp/workplace/_bmad-output/implementation-artifacts/platform-capabilities
+development_status:
+  epic-1: backlog
+  1-1-tier-safe-directory-rows: backlog
+  1-2-directory-page-chrome-and-presentation-floor: backlog
+  1-3-sort-filter-and-search-the-directory: backlog
+  1-4-entitled-column-picker: backlog
+  1-5-colleague-view-toggle-and-whitelist-banner: backlog
+  1-6-saved-and-shared-directory-views: backlog
+  1-7-visibility-safe-xlsx-export: backlog
+  1-8-custom-field-columns-and-filters: backlog
+  1-9-directory-performance-evidence-at-500-rows: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-unit-manager-dashboard-scope-headcount-and-people-table: backlog
+  2-2-unsourced-widget-slots-render-explicit-unavailable-states: backlog
+  2-3-people-partner-dashboard-pp-assigned-scope-with-no-resourcin: backlog
+  2-4-people-partner-department-grouping: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  epic-3-retrospective: optional

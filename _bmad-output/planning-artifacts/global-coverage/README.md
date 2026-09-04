@@ -52,6 +52,8 @@ Sprint status is an evidence input, not the coverage status. A `done` planning o
 - Every story mapping has a namespaced story ID and a valid coverage status.
 - Workboard IDs are retained where they exist and never reassigned.
 - An empty `stories` list is valid only when the requirement is `deferred` or `uncovered`.
+- Every requirement carries an explicit `epics` list. It may be empty only when the requirement is `deferred` or `uncovered`, and it is never narrower than the epics its `stories` imply. Epic-level coverage is recorded here and is not inferred by a reader from story-ID prefixes.
+- An epic assignment is not story coverage. `PM-FR-16`, `PM-FR-17` (`PMC-E3`, ruling PMC SD-7) and `PM-FR-39` (`PLAT-E7`, which draws the boundary without crossing it) are epic-assigned and deliberately story-uncovered.
 - A gate or conflict never counts as implementation coverage.
 - Red E2E and scenario prose count as specification evidence, not implementation evidence.
 - Requirement-level `in-progress` may represent an implemented foundation plus incomplete consumer or scope.

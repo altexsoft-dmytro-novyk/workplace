@@ -5,6 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "sync:clickup": "node scripts/sync-clickup.cjs",
+    "create:clickup": "node scripts/create-clickup-task.cjs",
+    "test:clickup": "node --test test/clickup-lib.test.cjs test/clickup-sync.test.cjs test/clickup-create.test.cjs test/clickup-safety.test.cjs test/clickup-descriptions.test.cjs",
+    "debug:clickup-lookup": "node scripts/debug-clickup-lookup.cjs",
+    "preflight:clickup": "node scripts/preflight-clickup-live.cjs",
+    "debug:clickup-list": "node scripts/debug-clickup-list.cjs",
     "services:init": "git submodule update --init --recursive",
     "services:status": "git submodule status",
     "services:sync": "git submodule update --remote",
@@ -24,5 +30,8 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"  
+  "license": "ISC",
+  "dependencies": {
+    "js-yaml": "^5.4.1"
+  }
 }

@@ -1,0 +1,448 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist','Geist Variable',system-ui,-apple-system,sans-serif;color:oklch(0.145 0.004 286);background:oklch(0.985 0 0);-webkit-font-smoothing:antialiased;font-size:13px;line-height:1.45;}
+    a{color:oklch(0.488 0.243 264.376);text-decoration:none;}
+    a:hover{color:oklch(0.42 0.20 264);text-decoration:underline;}
+    button{font-family:inherit;color:inherit;cursor:pointer;}
+    input,select{font-family:inherit;font-size:13px;}
+    .app{width:1440px;min-height:1040px;background:oklch(1 0 0);display:flex;flex-direction:column;}
+    .hdr{height:48px;flex:0 0 48px;border-bottom:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);display:flex;align-items:center;gap:16px;padding:0 14px;}
+    .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;width:214px;}
+    .brand .mk{width:22px;height:22px;border-radius:6px;background:oklch(0.488 0.243 264.376);display:flex;align-items:center;justify-content:center;color:#fff;}
+    .search{flex:1;max-width:400px;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 10px;color:oklch(0.556 0.012 286);background:oklch(1 0 0);}
+    .search input{border:0;outline:0;flex:1;background:transparent;color:oklch(0.145 0.004 286);}
+    .hdr-r{margin-left:auto;display:flex;align-items:center;gap:12px;color:oklch(0.556 0.012 286);}
+    .avatar{width:28px;height:28px;border-radius:999px;background:oklch(0.92 0.035 264);color:oklch(0.42 0.16 264);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:10.5px;}
+    .body{flex:1;display:flex;min-height:0;}
+    .sb{width:214px;flex:0 0 214px;border-right:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);padding:10px 8px;display:flex;flex-direction:column;gap:1px;}
+    .sb-h{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.62 0.012 286);padding:14px 10px 5px;}
+    .nav{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:oklch(0.32 0.008 286);font-weight:500;}
+    .nav:hover{background:oklch(0.955 0.003 286);}
+    .nav.on{background:oklch(0.205 0.008 286);color:oklch(0.985 0 0);}
+    .nav svg{width:16px;height:16px;flex:0 0 16px;stroke-width:2;}
+    .main{flex:1;min-width:0;padding:18px 22px 30px;overflow:auto;}
+    .top{display:flex;align-items:flex-start;gap:12px;margin-bottom:3px;}
+    .top h1{font-size:19px;font-weight:600;margin:0;letter-spacing:-0.01em;}
+    .sub{color:oklch(0.556 0.012 286);font-size:12.5px;margin-bottom:14px;max-width:760px;}
+    .demo{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:11px;color:oklch(0.55 0.012 286);flex:0 0 auto;}
+    .demo b{font-weight:600;letter-spacing:0.03em;text-transform:uppercase;font-size:9.5px;}
+    .seg{display:inline-flex;border:1px solid oklch(0.898 0.003 286);border-radius:8px;overflow:hidden;}
+    .seg button{border:0;background:#fff;padding:6px 10px;font-weight:500;font-size:11.5px;color:oklch(0.42 0.008 286);border-right:1px solid oklch(0.92 0.003 286);}
+    .seg button:last-child{border-right:0;}
+    .seg button.on{background:oklch(0.488 0.243 264.376);color:#fff;}
+    .seg button.warn.on{background:oklch(0.55 0.15 60);}
+    .stale{display:flex;gap:10px;align-items:flex-start;background:oklch(0.97 0.03 65);border:1px solid oklch(0.85 0.08 65);color:oklch(0.42 0.10 55);border-radius:11px;padding:10px 13px;margin-bottom:14px;font-size:12px;}
+    .stale svg{width:15px;height:15px;flex:0 0 15px;margin-top:1px;}
+    .bar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:12px;}
+    .mnav{display:inline-flex;align-items:center;gap:2px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;overflow:hidden;}
+    .mnav button{border:0;background:#fff;width:30px;height:32px;display:inline-flex;align-items:center;justify-content:center;color:oklch(0.40 0.008 286);}
+    .mnav button:hover{background:oklch(0.965 0.003 286);}
+    .mnav button:first-child{border-right:1px solid oklch(0.92 0.003 286);}
+    .mnav button:last-child{border-left:1px solid oklch(0.92 0.003 286);}
+    .mnav svg{width:15px;height:15px;stroke-width:2.4;}
+    .mlabel{font-size:15px;font-weight:600;letter-spacing:-0.01em;min-width:168px;}
+    .btn{height:32px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;border-radius:8px;border:1px solid oklch(0.898 0.003 286);background:oklch(1 0 0);font-weight:500;color:oklch(0.28 0.008 286);}
+    .btn:hover{background:oklch(0.965 0.003 286);}
+    .btn svg{width:14px;height:14px;stroke-width:2;}
+    .fld{height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;padding:0 8px;background:oklch(1 0 0);color:oklch(0.30 0.008 286);outline:none;}
+    .fld:focus{border-color:oklch(0.488 0.243 264.376);box-shadow:0 0 0 3px oklch(0.488 0.243 264.376 / 0.16);}
+    .qbox{display:flex;align-items:center;gap:7px;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;padding:0 9px;background:oklch(1 0 0);width:186px;}
+    .qbox input{border:0;outline:0;flex:1;background:transparent;}
+    .qbox svg{width:15px;height:15px;color:oklch(0.60 0.012 286);}
+    .spacer{flex:1;}
+    .legend{display:flex;align-items:center;gap:16px;margin-bottom:12px;font-size:11.5px;color:oklch(0.50 0.010 286);}
+    .lg{display:inline-flex;align-items:center;gap:6px;}
+    .lg i{width:11px;height:11px;border-radius:3px;flex:0 0 11px;}
+    .cnt{margin-left:auto;font-size:11.5px;color:oklch(0.556 0.012 286);}
+    .cal{border:1px solid oklch(0.898 0.003 286);border-radius:12px;overflow:hidden;background:#fff;}
+    .dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));background:oklch(0.984 0.002 286);border-bottom:1px solid oklch(0.898 0.003 286);}
+    .dow span{padding:8px 10px;font-size:10px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;color:oklch(0.54 0.012 286);}
+    .wk{position:relative;border-bottom:1px solid oklch(0.91 0.003 286);}
+    .wk:last-child{border-bottom:0;}
+    .wk-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));height:100%;}
+    .day{border-right:1px solid oklch(0.93 0.003 286);padding:4px 7px;}
+    .day:last-child{border-right:0;}
+    .day.we{background:oklch(0.981 0.002 286);}
+    .day.out{background:oklch(0.988 0.001 286);}
+    .dn{font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;color:oklch(0.44 0.008 286);display:inline-flex;align-items:center;justify-content:center;height:19px;min-width:19px;padding:0 3px;}
+    .day.out .dn{color:oklch(0.72 0.006 286);}
+    .day.today .dn{background:oklch(0.488 0.243 264.376);color:#fff;border-radius:999px;font-weight:600;}
+    .wk-bars{position:absolute;left:0;right:0;top:0;bottom:0;pointer-events:none;}
+    .evt{pointer-events:auto;cursor:default;font-size:11px;font-weight:500;line-height:20px;padding:0 8px;display:flex;align-items:center;gap:6px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .evt .en{overflow:hidden;text-overflow:ellipsis;}
+    .evt.cx{text-decoration:line-through;}
+    .more{position:absolute;right:8px;font-size:10.5px;font-weight:600;color:oklch(0.52 0.012 286);}
+    .foot{padding:10px 14px;font-size:11.5px;color:oklch(0.556 0.012 286);display:flex;align-items:center;gap:8px;border-top:1px solid oklch(0.93 0.003 286);}
+    .foot .spacer{flex:1;}
+
+    /* ── stretch layer ─────────────────────────────── */
+    :root{
+      --mono:'Geist Mono',ui-monospace,'SFMono-Regular',monospace;
+      --line:oklch(0.912 0.004 286);
+      --ink-2:oklch(0.44 0.008 286);--ink-3:oklch(0.57 0.010 286);
+      --blue:oklch(0.52 0.20 264);--amber:oklch(0.58 0.12 66);
+      --green:oklch(0.55 0.13 155);--violet:oklch(0.54 0.17 300);
+      --accent:var(--amber);
+    }
+    @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+    .btn,.nav,.tab,.seg button,.mnav button,.fld,.evt,tbody tr{transition:all .14s ease;}
+    .pghd{position:relative;padding:0 0 14px 15px;margin-bottom:16px;border-bottom:1px solid var(--line);}
+    .pghd::before{content:"";position:absolute;left:0;top:1px;height:44px;width:3px;border-radius:2px;background:var(--accent);}
+    .eyebrow{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap;}
+    .eyebrow .sep{opacity:.4;}
+    .pgrow{display:flex;align-items:flex-start;gap:14px;}
+    .pgrow h1{font-size:22px;font-weight:600;letter-spacing:-0.02em;margin:0;line-height:1.15;}
+    .pgacts{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .pglead{color:var(--ink-2);font-size:12.5px;margin-top:7px;max-width:720px;}
+    .prov{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px 2px 6px;border-radius:5px;border-left:2px solid currentColor;white-space:nowrap;}
+    .prov svg{width:10px;height:10px;stroke-width:2.2;}
+    .prov.synced{background:oklch(0.972 0.028 66);color:oklch(0.47 0.10 60);}
+    .prov.access{background:oklch(0.968 0.03 264);color:oklch(0.44 0.15 264);}
+    .eini{width:15px;height:15px;border-radius:999px;background:oklch(1 0 0 / 0.6);display:inline-flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:7.5px;font-weight:600;flex:0 0 15px;letter-spacing:0;}
+    .evt:hover{transform:translateY(-1px);box-shadow:0 3px 8px oklch(0.16 0.03 286 / 0.18);z-index:5;}
+    .day.today{background:oklch(0.985 0.02 264);}
+    .mlabel,.dn,.cnt,.foot span:first-child{font-family:var(--mono);}
+    .mlabel{letter-spacing:0;font-size:14px;}
+  </style>
+</helmet>
+
+<div class="app">
+  <div class="hdr">
+    <div class="brand">
+      <span class="mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20v-6a8 8 0 0 1 16 0v6"/><circle cx="12" cy="7" r="3"/></svg></span>
+      PeoplePlatform
+    </div>
+    <div class="search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input placeholder="Search people, projects, requests" />
+    </div>
+    <div class="hdr-r">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+      <span class="avatar">DN</span>
+    </div>
+  </div>
+
+  <div class="body">
+    <nav class="sb">
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg> Home</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> My workspace</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg> All Employees</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Dashboards</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Resourcing</div>
+      <div class="nav on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg> Absence calendar</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Risks</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg> Mentorship</div>
+      <div class="sb-h">Administration</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Roles &amp; permissions</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg> Custom fields</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg> Departments</div>
+    </nav>
+
+    <div class="main">
+      <div class="pghd">
+        <div class="eyebrow">
+          Workspace <span class="sep">/</span> Absence calendar
+          <span class="prov synced"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>Synced · timetracker</span>
+        </div>
+        <div class="pgrow">
+          <h1>Absence calendar</h1>
+          <div class="pgacts">
+            <span class="demo">
+              <b>Demo · timetracker</b>
+              <div class="seg">
+                <button class="{{liveCls}}" onClick="{{ onLive }}">Live</button>
+                <button class="warn {{staleCls}}" onClick="{{ onStale }}">Sync down</button>
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="pglead">Everyone's leave across the organisation — vacation, sick leave, parental leave and moved working days. Read-only; approvals and balances stay in the timetracker.</div>
+      </div>
+
+      <sc-if value="{{outage}}" hint-placeholder-val="{{ false }}">
+        <div class="stale">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.9 4.9 2.8 2.8"/><path d="m16.3 16.3 2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>
+          <div>Showing the last successful sync (14:02 today) — leave added or cancelled since then is not reflected. After 4 hours of failed sync, project-derived access is withdrawn platform-wide.</div>
+        </div>
+      </sc-if>
+
+      <div class="bar">
+        <div class="mnav">
+          <button onClick="{{ onPrev }}" aria-label="Previous month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m15 18-6-6 6-6"/></svg></button>
+          <button onClick="{{ onNext }}" aria-label="Next month"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 18 6-6-6-6"/></svg></button>
+        </div>
+        <div class="mlabel">{{monthLabel}}</div>
+        <button class="btn" onClick="{{ onToday }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l2.5 2.5"/></svg>Today</button>
+        <div class="spacer"></div>
+        <div class="qbox">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input placeholder="Filter by name" value="{{q}}" onInput="{{ onSearch }}" />
+        </div>
+        <select class="fld" value="{{dept}}" onChange="{{ onDept }}">
+          <option value="">All departments</option>
+          <option value="Platform">Platform</option>
+          <option value="Delivery">Delivery</option>
+          <option value="Data">Data</option>
+          <option value="People">People</option>
+          <option value="IT">IT</option>
+        </select>
+        <button class="btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/></svg>Export .ics</button>
+      </div>
+
+      <div class="legend">
+        <span class="lg"><i style="background:oklch(0.62 0.16 250)"></i>Vacation</span>
+        <span class="lg"><i style="background:oklch(0.62 0.17 25)"></i>Sick leave</span>
+        <span class="lg"><i style="background:oklch(0.62 0.14 310)"></i>Parental leave</span>
+        <span class="lg"><i style="background:oklch(0.55 0.13 160)"></i>Moved working day</span>
+        <span class="lg"><i style="background:transparent;border:1px dashed oklch(0.70 0.02 286)"></i>Cancelled</span>
+        <span class="cnt">{{summary}}</span>
+      </div>
+
+      <div class="cal">
+        <div class="dow">
+          <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+        </div>
+        <sc-for list="{{weeks}}" as="w" hint-placeholder-count="5">
+          <div class="wk" style="{{w.rowStyle}}">
+            <div class="wk-days">
+              <sc-for list="{{w.days}}" as="d" hint-placeholder-count="7">
+                <div class="day {{d.cls}}"><span class="dn">{{d.num}}</span></div>
+              </sc-for>
+            </div>
+            <div class="wk-bars">
+              <sc-for list="{{w.events}}" as="e" hint-placeholder-count="3">
+                <div class="evt {{e.cx}}" style="{{e.style}}" title="{{e.title}}"><sc-if value="{{e.hasIni}}" hint-placeholder-val="{{ true }}"><span class="eini">{{e.ini}}</span></sc-if><span class="en">{{e.label}}</span></div>
+              </sc-for>
+              <sc-if value="{{w.hasMore}}" hint-placeholder-val="{{ false }}">
+                <span class="more" style="{{w.moreStyle}}">{{w.moreLabel}}</span>
+              </sc-if>
+            </div>
+          </div>
+        </sc-for>
+        <div class="foot">
+          <span>{{recordLine}}</span>
+          <span class="spacer"></span>
+          <a href="#">Open in timetracker</a>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="oklch(0.488 0.243 264.376)" stroke-width="2"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { monthOffset: 0, dept: '', q: '', outage: false };
+    // Baseline month shown at offset 0 is September 2026; "today" is 1 Sep 2026.
+    this.BASE_Y = 2026;
+    this.BASE_M = 8; // 0-indexed
+    this.TODAY = Date.UTC(2026, 8, 1);
+    this.MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    this.TYPE = {
+      vacation: { label: 'Vacation',          bg: 'oklch(0.93 0.045 250)', fg: 'oklch(0.39 0.12 250)', ac: 'oklch(0.62 0.16 250)' },
+      sick:     { label: 'Sick leave',        bg: 'oklch(0.945 0.045 25)', fg: 'oklch(0.44 0.16 25)',  ac: 'oklch(0.62 0.17 25)'  },
+      parental: { label: 'Parental leave',    bg: 'oklch(0.94 0.04 310)',  fg: 'oklch(0.42 0.13 310)', ac: 'oklch(0.62 0.14 310)' },
+      move:     { label: 'Moved working day', bg: 'oklch(0.93 0.05 160)',  fg: 'oklch(0.37 0.10 160)', ac: 'oklch(0.55 0.13 160)' }
+    };
+    this.ABSENCES = [
+      { name: 'Priya Anand',         dept: 'Delivery', type: 'vacation', start: '2026-08-31', end: '2026-09-11', status: 'approved' },
+      { name: 'Elena Costa',         dept: 'Platform', type: 'vacation', start: '2026-09-01', end: '2026-09-15', status: 'approved' },
+      { name: 'Jonas Weber',         dept: 'Delivery', type: 'parental', start: '2026-09-01', end: '2026-10-31', status: 'approved' },
+      { name: 'Bohdan Serik',        dept: 'Delivery', type: 'sick',     start: '2026-09-02', end: '2026-09-03', status: 'approved' },
+      { name: 'Marco Feld',          dept: 'Platform', type: 'vacation', start: '2026-09-03', end: '2026-09-08', status: 'cancelled' },
+      { name: 'Farid Aliyev',        dept: 'IT',       type: 'move',     start: '2026-09-07', end: '2026-09-07', status: 'approved', note: 'Worked Sat 5 Sep instead' },
+      { name: 'Lena Fischer',        dept: 'Data',     type: 'vacation', start: '2026-09-07', end: '2026-09-11', status: 'approved' },
+      { name: 'Carla Mendes',        dept: 'Data',     type: 'vacation', start: '2026-09-14', end: '2026-09-25', status: 'approved' },
+      { name: 'Lucas Pereira',       dept: 'Data',     type: 'sick',     start: '2026-09-16', end: '2026-09-16', status: 'approved' },
+      { name: 'Hassan Karim',        dept: 'Data',     type: 'vacation', start: '2026-09-21', end: '2026-09-22', status: 'approved' },
+      { name: 'Grace Owens',         dept: 'People',   type: 'vacation', start: '2026-09-23', end: '2026-09-24', status: 'approved' },
+      { name: 'Oskar Lund',          dept: 'People',   type: 'vacation', start: '2026-09-28', end: '2026-09-30', status: 'approved' },
+      { name: 'Amelia Rho',          dept: 'Platform', type: 'vacation', start: '2026-08-12', end: '2026-08-19', status: 'approved' },
+      { name: 'Hassan Karim',        dept: 'Data',     type: 'vacation', start: '2026-08-05', end: '2026-08-09', status: 'approved' },
+      { name: 'Dmytro Novak',        dept: 'Delivery', type: 'vacation', start: '2026-10-06', end: '2026-10-12', status: 'approved' },
+      { name: 'Priya Anand',         dept: 'Delivery', type: 'vacation', start: '2026-10-26', end: '2026-10-30', status: 'approved' }
+    ];
+  }
+
+  parse(s) { const p = s.split('-'); return Date.UTC(+p[0], +p[1] - 1, +p[2]); }
+  addDays(ms, n) { return ms + n * 86400000; }
+  dow(ms) { return (new Date(ms).getUTCDay() + 6) % 7; } // Mon = 0
+  fmt(ms) { const d = new Date(ms); return d.getUTCDate() + ' ' + this.MONTHS[d.getUTCMonth()].slice(0, 3); }
+
+  step(n) { this.setState({ monthOffset: this.state.monthOffset + n }); }
+
+  renderVals() {
+    const s = this.state;
+    const DAY = 86400000;
+    const MAX_LANES = 5;
+    const view = new Date(Date.UTC(this.BASE_Y, this.BASE_M + s.monthOffset, 1));
+    const vy = view.getUTCFullYear(), vm = view.getUTCMonth();
+
+    const first = Date.UTC(vy, vm, 1);
+    const startOffset = this.dow(first);
+    const daysInMonth = new Date(Date.UTC(vy, vm + 1, 0)).getUTCDate();
+    const gridStart = this.addDays(first, -startOffset);
+    const totalCells = Math.ceil((startOffset + daysInMonth) / 7) * 7;
+
+    const q = s.q.trim().toLowerCase();
+    const absences = this.ABSENCES.filter(a => {
+      if (s.dept && a.dept !== s.dept) return false;
+      if (q && a.name.toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    }).map(a => ({ ...a, s: this.parse(a.start), e: this.parse(a.end) }));
+
+    // count distinct people with any (non-cancelled) leave touching this month
+    const monthEnd = this.addDays(first, (daysInMonth - 1) * DAY);
+    const touching = absences.filter(a => a.e >= first && a.s <= monthEnd);
+    const distinct = {};
+    touching.forEach(a => { if (a.status !== 'cancelled') distinct[a.name] = true; });
+    const nPeople = Object.keys(distinct).length;
+
+    const weeks = [];
+    for (let c = 0; c < totalCells; c += 7) {
+      const weekStart = this.addDays(gridStart, c);
+      const weekEnd = this.addDays(weekStart, 6);
+
+      const days = [];
+      for (let i = 0; i < 7; i++) {
+        const ms = this.addDays(weekStart, i);
+        const d = new Date(ms);
+        const out = d.getUTCMonth() !== vm;
+        const we = i >= 5;
+        const today = ms === this.TODAY;
+        let cls = '';
+        if (out) cls += 'out ';
+        if (we) cls += 'we ';
+        if (today) cls += 'today ';
+        days.push({ num: d.getUTCDate(), cls: cls.trim() });
+      }
+
+      // segments overlapping this week
+      let segs = absences.filter(a => a.s <= weekEnd && a.e >= weekStart).map(a => {
+        const sMs = Math.max(a.s, weekStart), eMs = Math.min(a.e, weekEnd);
+        const startCol = Math.round((sMs - weekStart) / DAY);
+        const endCol = Math.round((eMs - weekStart) / DAY);
+        return {
+          a, startCol, endCol,
+          isStart: a.s >= weekStart,
+          isEnd: a.e <= weekEnd
+        };
+      });
+      segs.sort((x, y) => x.startCol - y.startCol || (y.endCol - y.startCol) - (x.endCol - x.startCol) || x.a.name.localeCompare(y.a.name));
+
+      const laneEnd = [];
+      let overflow = 0;
+      const overflowCols = {};
+      const placed = [];
+      segs.forEach(seg => {
+        let lane = -1;
+        for (let i = 0; i < laneEnd.length; i++) { if (laneEnd[i] < seg.startCol) { lane = i; break; } }
+        if (lane < 0 && laneEnd.length < MAX_LANES) { lane = laneEnd.length; laneEnd.push(0); }
+        if (lane < 0) {
+          overflow++;
+          for (let k = seg.startCol; k <= seg.endCol; k++) overflowCols[k] = (overflowCols[k] || 0) + 1;
+          return;
+        }
+        laneEnd[lane] = seg.endCol + 1;
+        seg.lane = lane;
+        placed.push(seg);
+      });
+
+      const laneCount = laneEnd.length;
+      const rowH = Math.max(96, 26 + laneCount * 23 + 8);
+
+      const events = placed.map(seg => {
+        const t = this.TYPE[seg.a.type];
+        const cancelled = seg.a.status === 'cancelled';
+        const span = seg.endCol - seg.startCol + 1;
+        const leftPct = (seg.startCol / 7) * 100;
+        const widthPct = (span / 7) * 100;
+        const rl = seg.isStart ? '5px' : '0';
+        const rr = seg.isEnd ? '5px' : '0';
+        let style =
+          'position:absolute;' +
+          'left:calc(' + leftPct.toFixed(4) + '% + 4px);' +
+          'width:calc(' + widthPct.toFixed(4) + '% - 8px);' +
+          'top:' + (26 + seg.lane * 23) + 'px;height:20px;' +
+          'border-radius:' + rl + ' ' + rr + ' ' + rr + ' ' + rl + ';';
+        if (cancelled) {
+          style += 'background:transparent;border:1px dashed oklch(0.70 0.02 286);color:oklch(0.52 0.012 286);';
+        } else {
+          style += 'background:' + t.bg + ';color:' + t.fg + ';border-left:3px solid ' + t.ac + ';';
+          if (!seg.isStart) style += 'border-left-width:3px;border-left-style:dotted;';
+        }
+        const ini = seg.a.name.split(/\s+/).map(w => w.charAt(0)).slice(0, 2).join('').toUpperCase();
+        const label =
+          (cancelled ? 'Cancelled: ' : '') +
+          seg.a.name +
+          (seg.isStart ? ' · ' + (seg.a.type === 'move' ? 'Moved day' : t.label) : '');
+        const title =
+          seg.a.name + ' — ' + t.label + ' · ' + this.fmt(seg.a.s) + ' – ' + this.fmt(seg.a.e) +
+          (cancelled ? ' (cancelled)' : '') + (seg.a.note ? ' · ' + seg.a.note : '');
+        return { style, cx: cancelled ? 'cx' : '', label, title, ini, hasIni: !cancelled && span >= 2 };
+      });
+
+      const cols = Object.keys(overflowCols);
+      const hasMore = overflow > 0;
+      let moreStyle = 'top:' + (26 + MAX_LANES * 23) + 'px;';
+      if (cols.length) {
+        const minC = Math.min.apply(null, cols.map(Number));
+        moreStyle = 'top:' + (26 + MAX_LANES * 23) + 'px;left:calc(' + ((minC / 7) * 100).toFixed(2) + '% + 6px);right:auto;';
+      }
+
+      weeks.push({
+        days,
+        events,
+        rowStyle: 'height:' + rowH + 'px;',
+        hasMore,
+        moreStyle,
+        moreLabel: '+' + overflow + ' more'
+      });
+    }
+
+    const monthLabel = this.MONTHS[vm] + ' ' + vy;
+    const summary = nPeople === 0
+      ? 'No leave recorded this month'
+      : nPeople + (nPeople === 1 ? ' person' : ' people') + ' with leave in ' + this.MONTHS[vm];
+    const recordLine = touching.length + ' leave record(s) touch this month · synced ' + (s.outage ? '14:02 (stale)' : 'just now');
+
+    return {
+      outage: s.outage,
+      liveCls: s.outage ? '' : 'on',
+      staleCls: s.outage ? 'on' : '',
+      onLive: () => this.setState({ outage: false }),
+      onStale: () => this.setState({ outage: true }),
+
+      monthLabel,
+      onPrev: () => this.step(-1),
+      onNext: () => this.step(1),
+      onToday: () => this.setState({ monthOffset: 0 }),
+
+      q: s.q,
+      onSearch: (e) => this.setState({ q: e.target.value }),
+      dept: s.dept,
+      onDept: (e) => this.setState({ dept: e.target.value }),
+
+      weeks,
+      summary,
+      recordLine
+    };
+  }
+}
+</script>
+</body>
+</html>

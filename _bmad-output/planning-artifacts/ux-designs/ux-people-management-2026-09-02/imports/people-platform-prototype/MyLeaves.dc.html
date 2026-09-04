@@ -1,0 +1,337 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap');
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist','Geist Variable',system-ui,-apple-system,sans-serif;color:oklch(0.145 0.004 286);background:oklch(0.985 0 0);-webkit-font-smoothing:antialiased;font-size:13px;line-height:1.45;}
+    a{color:oklch(0.488 0.243 264.376);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    button{font-family:inherit;color:inherit;cursor:pointer;}
+    input,select,textarea{font-family:inherit;font-size:13px;}
+    .app{width:1440px;min-height:1140px;background:oklch(1 0 0);display:flex;flex-direction:column;}
+    .hdr{height:48px;flex:0 0 48px;border-bottom:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);display:flex;align-items:center;gap:16px;padding:0 14px;}
+    .brand{display:flex;align-items:center;gap:9px;font-weight:600;font-size:13.5px;width:214px;}
+    .brand .mk{width:22px;height:22px;border-radius:6px;background:oklch(0.488 0.243 264.376);display:flex;align-items:center;justify-content:center;color:#fff;}
+    .search{flex:1;max-width:400px;height:32px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;display:flex;align-items:center;gap:8px;padding:0 10px;color:oklch(0.556 0.012 286);background:#fff;}
+    .search input{border:0;outline:0;flex:1;background:transparent;}
+    .hdr-r{margin-left:auto;display:flex;align-items:center;gap:12px;color:oklch(0.556 0.012 286);}
+    .avatar{width:28px;height:28px;border-radius:999px;background:oklch(0.92 0.035 264);color:oklch(0.42 0.16 264);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:10.5px;}
+    .body{flex:1;display:flex;min-height:0;}
+    .sb{width:214px;flex:0 0 214px;border-right:1px solid oklch(0.898 0.003 286);background:oklch(0.985 0 0);padding:10px 8px;display:flex;flex-direction:column;gap:1px;}
+    .sb-h{font-size:10px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:oklch(0.62 0.012 286);padding:14px 10px 5px;}
+    .nav{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:8px;color:oklch(0.32 0.008 286);font-weight:500;}
+    .nav:hover{background:oklch(0.955 0.003 286);}
+    .nav.on{background:oklch(0.205 0.008 286);color:oklch(0.985 0 0);}
+    .nav svg{width:16px;height:16px;flex:0 0 16px;stroke-width:2;}
+    .main{flex:1;min-width:0;padding:18px 22px 30px;overflow:auto;}
+    .top{display:flex;align-items:flex-start;gap:12px;margin-bottom:3px;}
+    .top h1{font-size:19px;font-weight:600;margin:0;letter-spacing:-0.01em;}
+    .sub{color:oklch(0.556 0.012 286);font-size:12.5px;margin-bottom:14px;max-width:720px;}
+    .demo{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:11px;color:oklch(0.55 0.012 286);}
+    .demo b{font-weight:600;letter-spacing:0.03em;text-transform:uppercase;font-size:9.5px;}
+    .seg{display:inline-flex;border:1px solid oklch(0.898 0.003 286);border-radius:8px;overflow:hidden;}
+    .seg button{border:0;background:#fff;padding:6px 10px;font-weight:500;font-size:11.5px;color:oklch(0.42 0.008 286);border-right:1px solid oklch(0.92 0.003 286);}
+    .seg button:last-child{border-right:0;}
+    .seg button.on{background:oklch(0.488 0.243 264.376);color:#fff;}
+    .seg button.warn.on{background:oklch(0.55 0.15 60);}
+    .stale{display:flex;gap:10px;align-items:flex-start;background:oklch(0.97 0.03 65);border:1px solid oklch(0.85 0.08 65);color:oklch(0.42 0.10 55);border-radius:11px;padding:11px 13px;margin-bottom:16px;}
+    .stale svg{width:16px;height:16px;flex:0 0 16px;margin-top:1px;}
+    .stale b{font-size:12.5px;}
+    .stale p{margin:2px 0 0;font-size:11.5px;line-height:1.5;}
+    .cols{display:flex;gap:16px;align-items:flex-start;}
+    .colL{flex:1;min-width:0;}
+    .colR{width:360px;flex:0 0 360px;}
+    .card{border:1px solid oklch(0.898 0.003 286);border-radius:12px;background:#fff;overflow:hidden;}
+    .card > .ch{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid oklch(0.93 0.003 286);}
+    .ch h3{margin:0;font-size:12.5px;font-weight:600;}
+    .ch .src{margin-left:auto;font-size:11px;color:oklch(0.58 0.012 286);display:flex;align-items:center;gap:5px;}
+    .ch .src svg{width:12px;height:12px;}
+    .tabs{display:flex;gap:2px;padding:8px 10px 0;border-bottom:1px solid oklch(0.93 0.003 286);}
+    .tab{padding:7px 11px;font-weight:500;font-size:12px;color:oklch(0.50 0.012 286);border:0;background:none;border-bottom:2px solid transparent;margin-bottom:-1px;}
+    .tab.on{color:oklch(0.488 0.243 264.376);border-bottom-color:oklch(0.488 0.243 264.376);}
+    table{width:100%;border-collapse:collapse;}
+    thead th{text-align:left;font-size:10.5px;font-weight:600;letter-spacing:0.03em;text-transform:uppercase;color:oklch(0.52 0.012 286);padding:9px 14px;border-bottom:1px solid oklch(0.93 0.003 286);background:oklch(0.984 0.002 286);}
+    tbody td{padding:10px 14px;border-bottom:1px solid oklch(0.94 0.003 286);}
+    tbody tr:last-child td{border-bottom:0;}
+    .ty{display:inline-flex;align-items:center;gap:7px;font-weight:500;}
+    .swatch{width:8px;height:8px;border-radius:2px;flex:0 0 8px;}
+    .pill{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:10.5px;font-weight:600;}
+    .p-appr{background:oklch(0.95 0.05 155);color:oklch(0.42 0.11 155);}
+    .p-pend{background:oklch(0.96 0.05 90);color:oklch(0.46 0.11 78);}
+    .p-taken{background:oklch(0.955 0.003 286);color:oklch(0.48 0.012 286);}
+    .p-new{background:oklch(0.95 0.05 264);color:oklch(0.42 0.16 264);}
+    .num{font-variant-numeric:tabular-nums;}
+    .foot{padding:10px 14px;font-size:11.5px;color:oklch(0.556 0.012 286);display:flex;align-items:center;gap:8px;border-top:1px solid oklch(0.94 0.003 286);}
+    .btn{height:32px;display:inline-flex;align-items:center;gap:6px;padding:0 11px;border-radius:8px;border:1px solid oklch(0.898 0.003 286);background:#fff;font-weight:500;color:oklch(0.28 0.008 286);}
+    .btn:hover{background:oklch(0.965 0.003 286);}
+    .btn svg{width:13px;height:13px;stroke-width:2;}
+    .btn.pri{background:oklch(0.488 0.243 264.376);border-color:transparent;color:#fff;}
+    .btn.pri:hover{background:oklch(0.44 0.24 264);}
+    .btn.pri:disabled{opacity:.4;cursor:default;}
+    .propose{border:1px dashed oklch(0.80 0.03 60);background:oklch(0.985 0.012 65);border-radius:12px;padding:14px;}
+    .propose .flag{display:inline-flex;align-items:center;gap:6px;font-size:9.5px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:oklch(0.48 0.12 55);background:oklch(0.94 0.06 70);padding:3px 8px;border-radius:999px;}
+    .propose h3{margin:9px 0 3px;font-size:13.5px;font-weight:600;}
+    .propose > p{margin:0 0 12px;font-size:11.5px;color:oklch(0.45 0.04 60);line-height:1.5;}
+    .lbl{display:block;font-size:11px;font-weight:600;color:oklch(0.40 0.008 286);margin:11px 0 5px;}
+    .in{width:100%;height:34px;border:1px solid oklch(0.898 0.003 286);border-radius:8px;padding:0 10px;outline:none;background:#fff;}
+    .in:focus,textarea.in:focus{border-color:oklch(0.488 0.243 264.376);box-shadow:0 0 0 3px oklch(0.488 0.243 264.376 / 0.16);}
+    textarea.in{height:auto;min-height:56px;padding:8px 10px;resize:vertical;}
+    .two{display:flex;gap:10px;}
+    .two > div{flex:1;}
+    .balnote{margin-top:12px;font-size:11px;color:oklch(0.58 0.012 286);display:flex;gap:7px;align-items:flex-start;}
+    .balnote svg{width:13px;height:13px;flex:0 0 13px;margin-top:1px;}
+
+    /* ── stretch layer ─────────────────────────────── */
+    :root{
+      --mono:'Geist Mono',ui-monospace,'SFMono-Regular',monospace;
+      --line:oklch(0.912 0.004 286);
+      --ink-2:oklch(0.44 0.008 286);--ink-3:oklch(0.57 0.010 286);
+      --blue:oklch(0.52 0.20 264);--amber:oklch(0.58 0.12 66);
+      --green:oklch(0.55 0.13 155);--violet:oklch(0.54 0.17 300);
+      --accent:var(--amber);
+    }
+    @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;}}
+    .btn,.tab,.seg button,.in{transition:all .14s ease;}
+    .pghd{position:relative;padding:0 0 14px 15px;margin-bottom:16px;border-bottom:1px solid var(--line);}
+    .pghd::before{content:"";position:absolute;left:0;top:1px;height:44px;width:3px;border-radius:2px;background:var(--accent);}
+    .eyebrow{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:0.15em;text-transform:uppercase;color:var(--ink-3);display:flex;align-items:center;gap:9px;margin-bottom:8px;flex-wrap:wrap;}
+    .eyebrow .sep{opacity:.4;}
+    .pgrow{display:flex;align-items:flex-start;gap:14px;}
+    .pgrow h1{font-size:22px;font-weight:600;letter-spacing:-0.02em;margin:0;line-height:1.15;}
+    .pgacts{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .pglead{color:var(--ink-2);font-size:12.5px;margin-top:7px;max-width:720px;}
+    .prov{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);font-size:9px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;padding:2px 7px 2px 6px;border-radius:5px;border-left:2px solid currentColor;white-space:nowrap;}
+    .prov svg{width:10px;height:10px;stroke-width:2.2;}
+    .prov.synced{background:oklch(0.972 0.028 66);color:oklch(0.47 0.10 60);}
+    .num,.ch .src{font-family:var(--mono);}
+    .ch .src{letter-spacing:0.02em;font-size:10px;}
+    .propose .flag{font-family:var(--mono);}
+  </style>
+</helmet>
+
+<div class="app">
+  <div class="hdr">
+    <div class="brand"><span class="mk"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 20v-6a8 8 0 0 1 16 0v6"/><circle cx="12" cy="7" r="3"/></svg></span> PeoplePlatform</div>
+    <div class="search"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input placeholder="Search" /></div>
+    <div class="hdr-r"><span class="avatar">AR</span></div>
+  </div>
+  <div class="body">
+    <nav class="sb">
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg> Home</div>
+      <div class="nav on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg> My workspace</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13A4 4 0 0 1 16 11"/></svg> All Employees</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Dashboards</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Resourcing</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg> Risks</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M6 21V9a9 9 0 0 0 9 9"/></svg> Mentorship</div>
+      <div class="sb-h">Administration</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/></svg> Roles &amp; permissions</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 21v-7"/><path d="M4 10V3"/><path d="M12 21v-9"/><path d="M12 8V3"/><path d="M20 21v-5"/><path d="M20 12V3"/><path d="M1 14h6"/><path d="M9 8h6"/><path d="M17 16h6"/></svg> Custom fields</div>
+      <div class="nav"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/></svg> Departments</div>
+    </nav>
+
+    <div class="main">
+      <div class="pghd">
+        <div class="eyebrow">
+          Workspace <span class="sep">/</span> My time off
+          <span class="prov synced"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg>Synced · timetracker</span>
+        </div>
+        <div class="pgrow">
+          <h1>My time off</h1>
+          <div class="pgacts">
+            <span class="demo">
+              <b>Demo · timetracker</b>
+              <div class="seg">
+                <button class="{{liveCls}}" onClick="{{ onLive }}">Live</button>
+                <button class="warn {{staleCls}}" onClick="{{ onStale }}">Sync down</button>
+              </div>
+            </span>
+          </div>
+        </div>
+        <div class="pglead">Leave type, dates and status come from the timetracker. Balances, approvals and the calendar live there — this page reads the record and links out.</div>
+      </div>
+
+      <sc-if value="{{outage}}" hint-placeholder-val="{{ false }}">
+        <div class="stale">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4"/><path d="M12 18v4"/><path d="m4.9 4.9 2.8 2.8"/><path d="m16.3 16.3 2.8 2.8"/><path d="M2 12h4"/><path d="M18 12h4"/></svg>
+          <div>
+            <b>Timetracker data is not fresh</b>
+            <p>Showing the last successful sync (14:02 today). New requests are paused until the connection is restored. After 4 hours of failed sync, project-derived access is withdrawn platform-wide and the profile falls back to platform-owned relations.</p>
+          </div>
+        </div>
+      </sc-if>
+
+      <div class="cols">
+        <div class="colL">
+          <div class="card">
+            <div class="ch">
+              <h3>Leaves and absences</h3>
+              <span class="src"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v6l4 2"/><circle cx="12" cy="12" r="10"/></svg>Synced {{syncLabel}}</span>
+            </div>
+            <div class="tabs">
+              <button class="tab {{upcomingCls}}" onClick="{{ onUpcoming }}">Upcoming</button>
+              <button class="tab {{pastCls}}" onClick="{{ onPast }}">Past</button>
+            </div>
+            <table>
+              <thead>
+                <tr><th style="width:34%">Type</th><th style="width:30%">Dates</th><th style="width:16%">Working days</th><th style="width:20%">Status</th></tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+                  <tr>
+                    <td><span class="ty"><span class="swatch" style="{{r.swatch}}"></span>{{r.typeLabel}}</span></td>
+                    <td class="num">{{r.dates}}</td>
+                    <td class="num">{{r.days}}</td>
+                    <td><span class="pill {{r.statusCls}}">{{r.status}}</span></td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <div class="foot">
+              <span>{{rowCount}} record(s)</span>
+              <span style="flex:1"></span>
+              <a href="#">Manage in timetracker</a>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="oklch(0.488 0.243 264.376)" stroke-width="2"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="colR">
+          <div class="propose">
+            <span class="flag"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 9v4"/><path d="M12 17h.01"/><path d="M10.3 3.6 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.6a2 2 0 0 0-3.4 0Z"/></svg> Proposed · beyond current spec</span>
+            <h3>Request time off</h3>
+            <p>The v1.5 requirements keep leave management in the timetracker (pull-only sync, no new endpoints). This request flow is drawn for the scope discussion — it would need a documented write path and a decision recorded in the repo.</p>
+
+            <span class="lbl">Request type</span>
+            <select class="in" value="{{reqType}}" onChange="{{ onType }}">
+              <option value="vacation">Vacation</option>
+              <option value="sick">Sick leave</option>
+              <option value="move">Move a working day</option>
+            </select>
+
+            <div class="two">
+              <div>
+                <span class="lbl">{{label1}}</span>
+                <input class="in" type="date" value="{{d1}}" onInput="{{ onD1 }}" />
+              </div>
+              <div>
+                <span class="lbl">{{label2}}</span>
+                <input class="in" type="date" value="{{d2}}" onInput="{{ onD2 }}" />
+              </div>
+            </div>
+
+            <span class="lbl">Note (optional)</span>
+            <textarea class="in" placeholder="Context for your manager" value="{{note}}" onInput="{{ onNote }}"></textarea>
+
+            <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+              <button class="btn pri" disabled="{{submitDisabled}}" onClick="{{ onSubmit }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4Z"/></svg>
+                Submit request
+              </button>
+            </div>
+
+            <div class="balnote">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+              Leave balances are not shown in the platform — check your entitlement in the timetracker.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script data-dc-script data-props='{}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tab: 'upcoming',
+      outage: false,
+      reqType: 'vacation',
+      d1: '', d2: '', note: '',
+      rows: [
+        { id: 's1', type: 'vacation', from: 'Dec 23', to: 'Dec 31', days: '5', status: 'Pending', bucket: 'upcoming' },
+        { id: 's2', type: 'vacation', from: 'Aug 12', to: 'Aug 19', days: '6', status: 'Approved', bucket: 'upcoming' },
+        { id: 's3', type: 'sick', from: 'Jul 03', to: 'Jul 04', days: '2', status: 'Taken', bucket: 'past' },
+        { id: 's4', type: 'parental', from: '2024 Feb', to: '2024 May', days: '—', status: 'Taken', bucket: 'past' }
+      ]
+    };
+    this.typeMeta = {
+      vacation: { label: 'Vacation', swatch: 'background:oklch(0.62 0.16 250);' },
+      sick: { label: 'Sick leave', swatch: 'background:oklch(0.62 0.17 25);' },
+      parental: { label: 'Parental leave', swatch: 'background:oklch(0.62 0.14 310);' },
+      move: { label: 'Moved working day', swatch: 'background:oklch(0.60 0.13 160);' },
+      extended: { label: 'Extended leave', swatch: 'background:oklch(0.55 0.05 250);' }
+    };
+    this.statusCls = { 'Approved': 'p-appr', 'Pending': 'p-pend', 'Taken': 'p-taken' };
+  }
+
+  setTab(t) { this.setState({ tab: t }); }
+  setOutage(v) { this.setState({ outage: v }); }
+  submit() {
+    if (this.state.outage) return;
+    const t = this.state.reqType;
+    const meta = this.typeMeta[t];
+    const row = {
+      id: 'r' + Date.now(), type: t,
+      from: this.state.d1 || 'TBD', to: this.state.d2 || 'TBD',
+      days: '—', status: 'Sent to timetracker', bucket: 'upcoming', isNew: true
+    };
+    this.setState({ rows: [row].concat(this.state.rows), tab: 'upcoming', d1: '', d2: '', note: '' });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const isMove = s.reqType === 'move';
+    const rows = s.rows.filter(r => r.bucket === s.tab).map(r => {
+      const meta = this.typeMeta[r.type] || this.typeMeta.vacation;
+      return {
+        typeLabel: r.isNew ? meta.label + ' (requested)' : meta.label,
+        swatch: meta.swatch,
+        dates: r.from + ' – ' + r.to,
+        days: r.days,
+        status: r.status,
+        statusCls: r.isNew ? 'p-new' : (this.statusCls[r.status] || 'p-taken')
+      };
+    });
+
+    return {
+      outage: s.outage,
+      liveCls: s.outage ? '' : 'on',
+      staleCls: s.outage ? 'on' : '',
+      onLive: () => this.setOutage(false),
+      onStale: () => this.setOutage(true),
+      syncLabel: s.outage ? '14:02 (stale)' : 'just now',
+
+      upcomingCls: s.tab === 'upcoming' ? 'on' : '',
+      pastCls: s.tab === 'past' ? 'on' : '',
+      onUpcoming: () => this.setTab('upcoming'),
+      onPast: () => this.setTab('past'),
+      rows,
+      rowCount: rows.length,
+
+      reqType: s.reqType,
+      onType: (e) => this.setState({ reqType: e.target.value }),
+      label1: isMove ? 'Worked day' : 'From',
+      label2: isMove ? 'Day off instead' : 'To',
+      d1: s.d1, d2: s.d2, note: s.note,
+      onD1: (e) => this.setState({ d1: e.target.value }),
+      onD2: (e) => this.setState({ d2: e.target.value }),
+      onNote: (e) => this.setState({ note: e.target.value }),
+      submitDisabled: s.outage,
+      onSubmit: () => this.submit()
+    };
+  }
+}
+</script>
+</body>
+</html>

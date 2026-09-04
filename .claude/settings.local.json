@@ -23,12 +23,7 @@
       "Bash(git log:*)",
       "Bash(git show:*)",
       "Bash(git status:*)",
-      "Bash(git ls-files:*)",
-      "Bash(find src/pages/EmployeeOrganisationPage -type f)",
-      "Bash(ls src/api/hooks/)",
-      "Bash(sed -n '1,30p' src/api/hooks/useAccessJournal.ts)",
-      "Bash(cat src/api/organisation.ts)",
-      "Bash(grep -rn \"deferred\\\\|relationshipId\\\\|expectedCurrent\\\\|journalDerived\\\\|current manager\\\\|currentManager\" src/pages/EmployeeOrganisationPage/)"
+      "Bash(git ls-files:*)"
     ]
   }
 }

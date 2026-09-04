@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Same Table Wearing a Different Hat — 2026-09-02</title>
+<style>
+  :root{
+    --bg:#0e0e12; --bg2:#14141b; --line:#26262f;
+    --ink:#e8e8ef; --ink2:#a2a2b4; --ink3:#6e6e82;
+    --mary:#4ea8de; --john:#f0a44a; --sally:#c77dff; --winston:#5fd39c; --amelia:#ff6b8a;
+    --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.6 var(--sans);
+    -webkit-font-smoothing:antialiased;padding:0 0 80px}
+  .wrap{max-width:820px;margin:0 auto;padding:0 24px}
+
+  /* ---- header ---- */
+  header{padding:64px 0 40px;border-bottom:1px solid var(--line);margin-bottom:44px;position:relative}
+  .eyebrow{font:500 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);
+    display:flex;align-items:center;gap:10px;margin-bottom:20px}
+  .eyebrow::after{content:"";flex:1;height:1px;background:var(--line)}
+  h1{font-size:clamp(30px,5.4vw,46px);line-height:1.06;letter-spacing:-.028em;font-weight:600;margin:0 0 16px}
+  h1 em{font-style:normal;background:linear-gradient(100deg,var(--sally),var(--mary));
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--ink2);font-size:15.5px;max-width:600px;margin:0}
+  .stamp{font:500 10px/1 var(--mono);letter-spacing:.1em;color:var(--ink3);margin-top:26px;text-transform:uppercase}
+
+  /* ---- cast ---- */
+  .cast{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:10px;margin:0 0 52px}
+  .who{border:1px solid var(--line);border-radius:11px;padding:14px 13px;background:var(--bg2);
+    border-top:2px solid var(--c);transition:transform .16s ease,border-color .16s ease}
+  .who:hover{transform:translateY(-3px)}
+  .who .ic{font-size:20px;line-height:1;margin-bottom:9px;display:block}
+  .who .nm{font-weight:600;font-size:14px;color:var(--c);letter-spacing:-.01em}
+  .who .rl{font:500 9px/1.4 var(--mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);margin-top:5px}
+  .who .bt{font-size:11.5px;color:var(--ink2);margin-top:9px;line-height:1.45}
+
+  /* ---- turns ---- */
+  h2{font:500 10px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);
+    margin:52px 0 22px;display:flex;align-items:center;gap:10px}
+  h2::after{content:"";flex:1;height:1px;background:var(--line)}
+  .turn{display:grid;grid-template-columns:26px 1fr;gap:13px;margin:0 0 17px;
+    animation:rise .5s both cubic-bezier(.2,.7,.3,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+  .turn .av{font-size:16px;line-height:1.5;text-align:center}
+  .turn .bd{border-left:2px solid var(--c);padding:1px 0 1px 15px}
+  .turn .sp{font-weight:600;font-size:12.5px;color:var(--c);letter-spacing:.01em;
+    display:block;margin-bottom:3px}
+  .turn p{margin:0;color:var(--ink)}
+  .turn p + p{margin-top:7px}
+  .stage{color:var(--ink3);font-style:italic;font-size:13.5px}
+  .beat{font:500 9.5px/1 var(--mono);letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);
+    text-align:center;margin:30px 0;position:relative}
+  .beat span{background:var(--bg);padding:0 13px;position:relative;z-index:1}
+  .beat::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--line)}
+
+  /* ---- climax ---- */
+  .climax{border:1px solid var(--sally);border-radius:13px;padding:26px 24px;margin:32px 0;
+    background:linear-gradient(160deg,rgba(199,125,255,.09),transparent 70%)}
+  .climax .q{font-size:20.5px;line-height:1.36;font-weight:500;letter-spacing:-.015em;margin:0 0 12px}
+  .climax .attr{font:500 10px/1 var(--mono);letter-spacing:.11em;text-transform:uppercase;color:var(--sally)}
+
+  /* ---- verdicts ---- */
+  .v{border:1px solid var(--line);border-left:3px solid var(--c);border-radius:0 11px 11px 0;
+    padding:18px 20px;margin:0 0 13px;background:var(--bg2)}
+  .v .tag{font:500 9.5px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c);
+    display:block;margin-bottom:9px}
+  .v .hd{font-weight:600;font-size:15px;letter-spacing:-.012em;margin-bottom:7px}
+  .v p{margin:0;color:var(--ink2);font-size:14px}
+
+  /* ---- ledger ---- */
+  .ledger{border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:8px 0 0}
+  .ledger .row{display:grid;grid-template-columns:1fr auto;gap:14px;padding:13px 18px;
+    border-bottom:1px solid var(--line);align-items:center;font-size:14px}
+  .ledger .row:last-child{border-bottom:0}
+  .ledger .row:nth-child(odd){background:var(--bg2)}
+  .ledger .k{color:var(--ink2)}
+  .ledger .val{font:500 10px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  .win{color:var(--winston)} .lose{color:var(--amelia)} .hold{color:var(--john)}
+
+  footer{margin-top:56px;padding-top:26px;border-top:1px solid var(--line);
+    color:var(--ink3);font-size:12.5px;display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  footer .mono{font-family:var(--mono);letter-spacing:.06em}
+  .rb{color:var(--ink2);font-size:14px;font-style:italic;text-align:center;margin:44px 0 0}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Party Mode · Round Table</div>
+  <h1>The same table<br>wearing <em>a different hat</em></h1>
+  <p class="sub">Five voices, three epics, one defect nobody had written down — and the August argument that refused to stay dead.</p>
+  <div class="stamp">2026-09-02 · platform-capabilities · session mode</div>
+
+  <svg width="100%" height="34" viewBox="0 0 820 34" fill="none" style="margin-top:28px;opacity:.85" aria-hidden="true">
+    <path d="M0 25 L120 25 L138 9 L182 9 L200 25 L330 25 L348 17 L392 17 L410 25 L820 25"
+          stroke="url(#g)" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="200" cy="25" r="3.5" fill="#c77dff"/>
+    <circle cx="410" cy="25" r="3" fill="#4ea8de"/>
+    <defs><linearGradient id="g" x1="0" y1="0" x2="820" y2="0">
+      <stop stop-color="#26262f"/><stop offset=".42" stop-color="#c77dff"/>
+      <stop offset=".62" stop-color="#4ea8de"/><stop offset="1" stop-color="#26262f"/>
+    </linearGradient></defs>
+  </svg>
+</header>
+
+<div class="cast">
+  <div class="who" style="--c:var(--mary)"><span class="ic">📊</span>
+    <div class="nm">Mary</div><div class="rl">Business Analyst</div>
+    <div class="bt">Opened the drawer. Enjoyed it far too much.</div></div>
+  <div class="who" style="--c:var(--john)"><span class="ic">📋</span>
+    <div class="nm">John</div><div class="rl">Product Manager</div>
+    <div class="bt">Short questions. Sharper follow-ups. One ritual.</div></div>
+  <div class="who" style="--c:var(--sally)"><span class="ic">🎨</span>
+    <div class="nm">Sally</div><div class="rl">UX Designer</div>
+    <div class="bt">Put a picture on the table and ended the deadlock.</div></div>
+  <div class="who" style="--c:var(--winston)"><span class="ic">🏗️</span>
+    <div class="nm">Winston</div><div class="rl">System Architect</div>
+    <div class="bt">Lost the vote. Improved the outcome anyway.</div></div>
+  <div class="who" style="--c:var(--amelia)"><span class="ic">💻</span>
+    <div class="nm">Amelia</div><div class="rl">Senior Engineer</div>
+    <div class="bt">Still holding the August receipt on GET /users.</div></div>
+</div>
+
+<h2>The Exchange</h2>
+
+<div class="turn" style="--c:var(--mary);animation-delay:.02s"><div class="av">📊</div><div class="bd">
+  <span class="sp">Mary</span>
+  <p>Oh, this is <em>delicious</em>. Look what walked back in. August twenty-second, we put three things in a drawer and called them out of scope — custom fields, saved views, export. And here they are. <span style="font-family:var(--mono);font-size:12.5px">PM-FR-8</span>, <span style="font-family:var(--mono);font-size:12.5px">PM-FR-10</span>, <span style="font-family:var(--mono);font-size:12.5px">PM-FR-11</span>. The drawer opened.</p>
+</div></div>
+
+<div class="turn" style="--c:var(--john);animation-delay:.08s"><div class="av">📋</div><div class="bd">
+  <span class="sp">John</span>
+  <p>Then let's not re-litigate the drawer. Three epics. Question — who is the directory <em>for</em>?</p>
+</div></div>
+
+<div class="turn" style="--c:var(--mary);animation-delay:.14s"><div class="av">📊</div><div class="bd">
+  <span class="sp">Mary</span>
+  <p>All authenticated employees. Down to Colleague tier. §4.3, first line.</p>
+</div></div>
+
+<div class="turn" style="--c:var(--john);animation-delay:.2s"><div class="av">📋</div><div class="bd">
+  <span class="sp">John</span>
+  <p>Different population, different job. That's a split. Next.</p>
+</div></div>
+
+<div class="turn" style="--c:var(--winston);animation-delay:.26s"><div class="av">🏗️</div><div class="bd">
+  <span class="sp">Winston</span>
+  <p class="stage">(not looking up)</p>
+  <p>No. Not "next." We had this exact conversation in August and you lost it. You wanted to shard an epic on jobs-to-be-done, I showed you the files all four pieces touched, and the ruling went my way. Now there are three epics and you've moved straight past the part where I ask what they share.</p>
+</div></div>
+
+<div class="turn" style="--c:var(--winston);animation-delay:.32s"><div class="av">🏗️</div><div class="bd">
+  <span class="sp">Winston</span>
+  <p>Epic 2 builds the read models. Epic 3 <em>extends the same read models</em>. And Epic 3 can't start — <span style="font-family:var(--mono);font-size:12.5px">TT-IDENTITY-01</span> is an open P0. That's not a boundary. That's a merge conflict with a roadmap slot.</p>
+</div></div>
+
+<div class="turn" style="--c:var(--amelia);animation-delay:.38s"><div class="av">💻</div><div class="bd">
+  <span class="sp">Amelia</span>
+  <p>Confirmed on the endpoint, separately. <span style="font-family:var(--mono);font-size:12.5px">GET /users</span>. Whole-row serialization, all six handlers. Interim adapter returns <span style="font-family:var(--mono);font-size:12.5px">Boolean(userId)</span>. I flagged that gap in August. It's still open. Now three epics read through it.</p>
+</div></div>
+
+<div class="beat"><span>the room stalls</span></div>
+
+<div class="turn" style="--c:var(--sally);animation-delay:.44s"><div class="av">🎨</div><div class="bd">
+  <span class="sp">Sally</span>
+  <p>Can I put a picture on the table? Because I think you're all arguing about the wrong seam.</p>
+  <p>Bohdan opens All Employees Monday morning. Saved view, "My unit." Risk = high, sorted by trend. He's looking at a table of his people with risk, trend, project, leave status. <span class="stage">(beat)</span> Now open the spec for the UM dashboard people-table.</p>
+</div></div>
+
+<div class="climax">
+  <p class="q">"It's the same table wearing a different hat. The UM dashboard's people-table is a <em>saved view of the directory</em>, scoped to the reporting line. Bohdan doesn't experience two surfaces. He experiences his unit, twice, in two rooms."</p>
+  <div class="attr">🎨 Sally · the turn that moved the artifact</div>
+</div>
+
+<div class="turn" style="--c:var(--winston);animation-delay:.5s"><div class="av">🏗️</div><div class="bd">
+  <span class="sp">Winston</span>
+  <p class="stage">(long pause)</p>
+  <p>Then I withdraw half my objection and replace it with a worse one. The overlap isn't Epic 2 to Epic 3. It's Epic 1 to Epic 2. And that one's <em>good</em> news.</p>
+</div></div>
+
+<div class="turn" style="--c:var(--amelia);animation-delay:.56s"><div class="av">💻</div><div class="bd">
+  <span class="sp">Amelia</span>
+  <p>Then here's the defect. Coverage map assigns NFR-3 to Epic 1 only. "2s at 500+ rows including permission resolution." If the dashboard people-table is the same read model, the budget applies to Epic 2 as well. Mapped to one epic. Consumed by two.</p>
+</div></div>
+
+<div class="turn" style="--c:var(--mary);animation-delay:.62s"><div class="av">📊</div><div class="bd">
+  <span class="sp">Mary</span>
+  <p class="stage">(delighted)</p>
+  <p>And <em>that's</em> the clue. Not the epic count — the coverage map lying by omission.</p>
+</div></div>
+
+<div class="beat"><span>the ritual</span></div>
+
+<div class="turn" style="--c:var(--john);animation-delay:.68s"><div class="av">📋</div><div class="bd">
+  <span class="sp">John</span><p>Fine. Is this round earning its—</p></div></div>
+<div class="turn" style="--c:var(--sally);animation-delay:.72s"><div class="av">🎨</div><div class="bd">
+  <span class="sp">Sally</span><p class="stage">(without turning)</p><p>He's going to say it.</p></div></div>
+<div class="turn" style="--c:var(--john);animation-delay:.76s"><div class="av">📋</div><div class="bd">
+  <span class="sp">John</span><p>—its keep.</p></div></div>
+<div class="turn" style="--c:var(--sally);animation-delay:.8s"><div class="av">🎨</div><div class="bd">
+  <span class="sp">Sally</span><p>Every time. Nine months, every time.</p></div></div>
+<div class="turn" style="--c:var(--john);animation-delay:.84s"><div class="av">📋</div><div class="bd">
+  <span class="sp">John</span><p>It's a good question.</p></div></div>
+<div class="turn" style="--c:var(--sally);animation-delay:.88s"><div class="av">🎨</div><div class="bd">
+  <span class="sp">Sally</span><p>It's a <em>ritual</em>, John.</p></div></div>
+
+<div class="turn" style="--c:var(--winston);animation-delay:.94s"><div class="av">🏗️</div><div class="bd">
+  <span class="sp">Winston</span>
+  <p>I still haven't been answered on Epic 3. An epic that cannot start is not a plan, it's a placeholder with ceremony. You split it to make the P0 visible. I'd argue a blocked epic makes the P0 <em>decorative</em> — it gets a lane, a number, a slot, and everyone stops feeling the blockage because it looks scheduled.</p>
+</div></div>
+
+<h2>What The Room Changed</h2>
+
+<div class="v" style="--c:var(--sally)">
+  <span class="tag">defect · found and fixed</span>
+  <div class="hd">NFR-3 now binds Epic 1 <em>and</em> Epic 2</div>
+  <p>The 2-second / 500-row budget was mapped to the directory alone. A new <em>Shared read model</em> section records that the dashboard people-table is the same projection, that the 500-row evidence is produced once against the shared model, and that divergence between the two row projections is a defect rather than a design choice.</p>
+</div>
+
+<div class="v" style="--c:var(--winston)">
+  <span class="tag">challenge · overruled, then adopted</span>
+  <div class="hd">Epic 3 keeps its number — and gains a hard block</div>
+  <p>No story may be registered in <span style="font-family:var(--mono);font-size:12.5px">sprint-status.yaml</span>, assigned, or estimated until <span style="font-family:var(--mono);font-size:12.5px">TT-IDENTITY-01</span> closes and a project-membership writer exists. Winston lost the demotion vote but his reasoning is quoted inline: an epic number is not a schedule.</p>
+</div>
+
+<h2>The Ledger</h2>
+
+<div class="ledger">
+  <div class="row"><span class="k">Sally — the read-model seam</span><span class="val win">carried</span></div>
+  <div class="row"><span class="k">Amelia — NFR-3 mapped to one epic, consumed by two</span><span class="val win">carried</span></div>
+  <div class="row"><span class="k">Winston — Epic 2 ↔ Epic 3 file overlap</span><span class="val lose">withdrawn by author</span></div>
+  <div class="row"><span class="k">Winston — demote Epic 3 to gated backlog</span><span class="val lose">overruled</span></div>
+  <div class="row"><span class="k">Winston — a numbered blocker stops feeling blocking</span><span class="val hold">quoted in the doc</span></div>
+  <div class="row"><span class="k">John — split on audience, not readiness</span><span class="val win">stands</span></div>
+  <div class="row"><span class="k">Amelia — GET /users, open since August</span><span class="val hold">still open</span></div>
+</div>
+
+<p class="rb">Twice now, this room's epic-split question has gone to a ruling rather than a consensus.<br>Winston and John do not converge. They are not going to.</p>
+
+<footer>
+  <span class="mono">2026-09-02 · installed roster · session mode</span>
+  <span class="mono">round 4 · earning its keep</span>
+</footer>
+
+</div>
+</body>
+</html>

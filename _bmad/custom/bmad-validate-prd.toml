@@ -1,0 +1,9 @@
+[workflow]
+
+# The shipped default globs for project-context.md — a retired convention that
+# does not exist in this repo. The current agent-instructions block lives in
+# AGENTS.md (bmad-project-context writes there now), so point at it explicitly.
+# Arrays append: the base glob stays but matches nothing.
+persistent_facts = [
+  "file:{project-root}/AGENTS.md",
+]
