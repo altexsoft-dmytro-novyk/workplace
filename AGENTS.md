@@ -26,4 +26,12 @@ Spec-driven BMad workspace for the people-management product. Application code l
 
 - Root `npm test` is a stub — use `npm run services:test`, `services:build`, or `services:lint` to fan out to both services, or run commands inside each service directory.
 
+
+## Architecture authority (do not confuse)
+
+1. **Default:** PM spine = `_bmad-output/.../architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md`
+2. **Bare `AD-n`** in `docs/architecture/*` = **PM/AD-n**
+3. **ACF spine** = slice-scope only for Kernel MVP (`spec-access-control-kernel-mvp`, `ACM-*`). Cite as **ACF/AD-n**, never bare `AD-n`
+4. **Never** use ACF deferrals (e.g. "section matrices deferred") as product-wide scope — PM/AD-7, PM/AD-10 define the full model
+5. **Historical** = `prd-user-management-*`, `prd-mentorship-*` only — not PM spine, not `docs/project-requirements.md` v1.5
 <!-- /bmad:context -->
