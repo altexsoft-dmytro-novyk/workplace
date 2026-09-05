@@ -2,9 +2,9 @@
 title: 'PLAT-E4-S4.1a — DEFAULT_PERMISSIONS baseline + isAllowed union rule'
 type: 'feature'
 created: '2026-09-05'
-status: 'in-progress'
+status: 'in-review'
 review_loop_iteration: 0
-baseline_commit: '827ff3d443fce7a8bf0752bc93c034be0c8a144f'
+baseline_commit: '20ed2a08fca35f9325196fb3ac916fadbd6bc257' # services/backend submodule HEAD before this story; the earlier value recorded the outer workspace wrapper repo's HEAD by mistake
 context: ['{project-root}/docs/architecture/access-control.md']
 ---
 
@@ -58,13 +58,13 @@ context: ['{project-root}/docs/architecture/access-control.md']
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] Write the human-approved scenario doc (AD-1 stage 1) covering the I/O matrix rows against real Postgres — STOP for approval before writing any test.
-- [ ] `services/backend/test/access-control/*.e2e-spec.ts` -- write the red E2E from the approved scenario doc -- STOP for approval before writing implementation code.
-- [ ] `services/backend/src/access-control/domain/constants/default-permissions.ts` -- add `DEFAULT_PERMISSIONS`.
-- [ ] `.../domain/interfaces/functional-role.repository.port.ts` -- add `isActiveUser`.
-- [ ] `.../infrastructure/prisma-functional-role.repository.ts` -- implement `isActiveUser`.
-- [ ] `.../domain/services/functional-role-evaluator.service.ts` -- implement the union rule.
-- [ ] `functional-role-evaluator.service.spec.ts` -- unit-test the I/O matrix with a stubbed port.
+- [x] Write the human-approved scenario doc (AD-1 stage 1) covering the I/O matrix rows against real Postgres — STOP for approval before writing any test. (`docs/test-cases/access-control-kernel/is-allowed/s41a-dp-01..03`, approved 2026-09-05)
+- [x] `services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts` -- write the red E2E from the approved scenario doc -- confirmed red (DP-01) before implementation, approved 2026-09-05.
+- [x] `services/backend/src/access-control/domain/constants/default-permissions.ts` -- add `DEFAULT_PERMISSIONS`.
+- [x] `.../domain/interfaces/functional-role.repository.port.ts` -- add `isActiveUser`.
+- [x] `.../infrastructure/prisma-functional-role.repository.ts` -- implement `isActiveUser`.
+- [x] `.../domain/services/functional-role-evaluator.service.ts` -- implement the union rule.
+- [x] `functional-role-evaluator.service.spec.ts` -- unit-test the I/O matrix with a stubbed port (local mock consts, not a direct port-method reference, to keep `@typescript-eslint/unbound-method` clean).
 
 **Acceptance Criteria:**
 - Given an active user with no `UserPolicies` row, when `isAllowed(user, 'profile:identity:write')` is called, then it resolves `true`.
@@ -78,7 +78,8 @@ context: ['{project-root}/docs/architecture/access-control.md']
 
 ## Verification
 
-**Commands:**
-- `npm run test -- functional-role-evaluator` -- expected: new unit spec green.
-- `npm run test:e2e -- <new-spec-name>` -- expected: red before the code change, green after.
-- `npm run lint && npm run build` -- expected: clean.
+**Commands (all run 2026-09-05):**
+- `npm run test -- functional-role-evaluator` -- 4/4 unit tests green.
+- `npm run test:e2e -- s41a-default-permissions-baseline` -- red before the code change (DP-01 failed as predicted, DP-02/03 already green), 3/3 green after.
+- `npm run test:e2e -- acm2-is-allowed` -- 10/10 green, unchanged (no-regression check).
+- `npm run lint && npm run build` -- clean on every file this story touched; 12 remaining lint errors are pre-existing in untouched files (`acm1r-fr-foundation`, `acm9` measurement specs, `mentorship/fixtures.ts`), confirmed by stashing this story's changes and re-running lint/the acm1r e2e suite against the unmodified baseline — same 37 acm1r failures occur with none of this story's changes present.

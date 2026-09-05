@@ -78,9 +78,12 @@ development_status:
   # dual gate; feature half = code constant DEFAULT_PERMISSIONS union explicit
   # grants; no employee policy row, no seed change). Architect gate-shape /
   # section-endpoint-map pass done 2026-09-05 (Winston session) — story split
-  # into 4.1a-d, each its own AD-1 dispatch. 4.1a in progress:
-  # spec-4-1a-default-permissions-baseline.md.
-  4-1-generalise-section-access-authorisation: in-progress
+  # into 4.1a-d, each its own AD-1 dispatch. 4.1a implemented and verified
+  # 2026-09-05 (spec-4-1a-default-permissions-baseline.md, status in-review).
+  # 4.1b (section-key rename + matrix-driven resolveSectionAccess) implemented
+  # and verified 2026-09-05 (spec-4-1b-section-key-rename.md, status
+  # in-review); 4.1c/d not started.
+  4-1-generalise-section-access-authorisation: review
   # 4-2 recorded decision (Winston + Dmytro 2026-09-03/04): seeded root = boss
   # (hr-admin FR + tree root + §2.4 first holder); a delegated HR Admin = full
   # feature set, zero data access. Deletes the canEditS1 OR-override, seeds a

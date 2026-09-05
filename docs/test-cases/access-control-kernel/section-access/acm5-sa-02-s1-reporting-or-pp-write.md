@@ -1,8 +1,8 @@
-# ACM5-SA-02 · S1 grants write to Reporting or direct PP
+# ACM5-SA-02 · `profile:identity` grants write to Reporting or direct PP
 
 **Trace:**
 
-- SPEC [CAP-5](../../../../_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md#capabilities) — S1 is `write` for Reporting or direct PP.
+- SPEC [CAP-5](../../../../_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md#capabilities) — `profile:identity` is `write` for Reporting or direct PP.
 - Access Control Foundation [Architecture spine — Design Paradigm](../../../../_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#design-paradigm) — the public facade is the headless kernel boundary.
 - Architecture spine [AD-1](../../../../_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#ad-1--foundation-boundary-adopted-amended-2026-08-30-p2) — direct Reporting and direct PP are distinct Phase-0 inputs.
 - Architecture spine [AD-3](../../../../_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#ad-3--kernel-evidence-and-consumer-evidence-are-separate-amended-2026-08-30-p2) — the kernel subject is the public facade, never an invented HTTP endpoint.
@@ -16,11 +16,11 @@ confirmed active viewer/target pair and exactly `Set {'pp'}` for another; no
 additional audience changes either set.
 
 **When** the caller invokes
-`AccessControlFacade.canAccessSection(viewerId, 'S1', targetEmployeeId)` for
+`AccessControlFacade.canAccessSection(viewerId, 'profile:identity', targetEmployeeId)` for
 each pair.
 
-**Then** each promise resolves to `'write'`. This is only the S1 base section
-decision; a consumer still applies its own mutation prerequisites and any
+**Then** each promise resolves to `'write'`. This is only the `profile:identity`
+base section decision; a consumer still applies its own mutation prerequisites and any
 applicable matrix exception.
 
 **Preconditions:** `resolveAudiences` is unchanged; the Reporting and direct

@@ -145,6 +145,58 @@ spans stages, per the standing AD-1 gate rule.
    caller/scenario/test move `'S1'` → `'profile:identity'` (and
    `'S10'`/`'S11'` → `'profile:leave'` / `'profile:projects'` even though
    unconsumed, so the kernel carries no `S<n>` string anywhere).
+
+   **Target shape (architect pass, 2026-09-05):** this is not a string
+   find-replace — `resolveSectionAccess`'s hardcoded `if/else` is replaced by
+   a table lookup + fold, so a future section is a new matrix row, never a
+   new branch:
+
+   ```ts
+   // domain/constants/section-access-matrix.ts
+   export const SECTION_ACCESS_MATRIX: Record<
+     string,
+     Partial<Record<Audience, SectionAccess>>
+   > = {
+     'profile:identity': { self: 'read', colleague: 'read', reporting: 'write', pp: 'write' },
+     'profile:leave':    { self: 'read', colleague: 'read', reporting: 'read',  pp: 'read' },
+     'profile:projects': { self: 'read', colleague: 'read', reporting: 'read',  pp: 'read' },
+   };
+   ```
+
+   ```ts
+   // access-control.facade.ts
+   private async resolveSectionAccess(
+     viewerId: string,
+     section: string,
+     targetEmployeeId: string,
+   ): Promise<SectionAccess> {
+     const row = SECTION_ACCESS_MATRIX[section];
+     if (!row) return 'none';
+
+     const audiences = await this.resolveAudiences(viewerId, [targetEmployeeId]);
+     const targetAudiences = audiences.get(targetEmployeeId);
+     if (!targetAudiences || targetAudiences.size === 0) return 'none';
+
+     const RANK: Record<SectionAccess, number> = { none: 0, read: 1, write: 2 };
+     let best: SectionAccess = 'none';
+     for (const audience of targetAudiences) {
+       const cell = row[audience] ?? 'none';
+       if (RANK[cell] > RANK[best]) best = cell;
+     }
+     return best;
+   }
+   ```
+
+   The three matrix rows are byte-for-byte what today's `if (section ===
+   'S1') { ... }` branch already computes for S1/S10/S11 — this is a
+   behavior-preserving generalisation, not a policy change. It's also a
+   correctness upgrade: the fold is PRD FR-3's "strongest applicable
+   permission wins" multi-audience rule (`RW > R > —`) applied uniformly,
+   where today only S1's branch happens to implement that rule ad hoc and
+   S10/S11 don't merge audiences at all (they just return `'read'`
+   unconditionally once any audience is non-empty). A row with no entry for a
+   resolved audience denies (`?? 'none'`) — silent, not an error, matching
+   every other absent-cell case in this file.
 3. **4.1c — `@RequireSectionAccess` gate + adapter migration.** UM-owned. The
    decorator + guard in `application/guards/`, backed by the section→endpoint
    map above; `PATCH /users/:id` and `GET /users/:id` move onto it.
