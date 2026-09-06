@@ -234,6 +234,77 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  # ── Cross-service contract ───────────────────────────────────────────────
+  # The one job that checks the two services agree. The consumer run records
+  # what the frontend's real request modules send; the provider run replays that
+  # recording against a real NestJS app on real PostgreSQL. Gating from the
+  # start: unlike the Stage-2 suites, nothing here is committed red on purpose,
+  # so a red result is always a genuine disagreement.
+  contract:
+    name: Contract · consumer-driven (Pact)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.SERVICE_NODE_VERSION }}
+
+      - name: Materialise backend .env for docker compose
+        working-directory: services/backend
+        env:
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+        run: |
+          cp .env.example .env
+          if [ -n "$LOCALSTACK_AUTH_TOKEN" ]; then
+            # Security: secret passed through env: to prevent script injection
+            printf '\nLOCALSTACK_AUTH_TOKEN=%s\n' "$LOCALSTACK_AUTH_TOKEN" >> .env
+          fi
+
+      - name: Start Postgres
+        working-directory: services/backend
+        run: docker compose up -d --wait postgres
+
+      - name: Install frontend
+        working-directory: services/frontend
+        run: npm ci
+
+      - name: Consumer — record the pact
+        working-directory: services/frontend
+        # A stale pacts/ directory would leave the provider verifying
+        # interactions the consumer no longer declares; pact files merge.
+        run: |
+          rm -rf pacts
+          npm run test:contract
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pact-contract
+          path: services/frontend/pacts/
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Install backend
+        working-directory: services/backend
+        run: npm ci
+
+      - name: Apply migrations
+        working-directory: services/backend
+        run: npm run db:deploy
+
+      - name: Provider — verify the recorded pact
+        working-directory: services/backend
+        run: npm run test:contract
+
+      - name: Stop containers
+        if: always()
+        working-directory: services/backend
+        run: docker compose down -v
+
   # ── Evidence aggregation ─────────────────────────────────────────────────
   # Turns the three runs into the file /bmad-testarch-trace reads as `live`
   # evidence, which is what moves a trace run out of `contract_static`.
