@@ -5,31 +5,48 @@ and on manual dispatch.
 
 ## Jobs
 
-| Job                              | Gates a merge? | What it runs                                                       |
-| -------------------------------- | -------------- | ------------------------------------------------------------------ |
-| `Workspace · ClickUp sync`       | **Yes**        | `npm run test:clickup` — the workspace sync suite                   |
-| `Backend · unit (informational)` | No             | `npm test` in `services/backend`                                    |
-| `Backend · e2e (informational)`  | No             | `npm run test:e2e` against Postgres + LocalStack in docker compose  |
-| `Frontend · Playwright (informational)` | No      | `npm test` in `services/frontend` (chromium)                        |
-| `Live verification evidence`     | No             | Aggregates the three reports into `live-verification-results.json`  |
+| Job                              | Can fail the run? | What it runs                                                     |
+| -------------------------------- | ----------------- | ---------------------------------------------------------------- |
+| `Workspace · ClickUp sync`       | **Yes**           | `npm run test:clickup` — the workspace sync suite                 |
+| `Backend · unit`                 | **Yes**           | `npm test` in `services/backend`                                  |
+| `Backend · e2e (informational)`  | No                | `npm run test:e2e` against Postgres + LocalStack in docker compose|
+| `Frontend · Playwright`          | **Yes**           | `npm test` in `services/frontend` (chromium)                      |
+| `Live verification evidence`     | No                | Aggregates the three reports into `live-verification-results.json`|
 
-## Why three of them are informational
+"Can fail the run" is not the same as "blocks a merge". A job without
+`continue-on-error` concludes **failure** and turns the run red; whether that red
+stops the merge button depends on the branch protection required-check list,
+which is configured on GitHub and not in this repo. At the time of writing `main`
+carries no protection object, so today every row above is advisory.
+
+## Why backend e2e is still informational
 
 The project follows **AD-1**: a Stage-2 test is committed red, and the
 production code is written against it afterwards. Mentorship (~29 cases) has no
 module under `src/` at all, and there are 19 `it.todo` placeholders on top of
 that. A red result there is the process working, not a regression.
 
-So those three jobs carry `continue-on-error: true` at the job level. They run,
-they publish, their conclusion stays neutral, and no branch protection rule can
-block a merge on them. The point of the first runs is to see the **actual**
-red/green for the first time — until now it has only ever been inferred from
-which files exist.
+So `backend-e2e` alone still carries `continue-on-error: true` at the job level.
+It runs, it publishes, its conclusion stays neutral, and no branch protection
+rule can block a merge on it.
 
-This is a deliberate, temporary departure from the TEA guidance that a gate must
-be able to fail. **Promote a suite to a real gate by deleting its
-`continue-on-error: true` line** — and add it to the branch protection required
-checks — once that suite is meant to be green.
+Backend unit and Frontend Playwright started out under that same posture and
+have since been **promoted**. Both were observed green on a run at the service
+SHAs `main` currently pins — backend `20ed2a08` at 19/19, frontend `cfbed35` at
+124/124 with the Playwright report showing no flaky cases — so their
+`continue-on-error` is gone and a red result there fails the run for real.
+
+Promoting `backend-e2e` means deleting **all four** of its
+`continue-on-error: true` lines: the job-level one and the three on
+`Start Postgres + LocalStack`, `Apply migrations` and `E2E tests`. Removing only
+the job-level flag is not enough — a soft step that fails still counts as
+successful when the job's conclusion is computed, so the suite would keep
+reporting green. Making the resulting red actually block a merge is a second,
+separate act: the job has to be added to the branch protection required checks.
+
+The `Lint` steps of the two promoted jobs are deliberately still soft. Lint was
+not part of this promotion and the backend's is currently red, so promoting it
+is its own piece of work.
 
 ## Live verification evidence
 
@@ -106,7 +123,8 @@ apply migrations, run the suite, write a jest JSON report.
 - **Burn-in.** Flake detection needs a stable baseline to be meaningful; a suite
   that is red on purpose has none. `@seontechnologies/playwright-utils` is also
   not a dependency, so the `runBurnIn` selector the TEA guidance prefers is not
-  available. Revisit after the first suite is promoted to a gate.
+  available. Now worth revisiting for the two promoted suites, which do have a
+  green baseline; `backend-e2e` still does not.
 - **Contract testing.** `tea_use_pactjs_utils` is on in `_bmad/tea/config.yaml`,
   but the repo has no pact directory, no `.pacttest.ts` files, and neither
   `@pact-foundation/pact` nor `@seontechnologies/pactjs-utils` as a dependency.

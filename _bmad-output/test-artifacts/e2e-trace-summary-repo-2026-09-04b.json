@@ -1,13 +1,13 @@
 {
  "schema_version": "0.2.0",
- "snapshot_at": "2026-09-04T20:28:44Z",
+ "snapshot_at": "2026-09-04T21:57:51Z",
  "repo": "people management",
  "collection_mode": "contract_static",
  "collection_status": "COLLECTED",
  "inventory_basis": "static_spec_files",
  "gate_basis": "priority_thresholds",
  "source_sha": {
-  "workspace": "c954d136744d9f5e5562b34a4f680f6ba849e529",
+  "workspace": "27881d3cb8fea223a0a341b3fb250f17b2cd6d3f",
   "backend": "20ed2a08fca35f9325196fb3ac916fadbd6bc257",
   "frontend": "cfbed35bdabda7f58c639d8a477e58538824e00a"
  },
@@ -32,18 +32,18 @@
   "external_pointer_status": "not_used",
   "synthetic": false
  },
- "gate_status": "FAIL",
+ "gate_status": "CONCERNS",
  "coverage": {
   "inventory": {
-   "covered": 226,
+   "covered": 227,
    "total": 258,
    "pct": 88
   },
   "priority_breakdown": {
    "P0": {
     "total": 132,
-    "covered": 131,
-    "percentage": 99
+    "covered": 132,
+    "percentage": 100
    },
    "P1": {
     "total": 102,
@@ -66,7 +66,7 @@
    "api": 0,
    "component": 0,
    "unit": 13,
-   "live": 134,
+   "live": 148,
    "other": 0
   }
  },
@@ -78,7 +78,7 @@
   "pending_cases": 18
  },
  "risk_summary": {
-  "critical_open": 1,
+  "critical_open": 0,
   "high_open": 19,
   "medium_open": 12,
   "low_open": 0
@@ -94,26 +94,26 @@
   "present": true,
   "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
   "freshness": "fresh",
-  "recorded_source_sha": "c954d136744d9f5e5562b34a4f680f6ba849e529",
-  "current_source_sha": "c954d136744d9f5e5562b34a4f680f6ba849e529",
-  "producer": "local run (backend unit + frontend e2e; backend e2e absent — needs docker)",
-  "counted": 134,
+  "recorded_source_sha": "27881d3cb8fea223a0a341b3fb250f17b2cd6d3f",
+  "current_source_sha": "27881d3cb8fea223a0a341b3fb250f17b2cd6d3f",
+  "producer": "local run 2026-09-05 (backend unit + epic-5/apply-departure e2e + frontend e2e)",
+  "counted": 148,
   "stale": 0,
   "unverifiable": 0,
   "failed": 0,
   "contradicted": 0,
   "blocked": 0,
-  "skipped": 0,
+  "skipped": 4,
   "unmatched": 0,
   "invalid": 0,
   "requirements_live_only": 0,
   "retired_target": 3,
-  "scope_note": "Live evidence covers the backend unit suite and the frontend Playwright suite only. The backend e2e suite needs Postgres + LocalStack and was not executed in this pass, so its requirements rest on static evidence."
+  "scope_note": "Live evidence covers the backend unit suite, the frontend Playwright suite, and the epic-5/apply-departure e2e spec. The remaining backend e2e specs were not executed in this pass."
  },
  "gate_criteria": {
   "p0_coverage_required": 100,
-  "p0_coverage_actual": 99,
-  "p0_coverage_status": "FAIL",
+  "p0_coverage_actual": 100,
+  "p0_coverage_status": "PASS",
   "p1_coverage_target": 95,
   "p1_coverage_minimum": 80,
   "p1_coverage_actual": 81,
@@ -122,24 +122,11 @@
   "overall_coverage_actual": 88,
   "overall_coverage_status": "PASS"
  },
- "blockers": [
-  {
-   "id": "UM-DEP-08",
-   "severity": "critical",
-   "reason": "TODO_ONLY"
-  }
- ],
+ "blockers": [],
  "recommendations": [
   {
-   "priority": "P0",
-   "action": "Implement the Story 5.2 stale-executor fencing path so UM-DEP-08 stops being TODO-only",
-   "requirements": [
-    "UM-DEP-08"
-   ]
-  },
-  {
    "priority": "P1",
-   "action": "Build the mentorship module — 6 suites are committed red with no src/ module, which is the whole P1 deficit",
+   "action": "Build the mentorship module — 14 P1 and all 12 P2 gaps are its committed-red suites with no src/ module",
    "requirements": [
     "MEN-DEP-01",
     "MEN-DEP-02",
@@ -152,12 +139,25 @@
     "MEN-END-07",
     "MEN-PAIR-01",
     "MEN-PAIR-02",
-    "MEN-PAIR-03"
+    "MEN-PAIR-03",
+    "MEN-PAIR-04",
+    "MEN-PAIR-05"
    ]
   },
   {
    "priority": "P1",
-   "action": "Run the backend e2e suite (docker) so its requirements rest on observed evidence rather than static presence",
+   "action": "Resolve the FR-permission-matrix granularity that blocks UM-CT-03/04/05/06/09 (it.todo)",
+   "requirements": [
+    "UM-CT-03",
+    "UM-CT-04",
+    "UM-CT-05",
+    "UM-CT-06",
+    "UM-CT-09"
+   ]
+  },
+  {
+   "priority": "P2",
+   "action": "Run the remaining backend e2e specs so they rest on observed evidence",
    "requirements": []
   }
  ],
@@ -171,6 +171,9 @@
   "kind": "incremental",
   "base": "tea-trace-coverage-matrix-repo-2026-09-04.json",
   "note": "Prior requirement verdicts (coverage, impl_state) are carried forward UNCHANGED — they encode source inspection this pass did not repeat (e.g. mentorship has no src/ module, so its committed-red suites stay PARTIAL/NOT_IMPLEMENTED). Only the 67 requirements added since the base run were evaluated. tests[] is a union: the new scenario-id tagging enriches traceability without altering any prior verdict. A full re-derivation requires executing the backend e2e suite (docker) and redoing impl_state inspection.",
-  "new_requirements": 67
+  "new_requirements": 67,
+  "corrections": [
+   "UM-DEP-08: PARTIAL/TODO_ONLY -> FULL/IMPLEMENTED, on an observed run rather than carried-forward inference"
+  ]
  }
 }
