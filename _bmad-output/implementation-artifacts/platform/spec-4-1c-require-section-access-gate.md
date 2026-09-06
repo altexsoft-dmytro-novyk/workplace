@@ -156,14 +156,14 @@ table to keep in sync. A future section is a new decorator on a new route plus a
 **Execution:**
 - [ ] **AD-1 stage 1 — scenario docs only.** Amend `umac-07`, `umac-10`, `umac-01`..`umac-04`, `access-control-adoption/README.md`, `profile/um-edit-01`, `profile/um-edit-05`, `profile/README.md`, and author `s41c-sag-01`..`s41c-sag-05` under `docs/test-cases/user-management/access-control-adoption/`. Resolve the `umac-10` question in the **Ask First** list as part of this stage. **STOP for human approval — write no test file and no source file in this dispatch.**
 - [ ] **AD-1 stage 2 — red E2E only.** Write `services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts` strictly from the approved scenario docs; run it against unchanged source and record which cases are red and why (expected: the `s41c-sag-04` invariant case is red — today's OR-override allows it; the audience-half cases are already green under `canEditS1`). **STOP for human approval — write no source file in this dispatch.**
-- [ ] **AD-1 stage 3 — implementation.** `require-section-access.decorator.ts` -- add the decorator + metadata key.
-- [ ] `domain/constants/section-keys.ts` -- add `PROFILE_IDENTITY_SECTION`.
-- [ ] `domain/interfaces/access-control.port.ts` -- add the level types + `hasSectionAccess`.
-- [ ] `infrastructure/access-control-facade.adapter.ts` -- implement `hasSectionAccess` (audience-first, feature half only for `'write'`); repoint `canEditIdentityCard` at it; update the `identity-card-access.port.ts` docstring.
-- [ ] `application/guards/section-access.guard.ts` -- add the guard; register it in `user-management.module.ts` and in the controller's `@UseGuards` list.
-- [ ] `application/controllers/users.controller.ts` -- swap the two `@RequireFeatureForTarget` declarations for `@RequireSectionAccess`; refresh the `get-user-card.action.ts` comment.
-- [ ] `infrastructure/__tests__/access-control-facade.adapter.spec.ts` -- unit-test the rank table, the audience-first ordering, and the read/write feature-half rule with a stubbed facade.
-- [ ] Run the regression set in **Verification** and record results here.
+- [x] **AD-1 stage 3 — implementation.** `require-section-access.decorator.ts` -- add the decorator + metadata key.
+- [x] `domain/constants/section-keys.ts` -- add `PROFILE_IDENTITY_SECTION`.
+- [x] `domain/interfaces/access-control.port.ts` -- add the level types + `hasSectionAccess`.
+- [x] `infrastructure/access-control-facade.adapter.ts` -- implement `hasSectionAccess` (audience-first, feature half only for `'write'`); repoint `canEditIdentityCard` at it; update the `identity-card-access.port.ts` docstring.
+- [x] `application/guards/section-access.guard.ts` -- add the guard; register it in `user-management.module.ts` and in the controller's `@UseGuards` list.
+- [x] `application/controllers/users.controller.ts` -- swap the two `@RequireFeatureForTarget` declarations for `@RequireSectionAccess`; refresh the `get-user-card.action.ts` comment.
+- [x] `infrastructure/__tests__/access-control-facade.adapter.spec.ts` -- unit-test the rank table, the audience-first ordering, and the read/write feature-half rule with a stubbed facade.
+- [x] Run the regression set in **Verification** and record results here.
 
 **Acceptance Criteria:**
 - **Given** an active viewer V with no `Relationship` edge to an active target T (colleague audience only, so `canAccessSection(V, 'profile:identity', T)` is `read`) and V holding `profile:identity:write` implicitly via `DEFAULT_PERMISSIONS`, **when** V sends `PATCH /users/<T>` with a valid identity field, **then** the response is `403` and T's row is unchanged.
@@ -221,14 +221,94 @@ would be a no-op abstraction over the same class.
 
 ## Verification
 
-**Planned commands (nothing has been run yet — all results recorded at stage 3):**
-- `npm run test -- access-control-facade.adapter` -- the new adapter unit spec: rank table, audience-first ordering, read/write feature-half rule.
-- `npm run test:e2e -- s41c-section-access-gate` -- expected **red** at stage 2 (at minimum the `s41c-sag-04` functional-grant case, which today's OR-override allows), fully green after stage 3. Record the exact red case list at stage 2, before any source edit.
-- `npm run test:e2e -- read-adoption read-denial no-target-permission write-adoption` -- regression; expected green **except** the `umac-10` block (see the last AC and the open question). Record the umac-10 disposition and its reason here.
-- `npm run test:e2e -- edit-identity manager-change` -- regression; expected green, unmodified.
-- `npm run test:e2e -- test/user-management --testPathIgnorePatterns=<pre-existing failures>` -- full UM context sweep; any failure outside the two routes this story touches is a defect in this change, not a pre-existing one, unless proved otherwise by stashing.
-- `npm run lint && npm run build` -- must be clean on every file this story touches. The 12 pre-existing errors in untouched files documented in 4.1a/4.1b are expected to remain; confirm the count is unchanged rather than assuming it.
-- `grep -rn "RequireFeatureForTarget" src/user-management/application/controllers/` -- expected zero matches after stage 3 (the decorator itself and the guard's `targetScoped` path stay until 4.1d).
+**Run 2026-09-06 at AD-1 stage 3, from `services/backend`. Real output, not
+predictions.**
+
+| Command | Result |
+|---|---|
+| `npm run test -- access-control-facade.adapter` | **PASS** — 1 suite, **21/21** tests |
+| `npm run test:e2e -- s41c-section-access-gate` | **PASS** — 1 suite, **19/19** tests (was 3 failed / 16 passed at stage 2) |
+| `npm run test:e2e -- write-adoption read-adoption edit-identity manager-change` | **PASS** — 4 suites, **46/46** tests |
+| `npm run test:e2e -- read-denial no-target-permission audience-resolution` | **PASS** — 3 suites, **17/17** tests |
+| `npm run test:e2e -- test/user-management` | **PASS** — 23 suites, **254 passed / 18 todo / 272 total** |
+| `npm run test` (full unit suite) | **PASS** — 5 suites, **44/44** tests |
+| `npm run build` | **clean** |
+| `npm run lint` | **12 errors, all pre-existing in untouched files** — count unchanged |
+| `grep -rn "RequireFeatureForTarget" src/user-management/application/controllers/` | **zero matches** (exit 1) |
+
+**Stage-3 red → green.** The three stage-2 failures were `s41c-sag-04` Tests 1-3
+(expected `403`, received `200` — the `canEditS1` OR-override). All three pass
+now: `PATCH /users/:id` and the `canEdit` hint resolve through
+`hasSectionAccess`, whose audience half returns before `isAllowed` is reached.
+
+**Full e2e sweep (`npm run test:e2e`, 45 suites).** 38 passed, 7 failed — all 7
+pre-existing and unrelated to this story, none touching `GET`/`PATCH
+/users/:id`:
+
+- `test/mentorship/{pool,pair,view,flag,end,departure}.e2e-spec.ts` — six suites
+  whose own describe titles read "Stage-2 committed red"; another story's
+  approved red E2E awaiting its stage 3.
+- `test/access-control/acm1r-fr-foundation.e2e-spec.ts` — bootstrap/seed
+  foundation suite (its first failure is "exposes `db:bootstrap:access-control`
+  as an npm script"; no such script exists in `package.json`). Nothing in it
+  reaches User Management guards, the adapter, or the two migrated routes.
+
+Both sets are the same files that carry the 12 known pre-existing lint errors.
+
+**Lint — the 12 pre-existing errors, unchanged in count and location.**
+`acm1r-fr-foundation.e2e-spec.ts` (1), `acm9-baseline.measurement-spec.ts` (1),
+`acm9/manifest.spec.ts` (7), `acm9/manifest.ts` (1), `mentorship/fixtures.ts`
+(2). No new error on any file this story touched.
+
+**Known, out of scope.** Suites in `access-control-adoption/` that perform a
+successful `PATCH` emit a `user_events_createdBy_fkey` teardown warning —
+`fixtures.ts` cleanup deletes `User` rows before the `user_events` rows the edit
+wrote. Pre-existing, does not affect any assertion, and shared with other suites;
+not fixed here.
+
+### `umac-10` disposition — retired, with reason
+
+The `umac-10` describe block in
+`test/user-management/access-control-adoption/write-adoption.e2e-spec.ts` was
+**deleted** in this change (3 `it` blocks, formerly at lines 213/229/244), per
+the PO's 2026-09-05 Reading-1 decision recorded above. A dated comment block
+stands in its place in the spec file so the removal is legible in the suite
+itself rather than only in git history.
+
+**Reason.** The block pinned the interim `user-management:edit` OR-override,
+which reached the gate only through `isAllowedForTarget(EDIT_USER_FEATURE)` →
+`canEditS1`. This story moves `PATCH /users/:id` and the `canEdit` hint onto
+`@RequireSectionAccess('profile:identity', 'write')`, so the override is no
+longer on any live code path and two of the block's three assertions necessarily
+invert: a grant holder whose only audience is `colleague` (Test 1) or `self`
+(Test 2) is now `403` / `canEdit:false`, because §3.2 gives both cells `R` and
+`access-control.md:19` (NORMATIVE) forbids a functional role from widening a
+resolved audience. That is D1 taking effect — the flip restores the normative
+rule rather than regressing it.
+
+**Coverage is not lost.** Its intent is superseded by `s41c-sag-04`, which
+asserts the opposite deliberately, and its one surviving assertion (Test 3 — a
+`'none'` target stays closed to a grant holder) is carried over as `s41c-sag-04`
+Test 5. The scenario doc
+`docs/test-cases/user-management/access-control-adoption/umac-10-write-fr-grant-override.md`
+is **kept**, carrying the dated superseded-by pointer added at stage 1. The dead
+`user-management:edit` OR clause in `canEditS1` is **not** deleted here — that
+remains Story 4.2's, coupled to seating root in the relationship tree.
+
+### One decision the spec left open, taken here
+
+`test/access-control/audience-resolution.e2e-spec.ts` declares a test-only
+`FacadeBackedAccessControlAdapter implements AccessControlPort` and overrides
+`ACCESS_CONTROL_PORT`, driving its ACF-AU-01..04 HTTP allow path through
+`GET /users/:id`. Adding `hasSectionAccess` to the port made that class fail to
+compile, and the route it exercises now enters through the new method. It was
+given a `hasSectionAccess` that delegates to the same self/reporting/pp mapping
+its `isAllowedForTarget` already used (both now call one private
+`hasAllowedAudience`), so the suite's oracle is unchanged and it stays green
+(17/17 with `read-denial` / `no-target-permission`). The Code Map did not
+anticipate this file; the alternative — leaving it broken — was not an option,
+and changing its audience mapping would have altered another context's approved
+intent.
 
 ## Boundaries
 
