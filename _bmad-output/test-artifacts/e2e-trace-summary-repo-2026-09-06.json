@@ -1,0 +1,294 @@
+{
+ "schema_version": "0.2.0",
+ "snapshot_at": "2026-09-06T14:57:36.824Z",
+ "repo": "people-management workspace",
+ "collection_mode": "contract_static",
+ "collection_status": "COLLECTED",
+ "inventory_basis": "acceptance_criteria",
+ "gate_basis": "deterministic",
+ "source_sha": {
+  "workspace": "d8faa81ff914d9d198b33f76242fa47a0ef713bf",
+  "backend": "20ed2a08fca35f9325196fb3ac916fadbd6bc257",
+  "frontend": "cfbed35bdabda7f58c639d8a477e58538824e00a"
+ },
+ "target": {
+  "type": "release",
+  "id": "whole-repo-all-epics",
+  "label": "Whole repository — all epics (Access Control Kernel MVP, User Management, Mentorship, Frontend flows)"
+ },
+ "decision_mode": "deterministic",
+ "evaluator": "TEA Agent (bmad-testarch-trace)",
+ "confidence": "high",
+ "oracle": {
+  "resolution_mode": "formal_requirements",
+  "confidence": "high",
+  "synthetic": false,
+  "sources": [
+   "docs/test-cases/**",
+   "_bmad-output/planning-artifacts/**/epics.md",
+   "docs/project-requirements.md"
+  ],
+  "external_pointer_status": "not_used",
+  "ids_known": 294
+ },
+ "gate_status": "CONCERNS",
+ "coverage": {
+  "inventory": {
+   "covered": 227,
+   "total": 258,
+   "pct": 88
+  },
+  "priority_breakdown": {
+   "P0": {
+    "total": 132,
+    "covered": 132,
+    "percentage": 100
+   },
+   "P1": {
+    "total": 102,
+    "covered": 83,
+    "percentage": 81
+   },
+   "P2": {
+    "total": 24,
+    "covered": 12,
+    "percentage": 50
+   },
+   "P3": {
+    "total": 0,
+    "covered": 0,
+    "percentage": 100
+   }
+  },
+  "by_level": {
+   "e2e": 406,
+   "api": 0,
+   "component": 0,
+   "unit": 19,
+   "live": 538,
+   "other": 0
+  }
+ },
+ "tests": {
+  "files": 53,
+  "cases": 549,
+  "skipped_cases": 18,
+  "fixme_cases": 0,
+  "pending_cases": 0
+ },
+ "live_evidence": {
+  "present": true,
+  "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
+  "freshness": "fresh",
+  "recorded_source_sha": "d8faa81ff914d9d198b33f76242fa47a0ef713bf",
+  "current_source_sha": "d8faa81ff914d9d198b33f76242fa47a0ef713bf",
+  "producer": "local run 2026-09-06 (full backend unit + full backend e2e + frontend e2e, with db:bootstrap:access-control restored)",
+  "counted": 491,
+  "stale": 0,
+  "unverifiable": 0,
+  "failed": 29,
+  "contradicted": 0,
+  "blocked": 0,
+  "skipped": 18,
+  "unmatched": 0,
+  "invalid": 0,
+  "requirements_live_only": 0,
+  "scope_note": "Full sweep: backend unit (19 cases), the COMPLETE backend e2e suite (43 files / 406 cases), and the frontend Playwright suite (124 cases) all executed at these SHAs. No suite was omitted.",
+  "integrity_caveat": "Evidence was produced from a WORKING TREE that carries one uncommitted change: the restored \"db:bootstrap:access-control\" script in services/backend/package.json. recorded_source_sha therefore names a commit that does NOT yet contain the fix. A clean checkout of d8faa81f reproduces 37 acm1r-fr-foundation failures. Commit the fix before treating this run as reproducible evidence."
+ },
+ "blockers": [
+  {
+   "id": "MEN-DEP-01",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-DEP-02",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-END-01",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-END-02",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-END-03",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-END-04",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-END-05",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-END-06",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-END-07",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-FLAG-01",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-FLAG-02",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-FLAG-03",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-PAIR-01",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-PAIR-02",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-PAIR-03",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-PAIR-04",
+   "severity": "high",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-POOL-01",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-POOL-02",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-POOL-03",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-VIEW-01",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-VIEW-02",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-VIEW-03",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-VIEW-04",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  },
+  {
+   "id": "MEN-VIEW-05",
+   "severity": "medium",
+   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
+  }
+ ],
+ "recommendations": [
+  {
+   "priority": "P0",
+   "action": "Commit the restored db:bootstrap:access-control script so this evidence becomes reproducible from a clean checkout",
+   "requirements": [
+    "ACM1-FB-01",
+    "ACM1R-FB-14"
+   ]
+  },
+  {
+   "priority": "P1",
+   "action": "Close the mentorship gates (mentorship:assign permission seed, S13 canAccessSection increment, career-event application boundary) — 26 requirements and 29 red cases depend on them",
+   "requirements": [
+    "MEN-DEP-01",
+    "MEN-DEP-02",
+    "MEN-END-01",
+    "MEN-END-02",
+    "MEN-END-03",
+    "MEN-END-04",
+    "MEN-END-05",
+    "MEN-END-06",
+    "MEN-END-07",
+    "MEN-FLAG-01",
+    "MEN-FLAG-02",
+    "MEN-FLAG-03",
+    "MEN-FLAG-04",
+    "MEN-PAIR-01",
+    "MEN-PAIR-02",
+    "MEN-PAIR-03",
+    "MEN-PAIR-04",
+    "MEN-PAIR-05",
+    "MEN-POOL-01",
+    "MEN-POOL-02",
+    "MEN-POOL-03",
+    "MEN-VIEW-01",
+    "MEN-VIEW-02",
+    "MEN-VIEW-03",
+    "MEN-VIEW-04",
+    "MEN-VIEW-05"
+   ]
+  },
+  {
+   "priority": "P1",
+   "action": "Grant the FR-permission-matrix entry that unblocks the five career-timeline it.todo cases",
+   "requirements": [
+    "UM-CT-03",
+    "UM-CT-04",
+    "UM-CT-05",
+    "UM-CT-06",
+    "UM-CT-09"
+   ]
+  },
+  {
+   "priority": "P2",
+   "action": "Close the oracle-mapping gap: 11 ACM1/ACM1R requirements have no live record even though acm1r-fr-foundation ran 39/39 green — the producer matched their cases to no requirement id",
+   "requirements": [
+    "ACM1-FB-02",
+    "ACM1-FB-03",
+    "ACM1-FB-04",
+    "ACM1-FB-05",
+    "ACM1-FB-06",
+    "ACM1-FB-07",
+    "ACM1R-FB-10",
+    "ACM1R-FB-12",
+    "ACM1R-FB-13",
+    "ACM1R-FB-21",
+    "ACM1R-FB-22"
+   ]
+  }
+ ],
+ "links": {
+  "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix-repo-2026-09-06.md"
+ }
+}
