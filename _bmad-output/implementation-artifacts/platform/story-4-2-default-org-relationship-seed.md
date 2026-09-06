@@ -11,8 +11,9 @@ owners: ['access-control', 'user-management']
 decision_record: '_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-04-section-access-consolidation.md'
 depends_on:
   - 'PLAT-E4-S4.1 — `DEFAULT_PERMISSIONS` includes `profile:identity:write`, so root (an active employee) has the feature half; land alongside. 4.2 is not hard-blocked.'
-blocked_on:
-  - 'Architect solution-design for the upward-walk resolver change (AC-owned resolveAudiences change, its own AD-1)'
+blocked_on: []
+blocked_on_resolved:
+  - '2026-09-05 — was: "Architect solution-design for the upward-walk resolver change (AC-owned resolveAudiences change, its own AD-1)". Cleared by `_bmad-output/implementation-artifacts/access-control/solution-design-upward-walk-resolver.md` (2026-09-05), whose verdict is NO CODE CHANGE REQUIRED: the upward walk shipped 2026-08-30 in `services/backend` commit `f36d1b2` and is an ancestor of `services/backend` HEAD `e0b1a53`. This clears the blocker on scope item 4 ONLY — items 1, 2, 3 and 5 are untouched by that finding and remain unbuilt, so the story stays `backlog`.'
 ---
 
 # PLAT-E4-S4.2 — Default org-relationship seed + retire the identity-card FR override
@@ -86,14 +87,35 @@ authorisation code**.
    last-holder protection, column mapping — stays the access-control
    deferred-work "Full-profile access overlay" item; this story fixes only who
    the seeded holder is and wires it.)
-4. **Resolver: walk upward from targets.** `resolveAudiences` currently expands
+4. ~~**Resolver: walk upward from targets.** `resolveAudiences` currently expands
    every descendant of the viewer, then filters to the requested targets — so a
    viewer near the tree root walks the whole org to open one profile. This seed
    puts root permanently at the root, making that the standing worst case.
    Switch the reporting-chain resolution to walk **upward from each target**,
    bounded by chain depth. (Tracked as a deferred AC finding — this story makes
    it load-bearing for §7's 500-record / 2-second budget and pulls it into
-   scope. Its own AD-1 increment in the access-control package.)
+   scope. Its own AD-1 increment in the access-control package.)~~
+
+   **CORRECTED 2026-09-05 — this is already built; there is no resolver change
+   in this story.** The struck premise ("currently expands every descendant of
+   the viewer") stopped being true on 2026-08-30, in `services/backend` commit
+   `f36d1b2` ("feat(access-control): return all audiences per target; walk up
+   from targets"), which is an ancestor of `services/backend` HEAD `e0b1a53`
+   (verified with `git merge-base --is-ancestor f36d1b2 HEAD`). The shipped
+   reporting CTE at
+   `services/backend/src/access-control/infrastructure/prisma-relationship-graph.adapter.ts:88-120`
+   seeds the recursion from the **requested targets** (`r."userId" IN (${ids})`,
+   line 98) and ascends one `direct` edge per step
+   (`JOIN "relationships" r ON r."userId" = c.node_id`, lines 105-107), in one
+   query for all targets. The depth bound the item asks for is already delivered
+   structurally, by the `relationships_one_direct_per_user` partial unique plus
+   the `NOT c.repeated` halt. Full analysis and evidence:
+   `_bmad-output/implementation-artifacts/access-control/solution-design-upward-walk-resolver.md`
+   §§0-2 (verdict: **NO CODE CHANGE REQUIRED**).
+   **Residual scope for this item is evidence and documentation only** — an
+   ACM-9 `seeded-two-level` measurement for the shape item 5's seed introduces
+   (design §7.3). **Items 1, 2, 3 and 5 are unaffected by this correction and
+   remain unbuilt; this story is not finished.**
 5. **Dev seed spine.** A dev-only script (`db:dev:seed-org`, superseding
    `dev-grant-root.ts`) seeds a `type='direct'` reporting spine over the *fake*
    seeded/imported population, rooted at the root user. Shape: **two-level** —
@@ -138,24 +160,77 @@ authorisation code**.
   `GET /users` / `POST /users` / role-assignment routes → allowed;
   `PATCH /users/:id` on an unrelated person → `403`;
   `GET /users/:id` → `canEdit: false`.
-- The audience resolver walks upward from targets: a viewer at the tree root
+- ~~The audience resolver walks upward from targets: a viewer at the tree root
   opening one profile issues a query bounded by reporting-chain depth, not by
   org size — shown with the ACM-9 measurement pattern
-  (`_bmad-output/test-artifacts/performance/`).
+  (`_bmad-output/test-artifacts/performance/`).~~
+  **CORRECTED 2026-09-05 — the property already holds in HEAD**, so this is a
+  property to lock, not a change to make (`f36d1b2`;
+  `prisma-relationship-graph.adapter.ts:88-120`;
+  `solution-design-upward-walk-resolver.md` §§0-2 and §7.1, which also records
+  that the pinned ACM-9 PASS artifact was measured against a byte-identical
+  adapter). Restated: *the existing upward walk is evidenced for the shape this
+  story creates* — one ACM-9 run (`ACM9-MVP-v1`, `--role final`, 500 targets,
+  5 warm-ups, 20 samples, warm p95 **and** worst ≤ 2000 ms) over a new
+  `seeded-two-level` fixture, published append-only under
+  `_bmad-output/test-artifacts/performance/` (design §7.3). **No speedup may be
+  claimed for this story, because it changes no query.** Whether that run is its
+  own increment or folds into 4.2b is not settled here — see "Open for
+  decision" below.
 - `db:dev:seed-org` throws under `NODE_ENV=production`, is absent from
   `prisma/seed.ts` and `scripts/bootstrap-access-control.ts`, and the
   `test/access-control/acm1r-fr-foundation.e2e-spec.ts` invariant suite stays
   green.
 - Closes the access-control deferred-work "reporting walk descends from the
   viewer" finding; updates the "Full-profile access overlay" item's seeded-holder
-  question.
+  question. **(Note added 2026-09-05:** that deferred-work entry closes as
+  *already resolved by `f36d1b2`*, not as work this story performs — see
+  `_bmad-output/implementation-artifacts/access-control/deferred-work.md` and
+  `solution-design-upward-walk-resolver.md` §0.**)**
 
 ## Sequencing (AD-1 — production authz, no dispatch spans a stage)
 
-1. **4.2a** — upward-walk `resolveAudiences` change (AC increment, 3-stage).
+1. ~~**4.2a** — upward-walk `resolveAudiences` change (AC increment, 3-stage).~~
+   **CORRECTED 2026-09-05.** There is no resolver change left to sequence
+   (`f36d1b2`; `solution-design-upward-walk-resolver.md` §0). If 4.2a survives
+   at all, it is an evidence + documentation close-out increment (design §8);
+   the design recommends folding its ACM-9 `seeded-two-level` run into 4.2b
+   instead. **Not decided here — see "Open for decision" below.**
 2. **4.2b** — §2.4 first-holder = root at seed (AC / seed increment).
 3. **4.2c** — delete the `canEditS1` override + pinning test; `db:dev:seed-org`
    spine (UM increment). Lands with or just after 4.1's composition decision.
+
+## Open for decision (architect / PO — recorded 2026-09-05, not resolved here)
+
+Raised by
+`_bmad-output/implementation-artifacts/access-control/solution-design-upward-walk-resolver.md`
+§9 as a consequence of the scope-item-4 correction above. Quoted from that
+document; **none of these is settled by this documentation pass.**
+
+1. **Does 4.2a still exist?** > "If the PO accepts §0, 4.2a stops being a
+   resolver change. Two options: (a) keep it as the evidence + close-out
+   increment described in §8; (b) delete 4.2a and fold the ACM-9
+   `seeded-two-level` run into 4.2b's acceptance, since 4.2b is the increment
+   that actually creates the tree-root edge. **My recommendation: (b)** — the
+   measurement belongs to the change that alters the data, and (a) risks
+   manufacturing an increment to justify a ticket."
+2. **Explicit depth bound — confirm rejection.** > "§2.3 recommends against it
+   on the grounds that it is audience-narrowing. Needs a PO 'yes, agreed' so it
+   does not reappear as a performance suggestion in review." (§2.3's argument:
+   a numeric bound would silently deny `reporting` to a legitimate manager
+   sitting one level too deep — an audience-narrowing policy change, not a
+   performance refactor.)
+3. **Depth-499 headroom.** > "1346 ms p95 against 2000 ms is 1.49×, on an
+   18-core M5 Pro with a local PostgreSQL. Is that acceptable margin for the
+   deployment target, or does the `statement_timeout` headroom deferred item
+   need pulling forward? Not 4.2's problem, but 4.2 is the story that makes deep
+   chains reachable in a seeded environment." (The curve is super-linear in
+   depth — design §7.1.)
+4. **`Department.parentId` index.** > "Flagged in §6 as a migration the
+   department-branch increment will need. Should it be pre-landed with 4.2's
+   seed work, or held until the branch it serves? Adding an unused index has the
+   same 'no speculative schema' smell as an unused column
+   (`feedback_no_speculative_fields`) — **recommend holding it.**"
 
 ## References
 
@@ -168,3 +243,7 @@ authorisation code**.
   line 263 (§2.4 overlay is read-only), line 100 (HR Admin no data access)
 - `services/backend/prisma/seed.ts`, `scripts/dev-grant-root.ts`
 - `services/backend/src/access-control/domain/services/audience-resolver.service.ts`
+- `services/backend/src/access-control/infrastructure/prisma-relationship-graph.adapter.ts:88-120`
+  — the shipped upward reporting CTE (`f36d1b2`, 2026-08-30)
+- `_bmad-output/implementation-artifacts/access-control/solution-design-upward-walk-resolver.md`
+  — 2026-09-05 architect pass that cleared this story's `blocked_on`

@@ -1,5 +1,31 @@
 # UMAC-10 · S1 edit — a live `user-management:edit` FR grant is an OR-override on the section gate
 
+> **SUPERSEDED 2026-09-05 by [`s41c-sag-04`](./s41c-sag-04-functional-grant-never-widens-audience.md)**
+> (PLAT-E4-S4.1c; decision recorded by Dmytro Novyk, Product Owner, in
+> [`spec-4-1c-require-section-access-gate.md`](../../../../_bmad-output/implementation-artifacts/platform/spec-4-1c-require-section-access-gate.md)
+> § "Resolved decision — `umac-10` disposition").
+>
+> The OR-override this file ratified is the widening the 2026-09-03 code review
+> flagged against the NORMATIVE invariant at `access-control.md` line 19 — *a
+> functional role never widens data access*. SCP
+> `sprint-change-proposal-2026-09-04-section-access-consolidation.md` **D1**
+> replaces it with an audience-first **AND** (the dual gate), and 4.1c moves
+> `PATCH /users/:id` and the `GET /users/:id` `canEdit` hint onto that gate — at
+> which point the override is unreachable and Tests 1 and 2 below invert:
+> `200` / `canEdit: true` becomes `403` / `canEdit: false` for a viewer whose
+> only audience is `colleague` or `self`. §3.2 row S1 gives Self `R (photo RW)`
+> and Colleague `R`, so the inversion **restores** the normative rule rather
+> than regressing it. Test 3 (a `'none'` target stays closed) remains correct
+> and is carried into `s41c-sag-04` as its Test 5.
+>
+> **The text below is the historical record and is deliberately left unrewritten**
+> (this project keeps superseded records intact and adds a dated pointer). Do not
+> translate this file into new Stage-2 assertions; its `write-adoption.e2e-spec.ts`
+> describe block is retired by 4.1c's implementation stage, with the reason
+> recorded in that story's Verification section. The dead `canEditS1` OR clause
+> itself is **not** removed by 4.1c — that is Story 4.2's deletion, coupled to
+> seating root in the relationship tree.
+
 **Trace:** SPEC-user-management-access-control-adoption CAP-2 (write) · access-control.md ACM-5 (`canAccessSection(v,'S1',t)` → `write` for reporting/pp, `read` for self/colleague, `none` for an empty set) · PRD FR-9 refinement · [`umac-07`](./umac-07-write-dual-gate.md) (Variant A, product decision 2026-09-02) · `access-control-facade.adapter.ts` `canEditS1` · access-control deferred-work ("Generalise section-access authorisation") · `scripts/dev-grant-root.ts`
 
 > **Stage ordering.** `umac-07` (Variant A) withdrew the functional-permission
