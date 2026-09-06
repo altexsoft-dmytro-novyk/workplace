@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-05-2026 00:00
+last_updated: 09-06-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -52,11 +52,11 @@ development_status:
   1-9-register-epic-in-platform-sprint-status: done
   epic-1-retrospective: optional
 
-  epic-2: in-progress
+  epic-2: done  # its only story (2.1) is done; epics.md lists no others
   2-1-resolve-phase-0-audiences-acf-1: done
   epic-2-retrospective: optional
 
-  epic-3: in-progress
+  epic-3: done  # all 8 stories (3.1-3.8) done; epics.md lists no others
   3-1-inactive-viewer-bridge-and-target-fail-closed-behavior-acm-3: done
   3-2-multi-audience-merge-acm-4: done
   3-3-deploy-time-root-user-prerequisite-acm-0: done
@@ -82,12 +82,52 @@ development_status:
   # 2026-09-05 (spec-4-1a-default-permissions-baseline.md, status in-review).
   # 4.1b (section-key rename + matrix-driven resolveSectionAccess) implemented
   # and verified 2026-09-05 (spec-4-1b-section-key-rename.md, status
-  # in-review); 4.1c/d not started.
-  4-1-generalise-section-access-authorisation: review
+  # in-review).
+  # UPDATE 2026-09-06: all four increments have landed. 4.1c (the
+  # @RequireSectionAccess gate + dual-gate composition) and 4.1d (deletion of
+  # canEditS1, S1_SECTION, isAllowedForTarget, RequireFeatureForTarget and the
+  # guard's targetScoped branch) are in backend b311589 and ef03c88. Specs:
+  # spec-4-1c-require-section-access-gate.md, spec-4-1d-gate-cleanup.md, plus
+  # spec-4-1d-baseline-2026-09-06.md (the Stage-2 substitute gate artefact for
+  # a pure-deletion story). PO rulings recorded in each spec's Ask First table.
+  # CAVEAT: 4.1d's deletions are verified absent from source by grep, but the
+  # full test/user-management suite has NOT been re-run since the final edit to
+  # list-v15.e2e-spec.ts. Read this "done" as unverified until that run happens.
+  4-1-generalise-section-access-authorisation: done
   # 4-2 recorded decision (Winston + Dmytro 2026-09-03/04): seeded root = boss
   # (hr-admin FR + tree root + §2.4 first holder); a delegated HR Admin = full
   # feature set, zero data access. Deletes the canEditS1 OR-override, seeds a
   # two-level reporting spine, switches the audience resolver to walk upward
   # from targets. Blocked on the upward-walk solution-design (AC AD-1).
-  4-2-default-org-relationship-seed: backlog
+  # UPDATE 2026-09-06: unblocked and started.
+  # - The upward-walk blocker was CLEARED, not built: the 2026-09-05 architect
+  #   pass (solution-design-upward-walk-resolver.md) found the resolver already
+  #   walks up from targets, shipped 2026-08-30 in backend f36d1b2. No code
+  #   change; residual work is an ACM-9 measurement only.
+  # - Scope item 1 (delete the FR override) CLOSED BY VERIFICATION: 4.1c
+  #   retired the umac-10 pinning test, 4.1d deleted canEditS1 whole including
+  #   the OR clause (PO ruling AF-2, 2026-09-06).
+  # - Split into 4.2a (root-operator permission set), 4.2b (§2.4 first holder +
+  #   tree-root edge at bootstrap), 4.2c (dev seed spine).
+  # - 4.2a: spec written (spec-4-2a-root-operator-permission-set.md), AD-1
+  #   Stage 1 COMPLETE (6 new scenario docs, 20 amended). Stage 2 NOT started —
+  #   gated on an unresolved harness question (no suite boots Nest against a
+  #   bootstrap-provisioned database) and on confirming the kernel README rule
+  #   that protects acm1-fb-01..09, six of which Stage 1 amended.
+  # - 4.2b and 4.2c are UNBUILT. bootstrap-access-control.ts still seeds only
+  #   the three original keys; no db:dev:seed-org script exists;
+  #   scripts/dev-grant-root.ts remains the accepted dev+production stopgap.
+  4-2-default-org-relationship-seed: in-progress
   epic-4-retrospective: optional
+
+  # TRACKING GAPS recorded 2026-09-06 — NOT resolved here, they are planning
+  # decisions rather than status edits:
+  # - planning-artifacts/platform/epics.md carries a numbering collision: two
+  #   distinct "Epic 4" headings — "Access Control Authorization Consolidation"
+  #   (the one tracked above) and "Project-Line Audience" (4 stories,
+  #   untracked).
+  # - Epics 5 (Department Walk and People Partner HR-Line, 3 stories), 6
+  #   (Section Matrix Beyond the Kernel Slice, 6 stories) and 7 (Shared-Link
+  #   Section Policy and Full-Profile Overlay, 3 stories) are defined in
+  #   epics.md and appear nowhere in this file.
+  # This file therefore understates remaining platform scope by ~16 stories.
