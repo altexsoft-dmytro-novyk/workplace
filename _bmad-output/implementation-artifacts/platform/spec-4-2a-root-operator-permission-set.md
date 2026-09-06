@@ -517,7 +517,8 @@ quietly edit any of the four.
       Stage-1 outcome**. One question is left open for the Stage-2 gate — the
       harness shape for `s42a-op-03` / `s42a-op-05`; see **Verification §
       Open item carried into the Stage-2 gate**.
-- [ ] **AD-1 stage 2 — the red, in two distinct recordings.** This increment has
+- [x] **AD-1 stage 2 — the red, in two distinct recordings. DONE 2026-09-06.**
+      This increment has
       a real red test; do not collapse the two states into one number.
       - **(2a) Pre-existing red, recorded verbatim and *excluded* from the
         oracle.** Run `npm run test:e2e -- acm1r-fr-foundation` against
@@ -535,23 +536,44 @@ quietly edit any of the four.
         That contrast — *everything about the bootstrap's behaviour is right and
         only the size of the canonical set is wrong* — is the oracle.
       **STOP for human approval — write no `src/` file in this dispatch.**
-- [ ] **AD-1 stage 3 — the production change.**
+      - **What Stage 2 actually produced (2026-09-06, human-approved).** Rather
+        than amending `acm1r-fr-foundation.e2e-spec.ts` in place, Stage 2
+        authored **two new red suites** against the Stage-1 scenario docs and
+        left the ACM-1 invariant suite untouched, so that this increment's
+        oracle is separable from that suite's own (separately tracked)
+        amendment:
+        `test/access-control/s42a-op-bootstrap-canonical-set.e2e-spec.ts`
+        (`s42a-op-01`/`-02`, 3 failed / 0 passed at `ef03c88`) and
+        `test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts`
+        (`s42a-op-03`..`-06`, 20 failed / 1 passed). Both files label the
+        AF-1 precondition-repair red distinctly from the discriminating
+        canonical-set red, which is what the two-part recording asked for.
+- [x] **AD-1 stage 3 — the production change. DONE 2026-09-06.**
       `src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts`
       — append `org:relationships:write`, `employee:departure:record` **and
       `profile:timeline:write`** (AF-2) to `CANONICAL_PERMISSIONS` (`:22-35`)
       with descriptions in the existing form; correct the count three → **six**
       in the ownership comment (`:7-13`) and at `:371-372`.
-- [ ] `package.json` — the `db:bootstrap:access-control` alias, if it was not
-      already added under Stage 2b (AF-1).
-- [ ] `test/access-control/acm1r-fr-foundation.e2e-spec.ts` — correct the stale
+- [x] `package.json` — the `db:bootstrap:access-control` alias, if it was not
+      already added under Stage 2b (AF-1). **Added at Stage 3** (Stage 2 wrote no
+      non-test file), on the line after `db:seed` so the script block reads in
+      deploy order, in the `db:dev:grant-root` / `db:import:population` idiom:
+      `"db:bootstrap:access-control": "node --import tsx scripts/bootstrap-access-control.ts"`.
+- [ ] **DEFERRED, not done here — tracked separately (Stage-3 dispatch
+      instruction, 2026-09-06).**
+      `test/access-control/acm1r-fr-foundation.e2e-spec.ts` — correct the stale
       "EXPECTED RED" header (`:34-38`) to state the true remaining precondition;
       confirm the assertion amendments from Stage 2b are complete and that the
       six prose/test-name sites (`:334`, `:375`, `:1467-1471`) read correctly.
-- [ ] Run the **Verification** set and record real results in this file,
-      replacing the plan with the outcome.
-- [ ] Record in **Boundaries** what the increment deliberately did not close —
+      The Stage-3 dispatch explicitly withheld this file from the increment.
+      Its post-change state is recorded under **Verification § Stage-3
+      outcome** and is exactly the discriminating red Stage 2b predicted.
+- [x] Run the **Verification** set and record real results in this file,
+      replacing the plan with the outcome. **See Verification § Stage-3 outcome.**
+- [x] Record in **Boundaries** what the increment deliberately did not close —
       specifically that root still has no `canEdit` reach and `dev-grant-root.ts`
-      is still required.
+      is still required. **Done: the Boundaries table already carried both rows,
+      and a dated Stage-3 confirmation note is appended beneath it.**
 
 **Acceptance Criteria:**
 
@@ -805,7 +827,40 @@ and Trace quotations across most of the folder, not only in titles. Ten
 
 ### Open item carried into the Stage-2 gate — the harness shape
 
-**Unresolved; recorded, not decided here.** No suite in this repository today
+> **RESOLVED 2026-09-06 (John, PM), on the PO's "finish epic 4" instruction.**
+>
+> **Ruling: build the hybrid harness.** `s42a-op-03`..`-06` run in a suite that
+> (1) provisions the database through the *real* production path as a
+> subprocess — `db:deploy` → `db:seed` → `db:bootstrap:access-control` — then
+> (2) boots Nest via `Test.createTestingModule` against that same database, then
+> (3) drives the scenarios over HTTP.
+>
+> **Why not the cheaper option.** Granting the operator keys with
+> `fx.grantFunctionalRole` and skipping the script would test the *gate* while
+> leaving the *seed* unproven — and the seed is the entire subject of this
+> increment. This story's claim is "a clean `db:seed && db:bootstrap:access-control`
+> leaves root fully operational with no dev script." A harness that never runs
+> the bootstrap cannot falsify that claim, so it cannot verify it either.
+>
+> **Why this is not exotic.** Both halves already exist here.
+> `test/access-control/acm1r-fr-foundation.e2e-spec.ts` runs scripts as
+> subprocesses (`execFile` / `spawn`, `node:child_process`) and asserts against a
+> raw `PrismaClient` — it never boots Nest. The adoption suites boot Nest and
+> never run scripts. 4.2a is the first increment that needs both, and combining
+> two established patterns is not a new convention.
+>
+> **Binding constraint — isolation.** The bootstrap mutates singleton global
+> state (the root identity, the `hr-admin` FR policy) that other suites read.
+> `test:e2e` runs `--runInBand`, so suites share one database serially. The
+> Stage-2 implementer MUST replicate whatever isolation/restoration
+> `acm1r-fr-foundation.e2e-spec.ts` already uses for exactly this problem, and
+> must NOT invent a new scheme. If that file turns out to have no such
+> mechanism, STOP and report — that is a finding, not a gap to improvise across.
+>
+> `s42a-op-01` / `s42a-op-02` are unaffected: they are database-level and follow
+> the plain `acm1r` subprocess pattern with no Nest.
+
+**Superseded framing — retained as the record. Unresolved; recorded, not decided here.** No suite in this repository today
 provisions a session holder through the *production* bootstrap
 (`db:deploy` → `db:seed` → `db:bootstrap:access-control`) and then boots Nest
 against that database — every existing access-control case grants its own FR
@@ -854,6 +909,102 @@ Use `git grep` or `grep -arn`, never plain `grep -r`: 4.1d's Verification record
 that a NUL-carrying file in this tree
 (`test/user-management/epic-1/list-v15.e2e-spec.ts:741`) is skipped as binary by
 plain `grep -r`, which is how two live hits escaped an earlier oracle.
+
+### Stage-3 outcome — REAL RESULTS, recorded 2026-09-06
+
+Run from `services/backend` after the two production edits below and nothing
+else. Files changed by Stage 3, in full:
+
+- `package.json` — the `db:bootstrap:access-control` alias (AF-1), one line.
+- `src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts` —
+  three entries appended to `CANONICAL_PERMISSIONS`, plus three count
+  corrections (three → six) in the ownership comment, the `ensureGrants`
+  doc comment, and the in-transaction comment.
+
+No other file in either repository was written. `git status --porcelain` over
+`services/backend` shows exactly those two modified files plus the two
+Stage-2 test files, still untracked and unmodified.
+
+| Command | Real result |
+|---|---|
+| `npm run test:e2e -- s42a-op-bootstrap-canonical-set` | **1 suite passed, 3 passed / 3 total.** (Was 3 failed / 0 passed at Stage 2.) |
+| `npm run test:e2e -- s42a-op-root-operator-set` | **1 suite passed, 21 passed / 21 total.** (Was 20 failed / 1 passed at Stage 2.) |
+| `npm run test:e2e -- test/user-management` | **24 suites passed / 24 total; 275 passed, 18 todo, 293 total.** Matches the recorded baseline exactly — 23 pre-existing suites (254 passed, 18 todo) plus the now-green 21-test `s42a-op` suite. **Zero regressions.** |
+| `npm run test:e2e -- test/access-control` | **15 suites passed, 1 failed / 16 total; 110 passed, 16 failed / 126 total.** The single failing suite is `acm1r-fr-foundation`, whose amendment is tracked separately — see the next section. Every other access-control suite is green. |
+| `npm run test` (unit) | **5 suites passed / 5; 44 passed / 44.** |
+| `npm run build` | **Clean, exit 0.** |
+| `npm run lint` | **12 problems (12 errors, 0 warnings) — the exact 12 pre-existing errors 4.1d recorded**, all in files this increment did not touch: `acm1r-fr-foundation.e2e-spec.ts` (1), `acm9-baseline.measurement-spec.ts` (1), `acm9/manifest.spec.ts` (7), `acm9/manifest.ts` (1), `mentorship/fixtures.ts` (2). **No error added**; neither changed file appears. |
+| `git diff --stat -- scripts/dev-grant-root.ts` | **Empty.** Zero lines changed. |
+| `git status --porcelain -- prisma/migrations/` | **Empty.** No migration written. |
+| `grep -arn "CANONICAL_PERMISSIONS" src/ scripts/ test/` | Definition (`:22`) and its one consumer (`:246`) in the bootstrap file, plus four **prose-only** mentions in test fixtures. No third copy of the key list. |
+| `grep -arn "profile:identity:write\|user-management:edit" src/access-control/infrastructure/bootstrap/` | **0 matches.** No unruled data-access key and no dead key entered the canonical set. |
+| `grep -arnc "profile:timeline:write" .../access-control-bootstrap.ts` | **1** — exactly once, in `CANONICAL_PERMISSIONS`, as AF-2 requires. |
+
+#### What happened to `acm1r-fr-foundation` — recorded precisely
+
+| | Before Stage 3 (`ef03c88`) | After Stage 3 |
+|---|---|---|
+| Result | **37 failed / 2 passed, 39 total** | **16 failed / 23 passed, 39 total** |
+| Cause | The `db:bootstrap:access-control` alias did not exist, so `npm run` exited nonzero with *"Missing script"* before the wrapper ran a statement — every `runBootstrap` caller failed for a reason unrelated to its own subject | The AF-1 alias landed, so the suite **executes**. `ACM-1 CAP-3 — production entrypoint is wired` (`:321-331`) is **green**, and every shape, lock, adoption, drift, concurrency and rollback invariant that does not count rows is green |
+
+The 21 tests that flipped red → green are the proof that the entrypoint defect
+was the whole of the pre-existing failure. **All 16 remaining failures are pure
+cardinality**, with no behavioural assertion among them — verified by
+collecting every expected/received pair in the run:
+
+- `Expected: 3 / Received: 6` × 11, plus `Expected length: 3 / Received length: 6` × 1 — the canonical-set size
+- `Expected: 4 / Received: 7` × 2 — ACM1R-FB-16 (renamed key) and ACM1R-FB-28 (administrator's extra permission)
+- `Expected: 2 / Received: 5` × 1 — ACM1R-FB-26 R1's mid-drift grant count
+- one array equality — the `CANONICAL_KEYS` three-element key list
+
+Failing tests, in full: ACM1-FB-01, -03, -05, -06 · ACM1-FB-09 · ACM1R-FB-12 ·
+ACM1R-FB-15 · ACM1R-FB-16 · ACM1R-FB-18 · ACM1R-FB-20 A · ACM1R-FB-23 ·
+ACM1R-FB-25 A and B · ACM1R-FB-26 R1 · ACM1R-FB-27 · ACM1R-FB-28.
+
+This is **exactly the discriminating red Stage 2b predicted** — *everything
+about the bootstrap's behaviour is right and only the size of the canonical set
+is wrong* — arrived at from the other direction: the suite was left unamended,
+so the shipped six-key set is now what disagrees with its three-key literals.
+The Stage-3 dispatch withheld this file from the increment, so **not one
+assertion in it was edited**. Its amendment (the `3` → `6` / `4` → `7`
+cardinality updates, the `2` → `5` drift count, the key list, the stale
+"EXPECTED RED" header at `:34-38`, and the prose sites at `:334`, `:375`,
+`:1467-1471`) is the separately tracked follow-up.
+
+#### ACM-9 pin — the reasoning, recorded rather than ignored
+
+This increment does change a file under `src/access-control/**`
+(`infrastructure/bootstrap/access-control-bootstrap.ts`), which the
+`epic-4-context.md` rule names as invalidating the pinned ACM-9 baseline. It
+changes a **deploy-time constant**, not the audience-resolution hot path:
+`git diff --name-only -- src/` returns that one file, so
+`prisma-relationship-graph.adapter.ts` and `audience-resolver.service.ts` are
+byte-identical before and after, and the increment creates **no `Relationship`
+row**. No measured shape moves; ACM-9 was not rerun, deliberately.
+
+#### Manual verification — superseded by the Stage-2 hybrid harness
+
+Every step of the **Manual verification** script below is now executed
+automatically by `s42a-op-root-operator-set.e2e-spec.ts`, which provisions
+through the real `db:deploy` → `db:seed` → `db:bootstrap:access-control`
+subprocess path (and never `db:dev:grant-root`, which it asserts) before
+booting Nest. Steps 1-4 map to the shared precondition tests, `s42a-op-03`
+Tests 2-4, `s42a-op-04` Tests 1-2 and `s42a-op-06` Test 1 respectively, all
+green. No separate manual run was needed.
+
+#### Stale prose found in four test fixtures — a finding, not a fix
+
+Four fixture files still assert in **comments** that the canonical set holds
+only the three `user-management:*` keys, and that the keys this increment seeds
+are "NOT seeded":
+`test/user-management/epic-3/fixtures.ts:52`,
+`epic-4/fixtures.ts:32`, `epic-5/fixtures.ts:33`, and
+`access-control-adoption/fixtures.ts:53` (whose
+`CANONICAL_UM_PERMISSION_KEYS` constant is now a **subset** of the canonical
+set, not the whole of it). None is load-bearing — every suite that reads them
+is green, because each grants its key explicitly via `grantFunctionalRole`
+rather than relying on the absence. They are out of this increment's scope and
+were left untouched; they belong with the `acm1r-fr-foundation` amendment pass.
 
 ### Manual verification — the capability claim
 
@@ -916,3 +1067,35 @@ What this increment deliberately leaves standing, and who takes it:
 | `ACM1-FB-06`'s `countOf('Policies') === 1` invariant | Untouched here; it is the invariant scope item 3 will have to confront if the §2.4 grant is modelled as a `Policies` row | **Story 4.2 scope item 3** |
 | `Department.parentId` index; depth-499 headroom | Parked story-level questions (AF-7, AF-8); this increment writes no migration and moves no measurement | **architect / PO** |
 | `database-schema.md:368-375` / `:454-457`, `fr-architecture-amendment.md:165` and `spec-access-control-kernel-mvp/SPEC.md:97`, all still saying "exactly three" | **AF-4 as resolved: a separate architect pass, not this increment.** No superseding pointer was added either — Stage 1 amended none of the four and recorded the contradiction dated in `acm1-fb-01` instead. All four will contradict shipped behaviour until that pass runs | **the AF-4 architect pass** |
+
+### Stage-3 confirmation of what was deliberately left standing — 2026-09-06
+
+Every row of the table above is confirmed as still standing after the
+implementation, and two of them are worth restating so a green `s42a-op` suite
+is not misread as "root is fully operational":
+
+1. **Root still has no `canEdit` reach.** `s42a-op-04` Tests 1-2 pass by
+   asserting exactly that: root gets `403` on `PATCH /users/<unrelated>` and
+   `canEdit: false` on the read. Edit reach comes from seeded tree position,
+   which this increment does not create. **Story 4.2 scope item 3.**
+2. **`scripts/dev-grant-root.ts` is still required and is untouched**
+   (`git diff --stat` over it is empty). It remains the accepted dev **and**
+   production stopgap until scope items 3 and 5 land; `create:root` still
+   chains `db:seed && db:dev:grant-root` per AF-5. Its documented ACM-1
+   drift-check conflict has narrowed from seven keys to **one** —
+   `user-management:edit`, inert since 4.1c — because the other six are now
+   canonical.
+
+Also unchanged by Stage 3, verified: `docs/architecture/` (AF-4 — the four
+records still say "exactly three" and now contradict shipped behaviour, as the
+resolved ruling accepts), the six Stage-1 scenario docs, both Stage-2 test
+files, and `test/access-control/acm1r-fr-foundation.e2e-spec.ts`.
+
+**The AF-2 deviation shipped intact and must stay that way.** No audience check
+was added to `canEditTimeline`, the grant was not narrowed, and
+`career-timeline-access-facade.adapter.ts` was not opened. `s42a-op-06` Tests
+1-2 are green, which is the deviation being asserted on purpose: a delegated
+`hr-admin` holder writes and soft-deletes events on a stranger's career
+timeline. The seeded row carries an in-code comment naming the ruling, the
+cost, and the instruction not to close it as a drive-by. It closes with the
+deferred DEC-UM-001 narrowing, and the AF-4 architect pass registers it.

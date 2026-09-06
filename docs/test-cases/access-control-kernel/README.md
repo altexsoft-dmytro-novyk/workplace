@@ -160,7 +160,15 @@ criteria state "CAP-8 has already ensured the normalized active root User."
   `/roles` HTTP surface or permission-mutation port (FR-AMD-1 "MVP
   reduction"), and no User Management route changes are in scope.
 - Nothing already covered by `ACM1-FB-01`..`ACM1-FB-09`. Those nine are
-  approved and must not be rewritten, renumbered, or restated; the ACM-1R
+  approved and must not be rewritten, renumbered, or restated (**scoped
+  exception, 2026-09-06:** PLAT-E4-S4.2a amends `ACM1-FB-01`, `-02`, `-03`,
+  `-05`, `-06` and `-09` because the canonical permission set they assert grew
+  from three keys to six by PO ruling AF-2. Each amendment is a dated pointer
+  block; no original assertion text was rewritten, no id was renumbered. This
+  rule was written to scope the ACM-1R authoring dispatch, not to freeze these
+  docs against a change to the thing they describe — a doc asserting a
+  superseded canonical set is wrong, not protected. Approved by John (PM) on
+  the PO's instruction to finish Epic 4); the ACM-1R
   contracts add only what the audit records as Missing or Partial. The
   absent-singleton adoption table, post-bootstrap drift/rollback, concurrent-run
   convergence, and the AR-policy `targetRole='hr-admin'` cross-type collision

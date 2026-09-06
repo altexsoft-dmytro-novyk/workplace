@@ -90,9 +90,13 @@ development_status:
   # spec-4-1c-require-section-access-gate.md, spec-4-1d-gate-cleanup.md, plus
   # spec-4-1d-baseline-2026-09-06.md (the Stage-2 substitute gate artefact for
   # a pure-deletion story). PO rulings recorded in each spec's Ask First table.
-  # CAVEAT: 4.1d's deletions are verified absent from source by grep, but the
-  # full test/user-management suite has NOT been re-run since the final edit to
-  # list-v15.e2e-spec.ts. Read this "done" as unverified until that run happens.
+  # VERIFIED 2026-09-06: full test/user-management re-run against the frozen
+  # pre-deletion baseline (spec-4-1d-baseline-2026-09-06.md) reproduces it
+  # exactly — 23 suites passed, 254 passed, 18 todo, no assertion edited. The
+  # deletions removed only dead code. (A 24th suite, s42a-op-root-operator-set,
+  # was 4.2a's Stage-2 red at the time of that run; it went green with 4.2a
+  # Stage 3 the same day. test/user-management now: 24 suites, 275 passed,
+  # 18 todo — the 254 baseline plus that suite's 21.)
   4-1-generalise-section-access-authorisation: done
   # 4-2 recorded decision (Winston + Dmytro 2026-09-03/04): seeded root = boss
   # (hr-admin FR + tree root + §2.4 first holder); a delegated HR Admin = full
