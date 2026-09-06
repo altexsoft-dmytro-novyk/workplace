@@ -227,6 +227,30 @@ NFR is tracked as blocker `QUALITY-GATE-AC-NFR`. It closes only on an ACM9-MVP-v
 plus worst case ≤ 2 seconds. ACM-8 composition is not a substitute. This is not a
 release-readiness claim.
 
+**Qualifying evidence re-recorded (2026-09-06):**
+`acm9-final-acm9-1788722145229-13b089a4cb9f.json` is a `final` artifact with
+`status: PASS` and `comparability: comparable` at 500 requested active targets,
+32/32 gates, taken against backend `f7c0385` / workspace `58820d4` — the first
+qualifying artifact recorded on current code rather than on the 2026-09-02
+revisions. Whether that closes `QUALITY-GATE-AC-NFR` is a ratification
+decision, not a property of the artifact.
+
+The companion P6 report was re-recorded in the same session, and the version it
+replaced was not merely stale. It was generated 2026-08-30T18:17Z, ahead of a
+commit that is not in the backend's HEAD lineage, so it described an
+implementation that never merged: it showed 148.8 ms at depth 499 where every
+measurement against merged code shows ~960 ms. Do not treat a performance
+artifact as evidence without checking `source_revision` against the code it is
+being cited for.
+
+Depth is the cost driver here, and the tested sequence deliberately runs past
+the product's reachable range: cost is roughly quadratic in chain depth (the
+recursive walk carries a `path` array and tests `= ANY(path)` at every step),
+so depth 499 costs ~960 ms while depths 5-50 cost 9-12 ms. Real reporting
+chains run on the order of 5-10 levels, so the shipped range uses about 0.5% of
+the two-second budget. The deep shapes are a canary for algorithmic change, not
+a description of production load.
+
 ## Test data isolation (DEC-UM-010)
 
 Gate E2E for `user-management` follows an approved two-phase progression:
