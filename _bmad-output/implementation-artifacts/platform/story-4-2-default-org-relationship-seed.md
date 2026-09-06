@@ -285,6 +285,31 @@ authorisation code**.
 
 ## Sequencing (AD-1 — production authz, no dispatch spans a stage)
 
+**RENUMBERED 2026-09-06 (John, PM, on the PO's "finish epic 4" instruction) to
+match actual build order rather than the 2026-09-04 original assignment, which
+had drifted from reality twice over (the upward-walk item turned out to be
+already built, and the override item turned out to close by verification, not
+by a dedicated increment). The letters below are now the single source of
+truth; every prior letter-claim in this story or its specs is superseded by
+this table. Original sequencing text retained immediately below for the
+record.**
+
+| Letter | Increment | Status 2026-09-06 |
+|---|---|---|
+| **4.2a** | Root-operator permission set (scope item 2: bootstrap npm alias + canonical `hr-admin` set 3→6 keys) | **DONE** — `spec-4-2a-root-operator-permission-set.md`, backend `4ce8bd8` |
+| **4.2b** | Tree-root seed — verification that root needs no `Relationship` row to sit at the top of the `reports-to` chain, plus evidence that it resolves transitively (part of scope item 3) | **Spec written, ungated** — `spec-4-2b-tree-root-seed.md` |
+| **4.2c** | §2.4 full-profile-access first holder (the other part of scope item 3) | **NOT STARTED — blocked.** Needs an architect Stage-1 data-model decision first (no schema/port/gate exists for the overlay anywhere in `services/backend`; `access-control.md` §2.4 explicitly forbids inventing AD-28 scenarios ad hoc). Analogous to the 2026-09-05 upward-walk solution-design. |
+| **4.2d** | `db:dev:seed-org` dev spine (scope item 5), retiring `dev-grant-root.ts` | **NOT STARTED.** Carries scope item 1's verification grep as an entry check, not as work — that item is already closed. |
+
+Scope item 4 (upward-walk resolver) needs no letter — it was found already
+built on 2026-08-30 (`f36d1b2`); see the item's own correction above. Its
+residual ACM-9 `seeded-two-level` evidence question is carried as an open
+question below, not assigned a letter, per `spec-4-2b`'s AF-4 (this spec
+creates no tree-root edge, so the design's "fold into 4.2b" recommendation no
+longer has a premise to attach to).
+
+**Original sequencing text, retained as the record:**
+
 1. ~~**4.2a** — upward-walk `resolveAudiences` change (AC increment, 3-stage).~~
    **CORRECTED 2026-09-05.** There is no resolver change left to sequence
    (`f36d1b2`; `solution-design-upward-walk-resolver.md` §0). If 4.2a survives

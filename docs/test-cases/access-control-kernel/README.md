@@ -51,6 +51,21 @@ the same increment — what the grown role can and cannot do over HTTP — live 
 [`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
 as `S4.2a-OP-03`..`S4.2a-OP-06`.
 
+The one `S4.2b-TR-01` scenario in [`tree-root-seed/`](tree-root-seed/) is
+**draft Stage-1 prose for PLAT-E4-S4.2b** (Story 4.2 scope item 3, tree-root
+half only), pending independent human approval. It is a **verification, not a
+seed**: root sitting at the top of the `reports-to` tree is the absence of a
+`Relationship` row, not one anyone writes, and this file locks that absence
+against a live database a fresh `db:seed && db:bootstrap:access-control`
+produces. It authorizes no change to
+`prisma-relationship-graph.adapter.ts`, no migration, and (pending a separate
+Ask-First ruling) at most two documentation-only comments in
+`access-control-bootstrap.ts` / `prisma/seed.ts`. The positive-fact
+counterpart — proving a real multi-hop chain still resolves `reporting` write
+transitively up to root through the same unmodified CTE — lives in
+[`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
+as `S4.2b-TR-02`..`S4.2b-TR-04`.
+
 **ACM-8 non-goals:** rebinding `ACCESS_CONTROL_PORT` away from
 `InterimAccessControlAdapter` in `user-management.module.ts` (User
 Management's own, separately-gated AD-2 story); any change to
@@ -396,3 +411,4 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM1R-FB-28` | [fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md](fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md) | An administrator's approved extra permission — now the **seventh**, not the fourth — its grant to the canonical policy, and a later administrator's attachment all survive a rerun untouched. **Amended 2026-09-06 (PLAT-E4-S4.2a)**; the filename keeps `fourth` because scenario slugs are never renumbered. |
 | `S4.2a-OP-01` | [fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md](fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md) | `package.json` declares `db:bootstrap:access-control`, and the alias resolves to `scripts/bootstrap-access-control.ts`. **Precondition repair (AF-1)** — the missing alias is why every scenario in this folder is red at `ef03c88` for a reason unrelated to its subject; this file separates that red state from the discriminating one. |
 | `S4.2a-OP-02` | [fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md](fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md) | The upgrade rerun: against a database bootstrapped at the retired three-key set, the amended bootstrap restores the three added `Permissions` rows and their grants and leaves every pre-existing id, description, attachment and singleton column byte-identical. |
+| `S4.2b-TR-01` | [tree-root-seed/s42b-tr-01-bootstrap-writes-no-relationship-row.md](tree-root-seed/s42b-tr-01-bootstrap-writes-no-relationship-row.md) | A fresh `db:seed && db:bootstrap:access-control` writes **zero** `relationships` rows — root's own `direct`/`people_partner` count stays `0`. A verification, not new seed logic; re-proves the spec's own grep table against a live database. |

@@ -50,6 +50,21 @@
 > [`s42a-op-06`](./s42a-op-06-delegated-hr-admin-timeline-write-accepted-deviation.md);
 > do not silently "fix" it.
 
+> **Added 2026-09-06 (PLAT-E4-S4.2b — tree-root seed).** Three new scenarios
+> below — `s42b-tr-02`..`s42b-tr-04` — are the HTTP-level, positive-fact half of
+> the increment: a real two-level `direct` chain (`E2 → E1 → root`), built
+> through the real `POST /users/:id/relationships` write route, terminates at
+> root and resolves `reporting` write transitively, through the unmodified
+> upward-walk CTE. The database-level negative fact — a fresh bootstrap writes
+> zero `Relationship` rows — is
+> [`S4.2b-TR-01`](../../access-control-kernel/tree-root-seed/s42b-tr-01-bootstrap-writes-no-relationship-row.md)
+> in [`tree-root-seed/`](../../access-control-kernel/tree-root-seed/). **This is
+> a verification, not new seed behaviour**: no schema, no migration, and no
+> change to `prisma-relationship-graph.adapter.ts` or `assign-manager.action.ts`
+> is authorized by these files. `s42b-tr-04` is the negative control — nothing
+> about reaching **into** root moved for the employees the chain touches or for
+> anyone outside it.
+
 Stage-1 scenario documents (AD-1) for **Epic 0 — Access Control Adoption**. They
 mirror the dispatch entries `UMAC-1` / `UMAC-2` in
 `_bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml`
@@ -198,3 +213,6 @@ S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
 | `s42a-op-04-root-data-reach-unchanged-by-the-operator-set.md` | 4.2a | draft — the negative control: the same root still gets `403` on `PATCH /users/<unrelated>` and `canEdit: false` on the follow-up `GET`. Green before **and** after; a red here at Stage 3 means the increment widened data access and stops for a human. Root's edit reach is tree position (scope item 3), not a key |
 | `s42a-op-05-delegated-hr-admin-gets-no-data-access.md` | 4.2a | draft — a second holder attached to the bootstrap's own canonical policy lists users (`200`) and reads a colleague card (`200`, `canEdit: false`), is refused `PATCH` (`403`, row unchanged) and every other section write (`403`), and gains the two feature routes. The `access-control.md` line-19 invariant restated for the six-key role |
 | `s42a-op-06-delegated-hr-admin-timeline-write-accepted-deviation.md` | 4.2a | draft — **the AF-2 accepted deviation, asserted rather than left latent.** The same delegated holder, with no relationship to the target, writes and deletes career-timeline events (`201`/`204`) while still being refused that target's identity card (`403`, `canEdit: false`). Kept in its own file so the exception cannot soften the invariant in `s42a-op-05`. A later increment that narrows `canEditTimeline` supersedes this file with a dated pointer; it does not invert its expected results |
+| `s42b-tr-02-root-resolves-reporting-write-two-levels-down.md` | 4.2b | draft — root imports two employees, wires a real two-level `direct` chain (`E2 → E1 → root`) through `POST /users/:id/relationships`, then `PATCH`/`GET /users/<E2>` → `200`/`canEdit: true`, two hops up the unmodified upward-walk CTE. **Expected green on first run** — a regression lock over an already-correct property, not red-to-green |
+| `s42b-tr-03-root-has-no-upward-edge.md` | 4.2b | draft — `GET /users/<root>/relationships` → `200`, `data: []`, over the real endpoint (Gate B's `isAllowed('org:relationships:write')` disjunct is why root can read its own empty list at all). Re-proves `S4.2b-TR-01`'s database-level negative fact through HTTP, with two other people's edges already in the table. **Expected green on first run** |
+| `s42b-tr-04-unrelated-and-colleague-reach-into-root-unchanged.md` | 4.2b | draft — the negative control: E1 (whose own edge points at root) and U (no edge anywhere) both still get `403` on `PATCH /users/<root>` and `canEdit: false` on `GET /users/<root>`. Relationship edges are directional — reaching down to E2 grants nobody reach back up into root. Green before **and** after; a red here means the increment widened reach into root |
