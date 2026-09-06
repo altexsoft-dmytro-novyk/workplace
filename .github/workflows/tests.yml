@@ -33,18 +33,28 @@ jobs:
       - run: npm ci
       - run: npm run test:clickup
 
-  # ── Informational suites ─────────────────────────────────────────────────
-  # AD-1 commits Stage-2 tests red on purpose: the test lands before the
-  # production code. Mentorship (~29 cases) has no module under src/ at all.
-  # These jobs therefore report, they do not gate — `continue-on-error` keeps
-  # their conclusion neutral so no branch protection rule can block a merge on
-  # a red that the process asked for. Promote one to blocking by deleting its
-  # `continue-on-error` line once its suite is meant to be green.
+  # ── Service suites ───────────────────────────────────────────────────────
+  # Two of the three now gate. `backend-unit` (19/19) and `frontend-e2e`
+  # (124/124, no flaky cases) were observed green on a run at the currently
+  # pinned service SHAs — backend 20ed2a08, frontend cfbed35 — so they run
+  # without `continue-on-error` and a red result there is a real failure.
+  #
+  # `backend-e2e` stays informational. AD-1 commits Stage-2 tests red on
+  # purpose: the test lands before the production code, and mentorship
+  # (~29 cases) has no module under src/ at all. `continue-on-error` keeps that
+  # job's conclusion neutral so no branch protection rule can block a merge on a
+  # red the process asked for. Promote it the same way once its suite is meant
+  # to be green — but note it carries four `continue-on-error` lines, not two:
+  # job level plus the compose, migration and test steps. All four have to go,
+  # because a soft step that fails still counts as successful when the job's
+  # conclusion is computed.
+  #
+  # The `Lint` steps of the two gating jobs are deliberately still soft; lint
+  # has not been promoted.
 
   backend-unit:
-    name: Backend · unit (informational)
+    name: Backend · unit
     runs-on: ubuntu-latest
-    continue-on-error: true
     defaults:
       run:
         working-directory: services/backend
@@ -77,7 +87,6 @@ jobs:
         run: npx eslint "{src,apps,libs,test}/**/*.ts"
 
       - name: Unit tests
-        continue-on-error: true
         run: npm test -- --ci --json --outputFile="$GITHUB_WORKSPACE/reports/backend-unit.json"
 
       - uses: actions/upload-artifact@v4
@@ -160,9 +169,8 @@ jobs:
         run: docker compose down -v
 
   frontend-e2e:
-    name: Frontend · Playwright (informational)
+    name: Frontend · Playwright
     runs-on: ubuntu-latest
-    continue-on-error: true
     defaults:
       run:
         working-directory: services/frontend
@@ -204,7 +212,6 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: E2E tests
-        continue-on-error: true
         # The suite mocks the API at the network layer and starts Vite itself
         # (playwright.config.ts `webServer`), so no backend is needed here.
         env:
@@ -279,7 +286,8 @@ jobs:
           {
             echo '## Live verification evidence'
             echo
-            echo 'These suites run informationally — a red result never blocks a merge.'
+            echo 'Backend unit and Frontend Playwright are gating: a red result there fails the run.'
+            echo 'Backend e2e stays informational — its red is AD-1 by design and blocks nothing.'
             echo
             echo '```'
             cat summary.txt 2>/dev/null || echo 'producer did not run'
