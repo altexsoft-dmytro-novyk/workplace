@@ -1,4 +1,16 @@
-# ACM1-FB-03 · The seeded hr-admin role is connected to exactly three permissions
+# ACM1-FB-03 · The seeded hr-admin role is connected to exactly six permissions
+
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** `PolicyPermissions` after a fresh bootstrap `3` → **`6`**.
 
 **Trace:**
 
@@ -10,21 +22,25 @@
 
 ## Scenario
 
-**Given** the ACM1-FB-01 and ACM1-FB-02 outcomes: the three canonical
+**Given** the ACM1-FB-01 and ACM1-FB-02 outcomes: the six canonical
 `Permissions` rows and the one `hr-admin` FR `Policies` row exist.
 
 **When** `npm run db:bootstrap:access-control` runs to completion — the same
 run that produces ACM1-FB-01 and ACM1-FB-02.
 
-**Then** `PolicyPermissions` holds exactly three rows whose `policyId` is the
-`hr-admin` policy's id, each with `policyType='FR'`, and whose three
-`permissionId` values are exactly the three seeded `Permissions` ids — one
+**Then** `PolicyPermissions` holds exactly six rows whose `policyId` is the
+`hr-admin` policy's id, each with `policyType='FR'`, and whose six
+`permissionId` values are exactly the six seeded `Permissions` ids — one
 grant per canonical key, none missing, none extra, none duplicated.
+
+One grant per key is what makes the operator half real: the permission row
+alone allows nobody, so a set that seeded six `Permissions` and five grants
+would leave a live route gate closed with no visible defect in the catalog.
 
 **Preconditions:** freshly migrated database; CAP-8 root User exists and is
 active; `PolicyPermissions` empty before the run.
 
-## Test — bootstrap grants the three permissions to the role
+## Test — bootstrap grants the six permissions to the role
 
 - **entrypoint:** `npm run db:bootstrap:access-control`
 - **preconditionState:** `SELECT count(*) FROM "PolicyPermissions"` → `0`
@@ -33,6 +49,6 @@ active; `PolicyPermissions` empty before the run.
   SELECT "permissionId", "policyType"
   FROM "PolicyPermissions"
   WHERE "policyId" = :hrAdminPolicyId;
-  -- exactly the 3 ids present in Permissions, one row each, policyType = 'FR' on every row
-  SELECT count(*) FROM "PolicyPermissions"; -- 3
+  -- exactly the 6 ids present in Permissions, one row each, policyType = 'FR' on every row
+  SELECT count(*) FROM "PolicyPermissions"; -- 6
   ```

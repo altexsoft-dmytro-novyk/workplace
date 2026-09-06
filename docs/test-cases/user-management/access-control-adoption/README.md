@@ -25,6 +25,31 @@
 > §3.2 matrix-row citation. `umac-10` is **superseded** by
 > [`s41c-sag-04`](./s41c-sag-04-functional-grant-never-widens-audience.md).
 
+> **Amended 2026-09-06 (PLAT-E4-S4.2a — root-operator permission set).** The
+> canonical ACM-1 `hr-admin` functional role grows from **three** permission
+> keys to **six**: the three `user-management:*` keys plus
+> `org:relationships:write`, `employee:departure:record` and
+> `profile:timeline:write`. Four new scenarios below — `s42a-op-03`..`s42a-op-06`
+> — are the consumer side of that change; the database side is
+> [`fr-bootstrap/`](../../access-control-kernel/fr-bootstrap/) and the full
+> amendment record is
+> [`ACM1-FB-01`](../../access-control-kernel/fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md).
+> **No asserted outcome in `umac-01`..`umac-09` or `s41c-sag-01`..`s41c-sag-05`
+> changes**: none of the six keys is a section key, none appears in
+> `SECTION_ACCESS_MATRIX`, and `hasSectionAccess` consults none of them.
+>
+> **One deviation is deliberate and is recorded, not softened.**
+> `profile:timeline:write` is in the set by a dated Product Owner ruling (AF-2,
+> Dmytro Novyk, 2026-09-06) that overrides the increment spec's own
+> recommendation to exclude it. `canEditTimeline` discards its target, so this
+> grant gives every present and future holder of `hr-admin` org-wide write
+> access to every employee's career timeline with no relationship required —
+> a **known, accepted deviation from a NORMATIVE invariant** (`access-control.md`
+> line 19) in permanent production configuration. It stops being a deviation
+> when `canEditTimeline` gains its audience half. See
+> [`s42a-op-06`](./s42a-op-06-delegated-hr-admin-timeline-write-accepted-deviation.md);
+> do not silently "fix" it.
+
 Stage-1 scenario documents (AD-1) for **Epic 0 — Access Control Adoption**. They
 mirror the dispatch entries `UMAC-1` / `UMAC-2` in
 `_bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml`
@@ -169,3 +194,7 @@ S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
 | `s41c-sag-03-write-audience-plus-baseline-allows.md` | 4.1c | draft — reporting-line manager, assigned PP, and a transitive (two-hop) manager `PATCH` → `200`, change persists, follow-up `GET` → `canEdit: true`; no `UserPolicies` row anywhere, so the allow is the D2 code baseline |
 | `s41c-sag-04-functional-grant-never-widens-audience.md` | 4.1c | draft — **supersedes `umac-10`.** A live FR grant (`user-management:edit`, and even an explicit `profile:identity:write`) over a colleague-only or self audience → `403`, `canEdit: false`; a `'none'` target stays closed. The `access-control.md` line-19 invariant, asserted mechanically. **Expected red before 4.1c's implementation stage** |
 | `s41c-sag-05-unmapped-section-fails-closed.md` | 4.1c | draft — a section key with no `SECTION_ACCESS_MATRIX` row resolves `'none'` and denies for both `'read'` and `'write'`, with no throw, no log-and-allow, and `isAllowed` never called. No route declares an unmapped section, so its Stage-2 surface is the adapter unit spec plus kernel `acm5-sa-06` — see the flag in that file |
+| `s42a-op-03-root-operator-capability-after-production-bootstrap.md` | 4.2a | draft — root provisioned by `db:seed && db:bootstrap:access-control` **with no dev script** imports a population, wires a `direct` manager edge, sets a department manager and records a departure → success on all four. **Expected red before Stage 3** on the last three (`403`): `org:relationships:write` and `employee:departure:record` are absent from the canonical set at the baseline commit. Flags a Stage-1 question — this needs a harness that boots Nest against a bootstrap-provisioned database, which no suite has today |
+| `s42a-op-04-root-data-reach-unchanged-by-the-operator-set.md` | 4.2a | draft — the negative control: the same root still gets `403` on `PATCH /users/<unrelated>` and `canEdit: false` on the follow-up `GET`. Green before **and** after; a red here at Stage 3 means the increment widened data access and stops for a human. Root's edit reach is tree position (scope item 3), not a key |
+| `s42a-op-05-delegated-hr-admin-gets-no-data-access.md` | 4.2a | draft — a second holder attached to the bootstrap's own canonical policy lists users (`200`) and reads a colleague card (`200`, `canEdit: false`), is refused `PATCH` (`403`, row unchanged) and every other section write (`403`), and gains the two feature routes. The `access-control.md` line-19 invariant restated for the six-key role |
+| `s42a-op-06-delegated-hr-admin-timeline-write-accepted-deviation.md` | 4.2a | draft — **the AF-2 accepted deviation, asserted rather than left latent.** The same delegated holder, with no relationship to the target, writes and deletes career-timeline events (`201`/`204`) while still being refused that target's identity card (`403`, `canEdit: false`). Kept in its own file so the exception cannot soften the invariant in `s42a-op-05`. A later increment that narrows `canEditTimeline` supersedes this file with a dated pointer; it does not invert its expected results |

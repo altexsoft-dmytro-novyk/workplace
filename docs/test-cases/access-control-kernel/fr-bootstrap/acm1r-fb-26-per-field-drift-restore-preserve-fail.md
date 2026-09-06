@@ -1,5 +1,21 @@
 # ACM1R-FB-26 · Drift is dispositioned per field: restore, preserve, or fail before writes
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** the clean post-bootstrap snapshot `Permissions ×3` → **`×6`** and
+> `PolicyPermissions ×3` → **`×6`**. The eight R/P/F dispositions themselves are
+> unchanged — restore missing, preserve descriptive fields and generated ids,
+> fail before writes on identity or authorization-bearing drift. The
+> *"singleton's three columns"* is unrelated to the key count.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — behavioral row "Per-field FR-AMD-1 drift table — restore missing owned rows, preserve descriptive fields and generated ids, fail before writes on identity/authorization-bearing drift".
@@ -44,7 +60,7 @@ attachment does not license re-selecting a root.
 
 "Fail **before** writes" is the assertion, not merely "fail". Each F case must
 leave every count and every field exactly as the modification left it — a run
-that writes two of the three grants and then discovers F1 has already violated
+that writes two of the six grants and then discovers F1 has already violated
 the contract even though it exits nonzero, and ACM1R-FB-27 covers the rollback
 that makes that observable.
 
@@ -63,7 +79,7 @@ exactly one modification applied per case.
 - **entrypoint:** `npm run db:bootstrap:access-control`, once per case, each
   from a freshly bootstrapped database
 - **preconditionState:** per case, the clean post-bootstrap snapshot —
-  `Permissions` ×3 with ids, FR `Policies` ×1 with id, `PolicyPermissions` ×3,
+  `Permissions` ×6 with ids, FR `Policies` ×1 with id, `PolicyPermissions` ×6,
   `UserPolicies` ×1, `AccessControlBootstrap` ×1 with its three columns
 - **expectedDatabaseState:** exactly the "Required outcome" column above, and in
   every F case all five counts and every captured field are identical to the

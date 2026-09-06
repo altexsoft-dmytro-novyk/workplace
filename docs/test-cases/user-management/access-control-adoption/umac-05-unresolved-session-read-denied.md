@@ -6,7 +6,27 @@
 > `404`; visible resource but forbidden action `403`. Do not edit expectedResult
 > lines below as if they had always said `404`. Regeneration is a new AD-1 dispatch.
 
-**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) · `um-integration-contract-response.md` Q3 (empty set → deny), Q4 (**revised 2026-09-01 by human product decision — no "leak-free 404"; standard REST codes**; **superseded 2026-09-02 by PM/AD-24**), Q6 (the `Bearer <token:Bob>` literal-placeholder trap; adoption fixtures use `Bearer <token:<seeded-uuid>>`) · `access-control.md` §3.2 (identity validation runs **before** any audience derivation — an unconfirmed viewer or target yields an empty audience `Set`, never Self, never the Colleague floor) · `nestjs-di-tokens.md` (`AccessControlGuard` is the only sanctioned `ACCESS_CONTROL_PORT` consumer; it already maps a denied `isAllowedForTarget` to `403`) · `testing-strategy.md` AD-1 · `docs/test-cases/README.md`
+> **CORRECTED 2026-09-06 — mechanism only (PLAT-E4-S4.1c / PLAT-E4-S4.1d).**
+> Every `isAllowedForTarget` reference below describes machinery that no longer
+> exists. `AccessControlPort` exposes exactly two methods today, `isAllowed` and
+> `hasSectionAccess`
+> (`services/backend/src/user-management/domain/interfaces/access-control.port.ts:11-33`):
+> 4.1c moved `GET /users/:id` onto
+> `@RequireSectionAccess('profile:identity', 'read')`
+> (`services/backend/src/user-management/application/controllers/users.controller.ts:157-158`)
+> and 4.1d then deleted `isAllowedForTarget`, `RequireFeatureForTarget` and
+> `AccessControlGuard`'s `targetScoped` branch outright. The `403` this scenario
+> asserts is now thrown by `SectionAccessGuard` when
+> `hasSectionAccess(viewer, 'profile:identity', 'read', target)` returns `false`
+> (`services/backend/src/user-management/application/guards/section-access.guard.ts:53-66`),
+> which the adapter answers audience-first — an empty audience resolves `'none'`,
+> outranked by `'read'`, so `false`
+> (`services/backend/src/user-management/infrastructure/access-control-facade.adapter.ts:63-81`).
+> **The scenario, its Given/When/Then and every `expectedResult` below are
+> unchanged** — only descriptions of the mechanism are corrected here. Verified
+> against backend `ef03c88`.
+
+**Trace:** SPEC-user-management-access-control-adoption CAP-2 (read) · `um-integration-contract-response.md` Q3 (empty set → deny), Q4 (**revised 2026-09-01 by human product decision — no "leak-free 404"; standard REST codes**; **superseded 2026-09-02 by PM/AD-24**), Q6 (the `Bearer <token:Bob>` literal-placeholder trap; adoption fixtures use `Bearer <token:<seeded-uuid>>`) · `access-control.md` §3.2 (identity validation runs **before** any audience derivation — an unconfirmed viewer or target yields an empty audience `Set`, never Self, never the Colleague floor) · `nestjs-di-tokens.md` (~~`AccessControlGuard` is the only sanctioned `ACCESS_CONTROL_PORT` consumer; it already maps a denied `isAllowedForTarget` to `403`~~ — **corrected 2026-09-06 (4.1c/4.1d):** the port has two sanctioned guard consumers, `AccessControlGuard` for the no-target `isAllowed` check and `SectionAccessGuard` for `hasSectionAccess`; the `403` on this route is the latter's, `section-access.guard.ts:53-66`. `nestjs-di-tokens.md:62` itself still names only `SessionGuard`/`AccessControlGuard`) · `testing-strategy.md` AD-1 · `docs/test-cases/README.md`
 
 ## Scenario
 
@@ -30,25 +50,52 @@
   magic-link middleware enforces this. `InterimSessionResolverAdapter` is lax —
   it parses the token into `{ userId: <string> }` without checking the row
   exists or is active — so during the interim such a request reaches
-  `AccessControlGuard`, resolves to an empty audience, and surfaces as **`403`**
-  (see below). That interim `403` is acceptable; the target end state is `401`
-  once the real session middleware lands.
+  ~~`AccessControlGuard`~~ the route gate, resolves to an empty audience, and
+  surfaces as **`403`** (see below). That interim `403` is acceptable; the target
+  end state is `401` once the real session middleware lands.
+  **Corrected 2026-09-06:** the guard that produces that `403` is
+  `SectionAccessGuard` (`section-access.guard.ts:53-66`), not
+  `AccessControlGuard`, since 4.1c. Separately — and **not** decided by this
+  correction — `InterimSessionResolverAdapter` no longer exists either: Epic 2
+  Story 2.2 replaced it with `JwtSessionResolverAdapter`, whose persona
+  shorthand yields `null` for a persona that is not an active `User`
+  (`services/backend/src/user-management/infrastructure/jwt-session-resolver.adapter.ts:120-140`),
+  so `SessionGuard` raises `401` first
+  (`services/backend/src/user-management/application/guards/session.guard.ts:34-39`).
+  The committed E2E has already moved to that end state — `UMAC-05 Test 1` and
+  `Test 2` assert `401`
+  (`services/backend/test/user-management/access-control-adoption/read-denial.e2e-spec.ts:58,74`)
+  while the `expectedResult` lines below still read `403`. That divergence is
+  **flagged, not resolved here**: re-approving them is a new AD-1 dispatch, so
+  the approved lines are left exactly as they stand.
 - **Authenticated active viewer, empty audience → `403`.** On this read route
   `colleague` is the audience floor (`umac-04`), so an authenticated active
   viewer only gets an empty audience when the **target** is not an active
   `User`. The response is `403`. **No existence distinction is made** — a
-  forbidden target and a missing target both return `403`. This is exactly what
-  `AccessControlGuard` produces today from a denied `isAllowedForTarget`, so
-  **no guard or controller change is in scope** for this story.
+  forbidden target and a missing target both return `403`. ~~This is exactly what
+  `AccessControlGuard` produces today from a denied `isAllowedForTarget`~~ —
+  **corrected 2026-09-06 (4.1c/4.1d):** this is what `SectionAccessGuard`
+  produces from a denied `hasSectionAccess(viewer, 'profile:identity', 'read',
+  target)` (`section-access.guard.ts:53-66`); `isAllowedForTarget` is gone from
+  `AccessControlPort` (`access-control.port.ts:11-33`). The asserted status is
+  unaffected, and **no guard or controller change is in scope** for this story.
 
 There is **no `404` authorization branch** on `GET /users/:id`. The earlier
 "leak-free `404`" convention was withdrawn by human product decision on
 2026-09-01 (this is an internal employee directory; standard REST codes are
 clearer and the existence of a user id is not sensitive).
 
-This is the exact case that "passes" under the interim adapter
+~~This is the exact case that "passes" under the interim adapter
 (`isAllowedForTarget` returns `Boolean(userId)`, so `Boolean('Bob') === true` →
-`200`) and must fail under the real facade. The `profile.e2e-spec.ts`
+`200`) and must fail under the real facade.~~ **Corrected 2026-09-06.** That
+sentence described the pre-adoption interim access-control adapter, which was
+already superseded by `AccessControlFacadeAdapter` and whose `isAllowedForTarget`
+method 4.1d removed from the port entirely
+(`services/backend/src/user-management/domain/interfaces/access-control.port.ts:11-33`);
+no code path returns `Boolean(userId)` today. The point the sentence was making
+survives in a different mechanism: a `Bearer <token:Bob>` literal never reaches
+audience resolution at all, because the persona shorthand resolves only an
+active `User` row (`jwt-session-resolver.adapter.ts:120-140`). The `profile.e2e-spec.ts`
 `Bearer <token:Bob>` literals (`um-pf-01`..`04`) break here; whether those move
 to seeded personas or a tightened scope note is a Stage-2 call
 (`um-integration-contract-response.md` Q6), recorded, not resolved here.

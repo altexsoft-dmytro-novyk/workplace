@@ -45,6 +45,14 @@ canAccessSection(...) === 'write'` to the identity-card gate so
 above. Root's edit power comes from the seeded tree position, not an adapter
 special case.
 
+**Note added 2026-09-06 — the deletion has happened; only the reasoning is
+still live here.** `canEditS1` and its OR clause were deleted by Story 4.1d (PO
+ruling AF-2, 2026-09-06) and the pinning test retired by Story 4.1c (PO,
+2026-09-05). The corollary above stands as the rationale of record; the *action*
+it named has moved to a verification — see re-scoped scope item 1. Root's edit
+power still has to be *provisioned*, which is what scope items 2, 3 and 5 do,
+and none of them is built.
+
 ## User story
 
 As **the person running a fresh deployment (and as a developer on a seeded dev
@@ -59,13 +67,83 @@ authorisation code**.
 
 **In:**
 
-1. **Delete the override.** Remove the `user-management:edit` OR-branch from
+1. ~~**Delete the override.** Remove the `user-management:edit` OR-branch from
    `AccessControlFacadeAdapter.canEditS1`
    (`services/backend/src/user-management/infrastructure/access-control-facade.adapter.ts`)
    and the interim pinning test
    (`write-adoption.e2e-spec.ts` "S1 edit · `user-management:edit` FR grant is
    an OR-override" — see also the P2 active-target guard added in the same
-   review; that guard is subsumed once the override is gone).
+   review; that guard is subsumed once the override is gone).~~
+
+   **RE-SCOPED 2026-09-06 — both deletions were performed by other stories.
+   This item is now a VERIFICATION, not a change.** Nothing in scope item 1 is
+   left for 4.2 to delete; what remains is to assert that the removal actually
+   happened and did not come back. **What this item now asserts:** the
+   identity-card edit decision in `services/backend/src/` contains no
+   functional-role OR-branch, and the symbols that carried one no longer exist.
+
+   *Who deleted what, and on whose authority:*
+
+   - **The pinning test** — the `umac-10` describe block in
+     `test/user-management/access-control-adoption/write-adoption.e2e-spec.ts`
+     — was retired by **PLAT-E4-S4.1c**, on the Product Owner decision of
+     **2026-09-05 (Dmytro Novyk, "Reading 1")** recorded in
+     `_bmad-output/implementation-artifacts/platform/spec-4-1c-require-section-access-gate.md`
+     § "Resolved decision — `umac-10` disposition". Once 4.1c moved
+     `PATCH /users/:id` and the `canEdit` hint onto
+     `@RequireSectionAccess('profile:identity', 'write')`, the override was off
+     every live path and two of the block's three assertions necessarily
+     inverted. Its one surviving assertion (a `'none'` target stays closed to a
+     grant holder) was carried over verbatim as `s41c-sag-04` Test 5 in
+     `test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts:421`;
+     the scenario doc `umac-10-write-fr-grant-override.md` is kept and marked
+     superseded, not deleted.
+   - **The `user-management:edit` OR-branch** was deleted together with
+     `canEditS1` itself — the whole method — by **PLAT-E4-S4.1d**, on the
+     Product Owner ruling **AF-2 of 2026-09-06 (Dmytro Novyk)** recorded in the
+     resolved Ask First table of
+     `_bmad-output/implementation-artifacts/platform/spec-4-1d-gate-cleanup.md`:
+     *"Delete `canEditS1` whole, OR clause included … Story 4.2 closes its scope
+     item 1 by verification, not deletion."* The same ruling directed that
+     4.2's file be re-scoped in a separate pass — this is that pass.
+
+   *The gate as it now stands.* The identity-card decision is the audience-first
+   dual gate `AccessControlFacadeAdapter.hasSectionAccess`
+   (`access-control-facade.adapter.ts:63-81`), reached for the `canEdit` hint
+   through `canEditIdentityCard` (`:85-95`). `isAllowed` is consulted only
+   *after* `canAccessSection` has already allowed, and only for a `'write'`
+   requirement, with the key `'<section>:write'` — so the functional half can
+   only ever subtract. That is the `access-control.md:19` NORMATIVE invariant
+   holding structurally rather than by a hand-written special case.
+
+   *Concrete verification — grep over `services/backend/src/`, expected zero.*
+   Run with `git grep` or `grep -arn`, never plain `grep -r`: 4.1d's Verification
+   section records that a NUL-carrying file in this tree is skipped as binary by
+   plain `grep -r`, which is how two live hits escaped an earlier oracle.
+
+   | Symbol | Expected in `src/` | Measured 2026-09-06 at `services/backend` HEAD `ef03c88` |
+   | --- | --- | --- |
+   | `canEditS1` | 0 executable | **0 executable** (1 comment hit: `infrastructure/__tests__/access-control-facade.adapter.spec.ts:95`, a dated citation of the defect the 2026-09-03 review found — sanctioned by 4.1d's AC) |
+   | `S1_SECTION` | 0 | **0** |
+   | `isAllowedForTarget` | 0 | **0** |
+   | `EDIT_USER_FEATURE` | 0 | **0** |
+   | `user-management:edit` | 0 executable | **0 executable** (4 hits, all prose or a test title asserting the key is *not* consulted) |
+
+   *The P2 active-target guard.* It no longer exists as a distinct guard, and
+   there is nothing here for 4.2 to remove. It was the
+   `if (sectionAccess === 'none') return false;` clause inside `canEditS1` — the
+   constraint that stopped the override widening past a `'none'` section result
+   for a deactivated or unknown target (SCP 2026-09-04 §4.7). It went with
+   `canEditS1` in 4.1d. The parenthetical's prediction — "subsumed once the
+   override is gone" — held: `hasSectionAccess` denies whenever the resolved
+   rank sits below the requirement, so `'none'` denies on its own; and a
+   deactivated or unknown target cannot resolve above `'none'` in the first
+   place, because `AudienceResolverService` validates identity before deriving
+   any audience (CAP-1) through `PrismaIdentityAdapter.findActiveUserIds`, which
+   filters on `isActive: true`. The behaviour is pinned by `s41c-sag-04` Test 5.
+
+   **Scope items 2, 3 and 5 are untouched by this re-scoping and remain
+   entirely unbuilt; this story is not finished.**
 2. **Production root-operator bootstrap (AC-owned, ACM-1 amendment).** The
    canonical `hr-admin` FR grant in `scripts/bootstrap-access-control.ts` grows
    from the current three keys to the full **operator set** root needs to run a
@@ -149,9 +227,26 @@ authorisation code**.
 
 ## Acceptance criteria
 
-- `canEditS1` no longer references `isAllowed` / `EDIT_USER_FEATURE`; grep of
+- ~~`canEditS1` no longer references `isAllowed` / `EDIT_USER_FEATURE`; grep of
   `access-control-facade.adapter.ts` shows no FR-permission branch in the
-  identity-card decision. The OR-override pinning test is deleted.
+  identity-card decision. The OR-override pinning test is deleted.~~
+  **CORRECTED 2026-09-06 — already satisfied at `services/backend` HEAD
+  `ef03c88`, and satisfied trivially: `canEditS1` cannot reference `isAllowed`
+  or `EDIT_USER_FEATURE` because the method itself no longer exists.** 4.1d
+  deleted it whole under PO ruling AF-2 (2026-09-06); 4.1c retired the
+  OR-override pinning test under the PO decision of 2026-09-05 — see re-scoped
+  scope item 1. Restated as the standing regression guard this criterion now is:
+  *`git grep` / `grep -arn` over `services/backend/src/` returns zero executable
+  hits for `canEditS1`, `S1_SECTION`, `isAllowedForTarget`, `EDIT_USER_FEATURE`
+  and `user-management:edit`, and the identity-card decision runs entirely
+  through the audience-first `hasSectionAccess`
+  (`access-control-facade.adapter.ts:63-81`), where the functional half is
+  reached only after the audience half allows.* Measured PASS on 2026-09-06 (the
+  one `canEditS1` hit is the dated comment at
+  `infrastructure/__tests__/access-control-facade.adapter.spec.ts:95`, sanctioned
+  by 4.1d's own AC). **This criterion is closed by verification and carries no
+  work; it does not make the story complete — the criteria below it for scope
+  items 2, 3 and 5 are all outstanding.**
 - On a seeded dev DB: the root identity resolves `reporting` → `write` on
   `profile:identity` for every active user in the seeded population, and
   `GET /users/:id` returns `canEdit: true` for root on every card — with no
@@ -197,8 +292,15 @@ authorisation code**.
    the design recommends folding its ACM-9 `seeded-two-level` run into 4.2b
    instead. **Not decided here — see "Open for decision" below.**
 2. **4.2b** — §2.4 first-holder = root at seed (AC / seed increment).
-3. **4.2c** — delete the `canEditS1` override + pinning test; `db:dev:seed-org`
-   spine (UM increment). Lands with or just after 4.1's composition decision.
+3. **4.2c** — ~~delete the `canEditS1` override + pinning test;~~
+   `db:dev:seed-org` spine (UM increment). Lands with or just after 4.1's
+   composition decision.
+   **CORRECTED 2026-09-06.** There is no override or pinning test left to
+   sequence: 4.1c retired the pinning test (PO, 2026-09-05) and 4.1d deleted
+   `canEditS1` whole (PO ruling AF-2, 2026-09-06) — see re-scoped scope item 1.
+   4.2c is therefore the **`db:dev:seed-org` dev spine (scope item 5) only**,
+   carrying the item-1 verification grep as an entry check rather than as work.
+   That work is unbuilt and the increment still stands.
 
 ## Open for decision (architect / PO — recorded 2026-09-05, not resolved here)
 

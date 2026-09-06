@@ -1,5 +1,20 @@
 # ACM1R-FB-27 · A failure part-way through leaves no partial bootstrap state
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** **no SQL count moves** — the rollback leaves every table at `0`. Two prose
+> numbers change: the injected failure now fires after the **six** permissions
+> are inserted, and the dangerous partial state is **six** permissions with no
+> grants and no attachment.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — behavioral row "Atomic rollback on any conflicting drift or failure".
@@ -12,7 +27,7 @@
 **Given** a freshly migrated database with the CAP-8 root User active and every
 bootstrap-owned table empty, and an injected failure that fires **after** the
 bootstrap has written some of its rows but **before** it commits — for example
-after the three permissions are inserted and before the attachment is written.
+after the six permissions are inserted and before the attachment is written.
 
 **When** `npm run db:bootstrap:access-control` runs.
 
@@ -29,7 +44,7 @@ Here the failure is deliberately placed **after** writes have occurred, which is
 the only arrangement that can distinguish a genuine single transaction from a
 sequence of autocommitted statements that happened to fail early elsewhere.
 
-A partial bootstrap is specifically dangerous rather than merely untidy: three
+A partial bootstrap is specifically dangerous rather than merely untidy: six
 permissions and an FR policy with no grants and no attachment is a state in
 which `isAllowed` returns `false` for a root who appears, to an operator
 reading the tables, to have been provisioned.

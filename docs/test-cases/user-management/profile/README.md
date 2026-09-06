@@ -35,8 +35,9 @@ this set.**
 > **Variant A (product decision 2026-09-02, Dmytro Novyk).** The employee
 > identity card (S1) has **no separate functional permission**. The Epic 0 edit
 > gate on `PATCH /users/:id` is `canAccessSection(viewer, 'S1', target) ===
-> 'write'` alone — the target's reporting-line manager or assigned People
-> Partner. Consequently **Story 1.2 is no longer blocked on a `user-management:edit`
+> 'write'` alone [historical spelling and historical mechanism — see the
+> 2026-09-06 correction below] — the target's reporting-line manager or
+> assigned People Partner. Consequently **Story 1.2 is no longer blocked on a `user-management:edit`
 > holder decision or a kernel-seed sequence**; it is pending only its own
 > Stage 2 / Stage 3. `user-management:edit` survives only as the Epic 0 adapter's
 > internal routing key for the PATCH-gate branch.
@@ -75,6 +76,33 @@ this set.**
 > `canAccessSection('S1')`, read it as this dual gate on `'profile:identity'`.
 > New Epic 4 scenarios:
 > [`s41c-sag-01`](../access-control-adoption/s41c-sag-01-read-gate-any-audience-allows-none-denies.md)..[`s41c-sag-05`](../access-control-adoption/s41c-sag-05-unmapped-section-fails-closed.md).
+
+> **Corrected 2026-09-06 — mechanism only (PLAT-E4-S4.1c / PLAT-E4-S4.1d),
+> verified against backend `ef03c88`.** Two mechanism descriptions in this file
+> are wrong. **No scenario, request spec, persona, expected status or `canEdit`
+> value changes** — every assertion in the `um-edit-*` and `um-photo-*` files
+> stands as approved.
+>
+> 1. **`canAccessSection(…, 'S1', …)` is not a call any route makes, and the
+>    section key in code is never `'S1'`.** Since 4.1c a section-gated route
+>    declares `@RequireSectionAccess(PROFILE_IDENTITY_SECTION, <level>)` —
+>    `GET /users/:id` with `'read'` and `PATCH /users/:id` with `'write'`
+>    (`services/backend/src/user-management/application/controllers/users.controller.ts:157-158`
+>    and `:212-213`) — and `SectionAccessGuard` asks the UM-owned port exactly
+>    one question, `hasSectionAccess(viewer, section, level, target)`, throwing
+>    `403` when it returns `false`
+>    (`services/backend/src/user-management/application/guards/section-access.guard.ts:53-66`).
+>    Only the adapter behind that port calls the kernel facade's
+>    `canAccessSection`, for the audience half of the D1 dual gate, before
+>    consulting `isAllowed('<section>:write')`
+>    (`services/backend/src/user-management/infrastructure/access-control-facade.adapter.ts:63-81`);
+>    the same call backs the `canEdit` hint (`:85-95`). The key passed across
+>    the port is the human key `'profile:identity'`
+>    (`services/backend/src/user-management/domain/constants/section-keys.ts:11`);
+>    per **D4**, `S1` in this file is a citation of the `docs/project-requirements.md`
+>    §3.2 matrix row and nothing else.
+> 2. **The photo route was never gated by `@RequireFeatureForTarget` as
+>    decision 1 below describes** — see the correction appended to that decision.
 
 The `um-photo-*` set was authored 2026-09-02 for Epic 1 Story 1.3 against the
 compiled spec
@@ -269,16 +297,52 @@ Every item below is the author's most docs/precedent-consistent pick for a point
 the sources leave open. Each is written as the expected outcome in the files that
 depend on it and **needs human confirmation at the AD-1 stage-1 gate.**
 
-1. **Self-only is an identity check, returns `403` for everyone else.**
-   `feature === UPLOAD_PHOTO` → the rebound `AccessControlPort.isAllowedForTarget`
-   returns `viewerId === targetUserId` — **no** facade `isAllowed` /
-   `canAccessSection` call, **no** `user-management:upload-photo` key (Open
-   Decision vi), **no** dependency on the `user-management:edit` seed. A
-   reporting-line manager or PP who can write Alice's S1 scalars through the
-   umac-07 dual gate is still `403` on her photo. Mirrors `umac-09`. The
-   controller's interim `@RequireFeatureForTarget('user-management:upload-photo')`
-   is replaced by this rule in the Epic 0 port rebind, not by a new decorator.
-   *(`um-photo-03`)*
+1. **Self-only is an identity check, returns `403` for everyone else.** The
+   decision itself stands: **no** facade `isAllowed` / `canAccessSection` call,
+   **no** `user-management:upload-photo` key (Open Decision vi), **no**
+   dependency on the `user-management:edit` seed. A reporting-line manager or PP
+   who can write Alice's S1 scalars through the umac-07 dual gate is still `403`
+   on her photo. Mirrors `umac-09`. *(`um-photo-03`)*
+
+   ~~`feature === UPLOAD_PHOTO` → the rebound
+   `AccessControlPort.isAllowedForTarget` returns `viewerId === targetUserId`~~ …
+   ~~The controller's interim
+   `@RequireFeatureForTarget('user-management:upload-photo')` is replaced by this
+   rule in the Epic 0 port rebind, not by a new decorator.~~
+
+   > **Corrected 2026-09-06 (PLAT-E4-S4.1c / S4.1d).** The struck sentences do
+   > not describe machinery that changed — they describe machinery the photo
+   > route never had once the current implementation existed, so this is a
+   > correction of fact rather than a rename.
+   >
+   > - **How the route is actually gated today:** `PUT /users/:id/photo` carries
+   >   `@SelfOnly()` and nothing else
+   >   (`services/backend/src/user-management/application/controllers/users.controller.ts:227-228`).
+   >   `SelfOnlyGuard` compares `session.userId` against the route's `:id` and
+   >   throws `403` on mismatch, with **no** port call and **no** facade call at
+   >   all (`services/backend/src/user-management/application/guards/self-only.guard.ts:24-44`;
+   >   decorator at `.../application/decorators/self-only.decorator.ts:5-10`).
+   >   The `401` for a missing or unresolvable token comes earlier, from
+   >   `SessionGuard` (`.../application/guards/session.guard.ts:34-39`); the
+   >   controller-level guard chain is
+   >   `SessionGuard, AccessControlGuard, SectionAccessGuard, SelfOnlyGuard`
+   >   (`users.controller.ts:91`).
+   > - **There was no interim decorator on this route to replace.**
+   >   `@RequireFeatureForTarget('user-management:upload-photo')` gated the photo
+   >   route only in the pre-reset Epic 1 implementation (backend `c42de7d`,
+   >   2026-08-26), which the 2026-08-30 architecture reset (`64c7a38`) removed.
+   >   The rebuilt controller landed on 2026-09-02 (`0788f60`) already using
+   >   `@SelfOnly()`, so the claim was stale on the day this README was written.
+   > - **The port method named here no longer exists.** 4.1d removed
+   >   `isAllowedForTarget` from `AccessControlPort`, which now exposes only
+   >   `isAllowed` and `hasSectionAccess`
+   >   (`services/backend/src/user-management/domain/interfaces/access-control.port.ts:11-33`),
+   >   and deleted `RequireFeatureForTarget` outright. `@RequireFeature` survives
+   >   for no-target capability checks only
+   >   (`.../application/decorators/require-feature.decorator.ts:9-15`).
+   > - **Nothing observable changes:** every `um-photo-*` expectation — `403` for
+   >   Bob, Paula and Eve, `401` unauthenticated, `403` for a non-resolvable
+   >   target — is exactly what the `@SelfOnly()` identity comparison produces.
 
 2. **Non-resolvable / inactive target with a real session → `403`, not `404`.**
    Self-only means `viewer id == target id`; a syntactically valid id matching no

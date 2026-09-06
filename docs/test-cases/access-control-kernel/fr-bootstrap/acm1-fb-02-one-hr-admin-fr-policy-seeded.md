@@ -1,5 +1,22 @@
 # ACM1-FB-02 · A fresh database seeds exactly one hr-admin FR policy
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** **none.** `Policies` (`type='FR'`) is still exactly `1`, and this file asserts
+> no permission or grant count. Its **Trace** lines quote SPEC CAP-3 and
+> FR-AMD-1 saying *"three permissions"* / *"granting exactly those three
+> permissions"*. Those quotes are left **verbatim** because their sources are
+> unedited (AF-4), and they are therefore stale against shipped behaviour from
+> 2026-09-06. The FR policy row this file is actually about is unchanged.
+
 **Trace:**
 
 - SPEC [CAP-3](../../../../_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md#capabilities) — "the reviewed custom migration makes `Policies.type` non-null, restricts it to FR/AR, and enforces AD-4 row shapes ... ACM-1 ensures the three permissions, one FR policy, three grants, and one attachment."

@@ -1,5 +1,19 @@
 # ACM1R-FB-19 · Identity is revalidated before any write and again before commit
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** **no SQL count moves** — every count in this file is `0` or `1` and the run
+> rolls back. One prose number changes: the transaction is now about to grant
+> the root **six** permissions, not three.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — behavioral row "Lock-and-revalidate of singleton, User, and attachment before writes **and again before commit**".
@@ -28,7 +42,7 @@ check, before any write, is what makes a doomed run cheap and keeps the failure
 diagnostic precise. The **second**, before commit, is the one that is actually
 load-bearing for correctness: without it, everything between the first check and
 commit is a window in which the root identity can change underneath a
-transaction that is about to grant it three permissions. Locking the candidate
+transaction that is about to grant it six permissions. Locking the candidate
 User row is what makes the second check meaningful — an unlocked re-read can be
 invalidated again before commit lands.
 

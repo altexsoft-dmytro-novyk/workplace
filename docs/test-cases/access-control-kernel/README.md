@@ -29,6 +29,28 @@ The five `ACM8-KC-01`..`ACM8-KC-05` CAP-6 kernel-composition scenarios in
 independent human approval. They authorize neither an ACM-8 Stage-2 test nor
 any `app.module.ts`/`access-control.module.ts` change.
 
+The two `S4.2a-OP-01`..`S4.2a-OP-02` scenarios in
+[`fr-bootstrap/`](fr-bootstrap/) are **draft Stage-1 prose for PLAT-E4-S4.2a**
+(Story 4.2 scope item 2), pending independent human approval, and eighteen of
+the twenty-eight `ACM1-FB`/`ACM1R-FB` files were **amended 2026-09-06** by the
+same increment: the canonical `hr-admin` set grows from three permission keys to
+**six**, so `Permissions` and `PolicyPermissions` move from `3` to `6` (and from
+`4` to `7` in `ACM1R-FB-16` and `ACM1R-FB-28`). `Policies`, `UserPolicies` and
+the singleton do not move, and no behavioural assertion in any of those files
+changed. Every amended file carries a dated pointer to
+[`ACM1-FB-01`](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md),
+which holds the full record: the six keys with the live gate that reads each
+one, the **AF-2 accepted deviation** (`profile:timeline:write` is in the set by
+Product Owner ruling and gives every holder org-wide career-timeline write with
+no relationship required — a known, dated, deliberately accepted deviation from
+a NORMATIVE invariant), and the **AF-4 note** that `database-schema.md`,
+`fr-architecture-amendment.md` and the kernel SPEC still say *"exactly three"*
+and will contradict shipped behaviour until a separate architect pass runs.
+Those four documents are deliberately unedited. The consumer-side scenarios for
+the same increment — what the grown role can and cannot do over HTTP — live in
+[`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
+as `S4.2a-OP-03`..`S4.2a-OP-06`.
+
 **ACM-8 non-goals:** rebinding `ACCESS_CONTROL_PORT` away from
 `InterimAccessControlAdapter` in `user-management.module.ts` (User
 Management's own, separately-gated AD-2 story); any change to
@@ -336,9 +358,9 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM8-KC-03` | [kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md](kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md) | `GET /users/:id` and every other existing route return byte-for-byte identical responses before and after composition. |
 | `ACM8-KC-04` | [kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md](kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md) | No new route appears in the composed application's route table — `AccessControlModule` stays headless. |
 | `ACM8-KC-05` | [kernel-composition/acm8-kc-05-corrected-module-header-comment.md](kernel-composition/acm8-kc-05-corrected-module-header-comment.md) | The `AccessControlModule` header comment is corrected to stop conflating DI-graph visibility with the separate, not-yet-authorized `ACCESS_CONTROL_PORT` rebinding decision. |
-| `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the three canonical `Permissions` rows — no more, no fewer, no other key. |
+| `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the **six** canonical `Permissions` rows — no more, no fewer, no other key. **Amended 2026-09-06 (PLAT-E4-S4.2a)**, and the file carries the full amendment record: the six keys and their live consumers, the AF-2 accepted deviation, and the dated AF-4 architecture contradiction. |
 | `ACM1-FB-02` | [fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md](fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md) | A fresh database ends up with exactly one FR `Policies` row, `targetRole='hr-admin'`. |
-| `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the three seeded permissions through `PolicyPermissions`, one grant per key. |
+| `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the **six** seeded permissions through `PolicyPermissions`, one grant per key. **Amended 2026-09-06 (PLAT-E4-S4.2a).** |
 | `ACM1-FB-04` | [fr-bootstrap/acm1-fb-04-exactly-one-root-attachment.md](fr-bootstrap/acm1-fb-04-exactly-one-root-attachment.md) | The one pre-existing active root User (CAP-8) gets exactly one `UserPolicies` attachment to `hr-admin`, and `AccessControlBootstrap` records it as provenance. |
 | `ACM1-FB-05` | [fr-bootstrap/acm1-fb-05-rerun-seed-no-duplicates.md](fr-bootstrap/acm1-fb-05-rerun-seed-no-duplicates.md) | Running the bootstrap a second time against an already-bootstrapped, undrifted database changes nothing — same ids, same counts, no duplicate rows. |
 | `ACM1-FB-06` | [fr-bootstrap/acm1-fb-06-no-other-role-attachment-or-grant.md](fr-bootstrap/acm1-fb-06-no-other-role-attachment-or-grant.md) | After bootstrap, `Policies`/`Permissions`/`PolicyPermissions`/`UserPolicies` contain exactly the canonical rows and nothing else — no default AR policy, no extra grant, no non-root attachment. |
@@ -351,7 +373,7 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM1R-FB-13` | [fr-bootstrap/acm1r-fb-13-userpolicies-referential-integrity.md](fr-bootstrap/acm1r-fb-13-userpolicies-referential-integrity.md) | An attachment naming an unknown user or an unknown policy is rejected. (invariant 11, referential half) |
 | `ACM1R-FB-14` | [fr-bootstrap/acm1r-fb-14-bootstrap-singleton-constraints.md](fr-bootstrap/acm1r-fb-14-bootstrap-singleton-constraints.md) | A second singleton, a wrong `key`, and a duplicate `rootUserId`/`policyId` reference are each rejected — the singleton is a constraint, not a convention. (invariant 12) |
 | `ACM1R-FB-15` | [fr-bootstrap/acm1r-fb-15-on-delete-restrict-four-foreign-keys.md](fr-bootstrap/acm1r-fb-15-on-delete-restrict-four-foreign-keys.md) | Deleting a granted permission, a granted policy, an attached user, or a singleton-referenced row is rejected on all four foreign keys. (invariant 13) |
-| `ACM1R-FB-16` | [fr-bootstrap/acm1r-fb-16-permission-key-immutability.md](fr-bootstrap/acm1r-fb-16-permission-key-immutability.md) | A renamed canonical key is *absent*, not *different*: the seed restores the canonical row and preserves the renamed one, never issuing an in-place key update. (invariant 5, immutability half) |
+| `ACM1R-FB-16` | [fr-bootstrap/acm1r-fb-16-permission-key-immutability.md](fr-bootstrap/acm1r-fb-16-permission-key-immutability.md) | A renamed canonical key is *absent*, not *different*: the seed restores the canonical row and preserves the renamed one, never issuing an in-place key update. (invariant 5, immutability half) **Amended 2026-09-06 (PLAT-E4-S4.2a)** — six canonical rows before the rerun, seven after. |
 | `ACM1R-FB-17` | [fr-bootstrap/acm1r-fb-17-dec-um-007-normalization-at-lookup.md](fr-bootstrap/acm1r-fb-17-dec-um-007-normalization-at-lookup.md) | A whitespace- and case-variant `ROOT_WORK_EMAIL` resolves to the canonical root, and the singleton persists the normalized form. |
 | `ACM1R-FB-18` | [fr-bootstrap/acm1r-fb-18-advisory-lock-and-timeout.md](fr-bootstrap/acm1r-fb-18-advisory-lock-and-timeout.md) | The common advisory lock is taken before any bootstrap-state inspection — so it covers first creation on an empty database — and a timeout fails atomically. |
 | `ACM1R-FB-19` | [fr-bootstrap/acm1r-fb-19-revalidate-before-writes-and-before-commit.md](fr-bootstrap/acm1r-fb-19-revalidate-before-writes-and-before-commit.md) | A root deactivated inside the transaction window is caught by the pre-commit revalidation and the run rolls back. |
@@ -363,4 +385,6 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM1R-FB-25` | [fr-bootstrap/acm1r-fb-25-concurrent-runs.md](fr-bootstrap/acm1r-fb-25-concurrent-runs.md) | Two concurrent first runs converge on one bootstrap set; two runs with different configured roots leave one coherent set and one atomic failure. |
 | `ACM1R-FB-26` | [fr-bootstrap/acm1r-fb-26-per-field-drift-restore-preserve-fail.md](fr-bootstrap/acm1r-fb-26-per-field-drift-restore-preserve-fail.md) | The FR-AMD-1 drift table, case by case: missing owned rows restored, descriptive fields and generated ids preserved, identity and authorization-bearing drift failed before any write. |
 | `ACM1R-FB-27` | [fr-bootstrap/acm1r-fb-27-atomic-rollback-no-partial-state.md](fr-bootstrap/acm1r-fb-27-atomic-rollback-no-partial-state.md) | A failure injected *after* writes and before commit leaves nothing behind — the only arrangement that distinguishes one real transaction from statements that failed early. |
-| `ACM1R-FB-28` | [fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md](fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md) | An approved fourth permission, its grant to the canonical policy, and a later administrator's attachment all survive a rerun untouched. |
+| `ACM1R-FB-28` | [fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md](fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md) | An administrator's approved extra permission — now the **seventh**, not the fourth — its grant to the canonical policy, and a later administrator's attachment all survive a rerun untouched. **Amended 2026-09-06 (PLAT-E4-S4.2a)**; the filename keeps `fourth` because scenario slugs are never renumbered. |
+| `S4.2a-OP-01` | [fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md](fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md) | `package.json` declares `db:bootstrap:access-control`, and the alias resolves to `scripts/bootstrap-access-control.ts`. **Precondition repair (AF-1)** — the missing alias is why every scenario in this folder is red at `ef03c88` for a reason unrelated to its subject; this file separates that red state from the discriminating one. |
+| `S4.2a-OP-02` | [fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md](fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md) | The upgrade rerun: against a database bootstrapped at the retired three-key set, the amended bootstrap restores the three added `Permissions` rows and their grants and leaves every pre-existing id, description, attachment and singleton column byte-identical. |

@@ -1,5 +1,19 @@
 # ACM1R-FB-25 · Concurrent runs converge on one bootstrap set, and conflicting runs fail atomically
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** the converged set `Permissions` `3` → **`6`** and `PolicyPermissions` `3` →
+> **`6`**. The advisory lock, the serialization and the single-coherent-set
+> outcome are unchanged.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — behavioral row "Concurrent identical seeds converge to one bootstrap set with no partial state; conflicting execution fails atomically", named in `ACM-1-scenarios.invoke_dev_with` as "first-run/differing-root concurrency".
@@ -15,7 +29,7 @@ bootstrap-owned table empty.
 concurrently against it with identical configuration.
 
 **Then** both processes exit zero and the database converges to exactly **one**
-bootstrap set: three permissions, one FR policy, three grants, one attachment,
+bootstrap set: six permissions, one FR policy, six grants, one attachment,
 one singleton. The advisory lock serializes them, so the second run observes the
 first's committed state and takes its ordinary idempotent no-op path — the same
 path `ACM1-FB-05` describes for a sequential rerun. No duplicate row, no
@@ -62,9 +76,9 @@ tables empty; both processes launched concurrently.
 - **expectedDatabaseState:**
   - **A:** both exit zero;
     ```sql
-    SELECT count(*) FROM "Permissions";            -- 3
+    SELECT count(*) FROM "Permissions";            -- 6
     SELECT count(*) FROM "Policies" WHERE type='FR'; -- 1
-    SELECT count(*) FROM "PolicyPermissions";      -- 3
+    SELECT count(*) FROM "PolicyPermissions";      -- 6
     SELECT count(*) FROM "UserPolicies";           -- 1
     SELECT count(*) FROM "AccessControlBootstrap"; -- 1
     ```

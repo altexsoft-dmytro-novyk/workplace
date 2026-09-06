@@ -1,5 +1,20 @@
 # ACM1R-FB-11 · The grant table's type separation is a database boundary, not application validation
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** the post-bootstrap baseline `PolicyPermissions` `3` → **`6`**. The four probes,
+> the support key, the `policyType` default and the AR-grant rejection are
+> unchanged; the closing assertion is still "the precondition count plus
+> exactly one", which now reads `7`.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — invariants 4, 7, and 8, all recorded **Missing**. Invariant 8 is bolded in the checklist and was named in `ACM-1-scenarios.invoke_dev_with` as "database rejection of AR-policy grants".
@@ -10,7 +25,7 @@
 ## Scenario
 
 **Given** a migrated database on which the bootstrap has already run, so the FR
-`hr-admin` policy, the three canonical permissions, and — from ACM1R-FB-10 — a
+`hr-admin` policy, the six canonical permissions, and — from ACM1R-FB-10 — a
 legal AR policy also carrying `targetRole='hr-admin'` all exist.
 
 **When** the migrated schema is probed four ways, independent of the bootstrap
@@ -37,7 +52,7 @@ could acquire a functional permission, and it must be closed **by PostgreSQL** �
 a rejection produced by application code in the bootstrap script does not
 satisfy this contract, because the grant table is reachable without that script.
 
-**Preconditions:** migrated database; the canonical FR policy, the three
+**Preconditions:** migrated database; the canonical FR policy, the six
 permissions, and one AR `hr-admin` policy exist; `PolicyPermissions` row count
 captured before each attempt.
 
@@ -47,7 +62,7 @@ captured before each attempt.
   the migrated schema
 - **preconditionState:**
   ```sql
-  SELECT count(*) FROM "PolicyPermissions"; -- 3 (the canonical grants)
+  SELECT count(*) FROM "PolicyPermissions"; -- 6 (the canonical grants)
   SELECT id FROM "Policies" WHERE type = 'AR' AND "targetRole" = 'hr-admin'; -- one id
   ```
 - **expectedDatabaseState:**

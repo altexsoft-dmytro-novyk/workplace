@@ -1,5 +1,20 @@
 # ACM1R-FB-15 · Deleting a referenced functional-role row is rejected on all four foreign keys
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** `Permissions` `3` → **`6`**, and the referencing grants "three" → **"six"**.
+> `Policies`, `UserPolicies` and `AccessControlBootstrap` stay `1`. The **four**
+> in this file's title is the number of foreign keys, not the key count, and
+> does not move.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — invariant 13, recorded **Missing**.
@@ -11,7 +26,7 @@
 ## Scenario
 
 **Given** a migrated database on which the bootstrap has already run, so all
-four referencing rows exist: three grants, one root attachment, and the
+four referencing rows exist: six grants, one root attachment, and the
 singleton.
 
 **When** four deletes are attempted, independent of the bootstrap entrypoint:
@@ -31,7 +46,7 @@ operation." That claim is load-bearing for CAP-4 — ACM-2's acceptance covers
 wrong-type and nonmatching joins but explicitly *not* corruption states — so it
 must be proven, not assumed.
 
-**Preconditions:** migrated database; the bootstrap has run; the three grants,
+**Preconditions:** migrated database; the bootstrap has run; the six grants,
 the root attachment, and the singleton all exist; row counts for
 `Permissions`, `Policies`, `User`, and `AccessControlBootstrap` captured
 before each attempt.
@@ -41,7 +56,7 @@ before each attempt.
 - **entrypoint:** none — four direct SQL deletes against the migrated schema
 - **preconditionState:**
   ```sql
-  SELECT count(*) FROM "Permissions";              -- 3
+  SELECT count(*) FROM "Permissions";              -- 6
   SELECT count(*) FROM "Policies" WHERE type='FR'; -- 1
   SELECT count(*) FROM "UserPolicies";             -- 1
   SELECT count(*) FROM "AccessControlBootstrap";   -- 1
