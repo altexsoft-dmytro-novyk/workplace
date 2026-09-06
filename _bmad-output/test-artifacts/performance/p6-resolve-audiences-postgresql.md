@@ -1,6 +1,6 @@
 # P6 PostgreSQL resolveAudiences measurement
 
-Generated: 2026-08-30T18:17:06.998Z
+Generated: 2026-09-06T19:14:12.772Z
 
 ## Scope and protocol
 
@@ -14,10 +14,10 @@ Generated: 2026-08-30T18:17:06.998Z
 
 ## Runtime
 
-- Node: v24.18.0
+- Node: v24.20.0
 - OS: darwin 25.6.0 arm64
 - CPU: 18 available parallelism; 18 logical cores; Apple M5 Pro
-- Memory: 51539607552 bytes total; 6450921472 bytes free at report time
+- Memory: 51539607552 bytes total; 1911635968 bytes free at report time
 - PostgreSQL server: 18.6
 - PostgreSQL build: PostgreSQL 18.6 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
 
@@ -25,18 +25,18 @@ Generated: 2026-08-30T18:17:06.998Z
 
 | Scenario | Shape | Depth | Targets | Cold outcome / total ms | Warm total p50 / p95 / worst | Warm transaction p50 / p95 / worst | Warm facade overhead p50 / p95 / worst |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| balanced-one-target | balanced | 5 | 1 | success / 6.055 | 2.549 / 2.799 / 2.824 | 2.542 / 2.794 / 2.819 | 0.006 / 0.011 / 0.014 |
-| balanced-100-targets | balanced | 5 | 100 | success / 10.836 | 10.203 / 11.265 / 14.182 | 10.161 / 11.221 / 14.137 | 0.042 / 0.048 / 0.054 |
-| balanced-500-targets | balanced | 5 | 500 | success / 38.420 | 38.776 / 41.790 / 41.809 | 38.440 / 41.429 / 41.590 | 0.318 / 0.380 / 0.389 |
-| viewer-near-top-500-targets | balanced | 5 | 500 | success / 37.338 | 40.039 / 41.120 / 41.212 | 39.628 / 40.764 / 40.835 | 0.367 / 0.494 / 0.503 |
-| targets-at-different-depths | balanced | 5 | 5 | success / 4.882 | 3.228 / 4.002 / 4.849 | 3.219 / 3.986 / 4.837 | 0.012 / 0.017 / 0.019 |
-| acyclic-chain-depth-25 | acyclic_chain | 25 | 500 | success / 37.507 | 38.898 / 40.075 / 40.761 | 38.524 / 39.661 / 40.548 | 0.352 / 0.484 / 0.517 |
-| acyclic-chain-depth-50 | acyclic_chain | 50 | 500 | success / 37.707 | 39.889 / 41.109 / 41.818 | 39.360 / 40.463 / 41.461 | 0.377 / 0.540 / 0.646 |
-| acyclic-chain-depth-100 | acyclic_chain | 100 | 500 | success / 40.447 | 42.617 / 44.941 / 45.044 | 42.233 / 44.476 / 44.550 | 0.347 / 0.494 / 0.578 |
-| acyclic-chain-depth-200 | acyclic_chain | 200 | 500 | success / 52.698 | 56.277 / 57.400 / 58.056 | 55.890 / 57.087 / 57.731 | 0.357 / 0.470 / 1.014 |
-| acyclic-chain-depth-300 | acyclic_chain | 300 | 500 | success / 77.296 | 77.910 / 80.342 / 80.562 | 77.742 / 80.026 / 80.221 | 0.329 / 0.446 / 0.509 |
-| acyclic-chain-depth-400 | acyclic_chain | 400 | 500 | success / 107.825 | 108.151 / 109.515 / 109.994 | 107.792 / 109.188 / 109.698 | 0.387 / 0.523 / 0.527 |
-| worst-valid-acyclic-chain | acyclic_chain | 499 | 500 | success / 147.754 | 148.793 / 161.165 / 163.508 | 148.547 / 160.869 / 163.323 | 0.273 / 0.512 / 0.516 |
+| balanced-one-target | balanced | 5 | 1 | success / 6.103 | 1.900 / 2.174 / 2.410 | 1.633 / 1.847 / 2.004 | 0.292 / 0.364 / 0.406 |
+| balanced-100-targets | balanced | 5 | 100 | success / 4.199 | 3.742 / 4.330 / 4.596 | 3.034 / 3.546 / 3.810 | 0.712 / 0.864 / 0.877 |
+| balanced-500-targets | balanced | 5 | 500 | success / 9.014 | 8.853 / 9.139 / 9.400 | 6.687 / 6.917 / 6.940 | 2.128 / 2.223 / 2.720 |
+| viewer-near-top-500-targets | balanced | 5 | 500 | success / 9.648 | 8.965 / 9.556 / 10.018 | 6.801 / 7.418 / 7.712 | 2.120 / 2.307 / 2.525 |
+| targets-at-different-depths | balanced | 5 | 5 | success / 3.660 | 3.127 / 4.601 / 4.742 | 2.792 / 4.087 / 4.417 | 0.314 / 0.518 / 0.551 |
+| acyclic-chain-depth-25 | acyclic_chain | 25 | 500 | success / 8.085 | 8.452 / 9.097 / 10.085 | 6.227 / 6.842 / 6.871 | 2.222 / 2.359 / 3.243 |
+| acyclic-chain-depth-50 | acyclic_chain | 50 | 500 | success / 10.697 | 10.422 / 10.797 / 11.539 | 8.163 / 8.422 / 8.470 | 2.369 / 2.460 / 3.070 |
+| acyclic-chain-depth-100 | acyclic_chain | 100 | 500 | success / 22.889 | 17.670 / 19.305 / 19.428 | 15.663 / 17.319 / 17.406 | 1.999 / 2.317 / 2.580 |
+| acyclic-chain-depth-200 | acyclic_chain | 200 | 500 | success / 73.504 | 77.037 / 78.805 / 79.151 | 72.466 / 74.673 / 75.271 | 4.547 / 5.080 / 5.142 |
+| acyclic-chain-depth-300 | acyclic_chain | 300 | 500 | success / 211.071 | 209.275 / 216.346 / 234.887 | 204.720 / 212.442 / 230.357 | 4.579 / 4.974 / 5.080 |
+| acyclic-chain-depth-400 | acyclic_chain | 400 | 500 | success / 484.954 | 490.322 / 524.259 / 534.414 | 484.823 / 519.890 / 529.483 | 5.273 / 6.324 / 7.105 |
+| worst-valid-acyclic-chain | acyclic_chain | 499 | 500 | success / 957.013 | 960.940 / 983.087 / 984.351 | 955.547 / 977.840 / 981.965 | 5.688 / 5.985 / 6.299 |
 
 The transaction measurement is the full RelationshipGraphPort call: interactive transaction setup, SET LOCAL, reporting query, People Partner query, commit, and mapping. Individual production statements are not separately observable without production instrumentation.
 
@@ -46,8 +46,8 @@ No tested valid acyclic shape exceeded the two-second total facade-call budget.
 
 - Exact command under test: `SET LOCAL statement_timeout = '2s'`
 - Probe statement: `SELECT pg_sleep(2.2)`
-- Database-only result: statement_timeout after 2054.437 ms.
-- Equal-budget competition: first failure was outer_timeout after 2001.103 ms; eventual database outcome was statement_timeout after 2006.536 ms.
+- Database-only result: statement_timeout after 2059.963 ms.
+- Equal-budget competition: first failure was outer_timeout after 2000.361 ms; eventual database outcome was statement_timeout after 2009.190 ms.
 - Conclusion: The outer two-second request-budget timer fired before PostgreSQL statement_timeout; the database cancellation arrived later.
 
 ## Reproduction

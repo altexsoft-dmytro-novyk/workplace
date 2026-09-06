@@ -234,6 +234,83 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  # ── Performance NFR ──────────────────────────────────────────────────────
+  # ACM9 is the only performance suite that can actually fail: it asserts
+  # `expect(firstBreach).toBeNull()` against a 2 s absolute budget per gate.
+  # P6 (`measure:access-control:p6`) is deliberately measurement-only
+  # (`performanceThresholdAssertionsAdded: false`) — it records timings and
+  # asserts nothing about them, so a job for it could never go red on a
+  # regression. It is left out here on purpose rather than wired as a gate that
+  # cannot fail.
+  #
+  # `--role baseline` is the role that belongs in CI. The breach check runs for
+  # either role, but `--role final` additionally compares against a prior
+  # artifact whose `environment_manifest_hash` covers node version, platform,
+  # CPU count and total memory — so a baseline recorded on any other machine can
+  # never be `comparable` on a runner, and final would finalize INCOMPLETE
+  # instead of PASS. Baseline needs no prior artifact and still fails on a real
+  # breach.
+  #
+  # Informational for now, the same way backend-e2e is: locally the worst valid
+  # shape sits at ~987 ms against the 2 s budget, and a shared 2-core runner is
+  # slower by an unknown factor. Promote by deleting the two `continue-on-error`
+  # lines below — job level plus the measurement step — once a run is observed
+  # green, because a soft step that fails still counts as successful when the
+  # job's conclusion is computed.
+  backend-acm9:
+    name: Backend · ACM9 access-control NFR (informational)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    defaults:
+      run:
+        working-directory: services/backend
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.SERVICE_NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: services/backend/package-lock.json
+
+      - name: Materialise .env for docker compose
+        # Only Postgres is started below, so the LocalStack token is not needed.
+        run: cp .env.example .env
+
+      - name: Start Postgres
+        run: docker compose up -d --wait postgres
+
+      - name: Install
+        run: npm ci
+
+      - name: Apply migrations
+        run: npm run db:deploy
+
+      - name: ACM9 measurement
+        continue-on-error: true
+        run: npm run measure:access-control:acm9 -- --role baseline
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail=200
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: report-backend-acm9
+          # The suite writes to the workspace root, not under services/backend;
+          # `path` is workspace-relative regardless of working-directory.
+          path: _bmad-output/test-artifacts/performance/acm9-*.json
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Stop containers
+        if: always()
+        run: docker compose down -v
+
   # ── Evidence aggregation ─────────────────────────────────────────────────
   # Turns the three runs into the file /bmad-testarch-trace reads as `live`
   # evidence, which is what moves a trace run out of `contract_static`.

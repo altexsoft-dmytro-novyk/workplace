@@ -1,7 +1,7 @@
 {
   "story": "P6",
   "measurementOnly": true,
-  "generatedAt": "2026-08-30T18:17:06.998Z",
+  "generatedAt": "2026-09-06T19:14:12.772Z",
   "reproductionCommand": "source \"$HOME/.nvm/nvm.sh\" && nvm use system && cd services/backend && npm run measure:access-control:p6",
   "fixture": {
     "size": 500,
@@ -30,36 +30,36 @@
     "correctnessGuard": "After timing, every target key was required; root-viewer scenarios also required self/reporting for every target."
   },
   "runtime": {
-    "nodeVersion": "v24.18.0",
+    "nodeVersion": "v24.20.0",
     "nodeVersions": {
-      "node": "24.18.0",
-      "acorn": "8.16.0",
-      "ada": "3.4.4",
-      "amaro": "1.1.9",
-      "ares": "1.34.6",
+      "node": "24.20.0",
+      "acorn": "8.18.0",
+      "ada": "4.0.0",
+      "amaro": "1.1.11",
+      "ares": "1.34.8",
       "brotli": "1.2.0",
       "cldr": "48.0",
       "icu": "78.3",
-      "llhttp": "9.4.2",
+      "llhttp": "9.4.3",
       "merve": "1.2.2",
       "modules": "137",
       "napi": "10",
       "nbytes": "0.1.4",
       "ncrypto": "0.0.1",
-      "nghttp2": "1.69.0",
+      "nghttp2": "1.70.0",
       "nghttp3": "",
       "ngtcp2": "",
       "openssl": "3.5.7",
-      "simdjson": "4.6.4",
+      "simdjson": "4.6.6",
       "simdutf": "6.4.0",
-      "sqlite": "3.53.1",
-      "tz": "2026b",
-      "undici": "7.28.0",
+      "sqlite": "3.53.4",
+      "tz": "2026c",
+      "undici": "7.29.0",
       "unicode": "17.0",
       "uv": "1.52.1",
       "uvwasi": "0.0.23",
-      "v8": "13.6.233.17-node.50",
-      "zlib": "1.3.1-e00f703",
+      "v8": "13.6.233.17-node.53",
+      "zlib": "1.3.2.1-motley-42c2f19",
       "zstd": "1.5.7"
     },
     "operatingSystem": {
@@ -76,7 +76,7 @@
     },
     "memoryBytes": {
       "total": 51539607552,
-      "freeAtReportTime": 6450855936
+      "freeAtReportTime": 1911603200
     },
     "postgresql": {
       "version": "PostgreSQL 18.6 on aarch64-unknown-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit",
@@ -100,9 +100,9 @@
         5
       ],
       "cold": {
-        "totalMs": 6.055,
-        "transactionMs": 6.005,
-        "facadeOverheadMs": 0.05,
+        "totalMs": 6.103,
+        "transactionMs": 4.867,
+        "facadeOverheadMs": 1.236,
         "outcome": "success",
         "error": null
       },
@@ -110,19 +110,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 2.549,
-          "p95Ms": 2.799,
-          "worstMs": 2.824
+          "p50Ms": 1.9,
+          "p95Ms": 2.174,
+          "worstMs": 2.41
         },
         "transaction": {
-          "p50Ms": 2.542,
-          "p95Ms": 2.794,
-          "worstMs": 2.819
+          "p50Ms": 1.633,
+          "p95Ms": 1.847,
+          "worstMs": 2.004
         },
         "facadeOverhead": {
-          "p50Ms": 0.006,
-          "p95Ms": 0.011,
-          "worstMs": 0.014
+          "p50Ms": 0.292,
+          "p95Ms": 0.364,
+          "worstMs": 0.406
         },
         "outcomes": {
           "success": 20,
@@ -132,142 +132,142 @@
         },
         "samples": [
           {
-            "totalMs": 2.554,
-            "transactionMs": 2.543,
-            "facadeOverheadMs": 0.011,
+            "totalMs": 2.174,
+            "transactionMs": 1.847,
+            "facadeOverheadMs": 0.327,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.669,
-            "transactionMs": 2.655,
-            "facadeOverheadMs": 0.014,
+            "totalMs": 2.41,
+            "transactionMs": 2.004,
+            "facadeOverheadMs": 0.406,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.614,
-            "transactionMs": 2.608,
-            "facadeOverheadMs": 0.006,
+            "totalMs": 2.161,
+            "transactionMs": 1.797,
+            "facadeOverheadMs": 0.364,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.549,
-            "transactionMs": 2.542,
-            "facadeOverheadMs": 0.007,
+            "totalMs": 2.015,
+            "transactionMs": 1.682,
+            "facadeOverheadMs": 0.333,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.659,
-            "transactionMs": 2.651,
-            "facadeOverheadMs": 0.008,
+            "totalMs": 1.984,
+            "transactionMs": 1.672,
+            "facadeOverheadMs": 0.312,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.311,
-            "transactionMs": 2.306,
-            "facadeOverheadMs": 0.004,
+            "totalMs": 1.854,
+            "transactionMs": 1.561,
+            "facadeOverheadMs": 0.292,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.275,
-            "transactionMs": 2.27,
-            "facadeOverheadMs": 0.004,
+            "totalMs": 1.919,
+            "transactionMs": 1.614,
+            "facadeOverheadMs": 0.305,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.348,
-            "transactionMs": 2.342,
-            "facadeOverheadMs": 0.006,
+            "totalMs": 1.939,
+            "transactionMs": 1.642,
+            "facadeOverheadMs": 0.297,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.662,
-            "transactionMs": 2.654,
-            "facadeOverheadMs": 0.009,
+            "totalMs": 1.888,
+            "transactionMs": 1.595,
+            "facadeOverheadMs": 0.293,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.199,
-            "transactionMs": 2.192,
-            "facadeOverheadMs": 0.007,
+            "totalMs": 1.84,
+            "transactionMs": 1.548,
+            "facadeOverheadMs": 0.292,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.314,
-            "transactionMs": 2.308,
-            "facadeOverheadMs": 0.006,
+            "totalMs": 1.972,
+            "transactionMs": 1.706,
+            "facadeOverheadMs": 0.266,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.221,
-            "transactionMs": 2.215,
-            "facadeOverheadMs": 0.006,
+            "totalMs": 1.876,
+            "transactionMs": 1.592,
+            "facadeOverheadMs": 0.284,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.824,
-            "transactionMs": 2.819,
-            "facadeOverheadMs": 0.005,
+            "totalMs": 1.897,
+            "transactionMs": 1.626,
+            "facadeOverheadMs": 0.27,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.213,
-            "transactionMs": 2.208,
-            "facadeOverheadMs": 0.005,
+            "totalMs": 1.826,
+            "transactionMs": 1.568,
+            "facadeOverheadMs": 0.258,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.274,
-            "transactionMs": 2.27,
-            "facadeOverheadMs": 0.004,
+            "totalMs": 1.896,
+            "transactionMs": 1.633,
+            "facadeOverheadMs": 0.264,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.799,
-            "transactionMs": 2.794,
-            "facadeOverheadMs": 0.005,
+            "totalMs": 1.848,
+            "transactionMs": 1.557,
+            "facadeOverheadMs": 0.291,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.265,
-            "transactionMs": 2.261,
-            "facadeOverheadMs": 0.004,
+            "totalMs": 1.9,
+            "transactionMs": 1.637,
+            "facadeOverheadMs": 0.264,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.593,
-            "transactionMs": 2.588,
-            "facadeOverheadMs": 0.005,
+            "totalMs": 1.919,
+            "transactionMs": 1.638,
+            "facadeOverheadMs": 0.281,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.669,
-            "transactionMs": 2.659,
-            "facadeOverheadMs": 0.01,
+            "totalMs": 1.798,
+            "transactionMs": 1.534,
+            "facadeOverheadMs": 0.264,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.62,
-            "transactionMs": 2.613,
-            "facadeOverheadMs": 0.006,
+            "totalMs": 2,
+            "transactionMs": 1.696,
+            "facadeOverheadMs": 0.304,
             "outcome": "success",
             "error": null
           }
@@ -286,9 +286,9 @@
         5
       ],
       "cold": {
-        "totalMs": 10.836,
-        "transactionMs": 10.787,
-        "facadeOverheadMs": 0.049,
+        "totalMs": 4.199,
+        "transactionMs": 3.241,
+        "facadeOverheadMs": 0.958,
         "outcome": "success",
         "error": null
       },
@@ -296,19 +296,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 10.203,
-          "p95Ms": 11.265,
-          "worstMs": 14.182
+          "p50Ms": 3.742,
+          "p95Ms": 4.33,
+          "worstMs": 4.596
         },
         "transaction": {
-          "p50Ms": 10.161,
-          "p95Ms": 11.221,
-          "worstMs": 14.137
+          "p50Ms": 3.034,
+          "p95Ms": 3.546,
+          "worstMs": 3.81
         },
         "facadeOverhead": {
-          "p50Ms": 0.042,
-          "p95Ms": 0.048,
-          "worstMs": 0.054
+          "p50Ms": 0.712,
+          "p95Ms": 0.864,
+          "worstMs": 0.877
         },
         "outcomes": {
           "success": 20,
@@ -318,142 +318,142 @@
         },
         "samples": [
           {
-            "totalMs": 10.133,
-            "transactionMs": 10.094,
-            "facadeOverheadMs": 0.039,
+            "totalMs": 3.738,
+            "transactionMs": 2.977,
+            "facadeOverheadMs": 0.761,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.207,
-            "transactionMs": 10.161,
-            "facadeOverheadMs": 0.046,
+            "totalMs": 3.755,
+            "transactionMs": 3.071,
+            "facadeOverheadMs": 0.683,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.365,
-            "transactionMs": 10.321,
-            "facadeOverheadMs": 0.045,
+            "totalMs": 3.537,
+            "transactionMs": 2.844,
+            "facadeOverheadMs": 0.693,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.155,
-            "transactionMs": 10.11,
-            "facadeOverheadMs": 0.044,
+            "totalMs": 3.742,
+            "transactionMs": 3.031,
+            "facadeOverheadMs": 0.712,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 14.182,
-            "transactionMs": 14.137,
-            "facadeOverheadMs": 0.045,
+            "totalMs": 3.63,
+            "transactionMs": 2.939,
+            "facadeOverheadMs": 0.691,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.855,
-            "transactionMs": 10.81,
-            "facadeOverheadMs": 0.044,
+            "totalMs": 3.669,
+            "transactionMs": 2.991,
+            "facadeOverheadMs": 0.678,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 11.265,
-            "transactionMs": 11.221,
-            "facadeOverheadMs": 0.044,
+            "totalMs": 3.723,
+            "transactionMs": 3.02,
+            "facadeOverheadMs": 0.703,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.24,
-            "transactionMs": 10.195,
-            "facadeOverheadMs": 0.045,
+            "totalMs": 3.723,
+            "transactionMs": 3.034,
+            "facadeOverheadMs": 0.689,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.683,
-            "transactionMs": 10.641,
-            "facadeOverheadMs": 0.042,
+            "totalMs": 3.628,
+            "transactionMs": 2.931,
+            "facadeOverheadMs": 0.697,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 9.867,
-            "transactionMs": 9.822,
-            "facadeOverheadMs": 0.045,
+            "totalMs": 3.804,
+            "transactionMs": 3.061,
+            "facadeOverheadMs": 0.742,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 9.834,
-            "transactionMs": 9.795,
-            "facadeOverheadMs": 0.04,
+            "totalMs": 3.64,
+            "transactionMs": 2.968,
+            "facadeOverheadMs": 0.673,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.149,
-            "transactionMs": 10.095,
-            "facadeOverheadMs": 0.054,
+            "totalMs": 3.679,
+            "transactionMs": 2.996,
+            "facadeOverheadMs": 0.682,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.085,
-            "transactionMs": 10.037,
-            "facadeOverheadMs": 0.048,
+            "totalMs": 4.238,
+            "transactionMs": 3.513,
+            "facadeOverheadMs": 0.725,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.203,
-            "transactionMs": 10.162,
-            "facadeOverheadMs": 0.04,
+            "totalMs": 4.33,
+            "transactionMs": 3.546,
+            "facadeOverheadMs": 0.784,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.417,
-            "transactionMs": 10.378,
-            "facadeOverheadMs": 0.039,
+            "totalMs": 3.979,
+            "transactionMs": 3.208,
+            "facadeOverheadMs": 0.771,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 9.986,
-            "transactionMs": 9.945,
-            "facadeOverheadMs": 0.041,
+            "totalMs": 4.596,
+            "transactionMs": 3.81,
+            "facadeOverheadMs": 0.786,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.291,
-            "transactionMs": 10.25,
-            "facadeOverheadMs": 0.041,
+            "totalMs": 4.317,
+            "transactionMs": 3.44,
+            "facadeOverheadMs": 0.877,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 10.541,
-            "transactionMs": 10.502,
-            "facadeOverheadMs": 0.039,
+            "totalMs": 4.294,
+            "transactionMs": 3.429,
+            "facadeOverheadMs": 0.864,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 9.783,
-            "transactionMs": 9.743,
-            "facadeOverheadMs": 0.04,
+            "totalMs": 4.085,
+            "transactionMs": 3.303,
+            "facadeOverheadMs": 0.782,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 9.747,
-            "transactionMs": 9.711,
-            "facadeOverheadMs": 0.037,
+            "totalMs": 4.162,
+            "transactionMs": 3.357,
+            "facadeOverheadMs": 0.805,
             "outcome": "success",
             "error": null
           }
@@ -477,9 +477,9 @@
         5
       ],
       "cold": {
-        "totalMs": 38.42,
-        "transactionMs": 38.169,
-        "facadeOverheadMs": 0.251,
+        "totalMs": 9.014,
+        "transactionMs": 6.689,
+        "facadeOverheadMs": 2.325,
         "outcome": "success",
         "error": null
       },
@@ -487,19 +487,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 38.776,
-          "p95Ms": 41.79,
-          "worstMs": 41.809
+          "p50Ms": 8.853,
+          "p95Ms": 9.139,
+          "worstMs": 9.4
         },
         "transaction": {
-          "p50Ms": 38.44,
-          "p95Ms": 41.429,
-          "worstMs": 41.59
+          "p50Ms": 6.687,
+          "p95Ms": 6.917,
+          "worstMs": 6.94
         },
         "facadeOverhead": {
-          "p50Ms": 0.318,
-          "p95Ms": 0.38,
-          "worstMs": 0.389
+          "p50Ms": 2.128,
+          "p95Ms": 2.223,
+          "worstMs": 2.72
         },
         "outcomes": {
           "success": 20,
@@ -509,142 +509,142 @@
         },
         "samples": [
           {
-            "totalMs": 38.08,
-            "transactionMs": 37.899,
-            "facadeOverheadMs": 0.182,
+            "totalMs": 9.139,
+            "transactionMs": 6.917,
+            "facadeOverheadMs": 2.223,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.494,
-            "transactionMs": 37.307,
-            "facadeOverheadMs": 0.187,
+            "totalMs": 8.853,
+            "transactionMs": 6.687,
+            "facadeOverheadMs": 2.166,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38,
-            "transactionMs": 37.81,
-            "facadeOverheadMs": 0.19,
+            "totalMs": 9.4,
+            "transactionMs": 6.68,
+            "facadeOverheadMs": 2.72,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.226,
-            "transactionMs": 37.048,
-            "facadeOverheadMs": 0.178,
+            "totalMs": 8.35,
+            "transactionMs": 6.367,
+            "facadeOverheadMs": 1.983,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.079,
-            "transactionMs": 36.81,
-            "facadeOverheadMs": 0.269,
+            "totalMs": 8.249,
+            "transactionMs": 6.275,
+            "facadeOverheadMs": 1.974,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.836,
-            "transactionMs": 37.534,
-            "facadeOverheadMs": 0.301,
+            "totalMs": 8.246,
+            "transactionMs": 6.334,
+            "facadeOverheadMs": 1.912,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.776,
-            "transactionMs": 38.44,
-            "facadeOverheadMs": 0.336,
+            "totalMs": 8.346,
+            "transactionMs": 6.41,
+            "facadeOverheadMs": 1.936,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.641,
-            "transactionMs": 41.331,
-            "facadeOverheadMs": 0.31,
+            "totalMs": 8.418,
+            "transactionMs": 6.497,
+            "facadeOverheadMs": 1.92,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.574,
-            "transactionMs": 41.23,
-            "facadeOverheadMs": 0.344,
+            "totalMs": 8.739,
+            "transactionMs": 6.656,
+            "facadeOverheadMs": 2.083,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.411,
-            "transactionMs": 40.093,
-            "facadeOverheadMs": 0.318,
+            "totalMs": 8.961,
+            "transactionMs": 6.775,
+            "facadeOverheadMs": 2.186,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.695,
-            "transactionMs": 38.371,
-            "facadeOverheadMs": 0.324,
+            "totalMs": 9.096,
+            "transactionMs": 6.94,
+            "facadeOverheadMs": 2.156,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.849,
-            "transactionMs": 39.472,
-            "facadeOverheadMs": 0.377,
+            "totalMs": 9.061,
+            "transactionMs": 6.907,
+            "facadeOverheadMs": 2.154,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.341,
-            "transactionMs": 39.951,
-            "facadeOverheadMs": 0.389,
+            "totalMs": 8.931,
+            "transactionMs": 6.803,
+            "facadeOverheadMs": 2.128,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.068,
-            "transactionMs": 40.724,
-            "facadeOverheadMs": 0.345,
+            "totalMs": 8.797,
+            "transactionMs": 6.666,
+            "facadeOverheadMs": 2.131,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.351,
-            "transactionMs": 39.998,
-            "facadeOverheadMs": 0.353,
+            "totalMs": 8.864,
+            "transactionMs": 6.737,
+            "facadeOverheadMs": 2.127,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.809,
-            "transactionMs": 41.429,
-            "facadeOverheadMs": 0.38,
+            "totalMs": 9.054,
+            "transactionMs": 6.898,
+            "facadeOverheadMs": 2.156,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.74,
-            "transactionMs": 41.395,
-            "facadeOverheadMs": 0.345,
+            "totalMs": 8.932,
+            "transactionMs": 6.798,
+            "facadeOverheadMs": 2.134,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.79,
-            "transactionMs": 41.59,
-            "facadeOverheadMs": 0.199,
+            "totalMs": 8.891,
+            "transactionMs": 6.735,
+            "facadeOverheadMs": 2.156,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 36.76,
-            "transactionMs": 36.58,
-            "facadeOverheadMs": 0.18,
+            "totalMs": 8.844,
+            "transactionMs": 6.759,
+            "facadeOverheadMs": 2.085,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.314,
-            "transactionMs": 36.985,
-            "facadeOverheadMs": 0.328,
+            "totalMs": 8.666,
+            "transactionMs": 6.597,
+            "facadeOverheadMs": 2.069,
             "outcome": "success",
             "error": null
           }
@@ -668,9 +668,9 @@
         5
       ],
       "cold": {
-        "totalMs": 37.338,
-        "transactionMs": 37.132,
-        "facadeOverheadMs": 0.206,
+        "totalMs": 9.648,
+        "transactionMs": 7.168,
+        "facadeOverheadMs": 2.48,
         "outcome": "success",
         "error": null
       },
@@ -678,19 +678,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 40.039,
-          "p95Ms": 41.12,
-          "worstMs": 41.212
+          "p50Ms": 8.965,
+          "p95Ms": 9.556,
+          "worstMs": 10.018
         },
         "transaction": {
-          "p50Ms": 39.628,
-          "p95Ms": 40.764,
-          "worstMs": 40.835
+          "p50Ms": 6.801,
+          "p95Ms": 7.418,
+          "worstMs": 7.712
         },
         "facadeOverhead": {
-          "p50Ms": 0.367,
-          "p95Ms": 0.494,
-          "worstMs": 0.503
+          "p50Ms": 2.12,
+          "p95Ms": 2.307,
+          "worstMs": 2.525
         },
         "outcomes": {
           "success": 20,
@@ -700,142 +700,142 @@
         },
         "samples": [
           {
-            "totalMs": 41.212,
-            "transactionMs": 40.835,
-            "facadeOverheadMs": 0.377,
+            "totalMs": 8.601,
+            "transactionMs": 6.513,
+            "facadeOverheadMs": 2.087,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.568,
-            "transactionMs": 39.074,
-            "facadeOverheadMs": 0.494,
+            "totalMs": 8.653,
+            "transactionMs": 6.533,
+            "facadeOverheadMs": 2.12,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.085,
-            "transactionMs": 39.706,
-            "facadeOverheadMs": 0.379,
+            "totalMs": 8.691,
+            "transactionMs": 6.599,
+            "facadeOverheadMs": 2.092,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.702,
-            "transactionMs": 40.281,
-            "facadeOverheadMs": 0.42,
+            "totalMs": 9.003,
+            "transactionMs": 6.898,
+            "facadeOverheadMs": 2.105,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.384,
-            "transactionMs": 39.003,
-            "facadeOverheadMs": 0.381,
+            "totalMs": 8.967,
+            "transactionMs": 6.86,
+            "facadeOverheadMs": 2.107,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.416,
-            "transactionMs": 40.076,
-            "facadeOverheadMs": 0.34,
+            "totalMs": 9.211,
+            "transactionMs": 7.107,
+            "facadeOverheadMs": 2.104,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.678,
-            "transactionMs": 39.311,
-            "facadeOverheadMs": 0.367,
+            "totalMs": 9.143,
+            "transactionMs": 6.927,
+            "facadeOverheadMs": 2.216,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.455,
-            "transactionMs": 40.152,
-            "facadeOverheadMs": 0.303,
+            "totalMs": 9.117,
+            "transactionMs": 6.901,
+            "facadeOverheadMs": 2.215,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.893,
-            "transactionMs": 39.557,
-            "facadeOverheadMs": 0.336,
+            "totalMs": 9.52,
+            "transactionMs": 7.418,
+            "facadeOverheadMs": 2.102,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.666,
-            "transactionMs": 40.209,
-            "facadeOverheadMs": 0.458,
+            "totalMs": 8.839,
+            "transactionMs": 6.703,
+            "facadeOverheadMs": 2.136,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.094,
-            "transactionMs": 39.668,
-            "facadeOverheadMs": 0.427,
+            "totalMs": 8.634,
+            "transactionMs": 6.523,
+            "facadeOverheadMs": 2.111,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.051,
-            "transactionMs": 39.628,
-            "facadeOverheadMs": 0.422,
+            "totalMs": 8.558,
+            "transactionMs": 6.526,
+            "facadeOverheadMs": 2.033,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.12,
-            "transactionMs": 40.764,
-            "facadeOverheadMs": 0.356,
+            "totalMs": 8.932,
+            "transactionMs": 6.894,
+            "facadeOverheadMs": 2.038,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.401,
-            "transactionMs": 39.085,
-            "facadeOverheadMs": 0.316,
+            "totalMs": 10.018,
+            "transactionMs": 7.712,
+            "facadeOverheadMs": 2.307,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.586,
-            "transactionMs": 39.279,
-            "facadeOverheadMs": 0.308,
+            "totalMs": 9.556,
+            "transactionMs": 7.031,
+            "facadeOverheadMs": 2.525,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.572,
-            "transactionMs": 37.247,
-            "facadeOverheadMs": 0.325,
+            "totalMs": 9.184,
+            "transactionMs": 6.948,
+            "facadeOverheadMs": 2.236,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.978,
-            "transactionMs": 39.666,
-            "facadeOverheadMs": 0.311,
+            "totalMs": 8.747,
+            "transactionMs": 6.597,
+            "facadeOverheadMs": 2.15,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.237,
-            "transactionMs": 39.939,
-            "facadeOverheadMs": 0.299,
+            "totalMs": 8.992,
+            "transactionMs": 6.777,
+            "facadeOverheadMs": 2.214,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.039,
-            "transactionMs": 39.536,
-            "facadeOverheadMs": 0.503,
+            "totalMs": 8.833,
+            "transactionMs": 6.623,
+            "facadeOverheadMs": 2.21,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.302,
-            "transactionMs": 38.934,
-            "facadeOverheadMs": 0.367,
+            "totalMs": 8.965,
+            "transactionMs": 6.801,
+            "facadeOverheadMs": 2.165,
             "outcome": "success",
             "error": null
           }
@@ -858,9 +858,9 @@
         5
       ],
       "cold": {
-        "totalMs": 4.882,
-        "transactionMs": 4.864,
-        "facadeOverheadMs": 0.018,
+        "totalMs": 3.66,
+        "transactionMs": 3.285,
+        "facadeOverheadMs": 0.375,
         "outcome": "success",
         "error": null
       },
@@ -868,19 +868,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 3.228,
-          "p95Ms": 4.002,
-          "worstMs": 4.849
+          "p50Ms": 3.127,
+          "p95Ms": 4.601,
+          "worstMs": 4.742
         },
         "transaction": {
-          "p50Ms": 3.219,
-          "p95Ms": 3.986,
-          "worstMs": 4.837
+          "p50Ms": 2.792,
+          "p95Ms": 4.087,
+          "worstMs": 4.417
         },
         "facadeOverhead": {
-          "p50Ms": 0.012,
-          "p95Ms": 0.017,
-          "worstMs": 0.019
+          "p50Ms": 0.314,
+          "p95Ms": 0.518,
+          "worstMs": 0.551
         },
         "outcomes": {
           "success": 20,
@@ -890,142 +890,142 @@
         },
         "samples": [
           {
-            "totalMs": 3.301,
-            "transactionMs": 3.288,
-            "facadeOverheadMs": 0.013,
+            "totalMs": 3.149,
+            "transactionMs": 2.835,
+            "facadeOverheadMs": 0.314,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 3.945,
-            "transactionMs": 3.933,
-            "facadeOverheadMs": 0.012,
+            "totalMs": 3.029,
+            "transactionMs": 2.723,
+            "facadeOverheadMs": 0.306,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 3.12,
-            "transactionMs": 3.11,
-            "facadeOverheadMs": 0.01,
+            "totalMs": 3.251,
+            "transactionMs": 2.918,
+            "facadeOverheadMs": 0.333,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 3.443,
-            "transactionMs": 3.431,
-            "facadeOverheadMs": 0.012,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.277,
-            "transactionMs": 3.258,
-            "facadeOverheadMs": 0.019,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.053,
-            "transactionMs": 3.043,
-            "facadeOverheadMs": 0.01,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.662,
-            "transactionMs": 3.649,
-            "facadeOverheadMs": 0.013,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.153,
-            "transactionMs": 3.141,
-            "facadeOverheadMs": 0.012,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 4.002,
-            "transactionMs": 3.986,
-            "facadeOverheadMs": 0.016,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.217,
-            "transactionMs": 3.205,
-            "facadeOverheadMs": 0.012,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.103,
-            "transactionMs": 3.092,
-            "facadeOverheadMs": 0.011,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.636,
-            "transactionMs": 3.626,
-            "facadeOverheadMs": 0.011,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 3.211,
-            "transactionMs": 3.194,
-            "facadeOverheadMs": 0.017,
-            "outcome": "success",
-            "error": null
-          },
-          {
-            "totalMs": 4.849,
-            "transactionMs": 4.837,
-            "facadeOverheadMs": 0.012,
+            "totalMs": 3.286,
+            "transactionMs": 2.949,
+            "facadeOverheadMs": 0.337,
             "outcome": "success",
             "error": null
           },
           {
             "totalMs": 3.097,
-            "transactionMs": 3.086,
-            "facadeOverheadMs": 0.011,
+            "transactionMs": 2.792,
+            "facadeOverheadMs": 0.305,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 3.542,
-            "transactionMs": 3.526,
-            "facadeOverheadMs": 0.016,
+            "totalMs": 2.917,
+            "transactionMs": 2.612,
+            "facadeOverheadMs": 0.304,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 3.135,
-            "transactionMs": 3.123,
-            "facadeOverheadMs": 0.012,
+            "totalMs": 2.808,
+            "transactionMs": 2.538,
+            "facadeOverheadMs": 0.27,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 3.228,
-            "transactionMs": 3.219,
-            "facadeOverheadMs": 0.009,
+            "totalMs": 2.826,
+            "transactionMs": 2.547,
+            "facadeOverheadMs": 0.279,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 3.66,
-            "transactionMs": 3.648,
-            "facadeOverheadMs": 0.012,
+            "totalMs": 2.845,
+            "transactionMs": 2.577,
+            "facadeOverheadMs": 0.268,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 2.995,
-            "transactionMs": 2.985,
-            "facadeOverheadMs": 0.01,
+            "totalMs": 2.861,
+            "transactionMs": 2.558,
+            "facadeOverheadMs": 0.303,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 2.976,
+            "transactionMs": 2.707,
+            "facadeOverheadMs": 0.269,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 3.127,
+            "transactionMs": 2.803,
+            "facadeOverheadMs": 0.324,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 4.742,
+            "transactionMs": 4.417,
+            "facadeOverheadMs": 0.325,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 4.601,
+            "transactionMs": 4.087,
+            "facadeOverheadMs": 0.514,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 4.205,
+            "transactionMs": 3.654,
+            "facadeOverheadMs": 0.551,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 4.506,
+            "transactionMs": 3.988,
+            "facadeOverheadMs": 0.518,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 3.566,
+            "transactionMs": 3.12,
+            "facadeOverheadMs": 0.445,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 3.321,
+            "transactionMs": 2.941,
+            "facadeOverheadMs": 0.379,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 3.147,
+            "transactionMs": 2.747,
+            "facadeOverheadMs": 0.4,
+            "outcome": "success",
+            "error": null
+          },
+          {
+            "totalMs": 2.9,
+            "transactionMs": 2.602,
+            "facadeOverheadMs": 0.297,
             "outcome": "success",
             "error": null
           }
@@ -1069,9 +1069,9 @@
         25
       ],
       "cold": {
-        "totalMs": 37.507,
-        "transactionMs": 37.309,
-        "facadeOverheadMs": 0.198,
+        "totalMs": 8.085,
+        "transactionMs": 5.867,
+        "facadeOverheadMs": 2.219,
         "outcome": "success",
         "error": null
       },
@@ -1079,19 +1079,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 38.898,
-          "p95Ms": 40.075,
-          "worstMs": 40.761
+          "p50Ms": 8.452,
+          "p95Ms": 9.097,
+          "worstMs": 10.085
         },
         "transaction": {
-          "p50Ms": 38.524,
-          "p95Ms": 39.661,
-          "worstMs": 40.548
+          "p50Ms": 6.227,
+          "p95Ms": 6.842,
+          "worstMs": 6.871
         },
         "facadeOverhead": {
-          "p50Ms": 0.352,
-          "p95Ms": 0.484,
-          "worstMs": 0.517
+          "p50Ms": 2.222,
+          "p95Ms": 2.359,
+          "worstMs": 3.243
         },
         "outcomes": {
           "success": 20,
@@ -1101,142 +1101,142 @@
         },
         "samples": [
           {
-            "totalMs": 36.841,
-            "transactionMs": 36.455,
-            "facadeOverheadMs": 0.387,
+            "totalMs": 8.153,
+            "transactionMs": 6.012,
+            "facadeOverheadMs": 2.141,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.17,
-            "transactionMs": 38.653,
-            "facadeOverheadMs": 0.517,
+            "totalMs": 7.914,
+            "transactionMs": 5.844,
+            "facadeOverheadMs": 2.069,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.227,
-            "transactionMs": 38.85,
-            "facadeOverheadMs": 0.377,
+            "totalMs": 7.912,
+            "transactionMs": 5.812,
+            "facadeOverheadMs": 2.1,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.075,
-            "transactionMs": 39.661,
-            "facadeOverheadMs": 0.414,
+            "totalMs": 9.097,
+            "transactionMs": 6.871,
+            "facadeOverheadMs": 2.226,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.761,
-            "transactionMs": 40.548,
-            "facadeOverheadMs": 0.213,
+            "totalMs": 8.452,
+            "transactionMs": 6.143,
+            "facadeOverheadMs": 2.309,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.111,
-            "transactionMs": 36.786,
-            "facadeOverheadMs": 0.325,
+            "totalMs": 8.164,
+            "transactionMs": 6.03,
+            "facadeOverheadMs": 2.134,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.412,
-            "transactionMs": 38.06,
-            "facadeOverheadMs": 0.352,
+            "totalMs": 8.162,
+            "transactionMs": 6.114,
+            "facadeOverheadMs": 2.048,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.263,
-            "transactionMs": 38.053,
-            "facadeOverheadMs": 0.21,
+            "totalMs": 8.327,
+            "transactionMs": 6.164,
+            "facadeOverheadMs": 2.163,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 36.767,
-            "transactionMs": 36.421,
-            "facadeOverheadMs": 0.346,
+            "totalMs": 8.327,
+            "transactionMs": 6.121,
+            "facadeOverheadMs": 2.206,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.648,
-            "transactionMs": 37.333,
-            "facadeOverheadMs": 0.315,
+            "totalMs": 8.723,
+            "transactionMs": 6.499,
+            "facadeOverheadMs": 2.223,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.499,
-            "transactionMs": 38.165,
-            "facadeOverheadMs": 0.334,
+            "totalMs": 8.449,
+            "transactionMs": 6.227,
+            "facadeOverheadMs": 2.222,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40,
-            "transactionMs": 39.516,
-            "facadeOverheadMs": 0.484,
+            "totalMs": 8.342,
+            "transactionMs": 6.157,
+            "facadeOverheadMs": 2.185,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.157,
-            "transactionMs": 38.755,
-            "facadeOverheadMs": 0.402,
+            "totalMs": 8.704,
+            "transactionMs": 6.52,
+            "facadeOverheadMs": 2.184,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.683,
-            "transactionMs": 38.289,
-            "facadeOverheadMs": 0.395,
+            "totalMs": 10.085,
+            "transactionMs": 6.842,
+            "facadeOverheadMs": 3.243,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.332,
-            "transactionMs": 38.965,
-            "facadeOverheadMs": 0.367,
+            "totalMs": 8.89,
+            "transactionMs": 6.578,
+            "facadeOverheadMs": 2.312,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.943,
-            "transactionMs": 38.609,
-            "facadeOverheadMs": 0.334,
+            "totalMs": 8.893,
+            "transactionMs": 6.573,
+            "facadeOverheadMs": 2.32,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.542,
-            "transactionMs": 39.203,
-            "facadeOverheadMs": 0.34,
+            "totalMs": 8.817,
+            "transactionMs": 6.457,
+            "facadeOverheadMs": 2.359,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.43,
-            "transactionMs": 39.084,
-            "facadeOverheadMs": 0.347,
+            "totalMs": 8.712,
+            "transactionMs": 6.4,
+            "facadeOverheadMs": 2.312,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.898,
-            "transactionMs": 38.497,
-            "facadeOverheadMs": 0.401,
+            "totalMs": 8.656,
+            "transactionMs": 6.38,
+            "facadeOverheadMs": 2.276,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.884,
-            "transactionMs": 38.524,
-            "facadeOverheadMs": 0.36,
+            "totalMs": 8.849,
+            "transactionMs": 6.526,
+            "facadeOverheadMs": 2.324,
             "outcome": "success",
             "error": null
           }
@@ -1305,9 +1305,9 @@
         50
       ],
       "cold": {
-        "totalMs": 37.707,
-        "transactionMs": 37.536,
-        "facadeOverheadMs": 0.171,
+        "totalMs": 10.697,
+        "transactionMs": 8.255,
+        "facadeOverheadMs": 2.442,
         "outcome": "success",
         "error": null
       },
@@ -1315,19 +1315,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 39.889,
-          "p95Ms": 41.109,
-          "worstMs": 41.818
+          "p50Ms": 10.422,
+          "p95Ms": 10.797,
+          "worstMs": 11.539
         },
         "transaction": {
-          "p50Ms": 39.36,
-          "p95Ms": 40.463,
-          "worstMs": 41.461
+          "p50Ms": 8.163,
+          "p95Ms": 8.422,
+          "worstMs": 8.47
         },
         "facadeOverhead": {
-          "p50Ms": 0.377,
-          "p95Ms": 0.54,
-          "worstMs": 0.646
+          "p50Ms": 2.369,
+          "p95Ms": 2.46,
+          "worstMs": 3.07
         },
         "outcomes": {
           "success": 20,
@@ -1337,142 +1337,142 @@
         },
         "samples": [
           {
-            "totalMs": 38.52,
-            "transactionMs": 38.184,
-            "facadeOverheadMs": 0.336,
+            "totalMs": 10.304,
+            "transactionMs": 8.013,
+            "facadeOverheadMs": 2.292,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.531,
-            "transactionMs": 39.071,
-            "facadeOverheadMs": 0.46,
+            "totalMs": 10.311,
+            "transactionMs": 8.027,
+            "facadeOverheadMs": 2.283,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.818,
-            "transactionMs": 41.461,
-            "facadeOverheadMs": 0.357,
+            "totalMs": 10.785,
+            "transactionMs": 8.324,
+            "facadeOverheadMs": 2.46,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.03,
-            "transactionMs": 38.68,
-            "facadeOverheadMs": 0.351,
+            "totalMs": 10.797,
+            "transactionMs": 8.422,
+            "facadeOverheadMs": 2.375,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.008,
-            "transactionMs": 39.63,
-            "facadeOverheadMs": 0.378,
+            "totalMs": 10.326,
+            "transactionMs": 7.994,
+            "facadeOverheadMs": 2.332,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.109,
-            "transactionMs": 40.463,
-            "facadeOverheadMs": 0.646,
+            "totalMs": 10.643,
+            "transactionMs": 8.189,
+            "facadeOverheadMs": 2.454,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.379,
-            "transactionMs": 39.066,
-            "facadeOverheadMs": 0.313,
+            "totalMs": 10.55,
+            "transactionMs": 8.192,
+            "facadeOverheadMs": 2.358,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.07,
-            "transactionMs": 39.677,
-            "facadeOverheadMs": 0.393,
+            "totalMs": 10.339,
+            "transactionMs": 7.97,
+            "facadeOverheadMs": 2.369,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.94,
-            "transactionMs": 39.559,
-            "facadeOverheadMs": 0.381,
+            "totalMs": 10.396,
+            "transactionMs": 8.112,
+            "facadeOverheadMs": 2.285,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.785,
-            "transactionMs": 39.36,
-            "facadeOverheadMs": 0.424,
+            "totalMs": 10.267,
+            "transactionMs": 8.019,
+            "facadeOverheadMs": 2.248,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.077,
-            "transactionMs": 38.688,
-            "facadeOverheadMs": 0.389,
+            "totalMs": 10.597,
+            "transactionMs": 8.174,
+            "facadeOverheadMs": 2.423,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.235,
-            "transactionMs": 39.871,
-            "facadeOverheadMs": 0.364,
+            "totalMs": 10.597,
+            "transactionMs": 8.206,
+            "facadeOverheadMs": 2.39,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.389,
-            "transactionMs": 40.012,
-            "facadeOverheadMs": 0.377,
+            "totalMs": 10.675,
+            "transactionMs": 8.301,
+            "facadeOverheadMs": 2.374,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.333,
-            "transactionMs": 39.985,
-            "facadeOverheadMs": 0.348,
+            "totalMs": 10.671,
+            "transactionMs": 8.24,
+            "facadeOverheadMs": 2.431,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.657,
-            "transactionMs": 40.285,
-            "facadeOverheadMs": 0.372,
+            "totalMs": 11.539,
+            "transactionMs": 8.47,
+            "facadeOverheadMs": 3.07,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 39.889,
-            "transactionMs": 39.35,
-            "facadeOverheadMs": 0.54,
+            "totalMs": 10.627,
+            "transactionMs": 8.218,
+            "facadeOverheadMs": 2.409,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 38.99,
-            "transactionMs": 38.603,
-            "facadeOverheadMs": 0.387,
+            "totalMs": 10.422,
+            "transactionMs": 8.163,
+            "facadeOverheadMs": 2.259,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.355,
-            "transactionMs": 40.017,
-            "facadeOverheadMs": 0.338,
+            "totalMs": 10.243,
+            "transactionMs": 7.994,
+            "facadeOverheadMs": 2.249,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 36.968,
-            "transactionMs": 36.644,
-            "facadeOverheadMs": 0.323,
+            "totalMs": 10.384,
+            "transactionMs": 7.96,
+            "facadeOverheadMs": 2.424,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 37.433,
-            "transactionMs": 37.005,
-            "facadeOverheadMs": 0.429,
+            "totalMs": 9.946,
+            "transactionMs": 7.727,
+            "facadeOverheadMs": 2.218,
             "outcome": "success",
             "error": null
           }
@@ -1591,9 +1591,9 @@
         100
       ],
       "cold": {
-        "totalMs": 40.447,
-        "transactionMs": 40.279,
-        "facadeOverheadMs": 0.168,
+        "totalMs": 22.889,
+        "transactionMs": 20.284,
+        "facadeOverheadMs": 2.605,
         "outcome": "success",
         "error": null
       },
@@ -1601,19 +1601,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 42.617,
-          "p95Ms": 44.941,
-          "worstMs": 45.044
+          "p50Ms": 17.67,
+          "p95Ms": 19.305,
+          "worstMs": 19.428
         },
         "transaction": {
-          "p50Ms": 42.233,
-          "p95Ms": 44.476,
-          "worstMs": 44.55
+          "p50Ms": 15.663,
+          "p95Ms": 17.319,
+          "worstMs": 17.406
         },
         "facadeOverhead": {
-          "p50Ms": 0.347,
-          "p95Ms": 0.494,
-          "worstMs": 0.578
+          "p50Ms": 1.999,
+          "p95Ms": 2.317,
+          "worstMs": 2.58
         },
         "outcomes": {
           "success": 20,
@@ -1623,142 +1623,142 @@
         },
         "samples": [
           {
-            "totalMs": 44.082,
-            "transactionMs": 43.504,
-            "facadeOverheadMs": 0.578,
+            "totalMs": 17.687,
+            "transactionMs": 15.688,
+            "facadeOverheadMs": 1.999,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 45.044,
-            "transactionMs": 44.55,
-            "facadeOverheadMs": 0.494,
+            "totalMs": 17.607,
+            "transactionMs": 15.658,
+            "facadeOverheadMs": 1.949,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 43.83,
-            "transactionMs": 43.475,
-            "facadeOverheadMs": 0.355,
+            "totalMs": 17.695,
+            "transactionMs": 15.702,
+            "facadeOverheadMs": 1.993,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.216,
-            "transactionMs": 41.805,
-            "facadeOverheadMs": 0.411,
+            "totalMs": 17.244,
+            "transactionMs": 15.131,
+            "facadeOverheadMs": 2.114,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 43.628,
-            "transactionMs": 43.278,
-            "facadeOverheadMs": 0.351,
+            "totalMs": 17.702,
+            "transactionMs": 15.6,
+            "facadeOverheadMs": 2.102,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 44.941,
-            "transactionMs": 44.476,
-            "facadeOverheadMs": 0.466,
+            "totalMs": 17.445,
+            "transactionMs": 15.509,
+            "facadeOverheadMs": 1.936,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.92,
-            "transactionMs": 42.576,
-            "facadeOverheadMs": 0.344,
+            "totalMs": 18.272,
+            "transactionMs": 16.238,
+            "facadeOverheadMs": 2.034,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.644,
-            "transactionMs": 41.29,
-            "facadeOverheadMs": 0.354,
+            "totalMs": 18.176,
+            "transactionMs": 16.082,
+            "facadeOverheadMs": 2.094,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.689,
-            "transactionMs": 42.354,
-            "facadeOverheadMs": 0.336,
+            "totalMs": 17.56,
+            "transactionMs": 15.525,
+            "facadeOverheadMs": 2.035,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 40.836,
-            "transactionMs": 40.491,
-            "facadeOverheadMs": 0.344,
+            "totalMs": 17.342,
+            "transactionMs": 15.293,
+            "facadeOverheadMs": 2.049,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.373,
-            "transactionMs": 42.026,
-            "facadeOverheadMs": 0.347,
+            "totalMs": 17.393,
+            "transactionMs": 15.486,
+            "facadeOverheadMs": 1.907,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.179,
-            "transactionMs": 41.837,
-            "facadeOverheadMs": 0.342,
+            "totalMs": 19.305,
+            "transactionMs": 17.406,
+            "facadeOverheadMs": 1.899,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.617,
-            "transactionMs": 42.233,
-            "facadeOverheadMs": 0.383,
+            "totalMs": 19.428,
+            "transactionMs": 17.111,
+            "facadeOverheadMs": 2.317,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 43.097,
-            "transactionMs": 42.699,
-            "facadeOverheadMs": 0.398,
+            "totalMs": 18.815,
+            "transactionMs": 16.235,
+            "facadeOverheadMs": 2.58,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 44.37,
-            "transactionMs": 44.045,
-            "facadeOverheadMs": 0.326,
+            "totalMs": 19.295,
+            "transactionMs": 17.319,
+            "facadeOverheadMs": 1.976,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.19,
-            "transactionMs": 41.831,
-            "facadeOverheadMs": 0.359,
+            "totalMs": 17.67,
+            "transactionMs": 15.558,
+            "facadeOverheadMs": 2.112,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 43.308,
-            "transactionMs": 43.03,
-            "facadeOverheadMs": 0.279,
+            "totalMs": 17.653,
+            "transactionMs": 15.732,
+            "facadeOverheadMs": 1.921,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.636,
-            "transactionMs": 41.324,
-            "facadeOverheadMs": 0.312,
+            "totalMs": 17.822,
+            "transactionMs": 15.825,
+            "facadeOverheadMs": 1.998,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 41.278,
-            "transactionMs": 40.947,
-            "facadeOverheadMs": 0.331,
+            "totalMs": 17.669,
+            "transactionMs": 15.663,
+            "facadeOverheadMs": 2.006,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 42.126,
-            "transactionMs": 41.84,
-            "facadeOverheadMs": 0.287,
+            "totalMs": 17.544,
+            "transactionMs": 15.59,
+            "facadeOverheadMs": 1.954,
             "outcome": "success",
             "error": null
           }
@@ -1977,9 +1977,9 @@
         200
       ],
       "cold": {
-        "totalMs": 52.698,
-        "transactionMs": 52.525,
-        "facadeOverheadMs": 0.173,
+        "totalMs": 73.504,
+        "transactionMs": 71.153,
+        "facadeOverheadMs": 2.351,
         "outcome": "success",
         "error": null
       },
@@ -1987,19 +1987,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 56.277,
-          "p95Ms": 57.4,
-          "worstMs": 58.056
+          "p50Ms": 77.037,
+          "p95Ms": 78.805,
+          "worstMs": 79.151
         },
         "transaction": {
-          "p50Ms": 55.89,
-          "p95Ms": 57.087,
-          "worstMs": 57.731
+          "p50Ms": 72.466,
+          "p95Ms": 74.673,
+          "worstMs": 75.271
         },
         "facadeOverhead": {
-          "p50Ms": 0.357,
-          "p95Ms": 0.47,
-          "worstMs": 1.014
+          "p50Ms": 4.547,
+          "p95Ms": 5.08,
+          "worstMs": 5.142
         },
         "outcomes": {
           "success": 20,
@@ -2009,142 +2009,142 @@
         },
         "samples": [
           {
-            "totalMs": 56.5,
-            "transactionMs": 56.173,
-            "facadeOverheadMs": 0.327,
+            "totalMs": 78.627,
+            "transactionMs": 73.767,
+            "facadeOverheadMs": 4.86,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 57.111,
-            "transactionMs": 56.796,
-            "facadeOverheadMs": 0.316,
+            "totalMs": 78.112,
+            "transactionMs": 73.366,
+            "facadeOverheadMs": 4.746,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 56.501,
-            "transactionMs": 56.305,
-            "facadeOverheadMs": 0.195,
+            "totalMs": 78.805,
+            "transactionMs": 75.271,
+            "facadeOverheadMs": 3.534,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 53.426,
-            "transactionMs": 53.069,
-            "facadeOverheadMs": 0.358,
+            "totalMs": 78.797,
+            "transactionMs": 74.27,
+            "facadeOverheadMs": 4.527,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 56.277,
-            "transactionMs": 55.89,
-            "facadeOverheadMs": 0.387,
+            "totalMs": 77.439,
+            "transactionMs": 74.673,
+            "facadeOverheadMs": 2.766,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 57.247,
-            "transactionMs": 56.777,
-            "facadeOverheadMs": 0.47,
+            "totalMs": 76.9,
+            "transactionMs": 72.4,
+            "facadeOverheadMs": 4.5,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 56.381,
-            "transactionMs": 55.954,
-            "facadeOverheadMs": 0.427,
+            "totalMs": 77.037,
+            "transactionMs": 72.343,
+            "facadeOverheadMs": 4.694,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 56.527,
-            "transactionMs": 56.158,
-            "facadeOverheadMs": 0.37,
+            "totalMs": 76.471,
+            "transactionMs": 71.608,
+            "facadeOverheadMs": 4.863,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 55.809,
-            "transactionMs": 55.441,
-            "facadeOverheadMs": 0.369,
+            "totalMs": 77.92,
+            "transactionMs": 72.778,
+            "facadeOverheadMs": 5.142,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 53.493,
-            "transactionMs": 53.178,
-            "facadeOverheadMs": 0.314,
+            "totalMs": 77.017,
+            "transactionMs": 72.604,
+            "facadeOverheadMs": 4.412,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 55.173,
-            "transactionMs": 54.854,
-            "facadeOverheadMs": 0.319,
+            "totalMs": 76.909,
+            "transactionMs": 72.466,
+            "facadeOverheadMs": 4.443,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 56.528,
-            "transactionMs": 56.132,
-            "facadeOverheadMs": 0.396,
+            "totalMs": 76.662,
+            "transactionMs": 72.063,
+            "facadeOverheadMs": 4.599,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 55.814,
-            "transactionMs": 55.457,
-            "facadeOverheadMs": 0.357,
+            "totalMs": 76.069,
+            "transactionMs": 71.521,
+            "facadeOverheadMs": 4.547,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 54.645,
-            "transactionMs": 54.328,
-            "facadeOverheadMs": 0.317,
+            "totalMs": 77.329,
+            "transactionMs": 72.853,
+            "facadeOverheadMs": 4.476,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 57.4,
-            "transactionMs": 57.087,
-            "facadeOverheadMs": 0.313,
+            "totalMs": 79.151,
+            "transactionMs": 74.435,
+            "facadeOverheadMs": 4.716,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 56.049,
-            "transactionMs": 55.035,
-            "facadeOverheadMs": 1.014,
+            "totalMs": 75.508,
+            "transactionMs": 72.288,
+            "facadeOverheadMs": 3.221,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 56.133,
-            "transactionMs": 55.695,
-            "facadeOverheadMs": 0.438,
+            "totalMs": 76.544,
+            "transactionMs": 71.464,
+            "facadeOverheadMs": 5.08,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 54.968,
-            "transactionMs": 54.618,
-            "facadeOverheadMs": 0.351,
+            "totalMs": 77.332,
+            "transactionMs": 72.367,
+            "facadeOverheadMs": 4.965,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 57.244,
-            "transactionMs": 56.887,
-            "facadeOverheadMs": 0.357,
+            "totalMs": 75.453,
+            "transactionMs": 71.351,
+            "facadeOverheadMs": 4.102,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 58.056,
-            "transactionMs": 57.731,
-            "facadeOverheadMs": 0.325,
+            "totalMs": 77.165,
+            "transactionMs": 72.481,
+            "facadeOverheadMs": 4.684,
             "outcome": "success",
             "error": null
           }
@@ -2463,9 +2463,9 @@
         300
       ],
       "cold": {
-        "totalMs": 77.296,
-        "transactionMs": 77.139,
-        "facadeOverheadMs": 0.157,
+        "totalMs": 211.071,
+        "transactionMs": 208.214,
+        "facadeOverheadMs": 2.857,
         "outcome": "success",
         "error": null
       },
@@ -2473,19 +2473,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 77.91,
-          "p95Ms": 80.342,
-          "worstMs": 80.562
+          "p50Ms": 209.275,
+          "p95Ms": 216.346,
+          "worstMs": 234.887
         },
         "transaction": {
-          "p50Ms": 77.742,
-          "p95Ms": 80.026,
-          "worstMs": 80.221
+          "p50Ms": 204.72,
+          "p95Ms": 212.442,
+          "worstMs": 230.357
         },
         "facadeOverhead": {
-          "p50Ms": 0.329,
-          "p95Ms": 0.446,
-          "worstMs": 0.509
+          "p50Ms": 4.579,
+          "p95Ms": 4.974,
+          "worstMs": 5.08
         },
         "outcomes": {
           "success": 20,
@@ -2495,142 +2495,142 @@
         },
         "samples": [
           {
-            "totalMs": 79.804,
-            "transactionMs": 79.487,
-            "facadeOverheadMs": 0.317,
+            "totalMs": 234.887,
+            "transactionMs": 230.357,
+            "facadeOverheadMs": 4.531,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 76.875,
-            "transactionMs": 76.562,
-            "facadeOverheadMs": 0.312,
+            "totalMs": 214.59,
+            "transactionMs": 209.783,
+            "facadeOverheadMs": 4.807,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 76.743,
-            "transactionMs": 76.413,
-            "facadeOverheadMs": 0.33,
+            "totalMs": 210.544,
+            "transactionMs": 206.044,
+            "facadeOverheadMs": 4.499,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 78.704,
-            "transactionMs": 78.307,
-            "facadeOverheadMs": 0.397,
+            "totalMs": 209.159,
+            "transactionMs": 204.72,
+            "facadeOverheadMs": 4.439,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 79.147,
-            "transactionMs": 78.819,
-            "facadeOverheadMs": 0.328,
+            "totalMs": 209.707,
+            "transactionMs": 205.117,
+            "facadeOverheadMs": 4.589,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 80.342,
-            "transactionMs": 80.026,
-            "facadeOverheadMs": 0.316,
+            "totalMs": 213.454,
+            "transactionMs": 208.704,
+            "facadeOverheadMs": 4.751,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 77.91,
-            "transactionMs": 77.742,
-            "facadeOverheadMs": 0.169,
+            "totalMs": 209.194,
+            "transactionMs": 204.487,
+            "facadeOverheadMs": 4.706,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 78.208,
-            "transactionMs": 77.856,
-            "facadeOverheadMs": 0.352,
+            "totalMs": 216.346,
+            "transactionMs": 212.442,
+            "facadeOverheadMs": 3.904,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 77.317,
-            "transactionMs": 77.007,
-            "facadeOverheadMs": 0.31,
+            "totalMs": 209.758,
+            "transactionMs": 205.269,
+            "facadeOverheadMs": 4.489,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 77.694,
-            "transactionMs": 77.269,
-            "facadeOverheadMs": 0.425,
+            "totalMs": 209.275,
+            "transactionMs": 204.301,
+            "facadeOverheadMs": 4.974,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 80.562,
-            "transactionMs": 80.221,
-            "facadeOverheadMs": 0.341,
+            "totalMs": 209.604,
+            "transactionMs": 204.862,
+            "facadeOverheadMs": 4.742,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 76.932,
-            "transactionMs": 76.604,
-            "facadeOverheadMs": 0.329,
+            "totalMs": 209.26,
+            "transactionMs": 204.573,
+            "facadeOverheadMs": 4.687,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 77.387,
-            "transactionMs": 77.069,
-            "facadeOverheadMs": 0.318,
+            "totalMs": 208.04,
+            "transactionMs": 203.304,
+            "facadeOverheadMs": 4.736,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 78.347,
-            "transactionMs": 77.901,
-            "facadeOverheadMs": 0.446,
+            "totalMs": 208.584,
+            "transactionMs": 204.005,
+            "facadeOverheadMs": 4.579,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 77.187,
-            "transactionMs": 76.759,
-            "facadeOverheadMs": 0.428,
+            "totalMs": 212.931,
+            "transactionMs": 208.444,
+            "facadeOverheadMs": 4.487,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 78.422,
-            "transactionMs": 78.053,
-            "facadeOverheadMs": 0.369,
+            "totalMs": 206.702,
+            "transactionMs": 201.621,
+            "facadeOverheadMs": 5.08,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 79.436,
-            "transactionMs": 79.069,
-            "facadeOverheadMs": 0.367,
+            "totalMs": 206.393,
+            "transactionMs": 201.884,
+            "facadeOverheadMs": 4.508,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 80.225,
-            "transactionMs": 79.716,
-            "facadeOverheadMs": 0.509,
+            "totalMs": 206.79,
+            "transactionMs": 202.378,
+            "facadeOverheadMs": 4.413,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 76.483,
-            "transactionMs": 76.301,
-            "facadeOverheadMs": 0.182,
+            "totalMs": 211.112,
+            "transactionMs": 206.488,
+            "facadeOverheadMs": 4.624,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 76.343,
-            "transactionMs": 76.052,
-            "facadeOverheadMs": 0.291,
+            "totalMs": 208.552,
+            "transactionMs": 204.542,
+            "facadeOverheadMs": 4.01,
             "outcome": "success",
             "error": null
           }
@@ -3049,9 +3049,9 @@
         400
       ],
       "cold": {
-        "totalMs": 107.825,
-        "transactionMs": 107.65,
-        "facadeOverheadMs": 0.174,
+        "totalMs": 484.954,
+        "transactionMs": 482.155,
+        "facadeOverheadMs": 2.798,
         "outcome": "success",
         "error": null
       },
@@ -3059,19 +3059,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 108.151,
-          "p95Ms": 109.515,
-          "worstMs": 109.994
+          "p50Ms": 490.322,
+          "p95Ms": 524.259,
+          "worstMs": 534.414
         },
         "transaction": {
-          "p50Ms": 107.792,
-          "p95Ms": 109.188,
-          "worstMs": 109.698
+          "p50Ms": 484.823,
+          "p95Ms": 519.89,
+          "worstMs": 529.483
         },
         "facadeOverhead": {
-          "p50Ms": 0.387,
-          "p95Ms": 0.523,
-          "worstMs": 0.527
+          "p50Ms": 5.273,
+          "p95Ms": 6.324,
+          "worstMs": 7.105
         },
         "outcomes": {
           "success": 20,
@@ -3081,142 +3081,142 @@
         },
         "samples": [
           {
-            "totalMs": 108.319,
-            "transactionMs": 107.792,
-            "facadeOverheadMs": 0.527,
+            "totalMs": 494.436,
+            "transactionMs": 488.687,
+            "facadeOverheadMs": 5.749,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.849,
-            "transactionMs": 108.498,
-            "facadeOverheadMs": 0.351,
+            "totalMs": 490.387,
+            "transactionMs": 485.305,
+            "facadeOverheadMs": 5.082,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 106.458,
-            "transactionMs": 106.048,
-            "facadeOverheadMs": 0.409,
+            "totalMs": 534.414,
+            "transactionMs": 529.483,
+            "facadeOverheadMs": 4.931,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 107.32,
-            "transactionMs": 106.883,
-            "facadeOverheadMs": 0.437,
+            "totalMs": 524.259,
+            "transactionMs": 519.89,
+            "facadeOverheadMs": 4.37,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 107.485,
-            "transactionMs": 107.027,
-            "facadeOverheadMs": 0.458,
+            "totalMs": 492.696,
+            "transactionMs": 489.328,
+            "facadeOverheadMs": 3.368,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.823,
-            "transactionMs": 108.393,
-            "facadeOverheadMs": 0.43,
+            "totalMs": 486.528,
+            "transactionMs": 480.742,
+            "facadeOverheadMs": 5.786,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.059,
-            "transactionMs": 107.876,
-            "facadeOverheadMs": 0.183,
+            "totalMs": 482.367,
+            "transactionMs": 477.544,
+            "facadeOverheadMs": 4.823,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.151,
-            "transactionMs": 107.742,
-            "facadeOverheadMs": 0.409,
+            "totalMs": 489.242,
+            "transactionMs": 483.244,
+            "facadeOverheadMs": 5.998,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.863,
-            "transactionMs": 108.423,
-            "facadeOverheadMs": 0.441,
+            "totalMs": 495.57,
+            "transactionMs": 488.464,
+            "facadeOverheadMs": 7.105,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.884,
-            "transactionMs": 108.512,
-            "facadeOverheadMs": 0.372,
+            "totalMs": 488.683,
+            "transactionMs": 482.841,
+            "facadeOverheadMs": 5.842,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.025,
-            "transactionMs": 107.502,
-            "facadeOverheadMs": 0.523,
+            "totalMs": 490.322,
+            "transactionMs": 484.823,
+            "facadeOverheadMs": 5.499,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 108.634,
-            "transactionMs": 108.311,
-            "facadeOverheadMs": 0.324,
+            "totalMs": 492.372,
+            "transactionMs": 487.152,
+            "facadeOverheadMs": 5.22,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 107.981,
-            "transactionMs": 107.611,
-            "facadeOverheadMs": 0.37,
+            "totalMs": 486.974,
+            "transactionMs": 481.811,
+            "facadeOverheadMs": 5.164,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 109.212,
-            "transactionMs": 108.773,
-            "facadeOverheadMs": 0.439,
+            "totalMs": 487.214,
+            "transactionMs": 482.477,
+            "facadeOverheadMs": 4.737,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 109.515,
-            "transactionMs": 109.188,
-            "facadeOverheadMs": 0.328,
+            "totalMs": 493.932,
+            "transactionMs": 489.394,
+            "facadeOverheadMs": 4.538,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 107.092,
-            "transactionMs": 106.656,
-            "facadeOverheadMs": 0.437,
+            "totalMs": 488.913,
+            "transactionMs": 483.641,
+            "facadeOverheadMs": 5.273,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 107.471,
-            "transactionMs": 107.085,
-            "facadeOverheadMs": 0.387,
+            "totalMs": 492.86,
+            "transactionMs": 486.967,
+            "facadeOverheadMs": 5.894,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 107.707,
-            "transactionMs": 107.35,
-            "facadeOverheadMs": 0.357,
+            "totalMs": 483.027,
+            "transactionMs": 477.682,
+            "facadeOverheadMs": 5.345,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 109.324,
-            "transactionMs": 109.137,
-            "facadeOverheadMs": 0.187,
+            "totalMs": 493.681,
+            "transactionMs": 487.358,
+            "facadeOverheadMs": 6.324,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 109.994,
-            "transactionMs": 109.698,
-            "facadeOverheadMs": 0.296,
+            "totalMs": 480.522,
+            "transactionMs": 474.659,
+            "facadeOverheadMs": 5.864,
             "outcome": "success",
             "error": null
           }
@@ -3734,9 +3734,9 @@
         499
       ],
       "cold": {
-        "totalMs": 147.754,
-        "transactionMs": 147.455,
-        "facadeOverheadMs": 0.3,
+        "totalMs": 957.013,
+        "transactionMs": 953.784,
+        "facadeOverheadMs": 3.229,
         "outcome": "success",
         "error": null
       },
@@ -3744,19 +3744,19 @@
       "sampleCount": 20,
       "warm": {
         "total": {
-          "p50Ms": 148.793,
-          "p95Ms": 161.165,
-          "worstMs": 163.508
+          "p50Ms": 960.94,
+          "p95Ms": 983.087,
+          "worstMs": 984.351
         },
         "transaction": {
-          "p50Ms": 148.547,
-          "p95Ms": 160.869,
-          "worstMs": 163.323
+          "p50Ms": 955.547,
+          "p95Ms": 977.84,
+          "worstMs": 981.965
         },
         "facadeOverhead": {
-          "p50Ms": 0.273,
-          "p95Ms": 0.512,
-          "worstMs": 0.516
+          "p50Ms": 5.688,
+          "p95Ms": 5.985,
+          "worstMs": 6.299
         },
         "outcomes": {
           "success": 20,
@@ -3766,142 +3766,142 @@
         },
         "samples": [
           {
-            "totalMs": 147.863,
-            "transactionMs": 147.59,
-            "facadeOverheadMs": 0.273,
+            "totalMs": 956.11,
+            "transactionMs": 950.186,
+            "facadeOverheadMs": 5.925,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 147.358,
-            "transactionMs": 146.845,
-            "facadeOverheadMs": 0.512,
+            "totalMs": 965.766,
+            "transactionMs": 959.781,
+            "facadeOverheadMs": 5.985,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 149.306,
-            "transactionMs": 148.981,
-            "facadeOverheadMs": 0.325,
+            "totalMs": 966.167,
+            "transactionMs": 960.379,
+            "facadeOverheadMs": 5.788,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 147.604,
-            "transactionMs": 147.225,
-            "facadeOverheadMs": 0.379,
+            "totalMs": 969.659,
+            "transactionMs": 964.251,
+            "facadeOverheadMs": 5.408,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 148.039,
-            "transactionMs": 147.662,
-            "facadeOverheadMs": 0.377,
+            "totalMs": 953.622,
+            "transactionMs": 948.391,
+            "facadeOverheadMs": 5.231,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 148.425,
-            "transactionMs": 148.227,
-            "facadeOverheadMs": 0.197,
+            "totalMs": 953.604,
+            "transactionMs": 948.481,
+            "facadeOverheadMs": 5.124,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 145.012,
-            "transactionMs": 144.674,
-            "facadeOverheadMs": 0.339,
+            "totalMs": 959.133,
+            "transactionMs": 953.261,
+            "facadeOverheadMs": 5.872,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 146.551,
-            "transactionMs": 146.269,
-            "facadeOverheadMs": 0.282,
+            "totalMs": 967.083,
+            "transactionMs": 961.395,
+            "facadeOverheadMs": 5.688,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 146.093,
-            "transactionMs": 145.67,
-            "facadeOverheadMs": 0.422,
+            "totalMs": 952.207,
+            "transactionMs": 946.451,
+            "facadeOverheadMs": 5.756,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 149.062,
-            "transactionMs": 148.547,
-            "facadeOverheadMs": 0.516,
+            "totalMs": 952.982,
+            "transactionMs": 947.187,
+            "facadeOverheadMs": 5.795,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 149.128,
-            "transactionMs": 148.936,
-            "facadeOverheadMs": 0.192,
+            "totalMs": 957.12,
+            "transactionMs": 951.169,
+            "facadeOverheadMs": 5.951,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 156.347,
-            "transactionMs": 156.185,
-            "facadeOverheadMs": 0.161,
+            "totalMs": 975.533,
+            "transactionMs": 969.573,
+            "facadeOverheadMs": 5.96,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 151.377,
-            "transactionMs": 151.222,
-            "facadeOverheadMs": 0.155,
+            "totalMs": 983.087,
+            "transactionMs": 977.84,
+            "facadeOverheadMs": 5.247,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 148.793,
-            "transactionMs": 148.647,
-            "facadeOverheadMs": 0.146,
+            "totalMs": 960.94,
+            "transactionMs": 955.547,
+            "facadeOverheadMs": 5.393,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 148.629,
-            "transactionMs": 148.476,
-            "facadeOverheadMs": 0.154,
+            "totalMs": 957.161,
+            "transactionMs": 950.862,
+            "facadeOverheadMs": 6.299,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 151.462,
-            "transactionMs": 151.313,
-            "facadeOverheadMs": 0.148,
+            "totalMs": 955.021,
+            "transactionMs": 949.5,
+            "facadeOverheadMs": 5.521,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 163.508,
-            "transactionMs": 163.323,
-            "facadeOverheadMs": 0.185,
+            "totalMs": 966.448,
+            "transactionMs": 960.697,
+            "facadeOverheadMs": 5.751,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 152.205,
-            "transactionMs": 152.042,
-            "facadeOverheadMs": 0.163,
+            "totalMs": 976.544,
+            "transactionMs": 970.967,
+            "facadeOverheadMs": 5.577,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 161.165,
-            "transactionMs": 160.869,
-            "facadeOverheadMs": 0.296,
+            "totalMs": 984.351,
+            "transactionMs": 981.965,
+            "facadeOverheadMs": 2.386,
             "outcome": "success",
             "error": null
           },
           {
-            "totalMs": 155.254,
-            "transactionMs": 154.8,
-            "facadeOverheadMs": 0.454,
+            "totalMs": 973.112,
+            "transactionMs": 969.787,
+            "facadeOverheadMs": 3.325,
             "outcome": "success",
             "error": null
           }
@@ -3915,7 +3915,7 @@
     "configuredStatementTimeoutMs": 2000,
     "sleepMs": 2200,
     "databaseOnly": {
-      "totalMs": 2054.437,
+      "totalMs": 2059.963,
       "transactionMs": null,
       "facadeOverheadMs": null,
       "outcome": "statement_timeout",
@@ -3924,9 +3924,9 @@
     "competition": {
       "requestBudgetMs": 2000,
       "firstFailure": "outer_timeout",
-      "firstFailureElapsedMs": 2001.103,
+      "firstFailureElapsedMs": 2000.361,
       "eventualDatabaseOutcome": "statement_timeout",
-      "eventualDatabaseElapsedMs": 2006.536
+      "eventualDatabaseElapsedMs": 2009.19
     }
   },
   "productionCodeChanged": false,
