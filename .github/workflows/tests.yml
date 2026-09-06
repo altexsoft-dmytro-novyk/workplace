@@ -251,12 +251,20 @@ jobs:
   # instead of PASS. Baseline needs no prior artifact and still fails on a real
   # breach.
   #
-  # Informational for now, the same way backend-e2e is: locally the worst valid
-  # shape sits at ~987 ms against the 2 s budget, and a shared 2-core runner is
-  # slower by an unknown factor. Promote by deleting the two `continue-on-error`
-  # lines below — job level plus the measurement step — once a run is observed
-  # green, because a soft step that fails still counts as successful when the
-  # job's conclusion is computed.
+  # Informational on purpose, and not a step on the way to gating. The only
+  # shape that can breach the budget is the deep acyclic chain: locally depth
+  # 499 sits at ~987 ms of the 2 s limit, while depth 5-50 — the range a real
+  # org chart lives in, since a person has on the order of 5-10 managers above
+  # them — costs 9-12 ms, about 0.5% of the budget. A blocking gate here would
+  # therefore go red on a graph shape the product cannot produce, and stay
+  # silent about the range that actually ships. The `continue-on-error` lines
+  # below (job level plus the measurement step) are not a TODO.
+  #
+  # To make this gate mean something, narrow the protocol's depth sequence to
+  # realistic values rather than promoting this job. That is a new protocol
+  # version, not a tweak: `acyclic_depths` is hashed into
+  # `fixture_manifest_hash`, so changing it makes every existing baseline
+  # incomparable.
   backend-acm9:
     name: Backend · ACM9 access-control NFR (informational)
     runs-on: ubuntu-latest
