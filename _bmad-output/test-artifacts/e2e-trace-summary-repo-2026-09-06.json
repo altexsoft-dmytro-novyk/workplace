@@ -7,8 +7,8 @@
  "inventory_basis": "acceptance_criteria",
  "gate_basis": "deterministic",
  "source_sha": {
-  "workspace": "d8faa81ff914d9d198b33f76242fa47a0ef713bf",
-  "backend": "20ed2a08fca35f9325196fb3ac916fadbd6bc257",
+  "workspace": "943bb1425f55ff585585ac9cc69d7198f8f80bc0",
+  "backend": "714c5ca6e89351014a60f48133f3e31b4b4efd84",
   "frontend": "cfbed35bdabda7f58c639d8a477e58538824e00a"
  },
  "target": {
@@ -80,9 +80,9 @@
   "present": true,
   "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
   "freshness": "fresh",
-  "recorded_source_sha": "d8faa81ff914d9d198b33f76242fa47a0ef713bf",
-  "current_source_sha": "d8faa81ff914d9d198b33f76242fa47a0ef713bf",
-  "producer": "local run 2026-09-06 (full backend unit + full backend e2e + frontend e2e, with db:bootstrap:access-control restored)",
+  "recorded_source_sha": "943bb1425f55ff585585ac9cc69d7198f8f80bc0",
+  "current_source_sha": "943bb1425f55ff585585ac9cc69d7198f8f80bc0",
+  "producer": "local full sweep 2026-09-06 at workspace 943bb142 / backend 714c5ca6 / frontend cfbed35b — clean tree, all three suites executed",
   "counted": 491,
   "stale": 0,
   "unverifiable": 0,
@@ -94,7 +94,7 @@
   "invalid": 0,
   "requirements_live_only": 0,
   "scope_note": "Full sweep: backend unit (19 cases), the COMPLETE backend e2e suite (43 files / 406 cases), and the frontend Playwright suite (124 cases) all executed at these SHAs. No suite was omitted.",
-  "integrity_caveat": "Evidence was produced from a WORKING TREE that carries one uncommitted change: the restored \"db:bootstrap:access-control\" script in services/backend/package.json. recorded_source_sha therefore names a commit that does NOT yet contain the fix. A clean checkout of d8faa81f reproduces 37 acm1r-fr-foundation failures. Commit the fix before treating this run as reproducible evidence."
+  "provenance_note": "Suites were executed against these exact commits with a clean working tree; recorded_source_sha names the workspace commit under test. The artifacts themselves land in the commit that follows it, which is the same convention the CI producer uses (it records the branch head the run observed, then commits the evidence on top)."
  },
  "blockers": [
   {

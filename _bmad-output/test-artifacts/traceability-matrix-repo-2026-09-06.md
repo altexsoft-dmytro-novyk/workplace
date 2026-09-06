@@ -7,7 +7,7 @@ oracleConfidence: 'high'
 oracleResolutionMode: 'formal_requirements'
 externalPointerStatus: 'not_used'
 collectionStatus: 'COLLECTED'
-sourceSha: 'd8faa81ff914d9d198b33f76242fa47a0ef713bf'
+sourceSha: '943bb1425f55ff585585ac9cc69d7198f8f80bc0'
 ---
 
 # Traceability Matrix — whole repository, all epics
@@ -15,7 +15,7 @@ sourceSha: 'd8faa81ff914d9d198b33f76242fa47a0ef713bf'
 **Refresh of** `tea-trace-coverage-matrix-repo-2026-09-04b.json`. Generated 2026-09-06.
 Gate: **CONCERNS**.
 
-Workspace `d8faa81f` · backend `20ed2a08` · frontend `cfbed35b`.
+Workspace `943bb142` · backend `714c5ca6` · frontend `cfbed35b`.
 
 ## What changed since the base run
 
@@ -39,15 +39,26 @@ while the wrapper `scripts/bootstrap-access-control.ts` stayed in place. The 11
 has been restored and the suite is now 39/39 green. access-control-kernel was
 **re-evaluated against observation**, as requested, rather than carried forward.
 
-## ⚠️ Integrity caveat — this evidence is not yet reproducible
+## Provenance — this evidence is reproducible
 
-The run was produced from a **working tree**, not a commit. The restored
-`db:bootstrap:access-control` line is uncommitted, so `recorded_source_sha`
-(`d8faa81f`) names a commit that does **not** contain the fix. A clean checkout
-of `d8faa81f` still reproduces 37 failures. The freshness check passes only
-because the sha matches nominally.
+The run was executed against a clean working tree at committed SHAs:
 
-**Commit the fix before treating this run as reproducible evidence.**
+| | |
+| --- | --- |
+| workspace | `943bb142` |
+| backend | `714c5ca6` |
+| frontend | `cfbed35b` |
+
+An earlier pass of this same matrix was produced from an uncommitted working
+tree and carried an integrity caveat, because `source_sha` then named a commit
+that did not contain the restored `db:bootstrap:access-control` script. That is
+resolved: the fix is committed, every suite was re-executed against the commits
+above, and the result was identical (359 passed / 29 failed / 18 todo on the
+backend e2e suite, 124/124 frontend, 19/19 unit).
+
+`recorded_source_sha` names the workspace commit under test. These artifacts
+land in the commit that follows it — the same convention the CI producer uses,
+which records the branch head it observed and commits the evidence on top.
 
 ## Coverage
 
