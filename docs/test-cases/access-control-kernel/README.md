@@ -83,6 +83,61 @@ consumer-side, HTTP-level scenario for the same increment — root resolving
 [`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
 as `S4.2d-DS-06`.
 
+The six `ACM11-FPO-01`..`ACM11-FPO-06` scenarios in
+[`full-profile-overlay/`](full-profile-overlay/) are **draft Stage-1 prose for
+PLAT-E4-S4.2c** (Story 4.2 scope item 3, the §2.4 full-profile-access-overlay
+half — the other half, the tree-root edge, is `S4.2b-TR-*` above), pending
+independent human approval. **Stage 1 dispatch record — the two blocking Ask
+First rulings this folder's scenarios are written against, per
+`spec-4-2c-full-profile-access-overlay.md`'s frozen resolution block and the
+design doc's own §7 precedent for recording Stage-1 rulings in this README:**
+
+- **AF-1 — resolved 2026-09-07 (Dmytro Novyk, PO).** `access-control.md:284`'s
+  `max(Self, full-profile)` means "the merge result so far," not a literal
+  comparison against only the viewer's own Self audience. A full-profile grant
+  can only ever raise the resolved section access to `'read'` — never lower
+  it, and never touch `'write'`. This is the only reading under which the
+  overlay does anything for its stated purpose (a holder reading an unrelated
+  colleague's profile, where the viewer is never Self for that target).
+- **AF-6 — resolved 2026-09-07 (Dmytro Novyk, PO), accepted as recommended:
+  unit-level proof only, ship it anyway.** Independently re-verified: every
+  cell of every row in the real, shipped `SECTION_ACCESS_MATRIX` (`profile:identity`,
+  `profile:leave`, `profile:projects`) is already `'read'` or `'write'` — none
+  is `'none'` — so the resolver-read integration has **no HTTP-observable
+  effect through any live route today**. `ACM11-FPO-03` and `ACM11-FPO-04` are
+  therefore proven against a real `AccessControlFacade` wired to a
+  `jest.mock`'d `SECTION_ACCESS_MATRIX` carrying one synthetic row with a
+  `'none'` colleague cell (a Jest mock, not a live route) — a real, rigorous
+  proof that the branch is wired and correct, honestly labeled as not an
+  end-to-end HTTP behavior change today. The mechanism becomes load-bearing
+  the moment a future section with a `'none'` cell (e.g. S2 Personal contacts,
+  `project-requirements.md:169`, `Colleague: —`) lands in the live matrix —
+  adding one is explicitly out of this increment's scope. AF-2 (fold the
+  resolver-read into 4.2c rather than defer it) follows from this ruling —
+  seeding and resolution ship together.
+- **AF-3, AF-4, AF-5, AF-7 — resolved 2026-09-07, all accepted as recommended**
+  (recorded in the spec, not re-litigated here): lock-only last-holder
+  protection, defined but dormant in this increment (no scenario in this
+  folder exercises a revoke — Never list, spec); model name `FullProfileGrant`;
+  `AccessJournalKind`'s existing `full_profile_grant`/`full_profile_revoke`
+  members used as-is; the bootstrap-seed's one journal write reuses
+  `JournalOperation`'s existing `'create'` member, `kind` alone disambiguating
+  it.
+
+These scenarios cover: the bootstrap seeding of root as first holder and its
+paired `AccessJournal` row (`ACM11-FPO-01`), idempotent reruns
+(`ACM11-FPO-02`), the AF-6 unit-level resolver proof and its ceiling property
+(`ACM11-FPO-03`, `ACM11-FPO-04`), the CAP-1 leak-prevention property that a
+holder resolving a deactivated or nonexistent target still gets `'none'`
+(`ACM11-FPO-05`), and a regression lock proving today's three live sections
+resolve byte-identically for holder and non-holder alike
+(`ACM11-FPO-06`). **Explicitly not covered, by the spec's own Never list**: any
+grant/revoke HTTP endpoint, an admin UI, the shared-link revocation backstop's
+usage, the self-grant CHECK constraint's rejection as a live test (defined at
+the migration level, Stage 2/3), and any exercised last-holder-protection
+revoke path — all deferred to the access-control "Full-profile access
+overlay" lifecycle item.
+
 **ACM-8 non-goals:** rebinding `ACCESS_CONTROL_PORT` away from
 `InterimAccessControlAdapter` in `user-management.module.ts` (User
 Management's own, separately-gated AD-2 story); any change to
@@ -434,3 +489,9 @@ not be translated into an `Audience`, and the scenario never invokes
 | `S4.2d-DS-03` | [dev-seed-spine/s42d-ds-03-rerun-is-additive-only.md](dev-seed-spine/s42d-ds-03-rerun-is-additive-only.md) | A rerun creates edges only for users holding no `direct` row yet; an administrator-written edge survives untouched; a department whose synthesized lead later deactivates is not auto-repaired (AF-4, documented, not a defect). |
 | `S4.2d-DS-04` | [dev-seed-spine/s42d-ds-04-department-with-no-active-members-is-skipped.md](dev-seed-spine/s42d-ds-04-department-with-no-active-members-is-skipped.md) | A department whose only member is inactive is skipped with no error; a fresh database with no population imported seeds zero edges and exits `0` — both are success, not the `NODE_ENV` error case. |
 | `S4.2d-DS-05` | [dev-seed-spine/s42d-ds-05-dev-grant-root-retired-and-create-root-repointed.md](dev-seed-spine/s42d-ds-05-dev-grant-root-retired-and-create-root-repointed.md) | `scripts/dev-grant-root.ts` and its npm alias no longer exist (no shim); `create:root` equals the exact repointed chain; a pre-existing database's orphaned `user-management:edit` row is left untouched (AF-2), by dated ruling, not by omission. |
+| `ACM11-FPO-01` | [full-profile-overlay/acm11-fpo-01-bootstrap-seeds-root-as-first-holder.md](full-profile-overlay/acm11-fpo-01-bootstrap-seeds-root-as-first-holder.md) | A fresh `db:seed && db:bootstrap:access-control` leaves exactly one `full_profile_grants` row (`holderUserId = root`, `grantedByUserId = NULL`) and one paired `AccessJournal` row (`kind: 'full_profile_grant'`, actor and subject both root). |
+| `ACM11-FPO-02` | [full-profile-overlay/acm11-fpo-02-rerun-is-idempotent-no-duplicate-row.md](full-profile-overlay/acm11-fpo-02-rerun-is-idempotent-no-duplicate-row.md) | Re-running the bootstrap against an already-seeded database inserts no second `full_profile_grants` or `AccessJournal` row and raises no drift error — the "zero rows anywhere" seed condition, mirroring the FR-policy singleton's verify-or-no-op shape. |
+| `ACM11-FPO-03` | [full-profile-overlay/acm11-fpo-03-holder-bumps-a-none-cell-to-read.md](full-profile-overlay/acm11-fpo-03-holder-bumps-a-none-cell-to-read.md) | AF-6 unit-level proof: against a `jest.mock`'d `SECTION_ACCESS_MATRIX` synthetic row with a `'none'` colleague cell, a holder resolves `'read'` and a non-holder resolves `'none'` — honestly labeled as not an HTTP-observable behavior change today, since no shipped section has a `'none'` cell. |
+| `ACM11-FPO-04` | [full-profile-overlay/acm11-fpo-04-overlay-never-upgrades-to-write.md](full-profile-overlay/acm11-fpo-04-overlay-never-upgrades-to-write.md) | The overlay's own contribution is the fixed value `'read'`, never `'write'`, even against a synthetic row whose other audience cells are `'write'` — the ceiling property, distinct from `ACM11-FPO-03`'s bump proof. |
+| `ACM11-FPO-05` | [full-profile-overlay/acm11-fpo-05-overlay-does-not-apply-to-inactive-or-unknown-target.md](full-profile-overlay/acm11-fpo-05-overlay-does-not-apply-to-inactive-or-unknown-target.md) | A holder resolving a deactivated or nonexistent target id gets `'none'`, not `'read'`, against both the real matrix and the synthetic row — the CAP-1 leak-prevention property named in the design's §5.3. |
+| `ACM11-FPO-06` | [full-profile-overlay/acm11-fpo-06-non-holder-gets-no-overlay-effect-on-real-sections.md](full-profile-overlay/acm11-fpo-06-non-holder-gets-no-overlay-effect-on-real-sections.md) | Today's three live `SECTION_ACCESS_MATRIX` rows resolve byte-identically for a holder and a non-holder alike — a pass-already regression lock over the base path the overlay must not disturb. |
