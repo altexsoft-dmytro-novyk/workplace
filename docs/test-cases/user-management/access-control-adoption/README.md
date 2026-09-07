@@ -65,6 +65,18 @@
 > about reaching **into** root moved for the employees the chain touches or for
 > anyone outside it.
 
+> **Added 2026-09-07 (PLAT-E4-S4.2d — dev seed spine).** One new scenario below
+> — `s42d-ds-06` — is the HTTP-level counterpart to the five DB-level scenarios
+> in [`dev-seed-spine/`](../../access-control-kernel/dev-seed-spine/), per Ask
+> First **AF-1**. Where `S4.2b-TR-02` built its two-hop chain by hand through
+> `POST /users/:id/relationships`, `s42d-ds-06` reads root's `reporting`
+> resolution over a spine the new `db:dev:seed-org` script actually produced
+> over a real, multi-department imported population — proving the same
+> unmodified upward-walk CTE holds for the script's output, not only for a
+> hand-wired fixture. This increment also **retires** `scripts/dev-grant-root.ts`
+> and repoints `create:root`; neither change touches any asserted outcome in
+> this folder's existing files.
+
 Stage-1 scenario documents (AD-1) for **Epic 0 — Access Control Adoption**. They
 mirror the dispatch entries `UMAC-1` / `UMAC-2` in
 `_bmad-output/specs/spec-user-management-access-control-adoption/stories.yaml`
@@ -216,3 +228,4 @@ S7/S8 record flags and S1 derived-field immutability. It is no longer coupled to
 | `s42b-tr-02-root-resolves-reporting-write-two-levels-down.md` | 4.2b | draft — root imports two employees, wires a real two-level `direct` chain (`E2 → E1 → root`) through `POST /users/:id/relationships`, then `PATCH`/`GET /users/<E2>` → `200`/`canEdit: true`, two hops up the unmodified upward-walk CTE. **Expected green on first run** — a regression lock over an already-correct property, not red-to-green |
 | `s42b-tr-03-root-has-no-upward-edge.md` | 4.2b | draft — `GET /users/<root>/relationships` → `200`, `data: []`, over the real endpoint (Gate B's `isAllowed('org:relationships:write')` disjunct is why root can read its own empty list at all). Re-proves `S4.2b-TR-01`'s database-level negative fact through HTTP, with two other people's edges already in the table. **Expected green on first run** |
 | `s42b-tr-04-unrelated-and-colleague-reach-into-root-unchanged.md` | 4.2b | draft — the negative control: E1 (whose own edge points at root) and U (no edge anywhere) both still get `403` on `PATCH /users/<root>` and `canEdit: false` on `GET /users/<root>`. Relationship edges are directional — reaching down to E2 grants nobody reach back up into root. Green before **and** after; a red here means the increment widened reach into root |
+| `s42d-ds-06-root-resolves-reporting-write-over-every-seeded-member.md` | 4.2d | draft — root reads `GET /users/:id` for a department lead (one hop), an ordinary member (two hops, through their lead), and the sole member of a single-person department (one hop, lead and member the same row) — all `200`, `canEdit: true` — over a spine `db:dev:seed-org` produced, never a hand-wired chain. **Expected red before Stage 3**: the script and its npm alias do not exist yet |

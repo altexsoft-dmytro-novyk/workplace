@@ -66,6 +66,23 @@ transitively up to root through the same unmodified CTE — lives in
 [`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
 as `S4.2b-TR-02`..`S4.2b-TR-04`.
 
+The five `S4.2d-DS-01`..`S4.2d-DS-05` scenarios in
+[`dev-seed-spine/`](dev-seed-spine/) are **draft Stage-1 prose for
+PLAT-E4-S4.2d** (Story 4.2 scope item 5), pending independent human approval.
+This is a **real red-then-green increment, not a lock**: `scripts/dev-seed-org.ts`
+and its `db:dev:seed-org` npm alias do not exist at this dispatch's baseline,
+and `scripts/dev-grant-root.ts` still does. These files cover the new script's
+shape (a two-level `direct` spine — one synthesized lead per department to
+root, every other active member to their lead), its `NODE_ENV=production`
+guard, its additive-only rerun behaviour (including the documented,
+accepted AF-4 non-repair of a later-deactivated lead), the skip of a
+department with zero active members, and the retirement of
+`scripts/dev-grant-root.ts` together with the repoint of `create:root`. The
+consumer-side, HTTP-level scenario for the same increment — root resolving
+`reporting` write over the population this script actually seeds — lives in
+[`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
+as `S4.2d-DS-06`.
+
 **ACM-8 non-goals:** rebinding `ACCESS_CONTROL_PORT` away from
 `InterimAccessControlAdapter` in `user-management.module.ts` (User
 Management's own, separately-gated AD-2 story); any change to
@@ -412,3 +429,8 @@ not be translated into an `Audience`, and the scenario never invokes
 | `S4.2a-OP-01` | [fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md](fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md) | `package.json` declares `db:bootstrap:access-control`, and the alias resolves to `scripts/bootstrap-access-control.ts`. **Precondition repair (AF-1)** — the missing alias is why every scenario in this folder is red at `ef03c88` for a reason unrelated to its subject; this file separates that red state from the discriminating one. |
 | `S4.2a-OP-02` | [fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md](fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md) | The upgrade rerun: against a database bootstrapped at the retired three-key set, the amended bootstrap restores the three added `Permissions` rows and their grants and leaves every pre-existing id, description, attachment and singleton column byte-identical. |
 | `S4.2b-TR-01` | [tree-root-seed/s42b-tr-01-bootstrap-writes-no-relationship-row.md](tree-root-seed/s42b-tr-01-bootstrap-writes-no-relationship-row.md) | A fresh `db:seed && db:bootstrap:access-control` writes **zero** `relationships` rows — root's own `direct`/`people_partner` count stays `0`. A verification, not new seed logic; re-proves the spec's own grep table against a live database. |
+| `S4.2d-DS-01` | [dev-seed-spine/s42d-ds-01-throws-under-node-env-production.md](dev-seed-spine/s42d-ds-01-throws-under-node-env-production.md) | `npm run db:dev:seed-org` under `NODE_ENV=production` throws before any `PrismaClient` is constructed or database row is touched — the opposite of the reverted guard on the script this increment retires. |
+| `S4.2d-DS-02` | [dev-seed-spine/s42d-ds-02-two-level-spine-over-imported-population.md](dev-seed-spine/s42d-ds-02-two-level-spine-over-imported-population.md) | Over a real, multi-department imported population, exactly one `direct` edge per department's synthesized lead (smallest `User.id` among active members) to root, and one per other active member to their lead; root never becomes a subject. States the AF-5 tie-break rule precisely. |
+| `S4.2d-DS-03` | [dev-seed-spine/s42d-ds-03-rerun-is-additive-only.md](dev-seed-spine/s42d-ds-03-rerun-is-additive-only.md) | A rerun creates edges only for users holding no `direct` row yet; an administrator-written edge survives untouched; a department whose synthesized lead later deactivates is not auto-repaired (AF-4, documented, not a defect). |
+| `S4.2d-DS-04` | [dev-seed-spine/s42d-ds-04-department-with-no-active-members-is-skipped.md](dev-seed-spine/s42d-ds-04-department-with-no-active-members-is-skipped.md) | A department whose only member is inactive is skipped with no error; a fresh database with no population imported seeds zero edges and exits `0` — both are success, not the `NODE_ENV` error case. |
+| `S4.2d-DS-05` | [dev-seed-spine/s42d-ds-05-dev-grant-root-retired-and-create-root-repointed.md](dev-seed-spine/s42d-ds-05-dev-grant-root-retired-and-create-root-repointed.md) | `scripts/dev-grant-root.ts` and its npm alias no longer exist (no shim); `create:root` equals the exact repointed chain; a pre-existing database's orphaned `user-management:edit` row is left untouched (AF-2), by dated ruling, not by omission. |
