@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-22-2026 23:36
-last_updated: 09-04-2026 12:00
+last_updated: 09-08-2026 00:45
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -44,7 +44,10 @@ development_status:
   # retired: 0-3-flip-colleague-to-allow-narrowed — removed 2026-09-01 (human
   #   product decision): §3.2 S1 row is R for the Colleague column, so a colleague
   #   reads the S1 identity card from Story 0.1; there is nothing to flip.
-  epic-0: in-progress
+  # epic-0 done: both remaining stories done (0-3 retired). The 2026-09-03 status
+  # note below already reads "Epics 0/1/2 done + committed"; the epic field was
+  # just never flipped when its siblings were. Corrected 2026-09-08.
+  epic-0: done
   0-1-adopt-read-path-and-rebind-port: done  # UMAC-1 all 3 stages; committed
 
   0-2-adopt-write-path-dual-gate: done  # UMAC-2 via Variant A (canAccessSection('S1')==='write' gate, no permission); folded into the adapter + Stories 1.2/1.3
