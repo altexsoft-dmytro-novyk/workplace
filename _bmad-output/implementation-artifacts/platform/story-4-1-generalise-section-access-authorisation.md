@@ -1,5 +1,5 @@
 ---
-status: ready-for-dev
+status: done
 title: 'Generalise section-access authorisation + human section keys'
 type: 'tech'
 created: '2026-09-03'

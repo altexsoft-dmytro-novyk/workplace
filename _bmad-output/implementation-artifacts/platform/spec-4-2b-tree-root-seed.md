@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.2b — Tree-root seed: prove root needs no relationship row to sit at the top of the reports-to tree'
 type: 'feature'
 created: '2026-09-06'
-status: 'ready-for-dev'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: '4ce8bd8' # services/backend HEAD, branch dn-section-access, working tree clean
 story: '{project-root}/_bmad-output/implementation-artifacts/platform/story-4-2-default-org-relationship-seed.md'

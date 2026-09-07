@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-06-2026 00:00
+last_updated: 09-07-2026 20:45
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -72,7 +72,7 @@ development_status:
   # "No Epic 4" for this addition only). Kernel + UM-adoption cross-cut: one
   # section-parameterised gate driven by canAccessSection, human section keys
   # (profile:identity, never S1), one recorded FR-composition rule.
-  epic-4: in-progress
+  epic-4: done  # both stories (4.1, 4.2) done; backend 37a3aa3 "Closes Platform Epic 4"
   # 4-1 composition decision RESOLVED 2026-09-04 (SCP
   # sprint-change-proposal-2026-09-04-section-access-consolidation.md D1/D2:
   # dual gate; feature half = code constant DEFAULT_PERMISSIONS union explicit
@@ -98,40 +98,42 @@ development_status:
   # Stage 3 the same day. test/user-management now: 24 suites, 275 passed,
   # 18 todo — the 254 baseline plus that suite's 21.)
   4-1-generalise-section-access-authorisation: done
-  # 4-2 recorded decision (Winston + Dmytro 2026-09-03/04): seeded root = boss
-  # (hr-admin FR + tree root + §2.4 first holder); a delegated HR Admin = full
-  # feature set, zero data access. Deletes the canEditS1 OR-override, seeds a
-  # two-level reporting spine, switches the audience resolver to walk upward
-  # from targets. Blocked on the upward-walk solution-design (AC AD-1).
-  # UPDATE 2026-09-06: unblocked and started.
-  # - The upward-walk blocker was CLEARED, not built: the 2026-09-05 architect
-  #   pass (solution-design-upward-walk-resolver.md) found the resolver already
-  #   walks up from targets, shipped 2026-08-30 in backend f36d1b2. No code
-  #   change; residual work is an ACM-9 measurement only.
-  # - Scope item 1 (delete the FR override) CLOSED BY VERIFICATION: 4.1c
-  #   retired the umac-10 pinning test, 4.1d deleted canEditS1 whole including
-  #   the OR clause (PO ruling AF-2, 2026-09-06).
-  # - Split into 4.2a (root-operator permission set), 4.2b (§2.4 first holder +
-  #   tree-root edge at bootstrap), 4.2c (dev seed spine).
-  # - 4.2a: spec written (spec-4-2a-root-operator-permission-set.md), AD-1
-  #   Stage 1 COMPLETE (6 new scenario docs, 20 amended). Stage 2 NOT started —
-  #   gated on an unresolved harness question (no suite boots Nest against a
-  #   bootstrap-provisioned database) and on confirming the kernel README rule
-  #   that protects acm1-fb-01..09, six of which Stage 1 amended.
-  # - 4.2b and 4.2c are UNBUILT. bootstrap-access-control.ts still seeds only
-  #   the three original keys; no db:dev:seed-org script exists;
-  #   scripts/dev-grant-root.ts remains the accepted dev+production stopgap.
-  4-2-default-org-relationship-seed: in-progress
+  # 4-2 DONE 2026-09-07. Recorded decision (Winston + Dmytro 2026-09-03/04):
+  # seeded root = boss through ordinary mechanisms (hr-admin FR + tree-root
+  # position + §2.4 first holder); a delegated HR Admin gets the full feature
+  # set and zero data access. Delivered as four AD-1 increments:
+  # - 4.2a root-operator permission set — canonical hr-admin grant 3→6 keys +
+  #   db:bootstrap:access-control npm alias. Backend 4ce8bd8.
+  # - 4.2b tree-root seed — verified root needs no Relationship row to sit at
+  #   the top of the reports-to chain; locked against regression. Backend
+  #   8ec35fd.
+  # - 4.2c §2.4 full-profile-access overlay — new FullProfileGrant table,
+  #   resolver integration proven at the unit level (no live section shows an
+  #   observable effect yet), root seeded as first holder at bootstrap. Backend
+  #   37a3aa3.
+  # - 4.2d db:dev:seed-org dev spine — two-level reporting spine over the fake
+  #   population, throws under NODE_ENV=production; scripts/dev-grant-root.ts
+  #   retired. Backend de508c9.
+  # Scope item 1 (delete the FR OR-override) closed by verification — 4.1c
+  # retired the umac-10 pinning test, 4.1d deleted canEditS1 whole. Scope item 4
+  # (upward-walk resolver) was already shipped 2026-08-30 (backend f36d1b2); no
+  # code change.
+  # RESIDUAL, not blocking: the ACM-9 seeded-two-level measurement question and
+  # the PO/architect decisions in story-4-2 "Open for decision" remain open.
+  4-2-default-org-relationship-seed: done
   epic-4-retrospective: optional
 
-  # TRACKING GAPS recorded 2026-09-06 — NOT resolved here, they are planning
-  # decisions rather than status edits:
+  # TRACKING GAPS (recorded 2026-09-06, still open 2026-09-07) — NOT resolved
+  # here, they are planning decisions rather than status edits:
   # - planning-artifacts/platform/epics.md carries a numbering collision: two
   #   distinct "Epic 4" headings — "Access Control Authorization Consolidation"
-  #   (the one tracked above) and "Project-Line Audience" (4 stories,
-  #   untracked).
+  #   (done, tracked above) and "Project-Line Audience" (4 stories, untracked).
   # - Epics 5 (Department Walk and People Partner HR-Line, 3 stories), 6
   #   (Section Matrix Beyond the Kernel Slice, 6 stories) and 7 (Shared-Link
   #   Section Policy and Full-Profile Overlay, 3 stories) are defined in
   #   epics.md and appear nowhere in this file.
   # This file therefore understates remaining platform scope by ~16 stories.
+  # - CI gate promotion (spec-ci-promote-backend-unit-frontend-e2e-gates.md,
+  #   status done; backend-unit + frontend-e2e now merge-blocking) landed as
+  #   ad-hoc work with no story row here; its follow-ups are in platform
+  #   deferred-work.md.

@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.2c — Full-profile-access overlay: seed root as first holder, wire the resolver read'
 type: 'feature'
 created: '2026-09-07'
-status: 'blocked-on-ask-first'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: 'de508c9' # services/backend HEAD, branch dn-section-access, working tree clean
 story: '{project-root}/_bmad-output/implementation-artifacts/platform/story-4-2-default-org-relationship-seed.md'

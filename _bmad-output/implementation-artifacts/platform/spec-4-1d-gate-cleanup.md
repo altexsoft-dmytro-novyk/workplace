@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.1d — Delete the superseded target-scoped predicates + S1 naming sweep'
 type: 'refactor'
 created: '2026-09-06'
-status: 'ready-for-dev'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: 'b31158974ef0e452d75c6dc0e49f3c753afb0fce' # services/backend submodule HEAD after 4.1c landed
 context:

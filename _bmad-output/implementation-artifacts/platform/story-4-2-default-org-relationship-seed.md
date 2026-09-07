@@ -1,5 +1,5 @@
 ---
-status: backlog
+status: done
 title: 'Default org-relationship seed + retire the identity-card FR override'
 type: 'tech'
 created: '2026-09-04'
@@ -294,12 +294,14 @@ truth; every prior letter-claim in this story or its specs is superseded by
 this table. Original sequencing text retained immediately below for the
 record.**
 
-| Letter | Increment | Status 2026-09-06 |
+| Letter | Increment | Status 2026-09-07 |
 |---|---|---|
 | **4.2a** | Root-operator permission set (scope item 2: bootstrap npm alias + canonical `hr-admin` set 3→6 keys) | **DONE** — `spec-4-2a-root-operator-permission-set.md`, backend `4ce8bd8` |
-| **4.2b** | Tree-root seed — verification that root needs no `Relationship` row to sit at the top of the `reports-to` chain, plus evidence that it resolves transitively (part of scope item 3) | **Spec written, ungated** — `spec-4-2b-tree-root-seed.md` |
-| **4.2c** | §2.4 full-profile-access first holder (the other part of scope item 3) | **NOT STARTED — blocked.** Needs an architect Stage-1 data-model decision first (no schema/port/gate exists for the overlay anywhere in `services/backend`; `access-control.md` §2.4 explicitly forbids inventing AD-28 scenarios ad hoc). Analogous to the 2026-09-05 upward-walk solution-design. |
-| **4.2d** | `db:dev:seed-org` dev spine (scope item 5), retiring `dev-grant-root.ts` | **NOT STARTED.** Carries scope item 1's verification grep as an entry check, not as work — that item is already closed. |
+| **4.2b** | Tree-root seed — verification that root needs no `Relationship` row to sit at the top of the `reports-to` chain, plus evidence that it resolves transitively (part of scope item 3) | **DONE** — `spec-4-2b-tree-root-seed.md`, backend `8ec35fd` |
+| **4.2c** | §2.4 full-profile-access first holder (the other part of scope item 3) | **DONE** — `spec-4-2c-full-profile-access-overlay.md`, backend `37a3aa3`. New `FullProfileGrant` table; resolver read proven at unit level (no live section shows an observable effect yet); root seeded as first holder at bootstrap. |
+| **4.2d** | `db:dev:seed-org` dev spine (scope item 5), retiring `dev-grant-root.ts` | **DONE** — `spec-4-2d-dev-seed-spine.md`, backend `de508c9`. Two-level spine over the fake population, throws under `NODE_ENV=production`; `scripts/dev-grant-root.ts` removed, `scripts/dev-seed-org.ts` added. |
+
+**Story closed 2026-09-07** (workspace `aab2262`, backend `37a3aa3` "Closes Platform Epic 4"). Residual, non-blocking: the ACM-9 `seeded-two-level` measurement question and the "Open for decision" items below are still unresolved.
 
 Scope item 4 (upward-walk resolver) needs no letter — it was found already
 built on 2026-08-30 (`f36d1b2`); see the item's own correction above. Its

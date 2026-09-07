@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.2a — Root-operator permission set: wire the ACM-1 entrypoint + grow the canonical hr-admin grant'
 type: 'feature'
 created: '2026-09-06'
-status: 'ready-for-dev'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: 'ef03c88df6b72ec86d39fb3f7de9979f270be72e' # services/backend HEAD, branch dn-section-access, working tree clean
 story: '{project-root}/_bmad-output/implementation-artifacts/platform/story-4-2-default-org-relationship-seed.md'

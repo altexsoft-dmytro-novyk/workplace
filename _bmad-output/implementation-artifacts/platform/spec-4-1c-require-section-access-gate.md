@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.1c — @RequireSectionAccess gate + identity-card route migration'
 type: 'feature'
 created: '2026-09-05'
-status: 'ready-for-dev'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: 'e0b1a533dc4bcc58024f284c3d996121728e5b68' # services/backend submodule HEAD; 4.1a + 4.1b changes sit uncommitted on top (standing "do not commit" instruction)
 context:

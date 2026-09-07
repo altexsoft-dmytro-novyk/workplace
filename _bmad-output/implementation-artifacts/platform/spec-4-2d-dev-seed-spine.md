@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.2d — Dev seed spine: db:dev:seed-org, retiring dev-grant-root.ts'
 type: 'feature'
 created: '2026-09-07'
-status: 'ready-for-dev'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: '8ec35fd' # services/backend HEAD, branch dn-section-access, working tree clean
 story: '{project-root}/_bmad-output/implementation-artifacts/platform/story-4-2-default-org-relationship-seed.md'

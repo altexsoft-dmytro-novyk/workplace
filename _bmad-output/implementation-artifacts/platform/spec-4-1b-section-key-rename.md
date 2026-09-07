@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.1b — Section-key rename + matrix-driven resolveSectionAccess'
 type: 'refactor'
 created: '2026-09-05'
-status: 'in-review'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: '5add6a12226a1c21b46b8f95a23cbd1b324f0d9d' # services/backend submodule HEAD; 4.1a's changes sit uncommitted on top (not committed per standing "do not commit" instruction)
 context: ['{project-root}/docs/architecture/access-control.md']

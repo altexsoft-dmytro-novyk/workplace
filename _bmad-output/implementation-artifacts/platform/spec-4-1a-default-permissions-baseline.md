@@ -2,7 +2,7 @@
 title: 'PLAT-E4-S4.1a — DEFAULT_PERMISSIONS baseline + isAllowed union rule'
 type: 'feature'
 created: '2026-09-05'
-status: 'in-review'
+status: 'done'
 review_loop_iteration: 0
 baseline_commit: '20ed2a08fca35f9325196fb3ac916fadbd6bc257' # services/backend submodule HEAD before this story; the earlier value recorded the outer workspace wrapper repo's HEAD by mistake
 context: ['{project-root}/docs/architecture/access-control.md']
