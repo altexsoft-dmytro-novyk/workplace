@@ -25,6 +25,22 @@ context:
 > is struck through and annotated rather than deleted. The **Ask First** table
 > and the **Recorded consequence of AF-2** blockquote are the authoritative
 > record and are untouched.
+>
+> **AF-2 PARTIALLY REVERSED 2026-09-07 (PO, Dmytro Novyk).** `profile:timeline:write`
+> is **removed** from the canonical `hr-admin` set — back to **five** keys
+> (`user-management:create`, `user-management:deactivate`, `user-management:list`,
+> `org:relationships:write`, `employee:departure:record`). Career timeline is a
+> profile section (§3.2 S9); the key moves to `DEFAULT_PERMISSIONS` and
+> `canEditTimeline` gains its audience half (dual gate), with the effective
+> manual-write holders narrowed to the target's direct Unit Manager and assigned
+> People Partner (DEC-UM-001). HR Admin gets no career-timeline data access. This
+> spec's build (backend `4ce8bd8`) shipped the six-key set; the reduction and the
+> dual gate land in the follow-on AD-1 increment (the deferred `profile:timeline`
+> `canAccessSection` item). Decision + rationale: SCP
+> `sprint-change-proposal-2026-09-04-section-access-consolidation.md` §9.1.
+> `s42a-op-06` is superseded by that increment per its own dated-pointer rule.
+> The struck AF-2 reasoning and the "Recorded consequence" blockquote stay as the
+> historical record.
 
 ## Intent
 

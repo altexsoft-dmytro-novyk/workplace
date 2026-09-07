@@ -970,6 +970,8 @@ So that two independent writers cannot disagree about who is on a project.
 **Status:** backlog
 **Binding conditions:** see *Post-Kernel Extension (Epics 4–7) — Binding Conditions*. The ACM-9 re-baseline obligation applies with particular force here — this epic introduces recursive traversal.
 
+> **Interim backlog — DEPT-EPIC (`_bmad-output/planning-artifacts/platform/dept-epic.md`, opened 2026-09-07).** Two department-manager items are needed before Epic 5 formally starts, because `profile:timeline` manual write (DEC-UM-001) depends on them and the "Access Control Authorization Consolidation" epic left them out of scope: **DEPT-1** — the `Department.managerUserId` fact + one-level `isDirectDeptManager` derivation; **DEPT-2** — `profile:timeline` `canAccessSection` + dual gate + `hr-admin` stopgap removal. Epic 5's **DEPT-3** (full transitive department reporting-line audience) is the larger deliverable and reconciles the scalar fact with the PM/AD-35 AR-grant model. Track in `dept-epic.md` and `sprint-status.yaml` until pulled into this epic's story list.
+
 Complete the two Reporting-line inputs the kernel left fail-closed. Per PM/AD-10, department management is the second input to the Reporting-line relation (not a third audience), and People Partner propagation runs through the assigned PP's own chain inside HR — never through the employee's delivery chain.
 
 **FRs covered:** PM-FR-2

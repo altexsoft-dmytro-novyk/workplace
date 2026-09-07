@@ -123,6 +123,16 @@ development_status:
   4-2-default-org-relationship-seed: done
   epic-4-retrospective: optional
 
+  # DEPT-EPIC — Department-manager access control (deferred backlog). Holding
+  # epic opened 2026-09-07 (PO) for work that is NOT in the consolidation epic
+  # above: the department-manager reporting-line relation (§2.1 relation 2) and
+  # its dependents. Full detail: planning-artifacts/platform/dept-epic.md.
+  dept-epic: backlog
+  dept-1-department-manager-fact-and-direct-derivation: backlog
+  dept-2-profile-timeline-dual-gate-and-dec-um-001: backlog
+  dept-3-full-department-reporting-line-audience: backlog
+  dept-4-timeline-dual-gate-test-fallout: backlog
+
   # TRACKING GAPS (recorded 2026-09-06, still open 2026-09-07) — NOT resolved
   # here, they are planning decisions rather than status edits:
   # - planning-artifacts/platform/epics.md carries a numbering collision: two
