@@ -49,6 +49,7 @@ Where non-Self audiences overlap, compute each base matrix cell independently an
 | Dual gate | Matrix permits write but feature permission is absent | Deny mutation with `403`. |
 | FR is not audience | Viewer has feature permission but no target audience | `isAllowed` is true; hidden target section remains `404`. |
 | Bootstrap role | Fresh seed | Exactly one user holds the bootstrap HR Admin FR attachment. |
+| HR Admin is not data access | Viewer holds the HR Admin functional role and no relationship to the target | `resolveAudiences` grants **no** audience from the FR — HR Admin is configuration-only (v1.5 §2.2); the viewer falls back to Colleague. Data access comes only from §2.1 (relationship-derived audiences) and the separate §2.4 full-profile grant, never from holding a functional role. |
 | Due actor | Viewer has a due departure | Deny with `403` before feature or audience resolution (valid session, due cutoff). |
 | Due target | Target has a due departure | Current manager/PP gets read-only dismissed-target projection (`firstName`, `lastName`, `workEmail`, `employmentStatus: dismissed`); target absent from `GET /users?status=active`; writes `403`. |
 | Due manager/PP endpoint | A walk reaches a due manager or PP | Grant no audience and do not bridge to an ancestor. |
@@ -56,6 +57,8 @@ Where non-Self audiences overlap, compute each base matrix cell independently an
 | Due share-link authority | Link creator or revoker is due | Recheck fails and the dependent link is leak-free `404`. |
 
 ## Project-line gate
+
+**Fixed v1.5 reach (§3.2, §3.3.2):** Reporting line and Project line are **separate matrix columns and separate graph passes** — never merged into one "Manager line." The Project line grants a **strictly narrower** set of sections than Reporting: a Project-line PM/DM sees **no S2 and no S3 at all**, sees **S5 as CV + certificates only**, and sees the rest identically (S6 included). These narrowed positive cells (S2/S3-absent, S5-narrowed) are **out of the Phase-1 stage-1 contract** — Phase 1 only asserts the *withhold* negatives (PM with no other relation resolves no Project audience). Deeper Project-line cell coverage is Platform Epic 6 / `AC-SECTION-MATRIX-01`.
 
 **Fixed v1.5 revocation:** project-derived access withdraws within **15 minutes** of assignment end and after **four hours** of failed sync (§2.1, §5.1).
 

@@ -237,7 +237,7 @@ Binding rule for Epics 4–6 (SD-8):
 
 ## Epic 1: Platform Spec v1.5 Alignment
 
-**Status:** in-progress  
+**Status:** done (2026-09-07 — all 9 doc-alignment stories complete, plus the carved-out Story 1.3a which resolved to a doc-reconciliation once the E2E rework was found already shipped. Per-gap resolution in `_bmad-output/planning-artifacts/platform/changelog-traceability-matrix.md` §9. Edits are in the working tree pending human review + one commit.)  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 ### Story 1.1: Changelog Traceability Matrix
@@ -367,6 +367,25 @@ So that Alignment work is visible for the weekend build.
 
 - `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` lists Epic 1 with canonical sprint keys `1-1-changelog-traceability-matrix` … `1-9-register-epic-in-platform-sprint-status` and global IDs `PLAT-E1-S1.1` … `PLAT-E1-S1.9`. Historical SCP alias `P-1…P-9` (`sprint-change-proposal-2026-08-27.md`) is superseded — do not rewrite the SCP.
 - No Platform stories nested under UM `epic-1`…`epic-4` keys.
+
+### Story 1.3a: Colleague-403 Audience-Set Assertions
+
+**Split out of Story 1.3, 2026-09-07 — DONE the same day.** On dispatch it turned out the E2E rework had already shipped: `services/backend` `da7d1fa` (2026-09-06, in HEAD) makes `ACF-AU-05` / `ACF-FC-01` / `ACF-FC-02` assert resolver audience labels directly instead of an HTTP `403`, resolver code unchanged. Only the three scenario docs still carried `expectedResult: 403`; they were updated 2026-09-07 to match, and the stacked supersession blockquotes consolidated. No gated AD-1 dispatch was needed — this was documentation reconciliation to shipped code, i.e. the same nature as the rest of Epic 1.
+
+Sprint key `1-3a-colleague-403-audience-set-ad1`; global ID `PLAT-E1-S1.3a`. Brief: `_bmad-output/implementation-artifacts/platform/story-1-3a-colleague-403-audience-set.md`.
+
+As a QA/architect partner,
+I want `ACF-AU-05` / `ACF-FC-01` / `ACF-FC-02` reworked from an HTTP `403` expectation to a resolver audience-set assertion,
+So that the fail-closed principles they protect (a broken reports-to edge does not promote a colleague to `reporting`; PP resolution does not walk the PP's own manager chain; a colleague is not denied) stay pinned after User Management's 2026-09-01 answer made a colleague `GET /users/:id` a `200`, and the denial oracle is PM/AD-24 (`401` / `404` / `403`), not an empty-audience `403`.
+
+**Acceptance Criteria:**
+
+- `ACF-AU-05`: assert `resolveAudiences(colleague, [target])` yields `{colleague}` — non-empty, and not `self` / `reporting` / `pp`. No route-level `403`.
+- `ACF-FC-01`: assert `resolveAudiences(viewer, [target])` across a deactivated intermediate manager yields `{colleague}` and does **not** contain `reporting`.
+- `ACF-FC-02`: assert `resolveAudiences(pp-chain-viewer, [target])` yields `{colleague}` and does **not** contain `pp`.
+- The three scenario docs' 2026-08-30 / 2026-09-01 approval records are preserved; the `403` expected-results are replaced, not translated.
+- Genuinely-empty-audience denial follows PM/AD-24 (a UM controller concern) and is out of scope here.
+- The resolver code itself is unchanged — this is a test/scenario rework, verified against the shipped `resolveAudiences`.
 
 ## Epic 2: Access Control Foundation
 

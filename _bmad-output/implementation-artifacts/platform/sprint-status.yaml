@@ -29,28 +29,48 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-07-2026 20:45
+last_updated: 09-08-2026 00:15
 project: people management
 project_key: NOKEY
 tracking_system: file-system
 story_location: _bmad-output/implementation-artifacts/platform
 development_status:
-  epic-1: in-progress
-  # 1-1: UM↔AC matrix exists; platform-wide changelog matrix under
-  # planning-artifacts/platform/ was not delivered.
-  1-1-changelog-traceability-matrix: backlog
-  # 1-2: addendum still carries "pending v1.3" department language.
-  1-2-platform-prd-addendum-drift-close: backlog
-  # 1-3: ACF-AU-05 / ACF-FC-01 / ACF-FC-02 HTTP colleague-403 still need a
-  # fresh AD-1 pass as resolver audience-set assertions.
-  1-3-access-control-spec-stage-1-suite-alignment: backlog
-  1-4-architecture-binding-updates: backlog
-  1-5-dashboards-4-4-v1-5-fixed-facts: backlog
-  1-6-platform-test-design-refresh-v1-2-v1-5: backlog
+  # DONE 2026-09-07. All 9 v1.5 doc-alignment stories complete, plus the carved-out
+  # 1-3a (below) which resolved to doc reconciliation once its E2E rework was found
+  # already shipped. Agent-run, in working tree, not committed — awaiting human
+  # review + one commit. Per-gap resolution:
+  # planning-artifacts/platform/changelog-traceability-matrix.md §9.
+  epic-1: done
+  1-1-changelog-traceability-matrix: done  # new file changelog-traceability-matrix.md; bmad-review folded
+  1-2-platform-prd-addendum-drift-close: done  # Pattern E, department framing, memlog assumptions — all closed vs v1.5
+  1-3-access-control-spec-stage-1-suite-alignment: done  # PM/AD-24 annotations, Reporting/Project split in CAP intents, OQ2/3/4/6 closed, PM/AD-28 honesty, no-unit-entity
+  1-4-architecture-binding-updates: done  # verify-only pass — all 8 ACs already satisfied in spine + access-control.md, no edits
+  1-5-dashboards-4-4-v1-5-fixed-facts: done  # AD-18 fixed-facts expanded; engine model kept TBD
+  1-6-platform-test-design-refresh-v1-2-v1-5: done  # v1.5 refresh supplement across 5 platform test-design files; QUALITY-GATE-AC state recorded as debt
   1-7-um-planning-residual-non-epic-2-4-scope: done  # CAP-1 is seed; registration folder retired
   1-8-doc-pass-create-path-removal-from-binding-docs: done  # api-conventions + DEC-UM-006/008 retired
   1-9-register-epic-in-platform-sprint-status: done
   epic-1-retrospective: optional
+
+  # Carved out of Story 1.3 gap G5, 2026-09-07 — then found to be almost entirely
+  # already done. The E2E rework (ACF-AU-05 / ACF-FC-01 / ACF-FC-02 assert
+  # resolver audience labels directly instead of an HTTP 403) shipped in
+  # services/backend da7d1fa (2026-09-06, in HEAD); resolver code unchanged.
+  # Only the three scenario docs still carried expectedResult: 403 — updated
+  # 2026-09-07 to match the shipped assertions, blockquotes consolidated. No
+  # gated AD-1 dispatch was needed; this was doc reconciliation to shipped code.
+  # Brief: implementation-artifacts/platform/story-1-3a-colleague-403-audience-set.md
+  1-3a-colleague-403-audience-set-ad1: done
+
+  # Carry-forward from the Epic 1 run — NOT Epic 1 work, need a decision/owner action
+  # (full list: changelog-traceability-matrix.md §12):
+  # - global-fr-epic-story-coverage.yaml cannot represent any PLAT-E1-S1.x story
+  #   (needs a decision_and_gate_serving_work: section) — coverage-companion owner.
+  # - PLAT-E2-S2.1: in-progress in the coverage companion vs done here — flip the companion.
+  # - ARCHITECTURE-RATIFICATION.md:117 still says "30/18/8/4"; actual 31/17/10/4.
+  # - OQ-AC-EDIT / OQ-PERM-01 (P1): §2.3 permission keys + default matrix approval.
+  # - Platform test-design needs a bmad-testarch-test-design Validate run to produce
+  #   a fresh verdict (all 1.6 files carry "validation NOT RUN") + a full PR-B re-gate.
 
   epic-2: done  # its only story (2.1) is done; epics.md lists no others
   2-1-resolve-phase-0-audiences-acf-1: done

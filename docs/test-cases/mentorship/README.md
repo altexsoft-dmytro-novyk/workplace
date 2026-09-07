@@ -105,6 +105,8 @@ graphs overlap; mentorship-specific additions below.
 
 ## What blocks stage-2
 
+> **Gate-ID note (Platform Story 1.3, 2026-09-07).** The `G-CTX` / `G-PERM` / `G-S13` / `G-CT` / `G-DEP` labels below and in the Layout table are **local aliases, not global blockers**, and are flagged here for cleanup — they must resolve to `blockers.yaml` IDs. Canonical mapping (authoritative source: `_bmad-output/specs/spec-mentorship-domain/SPEC.md` §7): `G-CTX` → **`CC-10-MENTORSHIP`**; `G-PERM` → **`OQ-PERM-01`**; `G-S13` → **`AC-S9-S13`**; `G-CT` → **`CC-09`**; `G-DEP` → **`CC-06`**. The `OQ-M1`–`OQ-M7` local questions are likewise not global blockers (design resolved by PM/AD-5, PM/AD-17, PM/AD-23, PM/AD-30, PM/AD-34). Rewriting each cell to the canonical ID is a follow-up, not done here.
+
 | Blocker | Blocks |
 | --- | --- |
 | **G-CTX** — `MentorshipPair` schema; the open-to-mentoring flag's owning aggregate and endpoint (spine Deferred: "Do not infer it as a relationship patch"); closure + pool route names | every file (no endpoint contract exists) |
