@@ -26,7 +26,7 @@ on:
         required: true
         type: string
     secrets:
-      OPENAI_API_KEY:
+      ANTHROPIC_API_KEY:
         required: true
       SUBMODULES_TOKEN:
         required: true
@@ -47,6 +47,7 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: read
+      pull-requests: read
     env:
       REVIEW_REPOSITORY: ${{ inputs.repository || github.repository }}
       BASE_SHA: ${{ inputs.base_sha || github.event.pull_request.base.sha }}
@@ -86,11 +87,11 @@ jobs:
         id: credentials
         if: steps.target.outputs.valid == 'true'
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
-          if [ -z "$OPENAI_API_KEY" ]; then
+          if [ -z "$ANTHROPIC_API_KEY" ]; then
             echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::OPENAI_API_KEY is not configured; advisory review was skipped."
+            echo "::warning::ANTHROPIC_API_KEY is not configured; advisory review was skipped."
             cat > .pr-review/report.md <<'EOF'
           ## Automated code review
 
@@ -256,32 +257,28 @@ jobs:
         if: steps.diff.outputs.ready == 'true'
         continue-on-error: true
         timeout-minutes: 15
-        uses: openai/codex-action@v1
+        uses: anthropics/claude-code-action@v1
         with:
-          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
-          working-directory: ${{ github.workspace }}
-          permission-profile: ":read-only"
-          effort: high
-          output-file: ${{ github.workspace }}/.pr-review/reviewer-output.json
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
           prompt: |
             Read `.github/pr-review-prompt.txt` fully and follow it.
             The reviewed repository is `${{ env.REVIEW_REPOSITORY }}` at `${{ env.TARGET_PATH }}`.
-          output-schema: '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer","minimum":0},"medium_count":{"type":"integer","minimum":0},"low_count":{"type":"integer","minimum":0},"report_markdown":{"type":"string","minLength":1}},"required":["review_status","high_count","medium_count","low_count","report_markdown"]}'
+          claude_args: |
+            --model claude-haiku-4-5
+            --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
+            --json-schema '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer","minimum":0},"medium_count":{"type":"integer","minimum":0},"low_count":{"type":"integer","minimum":0},"report_markdown":{"type":"string","minLength":1}},"required":["review_status","high_count","medium_count","low_count","report_markdown"]}'
 
       - name: Materialize validated report
         if: always() && steps.diff.outputs.ready == 'true'
         env:
           REVIEW_OUTCOME: ${{ steps.reviewer.outcome }}
-          REVIEWER_OUTPUT_FILE: .pr-review/reviewer-output.json
-          FINAL_MESSAGE: ${{ steps.reviewer.outputs['final-message'] }}
+          REVIEWER_CONCLUSION: ${{ steps.reviewer.outputs.conclusion }}
+          STRUCTURED_OUTPUT: ${{ steps.reviewer.outputs.structured_output }}
         run: |
           structured_output=""
-          if [ "$REVIEW_OUTCOME" = "success" ]; then
-            if [ -s "$REVIEWER_OUTPUT_FILE" ]; then
-              structured_output=$(cat "$REVIEWER_OUTPUT_FILE")
-            else
-              structured_output=$FINAL_MESSAGE
-            fi
+          if [ "$REVIEW_OUTCOME" = "success" ] && [ "$REVIEWER_CONCLUSION" = "success" ]; then
+            structured_output=$STRUCTURED_OUTPUT
           fi
 
           if printf '%s' "$structured_output" |
