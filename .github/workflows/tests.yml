@@ -20,6 +20,17 @@ env:
   SERVICE_NODE_VERSION: '24'
 
 jobs:
+  readiness-map:
+    name: Workspace · readiness map
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run test:readiness
+
   # ── Blocking gate ────────────────────────────────────────────────────────
   # The workspace ClickUp sync suite is green today and stays a real gate.
   clickup:
@@ -362,6 +373,7 @@ jobs:
           merge-multiple: true
 
       - name: Build live-verification-results.json
+        id: evidence
         # `git rev-parse HEAD` on a pull_request event resolves to the ephemeral
         # merge commit, which no local trace run will ever match. The branch head
         # is the commit a reviewer actually has checked out.
@@ -407,4 +419,28 @@ jobs:
           name: live-verification-results
           path: _bmad-output/test-artifacts/live-verification-results.json
           if-no-files-found: warn
+          retention-days: 30
+
+      - name: Install readiness map dependencies
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        run: npm ci
+
+      - name: Build readiness map from this run
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          node scripts/build-readiness-map.cjs \
+            --sha "${PR_HEAD_SHA:-${GITHUB_SHA}}" \
+            --out reports/readiness-map/index.html
+          echo 'Readiness map: download the `workplace-readiness-map` artifact and open index.html.' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        with:
+          name: workplace-readiness-map
+          path: reports/readiness-map/index.html
+          if-no-files-found: error
           retention-days: 30
