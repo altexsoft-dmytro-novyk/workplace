@@ -102,7 +102,10 @@ scenario doc, and test move from `'S1'` / `'S10'` / `'S11'` to `profile:identity
 / `profile:leave` / `profile:projects`. The `S<n>` labels are requirements-matrix
 row ids only, cited for traceability, never passed. Full map in §5.
 
-**D5 — Seeded root = the boss; delegated HR Admin = features only.** The ACM-0
+**D5 — Seeded root = the boss; delegated HR Admin = features only.**
+*(Amended — read §9.2 with this. The tree position is structural, not seeded, and
+"the boss" never meant profile-section write: root holds operator features plus
+§2.4 full-profile **read**, and nothing else.)* The ACM-0
 seeded root identity holds, by seed: the `hr-admin` functional role carrying the
 full **operator permission set** (population import, org-relationship writes,
 departure recording — not just today's `list`/`create`/`deactivate`; section
@@ -330,3 +333,19 @@ Root resolves `reporting` write over a subordinate only once an ordinary
 `s42b-tr-02`), never over the imported production population by default
 (`s42a-op-04`, `s42b-tr-03`). D5's intent — root operational with no dev script —
 holds; the mechanism for the tree half is verify-and-lock, not seed.
+
+**And D5's headline — "Seeded root = the boss" — must not be read as section
+write.** `root` appears nowhere in `docs/project-requirements.md`; the PRD
+(`prd-user-management` FR-1) defines it only as *the first `User`, created by the
+ACM-0 seed, with the `hr-admin` FR policy attached*. §2.2 is NORMATIVE: "HR Admin
+grants no data access. It is a feature-administration role … Reading data is
+governed by 2.1 and 2.4, never by holding a functional role." So root's reach is:
+**operator features** (import, org-relationship writes, departure recording — the
+4.2a set) plus **§2.4 full-profile read**. It holds **no** profile-section write
+by virtue of being root. On a clean production install root resolves `colleague`
+to every employee and `PATCH /users/:id` is `403` on every target — the specified
+behaviour, not a gap. Story 4.2's Recorded Decision table, its user story, and
+its "canEdit: true for root on every card" acceptance criterion all claimed
+otherwise and are corrected in place (2026-09-08); `epics.md`'s Epic 4 restatement
+carries the same correction. Tracked as GAP-3 in
+`_bmad-output/planning-artifacts/platform/dept-epic.md`.
