@@ -12,3 +12,6 @@ _bmad-output/implementation-artifacts/sprint-status.yaml
 _bmad-output/planning-artifacts/epics.md
 _bmad-output/planning-artifacts/prd.md
 reports/
+
+# Generated readiness reports; the seed JSON and template are the tracked inputs.
+docs/demo/workplace-readiness-*.html
