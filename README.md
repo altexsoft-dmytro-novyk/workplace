@@ -114,5 +114,3 @@ npm run services:dev:frontend
 | workspace (this repo) | `.` | `git@github.com:altexsoft-dmytro-novyk/workplace.git` |
 | backend | `services/backend` | `git@github.com:altexsoft-dmytro-novyk/backend.git` |
 | frontend | `services/frontend` | `git@github.com:altexsoft-dmytro-novyk/frontend.git` |
-
-Lazy
