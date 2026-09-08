@@ -267,7 +267,7 @@ jobs:
           claude_args: |
             --model claude-haiku-4-5
             --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
-            --json-schema '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer","minimum":0},"medium_count":{"type":"integer","minimum":0},"low_count":{"type":"integer","minimum":0},"report_markdown":{"type":"string","minLength":1}},"required":["review_status","high_count","medium_count","low_count","report_markdown"]}'
+            --json-schema '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer"},"medium_count":{"type":"integer"},"low_count":{"type":"integer"},"report_markdown":{"type":"string"}},"required":["review_status","high_count","medium_count","low_count","report_markdown"]}'
 
       - name: Materialize validated report
         if: always() && steps.diff.outputs.ready == 'true'
