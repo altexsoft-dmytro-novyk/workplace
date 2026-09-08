@@ -20,6 +20,20 @@ env:
   SERVICE_NODE_VERSION: '24'
 
 jobs:
+  # Also blocking. This only runs the readiness-map scripts' unit tests (scripts/*.cjs) — the
+  # actual map for this run is built later, inside the `live-verification` job, from that run's
+  # real evidence.
+  readiness-map:
+    name: Workspace · readiness map (unit tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run test:readiness
+
   # ── Blocking gate ────────────────────────────────────────────────────────
   # The workspace ClickUp sync suite is green today and stays a real gate.
   clickup:
@@ -32,6 +46,24 @@ jobs:
           node-version: '20'
       - run: npm ci
       - run: npm run test:clickup
+
+  # Also blocking. The trace-gate threshold contract is a workspace suite with
+  # no service dependencies, so it gates from the start. It guards the
+  # customization the quality gate resolves its thresholds from:
+  # .agents/skills/bmad-testarch-trace/customize.toml carries a
+  # "DO NOT EDIT -- overwritten on every update" header, so a skill update that
+  # drops the threshold defaults would otherwise surface only at gate time, on
+  # the run that needed the gate.
+  trace-gate:
+    name: Workspace · trace gate thresholds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run test:trace-gate
 
   # ── Service suites ───────────────────────────────────────────────────────
   # Two of the three now gate. `backend-unit` (19/19) and `frontend-e2e`
@@ -344,6 +376,7 @@ jobs:
           merge-multiple: true
 
       - name: Build live-verification-results.json
+        id: evidence
         # `git rev-parse HEAD` on a pull_request event resolves to the ephemeral
         # merge commit, which no local trace run will ever match. The branch head
         # is the commit a reviewer actually has checked out.
@@ -389,4 +422,35 @@ jobs:
           name: live-verification-results
           path: _bmad-output/test-artifacts/live-verification-results.json
           if-no-files-found: warn
+          retention-days: 30
+
+      # The readiness map is a demo report built from evidence already uploaded above. A bug in
+      # this tooling must never fail the job that actually collected the test evidence, so every
+      # step below is continue-on-error — same convention as the informational jobs elsewhere in
+      # this file.
+      - name: Install readiness map dependencies
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        continue-on-error: true
+        run: npm ci
+
+      - name: Build readiness map from this run
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        continue-on-error: true
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RUN_BRANCH: ${{ github.head_ref || github.ref_name }}
+        run: |
+          node scripts/build-readiness-map.cjs \
+            --sha "${PR_HEAD_SHA:-${GITHUB_SHA}}" \
+            --out reports/readiness-map/index.html
+          echo 'Readiness map: download the `workplace-readiness-map` artifact and open index.html.' >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        continue-on-error: true
+        with:
+          name: workplace-readiness-map
+          path: reports/readiness-map/index.html
+          if-no-files-found: error
           retention-days: 30
