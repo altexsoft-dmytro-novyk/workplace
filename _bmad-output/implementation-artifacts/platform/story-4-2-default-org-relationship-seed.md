@@ -20,14 +20,23 @@ blocked_on_resolved:
 
 ## Recorded decision (Winston + Dmytro, 2026-09-03/04)
 
-**The ACM-0 seeded root identity is the organisation's boss.** By seed, on that
-one singleton identity, it holds all three, from three separate mechanisms:
+> **CORRECTED 2026-09-08 (PO, Dmytro Novyk) — "root is the organisation's boss"
+> was this story's own coinage and is not in the requirements.** `root` appears
+> nowhere in `docs/project-requirements.md`; the PRD (`prd-user-management`
+> FR-1) defines it only as *the first `User`, created by the ACM-0 seed, with the
+> `hr-admin` FR policy attached*. And §2.2 is NORMATIVE: **"HR Admin grants no
+> data access. It is a feature-administration role … Reading data is governed by
+> 2.1 and 2.4, never by holding a functional role."** So the middle row below —
+> root holding *write* on every reporting-line-writable section — was never a
+> requirement, and the shipped code correctly does not implement it. The
+> corrected table is the one that governs; the original is struck and kept as
+> the record. See SCP §9.2 and `dept-epic.md` GAP-3.
 
 | Capability | Mechanism |
 | --- | --- |
-| Assign functional roles, manage custom-field definitions, list/create/deactivate, every other admin feature | the `hr-admin` **functional role** (ACM-1 bootstrap) |
-| **Write** access to every profile section that the reporting-line audience can write | **top of the `reports-to` relationship tree** → `reporting` audience over everyone, transitively (§2.1, §3.1) |
-| Clean **read** of every section, including the ones the reporting line cannot | first holder of the **§2.4 full-profile-access** grant (read-only overlay, PM/AD-28) |
+| Assign functional roles, manage custom-field definitions, list/create/deactivate, import the population, wire organisational relationships, record departures — every admin **feature** | the `hr-admin` **functional role** (ACM-1 bootstrap, operator set grown by 4.2a) |
+| ~~**Write** access to every profile section that the reporting-line audience can write~~ — **struck 2026-09-08.** Root holds **no** section write by virtue of being root. Its tree-root position is *structural* (the permanent absence of a `Relationship` row for root, 4.2b) and yields `reporting` audience only over people whose `direct` chain actually terminates at root. On a clean production install nothing points at root, so root resolves `colleague` to everyone and `PATCH /users/:id` is `403` on every target — **§2.2 working, not a gap.** | ordinary `resolveAudiences`, no special case |
+| Clean **read** of every section, including the ones the reporting line cannot | first holder of the **§2.4 full-profile-access** grant (read-only overlay, PM/AD-28). Seeded by 4.2c but **observably inert** until a matrix row has a reachable `'none'` cell — see `dept-epic.md` DEPT-2 |
 
 **A delegated HR Admin** — anyone the root later assigns `hr-admin` to — holds
 the **complete functional-role feature set** ("all toggles on") and may delegate
@@ -57,11 +66,18 @@ and none of them is built.
 
 As **the person running a fresh deployment (and as a developer on a seeded dev
 DB)**,
-I want **the seed to place the root identity at the top of a real reporting tree
-and hold the §2.4 grant**,
-So that **root can administer and edit the organisation through the ordinary
-audience-resolution path, with no functional-role override anywhere in the
-authorisation code**.
+I want **the deploy-time bootstrap to give the root identity the operator
+feature set and the §2.4 grant, and — on a dev DB only — a seeded reporting
+spine to work against**,
+So that **root can administer the organisation with no dev script and no
+functional-role override anywhere in the authorisation code**.
+
+> **CORRECTED 2026-09-08 (PO).** Was: *"place the root identity at the top of a
+> real reporting tree … so that root can administer **and edit** the
+> organisation."* 4.2b established there is no tree row to place (the position is
+> the absence of one), and §2.2 gives root no section-edit reach — "edit the
+> organisation" was never a requirement. Root administers; the people who edit a
+> profile are that person's reporting-line manager and assigned PP.
 
 ## Scope
 
@@ -165,6 +181,12 @@ authorisation code**.
    last-holder protection, column mapping — stays the access-control
    deferred-work "Full-profile access overlay" item; this story fixes only who
    the seeded holder is and wires it.)
+   > **Corrected 2026-09-07 (see the RENUMBERED Sequencing table, which supersedes
+   > this scope-item text).** 4.2b found the tree-root half **cannot be seeded** —
+   > root's position at the top of the `reports-to` tree is the permanent absence
+   > of any `Relationship` row for root, verified and locked, never a written
+   > edge. The bootstrap seeds the operator FR set (4.2a) and the §2.4
+   > first-holder grant (4.2c) only; it writes no tree edge. SCP §9.2.
 4. ~~**Resolver: walk upward from targets.** `resolveAudiences` currently expands
    every descendant of the viewer, then filters to the requested targets — so a
    viewer near the tree root walks the whole org to open one profile. This seed
@@ -247,10 +269,27 @@ authorisation code**.
   by 4.1d's own AC). **This criterion is closed by verification and carries no
   work; it does not make the story complete — the criteria below it for scope
   items 2, 3 and 5 are all outstanding.**
-- On a seeded dev DB: the root identity resolves `reporting` → `write` on
+- ~~On a seeded dev DB: the root identity resolves `reporting` → `write` on
   `profile:identity` for every active user in the seeded population, and
   `GET /users/:id` returns `canEdit: true` for root on every card — with no
-  adapter special case.
+  adapter special case.~~
+  **CORRECTED 2026-09-08 (PO) — as written this criterion cannot pass, and the
+  half that can is dev-only.** Two defects: (a) *"every active user"* — root's
+  own card resolves `self`, and §3.2 S1 is `R` for Self, so `canEdit` is `false`
+  on root's own profile no matter what the spine looks like; (b) it read as a
+  property of the system when it is a property of `db:dev:seed-org` alone.
+  Restated:
+  - **Dev (`db:dev:seed-org`):** root resolves `reporting` → `write` on
+    `profile:identity` for every **other** active member of the seeded spine, and
+    `GET /users/:id` returns `canEdit: true` for those — through ordinary
+    audience resolution, no adapter special case. Root's **own** card stays
+    `canEdit: false` (`self: 'read'`).
+  - **Production (`db:deploy` → `db:seed` → `db:bootstrap:access-control` →
+    `db:import:population`):** nothing points at root, so root resolves
+    `colleague` to every employee — `read` on `profile:identity`,
+    `PATCH /users/:id` → **`403` on every target**, `canEdit: false` everywhere.
+    This is the **expected** shipped behaviour (§2.2: a functional role grants no
+    data access), asserted by `s42a-op-04` and `s42b-tr-03` — not a gap.
 - A delegated HR Admin (holds `hr-admin` FR, no relationship to the target):
   `GET /users` / `POST /users` / role-assignment routes → allowed;
   `PATCH /users/:id` on an unrelated person → `403`;

@@ -729,9 +729,16 @@ So that root administers and edits the organisation through the ordinary
 audience-resolution path, with no functional-role override anywhere in the
 authorisation code.
 
-**Recorded decision (Winston + Dmytro, 2026-09-03/04):** the ACM-0 seeded root
-identity is the organisation's boss — `hr-admin` functional role **+** top of
-the `reports-to` tree **+** first §2.4 full-profile-access holder, all by seed.
+**Recorded decision (Winston + Dmytro, 2026-09-03/04; ~~the organisation's
+boss~~ **CORRECTED 2026-09-08, PO** — see SCP §9.2):** the ACM-0 seeded root
+identity holds the `hr-admin` functional role (operator features) **+** the
+tree-root position — which is *structural*, the absence of a `Relationship` row,
+not a seeded edge (4.2b) **+** the first §2.4 full-profile-access grant (a
+**read** overlay). It holds **no profile-section write** by virtue of being root:
+`root` is absent from `project-requirements.md`, and §2.2 is NORMATIVE that a
+functional role grants no data access. On a clean production install root
+resolves `colleague` to everyone and `PATCH /users/:id` is `403` on every target
+— the specified behaviour.
 A *delegated* HR Admin holds the complete functional-role feature set and may
 delegate the role onward, but gets **zero data access** from it — reads/writes a
 profile only where they are that person's reporting-line manager or assigned PP

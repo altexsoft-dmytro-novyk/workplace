@@ -67,21 +67,39 @@ prohibited as an authorization rule or fallback.
 > **for the per-person section-write keys only** — global-feature default
 > holders (`directory:*`, `admin:*`) remain a separate §2.3 follow-up.
 
-The seed contains exactly one `hr-admin` role, exactly these three permission
-rows, exactly the corresponding three grants, and one attachment to the active
-user matching `ROOT_WORK_EMAIL` after DEC-UM-007 normalization:
+The seed contains exactly one `hr-admin` role and one attachment to the active
+user matching `ROOT_WORK_EMAIL` after DEC-UM-007 normalization. The canonical
+permission set is:
 
 - `user-management:create`
 - `user-management:deactivate`
 - `user-management:list`
+- `org:relationships:write` — added by PLAT-E4-S4.2a (backend `4ce8bd8`); the
+  operator half root needs to wire manager/PP/department edges
+- `employee:departure:record` — added by PLAT-E4-S4.2a, so root can record and
+  remediate departures
+- `profile:timeline:write` — added by PLAT-E4-S4.2a under PO ruling AF-2, a
+  **known, accepted, time-boxed deviation** from §2.2/§2.3: its gate
+  (`canEditTimeline`) has no audience half, so a seeded `hr-admin` holder can
+  write any employee's career timeline. Closure — the key leaves this set
+  (6 → 5) and career-timeline write becomes a dual gate — is tracked as
+  **DEPT-2** in `_bmad-output/planning-artifacts/platform/dept-epic.md`, blocked
+  on the department-manager audience. See `s42a-op-06` and SCP
+  `sprint-change-proposal-2026-09-04-section-access-consolidation.md` §9.1.
 
-There are no other seed-owned default grants. On a fresh database those are
-the exact FR rows. Reruns non-destructively ensure the bootstrap identities,
-fail atomically on conflicting seed-owned drift, and never delete or rewrite
-later non-bootstrap catalog state. **MVP reduction:** this deploy-time catalog
-is seed/migration-owned and has no HTTP mutation surface; no `/roles` HTTP
-surface ships in the Kernel MVP. Runtime role administration and the complete
-§2.3 permission catalog remain future normative product work.
+> Originally (Kernel MVP, pre-Epic-4) this set was the three `user-management:*`
+> keys only. The drift lock is split across two suites and not yet reconciled:
+> `acm1r-fr-foundation.e2e-spec.ts` still pins the three-key shape (stale),
+> `s42a-op-bootstrap-canonical-set.e2e-spec.ts` is the intended post-4.2a
+> replacement. Reconciling the count is tracked as **DEPT-4** (dept-epic.md); it
+> self-resolves when DEPT-2 takes the set back to five.
+
+There are no other seed-owned default grants. Reruns non-destructively ensure the
+bootstrap identities, fail atomically on conflicting seed-owned drift, and never
+delete or rewrite later non-bootstrap catalog state. **MVP reduction:** this
+deploy-time catalog is seed/migration-owned and has no HTTP mutation surface; no
+`/roles` HTTP surface ships in the Kernel MVP. Runtime role administration and
+the complete §2.3 permission catalog remain future normative product work.
 
 Before ACM-1, the deploy-time root User step **creates and validates** the root
 identity so a fresh migrated database is satisfiable without an unnamed external

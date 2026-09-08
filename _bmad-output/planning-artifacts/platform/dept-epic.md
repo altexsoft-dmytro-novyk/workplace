@@ -58,9 +58,14 @@ migration. `Department` has `parentId` but **no manager column**;
 
 ### DEPT-2 detail
 
+**Not in the consolidation PR.** That increment ships `profile:timeline:write` on
+`hr-admin` with the feature-only gate — the AF-2 deviation, recorded and accepted
+(`s42a-op-06` stays live). DEPT-2 is what *closes* that deviation; it retires
+`s42a-op-06` in place when it lands.
+
 **Decision:** SCP `sprint-change-proposal-2026-09-04-section-access-consolidation.md`
 §9.1; `project-requirements.md` §2.3 (*edit the career timeline*, confirmed
-2026-09-07); `deferred-work.md`. Supersedes `s42a-op-06`.
+2026-09-07); `deferred-work.md`.
 
 - **`SECTION_ACCESS_MATRIX`** — add
   `'profile:timeline': { self: 'read', reporting: 'write', pp: 'write' }`
@@ -83,27 +88,51 @@ migration. `Department` has `parentId` but **no manager column**;
 
 ### DEPT-4 detail
 
-- `test/access-control/acm1r-fr-foundation.e2e-spec.ts` — canonical-key count
-  back to **5**. This also closes the review's ACM-1 drift-lock finding (the
-  suite was left asserting `3` after 4.2a's 3→6 change; two suites currently
-  assert mutually exclusive facts about the same entrypoint under one `test:e2e`).
-- `acm11-fpo-06-non-holder-gets-no-overlay-effect-on-real-sections.md` — update
-  the "real sections" set now that `profile:timeline` has a reachable `'none'`.
-- `docs/test-cases/user-management/career-timeline/um-ct-09`, `um-ct-10` —
-  revisit; a permission-holder without S9 write audience being denied is now the
-  primary path.
-- Retire `s42a-op-06` (pointer added 2026-09-07); author the replacement
-  dual-gate scenario.
+- **DONE 2026-09-08 — `test/access-control/acm1r-fr-foundation.e2e-spec.ts`.**
+  Was asserting `3` (via a hardcoded `CANONICAL_KEYS`) after 4.2a grew the
+  bootstrap set to `6`, shipping red with the failure relabeled a "pre-existing
+  16-failure baseline" in `jest.setup-full-profile-grants-sentinel.ts`. Fixed by
+  deriving `CANONICAL_KEYS` / `CANONICAL_COUNT` from the bootstrap's exported
+  `CANONICAL_PERMISSIONS` (so it tracks 6→5 automatically when the timeline key
+  leaves), parameterising every count assertion, and removing the false-baseline
+  comment. **39/39 green.** Exact set membership stays owned by
+  `s42a-op-bootstrap-canonical-set.e2e-spec.ts`; this suite now owns only the
+  invariants (drift, locking, uniqueness, FK shape).
+- **DONE 2026-09-08 — `jwt-session-resolver.adapter.spec.ts` (new).** Unit
+  surface for `resolveJwtSubject` — the only staleness check the stateless
+  session JWT has, previously untested (every e2e uses the persona shorthand;
+  the one real-JWT e2e uses an active subject). 6 cases: active → resolves;
+  deactivated → `null`; missing → `null`; tampered / wrong-secret → `null` with
+  no DB call; departure cutoff still applies. **6/6 green.** Closes the DEPT-B2
+  `jwt-session-resolver` test gap.
+- Still open (rides DEPT-2):
+  `acm11-fpo-06-non-holder-gets-no-overlay-effect-on-real-sections.md` "real
+  sections" set once `profile:timeline` has a reachable `'none'`;
+  `docs/test-cases/user-management/career-timeline/um-ct-09`, `um-ct-10` revisit;
+  the replacement dual-gate scenario for `s42a-op-06`.
 
 ---
 
-## B. Open decisions — need a human ruling
+## A2. Epic 4 completion gaps (distinct from the DEPT-1..4 forward work above)
 
-| # | Decision | Source | Notes |
-|---|---|---|---|
-| DEPT-B1 | The two consolidation stories were implemented ahead of their AD-1 approval gate (`sprint-status.yaml` lists `4-1`/`4-2` as `backlog` with `last_updated: 09-04-2026`; SCP §6 says every code change is AD-1 gated with Stage-1 scenario approval). Run the Stage-1 scenario review retroactively, or record the exception and correct the status file. | 2026-09 review | The two most serious review findings are exactly what a Stage-1 scenario review exists to catch. |
-| DEPT-B2 | Changes shipped in the consolidation PR that are outside the SCP §5 impact map — split out or keep: (a) `jwt-session-resolver.adapter.ts` — a new per-request `user.findUnique`; a signature-valid JWT whose subject is deactivated now resolves `null`/401. An **authentication behaviour change** with no test (reverting the line leaves the suite green), and a cost against SCP §7's 500-record/2s budget. (b) `user.repository.ts` list filters → `Prisma.QueryMode.insensitive` across seven identity columns. (c) `.env.example` commenting out `ALLOW_TEST_SESSION_TOKENS`. (d) `package.json` `db:up` gaining `--wait --wait-timeout 120`. (e) `import-population.ts` header rewrite removing the script from the "binding deployment order". | 2026-09 review | Each is a real change with its own risk; several deserve their own PR. |
-| DEPT-B3 | `full_profile_grants.holderUserId` is `ON DELETE RESTRICT` — a user who ever held a grant, even a long-revoked one, can never be hard-deleted. Interacts with the `user.repository.ts` purge path. No cascade, no soft-delete story, no note. Needs a soft-delete/anonymise decision for grant holders. | 2026-09 review | |
+Surfaced by the workspace-wide review. These are the consolidation epic failing
+its own criteria — not deferred scope.
+
+| # | Gap | State |
+|---|---|---|
+| GAP-1 | **`acm1r-fr-foundation` shipped red** with the failure relabeled a "pre-existing baseline". | **CLOSED 2026-09-08** — see DEPT-4 detail. Suite green, count derived from source. |
+| GAP-2 | **ACM-9 rerun.** The epic defines done as "an ACM-9 rerun covers the shape the change introduced" (500 targets, warm p95 + worst ≤ 2s, `seeded-two-level` fixture). Newest artifacts predate 4.2c/4.2d; the epic net-adds per-request queries (`isActiveUser` per `DEFAULT_PERMISSIONS` key in the evaluator; `resolveJwtSubject` `findUnique` every authenticated request). | **OPEN.** Expectation: fine — `isAllowed` is once-per-request, `DEFAULT_PERMISSIONS` holds one key, neither new query is in the 500-target walk. But the epic's bar is measured, not expected. Do: run the measurement, or write the one-paragraph inspection proof that the new queries are O(1)-per-request. |
+| GAP-3 | **Story 4.2's Recorded Decision + AC claim root gets write to every profile section** ("top of the `reports-to` tree → `reporting` audience over everyone, transitively") and `canEdit: true` for root on every card. On a clean prod install root resolves `colleague` to everyone → `403` on every `PATCH`, and even its own card is `self: 'read'`. | **CLOSED 2026-09-08 (PO) — doc correction, no code change.** The shipped behaviour matches the SoT: `root` appears nowhere in `project-requirements.md`; the PRD (FR-1) defines it as *first `User` + `hr-admin`*; §2.2 [NORMATIVE] gives a functional role no data access; §2.4's "sees every section" audience is a **read** overlay. Root = operator features + full-profile read, **no section write**. Corrected in place, four files: `story-4-2` Recorded Decision table (write row struck), its user story ("administer **and edit**" → administer), and its AC (split into the dev-spine case, which excludes root's own `self: 'read'` card, and the production case, where `403` everywhere is expected); SCP §9.2 extended; `epics.md` Epic 4 restatement. |
+
+---
+
+## B. Open decisions — RESOLVED (PO, Dmytro Novyk, 2026-09-08)
+
+| # | Decision | Resolution |
+|---|---|---|
+| DEPT-B1 | The two consolidation stories were implemented ahead of their AD-1 approval gate (the review, run against `636ef8f`, saw `4-1`/`4-2` as `backlog`; SCP §6 says every code change is AD-1 gated with Stage-1 scenario approval). | **Retroactively accepted.** No retroactive Stage-1 scenario review; the shipped work stands. `sprint-status.yaml` already carries `4-1`/`4-2` and `epic-4` as `done` (updated post-review); the review's premise was stale. |
+| DEPT-B2 | Changes shipped in the consolidation PR outside the SCP §5 impact map: (a) `jwt-session-resolver.adapter.ts` — a new per-request `user.findUnique`; a signature-valid JWT whose subject is deactivated now resolves `null`/401 (auth behaviour change, no test); (b) `user.repository.ts` list filters → `Prisma.QueryMode.insensitive` across seven identity columns; (c) `.env.example` commenting out `ALLOW_TEST_SESSION_TOKENS`; (d) `package.json` `db:up` gaining `--wait --wait-timeout 120`; (e) `import-population.ts` header rewrite. | **Kept — all stay in the consolidation PR.** Not split out. The `jwt-session-resolver` test gap and the `mode: 'insensitive'` `ILIKE`/index concerns remain in the DEPT-C patch backlog for follow-up. |
+| DEPT-B3 | `full_profile_grants` FKs (`holderUserId`, `grantedByUserId`, `revokedByUserId`) are all `ON DELETE RESTRICT` — anyone who has ever held/granted/revoked a full-profile grant can never be hard-deleted from `users`; grant rows are never deleted (revoke only sets `revokedAt`). | **Kept as-is.** Internal system: user hard-delete is not a use case (there is no `prisma.user.delete()` path; removal is `isActive = false` + `EmploymentStatus: dismissed`). No GDPR erasure requirement. `ON DELETE RESTRICT` on an access-audit table is the intended behaviour. No note, no migration change. |
 
 ---
 
@@ -115,12 +144,15 @@ these under a dedicated review doc, lift section C out — it is self-contained.
 
 **Security-shaped**
 
-- `SECTION_ACCESS_MATRIX` is a plain object literal — inherited keys
-  (`SECTION_ACCESS_MATRIX['__proto__']` / `['constructor']` / `['toString']`) are
-  truthy, bypass `if (!row) return 'none'`, fall through the merge loop, resolve
-  `'none'`, and reach the overlay. Not route-reachable today (both call sites
-  pass constants). Fix: `Object.hasOwn`, a null-prototype object, or a `Map`.
-  `src/access-control/domain/constants/section-access-matrix.ts:13`
+- ~~`SECTION_ACCESS_MATRIX` is a plain object literal — inherited keys
+  (`['__proto__']` / `['constructor']` / `['toString']`) are truthy, bypass
+  `if (!row) return 'none'`, and reach the overlay.~~ **FIXED 2026-09-08** —
+  `resolveSectionAccess` now guards the lookup with `Object.hasOwn`, so an
+  unknown section key fails closed. `access-control.facade.ts`
+- ~~`SECTION_ACCESS_RANK[resolved] < SECTION_ACCESS_RANK[level]` fails open on an
+  unknown level (`undefined < n` → `false` → the deny is skipped → gate
+  passes).~~ **FIXED 2026-09-08** — `?? -1` / `?? Infinity`, fails closed.
+  `src/user-management/infrastructure/access-control-facade.adapter.ts`
 - `SectionAccessGuard` reads handler-level metadata only —
   `this.reflector.get(..., context.getHandler())` with no `getAllAndOverride` /
   `getClass()` fallback, so a class-level `@RequireSectionAccess` is silently
@@ -196,9 +228,8 @@ these under a dedicated review doc, lift section C out — it is self-contained.
   `tx.fullProfileGrant.create(...)` / `tx.accessJournal.create(...)` exist (both
   real Prisma models added in the same diff) and would catch a column typo at
   compile time. `access-control-bootstrap.ts`
-- `RANK` is re-allocated on every `resolveSectionAccess` call — it is a constant
-  map, declared correctly at module scope one file over
-  (`access-control-facade.adapter.ts`). Hoist it.
+- ~~`RANK` is re-allocated on every `resolveSectionAccess` call.~~ **FIXED
+  2026-09-08** — hoisted to module scope.
   `src/access-control/application/access-control.facade.ts`
 - `users.controller.ts` carries a stale forward-reference comment ("the dead
   adapter branches ... are 4.1d's to remove") — this PR already removed them; no
@@ -209,19 +240,47 @@ these under a dedicated review doc, lift section C out — it is self-contained.
   return 200, and be ignored, with no compile error and no test failure.
   `src/user-management/infrastructure/user.repository.ts`
 
+**Added from the workspace-wide review (2026-09-08)**
+
+- **`section-keys.ts` — no shared type across the AC↔UM boundary.**
+  `src/user-management/domain/constants/section-keys.ts` declares
+  `'profile:identity'` as a bare literal; Access Control independently declares
+  the same literal as a matrix key. Rename or mistype either side and it
+  compiles cleanly, then silently 403s every gated route. Fix: AC owns the
+  section-key union; UM imports it, never redeclares — plus a startup assertion
+  that every declared key has a matrix row.
+- The migration's two raw-SQL constraints (`no-self-grant` CHECK, partial unique
+  index) have **no `pg_constraint` probe test** — the repo's established pattern
+  (`ACM1R-FB-11`) is what keeps hand-edited migrations safe across later
+  migrations. `prisma/migrations/20260907135054_story_4_2c_full_profile_grant/`
+- `S<n>` still reaches the gate as a section argument in two deliberate
+  "retired-identifier" test assertions — but the D4 AC is an unconditional
+  grep-clean rule over `src/` and `test/`. Use an obviously bogus key instead.
+  `test/access-control/acm5-section-access.e2e-spec.ts`,
+  `src/user-management/infrastructure/__tests__/access-control-facade.adapter.spec.ts`
+- Permission key derived by string concatenation (`<section>:write`) with no
+  validation or diagnostic — a section not following the convention produces a
+  key nobody holds and denies silently.
+  `src/user-management/infrastructure/access-control-facade.adapter.ts`
+- Stale comments / wrong line citations: `schema.prisma:101` cited for
+  `AccessJournal.actorUserId NOT NULL` (line 101 is an enum member);
+  `prisma/seed.ts:149` cited for a comment at ~136; the bootstrap call site
+  still calls the overlay seed a "lock-within-the-lock" after the adjacent
+  CORRECTED note records the `FOR UPDATE` was removed.
+
 ---
 
 ## D. Documentation-alignment residue
 
-- `fr-permission-matrix-draft-2026-09-02.md` — the file has UTF-8 mojibake
-  (`â`, `Â§`) that breaks exact-match editing. Repair the encoding, then finish
-  clearing the remaining `?` / "Confirm" markers (item 4 timeline is confirmed
-  per §9.1 but the row cells and §5 table still read as draft).
-- `story-4-2-default-org-relationship-seed.md` scope item 3 text still says
-  `bootstrap-access-control.ts` "seats root at the top of the `reports-to` tree
-  ... provisioned at deploy time" — 4.2b found this is structural, not seeded.
-  The RENUMBERED table in the same file already supersedes it; add a one-line
-  correction marker on the scope-item text.
+- `fr-permission-matrix-draft-2026-09-02.md` — **untouched.** The file has UTF-8
+  mojibake (`â`, `Â§`) that broke exact-match editing, so the
+  `profile:timeline:write` "Confirm" markers in §6 item 4 and §5 still read as
+  draft. The PO confirmation is authoritative in SCP §9.1 and
+  `project-requirements.md` §2.3; this draft needs its encoding repaired and the
+  markers cleared to match.
+- `story-4-2-default-org-relationship-seed.md` scope item 3 text — **done
+  2026-09-07:** correction marker added, pointing at the RENUMBERED table and
+  SCP §9.2.
 - D4 corpus (SCP §4.6): `docs/test-cases/**` still ships legacy `'S1'` /
   `'S10'` / `'S11'` section strings. SCP scopes the rename to "PLAT-E4-S4.1
   AD-1 Stage-1"; that pass has not run. Track the rename increment.
