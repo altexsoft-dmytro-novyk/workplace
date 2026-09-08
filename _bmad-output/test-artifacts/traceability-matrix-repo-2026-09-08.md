@@ -20,11 +20,18 @@ against [run 34222307987](https://github.com/altexsoft-dmytro-novyk/workplace/ac
 
 Workspace `6f22d85` · backend `49fd0c4` · frontend `4684eb1`.
 
-> **Amended.** The first cut of this matrix wrote `tests[]` as `{file, level}`
-> with no `title`. `build-live-verification-results.cjs` indexes on
-> `(file, title)` and skips any entry without a title, so the exact lookup
-> collapsed from 496 matched cases to 3 and 17 cases fell back to unmatched.
-> Titles are restored; the mapping is back to 612 via the matrix index.
+> **Amended twice.** The first cut wrote `tests[]` as `{file, level}` with no
+> `title`. `build-live-verification-results.cjs` indexes on `(file, title)` and
+> skips any entry without one, so the exact lookup collapsed from 496 matched
+> cases to 3 and 17 cases fell back to unmatched.
+>
+> Restoring titles by merging the 09-06 entries then over-corrected:
+> `readiness-map.cjs` treats **every** entry in `tests[]` as an expectation that
+> a passing case must satisfy, so 67 stale or title-less entries downgraded
+> green requirements to "Partial evidence" — 86 partials on the map against 9
+> real ones. `tests[]` now holds only expectations that still exist: for an
+> observed requirement, exactly the cases that ran. Carried-forward entries
+> survive only where nothing was observed.
 
 ## Why there is no gate verdict
 
@@ -180,6 +187,14 @@ budget — 0.3% over, on the deep-chain shape only. Real reporting chains are
 `continue-on-error` for exactly this reason and should stay that way; the fix is
 to narrow the protocol's depth sequence, which is a new protocol version, not a
 tweak.
+
+## 11 retired requirements still have live tests
+
+The readiness map lists these as inventory gaps with priority `?`, because the
+evidence resolves passing cases to ids the matrix treats as retired:
+`ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02`, `MEN-END-08`, `UM-CT-01`, `UM-EDIT-03`,
+`UM-EDIT-04`, `UM-LIST-05`, `UM-SEED-02`, `UM-SEED-10`, `UMAC-05`. Either the
+retirement is stale or the tests are — worth one pass to decide which.
 
 ## What to do next
 
