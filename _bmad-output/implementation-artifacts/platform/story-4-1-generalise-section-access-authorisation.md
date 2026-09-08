@@ -1,17 +1,16 @@
 ---
-status: backlog
+status: done
 title: 'Generalise section-access authorisation + human section keys'
 type: 'tech'
 created: '2026-09-03'
-updated: '2026-09-04'
+updated: '2026-09-05'
 story_id: 'PLAT-E4-S4.1'
 sprint_key: '4-1-generalise-section-access-authorisation'
 epic: 'Platform Epic 4 — Access Control Authorization Consolidation'
 raised_by: 'dn-um-implementation code review (2026-09-03) + Winston architecture session (2026-09-03/04), Dmytro Novyk'
 owners: ['access-control', 'user-management']
 decision_record: '_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-04-section-access-consolidation.md'
-blocked_on:
-  - 'Architect solution-design pass: the `@RequireSectionAccess` decorator/guard shape + the section→endpoint map'
+architect_pass: '2026-09-05 — unblocked; section→endpoint map and story split below'
 supersedes_note: >
   Platform epics.md line 32 ("No Epic 4") scoped the 2026-09-02 ratification CE
   pass only. This epic is new scope from a 2026-09-03 code review.
@@ -115,12 +114,98 @@ a functional permission widen a resolved audience**.
 - The Access Control deferred-work "Generalise section-access authorisation" and
   the `profile:timeline` rename follow-up are closed by this story.
 
-## Story split (fill during the architect pass)
+## Section → endpoint map (architect pass, 2026-09-05)
 
-Expected: (4.1a) `DEFAULT_PERMISSIONS` + evaluator union + `access-control.md`
-entry; (4.1b) section-key rename increment; (4.1c) `@RequireSectionAccess` gate
-+ adapter migration; (4.1d) cleanup + test regeneration. Each its own AD-1
-dispatch, no dispatch spanning stages.
+Only `profile:identity` has a live User Management consumer today —
+`profile:leave` / `profile:projects` (ACM-5's `S10`/`S11`) exist in the kernel
+matrix but no route reads them yet, so this story wires one section, not
+three:
+
+| Route | Required section access | Replaces |
+|---|---|---|
+| `PATCH /users/:id` | `@RequireSectionAccess('profile:identity', 'write')` | `EDIT_USER_FEATURE` branch calling `canEditS1` |
+| `GET /users/:id` (`data`) | `@RequireSectionAccess('profile:identity', 'read')` | `READ_USER_FEATURE` branch's non-empty-audience check |
+| `GET /users/:id` (`canEdit` hint) | same `'write'` check as `PATCH`, computed inline (not a separate route) | `canEditIdentityCard` → `canEditS1` |
+
+Guard semantics: a required level is satisfied by a resolved `SectionAccess` at
+or above it (`write` satisfies a `'read'` requirement; `none` satisfies
+neither). `profile:leave` / `profile:projects` get their own map rows in
+whichever future story wires their first route — no work item here.
+
+## Story split (architect pass, 2026-09-05)
+
+Each row is its own AD-1 dispatch (scenario doc → red E2E → code); no dispatch
+spans stages, per the standing AD-1 gate rule.
+
+1. **4.1a — `DEFAULT_PERMISSIONS` + evaluator union.** AC-owned. The code
+   constant (`profile:identity:write`, ...), `isAllowed` union rule, and the
+   `docs/architecture/access-control.md` decision entry (SCP §4.3). No seed /
+   bootstrap / migration change.
+2. **4.1b — Section-key rename.** AC-owned. `canAccessSection` and every
+   caller/scenario/test move `'S1'` → `'profile:identity'` (and
+   `'S10'`/`'S11'` → `'profile:leave'` / `'profile:projects'` even though
+   unconsumed, so the kernel carries no `S<n>` string anywhere).
+
+   **Target shape (architect pass, 2026-09-05):** this is not a string
+   find-replace — `resolveSectionAccess`'s hardcoded `if/else` is replaced by
+   a table lookup + fold, so a future section is a new matrix row, never a
+   new branch:
+
+   ```ts
+   // domain/constants/section-access-matrix.ts
+   export const SECTION_ACCESS_MATRIX: Record<
+     string,
+     Partial<Record<Audience, SectionAccess>>
+   > = {
+     'profile:identity': { self: 'read', colleague: 'read', reporting: 'write', pp: 'write' },
+     'profile:leave':    { self: 'read', colleague: 'read', reporting: 'read',  pp: 'read' },
+     'profile:projects': { self: 'read', colleague: 'read', reporting: 'read',  pp: 'read' },
+   };
+   ```
+
+   ```ts
+   // access-control.facade.ts
+   private async resolveSectionAccess(
+     viewerId: string,
+     section: string,
+     targetEmployeeId: string,
+   ): Promise<SectionAccess> {
+     const row = SECTION_ACCESS_MATRIX[section];
+     if (!row) return 'none';
+
+     const audiences = await this.resolveAudiences(viewerId, [targetEmployeeId]);
+     const targetAudiences = audiences.get(targetEmployeeId);
+     if (!targetAudiences || targetAudiences.size === 0) return 'none';
+
+     const RANK: Record<SectionAccess, number> = { none: 0, read: 1, write: 2 };
+     let best: SectionAccess = 'none';
+     for (const audience of targetAudiences) {
+       const cell = row[audience] ?? 'none';
+       if (RANK[cell] > RANK[best]) best = cell;
+     }
+     return best;
+   }
+   ```
+
+   The three matrix rows are byte-for-byte what today's `if (section ===
+   'S1') { ... }` branch already computes for S1/S10/S11 — this is a
+   behavior-preserving generalisation, not a policy change. It's also a
+   correctness upgrade: the fold is PRD FR-3's "strongest applicable
+   permission wins" multi-audience rule (`RW > R > —`) applied uniformly,
+   where today only S1's branch happens to implement that rule ad hoc and
+   S10/S11 don't merge audiences at all (they just return `'read'`
+   unconditionally once any audience is non-empty). A row with no entry for a
+   resolved audience denies (`?? 'none'`) — silent, not an error, matching
+   every other absent-cell case in this file.
+3. **4.1c — `@RequireSectionAccess` gate + adapter migration.** UM-owned. The
+   decorator + guard in `application/guards/`, backed by the section→endpoint
+   map above; `PATCH /users/:id` and `GET /users/:id` move onto it.
+4. **4.1d — Cleanup + test regeneration.** UM-owned. Delete `canEditS1`, the
+   `EDIT_USER_FEATURE` / `READ_USER_FEATURE` branches in `isAllowedForTarget`,
+   and `S1_SECTION`; update `write-adoption.e2e-spec.ts` and any other pinned
+   test whose name or assertion still says `S1`. (The OR-override itself is
+   Story 4.2's deletion, per that story's scope — 4.1d only removes what's
+   dead once the gate lands.)
 
 ## References
 

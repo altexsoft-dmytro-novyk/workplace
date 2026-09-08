@@ -29,6 +29,115 @@ The five `ACM8-KC-01`..`ACM8-KC-05` CAP-6 kernel-composition scenarios in
 independent human approval. They authorize neither an ACM-8 Stage-2 test nor
 any `app.module.ts`/`access-control.module.ts` change.
 
+The two `S4.2a-OP-01`..`S4.2a-OP-02` scenarios in
+[`fr-bootstrap/`](fr-bootstrap/) are **draft Stage-1 prose for PLAT-E4-S4.2a**
+(Story 4.2 scope item 2), pending independent human approval, and eighteen of
+the twenty-eight `ACM1-FB`/`ACM1R-FB` files were **amended 2026-09-06** by the
+same increment: the canonical `hr-admin` set grows from three permission keys to
+**six**, so `Permissions` and `PolicyPermissions` move from `3` to `6` (and from
+`4` to `7` in `ACM1R-FB-16` and `ACM1R-FB-28`). `Policies`, `UserPolicies` and
+the singleton do not move, and no behavioural assertion in any of those files
+changed. Every amended file carries a dated pointer to
+[`ACM1-FB-01`](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md),
+which holds the full record: the six keys with the live gate that reads each
+one, the **AF-2 accepted deviation** (`profile:timeline:write` is in the set by
+Product Owner ruling and gives every holder org-wide career-timeline write with
+no relationship required — a known, dated, deliberately accepted deviation from
+a NORMATIVE invariant), and the **AF-4 note** that `database-schema.md`,
+`fr-architecture-amendment.md` and the kernel SPEC still say *"exactly three"*
+and will contradict shipped behaviour until a separate architect pass runs.
+Those four documents are deliberately unedited. The consumer-side scenarios for
+the same increment — what the grown role can and cannot do over HTTP — live in
+[`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
+as `S4.2a-OP-03`..`S4.2a-OP-06`.
+
+The one `S4.2b-TR-01` scenario in [`tree-root-seed/`](tree-root-seed/) is
+**draft Stage-1 prose for PLAT-E4-S4.2b** (Story 4.2 scope item 3, tree-root
+half only), pending independent human approval. It is a **verification, not a
+seed**: root sitting at the top of the `reports-to` tree is the absence of a
+`Relationship` row, not one anyone writes, and this file locks that absence
+against a live database a fresh `db:seed && db:bootstrap:access-control`
+produces. It authorizes no change to
+`prisma-relationship-graph.adapter.ts`, no migration, and (pending a separate
+Ask-First ruling) at most two documentation-only comments in
+`access-control-bootstrap.ts` / `prisma/seed.ts`. The positive-fact
+counterpart — proving a real multi-hop chain still resolves `reporting` write
+transitively up to root through the same unmodified CTE — lives in
+[`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
+as `S4.2b-TR-02`..`S4.2b-TR-04`.
+
+The five `S4.2d-DS-01`..`S4.2d-DS-05` scenarios in
+[`dev-seed-spine/`](dev-seed-spine/) are **draft Stage-1 prose for
+PLAT-E4-S4.2d** (Story 4.2 scope item 5), pending independent human approval.
+This is a **real red-then-green increment, not a lock**: `scripts/dev-seed-org.ts`
+and its `db:dev:seed-org` npm alias do not exist at this dispatch's baseline,
+and `scripts/dev-grant-root.ts` still does. These files cover the new script's
+shape (a two-level `direct` spine — one synthesized lead per department to
+root, every other active member to their lead), its `NODE_ENV=production`
+guard, its additive-only rerun behaviour (including the documented,
+accepted AF-4 non-repair of a later-deactivated lead), the skip of a
+department with zero active members, and the retirement of
+`scripts/dev-grant-root.ts` together with the repoint of `create:root`. The
+consumer-side, HTTP-level scenario for the same increment — root resolving
+`reporting` write over the population this script actually seeds — lives in
+[`../user-management/access-control-adoption/`](../user-management/access-control-adoption/)
+as `S4.2d-DS-06`.
+
+The six `ACM11-FPO-01`..`ACM11-FPO-06` scenarios in
+[`full-profile-overlay/`](full-profile-overlay/) are **draft Stage-1 prose for
+PLAT-E4-S4.2c** (Story 4.2 scope item 3, the §2.4 full-profile-access-overlay
+half — the other half, the tree-root edge, is `S4.2b-TR-*` above), pending
+independent human approval. **Stage 1 dispatch record — the two blocking Ask
+First rulings this folder's scenarios are written against, per
+`spec-4-2c-full-profile-access-overlay.md`'s frozen resolution block and the
+design doc's own §7 precedent for recording Stage-1 rulings in this README:**
+
+- **AF-1 — resolved 2026-09-07 (Dmytro Novyk, PO).** `access-control.md:284`'s
+  `max(Self, full-profile)` means "the merge result so far," not a literal
+  comparison against only the viewer's own Self audience. A full-profile grant
+  can only ever raise the resolved section access to `'read'` — never lower
+  it, and never touch `'write'`. This is the only reading under which the
+  overlay does anything for its stated purpose (a holder reading an unrelated
+  colleague's profile, where the viewer is never Self for that target).
+- **AF-6 — resolved 2026-09-07 (Dmytro Novyk, PO), accepted as recommended:
+  unit-level proof only, ship it anyway.** Independently re-verified: every
+  cell of every row in the real, shipped `SECTION_ACCESS_MATRIX` (`profile:identity`,
+  `profile:leave`, `profile:projects`) is already `'read'` or `'write'` — none
+  is `'none'` — so the resolver-read integration has **no HTTP-observable
+  effect through any live route today**. `ACM11-FPO-03` and `ACM11-FPO-04` are
+  therefore proven against a real `AccessControlFacade` wired to a
+  `jest.mock`'d `SECTION_ACCESS_MATRIX` carrying one synthetic row with a
+  `'none'` colleague cell (a Jest mock, not a live route) — a real, rigorous
+  proof that the branch is wired and correct, honestly labeled as not an
+  end-to-end HTTP behavior change today. The mechanism becomes load-bearing
+  the moment a future section with a `'none'` cell (e.g. S2 Personal contacts,
+  `project-requirements.md:169`, `Colleague: —`) lands in the live matrix —
+  adding one is explicitly out of this increment's scope. AF-2 (fold the
+  resolver-read into 4.2c rather than defer it) follows from this ruling —
+  seeding and resolution ship together.
+- **AF-3, AF-4, AF-5, AF-7 — resolved 2026-09-07, all accepted as recommended**
+  (recorded in the spec, not re-litigated here): lock-only last-holder
+  protection, defined but dormant in this increment (no scenario in this
+  folder exercises a revoke — Never list, spec); model name `FullProfileGrant`;
+  `AccessJournalKind`'s existing `full_profile_grant`/`full_profile_revoke`
+  members used as-is; the bootstrap-seed's one journal write reuses
+  `JournalOperation`'s existing `'create'` member, `kind` alone disambiguating
+  it.
+
+These scenarios cover: the bootstrap seeding of root as first holder and its
+paired `AccessJournal` row (`ACM11-FPO-01`), idempotent reruns
+(`ACM11-FPO-02`), the AF-6 unit-level resolver proof and its ceiling property
+(`ACM11-FPO-03`, `ACM11-FPO-04`), the CAP-1 leak-prevention property that a
+holder resolving a deactivated or nonexistent target still gets `'none'`
+(`ACM11-FPO-05`), and a regression lock proving today's three live sections
+resolve byte-identically for holder and non-holder alike
+(`ACM11-FPO-06`). **Explicitly not covered, by the spec's own Never list**: any
+grant/revoke HTTP endpoint, an admin UI, the shared-link revocation backstop's
+usage, the self-grant CHECK constraint's rejection as a live test (defined at
+the migration level, Stage 2/3), and any exercised last-holder-protection
+revoke path — all deferred to the access-control "Full-profile access
+overlay" lifecycle item.
+
 **ACM-8 non-goals:** rebinding `ACCESS_CONTROL_PORT` away from
 `InterimAccessControlAdapter` in `user-management.module.ts` (User
 Management's own, separately-gated AD-2 story); any change to
@@ -138,7 +247,15 @@ criteria state "CAP-8 has already ensured the normalized active root User."
   `/roles` HTTP surface or permission-mutation port (FR-AMD-1 "MVP
   reduction"), and no User Management route changes are in scope.
 - Nothing already covered by `ACM1-FB-01`..`ACM1-FB-09`. Those nine are
-  approved and must not be rewritten, renumbered, or restated; the ACM-1R
+  approved and must not be rewritten, renumbered, or restated (**scoped
+  exception, 2026-09-06:** PLAT-E4-S4.2a amends `ACM1-FB-01`, `-02`, `-03`,
+  `-05`, `-06` and `-09` because the canonical permission set they assert grew
+  from three keys to six by PO ruling AF-2. Each amendment is a dated pointer
+  block; no original assertion text was rewritten, no id was renumbered. This
+  rule was written to scope the ACM-1R authoring dispatch, not to freeze these
+  docs against a change to the thing they describe — a doc asserting a
+  superseded canonical set is wrong, not protected. Approved by John (PM) on
+  the PO's instruction to finish Epic 4); the ACM-1R
   contracts add only what the audit records as Missing or Partial. The
   absent-singleton adoption table, post-bootstrap drift/rollback, concurrent-run
   convergence, and the AR-policy `targetRole='hr-admin'` cross-type collision
@@ -336,9 +453,9 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM8-KC-03` | [kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md](kernel-composition/acm8-kc-03-user-management-behavior-unchanged.md) | `GET /users/:id` and every other existing route return byte-for-byte identical responses before and after composition. |
 | `ACM8-KC-04` | [kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md](kernel-composition/acm8-kc-04-no-http-or-debug-endpoint-added.md) | No new route appears in the composed application's route table — `AccessControlModule` stays headless. |
 | `ACM8-KC-05` | [kernel-composition/acm8-kc-05-corrected-module-header-comment.md](kernel-composition/acm8-kc-05-corrected-module-header-comment.md) | The `AccessControlModule` header comment is corrected to stop conflating DI-graph visibility with the separate, not-yet-authorized `ACCESS_CONTROL_PORT` rebinding decision. |
-| `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the three canonical `Permissions` rows — no more, no fewer, no other key. |
+| `ACM1-FB-01` | [fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md](fr-bootstrap/acm1-fb-01-three-canonical-permissions-seeded.md) | A fresh database ends up with exactly the **six** canonical `Permissions` rows — no more, no fewer, no other key. **Amended 2026-09-06 (PLAT-E4-S4.2a)**, and the file carries the full amendment record: the six keys and their live consumers, the AF-2 accepted deviation, and the dated AF-4 architecture contradiction. |
 | `ACM1-FB-02` | [fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md](fr-bootstrap/acm1-fb-02-one-hr-admin-fr-policy-seeded.md) | A fresh database ends up with exactly one FR `Policies` row, `targetRole='hr-admin'`. |
-| `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the three seeded permissions through `PolicyPermissions`, one grant per key. |
+| `ACM1-FB-03` | [fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md](fr-bootstrap/acm1-fb-03-role-granted-exactly-three-permissions.md) | The seeded `hr-admin` role is joined to exactly the **six** seeded permissions through `PolicyPermissions`, one grant per key. **Amended 2026-09-06 (PLAT-E4-S4.2a).** |
 | `ACM1-FB-04` | [fr-bootstrap/acm1-fb-04-exactly-one-root-attachment.md](fr-bootstrap/acm1-fb-04-exactly-one-root-attachment.md) | The one pre-existing active root User (CAP-8) gets exactly one `UserPolicies` attachment to `hr-admin`, and `AccessControlBootstrap` records it as provenance. |
 | `ACM1-FB-05` | [fr-bootstrap/acm1-fb-05-rerun-seed-no-duplicates.md](fr-bootstrap/acm1-fb-05-rerun-seed-no-duplicates.md) | Running the bootstrap a second time against an already-bootstrapped, undrifted database changes nothing — same ids, same counts, no duplicate rows. |
 | `ACM1-FB-06` | [fr-bootstrap/acm1-fb-06-no-other-role-attachment-or-grant.md](fr-bootstrap/acm1-fb-06-no-other-role-attachment-or-grant.md) | After bootstrap, `Policies`/`Permissions`/`PolicyPermissions`/`UserPolicies` contain exactly the canonical rows and nothing else — no default AR policy, no extra grant, no non-root attachment. |
@@ -351,7 +468,7 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM1R-FB-13` | [fr-bootstrap/acm1r-fb-13-userpolicies-referential-integrity.md](fr-bootstrap/acm1r-fb-13-userpolicies-referential-integrity.md) | An attachment naming an unknown user or an unknown policy is rejected. (invariant 11, referential half) |
 | `ACM1R-FB-14` | [fr-bootstrap/acm1r-fb-14-bootstrap-singleton-constraints.md](fr-bootstrap/acm1r-fb-14-bootstrap-singleton-constraints.md) | A second singleton, a wrong `key`, and a duplicate `rootUserId`/`policyId` reference are each rejected — the singleton is a constraint, not a convention. (invariant 12) |
 | `ACM1R-FB-15` | [fr-bootstrap/acm1r-fb-15-on-delete-restrict-four-foreign-keys.md](fr-bootstrap/acm1r-fb-15-on-delete-restrict-four-foreign-keys.md) | Deleting a granted permission, a granted policy, an attached user, or a singleton-referenced row is rejected on all four foreign keys. (invariant 13) |
-| `ACM1R-FB-16` | [fr-bootstrap/acm1r-fb-16-permission-key-immutability.md](fr-bootstrap/acm1r-fb-16-permission-key-immutability.md) | A renamed canonical key is *absent*, not *different*: the seed restores the canonical row and preserves the renamed one, never issuing an in-place key update. (invariant 5, immutability half) |
+| `ACM1R-FB-16` | [fr-bootstrap/acm1r-fb-16-permission-key-immutability.md](fr-bootstrap/acm1r-fb-16-permission-key-immutability.md) | A renamed canonical key is *absent*, not *different*: the seed restores the canonical row and preserves the renamed one, never issuing an in-place key update. (invariant 5, immutability half) **Amended 2026-09-06 (PLAT-E4-S4.2a)** — six canonical rows before the rerun, seven after. |
 | `ACM1R-FB-17` | [fr-bootstrap/acm1r-fb-17-dec-um-007-normalization-at-lookup.md](fr-bootstrap/acm1r-fb-17-dec-um-007-normalization-at-lookup.md) | A whitespace- and case-variant `ROOT_WORK_EMAIL` resolves to the canonical root, and the singleton persists the normalized form. |
 | `ACM1R-FB-18` | [fr-bootstrap/acm1r-fb-18-advisory-lock-and-timeout.md](fr-bootstrap/acm1r-fb-18-advisory-lock-and-timeout.md) | The common advisory lock is taken before any bootstrap-state inspection — so it covers first creation on an empty database — and a timeout fails atomically. |
 | `ACM1R-FB-19` | [fr-bootstrap/acm1r-fb-19-revalidate-before-writes-and-before-commit.md](fr-bootstrap/acm1r-fb-19-revalidate-before-writes-and-before-commit.md) | A root deactivated inside the transaction window is caught by the pre-commit revalidation and the run rolls back. |
@@ -363,4 +480,18 @@ not be translated into an `Audience`, and the scenario never invokes
 | `ACM1R-FB-25` | [fr-bootstrap/acm1r-fb-25-concurrent-runs.md](fr-bootstrap/acm1r-fb-25-concurrent-runs.md) | Two concurrent first runs converge on one bootstrap set; two runs with different configured roots leave one coherent set and one atomic failure. |
 | `ACM1R-FB-26` | [fr-bootstrap/acm1r-fb-26-per-field-drift-restore-preserve-fail.md](fr-bootstrap/acm1r-fb-26-per-field-drift-restore-preserve-fail.md) | The FR-AMD-1 drift table, case by case: missing owned rows restored, descriptive fields and generated ids preserved, identity and authorization-bearing drift failed before any write. |
 | `ACM1R-FB-27` | [fr-bootstrap/acm1r-fb-27-atomic-rollback-no-partial-state.md](fr-bootstrap/acm1r-fb-27-atomic-rollback-no-partial-state.md) | A failure injected *after* writes and before commit leaves nothing behind — the only arrangement that distinguishes one real transaction from statements that failed early. |
-| `ACM1R-FB-28` | [fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md](fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md) | An approved fourth permission, its grant to the canonical policy, and a later administrator's attachment all survive a rerun untouched. |
+| `ACM1R-FB-28` | [fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md](fr-bootstrap/acm1r-fb-28-fourth-permission-and-admin-attachments-survive.md) | An administrator's approved extra permission — now the **seventh**, not the fourth — its grant to the canonical policy, and a later administrator's attachment all survive a rerun untouched. **Amended 2026-09-06 (PLAT-E4-S4.2a)**; the filename keeps `fourth` because scenario slugs are never renumbered. |
+| `S4.2a-OP-01` | [fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md](fr-bootstrap/s42a-op-01-bootstrap-entrypoint-npm-alias.md) | `package.json` declares `db:bootstrap:access-control`, and the alias resolves to `scripts/bootstrap-access-control.ts`. **Precondition repair (AF-1)** — the missing alias is why every scenario in this folder is red at `ef03c88` for a reason unrelated to its subject; this file separates that red state from the discriminating one. |
+| `S4.2a-OP-02` | [fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md](fr-bootstrap/s42a-op-02-rerun-over-a-three-key-database-adds-only-the-new-rows.md) | The upgrade rerun: against a database bootstrapped at the retired three-key set, the amended bootstrap restores the three added `Permissions` rows and their grants and leaves every pre-existing id, description, attachment and singleton column byte-identical. |
+| `S4.2b-TR-01` | [tree-root-seed/s42b-tr-01-bootstrap-writes-no-relationship-row.md](tree-root-seed/s42b-tr-01-bootstrap-writes-no-relationship-row.md) | A fresh `db:seed && db:bootstrap:access-control` writes **zero** `relationships` rows — root's own `direct`/`people_partner` count stays `0`. A verification, not new seed logic; re-proves the spec's own grep table against a live database. |
+| `S4.2d-DS-01` | [dev-seed-spine/s42d-ds-01-throws-under-node-env-production.md](dev-seed-spine/s42d-ds-01-throws-under-node-env-production.md) | `npm run db:dev:seed-org` under `NODE_ENV=production` throws before any `PrismaClient` is constructed or database row is touched — the opposite of the reverted guard on the script this increment retires. |
+| `S4.2d-DS-02` | [dev-seed-spine/s42d-ds-02-two-level-spine-over-imported-population.md](dev-seed-spine/s42d-ds-02-two-level-spine-over-imported-population.md) | Over a real, multi-department imported population, exactly one `direct` edge per department's synthesized lead (smallest `User.id` among active members) to root, and one per other active member to their lead; root never becomes a subject. States the AF-5 tie-break rule precisely. |
+| `S4.2d-DS-03` | [dev-seed-spine/s42d-ds-03-rerun-is-additive-only.md](dev-seed-spine/s42d-ds-03-rerun-is-additive-only.md) | A rerun creates edges only for users holding no `direct` row yet; an administrator-written edge survives untouched; a department whose synthesized lead later deactivates is not auto-repaired (AF-4, documented, not a defect). |
+| `S4.2d-DS-04` | [dev-seed-spine/s42d-ds-04-department-with-no-active-members-is-skipped.md](dev-seed-spine/s42d-ds-04-department-with-no-active-members-is-skipped.md) | A department whose only member is inactive is skipped with no error; a fresh database with no population imported seeds zero edges and exits `0` — both are success, not the `NODE_ENV` error case. |
+| `S4.2d-DS-05` | [dev-seed-spine/s42d-ds-05-dev-grant-root-retired-and-create-root-repointed.md](dev-seed-spine/s42d-ds-05-dev-grant-root-retired-and-create-root-repointed.md) | `scripts/dev-grant-root.ts` and its npm alias no longer exist (no shim); `create:root` equals the exact repointed chain; a pre-existing database's orphaned `user-management:edit` row is left untouched (AF-2), by dated ruling, not by omission. |
+| `ACM11-FPO-01` | [full-profile-overlay/acm11-fpo-01-bootstrap-seeds-root-as-first-holder.md](full-profile-overlay/acm11-fpo-01-bootstrap-seeds-root-as-first-holder.md) | A fresh `db:seed && db:bootstrap:access-control` leaves exactly one `full_profile_grants` row (`holderUserId = root`, `grantedByUserId = NULL`) and one paired `AccessJournal` row (`kind: 'full_profile_grant'`, actor and subject both root). |
+| `ACM11-FPO-02` | [full-profile-overlay/acm11-fpo-02-rerun-is-idempotent-no-duplicate-row.md](full-profile-overlay/acm11-fpo-02-rerun-is-idempotent-no-duplicate-row.md) | Re-running the bootstrap against an already-seeded database inserts no second `full_profile_grants` or `AccessJournal` row and raises no drift error — the "zero rows anywhere" seed condition, mirroring the FR-policy singleton's verify-or-no-op shape. |
+| `ACM11-FPO-03` | [full-profile-overlay/acm11-fpo-03-holder-bumps-a-none-cell-to-read.md](full-profile-overlay/acm11-fpo-03-holder-bumps-a-none-cell-to-read.md) | AF-6 unit-level proof: against a `jest.mock`'d `SECTION_ACCESS_MATRIX` synthetic row with a `'none'` colleague cell, a holder resolves `'read'` and a non-holder resolves `'none'` — honestly labeled as not an HTTP-observable behavior change today, since no shipped section has a `'none'` cell. |
+| `ACM11-FPO-04` | [full-profile-overlay/acm11-fpo-04-overlay-never-upgrades-to-write.md](full-profile-overlay/acm11-fpo-04-overlay-never-upgrades-to-write.md) | The overlay's own contribution is the fixed value `'read'`, never `'write'`, even against a synthetic row whose other audience cells are `'write'` — the ceiling property, distinct from `ACM11-FPO-03`'s bump proof. |
+| `ACM11-FPO-05` | [full-profile-overlay/acm11-fpo-05-overlay-does-not-apply-to-inactive-or-unknown-target.md](full-profile-overlay/acm11-fpo-05-overlay-does-not-apply-to-inactive-or-unknown-target.md) | A holder resolving a deactivated or nonexistent target id gets `'none'`, not `'read'`, against both the real matrix and the synthetic row — the CAP-1 leak-prevention property named in the design's §5.3. |
+| `ACM11-FPO-06` | [full-profile-overlay/acm11-fpo-06-non-holder-gets-no-overlay-effect-on-real-sections.md](full-profile-overlay/acm11-fpo-06-non-holder-gets-no-overlay-effect-on-real-sections.md) | Today's three live `SECTION_ACCESS_MATRIX` rows resolve byte-identically for a holder and a non-holder alike — a pass-already regression lock over the base path the overlay must not disturb. |

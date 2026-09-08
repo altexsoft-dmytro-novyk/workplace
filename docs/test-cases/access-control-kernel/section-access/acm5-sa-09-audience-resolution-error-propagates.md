@@ -16,7 +16,7 @@ operation encounters an infrastructure error while obtaining the audience
 result.
 
 **When** the caller invokes
-`AccessControlFacade.canAccessSection(viewerId, 'S1', targetEmployeeId)`.
+`AccessControlFacade.canAccessSection(viewerId, 'profile:identity', targetEmployeeId)`.
 
 **Then** the promise rejects with that error; it never resolves to `'none'`,
 `'read'`, or `'write'` as a silent fallback.

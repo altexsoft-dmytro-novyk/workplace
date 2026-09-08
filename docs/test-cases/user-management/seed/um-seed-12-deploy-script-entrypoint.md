@@ -1,5 +1,23 @@
 # UM-SEED-12 · The deploy-script entrypoint loads `docs/Accounts_template.csv` in the deploy order
 
+> **CORRECTED 2026-09-07 (Dmytro Novyk, PO) — this is not the real production
+> entrypoint; it is a CI/test-harness and local-dev entrypoint.** A production
+> install has no fixture roster to auto-load — `docs/Accounts_template.csv` is
+> deploy/test fixture data (one pseudonymised row), not a real organisation's
+> data. The real production path is root signing in after
+> `db:bootstrap:access-control` and importing the real roster through
+> `POST /users/import`. Binding production order is `db:deploy` → `db:seed` →
+> `db:bootstrap:access-control` → `start:prod`; population import happens
+> afterward, through the running app. The script itself, its shared
+> writer/normalization/idempotent-upsert contract with `POST /users/import`,
+> and both Tests below are **unaffected and still asserted as written** — they
+> establish real, still-valuable behavior (the script runs, is idempotent,
+> and the HTTP endpoint stays upload-only). Only the "real production
+> entrypoint" / "binding deploy order" framing is corrected. Six e2e suites
+> depend on this script as a real, non-HTTP provisioning path (`s42b-tr-01`,
+> `s42d-ds-02`/`-04`/`-06`, and this file's own fixtures), which is why it is
+> kept rather than retired.
+
 **Trace:** requirements §4.17 · [decisions §1](../../../../_bmad-output/implementation-artifacts/user-management/epic-1-story-1-1-decisions.md) (the operator endpoint accepts the file OR reads it from the known path) · [testing-strategy.md](../../../architecture/testing-strategy.md) ("deploy-time stories invoke their real production entrypoint") · [seed README](README.md#deployment-order-binding) (binding deployment order; "the HTTP endpoint never reads a server-local path — upload only") · [seed README](README.md#seam-table) seam row "Deploy/operator script entrypoint" · epics.md Story 1.1
 
 ## Scenario

@@ -1,5 +1,21 @@
 # ACM1R-FB-23 · With the singleton present, a changed root email is conflicting drift — no transfer, no second attachment
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** the pre-rerun and post-rerun `Permissions` `3` → **`6`** and
+> `PolicyPermissions` `3` → **`6`**. The fail-before-writes contract is
+> unchanged: every count is identical before and after. The *"singleton's three
+> columns"* in this file means `normalizedRootEmail`/`rootUserId`/`policyId`
+> and is unrelated to the key count.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — behavioral row "Singleton-present — changed root email is conflicting drift: no transfer, no second attachment".
@@ -57,6 +73,6 @@ before the rerun.
   SELECT count(*) FROM "UserPolicies";                          -- 1
   SELECT "userId" FROM "UserPolicies";                          -- :rootId, not :ritaId
   SELECT count(*) FROM "UserPolicies" WHERE "userId" = :ritaId; -- 0
-  SELECT count(*) FROM "Permissions";                           -- 3
-  SELECT count(*) FROM "PolicyPermissions";                     -- 3
+  SELECT count(*) FROM "Permissions";                           -- 6
+  SELECT count(*) FROM "PolicyPermissions";                     -- 6
   ```

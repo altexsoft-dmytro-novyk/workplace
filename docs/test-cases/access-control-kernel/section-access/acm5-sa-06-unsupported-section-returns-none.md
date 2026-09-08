@@ -14,11 +14,15 @@
 **Given** a viewer and target form a confirmed valid Phase-0 audience pair.
 
 **When** the caller invokes
-`AccessControlFacade.canAccessSection(viewerId, 'S5', targetEmployeeId)` (or
-any string other than `'S1'`, `'S10'`, or `'S11'`).
+`AccessControlFacade.canAccessSection(viewerId, 'S1', targetEmployeeId)` (or
+any string other than `'profile:identity'`, `'profile:leave'`, or
+`'profile:projects'`).
 
 **Then** the promise resolves successfully to `'none'`; it does not throw and
-does not attempt to derive a decision for that unsupported section.
+does not attempt to derive a decision for that unsupported section. `'S1'` is
+deliberately the chosen example here (PLAT-E4-S4.1b): it is the retired
+pre-rename identifier, now just an arbitrary unmatched string like any other —
+proof the rename left no magic-string special case behind.
 
 **Preconditions:** identities are present and active; the string is not one of
 the three CAP-5-supported section identifiers.

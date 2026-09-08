@@ -16,7 +16,8 @@ viewer/target pair, for example because the viewer or target is inactive.
 
 **When** the caller invokes
 `AccessControlFacade.canAccessSection(viewerId, section, targetEmployeeId)`
-once each with `section` equal to `'S1'`, `'S10'`, and `'S11'`.
+once each with `section` equal to `'profile:identity'`, `'profile:leave'`, and
+`'profile:projects'`.
 
 **Then** every promise resolves to `'none'`. No supported section can turn an
 empty audience set into `read` or `write`.

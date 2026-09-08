@@ -16,7 +16,7 @@ whose set is exactly `Set {'reporting', 'pp'}` from independent valid direct
 Reporting and direct-PP facts.
 
 **When** the caller invokes
-`AccessControlFacade.canAccessSection(viewerId, 'S1', targetEmployeeId)`.
+`AccessControlFacade.canAccessSection(viewerId, 'profile:identity', targetEmployeeId)`.
 
 **Then** the promise resolves to `'write'`. The result is the strongest
 applicable access (`write > read > none`), independent of the set's iteration

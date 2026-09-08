@@ -17,12 +17,32 @@
 > audience-only (`canAccessSection('S1')`), which Epic 0 already ships; Story 1.2
 > is pending only its own Stage 2 / Stage 3.
 
+> **Amended 2026-09-05 (PLAT-E4-S4.1c).** The "Variant A" framing in the scope
+> note above (identity card has no functional permission; the whole Epic 0 gate
+> is `canAccessSection` alone) is **superseded by SCP
+> [`sprint-change-proposal-2026-09-04-section-access-consolidation.md`](../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-04-section-access-consolidation.md)
+> D1**: `PATCH /users/:id` is a **dual gate** — the audience half
+> `canAccessSection(viewer, 'profile:identity', target) === 'write'` resolved
+> **first**, then the feature half `isAllowed(viewer, 'profile:identity:write')`,
+> held implicitly by every **active** employee through the `DEFAULT_PERMISSIONS`
+> code constant (**D2**), with no `Policies` / `UserPolicies` row. From
+> PLAT-E4-S4.1c both halves are one call behind
+> `@RequireSectionAccess('profile:identity', 'write')`.
+>
+> **Nothing in this file's assertions changes.** Bob is an active employee, so
+> he holds the feature half by construction; his reporting-line edge to Alice is
+> still what decides, and the entitlement scenarios still live in Epic 0
+> (`umac-07`), not here. The section identifier is the human key
+> `profile:identity` (**D4** / 4.1b); `S1` stays a `docs/project-requirements.md`
+> §3.2 matrix-row citation. Story 1.2 remains unblocked on any kernel seed —
+> more so than before, since the feature half needs no seed at all.
+
 ## Scenario
 
 **Given** Alice, a seeded employee with `position: "Engineer"`, `country: "PL"`,
 `city: "Warsaw"`, `workPhone: null`; and Bob, Alice's **direct** Unit Manager
 (reporting-line `write` on Alice's S1 via the umac-07 gate — `canAccessSection(Bob,
-'S1', Alice) === 'write'`), acting as an already-entitled actor.
+'profile:identity', Alice) === 'write'`), acting as an already-entitled actor.
 
 **When** Bob `PATCH`es Alice's `position`, `country`, `city`, and `workPhone` in
 one request.
@@ -35,7 +55,7 @@ field is unchanged; and a follow-up `GET /users/:id` returns the standard
 
 **Preconditions:** [fixture](../README.md#canonical-personas); Alice seeded as
 above; real `Relationship` Alice→Bob `type='direct'` (so Bob's
-`canAccessSection(Bob, 'S1', Alice)` is `write`); the Epic 0 port is rebound.
+`canAccessSection(Bob, 'profile:identity', Alice)` is `write`); the Epic 0 port is rebound.
 Stage 2 resolves `<aliceId>` / `<bobId>` from the seeded fixture id table, never
 a hardcoded literal.
 

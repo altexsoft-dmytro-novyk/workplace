@@ -1,5 +1,19 @@
 # ACM1R-FB-20 · With no singleton, an existing FR `hr-admin` policy is adopted by natural key — and verified
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** in Scenario A the grants created against the adopted policy `3` → **`6`**.
+> Scenario B's counts are all `0` and do not move. Adoption by natural key and
+> the refusal on field drift are unchanged.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — behavioral row "Absent-singleton adoption — FR `hr-admin` policy by natural key after verifying `operator`, `managedBy`, null targets", named in `ACM-1-scenarios.invoke_dev_with` under "COVER THE ABSENT-SINGLETON CASES EXPLICITLY".
@@ -19,7 +33,7 @@ carrying its own id.
 
 **Then** the bootstrap **adopts** that row: it creates no second FR policy, it
 leaves the existing row's id unchanged, and it writes the singleton with
-`policyId` equal to that pre-existing id. The three canonical grants are
+`policyId` equal to that pre-existing id. The six canonical grants are
 created against it, and the root attachment points at it.
 
 ## Scenario B — refused adoption on field drift
@@ -61,7 +75,7 @@ whose id is captured before the run; `UserPolicies`, `PolicyPermissions` empty.
     SELECT count(*) FROM "Policies" WHERE type='FR';        -- still 1
     SELECT id FROM "Policies" WHERE type='FR';              -- still :existingPolicyId
     SELECT "policyId" FROM "AccessControlBootstrap";        -- :existingPolicyId
-    SELECT count(*) FROM "PolicyPermissions" WHERE "policyId" = :existingPolicyId; -- 3
+    SELECT count(*) FROM "PolicyPermissions" WHERE "policyId" = :existingPolicyId; -- 6
     SELECT "policyId" FROM "UserPolicies";                  -- :existingPolicyId
     ```
   - **B:** run exits nonzero with a diagnostic naming `managedBy`;

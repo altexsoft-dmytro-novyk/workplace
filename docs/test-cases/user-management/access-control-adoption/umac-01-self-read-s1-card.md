@@ -2,6 +2,26 @@
 
 **Trace:** SPEC-user-management-access-control-adoption CAP-1 + CAP-2 (read) + CAP-3 · `um-integration-contract-response.md` Q1 (the adoption seam is the single `ACCESS_CONTROL_PORT` binding, not a route), Q2 (the port shape is kept; the adapter is UM-owned `infrastructure/`), Q3 (READ_USER_FEATURE, `self` → allow), Q5 (S1-card projection ships in Story 0.1) · PRD FR-16 · `access-control.md` §3.2 (Self column) · AD-2 (hexagonal boundary is absolute) / AD-21 (v1.5 brownfield cutover — the interim adapter is deleted in the same change) in `architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` · AD-3 (real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E, no provider overrides) in `architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md` · `nestjs-di-tokens.md` (only `application/guards/` consumes `ACCESS_CONTROL_PORT`; actions never `@Inject` a port) · `testing-strategy.md` AD-1 (scenario prose → human approval → committed-red E2E → production; no stage is self-certified)
 
+> **Amended 2026-09-05 (PLAT-E4-S4.1c).** The `canEdit` rationale below was
+> written under the 2026-09-02 "Variant A" framing (identity card has no
+> functional permission; the whole gate is `canAccessSection`). That framing is
+> **superseded by SCP 2026-09-04 D1**: `canEdit` is the `profile:identity`
+> `'write'` **dual gate** — the audience half
+> (`canAccessSection(viewer, 'profile:identity', target) === 'write'`) resolved
+> **first**, and only then the feature half
+> (`isAllowed(viewer, 'profile:identity:write')`, held implicitly by every
+> active employee via `DEFAULT_PERMISSIONS`, D2). Ordering is the invariant: the
+> feature half can only subtract, never widen a resolved audience
+> (`access-control.md` line 19). **The asserted value of `canEdit` in this file
+> is unchanged** — every session holder is an active employee and therefore
+> holds the baseline, so the audience half remains the deciding term. The
+> section identifier is the human key `profile:identity` (D4); `S1` is a §3.2
+> matrix-row citation only, never a string passed to the facade. From 4.1c both
+> the `data` read gate and this hint are answered by one call,
+> `hasSectionAccess(viewer, 'profile:identity', <level>, target)` — see
+> [`s41c-sag-01`](./s41c-sag-01-read-gate-any-audience-allows-none-denies.md)
+> and [`s41c-sag-02`](./s41c-sag-02-baseline-holder-without-write-audience-denied.md).
+
 ## Scenario
 
 **Given** the production `ACCESS_CONTROL_PORT` is bound to the real
@@ -18,12 +38,14 @@ longer spreads the whole row; Story 0.1's S1-card DTO returns exactly `id`,
 V's Phase-0 audience over itself is `self` (after identity confirmation; Self
 is exclusive), a non-empty set, so the adapter allows `user-management:read`.
 
-`canEdit` is the read-only edit-gate hint. **Variant A (product decision
-2026-09-02): the identity card has no separate functional permission — the whole
-gate is `canAccessSection(V, 'S1', target) === 'write'`.** Self's
-`canAccessSection(V, 'S1', V)` is `'read'` (S1 is read-only for self; only the
-photo is Self-writable — `umac-09`), so **`canEdit` is `false`** for a self
-read. This does not flip — a person is never the reporting-line manager or
+`canEdit` is the read-only edit-gate hint. **Under the dual gate (SCP
+2026-09-04 D1) it is the `profile:identity` `'write'` question, audience half
+first.** Self's `canAccessSection(V, 'profile:identity', V)` is `'read'` (§3.2
+row S1 gives Self `R (photo RW)` — read-only for self, only the photo is
+Self-writable, `umac-09`), rank `1 < 2`, so the audience half denies before the
+feature half is reached and **`canEdit` is `false`** for a self read. V does
+hold `profile:identity:write` via `DEFAULT_PERMISSIONS` as an active employee;
+it changes nothing (`s41c-sag-02`). This does not flip — a person is never the reporting-line manager or
 assigned People Partner of themselves.
 
 > **CAP-3 — `{ data, canEdit }`; `data` is the same 12 fields for every
@@ -52,4 +74,4 @@ assigned People Partner of themselves.
   ```json
   { "headers": { "authorization": "Bearer <token:<V-uuid>>" } }
   ```
-- **expectedResult:** `200`. Body is `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `false` (Variant A: `canAccessSection(V, 'S1', V)` is `'read'` for self; no flip).
+- **expectedResult:** `200`. Body is `{ data, canEdit }`. `data` **contains exactly** `id`, `firstName`, `lastName`, `photo`, `position`, `country`, `city`, `workEmail`, `workPhone`, `birthDay`, `birthMonth`, `companyJoinDate` and **does not contain** `ttId`, `isActive`, `customFields`, `createdAt`, `createdBy`. `canEdit` is `false` (`canAccessSection(V, 'profile:identity', V)` is `'read'` for self — §3.2 row S1, Self = `R (photo RW)`; the audience half denies before the feature half is consulted, and it never flips).

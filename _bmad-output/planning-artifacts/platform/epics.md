@@ -729,9 +729,16 @@ So that root administers and edits the organisation through the ordinary
 audience-resolution path, with no functional-role override anywhere in the
 authorisation code.
 
-**Recorded decision (Winston + Dmytro, 2026-09-03/04):** the ACM-0 seeded root
-identity is the organisation's boss — `hr-admin` functional role **+** top of
-the `reports-to` tree **+** first §2.4 full-profile-access holder, all by seed.
+**Recorded decision (Winston + Dmytro, 2026-09-03/04; ~~the organisation's
+boss~~ **CORRECTED 2026-09-08, PO** — see SCP §9.2):** the ACM-0 seeded root
+identity holds the `hr-admin` functional role (operator features) **+** the
+tree-root position — which is *structural*, the absence of a `Relationship` row,
+not a seeded edge (4.2b) **+** the first §2.4 full-profile-access grant (a
+**read** overlay). It holds **no profile-section write** by virtue of being root:
+`root` is absent from `project-requirements.md`, and §2.2 is NORMATIVE that a
+functional role grants no data access. On a clean production install root
+resolves `colleague` to everyone and `PATCH /users/:id` is `403` on every target
+— the specified behaviour.
 A *delegated* HR Admin holds the complete functional-role feature set and may
 delegate the role onward, but gets **zero data access** from it — reads/writes a
 profile only where they are that person's reporting-line manager or assigned PP
@@ -969,6 +976,8 @@ So that two independent writers cannot disagree about who is on a project.
 
 **Status:** backlog
 **Binding conditions:** see *Post-Kernel Extension (Epics 4–7) — Binding Conditions*. The ACM-9 re-baseline obligation applies with particular force here — this epic introduces recursive traversal.
+
+> **Interim backlog — DEPT-EPIC (`_bmad-output/planning-artifacts/platform/dept-epic.md`, opened 2026-09-07).** Two department-manager items are needed before Epic 5 formally starts, because `profile:timeline` manual write (DEC-UM-001) depends on them and the "Access Control Authorization Consolidation" epic left them out of scope: **DEPT-1** — the `Department.managerUserId` fact + one-level `isDirectDeptManager` derivation; **DEPT-2** — `profile:timeline` `canAccessSection` + dual gate + `hr-admin` stopgap removal. Epic 5's **DEPT-3** (full transitive department reporting-line audience) is the larger deliverable and reconciles the scalar fact with the PM/AD-35 AR-grant model. Track in `dept-epic.md` and `sprint-status.yaml` until pulled into this epic's story list.
 
 Complete the two Reporting-line inputs the kernel left fail-closed. Per PM/AD-10, department management is the second input to the Reporting-line relation (not a third audience), and People Partner propagation runs through the assigned PP's own chain inside HR — never through the employee's delivery chain.
 

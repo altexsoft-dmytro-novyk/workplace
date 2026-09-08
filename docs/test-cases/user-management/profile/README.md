@@ -35,11 +35,74 @@ this set.**
 > **Variant A (product decision 2026-09-02, Dmytro Novyk).** The employee
 > identity card (S1) has **no separate functional permission**. The Epic 0 edit
 > gate on `PATCH /users/:id` is `canAccessSection(viewer, 'S1', target) ===
-> 'write'` alone — the target's reporting-line manager or assigned People
-> Partner. Consequently **Story 1.2 is no longer blocked on a `user-management:edit`
+> 'write'` alone [historical spelling and historical mechanism — see the
+> 2026-09-06 correction below] — the target's reporting-line manager or
+> assigned People Partner. Consequently **Story 1.2 is no longer blocked on a `user-management:edit`
 > holder decision or a kernel-seed sequence**; it is pending only its own
 > Stage 2 / Stage 3. `user-management:edit` survives only as the Epic 0 adapter's
 > internal routing key for the PATCH-gate branch.
+
+> **Amended 2026-09-05 (PLAT-E4-S4.1c — `@RequireSectionAccess` gate).** The
+> Variant A blockquote above is kept as the historical record of the 2026-09-02
+> decision and is **no longer the live rule.** SCP
+> [`sprint-change-proposal-2026-09-04-section-access-consolidation.md`](../../../../_bmad-output/planning-artifacts/sprint-change-proposal-2026-09-04-section-access-consolidation.md)
+> **D1** restores the identity-card edit as a **dual gate**, evaluated
+> audience-first:
+>
+> 1. `canAccessSection(viewer, 'profile:identity', target)` must already resolve
+>    to `write` — `docs/project-requirements.md` §3.2 row **S1** gives
+>    `RW¹` to the Reporting line and to PP, and only `R` to Self
+>    (`R (photo RW)`) and Colleague;
+> 2. **then** `isAllowed(viewer, 'profile:identity:write')`, which every
+>    **active** employee holds implicitly through the `DEFAULT_PERMISSIONS` code
+>    constant (**D2**) — no `Policies`, `PolicyPermissions`, `UserPolicies` row,
+>    no seed, no bootstrap change.
+>
+> The order is the invariant, not a preference: a failed audience half
+> short-circuits, so the feature half can only ever turn an allow into a deny
+> and never widens a resolved audience (`access-control.md` line 19).
+>
+> **What this changes for `um-edit-*` and `um-photo-*`: nothing observable.**
+> Every persona in this file is an active employee and therefore holds the
+> feature half by construction, so the audience half remains the deciding term
+> and every asserted status, body and `canEdit` value stands. Story 1.2 is still
+> unblocked on any kernel seed — more so, since the feature half needs none. Two
+> vocabulary changes do apply throughout: the section identifier passed to the
+> facade is the human key **`profile:identity`** (**D4** / PLAT-E4-S4.1b, already
+> landed in code) and `S<n>` is a §3.2 matrix-row citation only; and the Epic 0
+> route gate is now the single declaration
+> `@RequireSectionAccess('profile:identity', 'write')` rather than a
+> feature-string branch. Where the prose below still reads "audience-only" or
+> `canAccessSection('S1')`, read it as this dual gate on `'profile:identity'`.
+> New Epic 4 scenarios:
+> [`s41c-sag-01`](../access-control-adoption/s41c-sag-01-read-gate-any-audience-allows-none-denies.md)..[`s41c-sag-05`](../access-control-adoption/s41c-sag-05-unmapped-section-fails-closed.md).
+
+> **Corrected 2026-09-06 — mechanism only (PLAT-E4-S4.1c / PLAT-E4-S4.1d),
+> verified against backend `ef03c88`.** Two mechanism descriptions in this file
+> are wrong. **No scenario, request spec, persona, expected status or `canEdit`
+> value changes** — every assertion in the `um-edit-*` and `um-photo-*` files
+> stands as approved.
+>
+> 1. **`canAccessSection(…, 'S1', …)` is not a call any route makes, and the
+>    section key in code is never `'S1'`.** Since 4.1c a section-gated route
+>    declares `@RequireSectionAccess(PROFILE_IDENTITY_SECTION, <level>)` —
+>    `GET /users/:id` with `'read'` and `PATCH /users/:id` with `'write'`
+>    (`services/backend/src/user-management/application/controllers/users.controller.ts:157-158`
+>    and `:212-213`) — and `SectionAccessGuard` asks the UM-owned port exactly
+>    one question, `hasSectionAccess(viewer, section, level, target)`, throwing
+>    `403` when it returns `false`
+>    (`services/backend/src/user-management/application/guards/section-access.guard.ts:53-66`).
+>    Only the adapter behind that port calls the kernel facade's
+>    `canAccessSection`, for the audience half of the D1 dual gate, before
+>    consulting `isAllowed('<section>:write')`
+>    (`services/backend/src/user-management/infrastructure/access-control-facade.adapter.ts:63-81`);
+>    the same call backs the `canEdit` hint (`:85-95`). The key passed across
+>    the port is the human key `'profile:identity'`
+>    (`services/backend/src/user-management/domain/constants/section-keys.ts:11`);
+>    per **D4**, `S1` in this file is a citation of the `docs/project-requirements.md`
+>    §3.2 matrix row and nothing else.
+> 2. **The photo route was never gated by `@RequireFeatureForTarget` as
+>    decision 1 below describes** — see the correction appended to that decision.
 
 The `um-photo-*` set was authored 2026-09-02 for Epic 1 Story 1.3 against the
 compiled spec
@@ -58,28 +121,32 @@ already shipped (UMAC-1 / Epic 0 Story 0.1). *Who* is entitled to `PATCH` —
 reporting-line manager / assigned PP allowed, self `403` on S1 scalars,
 colleague `403`, `401`/`403` unresolved — is asserted **canonically by Epic 0**
 against the real `AccessControlFacade` in `access-control-adoption/umac-07`
-(Variant A: `canAccessSection('S1') === 'write'`) and `umac-08` (org-field
-rejection). The `um-edit-*` files do **not** duplicate those; every `um-edit-*`
-Stage-2 test **seeds an already-entitled actor** (real seeded-UUID token + real
-`Relationship` edge giving `canAccessSection('S1') === 'write'`) and asserts only
-what the write does to the data.
+(the `profile:identity` dual gate) and `umac-08` (org-field rejection). The
+`um-edit-*` files do **not** duplicate those; every `um-edit-*` Stage-2 test
+**seeds an already-entitled actor** (real seeded-UUID token + real
+`Relationship` edge giving `canAccessSection('profile:identity') === 'write'`,
+the actor's active state supplying the feature half) and asserts only what the
+write does to the data.
 
 ### Stage 2 / Stage 3 state
 
-Under Variant A the Epic 0 edit gate is audience-only
-(`canAccessSection('S1') === 'write'`), which Epic 0 Story 0.1 already ships — so
+The Epic 0 edit gate is the `profile:identity` dual gate (audience half
+`canAccessSection(v, 'profile:identity', t) === 'write'`, then the
+`DEFAULT_PERMISSIONS`-backed feature half), which Epic 0 Story 0.1 and
+PLAT-E4-S4.1a already ship — so
 `um-edit-*` is **not** blocked on any kernel seed or permission-holder decision.
 Bob's seeded reporting-line edge to Alice satisfies the gate, so a Stage-2
 `PATCH` reaches `EditUserAction` / `UpdateUserDto`. The set is pending only its
 own Stage 2 (committed-red E2E) and Stage 3 (production) dispatches under the
 AD-1 gate.
 
-### Also settled by Variant A
+### Also settled by Variant A (and still settled under the D1 dual gate)
 
 `access-control-adoption/umac-07` (CONDITIONAL → reframed and green), the
 `write-adoption.e2e-spec.ts` UMAC-07 group (green), and Story 1.3's
 `um-photo-09` Test 1 (`PATCH` + `photo` → `400`, which needs the guard to pass
-first — a reporting-line manager now clears the audience-only gate). The
+first — a reporting-line manager clears the gate: `write` audience **and** the
+`DEFAULT_PERMISSIONS` feature half). The
 `write-adoption.e2e-spec.ts` UMAC-08 group stays **red** until Story 1.2 Stage 3
 adds the `@IsEmpty()` rejection on the org keys.
 
@@ -87,8 +154,9 @@ adds the `@IsEmpty()` rejection on the org keys.
 
 Reconcile against [../README.md](../README.md#canonical-personas): **Alice**
 (seeded subject; reports to Bob; PP Paula), **Bob** (Alice's direct Unit
-Manager — `canAccessSection(Bob, 'S1', Alice) === 'write'`, which under Variant A
-is the whole umac-07 edit gate), **Paula** (Alice's assigned PP — second entitled
+Manager — `canAccessSection(Bob, 'profile:identity', Alice) === 'write'`, the
+audience half of the umac-07 dual gate; Bob holds its feature half
+`profile:identity:write` implicitly as an active employee), **Paula** (Alice's assigned PP — second entitled
 writer, same gate), **Colin** (unrelated seeded employee holding the in-use
 `workEmail` / `ttId` the uniqueness cases collide against), **Nina** (fresh
 target / second `ttId: null` row). Token convention: `Bearer <token:<bobId>>`
@@ -111,9 +179,11 @@ The `PATCH` response is the plain `toUserResponse` shape (whole-row spread),
 **not** the `{ data, canEdit }` envelope — only `GET /users/:id` returns the
 CAP-3 envelope (`access-control-adoption/README.md` "Response-body scope",
 `um-photo` README decision 9). The follow-up `GET` in `um-edit-01` asserts the
-envelope; under Variant A `canEdit` is `true` for a reporting-line / PP viewer
-(`canAccessSection(v,'S1',t)` → `write`, the whole gate), `false` for Self /
-colleague (`canAccessSection(v,'S1',t)` → `read`).
+envelope; `canEdit` is the `profile:identity` `'write'` dual-gate hint — `true`
+for a reporting-line / PP viewer (`canAccessSection(v,'profile:identity',t)` →
+`write`, plus the `DEFAULT_PERMISSIONS` feature half), `false` for Self /
+colleague (`canAccessSection(v,'profile:identity',t)` → `read`, which the
+feature half cannot widen).
 
 ### One "produce the new state" call site (AD-11 / Epic 3 hook)
 
@@ -227,16 +297,52 @@ Every item below is the author's most docs/precedent-consistent pick for a point
 the sources leave open. Each is written as the expected outcome in the files that
 depend on it and **needs human confirmation at the AD-1 stage-1 gate.**
 
-1. **Self-only is an identity check, returns `403` for everyone else.**
-   `feature === UPLOAD_PHOTO` → the rebound `AccessControlPort.isAllowedForTarget`
-   returns `viewerId === targetUserId` — **no** facade `isAllowed` /
-   `canAccessSection` call, **no** `user-management:upload-photo` key (Open
-   Decision vi), **no** dependency on the `user-management:edit` seed. A
-   reporting-line manager or PP who can write Alice's S1 scalars through the
-   umac-07 dual gate is still `403` on her photo. Mirrors `umac-09`. The
-   controller's interim `@RequireFeatureForTarget('user-management:upload-photo')`
-   is replaced by this rule in the Epic 0 port rebind, not by a new decorator.
-   *(`um-photo-03`)*
+1. **Self-only is an identity check, returns `403` for everyone else.** The
+   decision itself stands: **no** facade `isAllowed` / `canAccessSection` call,
+   **no** `user-management:upload-photo` key (Open Decision vi), **no**
+   dependency on the `user-management:edit` seed. A reporting-line manager or PP
+   who can write Alice's S1 scalars through the umac-07 dual gate is still `403`
+   on her photo. Mirrors `umac-09`. *(`um-photo-03`)*
+
+   ~~`feature === UPLOAD_PHOTO` → the rebound
+   `AccessControlPort.isAllowedForTarget` returns `viewerId === targetUserId`~~ …
+   ~~The controller's interim
+   `@RequireFeatureForTarget('user-management:upload-photo')` is replaced by this
+   rule in the Epic 0 port rebind, not by a new decorator.~~
+
+   > **Corrected 2026-09-06 (PLAT-E4-S4.1c / S4.1d).** The struck sentences do
+   > not describe machinery that changed — they describe machinery the photo
+   > route never had once the current implementation existed, so this is a
+   > correction of fact rather than a rename.
+   >
+   > - **How the route is actually gated today:** `PUT /users/:id/photo` carries
+   >   `@SelfOnly()` and nothing else
+   >   (`services/backend/src/user-management/application/controllers/users.controller.ts:227-228`).
+   >   `SelfOnlyGuard` compares `session.userId` against the route's `:id` and
+   >   throws `403` on mismatch, with **no** port call and **no** facade call at
+   >   all (`services/backend/src/user-management/application/guards/self-only.guard.ts:24-44`;
+   >   decorator at `.../application/decorators/self-only.decorator.ts:5-10`).
+   >   The `401` for a missing or unresolvable token comes earlier, from
+   >   `SessionGuard` (`.../application/guards/session.guard.ts:34-39`); the
+   >   controller-level guard chain is
+   >   `SessionGuard, AccessControlGuard, SectionAccessGuard, SelfOnlyGuard`
+   >   (`users.controller.ts:91`).
+   > - **There was no interim decorator on this route to replace.**
+   >   `@RequireFeatureForTarget('user-management:upload-photo')` gated the photo
+   >   route only in the pre-reset Epic 1 implementation (backend `c42de7d`,
+   >   2026-08-26), which the 2026-08-30 architecture reset (`64c7a38`) removed.
+   >   The rebuilt controller landed on 2026-09-02 (`0788f60`) already using
+   >   `@SelfOnly()`, so the claim was stale on the day this README was written.
+   > - **The port method named here no longer exists.** 4.1d removed
+   >   `isAllowedForTarget` from `AccessControlPort`, which now exposes only
+   >   `isAllowed` and `hasSectionAccess`
+   >   (`services/backend/src/user-management/domain/interfaces/access-control.port.ts:11-33`),
+   >   and deleted `RequireFeatureForTarget` outright. `@RequireFeature` survives
+   >   for no-target capability checks only
+   >   (`.../application/decorators/require-feature.decorator.ts:9-15`).
+   > - **Nothing observable changes:** every `um-photo-*` expectation — `403` for
+   >   Bob, Paula and Eve, `401` unauthenticated, `403` for a non-resolvable
+   >   target — is exactly what the `@SelfOnly()` identity comparison produces.
 
 2. **Non-resolvable / inactive target with a real session → `403`, not `404`.**
    Self-only means `viewer id == target id`; a syntactically valid id matching no

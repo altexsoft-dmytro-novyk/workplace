@@ -1,5 +1,20 @@
 # ACM1R-FB-24 · An AR policy carrying `targetRole='hr-admin'` is invisible to the bootstrap
 
+> **Amended 2026-09-06 — PLAT-E4-S4.2a.** The canonical ACM-1 `hr-admin` set
+> grew from three keys to **six**: the three original `user-management:*` keys
+> plus `org:relationships:write`, `employee:departure:record`, and
+> `profile:timeline:write` — the last a **known, deliberately accepted deviation
+> from a NORMATIVE invariant** (AF-2, Dmytro Novyk, Product Owner, 2026-09-06).
+> The full record, the live consumer of every key, and the dated AF-4 note that
+> the ratified architecture text still says *"exactly three"* and contradicts
+> this file, are in
+> [`ACM1-FB-01`](./acm1-fb-01-three-canonical-permissions-seeded.md).
+>
+> **This file's numbers change:** the grants written to the newly created FR row "three" → **"six"**. The AR-row
+> assertions — `PolicyPermissions` for the AR policy stays `0`, the AR row byte-
+> identical, Piotr's attachment untouched — are unchanged. The **four** failure
+> modes in this file are failure modes, not a key count.
+
 **Trace:**
 
 - [ACM-1 Stage-1 coverage audit](../../../../_bmad-output/implementation-artifacts/access-control/acm-1-stage1-coverage-audit.md) — behavioral row "Cross-type collision — an AR policy carrying `targetRole='hr-admin'` is never adopted, mutated, counted, or reported as drift", named in `ACM-1-scenarios.invoke_dev_with` under "COVER CROSS-TYPE COLLISION".
@@ -21,7 +36,7 @@ attached an unrelated active User, **Piotr**, via `UserPolicies`. No FR
 **Then** the bootstrap behaves exactly as it would on a database where that AR
 row did not exist. It **creates** its own FR `hr-admin` policy — it does not
 adopt the AR row, because its natural-key lookup filters `type='FR'` — grants
-the three permissions to the FR row, attaches the root to the FR row, and writes
+the six permissions to the FR row, attaches the root to the FR row, and writes
 the singleton naming the FR row's id. The AR row is byte-identical afterwards:
 same id, same `operator`, same `managedBy`, same target pair. Piotr's
 attachment to the AR policy survives untouched and is not counted as a root

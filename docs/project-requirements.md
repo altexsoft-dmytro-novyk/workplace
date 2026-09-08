@@ -131,6 +131,24 @@ Requirements:
 
 **Default assignments.** Which of the starting roles holds which permission on first launch is **drafted by the team from this document and confirmed by the PO** before the roles admin screen is built. Three points need explicit confirmation, because this document does not settle them: who may manage custom fields, who may assign mentors, and the defaults for *approve or reject proposed candidates*, *edit the career timeline* and *create feedback*.
 
+> **Confirmed target — *edit the career timeline* (PO, 2026-09-07).** The
+> permission is a baseline every active employee holds (`DEFAULT_PERMISSIONS`),
+> and the S9 write audience is the sole discriminator — a manual timeline edit
+> needs the permission **and** S9 `write` over the target. Effective manual-write
+> holders are the target's **direct department manager** and **assigned People
+> Partner** only (DEC-UM-001); project-derived DM/PM and transitive managers stay
+> read-only for manual mutation. **HR Admin holds nothing here** — it is a
+> feature-administration role with no data access (§2.2).
+>
+> **Interim (Access Control Authorization Consolidation PR, backend `37a3aa3`).**
+> Until the closure increment ships, `profile:timeline:write` is seeded to the
+> `hr-admin` role only and gated by the feature check alone — a known, accepted,
+> time-boxed deviation from §2.2/§2.3 (`s42a-op-06`), because the compliant
+> implementation needs the department-manager audience, which does not exist
+> yet. Closure is tracked as **DEPT-2** in
+> `_bmad-output/planning-artifacts/platform/dept-epic.md`. See SCP
+> `sprint-change-proposal-2026-09-04-section-access-consolidation.md` §9.1.
+
 ### 2.4 Full profile access
 
 The audience that sees every section of every profile exists, but it is **not** a functional role and is not bundled with one.

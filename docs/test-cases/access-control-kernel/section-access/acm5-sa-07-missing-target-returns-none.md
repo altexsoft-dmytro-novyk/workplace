@@ -16,7 +16,8 @@ viewer is present and active.
 
 **When** the caller invokes
 `AccessControlFacade.canAccessSection(viewerId, section, targetEmployeeId)`
-once each with `section` equal to `'S1'`, `'S10'`, and `'S11'`.
+once each with `section` equal to `'profile:identity'`, `'profile:leave'`, and
+`'profile:projects'`.
 
 **Then** every promise resolves successfully to `'none'`. A nonexistent target
 is not a thrown application error and cannot receive a base section grant for

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-04-2026 00:00
+last_updated: 09-07-2026 20:45
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -52,11 +52,11 @@ development_status:
   1-9-register-epic-in-platform-sprint-status: done
   epic-1-retrospective: optional
 
-  epic-2: in-progress
+  epic-2: done  # its only story (2.1) is done; epics.md lists no others
   2-1-resolve-phase-0-audiences-acf-1: done
   epic-2-retrospective: optional
 
-  epic-3: in-progress
+  epic-3: done  # all 8 stories (3.1-3.8) done; epics.md lists no others
   3-1-inactive-viewer-bridge-and-target-fail-closed-behavior-acm-3: done
   3-2-multi-audience-merge-acm-4: done
   3-3-deploy-time-root-user-prerequisite-acm-0: done
@@ -72,17 +72,78 @@ development_status:
   # "No Epic 4" for this addition only). Kernel + UM-adoption cross-cut: one
   # section-parameterised gate driven by canAccessSection, human section keys
   # (profile:identity, never S1), one recorded FR-composition rule.
-  epic-4: backlog
+  epic-4: done  # both stories (4.1, 4.2) done; backend 37a3aa3 "Closes Platform Epic 4"
   # 4-1 composition decision RESOLVED 2026-09-04 (SCP
   # sprint-change-proposal-2026-09-04-section-access-consolidation.md D1/D2:
   # dual gate; feature half = code constant DEFAULT_PERMISSIONS union explicit
-  # grants; no employee policy row, no seed change). Stays backlog until the
-  # architect gate-shape / section-endpoint-map design pass.
-  4-1-generalise-section-access-authorisation: backlog
-  # 4-2 recorded decision (Winston + Dmytro 2026-09-03/04): seeded root = boss
-  # (hr-admin FR + tree root + §2.4 first holder); a delegated HR Admin = full
-  # feature set, zero data access. Deletes the canEditS1 OR-override, seeds a
-  # two-level reporting spine, switches the audience resolver to walk upward
-  # from targets. Blocked on the upward-walk solution-design (AC AD-1).
-  4-2-default-org-relationship-seed: backlog
+  # grants; no employee policy row, no seed change). Architect gate-shape /
+  # section-endpoint-map pass done 2026-09-05 (Winston session) — story split
+  # into 4.1a-d, each its own AD-1 dispatch. 4.1a implemented and verified
+  # 2026-09-05 (spec-4-1a-default-permissions-baseline.md, status in-review).
+  # 4.1b (section-key rename + matrix-driven resolveSectionAccess) implemented
+  # and verified 2026-09-05 (spec-4-1b-section-key-rename.md, status
+  # in-review).
+  # UPDATE 2026-09-06: all four increments have landed. 4.1c (the
+  # @RequireSectionAccess gate + dual-gate composition) and 4.1d (deletion of
+  # canEditS1, S1_SECTION, isAllowedForTarget, RequireFeatureForTarget and the
+  # guard's targetScoped branch) are in backend b311589 and ef03c88. Specs:
+  # spec-4-1c-require-section-access-gate.md, spec-4-1d-gate-cleanup.md, plus
+  # spec-4-1d-baseline-2026-09-06.md (the Stage-2 substitute gate artefact for
+  # a pure-deletion story). PO rulings recorded in each spec's Ask First table.
+  # VERIFIED 2026-09-06: full test/user-management re-run against the frozen
+  # pre-deletion baseline (spec-4-1d-baseline-2026-09-06.md) reproduces it
+  # exactly — 23 suites passed, 254 passed, 18 todo, no assertion edited. The
+  # deletions removed only dead code. (A 24th suite, s42a-op-root-operator-set,
+  # was 4.2a's Stage-2 red at the time of that run; it went green with 4.2a
+  # Stage 3 the same day. test/user-management now: 24 suites, 275 passed,
+  # 18 todo — the 254 baseline plus that suite's 21.)
+  4-1-generalise-section-access-authorisation: done
+  # 4-2 DONE 2026-09-07. Recorded decision (Winston + Dmytro 2026-09-03/04):
+  # seeded root = boss through ordinary mechanisms (hr-admin FR + tree-root
+  # position + §2.4 first holder); a delegated HR Admin gets the full feature
+  # set and zero data access. Delivered as four AD-1 increments:
+  # - 4.2a root-operator permission set — canonical hr-admin grant 3→6 keys +
+  #   db:bootstrap:access-control npm alias. Backend 4ce8bd8.
+  # - 4.2b tree-root seed — verified root needs no Relationship row to sit at
+  #   the top of the reports-to chain; locked against regression. Backend
+  #   8ec35fd.
+  # - 4.2c §2.4 full-profile-access overlay — new FullProfileGrant table,
+  #   resolver integration proven at the unit level (no live section shows an
+  #   observable effect yet), root seeded as first holder at bootstrap. Backend
+  #   37a3aa3.
+  # - 4.2d db:dev:seed-org dev spine — two-level reporting spine over the fake
+  #   population, throws under NODE_ENV=production; scripts/dev-grant-root.ts
+  #   retired. Backend de508c9.
+  # Scope item 1 (delete the FR OR-override) closed by verification — 4.1c
+  # retired the umac-10 pinning test, 4.1d deleted canEditS1 whole. Scope item 4
+  # (upward-walk resolver) was already shipped 2026-08-30 (backend f36d1b2); no
+  # code change.
+  # RESIDUAL, not blocking: the ACM-9 seeded-two-level measurement question and
+  # the PO/architect decisions in story-4-2 "Open for decision" remain open.
+  4-2-default-org-relationship-seed: done
   epic-4-retrospective: optional
+
+  # DEPT-EPIC — Department-manager access control (deferred backlog). Holding
+  # epic opened 2026-09-07 (PO) for work that is NOT in the consolidation epic
+  # above: the department-manager reporting-line relation (§2.1 relation 2) and
+  # its dependents. Full detail: planning-artifacts/platform/dept-epic.md.
+  dept-epic: backlog
+  dept-1-department-manager-fact-and-direct-derivation: backlog
+  dept-2-profile-timeline-dual-gate-and-dec-um-001: backlog
+  dept-3-full-department-reporting-line-audience: backlog
+  dept-4-timeline-dual-gate-test-fallout: backlog
+
+  # TRACKING GAPS (recorded 2026-09-06, still open 2026-09-07) — NOT resolved
+  # here, they are planning decisions rather than status edits:
+  # - planning-artifacts/platform/epics.md carries a numbering collision: two
+  #   distinct "Epic 4" headings — "Access Control Authorization Consolidation"
+  #   (done, tracked above) and "Project-Line Audience" (4 stories, untracked).
+  # - Epics 5 (Department Walk and People Partner HR-Line, 3 stories), 6
+  #   (Section Matrix Beyond the Kernel Slice, 6 stories) and 7 (Shared-Link
+  #   Section Policy and Full-Profile Overlay, 3 stories) are defined in
+  #   epics.md and appear nowhere in this file.
+  # This file therefore understates remaining platform scope by ~16 stories.
+  # - CI gate promotion (spec-ci-promote-backend-unit-frontend-e2e-gates.md,
+  #   status done; backend-unit + frontend-e2e now merge-blocking) landed as
+  #   ad-hoc work with no story row here; its follow-ups are in platform
+  #   deferred-work.md.

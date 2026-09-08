@@ -102,7 +102,10 @@ scenario doc, and test move from `'S1'` / `'S10'` / `'S11'` to `profile:identity
 / `profile:leave` / `profile:projects`. The `S<n>` labels are requirements-matrix
 row ids only, cited for traceability, never passed. Full map in §5.
 
-**D5 — Seeded root = the boss; delegated HR Admin = features only.** The ACM-0
+**D5 — Seeded root = the boss; delegated HR Admin = features only.**
+*(Amended — read §9.2 with this. The tree position is structural, not seeded, and
+"the boss" never meant profile-section write: root holds operator features plus
+§2.4 full-profile **read**, and nothing else.)* The ACM-0
 seeded root identity holds, by seed: the `hr-admin` functional role carrying the
 full **operator permission set** (population import, org-relationship writes,
 departure recording — not just today's `list`/`create`/`deactivate`; section
@@ -262,3 +265,87 @@ Approved by Dmytro Novyk (Product Owner / Architect) in the 2026-09-03/04
 architecture session with Winston. Scope: planning artifacts and
 `docs/architecture/` companion docs only, as bounded in the status note. All
 behavioural change runs Platform Epic 4 under AD-1.
+
+## 9. Amendments
+
+### 9.1 — `profile:timeline:write` — deviation stands this PR; target design fixed; closure tracked as DEPT-2 (PO, 2026-09-07)
+
+**Context.** PO ruling AF-2 (2026-09-06, `spec-4-2a-root-operator-permission-set.md`)
+seeded `profile:timeline:write` into the canonical `hr-admin` bootstrap set as a
+stopgap, because the deferred `profile:timeline` `canAccessSection` support had
+not shipped. Its gate (`canEditTimeline`, `career-timeline-access-facade.adapter.ts`
+— `isAllowed` alone, `void targetUserId`) has no audience half, so the grant gives
+every `hr-admin` holder org-wide career-timeline write with no relationship to the
+target. `s42a-op-06` records that as a known deviation from the NORMATIVE
+invariant (`docs/architecture/access-control.md:19`; `project-requirements.md`
+§2.2 "HR Admin grants no data access", §2.3 "a feature operates within the
+holder's access role").
+
+**What ships in this PR.** The deviation **stands, unchanged** — `hr-admin`
+carries six canonical keys including `profile:timeline:write`, and manual
+timeline write is gated by `isAllowed` alone. Reversing it needs the
+department-manager audience (relation 2 of the §2.1 reporting line), which does
+not exist in the resolver or the data today — a multi-increment Epic 5
+dependency. It is a **known, accepted, time-boxed deviation** for the
+consolidation increment, exactly as `s42a-op-06` frames it. No code in this PR
+changes for it.
+
+**Target design (decided, not yet built).** Career timeline is a profile section
+(§3.2 **S9**: Self `R`; Reporting line / Project line / PP `RW`; Colleague `—`).
+When the closure increment lands:
+
+- `profile:timeline:write` **leaves the canonical `hr-admin` bootstrap set**
+  (6 keys → 5). The operator keys `org:relationships:write` and
+  `employee:departure:record` stay — they touch no section matrix.
+- The feature half moves to **`DEFAULT_PERMISSIONS`** (D2), like
+  `profile:identity:write`. `canEditTimeline` becomes a **dual gate**:
+  `isAllowed(viewer, 'profile:timeline:write')` **AND**
+  `canAccessSection(viewer, 'profile:timeline', target) === 'write'`.
+- The audience half is narrowed per **DEC-UM-001**: the effective manual-write
+  holders are the target's **direct department manager** and **assigned People
+  Partner** only. Project-derived DM/PM and transitive managers are read-only
+  for manual mutation. This confirms the "Confirm" points in
+  `fr-permission-matrix-draft-2026-09-02.md` §6 item 4 and §5.
+- `canReadTimeline` moves off its interim `resolveAudiences` rule to
+  `canAccessSection(..., 'profile:timeline', ...) !== 'none'`.
+
+**Closure carrier.** **DEPT-2** in
+`_bmad-output/planning-artifacts/platform/dept-epic.md` (DEPT-EPIC), which
+depends on **DEPT-1** — the `Department.managerUserId` fact +
+`isDirectDeptManager` derivation. Knock-on when DEPT-2 lands: `profile:timeline`
+is the first matrix row with a reachable `'none'` cell (Colleague), so it makes
+the §2.4 full-profile overlay observable for the first time — expected, covered
+by `acm11-fpo-03`. DEPT-2's Stage-1 reconciles the downstream records
+(`spec-4-2a`, `s42a-op-06`, `fr-permission-matrix-draft`, `deferred-work`,
+`epic-4-context`, `project-requirements.md` §2.3).
+
+### 9.2 — D5 tree-root position correction (PO, 2026-09-07)
+
+D5 as written says the seeded root holds "the top position in the `reports-to`
+relationship tree ... all provisioned at deploy time by
+`bootstrap-access-control.ts`." Story 4.2b (`spec-4-2b-tree-root-seed.md`,
+backend `8ec35fd`) found that half cannot be written as stated: root's tree-root
+position is **structural** — the permanent absence of any `Relationship` row for
+root — not a seeded edge. The bootstrap seeds the operator FR set (4.2a) and the
+§2.4 full-profile-access first-holder grant (4.2c); it writes **no** tree edge.
+Root resolves `reporting` write over a subordinate only once an ordinary
+`assign-manager` call terminates a chain at root (proven transitively by
+`s42b-tr-02`), never over the imported production population by default
+(`s42a-op-04`, `s42b-tr-03`). D5's intent — root operational with no dev script —
+holds; the mechanism for the tree half is verify-and-lock, not seed.
+
+**And D5's headline — "Seeded root = the boss" — must not be read as section
+write.** `root` appears nowhere in `docs/project-requirements.md`; the PRD
+(`prd-user-management` FR-1) defines it only as *the first `User`, created by the
+ACM-0 seed, with the `hr-admin` FR policy attached*. §2.2 is NORMATIVE: "HR Admin
+grants no data access. It is a feature-administration role … Reading data is
+governed by 2.1 and 2.4, never by holding a functional role." So root's reach is:
+**operator features** (import, org-relationship writes, departure recording — the
+4.2a set) plus **§2.4 full-profile read**. It holds **no** profile-section write
+by virtue of being root. On a clean production install root resolves `colleague`
+to every employee and `PATCH /users/:id` is `403` on every target — the specified
+behaviour, not a gap. Story 4.2's Recorded Decision table, its user story, and
+its "canEdit: true for root on every card" acceptance criterion all claimed
+otherwise and are corrected in place (2026-09-08); `epics.md`'s Epic 4 restatement
+carries the same correction. Tracked as GAP-3 in
+`_bmad-output/planning-artifacts/platform/dept-epic.md`.
