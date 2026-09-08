@@ -33,6 +33,24 @@ jobs:
       - run: npm ci
       - run: npm run test:clickup
 
+  # Also blocking. The trace-gate threshold contract is a workspace suite with
+  # no service dependencies, so it gates from the start. It guards the
+  # customization the quality gate resolves its thresholds from:
+  # .agents/skills/bmad-testarch-trace/customize.toml carries a
+  # "DO NOT EDIT -- overwritten on every update" header, so a skill update that
+  # drops the threshold defaults would otherwise surface only at gate time, on
+  # the run that needed the gate.
+  trace-gate:
+    name: Workspace · trace gate thresholds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run test:trace-gate
+
   # ── Service suites ───────────────────────────────────────────────────────
   # Two of the three now gate. `backend-unit` (19/19) and `frontend-e2e`
   # (124/124, no flaky cases) were observed green on a run at the currently
