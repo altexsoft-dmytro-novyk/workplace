@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="uk" data-visualize-standalone>
+<html lang="en" data-visualize-standalone>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1025,32 +1025,32 @@ html>body{padding:0}</style>
 </head>
 <body>
 <div id="workplace-map">
-  <h2>Workplace · карта готовності</h2>
+  <h2>Workplace · readiness map</h2>
   <div id="ci-summary" class="text-small evidence-path"></div>
-  <div id="sync-status" class="text-small" role="status">Збережений CI-знімок. Автооновлення доступне через локальну демо-адресу.</div>
-  <div class="nav nav-pills" role="tablist" aria-label="Шар карти">
-    <button class="nav-link active" id="product-tab" role="tab" aria-controls="product-panel" aria-selected="true" type="button">Продукт</button>
-    <button class="nav-link" id="tests-tab" role="tab" aria-controls="tests-panel" aria-selected="false" type="button">Тести</button>
-    <button class="nav-link" id="gaps-tab" role="tab" aria-controls="gaps-panel" aria-selected="false" type="button">Прогалини</button>
+  <div id="sync-status" class="text-small" role="status">Saved CI snapshot. Auto-refresh is available via the local demo address.</div>
+  <div class="nav nav-pills" role="tablist" aria-label="Map layer">
+    <button class="nav-link active" id="product-tab" role="tab" aria-controls="product-panel" aria-selected="true" type="button">Product</button>
+    <button class="nav-link" id="tests-tab" role="tab" aria-controls="tests-panel" aria-selected="false" type="button">Tests</button>
+    <button class="nav-link" id="gaps-tab" role="tab" aria-controls="gaps-panel" aria-selected="false" type="button">Gaps</button>
   </div>
   <section id="product-panel" role="tabpanel" aria-labelledby="product-tab">
-    <div class="viz-controls"><label class="form-label">Модуль<select class="form-select" id="module-select"></select></label></div>
+    <div class="viz-controls"><label class="form-label">Module<select class="form-select" id="module-select"></select></label></div>
     <div id="module-summary" aria-live="polite"></div>
     <div class="card" id="product-detail" aria-live="polite"></div>
-    <div id="product-grid" class="feature-grid" aria-label="Вимоги продукту"></div>
-    <div class="text-small">◐ У процесі · ○ Специфіковано · ! Немає story · — Відкладено. Кольори — статуси планування, не результат перевірки коду.</div>
+    <div id="product-grid" class="feature-grid" aria-label="Product requirements"></div>
+    <div class="text-small">◐ In progress · ○ Specified · ! No story · — Deferred. Colors are planning statuses, not a code-verification result.</div>
   </section>
   <section id="tests-panel" role="tabpanel" aria-labelledby="tests-tab" hidden>
-    <div class="viz-controls"><label class="form-label">Область<select class="form-select" id="area-select"></select></label></div>
+    <div class="viz-controls"><label class="form-label">Area<select class="form-select" id="area-select"></select></label></div>
     <div id="test-summary" aria-live="polite"></div>
     <div class="card" id="test-detail" aria-live="polite"></div>
-    <div id="test-grid" class="feature-grid" aria-label="Критерії з тестового звіту"></div>
-    <div class="text-small">✓ Спостерігали pass · ◐ Частковий доказ · × Fail · ○ Лише skipped/todo · ? Без запису запуску. Результати належать SHA, зазначеному вгорі.</div>
+    <div id="test-grid" class="feature-grid" aria-label="Criteria from the test report"></div>
+    <div class="text-small">✓ Observed pass · ◐ Partial evidence · × Fail · ○ Skipped/todo only · ? No run recorded. Results belong to the SHA noted above.</div>
   </section>
   <section id="gaps-panel" role="tabpanel" aria-labelledby="gaps-tab" hidden>
     <div id="gap-summary"></div>
-    <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Область</th><th>Fail</th><th>Частково</th><th>Skipped</th><th>Без доказу</th></tr></thead><tbody id="gap-rows"></tbody></table></div>
-    <div class="text-small">Цей список перераховується з CI. Семантичний аудит вимог, негативних сценаріїв та інтеграцій залишається окремим від результату запуску.</div>
+    <div class="table-responsive"><table class="table table-sm"><thead><tr><th>Area</th><th>Fail</th><th>Partial</th><th>Skipped</th><th>No evidence</th></tr></thead><tbody id="gap-rows"></tbody></table></div>
+    <div class="text-small">This list is recomputed from CI. A semantic audit of requirements, negative scenarios, and integrations remains separate from the run result.</div>
   </section>
 </div>
 <style>
@@ -1071,21 +1071,21 @@ html>body{padding:0}</style>
  const root=document.getElementById('workplace-map');
  const data=JSON.parse(document.getElementById('workplace-data').textContent);
  const q=id=>root.querySelector('#'+id);
- const labels={'in-progress':'◐ У процесі',implemented:'✓ Реалізовано за планом',specified:'○ Специфіковано',uncovered:'! Немає story',deferred:'— Відкладено',observed_pass:'✓ Спостерігали pass',observed_partial:'◐ Частковий доказ',failing:'× Fail',skipped_only:'○ Лише skipped/todo',not_observed:'? Без запису запуску'};
+ const labels={'in-progress':'◐ In progress',implemented:'✓ Implemented as planned',specified:'○ Specified',uncovered:'! No story',deferred:'— Deferred',observed_pass:'✓ Observed pass',observed_partial:'◐ Partial evidence',failing:'× Fail',skipped_only:'○ Skipped/todo only',not_observed:'? No run recorded'};
  const add=(parent,tag,text,cls)=>{const el=document.createElement(tag);el.textContent=text;if(cls)el.className=cls;parent.append(el);return el};
  const options=(id,values)=>values.forEach(([value,title])=>{let o=add(q(id),'option',title);o.value=value});
- options('module-select',[['all','Увесь продукт'],...data.modules.map(m=>[m.id,m.name])]);
- options('area-select',[['all','Усі області'],...data.areas.map(a=>[a,a])]);
- function detailProduct(r){let el=q('product-detail');el.replaceChildren();add(el,'h3',r.id+' · '+r.summary);add(el,'div','Планування: '+labels[r.coverage_status]);add(el,'div','Реалізація: '+r.implementation);add(el,'div','Відповідність усій вимозі: не підтверджена');add(el,'div','Канонічні stories: '+r.stories.length+' · Прямі PM-FR посилання у знімку критеріїв: '+r.linked.length);add(el,'div','Наявність зв’язку не доводить повноту тестів.','text-small');if(r.gates?.length)add(el,'div','Залежності: '+r.gates.join(', '));add(el,'div','Джерело вимоги: '+r.normative_refs.join(', '));if(r.linked.length)add(el,'div',r.linked.join(', '),'text-small evidence-path');}
- function detailTest(r){let el=q('test-detail');el.replaceChildren();add(el,'h3',r.id+' · '+r.title);add(el,'div',labels[r.live_observation]+' · '+r.priority);add(el,'div','Покриття написаними тестами: '+r.coverage+' · реалізація за матрицею: '+r.impl_state);add(el,'div','Критерій: '+(r.doc||'Немає у матриці'),'text-small evidence-path');const files=[...new Set(r.tests.map(t=>t.file))];files.forEach(f=>add(el,'div',f,'text-small evidence-path'));add(el,'div','CI: '+r.live_cases.length+' записів · SHA '+data.ci.sourceSha.slice(0,12),'text-small');r.live_cases.filter(c=>c.status!=='pass').forEach(c=>add(el,'div',c.status+' · '+c.title,'text-small evidence-path'));}
- function grid(el,rows,state,detail){el.replaceChildren();rows.forEach((r,i)=>{let b=add(el,'button',r.id,'btn viz-tile');b.type='button';b.dataset.state=r[state];b.setAttribute('aria-label',r.id+': '+(r.summary||r.title)+'. '+labels[r[state]]);b.setAttribute('aria-pressed',String(i===0));b.onclick=()=>{el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));detail(r)};});if(rows.length)detail(rows[0]);}
- function product(){const selected=q('module-select').value;const rows=data.product.filter(r=>selected==='all'||r.module===selected);const counts={};rows.forEach(r=>counts[r.coverage_status]=(counts[r.coverage_status]||0)+1);q('module-summary').textContent=rows.length+' вимог · '+Object.entries(counts).map(([s,n])=>n+' '+(labels[s]||s)).join(' · ')+'. Статуси — з планування; реалізаційні нотатки — огляд '+data.inventory.implementationNotesAt+'.';grid(q('product-grid'),rows,'coverage_status',detailProduct);}
- function tests(){const selected=q('area-select').value;const rows=data.criteria.filter(r=>selected==='all'||r.area===selected);const n=rows.filter(r=>r.coverage==='FULL').length;const passed=rows.filter(r=>r.live_observation==='observed_pass').length;q('test-summary').textContent=rows.length+' критеріїв · '+n+' FULL за написаними тестами · '+passed+' з observed pass. Матриця: '+data.inventory.generatedAt+'.';grid(q('test-grid'),rows,'live_observation',detailTest);}
- const ci=data.ci;add(q('ci-summary'),'div','CI · '+ci.observedAt+' · '+(ci.headBranch||'гілка не вказана')+' · SHA '+ci.sourceSha.slice(0,12));
- add(q('ci-summary'),'div',ci.counts.pass+' pass · '+ci.counts.fail+' fail · '+ci.counts.skipped+' skipped — прив’язані до критеріїв. Ще '+ci.untraceable+' без requirement ID; '+ci.unmatched+' unmatched.');
- if(ci.url && /^https:\/\/github\.com\//.test(ci.url)){const a=add(q('ci-summary'),'a','Відкрити запуск CI');a.href=ci.url;a.target='_blank';a.rel='noopener noreferrer';}
- if(!ci.complete)add(q('ci-summary'),'div','Неповні докази: відсутні звіти '+JSON.stringify(ci.missingReports),'text-destructive');
- q('gap-summary').textContent='Прогалини виконання за поточним CI-знімком. '+ci.inventoryGaps+' критеріїв поза інвентарем матриці.';
+ options('module-select',[['all','Entire product'],...data.modules.map(m=>[m.id,m.name])]);
+ options('area-select',[['all','All areas'],...data.areas.map(a=>[a,a])]);
+ function detailProduct(r){let el=q('product-detail');el.replaceChildren();if(!r)return;add(el,'h3',r.id+' · '+r.summary);add(el,'div','Planning: '+labels[r.coverage_status]);add(el,'div','Implementation: '+r.implementation);add(el,'div','Full-requirement compliance: unconfirmed');add(el,'div','Canonical stories: '+r.stories.length+' · Direct PM-FR references in the criteria snapshot: '+r.linked.length);add(el,'div','A link existing does not prove test completeness.','text-small');if(r.gates?.length)add(el,'div','Dependencies: '+r.gates.join(', '));add(el,'div','Requirement source: '+r.normative_refs.join(', '));if(r.linked.length)add(el,'div',r.linked.join(', '),'text-small evidence-path');}
+ function detailTest(r){let el=q('test-detail');el.replaceChildren();if(!r)return;add(el,'h3',r.id+' · '+r.title);add(el,'div',labels[r.live_observation]+' · '+r.priority);add(el,'div','Coverage by written tests: '+r.coverage+' · implementation per matrix: '+r.impl_state);add(el,'div','Criterion: '+(r.doc||'Not in matrix'),'text-small evidence-path');const files=[...new Set(r.tests.map(t=>t.file))];files.forEach(f=>add(el,'div',f,'text-small evidence-path'));add(el,'div','CI: '+r.live_cases.length+' records · SHA '+data.ci.sourceSha.slice(0,12),'text-small');r.live_cases.filter(c=>c.status!=='pass').forEach(c=>add(el,'div',c.status+' · '+c.title,'text-small evidence-path'));}
+ function grid(el,rows,state,detail){el.replaceChildren();rows.forEach((r,i)=>{let b=add(el,'button',r.id,'btn viz-tile');b.type='button';b.dataset.state=r[state];b.setAttribute('aria-label',r.id+': '+(r.summary||r.title)+'. '+labels[r[state]]);b.setAttribute('aria-pressed',String(i===0));b.onclick=()=>{el.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));detail(r)};});detail(rows[0]||null);}
+ function product(){const selected=q('module-select').value;const rows=data.product.filter(r=>selected==='all'||r.module===selected);const counts={};rows.forEach(r=>counts[r.coverage_status]=(counts[r.coverage_status]||0)+1);q('module-summary').textContent=rows.length+' requirements · '+Object.entries(counts).map(([s,n])=>n+' '+(labels[s]||s)).join(' · ')+'. Statuses are from planning; implementation notes reviewed '+data.inventory.implementationNotesAt+'.';grid(q('product-grid'),rows,'coverage_status',detailProduct);}
+ function tests(){const selected=q('area-select').value;const rows=data.criteria.filter(r=>selected==='all'||r.area===selected);const n=rows.filter(r=>r.coverage==='FULL').length;const passed=rows.filter(r=>r.live_observation==='observed_pass').length;q('test-summary').textContent=rows.length+' criteria · '+n+' FULL by written tests · '+passed+' with observed pass. Matrix: '+data.inventory.generatedAt+'.';grid(q('test-grid'),rows,'live_observation',detailTest);}
+ const ci=data.ci;add(q('ci-summary'),'div','CI · '+ci.observedAt+' · '+(ci.headBranch||'branch not specified')+' · SHA '+ci.sourceSha.slice(0,12));
+ add(q('ci-summary'),'div',ci.counts.pass+' pass · '+ci.counts.fail+' fail · '+ci.counts.skipped+' skipped — tied to criteria. Plus '+ci.untraceable+' without a requirement ID; '+ci.unmatched+' unmatched.');
+ if(ci.url && /^https:\/\/github\.com\//.test(ci.url)){const a=add(q('ci-summary'),'a','Open CI run');a.href=ci.url;a.target='_blank';a.rel='noopener noreferrer';}
+ if(!ci.complete)add(q('ci-summary'),'div','Incomplete evidence: missing reports '+JSON.stringify(ci.missingReports),'text-destructive');
+ q('gap-summary').textContent='Execution gaps for the current CI snapshot. '+ci.inventoryGaps+' criteria outside the matrix inventory.';
  data.areas.forEach(area=>{const rows=data.criteria.filter(r=>r.area===area);const tr=add(q('gap-rows'),'tr','');add(tr,'td',area);['failing','observed_partial','skipped_only','not_observed'].forEach(s=>add(tr,'td',String(rows.filter(r=>r.live_observation===s).length)));});
  q('module-select').onchange=product;q('area-select').onchange=tests;product();tests();
 })();

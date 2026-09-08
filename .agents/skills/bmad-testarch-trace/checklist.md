@@ -329,7 +329,7 @@ Knowledge fragments referenced:
 **P0 Criteria Evaluation:**
 
 - [ ] Gate thresholds resolved from the workflow customization; an empty or unparsable threshold recorded as FAIL with a `critical` blocker, never as a relaxed criterion and never as an aborted step
-- [ ] Coverage compared on the unrounded `covered`/`total` counts, not on rounded percentages — 199 of 200 requirements must not satisfy a 100% threshold
+- [ ] Coverage compared on the unrounded `covered`/`total` counts, not on rounded percentages — 199 of 200 requirements must not satisfy a 100% threshold (applies to P0, P1, and overall coverage alike)
 - [ ] P0 test pass rate evaluated (must be 100%)
 - [ ] P0 oracle-item coverage evaluated (must be >= `{workflow.p0_coverage_required}`%)
 - [ ] Security issues count evaluated (must be 0)

@@ -20,8 +20,11 @@ env:
   SERVICE_NODE_VERSION: '24'
 
 jobs:
+  # Also blocking. This only runs the readiness-map scripts' unit tests (scripts/*.cjs) — the
+  # actual map for this run is built later, inside the `live-verification` job, from that run's
+  # real evidence.
   readiness-map:
-    name: Workspace · readiness map
+    name: Workspace · readiness map (unit tests)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
@@ -421,12 +424,18 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      # The readiness map is a demo report built from evidence already uploaded above. A bug in
+      # this tooling must never fail the job that actually collected the test evidence, so every
+      # step below is continue-on-error — same convention as the informational jobs elsewhere in
+      # this file.
       - name: Install readiness map dependencies
         if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        continue-on-error: true
         run: npm ci
 
       - name: Build readiness map from this run
         if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        continue-on-error: true
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -439,6 +448,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() && steps.evidence.outcome == 'success' }}
+        continue-on-error: true
         with:
           name: workplace-readiness-map
           path: reports/readiness-map/index.html

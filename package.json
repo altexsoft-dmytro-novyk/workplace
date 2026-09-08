@@ -8,7 +8,7 @@
     "demo:readiness:sync": "node scripts/sync-readiness-map.cjs",
     "demo:readiness:build": "node scripts/build-readiness-map.cjs",
     "test:readiness": "node --test test/readiness-map.test.cjs test/readiness-sync.test.cjs",
-    "test:trace-gate": "node --test test/trace-gate-thresholds.test.cjs",
+    "test:trace-gate": "node --test test/trace-gate-thresholds.test.cjs test/trace-gate-decision-logic.test.cjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync:clickup": "node scripts/sync-clickup.cjs",
     "create:clickup": "node scripts/create-clickup-task.cjs",

@@ -15,7 +15,7 @@ const github = async args => (await runFile('gh', args, {
   cwd: ROOT, timeout: 30000, maxBuffer: 8*1024*1024,
 })).stdout;
 
-async function syncOnce({repo, branch, output, state, gh = github}) {
+async function syncOnce({repo, branch, output, state, gh = github, root = ROOT}) {
   let temp;
   try {
     const runs = JSON.parse(await gh(['run','list','--repo',repo,'--workflow','tests.yml',
@@ -32,7 +32,7 @@ async function syncOnce({repo, branch, output, state, gh = github}) {
       await gh(['run','download',String(run.databaseId),'--repo',repo,
         '--name','live-verification-results','--dir',temp]);
       const evidence = JSON.parse(fs.readFileSync(path.join(temp,'live-verification-results.json'),'utf8'));
-      const result = build(evidence, run);
+      const result = build(evidence, run, root);
       writeMap(output,result);
       state.revision = crypto.createHash('sha256').update(result.html).digest('hex');
       state.artifactKey = key;
@@ -46,7 +46,7 @@ async function syncOnce({repo, branch, output, state, gh = github}) {
   } catch (error) {
     // Never publish an old report as if it came from the new run.
     // Error text is intentionally bounded; no credentials or environment are sent to the browser.
-    state.error = `Не вдалося оновити CI-звіт (${error.code || error.message.slice(0,180)}). Показано останні отримані дані.`;
+    state.error = `Failed to refresh the CI report (${error.code || error.message.slice(0,180)}). Showing the last data received.`;
     return false;
   } finally {
     state.checkedAt = new Date().toISOString();
@@ -67,19 +67,26 @@ function createServer({output,state}) {
     if (url.pathname !== '/') {res.writeHead(404);res.end();return;}
     if (!fs.existsSync(output)) {
       res.writeHead(503,{'Content-Type':'text/html; charset=utf-8'});
-      res.end('<meta http-equiv="refresh" content="15"><p>Очікуємо CI-звіт. Сторінка повторить спробу автоматично.</p>');return;
+      res.end('<meta http-equiv="refresh" content="15"><p>Waiting for the CI report. The page will retry automatically.</p>');return;
     }
-    let html = fs.readFileSync(output,'utf8').replace('connect-src blob: data:',"connect-src 'self' blob: data:");
+    let html = fs.readFileSync(output,'utf8');
+    // A plain string replace no-ops silently if the template's CSP text is ever reformatted, which
+    // would leave the page unable to fetch('/status') and break live-reload with no visible cause
+    // beyond a browser-console CSP violation. Warn server-side so that's diagnosable.
+    const cspSource='connect-src blob: data:', cspTarget="connect-src 'self' blob: data:";
+    if (!html.includes(cspSource)) console.error(`readiness map template CSP text not found ("${cspSource}"); live-reload polling will be blocked by CSP`);
+    html = html.replace(cspSource, cspTarget);
     const revision = JSON.stringify(state.revision || '');
     const client = `<script>
     (()=>{const revision=${revision};let busy=false;
     async function check(){if(busy)return;busy=true;const el=document.getElementById('sync-status');
       try{const response=await fetch('/status',{cache:'no-store'});if(!response.ok)throw Error('status');const s=await response.json();
       if(s.revision && s.revision!==revision){location.reload();return;}
-      if(el){el.textContent=s.error||('Автооновлення CI · перевірено '+(s.checkedAt||'очікуємо')+' · гілка '+s.branch);el.classList.toggle('text-destructive',Boolean(s.error));}}
-      catch{if(el){el.textContent='Автооновлення недоступне: локальний процес зупинено або втрачено зв’язок. Показано останній знімок.';el.classList.add('text-destructive');}}
+      if(el){el.textContent=s.error||('Auto-refresh CI · checked '+(s.checkedAt||'pending')+' · branch '+s.branch);el.classList.toggle('text-destructive',Boolean(s.error));}}
+      catch{if(el){el.textContent='Auto-refresh unavailable: the local process stopped or the connection was lost. Showing the last snapshot.';el.classList.add('text-destructive');}}
       finally{busy=false;}}
     check();setInterval(check,5000);})();</script>`;
+    if (!html.includes('</body>')) console.error('readiness map output has no </body> tag; live-reload client script was not injected');
     html = html.replace('</body>',client+'</body>');
     res.setHeader('Content-Type','text/html; charset=utf-8');res.end(html);
   });

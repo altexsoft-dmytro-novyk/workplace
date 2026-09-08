@@ -26,9 +26,9 @@ function build(evidence, run = {}, root = ROOT) {
       return fs.existsSync(p) && new RegExp(`\\b${r.id}\\b`).test(fs.readFileSync(p, 'utf8'));
     }).map(c => c.id);
     return { ...r, module: module?.id || 'other', linked,
-      implementation: old?.implementation || 'Потрібен огляд реалізації' };
+      implementation: old?.implementation || 'Implementation review needed' };
   });
-  if (seed.product.some(r => r.module === 'other')) seed.modules.push({id:'other',name:'Інші вимоги',note:'Потрібен огляд реалізації'});
+  if (seed.product.some(r => r.module === 'other')) seed.modules.push({id:'other',name:'Other requirements',note:'Implementation review needed'});
   const data = overlayEvidence(seed, evidence, run);
   data.inventory = { matrix: matrixPath, generatedAt: matrix.generated_at,
     implementationNotesAt: '2026-09-07', canonicalBaseline: canonical.baseline_date };
@@ -56,6 +56,6 @@ if (require.main === module) {
       url: process.env.RUN_URL || '', headBranch: process.env.RUN_BRANCH || '' });
     writeMap(path.resolve(output), result);
     console.log(JSON.stringify({output, sourceSha:result.data.ci.sourceSha, ...result.data.ci.counts}));
-  } catch (error) { console.error(error.message); process.exitCode = 1; }
+  } catch (error) { console.error(error.stack || error.message); process.exitCode = 1; }
 }
 module.exports = { build, writeMap };
