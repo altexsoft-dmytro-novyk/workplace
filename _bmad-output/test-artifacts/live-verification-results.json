@@ -1,33 +1,33 @@
 {
   "schema_version": "0.1.0",
-  "source_sha": "c305f2c0377de740b351d469185b3d81c63cd26e",
-  "observed_at": "2026-09-08T11:04:10Z",
-  "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34218105827",
+  "source_sha": "6f22d85bf222fc0d216d1dd85c472202362e94da",
+  "observed_at": "2026-09-08T11:56:06Z",
+  "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34222307987 (re-resolved locally against the corrected matrix index)",
   "results": [
     {
       "id": "repo-LIVE-001",
-      "requirement_id": "S41C-SAG-05",
+      "requirement_id": "S4.1c-SAG-05",
       "title": "AccessControlFacadeAdapter.hasSectionAccess (PLAT-E4-S4.1c) › s41c-sag-05 · an unmapped section fails closed › Test 1 · \"read\" over an unmapped section → false, isAllowed untouched",
       "status": "pass",
       "evidence": "backend-unit: services/backend/src/user-management/infrastructure/__tests__/access-control-facade.adapter.spec.ts"
     },
     {
       "id": "repo-LIVE-002",
-      "requirement_id": "S41C-SAG-05",
+      "requirement_id": "S4.1c-SAG-05",
       "title": "AccessControlFacadeAdapter.hasSectionAccess (PLAT-E4-S4.1c) › s41c-sag-05 · an unmapped section fails closed › Test 2 · \"write\" over an unmapped section → false, isAllowed untouched",
       "status": "pass",
       "evidence": "backend-unit: services/backend/src/user-management/infrastructure/__tests__/access-control-facade.adapter.spec.ts"
     },
     {
       "id": "repo-LIVE-003",
-      "requirement_id": "S41C-SAG-05",
+      "requirement_id": "S4.1c-SAG-05",
       "title": "AccessControlFacadeAdapter.hasSectionAccess (PLAT-E4-S4.1c) › s41c-sag-05 · an unmapped section fails closed › Test 3 · the retired \"S1\" identifier is just an unmatched string → false",
       "status": "pass",
       "evidence": "backend-unit: services/backend/src/user-management/infrastructure/__tests__/access-control-facade.adapter.spec.ts"
     },
     {
       "id": "repo-LIVE-004",
-      "requirement_id": "S41C-SAG-05",
+      "requirement_id": "S4.1c-SAG-05",
       "title": "SectionAccessGuard (PLAT-E4-S4.1c) › s41c-sag-05 Test 4 · a false from the port becomes ForbiddenException",
       "status": "pass",
       "evidence": "backend-unit: services/backend/src/user-management/infrastructure/__tests__/access-control-facade.adapter.spec.ts"
@@ -391,294 +391,294 @@
     },
     {
       "id": "repo-LIVE-056",
-      "requirement_id": "S42D-DS-01",
+      "requirement_id": "S4.2d-DS-01",
       "title": "s42d-ds-01 · db:dev:seed-org throws under NODE_ENV=production, before any database connection › s42d-ds-01 Test 1 · the guard fires and exits nonzero, naming NODE_ENV=production as the refusal reason",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-057",
-      "requirement_id": "S42D-DS-01",
+      "requirement_id": "S4.2d-DS-01",
       "title": "s42d-ds-01 · db:dev:seed-org throws under NODE_ENV=production, before any database connection › s42d-ds-01 Test 2 · no database connection is attempted — the scoped row-count snapshot is byte-identical",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-058",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › shared precondition · root wires betaMember → root via the real POST /users/:id/relationships route, before any spine run",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-059",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › shared precondition · no relationship row exists for any of this run's imported users before the first spine run",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-060",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 1 · the initial spine over the imported population › s42d-ds-02 Test 1 · one edge per department lead, straight to root",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-061",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 1 · the initial spine over the imported population › s42d-ds-02 Test 2 · every other active member of Alpha and Gamma reports to their own department's lead",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-062",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 1 · the initial spine over the imported population › s42d-ds-02 Test 3 · root never becomes a subject",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-063",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 1 · the initial spine over the imported population › s42d-ds-02 Test 4 · the single-member department (Solo) collapses lead and member into exactly one edge",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-064",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 1 · the initial spine over the imported population › s42d-ds-02 Test 5 · exact row-count accounting for this run's namespace",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-065",
-      "requirement_id": "S42D-DS-03",
+      "requirement_id": "S4.2d-DS-03",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 1 · the initial spine over the imported population › s42d-ds-03 Test 3 · the administrator-written betaMember → root edge survives the first spine run untouched",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-066",
-      "requirement_id": "S42D-DS-02",
+      "requirement_id": "S4.2d-DS-02",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › AF-4 fixture · gammaLead is deactivated by a direct, minimal Prisma write (fixture setup only) › gammaLead.isActive is confirmed false by a direct read before the rerun",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-067",
-      "requirement_id": "S42D-DS-03",
+      "requirement_id": "S4.2d-DS-03",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 2 · a rerun with no new population import › s42d-ds-03 Test 1 · zero new rows — every row is byte-identical to the pre-rerun snapshot",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-068",
-      "requirement_id": "S42D-DS-03",
+      "requirement_id": "S4.2d-DS-03",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 2 · a rerun with no new population import › s42d-ds-03 Test 4 · Gamma is not auto-repaired (AF-4) — gammaMember still reports to the now-inactive former lead",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-069",
-      "requirement_id": "S42D-DS-03",
+      "requirement_id": "S4.2d-DS-03",
       "title": "s42d-ds-02 & s42d-ds-03 · the two-level spine over a real, multi-department population, and its idempotence › run 3 · a rerun after a new population-import batch › s42d-ds-03 Test 2 · new edges exist only for the new department and the newly-added Alpha member",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-070",
-      "requirement_id": "S42D-DS-04",
+      "requirement_id": "S4.2d-DS-04",
       "title": "s42d-ds-04 · a department with zero active members is skipped, and an empty population seeds nothing › Part A · a department with zero active members › s42d-ds-04 Test 1 · the all-inactive department is skipped without error",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-071",
-      "requirement_id": "S42D-DS-04",
+      "requirement_id": "S4.2d-DS-04",
       "title": "s42d-ds-04 · a department with zero active members is skipped, and an empty population seeds nothing › Part B · a fresh database with no population imported at all › s42d-ds-04 Test 2 · an empty database (this run's own namespace) seeds nothing and reports success, not error",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-072",
-      "requirement_id": "S42D-DS-05",
+      "requirement_id": "S4.2d-DS-05",
       "title": "s42d-ds-05 · dev-grant-root.ts is retired in full, and create:root is repointed › s42d-ds-05 Test 1 · scripts/dev-grant-root.ts no longer exists on disk",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-073",
-      "requirement_id": "S42D-DS-05",
+      "requirement_id": "S4.2d-DS-05",
       "title": "s42d-ds-05 · dev-grant-root.ts is retired in full, and create:root is repointed › s42d-ds-05 Test 2 · npm run db:dev:grant-root fails with npm's own Missing script text, not this project's own diagnostic",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-074",
-      "requirement_id": "S42D-DS-05",
+      "requirement_id": "S4.2d-DS-05",
       "title": "s42d-ds-05 · dev-grant-root.ts is retired in full, and create:root is repointed › s42d-ds-05 Test 3 · create:root's value is the exact repointed chain",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-075",
-      "requirement_id": "S42D-DS-05",
+      "requirement_id": "S4.2d-DS-05",
       "title": "s42d-ds-05 · dev-grant-root.ts is retired in full, and create:root is repointed › s42d-ds-05 Test 4 · create:root actually runs the repointed chain end to end › exits 0, provisions root through the canonical six-key chain, and leaves relationships at 0 for this run",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-076",
-      "requirement_id": "S42D-DS-05",
+      "requirement_id": "S4.2d-DS-05",
       "title": "s42d-ds-05 · dev-grant-root.ts is retired in full, and create:root is repointed › s42d-ds-05 Test 5 · a database carrying the pre-existing orphaned user-management:edit key is left untouched (AF-2) › the orphaned Permissions row and its grant survive a bootstrap rerun, byte-identical",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42d-ds-dev-seed-spine.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-077",
-      "requirement_id": "S42A-OP-03",
+      "requirement_id": "S4.2a-OP-03",
       "title": "shared precondition · the production path alone provisioned this database › s42a-op-03 precondition 1 · db:deploy → db:seed → db:bootstrap:access-control all exit 0 and root is readable back",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-078",
-      "requirement_id": "S42A-OP-03",
+      "requirement_id": "S4.2a-OP-03",
       "title": "shared precondition · the production path alone provisioned this database › s42a-op-03 precondition 2 · db:dev:grant-root was NOT run — Permissions is the canonical six, not the stopgap superset, and UserPolicies holds exactly one row",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-079",
-      "requirement_id": "S42A-OP-04",
+      "requirement_id": "S4.2a-OP-04",
       "title": "shared precondition · the production path alone provisioned this database › s42a-op-04 precondition · no Relationship row between root and T in either direction",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-080",
-      "requirement_id": "S42A-OP-05",
+      "requirement_id": "S4.2a-OP-05",
       "title": "shared precondition · the production path alone provisioned this database › s42a-op-05 precondition · no Relationship row between Nadia and T in either direction",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-081",
-      "requirement_id": "S42A-OP-05",
+      "requirement_id": "S4.2a-OP-05",
       "title": "shared precondition · the production path alone provisioned this database › … and an administrator has delegated the canonical hr-admin role to Nadia › s42a-op-05 precondition · Nadia is attached to the bootstrap’s own canonical policy and UserPolicies holds exactly 2 rows",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-082",
-      "requirement_id": "S42A-OP-03",
+      "requirement_id": "S4.2a-OP-03",
       "title": "s42a-op-03 · root provisioned only by the production bootstrap can wire relationships and record departures › s42a-op-03 Test 1 · root imports the population — `user-management:create` reaches its gate → 200, two employees created",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-083",
-      "requirement_id": "S42A-OP-03",
+      "requirement_id": "S4.2a-OP-03",
       "title": "s42a-op-03 · root provisioned only by the production bootstrap can wire relationships and record departures › s42a-op-03 Test 2 · root wires a manager edge (`org:relationships:write`) → 201, the direct edge persisted",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-084",
-      "requirement_id": "S42A-OP-03",
+      "requirement_id": "S4.2a-OP-03",
       "title": "s42a-op-03 · root provisioned only by the production bootstrap can wire relationships and record departures › s42a-op-03 Test 3 · root records a departure (`employee:departure:record`) → 201, the departure persisted for S",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-085",
-      "requirement_id": "S42A-OP-03",
+      "requirement_id": "S4.2a-OP-03",
       "title": "s42a-op-03 · root provisioned only by the production bootstrap can wire relationships and record departures › s42a-op-03 Test 4 · the department-manager route carries the same key → 200, M persisted as the department’s manager",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-086",
-      "requirement_id": "S42A-OP-04",
+      "requirement_id": "S4.2a-OP-04",
       "title": "s42a-op-04 · the grown operator set gives root no data reach it did not already have › s42a-op-04 Test 1 · root cannot edit an unrelated identity card → 403, T’s row unchanged",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-087",
-      "requirement_id": "S42A-OP-04",
+      "requirement_id": "S4.2a-OP-04",
       "title": "s42a-op-04 · the grown operator set gives root no data reach it did not already have › s42a-op-04 Test 2 · root’s canEdit hint agrees with the gate → 200, canEdit false, data unchanged",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-088",
-      "requirement_id": "S42A-OP-04",
+      "requirement_id": "S4.2a-OP-04",
       "title": "s42a-op-04 · the grown operator set gives root no data reach it did not already have › s42a-op-04 Test 3 · the added feature keys are absent from every section decision",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-089",
-      "requirement_id": "S42A-OP-05",
+      "requirement_id": "S4.2a-OP-05",
       "title": "s42a-op-05 · a delegated HR Admin gets zero data access from the six-key role › s42a-op-05 Test 1 · the delegated holder lists users → 200",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-090",
-      "requirement_id": "S42A-OP-05",
+      "requirement_id": "S4.2a-OP-05",
       "title": "s42a-op-05 · a delegated HR Admin gets zero data access from the six-key role › s42a-op-05 Test 2 · she reads T’s card but cannot edit it → 200, canEdit false",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-091",
-      "requirement_id": "S42A-OP-05",
+      "requirement_id": "S4.2a-OP-05",
       "title": "s42a-op-05 · a delegated HR Admin gets zero data access from the six-key role › s42a-op-05 Test 3 · her write is refused and the row is untouched → 403",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-092",
-      "requirement_id": "S42A-OP-05",
+      "requirement_id": "S4.2a-OP-05",
       "title": "s42a-op-05 · a delegated HR Admin gets zero data access from the six-key role › s42a-op-05 Test 4 · the feature half of the role does open — relationship write and departure record both succeed",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-093",
-      "requirement_id": "S42A-OP-05",
+      "requirement_id": "S4.2a-OP-05",
       "title": "s42a-op-05 · a delegated HR Admin gets zero data access from the six-key role › s42a-op-05 Test 5 · no other section opens for her — every routed section-write surface is 403 and the remaining sections have no route at all",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-094",
-      "requirement_id": "S42A-OP-06",
+      "requirement_id": "S4.2a-OP-06",
       "title": "s42a-op-06 · a delegated HR Admin can write any employee’s career timeline — a known accepted deviation › s42a-op-06 Test 1 · the delegated holder writes a stranger’s career timeline → 201, persisted against T",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-095",
-      "requirement_id": "S42A-OP-06",
+      "requirement_id": "S4.2a-OP-06",
       "title": "s42a-op-06 · a delegated HR Admin can write any employee’s career timeline — a known accepted deviation › s42a-op-06 Test 2 · she deletes an event on the same stranger’s timeline → 204, soft-deleted and absent from a follow-up read",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-096",
-      "requirement_id": "S42A-OP-06",
+      "requirement_id": "S4.2a-OP-06",
       "title": "s42a-op-06 · a delegated HR Admin can write any employee’s career timeline — a known accepted deviation › s42a-op-06 Test 3 · the same viewer is still refused T’s identity card → 403 and canEdit false",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-097",
-      "requirement_id": "S42A-OP-06",
+      "requirement_id": "S4.2a-OP-06",
       "title": "s42a-op-06 · a delegated HR Admin can write any employee’s career timeline — a known accepted deviation › s42a-op-06 Test 4 · the deviation is bounded to the timeline — every other routed profile-section write stays 403",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42a-op-root-operator-set.e2e-spec.ts"
@@ -1630,119 +1630,119 @@
     },
     {
       "id": "repo-LIVE-233",
-      "requirement_id": "S42B-TR-02",
+      "requirement_id": "S4.2b-TR-02",
       "title": "s42b-tr-02 · root resolves reporting write two levels down a real chain that terminates at it › s42b-tr-02 Test 1 · root imports the population — E1 and E2 exist",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-234",
-      "requirement_id": "S42B-TR-02",
+      "requirement_id": "S4.2b-TR-02",
       "title": "s42b-tr-02 · root resolves reporting write two levels down a real chain that terminates at it › s42b-tr-02 Test 2 · root wires E1 to itself (E1 → root, the first hop)",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-235",
-      "requirement_id": "S42B-TR-02",
+      "requirement_id": "S4.2b-TR-02",
       "title": "s42b-tr-02 · root resolves reporting write two levels down a real chain that terminates at it › s42b-tr-02 Test 3 · root wires E2 to E1 (E2 → E1, the second hop — the chain now terminates at root)",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-236",
-      "requirement_id": "S42B-TR-02",
+      "requirement_id": "S4.2b-TR-02",
       "title": "s42b-tr-02 · root resolves reporting write two levels down a real chain that terminates at it › s42b-tr-02 Test 4 · root edits E2, two levels down, through the unmodified upward-walk CTE",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-237",
-      "requirement_id": "S42B-TR-02",
+      "requirement_id": "S4.2b-TR-02",
       "title": "s42b-tr-02 · root resolves reporting write two levels down a real chain that terminates at it › s42b-tr-02 Test 5 · a follow-up read agrees: canEdit true, two levels down",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-238",
-      "requirement_id": "S42B-TR-03",
+      "requirement_id": "S4.2b-TR-03",
       "title": "s42b-tr-03 · root's own upward walk is empty, over the real endpoint › precondition · no Relationship row where userId = root, immediately before the request",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-239",
-      "requirement_id": "S42B-TR-03",
+      "requirement_id": "S4.2b-TR-03",
       "title": "s42b-tr-03 · root's own upward walk is empty, over the real endpoint › s42b-tr-03 Test · root reads its own relationship list → 200, data: []",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-240",
-      "requirement_id": "S42B-TR-04",
+      "requirement_id": "S4.2b-TR-04",
       "title": "s42b-tr-04 · nothing about reaching into root moved — an unrelated employee and a colleague inside root’s own chain › precondition 1 · U was imported by a real POST /users/import call and has no Relationship row anywhere",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-241",
-      "requirement_id": "S42B-TR-04",
+      "requirement_id": "S4.2b-TR-04",
       "title": "s42b-tr-04 · nothing about reaching into root moved — an unrelated employee and a colleague inside root’s own chain › precondition 2 · E1's only edge points AT root, never received FROM root",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-242",
-      "requirement_id": "S42B-TR-04",
+      "requirement_id": "S4.2b-TR-04",
       "title": "s42b-tr-04 · nothing about reaching into root moved — an unrelated employee and a colleague inside root’s own chain › s42b-tr-04 Test 1 · E1, whose own edge points at root, still cannot edit root's card → 403",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-243",
-      "requirement_id": "S42B-TR-04",
+      "requirement_id": "S4.2b-TR-04",
       "title": "s42b-tr-04 · nothing about reaching into root moved — an unrelated employee and a colleague inside root’s own chain › s42b-tr-04 Test 2 · E1 reads root's card → 200, canEdit false",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-244",
-      "requirement_id": "S42B-TR-04",
+      "requirement_id": "S4.2b-TR-04",
       "title": "s42b-tr-04 · nothing about reaching into root moved — an unrelated employee and a colleague inside root’s own chain › s42b-tr-04 Test 3 · U, with no edge anywhere, cannot edit root's card either → 403",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-245",
-      "requirement_id": "S42B-TR-04",
+      "requirement_id": "S4.2b-TR-04",
       "title": "s42b-tr-04 · nothing about reaching into root moved — an unrelated employee and a colleague inside root’s own chain › s42b-tr-04 Test 4 · U reads root's card → 200, canEdit false",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-246",
-      "requirement_id": "S42D-DS-06",
+      "requirement_id": "S4.2d-DS-06",
       "title": "shared precondition · provision and seed the population (Test 1 — setup, not itself an assertion of the audience claim) › s42d-ds-06 Test 1 · db:import:population and db:dev:seed-org both exit 0, matching s42d-ds-02's own shape",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42d-ds-root-resolves-over-seeded-population.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-247",
-      "requirement_id": "S42D-DS-06",
+      "requirement_id": "S4.2d-DS-06",
       "title": "s42d-ds-06 · root resolves reporting write over every seeded member of a real, multi-department spine › s42d-ds-06 Test 2 · root reads a department lead (one hop) → 200, canEdit true",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42d-ds-root-resolves-over-seeded-population.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-248",
-      "requirement_id": "S42D-DS-06",
+      "requirement_id": "S4.2d-DS-06",
       "title": "s42d-ds-06 · root resolves reporting write over every seeded member of a real, multi-department spine › s42d-ds-06 Test 3 · root reads an ordinary member (two hops, through their lead) → 200, canEdit true",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42d-ds-root-resolves-over-seeded-population.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-249",
-      "requirement_id": "S42D-DS-06",
+      "requirement_id": "S4.2d-DS-06",
       "title": "s42d-ds-06 · root resolves reporting write over every seeded member of a real, multi-department spine › s42d-ds-06 Test 4 · root reads the sole member of a single-person department → 200, canEdit true",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s42d-ds-root-resolves-over-seeded-population.e2e-spec.ts"
@@ -1924,154 +1924,154 @@
     },
     {
       "id": "repo-LIVE-275",
-      "requirement_id": "S41C-SAG-01",
+      "requirement_id": "S4.1c-SAG-01",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-01 · read gate — any non-empty audience allows, `none` denies › s41c-sag-01 Test 1 · self (§3.2 S1 Self = R) → 200, exactly the 12-key card, canEdit false",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-276",
-      "requirement_id": "S41C-SAG-01",
+      "requirement_id": "S4.1c-SAG-01",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-01 · read gate — any non-empty audience allows, `none` denies › s41c-sag-01 Test 2 · colleague, no Relationship edge (§3.2 S1 Colleague = R) → 200, same field set",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-277",
-      "requirement_id": "S41C-SAG-01",
+      "requirement_id": "S4.1c-SAG-01",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-01 · read gate — any non-empty audience allows, `none` denies › s41c-sag-01 Test 3 · reporting-line manager (§3.2 S1 Reporting line = RW) → 200 — `write` satisfies a `read` requirement",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-278",
-      "requirement_id": "S41C-SAG-01",
+      "requirement_id": "S4.1c-SAG-01",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-01 · read gate — any non-empty audience allows, `none` denies › s41c-sag-01 Test 4 · assigned People Partner (§3.2 S1 PP = RW) → 200, same field set",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-279",
-      "requirement_id": "S41C-SAG-01",
+      "requirement_id": "S4.1c-SAG-01",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-01 · read gate — any non-empty audience allows, `none` denies › s41c-sag-01 Test 5 · deactivated target → 403, leak-free body",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-280",
-      "requirement_id": "S41C-SAG-01",
+      "requirement_id": "S4.1c-SAG-01",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-01 · read gate — any non-empty audience allows, `none` denies › s41c-sag-01 Test 6 · unknown target id → 403, leak-free body",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-281",
-      "requirement_id": "S41C-SAG-02",
+      "requirement_id": "S4.1c-SAG-02",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-02 · the `profile:identity:write` baseline alone is not enough — a `read` audience is denied › s41c-sag-02 Test 1 · colleague holding the baseline PATCHes → 403, row unchanged",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-282",
-      "requirement_id": "S41C-SAG-02",
+      "requirement_id": "S4.1c-SAG-02",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-02 · the `profile:identity:write` baseline alone is not enough — a `read` audience is denied › s41c-sag-02 Test 2 · the same viewer’s canEdit hint is false",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-283",
-      "requirement_id": "S41C-SAG-02",
+      "requirement_id": "S4.1c-SAG-02",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-02 · the `profile:identity:write` baseline alone is not enough — a `read` audience is denied › s41c-sag-02 Test 3 · self PATCHes a non-photo S1 field → 403, own row unchanged",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-284",
-      "requirement_id": "S41C-SAG-02",
+      "requirement_id": "S4.1c-SAG-02",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-02 · the `profile:identity:write` baseline alone is not enough — a `read` audience is denied › s41c-sag-02 Test 4 · self’s own canEdit hint is false",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-285",
-      "requirement_id": "S41C-SAG-03",
+      "requirement_id": "S4.1c-SAG-03",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-03 · a `write` audience plus the `profile:identity:write` baseline allows the edit › s41c-sag-03 Test 1 · reporting-line manager → 200, the change persists",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-286",
-      "requirement_id": "S41C-SAG-03",
+      "requirement_id": "S4.1c-SAG-03",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-03 · a `write` audience plus the `profile:identity:write` baseline allows the edit › s41c-sag-03 Test 2 · observing the change, and the hint → 200, exactly the 12-key card, canEdit true",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-287",
-      "requirement_id": "S41C-SAG-03",
+      "requirement_id": "S4.1c-SAG-03",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-03 · a `write` audience plus the `profile:identity:write` baseline allows the edit › s41c-sag-03 Test 3 · assigned People Partner → 200, the change persists",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-288",
-      "requirement_id": "S41C-SAG-03",
+      "requirement_id": "S4.1c-SAG-03",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-03 · a `write` audience plus the `profile:identity:write` baseline allows the edit › s41c-sag-03 Test 4 · transitive reporting line (T → M → V) → 200",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-289",
-      "requirement_id": "S41C-SAG-04",
+      "requirement_id": "S4.1c-SAG-04",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-04 · a live functional-role grant never widens a resolved audience › s41c-sag-04 Test 1 · grant holder, colleague audience, active target → 403, row unchanged [RED until Stage 3]",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-290",
-      "requirement_id": "S41C-SAG-04",
+      "requirement_id": "S4.1c-SAG-04",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-04 · a live functional-role grant never widens a resolved audience › s41c-sag-04 Test 2 · the same grant holder’s canEdit hint is false [RED until Stage 3]",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-291",
-      "requirement_id": "S41C-SAG-04",
+      "requirement_id": "S4.1c-SAG-04",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-04 · a live functional-role grant never widens a resolved audience › s41c-sag-04 Test 3 · grant holder edits their OWN card → 403 [RED until Stage 3]",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-292",
-      "requirement_id": "S41C-SAG-04",
+      "requirement_id": "S4.1c-SAG-04",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-04 · a live functional-role grant never widens a resolved audience › s41c-sag-04 Test 4 · a grant of the dual gate’s OWN feature key still does not widen → 403",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-293",
-      "requirement_id": "S41C-SAG-04",
+      "requirement_id": "S4.1c-SAG-04",
       "title": "PLAT-E4-S4.1c Stage 2 — section-access gate on GET / PATCH /users/:id (e2e) › s41c-sag-04 · a live functional-role grant never widens a resolved audience › s41c-sag-04 Test 5 · a `none` target stays closed to a grant holder → 403 (carried over from umac-10 Test 3)",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/user-management/access-control-adoption/s41c-section-access-gate.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-294",
-      "requirement_id": "S42A-OP-01",
+      "requirement_id": "S4.2a-OP-01",
       "title": "s42a-op-01 · the production bootstrap entrypoint is wired as an npm script › s42a-op-01 Test 1 · the alias is declared and invokes scripts/bootstrap-access-control.ts",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42a-op-bootstrap-canonical-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-295",
-      "requirement_id": "S42A-OP-01",
+      "requirement_id": "S4.2a-OP-01",
       "title": "s42a-op-01 · the production bootstrap entrypoint is wired as an npm script › s42a-op-01 Test 2 · the alias resolves and runs the wrapper, leaving the canonical state",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42a-op-bootstrap-canonical-set.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-296",
-      "requirement_id": "S42A-OP-02",
+      "requirement_id": "S4.2a-OP-02",
       "title": "s42a-op-02 · the upgrade rerun restores three rows and preserves everything else › s42a-op-02 Test · rerun over a three-key database → 6 permissions, 6 grants, every pre-existing value byte-identical",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42a-op-bootstrap-canonical-set.e2e-spec.ts"
@@ -3051,7 +3051,7 @@
     },
     {
       "id": "repo-LIVE-436",
-      "requirement_id": "S42B-TR-01",
+      "requirement_id": "S4.2b-TR-01",
       "title": "s42b-tr-01 · a fresh production bootstrap writes zero Relationship rows › s42b-tr-01 Test · db:seed && db:bootstrap:access-control leaves \"relationships\" empty, whole table",
       "status": "pass",
       "evidence": "backend-e2e: services/backend/test/access-control/s42b-tr-bootstrap-no-relationship-row.e2e-spec.ts"
@@ -3102,8 +3102,8 @@
       "id": "repo-LIVE-443",
       "requirement_id": "ACM-0",
       "title": "ACM-0 — deploy-time root User prerequisite (migrated PostgreSQL) › converges concurrent seeds after a users_workEmail_key insert race",
-      "status": "fail",
-      "evidence": "backend-e2e: services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts — Error: thrown: \"Exceeded timeout of 5000 ms for a test."
+      "status": "pass",
+      "evidence": "backend-e2e: services/backend/test/access-control/acm0-root-user-prerequisite.e2e-spec.ts"
     },
     {
       "id": "repo-LIVE-444",
@@ -3555,867 +3555,888 @@
     },
     {
       "id": "repo-LIVE-508",
+      "requirement_id": "S4.1a-DP-01",
+      "title": "PLAT-E4-S4.1a Stage 2 — DEFAULT_PERMISSIONS baseline (PostgreSQL) › allows an active user with zero policy attachments through the DEFAULT_PERMISSIONS baseline",
+      "status": "pass",
+      "evidence": "backend-e2e: services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-509",
+      "requirement_id": "S4.1a-DP-02",
+      "title": "PLAT-E4-S4.1a Stage 2 — DEFAULT_PERMISSIONS baseline (PostgreSQL) › denies a deactivated user the baseline key despite no per-individual carve-out",
+      "status": "pass",
+      "evidence": "backend-e2e: services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-510",
+      "requirement_id": "S4.1a-DP-03",
+      "title": "PLAT-E4-S4.1a Stage 2 — DEFAULT_PERMISSIONS baseline (PostgreSQL) › denies a nonexistent user id the baseline key as an ordinary false result",
+      "status": "pass",
+      "evidence": "backend-e2e: services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts"
+    },
+    {
+      "id": "repo-LIVE-511",
       "requirement_id": "FE-SHELL-01",
       "title": "App › fe-shell-01 · renders the app shell and sends anonymous visitors to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/app.spec.ts"
     },
     {
-      "id": "repo-LIVE-509",
+      "id": "repo-LIVE-512",
       "requirement_id": "FE-SHELL-01",
       "title": "App › fe-shell-01 · routes unknown paths back through the guard to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/app.spec.ts"
     },
     {
-      "id": "repo-LIVE-510",
+      "id": "repo-LIVE-513",
       "requirement_id": "FE-AUTH-01",
       "title": "Magic-link authentication › fe-auth-01 · unauthenticated visit to a protected route lands on /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-511",
+      "id": "repo-LIVE-514",
       "requirement_id": "FE-AUTH-02",
       "title": "Magic-link authentication › fe-auth-02 · an expired stored token is treated as logged out",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-512",
+      "id": "repo-LIVE-515",
       "requirement_id": "FE-AUTH-03",
       "title": "Magic-link authentication › fe-auth-03 · requesting a link shows the enumeration-safe confirmation",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-513",
+      "id": "repo-LIVE-516",
       "requirement_id": "FE-AUTH-03",
       "title": "Magic-link authentication › fe-auth-03 · a failed link request shows a generic error and re-enables the form",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-514",
+      "id": "repo-LIVE-517",
       "requirement_id": "FE-AUTH-03",
       "title": "Magic-link authentication › fe-auth-03 · an invalid email is blocked client-side with no request sent",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-515",
+      "id": "repo-LIVE-518",
       "requirement_id": "FE-AUTH-04",
       "title": "Magic-link authentication › fe-auth-04 · consuming a valid token establishes a session, lands on Home, and consumes once",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-516",
+      "id": "repo-LIVE-519",
       "requirement_id": "FE-AUTH-04",
       "title": "Magic-link authentication › fe-auth-04 · consuming an invalid token shows one generic error and stores no session",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-517",
+      "id": "repo-LIVE-520",
       "requirement_id": "FE-AUTH-04",
       "title": "Magic-link authentication › fe-auth-04 · visiting the consume route with no token shows the generic error",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-518",
+      "id": "repo-LIVE-521",
       "requirement_id": "FE-AUTH-02",
       "title": "Magic-link authentication › fe-auth-02 · a stored, unexpired session survives a reload",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-519",
+      "id": "repo-LIVE-522",
       "requirement_id": "FE-AUTH-02",
       "title": "Magic-link authentication › fe-auth-02 · an authenticated user visiting /login is redirected to Home",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-520",
+      "id": "repo-LIVE-523",
       "requirement_id": "FE-AUTH-05",
       "title": "Magic-link authentication › fe-auth-05 · signing out clears the session and returns to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/auth/auth.spec.ts"
     },
     {
-      "id": "repo-LIVE-521",
+      "id": "repo-LIVE-524",
       "requirement_id": "FE-DEP-01",
       "title": "Departure workflow › fe-dep-01 · records a clean departure: Idempotency-Key header + body, 201 → status view + ?departure=",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-522",
+      "id": "repo-LIVE-525",
       "requirement_id": "FE-DEP-02",
       "title": "Departure workflow › fe-dep-02 · a past effective date is blocked client-side — no request is sent",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-523",
+      "id": "repo-LIVE-526",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · a 409 blocked-by-responsibilities response renders the blocker panel with names",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-524",
+      "id": "repo-LIVE-527",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · re-parent to the default clears blockers and \"record now\" resubmits with a NEW key",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-525",
+      "id": "repo-LIVE-528",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · re-parenting that leaves external blockers shows the timetracker message and does not resubmit",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-526",
+      "id": "repo-LIVE-529",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · a stale blocker version reloads the blockers (a fresh record POST) and shows a note",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-527",
+      "id": "repo-LIVE-530",
       "requirement_id": "FE-DEP-06",
       "title": "Departure workflow › fe-dep-06 · a 409 departure_already_scheduled shows the \"already has a scheduled departure\" copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-528",
+      "id": "repo-LIVE-531",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · a retry_wait status shows attempts + last error and \"Retry now\" calls the retry route",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-529",
+      "id": "repo-LIVE-532",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · an applied status renders the terminal panel with no retry action",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-530",
+      "id": "repo-LIVE-533",
       "requirement_id": "FE-DEP-07",
       "title": "Departure workflow › fe-dep-07 · a write 403 collapses the form to a permission notice",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-531",
+      "id": "repo-LIVE-534",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · an unknown ?departure= id shows \"no longer available\" with a path back to the form",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-532",
+      "id": "repo-LIVE-535",
       "requirement_id": "FE-DEP-02",
       "title": "Departure workflow › fe-dep-02 · the confirm dialog Cancel sends no request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-533",
+      "id": "repo-LIVE-536",
       "requirement_id": "FE-DEP-04",
       "title": "Departure workflow › fe-dep-04 · a 409 idempotency_key_payload_mismatch shows the reload copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-534",
+      "id": "repo-LIVE-537",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · the blocker panel \"choose someone else\" path re-parents to a picked target",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-535",
+      "id": "repo-LIVE-538",
       "requirement_id": "FE-DEP-03",
       "title": "Departure workflow › fe-dep-03 · a re-parent 404 shows the unknown-target copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-536",
+      "id": "repo-LIVE-539",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · a status GET 403 shows the forbidden panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-537",
+      "id": "repo-LIVE-540",
       "requirement_id": "FE-DEP-05",
       "title": "Departure workflow › fe-dep-05 · retry returning departure_not_retryable shows the note and refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-538",
+      "id": "repo-LIVE-541",
       "requirement_id": "FE-DEP-04",
       "title": "Departure workflow › fe-dep-04 · an unchanged resubmit reuses the idempotency key; a changed value mints a new one",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-539",
+      "id": "repo-LIVE-542",
       "requirement_id": "FE-DEP-07",
       "title": "Departure workflow › fe-dep-07 · a 401 anywhere triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-540",
+      "id": "repo-LIVE-543",
       "requirement_id": "FE-DEP-08",
       "title": "Departure workflow › fe-dep-08 · the profile screen links through to the Departure screen",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/departure/departure.spec.ts"
     },
     {
-      "id": "repo-LIVE-541",
+      "id": "repo-LIVE-544",
       "requirement_id": "FE-EMP-01",
       "title": "Employee directory › fe-emp-01 · default load renders the roster, cells, footer count and a clean request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-542",
+      "id": "repo-LIVE-545",
       "requirement_id": "FE-EMP-02",
       "title": "Employee directory › fe-emp-02 · the sidebar \"All Employees\" link opens the directory",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-543",
+      "id": "repo-LIVE-546",
       "requirement_id": "FE-EMP-03",
       "title": "Employee directory › fe-emp-03 · applying a filter reflects it in the URL, refetches, and resets the page",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-544",
+      "id": "repo-LIVE-547",
       "requirement_id": "FE-EMP-03",
       "title": "Employee directory › fe-emp-03 · forwards a valid birth-month filter but drops an out-of-range one",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-545",
+      "id": "repo-LIVE-548",
       "requirement_id": "FE-EMP-04",
       "title": "Employee directory › fe-emp-04 · paginates through the results and disables the pager at the bounds",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-546",
+      "id": "repo-LIVE-549",
       "requirement_id": "FE-EMP-03",
       "title": "Employee directory › fe-emp-03 · filtering by dismissed status shows dismissed rows with a badge",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-547",
+      "id": "repo-LIVE-550",
       "requirement_id": "FE-EMP-05",
       "title": "Employee directory › fe-emp-05 · an empty result renders the empty state with a clear-filters action",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-548",
+      "id": "repo-LIVE-551",
       "requirement_id": "FE-EMP-06",
       "title": "Employee directory › fe-emp-06 · a 400 keeps the filter bar and shows the bad-request panel without a retry",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-549",
+      "id": "repo-LIVE-552",
       "requirement_id": "FE-EMP-06",
       "title": "Employee directory › fe-emp-06 · a 403 renders the no-access panel with no retry loop",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-550",
+      "id": "repo-LIVE-553",
       "requirement_id": "FE-EMP-06",
       "title": "Employee directory › fe-emp-06 · a 500 renders the error panel and the retry button refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-551",
+      "id": "repo-LIVE-554",
       "requirement_id": "FE-EMP-07",
       "title": "Employee directory › fe-emp-07 · a 401 on the list request triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/employees/employees.spec.ts"
     },
     {
-      "id": "repo-LIVE-552",
+      "id": "repo-LIVE-555",
       "requirement_id": "FE-IMP-01",
       "title": "Population import › fe-imp-01 · a picked CSV is POSTed as multipart with a single \"file\" part and the 200 summary renders",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-553",
+      "id": "repo-LIVE-556",
       "requirement_id": "FE-IMP-02",
       "title": "Population import › fe-imp-02 · a 200 with skipped rows shows the errors table (with a copy action) and is not an error panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-554",
+      "id": "repo-LIVE-557",
       "requirement_id": "FE-IMP-01",
       "title": "Population import › fe-imp-01 · a clean 200 shows the \"everything imported\" copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-555",
+      "id": "repo-LIVE-558",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · a 400 shows the backend message verbatim, no summary, and the picker stays usable",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-556",
+      "id": "repo-LIVE-559",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · the fix-and-re-upload loop: picking a corrected file clears the 400 and resubmits to a 200",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-557",
+      "id": "repo-LIVE-560",
       "requirement_id": "FE-IMP-03",
       "title": "Population import › fe-imp-03 · picking a second, different file replaces the shown selection",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-558",
+      "id": "repo-LIVE-561",
       "requirement_id": "FE-IMP-03",
       "title": "Population import › fe-imp-03 · a non-.csv name shows the soft hint but still allows submitting",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-559",
+      "id": "repo-LIVE-562",
       "requirement_id": "FE-IMP-03",
       "title": "Population import › fe-imp-03 · an empty file is blocked before any request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-560",
+      "id": "repo-LIVE-563",
       "requirement_id": "FE-IMP-04",
       "title": "Population import › fe-imp-04 · the confirm dialog: Cancel sends nothing, Confirm proceeds",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-561",
+      "id": "repo-LIVE-564",
       "requirement_id": "FE-IMP-06",
       "title": "Population import › fe-imp-06 · a 403 shows the permission notice and disables the upload control",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-562",
+      "id": "repo-LIVE-565",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · a 500 shows the generic server error and re-enables the picker",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-563",
+      "id": "repo-LIVE-566",
       "requirement_id": "FE-IMP-05",
       "title": "Population import › fe-imp-05 · a 200 with a malformed body is treated as a server error, not a result",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-564",
+      "id": "repo-LIVE-567",
       "requirement_id": "FE-IMP-07",
       "title": "Population import › fe-imp-07 · a 401 triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-565",
+      "id": "repo-LIVE-568",
       "requirement_id": "FE-IMP-08",
       "title": "Population import › fe-imp-08 · the directory empty state (no filters) leads with the Import population CTA",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-566",
+      "id": "repo-LIVE-569",
       "requirement_id": "FE-IMP-08",
       "title": "Population import › fe-imp-08 · the directory toolbar Import population button routes to the import screen",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-567",
+      "id": "repo-LIVE-570",
       "requirement_id": "FE-IMP-08",
       "title": "Population import › fe-imp-08 · the directory 403 panel hides the toolbar Import population button",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-568",
+      "id": "repo-LIVE-571",
       "requirement_id": "FE-IMP-09",
       "title": "Population import › fe-imp-09 · a successful import invalidates the directory query so the next visit refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/import/import.spec.ts"
     },
     {
-      "id": "repo-LIVE-569",
+      "id": "repo-LIVE-572",
       "requirement_id": "FE-ORG-01",
       "title": "Organisational relationships › fe-org-01 · renders the journal newest-first with formatted cells and shows the authoritative current manager / PP by name",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-570",
+      "id": "repo-LIVE-573",
       "requirement_id": "FE-ORG-01",
       "title": "Organisational relationships › fe-org-01 · shows the loading state for the current value while the relationships read is in flight",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-571",
+      "id": "repo-LIVE-574",
       "requirement_id": "FE-ORG-02",
       "title": "Organisational relationships › fe-org-02 · the subject header shows the person name when the S1 card is readable",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-572",
+      "id": "repo-LIVE-575",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a journal 403 shows the explanatory panel once and the sections fall back to \"not available\"",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-573",
+      "id": "repo-LIVE-576",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a journal 404 shows a non-retryable \"not found\" panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-574",
+      "id": "repo-LIVE-577",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a malformed journal body (200, no data array) renders the error panel, not the empty state",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-575",
+      "id": "repo-LIVE-578",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · an empty journal (200, data: []) plus an empty relationships read shows the empty state and \"none assigned\" hints",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-576",
+      "id": "repo-LIVE-579",
       "requirement_id": "FE-ORG-03",
       "title": "Organisational relationships › fe-org-03 · a journal 500 renders the error panel and retry refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-577",
+      "id": "repo-LIVE-580",
       "requirement_id": "FE-ORG-04",
       "title": "Organisational relationships › fe-org-04 · assigns a manager: POST body is exactly { type, targetId } and the journal refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-578",
+      "id": "repo-LIVE-581",
       "requirement_id": "FE-ORG-04",
       "title": "Organisational relationships › fe-org-04 · the reassign picker excludes the subject and the current manager",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-579",
+      "id": "repo-LIVE-582",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a plain 409 on manager assignment shows the \"already has a manager\" copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-580",
+      "id": "repo-LIVE-583",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a 409 target_has_scheduled_departure on manager assignment shows its own copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-581",
+      "id": "repo-LIVE-584",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a non-self 400 on manager assignment shows the generic copy, not the self copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-582",
+      "id": "repo-LIVE-585",
       "requirement_id": "FE-ORG-05",
       "title": "Organisational relationships › fe-org-05 · a transport failure on manager assignment shows the network copy and does not refetch the journal",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-583",
+      "id": "repo-LIVE-586",
       "requirement_id": "FE-ORG-09",
       "title": "Organisational relationships › fe-org-09 · assigns a first People Partner (no current one): no confirm, PUT body { targetId }, journal refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-584",
+      "id": "repo-LIVE-587",
       "requirement_id": "FE-ORG-10",
       "title": "Organisational relationships › fe-org-10 · replacing an existing People Partner routes through a confirm step",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-585",
+      "id": "repo-LIVE-588",
       "requirement_id": "FE-ORG-10",
       "title": "Organisational relationships › fe-org-10 · cancelling the People Partner replace confirm sends no PUT",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-586",
+      "id": "repo-LIVE-589",
       "requirement_id": "FE-ORG-11",
       "title": "Organisational relationships › fe-org-11 · removes a People Partner: DELETE is sent and the section shows none",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-587",
+      "id": "repo-LIVE-590",
       "requirement_id": "FE-ORG-11",
       "title": "Organisational relationships › fe-org-11 · cancelling the People Partner remove confirm sends no DELETE",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-588",
+      "id": "repo-LIVE-591",
       "requirement_id": "FE-ORG-11",
       "title": "Organisational relationships › fe-org-11 · a 404 on People Partner removal explains there is nothing to remove",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-589",
+      "id": "repo-LIVE-592",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a write 403 on the manager POST disables both sections and shows the permission notice",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-590",
+      "id": "repo-LIVE-593",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a write 403 on the People Partner PUT disables both sections",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-591",
+      "id": "repo-LIVE-594",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a write 403 on the People Partner DELETE disables both sections",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-592",
+      "id": "repo-LIVE-595",
       "requirement_id": "FE-ORG-14",
       "title": "Organisational relationships › fe-org-14 · a 403 from the directory disables the person picker",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-593",
+      "id": "repo-LIVE-596",
       "requirement_id": "FE-ORG-15",
       "title": "Organisational relationships › fe-org-15 · a 401 anywhere triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-594",
+      "id": "repo-LIVE-597",
       "requirement_id": "FE-ORG-16",
       "title": "Organisational relationships › fe-org-16 · the profile screen links through to the Organisation screen and shows the name",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-595",
+      "id": "repo-LIVE-598",
       "requirement_id": "FE-ORG-06",
       "title": "Organisational relationships › fe-org-06 · reassigns a manager: DELETE (current relationshipId) then POST (new target), and both reads refetch",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-596",
+      "id": "repo-LIVE-599",
       "requirement_id": "FE-ORG-06",
       "title": "Organisational relationships › fe-org-06 · a reassignment that fails after the delete shows the recovery copy; retry re-POSTs only",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-597",
+      "id": "repo-LIVE-600",
       "requirement_id": "FE-ORG-07",
       "title": "Organisational relationships › fe-org-07 · an authoritative manager offers Remove; removing shows \"none\"",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-598",
+      "id": "repo-LIVE-601",
       "requirement_id": "FE-ORG-08",
       "title": "Organisational relationships › fe-org-08 · relationships 403 falls back to the journal-derived hint (assign only, no reassign)",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-599",
+      "id": "repo-LIVE-602",
       "requirement_id": "FE-ORG-12",
       "title": "Organisational relationships › fe-org-12 · a People Partner change and removal carry expectedCurrentTargetId",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-600",
+      "id": "repo-LIVE-603",
       "requirement_id": "FE-ORG-12",
       "title": "Organisational relationships › fe-org-12 · removing a People Partner sends the expectedCurrentTargetId query param",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-601",
+      "id": "repo-LIVE-604",
       "requirement_id": "FE-ORG-12",
       "title": "Organisational relationships › fe-org-12 · a 409 on a People Partner change shows the stale-token copy with a refresh action",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-602",
+      "id": "repo-LIVE-605",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · 404 → unknown-target copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-603",
+      "id": "repo-LIVE-606",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · 422 → inactive-target copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-604",
+      "id": "repo-LIVE-607",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · plain 409 → generic copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-605",
+      "id": "repo-LIVE-608",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · 409 target_has_scheduled_departure → its own copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-606",
+      "id": "repo-LIVE-609",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · non-self 400 → generic copy, not the self copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-607",
+      "id": "repo-LIVE-610",
       "requirement_id": "FE-ORG-13",
       "title": "Organisational relationships › People Partner assignment errors (no current PP — no confirm) › fe-org-13 · transport failure → network copy",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/organisation/organisation.spec.ts"
     },
     {
-      "id": "repo-LIVE-608",
+      "id": "repo-LIVE-611",
       "requirement_id": "FE-PROF-01",
       "title": "Employee profile › fe-prof-01 · read-only view renders the identity card, dashes for nulls and no edit affordance",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-609",
+      "id": "repo-LIVE-612",
       "requirement_id": "FE-PROF-01",
       "title": "Employee profile › fe-prof-01 · my own profile shows the photo-upload control",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-610",
+      "id": "repo-LIVE-613",
       "requirement_id": "FE-PROF-02",
       "title": "Employee profile › fe-prof-02 · an editable card edits one field and PATCHes only the changed key",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-611",
+      "id": "repo-LIVE-614",
       "requirement_id": "FE-PROF-03",
       "title": "Employee profile › fe-prof-03 · a 409 on the email edit shows a conflict error and leaves the card unchanged",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-612",
+      "id": "repo-LIVE-615",
       "requirement_id": "FE-PROF-05",
       "title": "Employee profile › fe-prof-05 · uploads a valid photo and rejects a bad type client-side",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-613",
+      "id": "repo-LIVE-616",
       "requirement_id": "FE-PROF-06",
       "title": "Employee profile › fe-prof-06 · shows the empty timeline state, then adds an event and refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-614",
+      "id": "repo-LIVE-617",
       "requirement_id": "FE-PROF-07",
       "title": "Employee profile › fe-prof-07 · deletes an event through the confirm dialog",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-615",
+      "id": "repo-LIVE-618",
       "requirement_id": "FE-PROF-07",
       "title": "Employee profile › fe-prof-07 · a failed delete keeps the row and shows an inline error",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-616",
+      "id": "repo-LIVE-619",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 404 on the card renders the unavailable panel with a link back to the directory",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-617",
+      "id": "repo-LIVE-620",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 500 on the card renders the error panel and retry refetches",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-618",
+      "id": "repo-LIVE-621",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 403 on the card also renders the unavailable panel",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-619",
+      "id": "repo-LIVE-622",
       "requirement_id": "FE-PROF-10",
       "title": "Employee profile › fe-prof-10 · the \"My profile\" account-menu item resolves to /employees/<my user id>",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-620",
+      "id": "repo-LIVE-623",
       "requirement_id": "FE-PROF-11",
       "title": "Employee profile › fe-prof-11 · a 401 anywhere on the profile triggers the global redirect to /login",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-621",
+      "id": "repo-LIVE-624",
       "requirement_id": "FE-PROF-09",
       "title": "Employee profile › fe-prof-09 · a timeline 403 is requested exactly once — no retry",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-622",
+      "id": "repo-LIVE-625",
       "requirement_id": "FE-PROF-08",
       "title": "Employee profile › fe-prof-08 · a 200 with no data body renders the error panel, never a blank screen",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-623",
+      "id": "repo-LIVE-626",
       "requirement_id": "FE-PROF-02",
       "title": "Employee profile › fe-prof-02 · editing the birth day PATCHes a numeric value",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-624",
+      "id": "repo-LIVE-627",
       "requirement_id": "FE-PROF-05",
       "title": "Employee profile › fe-prof-05 · a 6 MiB photo is rejected client-side with no request",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-625",
+      "id": "repo-LIVE-628",
       "requirement_id": "FE-PROF-05",
       "title": "Employee profile › fe-prof-05 · a 503 on the photo upload shows the storage-specific message",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-626",
+      "id": "repo-LIVE-629",
       "requirement_id": "FE-PROF-06",
       "title": "Employee profile › fe-prof-06 · invalid JSON in the add-event details blocks the POST",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-627",
+      "id": "repo-LIVE-630",
       "requirement_id": "FE-PROF-06",
       "title": "Employee profile › fe-prof-06 · valid details JSON is carried in the add-event POST body",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-628",
+      "id": "repo-LIVE-631",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · a malformed email shows a field error and sends no PATCH",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-629",
+      "id": "repo-LIVE-632",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · birth month 13 shows a range error and sends no PATCH",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-630",
+      "id": "repo-LIVE-633",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · clearing only the birth month shows the pair error and sends no PATCH",
       "status": "pass",
       "evidence": "frontend-e2e: services/frontend/e2e/flows/profile/profile.spec.ts"
     },
     {
-      "id": "repo-LIVE-631",
+      "id": "repo-LIVE-634",
       "requirement_id": "FE-PROF-04",
       "title": "Employee profile › identity-card validation blocks the request › fe-prof-04 · clearing both birthday halves is blocked with an inline message",
       "status": "pass",
@@ -4427,32 +4448,32 @@
       {
         "kind": "jest",
         "suite": "backend-unit",
-        "file": "reports/backend-unit.json"
+        "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/a37f75c5-b4ea-4193-bc15-0abf5d33e683/scratchpad/rep/report-backend-unit/backend-unit.json"
       },
       {
         "kind": "jest",
         "suite": "backend-e2e",
-        "file": "reports/backend-e2e.json"
+        "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/a37f75c5-b4ea-4193-bc15-0abf5d33e683/scratchpad/rep/report-backend-e2e/backend-e2e.json"
       },
       {
         "kind": "playwright",
         "suite": "frontend-e2e",
-        "file": "reports/frontend-e2e.json"
+        "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/a37f75c5-b4ea-4193-bc15-0abf5d33e683/scratchpad/rep/report-frontend-e2e/frontend-e2e.json"
       }
     ],
     "missing_reports": [],
-    "matrix_used": "_bmad-output/test-artifacts/tea-trace-coverage-matrix-repo-2026-09-06.json",
+    "matrix_used": "_bmad-output/test-artifacts/tea-trace-coverage-matrix-repo-2026-09-08.json",
     "oracle_ids_known": 324,
     "cases_seen": 680,
-    "cases_mapped": 631,
+    "cases_mapped": 634,
     "mapped_via": {
-      "matrix": 496,
-      "title": 135
+      "matrix": 612,
+      "title": 22
     },
     "status_counts": {
-      "pass": 572,
+      "pass": 576,
       "skipped": 18,
-      "fail": 41
+      "fail": 40
     },
     "untraceable_count": 11
   },
@@ -4470,10 +4491,10 @@
     }
   },
   "unmatched_summary": {
-    "count": 38,
+    "count": 35,
     "by_suite": {
       "backend-unit": 27,
-      "backend-e2e": 11
+      "backend-e2e": 8
     },
     "by_file": [
       {
@@ -4491,10 +4512,6 @@
       {
         "file": "services/backend/test/user-management/epic-1/list-v15.e2e-spec.ts",
         "count": 4
-      },
-      {
-        "file": "services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts",
-        "count": 3
       },
       {
         "file": "services/backend/test/user-management/access-control-adoption/s42b-tr-root-tree-position.e2e-spec.ts",
@@ -4714,24 +4731,6 @@
         "suite": "backend-e2e",
         "file": "services/backend/test/user-management/access-control-adoption/s42d-ds-root-resolves-over-seeded-population.e2e-spec.ts",
         "title": "tieUser's spine edge is placed per whichever of TieA/TieB has the lexicographically smaller department id",
-        "status": "pass"
-      },
-      {
-        "suite": "backend-e2e",
-        "file": "services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts",
-        "title": "allows an active user with zero policy attachments through the DEFAULT_PERMISSIONS baseline",
-        "status": "pass"
-      },
-      {
-        "suite": "backend-e2e",
-        "file": "services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts",
-        "title": "denies a deactivated user the baseline key despite no per-individual carve-out",
-        "status": "pass"
-      },
-      {
-        "suite": "backend-e2e",
-        "file": "services/backend/test/access-control/s41a-default-permissions-baseline.e2e-spec.ts",
-        "title": "denies a nonexistent user id the baseline key as an ordinary false result",
         "status": "pass"
       }
     ]

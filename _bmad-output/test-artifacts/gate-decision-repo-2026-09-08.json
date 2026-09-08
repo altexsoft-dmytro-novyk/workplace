@@ -1,6 +1,6 @@
 {
  "schema_version": "0.1.0",
- "snapshot_at": "2026-09-08T11:20:07.855Z",
+ "snapshot_at": "2026-09-08T11:56:42.070Z",
  "target": {
   "type": "planning_audit",
   "id": "whole-repo-all-epics",
@@ -12,7 +12,7 @@
  "allow_gate": false,
  "evaluator": "TEA Agent (bmad-testarch-trace)",
  "source_sha": {
-  "workspace": "c305f2c0377de740b351d469185b3d81c63cd26e",
+  "workspace": "6f22d85bf222fc0d216d1dd85c472202362e94da",
   "backend": "49fd0c4bd30f6d9cbe4d3e04eabf5688e41d1c24",
   "frontend": "4684eb108e95c29b87247e62e7d7443f09d8baff"
  },
@@ -23,18 +23,13 @@
   "p1_coverage_minimum": 100,
   "overall_coverage_minimum": 100,
   "p0_static_coverage_actual": 100,
-  "p0_verified_actual": 87,
+  "p0_verified_actual": 90,
   "p1_static_coverage_actual": 82,
   "p1_verified_actual": 70,
   "overall_static_coverage_actual": 89,
-  "overall_verified_actual": 78
+  "overall_verified_actual": 79
  },
  "blockers": [
-  {
-   "id": "ACM-0",
-   "severity": "high",
-   "reason": "Jest 5000 ms per-case timeout on the concurrent-seed race case, on a 2-vCPU runner. Not observed failing on the 2026-09-06 local sweep — treat as a suspected runner-speed flake until a re-run says otherwise."
-  },
   {
    "id": "MEN-DEP-01",
    "severity": "high",
@@ -158,117 +153,102 @@
   {
    "id": "UMAC-09",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-01",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-02",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-03",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-05",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-06",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-07",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-08",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "UM-PHOTO-09",
    "severity": "high",
-   "reason": "Environment fault, not a product regression: the `localstack` container came up unhealthy in this run, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage is unchanged; there is simply no fresh passing evidence. Re-run once LocalStack is healthy."
+   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
   },
   {
    "id": "ACM1-FB-02",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1-FB-04",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1-FB-05",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1-FB-06",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1-FB-07",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1R-FB-10",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1R-FB-12",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1R-FB-13",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1R-FB-21",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "ACM1R-FB-22",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: acm1r-fr-foundation.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
-  },
-  {
-   "id": "S4.1a-DP-01",
-   "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: s41a-default-permissions-baseline.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
-  },
-  {
-   "id": "S4.1a-DP-02",
-   "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: s41a-default-permissions-baseline.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
-  },
-  {
-   "id": "S4.1a-DP-03",
-   "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: s41a-default-permissions-baseline.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   },
   {
    "id": "UMAC-10",
    "severity": "medium",
-   "reason": "Oracle-mapping gap, not a coverage gap: s41c-section-access-gate.e2e-spec.ts ran green, but none of its case titles carry this id, so the evidence producer could not resolve them. Add the id to the case titles."
+   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
   }
  ],
  "coverage": {
@@ -278,17 +258,17 @@
    "pct": 89
   },
   "verified": {
-   "verified": 224,
+   "verified": 228,
    "total": 288,
-   "pct": 78
+   "pct": 79
   },
   "priority_breakdown": {
    "P0": {
     "total": 159,
     "covered": 159,
     "percentage": 100,
-    "verified": 139,
-    "verified_percentage": 87
+    "verified": 143,
+    "verified_percentage": 90
    },
    "P1": {
     "total": 105,
@@ -327,20 +307,20 @@
   "present": true,
   "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
   "freshness": "fresh",
-  "recorded_source_sha": "c305f2c0377de740b351d469185b3d81c63cd26e",
-  "current_source_sha": "c305f2c0377de740b351d469185b3d81c63cd26e",
-  "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34218105827",
-  "counted": 536,
+  "recorded_source_sha": "6f22d85bf222fc0d216d1dd85c472202362e94da",
+  "current_source_sha": "6f22d85bf222fc0d216d1dd85c472202362e94da",
+  "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34222307987 (re-resolved locally against the corrected matrix index)",
+  "counted": 576,
   "stale": 0,
   "unverifiable": 0,
-  "failed": 41,
+  "failed": 40,
   "contradicted": 15,
   "blocked": 0,
   "skipped": 18,
-  "unmatched": 21,
+  "unmatched": 35,
   "invalid": 0,
   "requirements_live_only": 0,
-  "scope_note": "CI run https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34218105827 on a workflow_dispatch of tests.yml at c305f2c. Backend unit, the complete backend e2e suite and the frontend Playwright suite all executed: 680 cases seen, 631 mapped. The e2e job's compose step exited 1 (localstack unhealthy) but is continue-on-error, so the suite still ran and reported.",
+  "scope_note": "CI run 34222307987 (push to main at 6f22d85). Re-resolved locally against the corrected matrix index; same three uploaded reports, 634 of 680 cases mapped.",
   "provenance_note": "The workspace was fast-forwarded to the exact commit the run observed and both submodules already sat at the SHAs that commit pins, so recorded_source_sha and current_source_sha are the same commit."
  },
  "change_from_previous": {
