@@ -1,0 +1,422 @@
+name: Advisory PR code review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+  workflow_call:
+    inputs:
+      repository:
+        description: Repository containing the pull request
+        required: true
+        type: string
+      base_sha:
+        description: Pull request base commit
+        required: true
+        type: string
+      head_sha:
+        description: Pull request head commit
+        required: true
+        type: string
+      pull_request_number:
+        description: Pull request number
+        required: true
+        type: number
+      checkout_path:
+        description: Workspace-relative path for the service checkout
+        required: true
+        type: string
+    secrets:
+      OPENAI_API_KEY:
+        required: true
+      SUBMODULES_TOKEN:
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: advisory-pr-review-${{ github.repository }}-${{ github.event.pull_request.number || inputs.pull_request_number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    name: Generate advisory findings
+    if: inputs.repository != '' || github.event.pull_request.user.type != 'Bot'
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    env:
+      REVIEW_REPOSITORY: ${{ inputs.repository || github.repository }}
+      BASE_SHA: ${{ inputs.base_sha || github.event.pull_request.base.sha }}
+      HEAD_SHA: ${{ inputs.head_sha || github.event.pull_request.head.sha }}
+      TARGET_PATH: ${{ inputs.checkout_path || '.' }}
+    steps:
+      - name: Initialize neutral report
+        run: |
+          mkdir -p .pr-review
+          cat > .pr-review/report.md <<'EOF'
+          ## Automated code review
+
+          Review preparation did not complete. No findings were produced.
+          EOF
+
+      - name: Validate review target
+        id: target
+        env:
+          SERVICE_REPOSITORY: ${{ inputs.repository }}
+        run: |
+          if [ -z "$SERVICE_REPOSITORY" ]; then
+            echo "valid=true" >> "$GITHUB_OUTPUT"
+          elif [ "$SERVICE_REPOSITORY" = "altexsoft-dmytro-novyk/backend" ] &&
+               [ "$TARGET_PATH" = "services/backend" ]; then
+            echo "valid=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "valid=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Unsupported reusable review target; advisory review was skipped."
+            cat > .pr-review/report.md <<'EOF'
+          ## Automated code review
+
+          The reusable caller requested an unsupported repository or checkout path. No findings were produced and no merge gate was applied.
+          EOF
+          fi
+
+      - name: Check reviewer credentials
+        id: credentials
+        if: steps.target.outputs.valid == 'true'
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          if [ -z "$OPENAI_API_KEY" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::OPENAI_API_KEY is not configured; advisory review was skipped."
+            cat > .pr-review/report.md <<'EOF'
+          ## Automated code review
+
+          Reviewer credentials are unavailable. The advisory review was skipped; no merge gate was applied.
+          EOF
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout workspace pull request
+        id: workspace-pr
+        if: steps.target.outputs.valid == 'true' && steps.credentials.outputs.available == 'true' && inputs.repository == ''
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Checkout workspace review assets
+        id: workspace-assets
+        if: steps.target.outputs.valid == 'true' && steps.credentials.outputs.available == 'true' && inputs.repository != ''
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          repository: altexsoft-dmytro-novyk/workplace
+          ref: main
+          fetch-depth: 1
+          persist-credentials: false
+          token: ${{ secrets.SUBMODULES_TOKEN || github.token }}
+
+      - name: Checkout service pull request
+        id: service-pr
+        if: steps.target.outputs.valid == 'true' && steps.credentials.outputs.available == 'true' && inputs.repository != ''
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.head_sha }}
+          path: ${{ inputs.checkout_path }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Prepare filtered three-dot diff
+        id: diff
+        if: steps.target.outputs.valid == 'true' && steps.credentials.outputs.available == 'true'
+        env:
+          REVIEW_KIND: ${{ inputs.repository != '' && 'service' || 'workspace' }}
+          WORKSPACE_PR_CHECKOUT: ${{ steps.workspace-pr.outcome }}
+          WORKSPACE_ASSETS_CHECKOUT: ${{ steps.workspace-assets.outcome }}
+          SERVICE_PR_CHECKOUT: ${{ steps.service-pr.outcome }}
+        run: |
+          set -u
+          mkdir -p "$GITHUB_WORKSPACE/.pr-review"
+
+          if { [ "$REVIEW_KIND" = "workspace" ] &&
+               [ "$WORKSPACE_PR_CHECKOUT" != "success" ]; } ||
+             { [ "$REVIEW_KIND" = "service" ] &&
+               { [ "$WORKSPACE_ASSETS_CHECKOUT" != "success" ] ||
+                 [ "$SERVICE_PR_CHECKOUT" != "success" ]; }; }; then
+            echo "::warning::A required repository checkout failed; advisory review was skipped."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
+          ## Automated code review
+
+          A required repository checkout failed. No findings were produced and no merge gate was applied.
+          EOF
+            exit 0
+          fi
+
+          if [[ ! "$BASE_SHA" =~ ^[0-9a-fA-F]{40}$ ]] ||
+             [[ ! "$HEAD_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "::warning::Pull request SHAs are missing or invalid; advisory review was skipped."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            cat > .pr-review/report.md <<'EOF'
+          ## Automated code review
+
+          The pull request commit range was invalid. No findings were produced and no merge gate was applied.
+          EOF
+            exit 0
+          fi
+
+          if ! cd "$TARGET_PATH" ||
+             ! git cat-file -e "$BASE_SHA^{commit}" 2>/dev/null ||
+             ! git cat-file -e "$HEAD_SHA^{commit}" 2>/dev/null; then
+            echo "::warning::The pull request commit range is unavailable; advisory review was skipped."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
+          ## Automated code review
+
+          The pull request commit range was unavailable after checkout. No findings were produced and no merge gate was applied.
+          EOF
+            exit 0
+          fi
+
+          pathspec=(.)
+          if [ "$REVIEW_KIND" = "workspace" ]; then
+            pathspec+=(
+              ':(exclude).tmp/**'
+              ':(exclude)_bmad-output/**'
+              ':(exclude)docs/**'
+            )
+          fi
+
+          range="$BASE_SHA...$HEAD_SHA"
+          if ! git diff --no-ext-diff --name-only --diff-filter=ACDMRT \
+              "$range" -- "${pathspec[@]}" \
+              > "$GITHUB_WORKSPACE/.pr-review/files.txt"; then
+            echo "::warning::The three-dot diff could not be generated; advisory review was skipped."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
+          ## Automated code review
+
+          The filtered three-dot diff could not be generated. No findings were produced and no merge gate was applied.
+          EOF
+            exit 0
+          fi
+
+          if [ ! -s "$GITHUB_WORKSPACE/.pr-review/files.txt" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
+          ## Automated code review
+
+          No reviewable code paths remained after applying the repository's review filter.
+          EOF
+            exit 0
+          fi
+
+          if ! git diff --no-ext-diff --unified=80 "$range" -- "${pathspec[@]}" \
+              > "$GITHUB_WORKSPACE/.pr-review/diff.patch"; then
+            echo "::warning::The filtered patch could not be generated; advisory review was skipped."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
+          ## Automated code review
+
+          The filtered patch could not be generated. No findings were produced and no merge gate was applied.
+          EOF
+            exit 0
+          fi
+
+          if [ ! -s "$GITHUB_WORKSPACE/.pr-review/diff.patch" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
+          ## Automated code review
+
+          The filtered code diff was empty. No findings were produced.
+          EOF
+            exit 0
+          fi
+
+          echo "ready=true" >> "$GITHUB_OUTPUT"
+          {
+            echo "### Review input"
+            echo
+            echo "- Repository: \`$REVIEW_REPOSITORY\`"
+            echo "- Range: \`$BASE_SHA...$HEAD_SHA\`"
+            echo "- Files: $(wc -l < "$GITHUB_WORKSPACE/.pr-review/files.txt")"
+            echo "- Patch lines: $(wc -l < "$GITHUB_WORKSPACE/.pr-review/diff.patch")"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run BMad code review
+        id: reviewer
+        if: steps.diff.outputs.ready == 'true'
+        continue-on-error: true
+        timeout-minutes: 15
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          working-directory: ${{ github.workspace }}
+          permission-profile: ":read-only"
+          effort: high
+          output-file: ${{ github.workspace }}/.pr-review/reviewer-output.json
+          prompt: |
+            Read `.github/pr-review-prompt.txt` fully and follow it.
+            The reviewed repository is `${{ env.REVIEW_REPOSITORY }}` at `${{ env.TARGET_PATH }}`.
+          output-schema: '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer","minimum":0},"medium_count":{"type":"integer","minimum":0},"low_count":{"type":"integer","minimum":0},"report_markdown":{"type":"string","minLength":1}},"required":["review_status","high_count","medium_count","low_count","report_markdown"]}'
+
+      - name: Materialize validated report
+        if: always() && steps.diff.outputs.ready == 'true'
+        env:
+          REVIEW_OUTCOME: ${{ steps.reviewer.outcome }}
+          REVIEWER_OUTPUT_FILE: .pr-review/reviewer-output.json
+          FINAL_MESSAGE: ${{ steps.reviewer.outputs['final-message'] }}
+        run: |
+          structured_output=""
+          if [ "$REVIEW_OUTCOME" = "success" ]; then
+            if [ -s "$REVIEWER_OUTPUT_FILE" ]; then
+              structured_output=$(cat "$REVIEWER_OUTPUT_FILE")
+            else
+              structured_output=$FINAL_MESSAGE
+            fi
+          fi
+
+          if printf '%s' "$structured_output" |
+               jq -e '(.report_markdown | type) == "string" and (.report_markdown | length) > 0' \
+                 >/dev/null 2>&1; then
+            printf '%s' "$structured_output" | jq -r '.report_markdown' > .pr-review/report.md
+          else
+            echo "::warning::The reviewer failed or returned invalid structured output; advisory review remains neutral."
+            cat > .pr-review/report.md <<'EOF'
+          ## Automated code review
+
+          The reviewer failed or returned invalid structured output. No findings were published and no merge gate was applied.
+          EOF
+          fi
+
+      - name: Bound report size
+        if: always()
+        run: |
+          if [ ! -s .pr-review/report.md ]; then
+            mkdir -p .pr-review
+            cat > .pr-review/report.md <<'EOF'
+          ## Automated code review
+
+          The findings report was unavailable. No findings were published and no merge gate was applied.
+          EOF
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path(".pr-review/report.md")
+          limit = 60000
+          suffix = b"\n\n_Report truncated to fit the pull request comment limit._\n"
+          report = path.read_bytes()
+          if len(report) > limit:
+              prefix = report[: limit - len(suffix)].decode("utf-8", errors="ignore")
+              path.write_bytes(prefix.encode("utf-8") + suffix)
+          PY
+
+      - name: Review job summary
+        if: always()
+        run: |
+          if [ -s .pr-review/report.md ]; then
+            {
+              echo '<!-- bmad-code-review -->'
+              cat .pr-review/report.md
+            } >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo '## Automated code review' >> "$GITHUB_STEP_SUMMARY"
+            echo >> "$GITHUB_STEP_SUMMARY"
+            echo 'The report was unavailable. No merge gate was applied.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload findings report
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: bmad-pr-review-report
+          path: .pr-review/report.md
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 14
+
+  comment:
+    name: Publish advisory findings
+    needs: review
+    if: >-
+      always() && !cancelled() &&
+      (
+        (inputs.repository == '' && github.event.pull_request.user.type != 'Bot') ||
+        (inputs.repository == 'altexsoft-dmytro-novyk/backend' && inputs.checkout_path == 'services/backend')
+      )
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    permissions:
+      contents: read
+      pull-requests: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REVIEW_REPOSITORY: ${{ inputs.repository || github.repository }}
+      PR_NUMBER: ${{ inputs.pull_request_number || github.event.pull_request.number }}
+    steps:
+      - name: Download findings report
+        id: download
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: bmad-pr-review-report
+          path: pr-review-output
+
+      - name: Prepare comment and job summary
+        run: |
+          if [ ! -s pr-review-output/report.md ]; then
+            mkdir -p pr-review-output
+            cat > pr-review-output/report.md <<'EOF'
+          ## Automated code review
+
+          The findings artifact was unavailable. No findings were published and no merge gate was applied.
+          EOF
+          fi
+          python3 - <<'PY'
+          from pathlib import Path
+
+          path = Path("pr-review-output/report.md")
+          limit = 60000
+          suffix = b"\n\n_Report truncated to fit the pull request comment limit._\n"
+          report = path.read_bytes()
+          if len(report) > limit:
+              prefix = report[: limit - len(suffix)].decode("utf-8", errors="ignore")
+              path.write_bytes(prefix.encode("utf-8") + suffix)
+          PY
+          {
+            echo '<!-- bmad-code-review -->'
+            cat pr-review-output/report.md
+          } > pr-review-output/comment.md
+          cat pr-review-output/comment.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upsert advisory pull request comment
+        run: |
+          set -u
+          endpoint="repos/$REVIEW_REPOSITORY/issues/$PR_NUMBER/comments"
+          if ! comment_ids=$(gh api --paginate "$endpoint" \
+              --jq '.[] | select(.user.login == "github-actions[bot]") | select(.body | contains("<!-- bmad-code-review -->")) | .id'); then
+            echo "::warning::Could not list pull request comments; findings remain available in the run summary."
+            exit 0
+          fi
+
+          comment_id=${comment_ids%%$'\n'*}
+          if [ -n "$comment_id" ]; then
+            if ! gh api --method PATCH \
+                "repos/$REVIEW_REPOSITORY/issues/comments/$comment_id" \
+                -F body=@pr-review-output/comment.md >/dev/null; then
+              echo "::warning::Could not update the advisory review comment; findings remain available in the run summary."
+            fi
+          elif ! gh api --method POST "$endpoint" \
+              -F body=@pr-review-output/comment.md >/dev/null; then
+            echo "::warning::Could not create the advisory review comment; findings remain available in the run summary."
+          fi
