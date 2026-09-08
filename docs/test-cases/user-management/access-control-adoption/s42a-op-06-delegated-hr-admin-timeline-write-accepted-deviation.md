@@ -1,18 +1,20 @@
 # S4.2a-OP-06 · A delegated HR Admin can write any employee's career timeline — a known accepted deviation
 
-> **SUPERSEDED 2026-09-07 (PO, Dmytro Novyk) — AF-2 partially reversed.**
-> `profile:timeline:write` is being **removed** from the canonical `hr-admin`
-> set; career timeline is a profile section (§3.2 S9), and `canEditTimeline`
-> gains its audience half (dual gate), narrowed to the target's direct Unit
-> Manager and assigned People Partner (DEC-UM-001). HR Admin then holds nothing
-> here. The deviation this scenario records is **closed, not accepted.** This
-> file is retired in place — not rewritten — per its own dated-pointer rule
-> below; the follow-on AD-1 increment (the deferred `profile:timeline`
-> `canAccessSection` item) replaces it with a scenario asserting the dual gate.
-> Decision + rationale: SCP
-> `sprint-change-proposal-2026-09-04-section-access-consolidation.md` §9.1;
-> `project-requirements.md` §2.3 (*edit the career timeline*, confirmed
-> 2026-09-07).
+> **LIVE for the consolidation PR — closure scheduled (PO, Dmytro Novyk,
+> 2026-09-07).** This scenario stands and is correct as written: the
+> consolidation increment ships `profile:timeline:write` on `hr-admin` with the
+> feature-only gate, a known, accepted, time-boxed deviation from §2.2/§2.3.
+> **Closure** — career timeline reclassified as a profile section (§3.2 S9),
+> `canEditTimeline` gaining its audience half (dual gate, narrowed to the
+> target's direct department manager + assigned People Partner per DEC-UM-001),
+> `profile:timeline:write` leaving the canonical `hr-admin` set — is a separate
+> AD-1 increment, **DEPT-2** in
+> `_bmad-output/planning-artifacts/platform/dept-epic.md`, blocked on DEPT-1 (the
+> department-manager audience, which does not exist yet). When DEPT-2 lands it
+> retires this file **in place** — not rewritten — per the dated-pointer rule
+> below, and replaces it with a scenario asserting the dual gate. Decision +
+> rationale: SCP `sprint-change-proposal-2026-09-04-section-access-consolidation.md`
+> §9.1; `project-requirements.md` §2.3.
 
 > ### Recorded consequence of AF-2 — PLAT-E4-S4.2a, 2026-09-06
 >

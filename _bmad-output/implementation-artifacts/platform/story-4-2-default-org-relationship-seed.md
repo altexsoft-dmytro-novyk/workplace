@@ -165,6 +165,12 @@ authorisation code**.
    last-holder protection, column mapping — stays the access-control
    deferred-work "Full-profile access overlay" item; this story fixes only who
    the seeded holder is and wires it.)
+   > **Corrected 2026-09-07 (see the RENUMBERED Sequencing table, which supersedes
+   > this scope-item text).** 4.2b found the tree-root half **cannot be seeded** —
+   > root's position at the top of the `reports-to` tree is the permanent absence
+   > of any `Relationship` row for root, verified and locked, never a written
+   > edge. The bootstrap seeds the operator FR set (4.2a) and the §2.4
+   > first-holder grant (4.2c) only; it writes no tree edge. SCP §9.2.
 4. ~~**Resolver: walk upward from targets.** `resolveAudiences` currently expands
    every descendant of the viewer, then filters to the requested targets — so a
    viewer near the tree root walks the whole org to open one profile. This seed

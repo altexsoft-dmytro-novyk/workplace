@@ -58,9 +58,14 @@ migration. `Department` has `parentId` but **no manager column**;
 
 ### DEPT-2 detail
 
+**Not in the consolidation PR.** That increment ships `profile:timeline:write` on
+`hr-admin` with the feature-only gate — the AF-2 deviation, recorded and accepted
+(`s42a-op-06` stays live). DEPT-2 is what *closes* that deviation; it retires
+`s42a-op-06` in place when it lands.
+
 **Decision:** SCP `sprint-change-proposal-2026-09-04-section-access-consolidation.md`
 §9.1; `project-requirements.md` §2.3 (*edit the career timeline*, confirmed
-2026-09-07); `deferred-work.md`. Supersedes `s42a-op-06`.
+2026-09-07); `deferred-work.md`.
 
 - **`SECTION_ACCESS_MATRIX`** — add
   `'profile:timeline': { self: 'read', reporting: 'write', pp: 'write' }`
@@ -97,13 +102,13 @@ migration. `Department` has `parentId` but **no manager column**;
 
 ---
 
-## B. Open decisions — need a human ruling
+## B. Open decisions — RESOLVED (PO, Dmytro Novyk, 2026-09-08)
 
-| # | Decision | Source | Notes |
-|---|---|---|---|
-| DEPT-B1 | The two consolidation stories were implemented ahead of their AD-1 approval gate (`sprint-status.yaml` lists `4-1`/`4-2` as `backlog` with `last_updated: 09-04-2026`; SCP §6 says every code change is AD-1 gated with Stage-1 scenario approval). Run the Stage-1 scenario review retroactively, or record the exception and correct the status file. | 2026-09 review | The two most serious review findings are exactly what a Stage-1 scenario review exists to catch. |
-| DEPT-B2 | Changes shipped in the consolidation PR that are outside the SCP §5 impact map — split out or keep: (a) `jwt-session-resolver.adapter.ts` — a new per-request `user.findUnique`; a signature-valid JWT whose subject is deactivated now resolves `null`/401. An **authentication behaviour change** with no test (reverting the line leaves the suite green), and a cost against SCP §7's 500-record/2s budget. (b) `user.repository.ts` list filters → `Prisma.QueryMode.insensitive` across seven identity columns. (c) `.env.example` commenting out `ALLOW_TEST_SESSION_TOKENS`. (d) `package.json` `db:up` gaining `--wait --wait-timeout 120`. (e) `import-population.ts` header rewrite removing the script from the "binding deployment order". | 2026-09 review | Each is a real change with its own risk; several deserve their own PR. |
-| DEPT-B3 | `full_profile_grants.holderUserId` is `ON DELETE RESTRICT` — a user who ever held a grant, even a long-revoked one, can never be hard-deleted. Interacts with the `user.repository.ts` purge path. No cascade, no soft-delete story, no note. Needs a soft-delete/anonymise decision for grant holders. | 2026-09 review | |
+| # | Decision | Resolution |
+|---|---|---|
+| DEPT-B1 | The two consolidation stories were implemented ahead of their AD-1 approval gate (the review, run against `636ef8f`, saw `4-1`/`4-2` as `backlog`; SCP §6 says every code change is AD-1 gated with Stage-1 scenario approval). | **Retroactively accepted.** No retroactive Stage-1 scenario review; the shipped work stands. `sprint-status.yaml` already carries `4-1`/`4-2` and `epic-4` as `done` (updated post-review); the review's premise was stale. |
+| DEPT-B2 | Changes shipped in the consolidation PR outside the SCP §5 impact map: (a) `jwt-session-resolver.adapter.ts` — a new per-request `user.findUnique`; a signature-valid JWT whose subject is deactivated now resolves `null`/401 (auth behaviour change, no test); (b) `user.repository.ts` list filters → `Prisma.QueryMode.insensitive` across seven identity columns; (c) `.env.example` commenting out `ALLOW_TEST_SESSION_TOKENS`; (d) `package.json` `db:up` gaining `--wait --wait-timeout 120`; (e) `import-population.ts` header rewrite. | **Kept — all stay in the consolidation PR.** Not split out. The `jwt-session-resolver` test gap and the `mode: 'insensitive'` `ILIKE`/index concerns remain in the DEPT-C patch backlog for follow-up. |
+| DEPT-B3 | `full_profile_grants` FKs (`holderUserId`, `grantedByUserId`, `revokedByUserId`) are all `ON DELETE RESTRICT` — anyone who has ever held/granted/revoked a full-profile grant can never be hard-deleted from `users`; grant rows are never deleted (revoke only sets `revokedAt`). | **Kept as-is.** Internal system: user hard-delete is not a use case (there is no `prisma.user.delete()` path; removal is `isActive = false` + `EmploymentStatus: dismissed`). No GDPR erasure requirement. `ON DELETE RESTRICT` on an access-audit table is the intended behaviour. No note, no migration change. |
 
 ---
 
@@ -213,15 +218,15 @@ these under a dedicated review doc, lift section C out — it is self-contained.
 
 ## D. Documentation-alignment residue
 
-- `fr-permission-matrix-draft-2026-09-02.md` — the file has UTF-8 mojibake
-  (`â`, `Â§`) that breaks exact-match editing. Repair the encoding, then finish
-  clearing the remaining `?` / "Confirm" markers (item 4 timeline is confirmed
-  per §9.1 but the row cells and §5 table still read as draft).
-- `story-4-2-default-org-relationship-seed.md` scope item 3 text still says
-  `bootstrap-access-control.ts` "seats root at the top of the `reports-to` tree
-  ... provisioned at deploy time" — 4.2b found this is structural, not seeded.
-  The RENUMBERED table in the same file already supersedes it; add a one-line
-  correction marker on the scope-item text.
+- `fr-permission-matrix-draft-2026-09-02.md` — **untouched.** The file has UTF-8
+  mojibake (`â`, `Â§`) that broke exact-match editing, so the
+  `profile:timeline:write` "Confirm" markers in §6 item 4 and §5 still read as
+  draft. The PO confirmation is authoritative in SCP §9.1 and
+  `project-requirements.md` §2.3; this draft needs its encoding repaired and the
+  markers cleared to match.
+- `story-4-2-default-org-relationship-seed.md` scope item 3 text — **done
+  2026-09-07:** correction marker added, pointing at the RENUMBERED table and
+  SCP §9.2.
 - D4 corpus (SCP §4.6): `docs/test-cases/**` still ships legacy `'S1'` /
   `'S10'` / `'S11'` section strings. SCP scopes the rename to "PLAT-E4-S4.1
   AD-1 Stage-1"; that pass has not run. Track the rename increment.
