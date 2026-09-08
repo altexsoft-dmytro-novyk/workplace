@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test:trace-gate": "node --test test/trace-gate-thresholds.test.cjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync:clickup": "node scripts/sync-clickup.cjs",
     "create:clickup": "node scripts/create-clickup-task.cjs",

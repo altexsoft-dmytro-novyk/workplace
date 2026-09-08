@@ -328,8 +328,10 @@ Knowledge fragments referenced:
 
 **P0 Criteria Evaluation:**
 
+- [ ] Gate thresholds resolved from the workflow customization; an empty or unparsable threshold recorded as FAIL with a `critical` blocker, never as a relaxed criterion and never as an aborted step
+- [ ] Coverage compared on the unrounded `covered`/`total` counts, not on rounded percentages — 199 of 200 requirements must not satisfy a 100% threshold
 - [ ] P0 test pass rate evaluated (must be 100%)
-- [ ] P0 oracle-item coverage evaluated (must be 100%)
+- [ ] P0 oracle-item coverage evaluated (must be >= `{workflow.p0_coverage_required}`%)
 - [ ] Security issues count evaluated (must be 0)
 - [ ] Critical NFR failures evaluated (must be 0)
 - [ ] Flaky tests evaluated (must be 0 if burn-in enabled)
@@ -338,9 +340,9 @@ Knowledge fragments referenced:
 **P1 Criteria Evaluation:**
 
 - [ ] P1 test pass rate evaluated (threshold: min_p1_pass_rate)
-- [ ] P1 oracle-item coverage evaluated (PASS >=90%, CONCERNS 80-89%, FAIL <80%)
+- [ ] P1 oracle-item coverage evaluated (PASS >= `{workflow.p1_coverage_target}`%, CONCERNS from `{workflow.p1_coverage_minimum}`% up to the target, FAIL below `{workflow.p1_coverage_minimum}`%; the CONCERNS band is empty when target and minimum are equal)
 - [ ] Overall test pass rate evaluated (threshold: min_overall_pass_rate)
-- [ ] Overall oracle coverage evaluated (threshold: >=80%)
+- [ ] Overall oracle coverage evaluated (threshold: >= `{workflow.overall_coverage_minimum}`%)
 - [ ] Code coverage considered if available (informational unless explicitly required by policy)
 - [ ] P1 decision recorded: PASS or CONCERNS
 
@@ -614,7 +616,7 @@ Knowledge fragments referenced:
 
 - [ ] All prerequisites met
 - [ ] All oracle items mapped or gaps documented
-- [ ] P0 coverage is 100% OR documented as BLOCKER
+- [ ] P0 coverage is >= `{workflow.p0_coverage_required}`% OR documented as BLOCKER
 - [ ] Gap analysis is complete and prioritized
 - [ ] Test quality issues identified and flagged
 - [ ] Deliverables generated and saved

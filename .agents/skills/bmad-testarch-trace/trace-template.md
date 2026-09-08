@@ -364,7 +364,7 @@ Note: This workflow does not generate tests. If gaps exist, run `/bmad-testarch-
 
 | Criterion             | Threshold | Actual                    | Status   |
 | --------------------- | --------- | ------------------------- | -------- | -------- |
-| P0 Coverage           | 100%      | {p0_coverage}%            | {✅ PASS | ❌ FAIL} |
+| P0 Coverage           | ≥{workflow.p0_coverage_required}% | {p0_coverage}% | {✅ PASS | ❌ FAIL} |
 | P0 Test Pass Rate     | 100%      | {p0_pass_rate}%           | {✅ PASS | ❌ FAIL} |
 | Security Issues       | 0         | {security_issue_count}    | {✅ PASS | ❌ FAIL} |
 | Critical NFR Failures | 0         | {critical_nfr_fail_count} | {✅ PASS | ❌ FAIL} |
@@ -378,10 +378,10 @@ Note: This workflow does not generate tests. If gaps exist, run `/bmad-testarch-
 
 | Criterion              | Threshold                 | Actual               | Status   |
 | ---------------------- | ------------------------- | -------------------- | -------- | ----------- | -------- |
-| P1 Coverage            | ≥{min_p1_coverage}%       | {p1_coverage}%       | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
+| P1 Coverage            | ≥{workflow.p1_coverage_target}% for PASS, ≥{workflow.p1_coverage_minimum}% for CONCERNS | {p1_coverage}% | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
 | P1 Test Pass Rate      | ≥{min_p1_pass_rate}%      | {p1_pass_rate}%      | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
 | Overall Test Pass Rate | ≥{min_overall_pass_rate}% | {overall_pass_rate}% | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
-| Overall Coverage       | ≥{min_coverage}%          | {overall_coverage}%  | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
+| Overall Coverage       | ≥{workflow.overall_coverage_minimum}% | {overall_coverage}% | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
 
 **P1 Evaluation**: {✅ ALL PASS | ⚠️ SOME CONCERNS | ❌ FAILED}
 
@@ -393,6 +393,8 @@ Note: This workflow does not generate tests. If gaps exist, run `/bmad-testarch-
 | ----------------- | --------------- | ------------------------------------------------------------ |
 | P2 Test Pass Rate | {p2_pass_rate}% | {allow_p2_failures ? "Tracked, doesn't block" : "Evaluated"} |
 | P3 Test Pass Rate | {p3_pass_rate}% | {allow_p3_failures ? "Tracked, doesn't block" : "Evaluated"} |
+
+**Pass rates** for P2/P3 are informational. Their **coverage** is not: uncovered P2/P3 requirements count against Overall Coverage above, so they can decide the gate on their own whenever `{workflow.overall_coverage_minimum}` is high enough to leave no slack.
 
 ---
 

@@ -5,16 +5,25 @@
 
 [workflow]
 
-# Quality-gate thresholds are strings because rendered workflow values are
-# substituted into Markdown and JavaScript. A project team can override them in
-# _bmad/custom/bmad-testarch-trace.toml without editing the installed workflow.
+# --- Configurable below. Overrides merge per BMad structural rules: ---
+#   scalars: override wins • arrays (persistent_facts, activation_steps_*): append
+
+# Quality-gate thresholds, as strings, because rendered workflow values are substituted into
+# Markdown and JavaScript. A project team overrides them in
+# _bmad/custom/bmad-testarch-trace.toml without editing this installed workflow.
+#
+# These four keys are load-bearing, not decorative: steps-c/step-05-gate-decision.md,
+# checklist.md, and trace-template.md all reference them as {workflow.*} tokens, and the
+# renderer requires a default here for every token it resolves. This file carries a
+# "DO NOT EDIT -- overwritten on every update" header, so a skill update that ships without
+# these keys silently removes the base layer. Two things catch that rather than letting the
+# gate quietly relax: step-05 treats an unresolved threshold as FAIL with a `critical`
+# blocker, and test/trace-gate-thresholds.test.cjs fails the repo's test suite. If an update
+# does drop them, restore them here and upstream — do not work around it by lowering the gate.
 p0_coverage_required = "100"
 p1_coverage_target = "90"
 p1_coverage_minimum = "80"
 overall_coverage_minimum = "80"
-
-# --- Configurable below. Overrides merge per BMad structural rules: ---
-#   scalars: override wins • arrays (persistent_facts, activation_steps_*): append
 
 # Steps to run before the standard activation (config load, greet).
 # Overrides append. Use for pre-flight loads, compliance checks, etc.
