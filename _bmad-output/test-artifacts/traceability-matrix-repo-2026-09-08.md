@@ -9,16 +9,22 @@ oracleSources: ['docs/test-cases/**', '_bmad-output/planning-artifacts/**/epics.
 externalPointerStatus: 'not_used'
 collectionStatus: 'COLLECTED'
 allowGate: false
-sourceSha: 'c305f2c0377de740b351d469185b3d81c63cd26e'
+sourceSha: '6f22d85bf222fc0d216d1dd85c472202362e94da'
 ---
 
 # Traceability Matrix — whole repository, all epics
 
-**Planning audit.** No quality gate was issued. Generated 2026-09-08 from a fresh
-`workflow_dispatch` of `tests.yml`:
-[run 34218105827](https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34218105827).
+**Planning audit.** No quality gate was issued. Generated 2026-09-08, amended
+against [run 34222307987](https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34222307987)
+(push to `main` at `6f22d85`, the merge of this matrix).
 
-Workspace `c305f2c` · backend `49fd0c4` · frontend `4684eb1`.
+Workspace `6f22d85` · backend `49fd0c4` · frontend `4684eb1`.
+
+> **Amended.** The first cut of this matrix wrote `tests[]` as `{file, level}`
+> with no `title`. `build-live-verification-results.cjs` indexes on
+> `(file, title)` and skips any entry without a title, so the exact lookup
+> collapsed from 496 matched cases to 3 and 17 cases fell back to unmatched.
+> Titles are restored; the mapping is back to 612 via the matrix index.
 
 ## Why there is no gate verdict
 
@@ -71,8 +77,8 @@ the team's 100% policy is written against.
 
 | | Total | Verified | % |
 | --- | --- | --- | --- |
-| **All requirements** | 288 | 224 | **78%** |
-| P0 | 159 | 139 | **87%** |
+| **All requirements** | 288 | 228 | **79%** |
+| P0 | 159 | 143 | **90%** |
 | P1 | 105 | 73 | 70% |
 | P2 | 24 | 12 | 50% |
 
@@ -80,13 +86,13 @@ By area:
 
 | Area | Requirements | FULL | Verified | Observed failing |
 | --- | --- | --- | --- | --- |
-| user-management | 109 | 104 | 85 | 9 |
-| access-control-kernel | 90 | 90 | 76 | 1 |
+| user-management | 109 | 104 | 86 | 9 |
+| access-control-kernel | 90 | 90 | 79 | 0 |
 | frontend | 57 | 57 | 57 | 0 |
 | mentorship | 26 | 0 | 0 | 24 |
 | access-control-foundation | 6 | 6 | 6 | 0 |
 
-Live observation across all 288: 224 observed passing, 34 failing, 16 not
+Live observation across all 288: 228 observed passing, 33 failing, 13 not
 observed, 9 partially observed, 5 with only `todo` cases.
 
 What actually ran, from the three uploaded reports:
@@ -94,10 +100,10 @@ What actually ran, from the three uploaded reports:
 | Suite | Cases | Passed | Failed | Todo |
 | --- | --- | --- | --- | --- |
 | Backend unit | 50 | 50 | 0 | 0 |
-| Backend e2e (54 suites) | 506 | 447 | 41 | 18 |
+| Backend e2e (54 suites) | 506 | 448 | 40 | 18 |
 | Frontend Playwright | 124 | 124 | 0 | 0 |
 
-680 cases seen, 631 mapped to a requirement, 21 unmatched, 11 deliberately
+680 cases seen, 634 mapped to a requirement, 35 unmatched, 11 deliberately
 untraceable (framework scaffolding, packaging and test-hygiene assertions).
 
 ## The green checkmarks overstate the run
@@ -124,30 +130,31 @@ upload path with no LocalStack behind it. The code is unchanged and these were
 green on the 2026-09-06 sweep. Static coverage stands; there is simply no fresh
 passing evidence. Re-run once LocalStack is healthy.
 
-### `ACM-0` — suspected flake
+### `ACM-0` — flake, confirmed
 
-One case, `converges concurrent seeds after a users_workEmail_key insert race`,
-hit the Jest 5000 ms per-case timeout on a 2-vCPU runner. Not failing on the
-local sweep. Treat as runner-speed until a re-run says otherwise.
+`converges concurrent seeds after a users_workEmail_key insert race` hit the
+Jest 5000 ms per-case timeout in run 34218105827 and **passed in run
+34222307987** on the same code. Runner speed, not a defect.
 
-## 20 P0 requirements have no fresh passing evidence
+## 16 P0 requirements have no fresh passing evidence
 
-P0 static coverage is 100%, but only 139 of 159 were observed green:
+P0 static coverage is 100%, but only 143 of 159 were observed green:
 
-**14 are oracle-mapping gaps, not coverage gaps** — the suite ran green, but no
-case title carries the id, so the evidence producer could not resolve it:
+**11 are mapping gaps, not coverage gaps** — the suite ran green, but the
+producer could not resolve the case to the requirement:
 
 - `ACM1-FB-02, -04, -05, -06, -07`, `ACM1R-FB-10, -12, -13, -21, -22` —
-  `acm1r-fr-foundation.e2e-spec.ts`, 39/39 green. **Same ten flagged on
-  2026-09-06 and still open.**
-- `S4.1a-DP-01, -02, -03` — `s41a-default-permissions-baseline.e2e-spec.ts` has
-  exactly three passing cases that correspond one-to-one with the three docs.
+  `acm1r-fr-foundation.e2e-spec.ts`, 39/39 green. The matrix does carry titles
+  for these, but they predate the suite's rewrite in `49fd0c4`, so the exact
+  `(file, title)` lookup misses. Re-mapping against the current titles closes
+  all ten. **Flagged on 2026-09-06 and still open.**
 - `UMAC-10` — `s41c-section-access-gate.e2e-spec.ts`.
 
-Adding the id to those case titles closes all 14 and is the single
-highest-value cleanup here.
+`S4.1a-DP-01, -02, -03` were in this list and are now closed: the three cases in
+`s41a-default-permissions-baseline.e2e-spec.ts` correspond one-to-one with the
+three docs, and that mapping is now in the matrix.
 
-**2 failing:** `UMAC-09` (LocalStack), `ACM-0` (timeout).
+**1 failing:** `UMAC-09` (LocalStack).
 
 **4 partially observed:** `UM-DEP-02, -03, -04`, `UM-SEED-13`.
 
@@ -176,9 +183,10 @@ tweak.
 
 ## What to do next
 
-1. **Add requirement ids to case titles** in `acm1r-fr-foundation`,
-   `s41a-default-permissions-baseline` and `s41c-section-access-gate` — recovers
-   14 P0 requirements' evidence for free.
+1. **Re-map the ten `ACM1*` requirements** against the current titles in
+   `acm1r-fr-foundation.e2e-spec.ts`, and map `UMAC-10` — recovers 11 P0
+   requirements' evidence for free. Putting the id in the case title would make
+   these self-healing across future rewrites.
 2. **Fix the LocalStack health check** in the e2e job, then re-run — recovers 9
    more (1 of them P0).
 3. **Make `Container logs on failure` run** when a soft step fails
