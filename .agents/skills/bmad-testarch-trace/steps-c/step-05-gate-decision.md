@@ -90,11 +90,46 @@ if (
   );
 }
 const priorityBreakdown = stats.priority_breakdown;
-const p0Coverage = priorityBreakdown.P0.percentage;
-const p1Coverage = priorityBreakdown.P1.percentage;
+// Step 4 reports every percentage through Math.round, so 199 FULL requirements out of 200 arrive
+// here as `100`. Against a 100% threshold that rounding turns a real gap into a PASS, so each
+// comparison below runs on the unrounded ratio recomputed from the counts Step 4 emits alongside
+// the percentage. The reported percentage is used only when those counts are missing.
+const exactCoverage = (bucket, reportedPercentage) => {
+  const total = Number(bucket?.total);
+  const covered = Number(bucket?.covered);
+  if (!Number.isFinite(total) || !Number.isFinite(covered)) return Number(reportedPercentage);
+  if (total === 0) return 100; // matches Step 4's safePct: an empty bucket is vacuously complete
+  return (covered / total) * 100;
+};
+// Coverage can now carry a fraction. Render it without inventing precision it does not have:
+// a whole number stays whole, anything else keeps at most two decimals.
+const formatCoverage = (value) =>
+  Number.isFinite(value)
+    ? Number.isInteger(value)
+      ? String(value)
+      : value.toFixed(2).replace(/\.?0+$/, '')
+    : String(value);
+const p0Coverage = exactCoverage(priorityBreakdown.P0, priorityBreakdown.P0.percentage);
+const p1Coverage = exactCoverage(priorityBreakdown.P1, priorityBreakdown.P1.percentage);
 const hasP1Requirements = (priorityBreakdown.P1.total || 0) > 0;
 const effectiveP1Coverage = hasP1Requirements ? p1Coverage : 100;
-const overallCoverage = stats.overall_coverage_percentage;
+const overallCoverage = exactCoverage(
+  { total: stats.total_requirements, covered: stats.fully_covered },
+  stats.overall_coverage_percentage,
+);
+// `covered` counts FULL only, so `total - covered` is every requirement short of FULL, PARTIAL
+// included. The overall minimum spans P0-P3 by design, which means a P2/P3 gap can decide the gate;
+// naming the priorities that carry the gap keeps that from reading as an unexplained failure.
+const priorityGaps = ['P0', 'P1', 'P2', 'P3']
+  .map((key) => ({
+    key,
+    missing: Math.max(0, (Number(priorityBreakdown[key]?.total) || 0) - (Number(priorityBreakdown[key]?.covered) || 0)),
+  }))
+  .filter((entry) => entry.missing > 0);
+const priorityGapSummary = priorityGaps.length
+  ? priorityGaps.map((entry) => `${entry.key}: ${entry.missing}`).join(', ')
+  : 'none';
+const overallGapIsLowPriorityOnly = priorityGaps.length > 0 && priorityGaps.every((entry) => ['P2', 'P3'].includes(entry.key));
 const criticalGaps = (coverageMatrix.gap_analysis?.critical_gaps || []).length;
 const isUnresolved = (value) => typeof value === 'string' && value.startsWith('{') && value.endsWith('}');
 const normalizeResolvedToken = (value) => {
@@ -259,42 +294,140 @@ const rawCollectionStatus =
 const collectionStatus = String(rawCollectionStatus).trim().toUpperCase();
 const gateEligible = allowGate && collectionStatus === 'COLLECTED';
 
+// Thresholds arrive as rendered customization strings, so they are validated rather than trusted.
+// Two rules govern the validation:
+//   1. A misconfigured threshold must never weaken the gate. `Number('')` and `Number('  ')` are
+//      both 0, which passes a naive 0-100 range check and would silently require 0% coverage, so
+//      blank input is rejected before the numeric conversion rather than coerced.
+//   2. A misconfigured threshold must never abort this step. Throwing here would skip the report,
+//      e2e-trace-summary.json, and gate-decision.json below, and the Master Rule at the end of this
+//      file requires e2e-trace-summary.json to be written before the workflow terminates. Problems
+//      are collected instead and resolved into a deterministic FAIL by the decision logic.
+// The installed defaults below are a rendering fallback only: they keep the criteria block and the
+// report renderable when a threshold is unusable. They never produce a PASS, because
+// `gateThresholdsValid` is false in exactly the cases where they are used.
+const GATE_THRESHOLD_FALLBACKS = {
+  p0CoverageRequired: 100,
+  p1CoverageTarget: 90,
+  p1CoverageMinimum: 80,
+  overallCoverageMinimum: 80,
+};
+const thresholdErrors = [];
+const parseGateThreshold = (rawValue, name, fallback) => {
+  const text = String(rawValue ?? '').trim();
+  if (text === '') {
+    thresholdErrors.push(`The ${name} threshold is empty or unresolved. Expected a number from 0 through 100.`);
+    return fallback;
+  }
+  const value = Number(text);
+  if (!Number.isFinite(value) || value < 0 || value > 100) {
+    thresholdErrors.push(`Invalid ${name} threshold: ${text}. Expected a number from 0 through 100.`);
+    return fallback;
+  }
+  return value;
+};
+const gateThresholds = {
+  p0CoverageRequired: parseGateThreshold(
+    '{workflow.p0_coverage_required}',
+    'P0 coverage required',
+    GATE_THRESHOLD_FALLBACKS.p0CoverageRequired,
+  ),
+  p1CoverageTarget: parseGateThreshold(
+    '{workflow.p1_coverage_target}',
+    'P1 coverage target',
+    GATE_THRESHOLD_FALLBACKS.p1CoverageTarget,
+  ),
+  p1CoverageMinimum: parseGateThreshold(
+    '{workflow.p1_coverage_minimum}',
+    'P1 coverage minimum',
+    GATE_THRESHOLD_FALLBACKS.p1CoverageMinimum,
+  ),
+  overallCoverageMinimum: parseGateThreshold(
+    '{workflow.overall_coverage_minimum}',
+    'overall coverage minimum',
+    GATE_THRESHOLD_FALLBACKS.overallCoverageMinimum,
+  ),
+};
+if (gateThresholds.p1CoverageTarget < gateThresholds.p1CoverageMinimum) {
+  thresholdErrors.push(
+    `The P1 coverage target (${gateThresholds.p1CoverageTarget}%) is lower than the P1 coverage minimum ` +
+      `(${gateThresholds.p1CoverageMinimum}%), which leaves no PASS band.`,
+  );
+}
+const gateThresholdsValid = thresholdErrors.length === 0;
+if (!gateThresholdsValid) {
+  console.error(`❌ Gate thresholds could not be resolved: ${thresholdErrors.join(' ')}`);
+}
+// A bucket with no `total`/`covered` and no numeric `percentage` falls through exactCoverage() to
+// `Number(undefined)`, i.e. NaN. Every `<`/`>=` comparison against NaN is false, so without this
+// check Rules 1-5 below would all silently fail to match and gateDecision would stay at its
+// 'NOT_EVALUATED' default with `rationale` left undefined — even though gateEligible is true. That
+// violates the same Master Rule that Rule 0 above exists to uphold, so an unresolvable coverage
+// value gets the identical treatment: a deterministic FAIL, never a silent non-decision.
+const coverageValuesValid = [p0Coverage, effectiveP1Coverage, overallCoverage].every(Number.isFinite);
+
 let gateDecision = 'NOT_EVALUATED'; // default; overwritten when gateEligible
 let rationale;
 
 if (!gateEligible) {
   rationale = `Gate decision skipped because allow_gate=${allowGate} and collection_status=${collectionStatus}.`;
+}
+// Rule 0: an unusable threshold configuration is a blocking condition, not a coverage outcome.
+// It resolves to FAIL rather than to a throw or a PASS: a gate whose own criteria cannot be
+// resolved has not been satisfied, and the outputs below still have to be written so CI can tell
+// a misconfigured gate apart from a crashed pipeline.
+else if (!gateThresholdsValid) {
+  gateDecision = 'FAIL';
+  rationale =
+    `Gate thresholds could not be resolved: ${thresholdErrors.join(' ')} ` +
+    `Fix the workflow customization (_bmad/custom/{skill-name}.toml) and re-run. ` +
+    `The criteria reported below fall back to the installed defaults and did not decide this run.`;
+}
+// Rule 0b: coverage that cannot be computed is a data problem from Phase 1, not a coverage
+// outcome. Same treatment as Rule 0 — deterministic FAIL, never NOT_EVALUATED.
+else if (!coverageValuesValid) {
+  gateDecision = 'FAIL';
+  rationale =
+    `Coverage values could not be determined from the coverage matrix ` +
+    `(P0: ${formatCoverage(p0Coverage)}%, P1: ${formatCoverage(effectiveP1Coverage)}%, overall: ${formatCoverage(overallCoverage)}%). ` +
+    `Step 4 must emit numeric total/covered counts or a numeric percentage for every priority bucket.`;
 } else {
-  // Rule 1: P0 coverage must be 100%
-  if (p0Coverage < 100) {
+  // Rule 1: P0 coverage must meet the configured requirement.
+  if (p0Coverage < gateThresholds.p0CoverageRequired) {
     gateDecision = 'FAIL';
-    rationale = `P0 coverage is ${p0Coverage}% (required: 100%). ${criticalGaps} critical requirements uncovered.`;
+    rationale = `P0 coverage is ${formatCoverage(p0Coverage)}% (required: ${gateThresholds.p0CoverageRequired}%). ${criticalGaps} critical requirements uncovered.`;
   }
-  // Rule 2: Overall coverage must be >= 80%
-  else if (overallCoverage < 80) {
+  // Rule 2: Overall coverage must meet the configured minimum.
+  else if (overallCoverage < gateThresholds.overallCoverageMinimum) {
     gateDecision = 'FAIL';
-    rationale = `Overall coverage is ${overallCoverage}% (minimum: 80%). Significant gaps exist.`;
+    rationale =
+      `Overall coverage is ${formatCoverage(overallCoverage)}% (minimum: ${gateThresholds.overallCoverageMinimum}%). ` +
+      `${stats.total_requirements - stats.fully_covered} of ${stats.total_requirements} requirements short of FULL ` +
+      `(by priority — ${priorityGapSummary}).` +
+      (overallGapIsLowPriorityOnly
+        ? ` P0 and P1 are complete; this gate failed on P2/P3 alone, because the overall minimum spans every priority.`
+        : '');
   }
-  // Rule 3: P1 coverage < 80% → FAIL
-  else if (effectiveP1Coverage < 80) {
+  // Rule 3: P1 coverage below the configured minimum fails.
+  else if (effectiveP1Coverage < gateThresholds.p1CoverageMinimum) {
     gateDecision = 'FAIL';
     rationale = hasP1Requirements
-      ? `P1 coverage is ${effectiveP1Coverage}% (minimum: 80%). High-priority gaps must be addressed.`
+      ? `P1 coverage is ${formatCoverage(effectiveP1Coverage)}% (minimum: ${gateThresholds.p1CoverageMinimum}%). High-priority gaps must be addressed.`
       : `P1 requirements are not present; continuing with remaining gate criteria.`;
   }
-  // Rule 4: P1 coverage >= 90% and overall >= 80% with P0 at 100% → PASS
-  else if (effectiveP1Coverage >= 90) {
+  // Rule 4: P1 coverage at the configured target passes.
+  else if (effectiveP1Coverage >= gateThresholds.p1CoverageTarget) {
     gateDecision = 'PASS';
     rationale = hasP1Requirements
-      ? `P0 coverage is 100%, P1 coverage is ${effectiveP1Coverage}% (target: 90%), and overall coverage is ${overallCoverage}% (minimum: 80%).`
-      : `P0 coverage is 100% and overall coverage is ${overallCoverage}% (minimum: 80%). No P1 requirements detected.`;
+      ? `P0 coverage is ${formatCoverage(p0Coverage)}%, P1 coverage is ${formatCoverage(effectiveP1Coverage)}% (target: ${gateThresholds.p1CoverageTarget}%), and overall coverage is ${formatCoverage(overallCoverage)}% (minimum: ${gateThresholds.overallCoverageMinimum}%).`
+      : `P0 coverage is ${formatCoverage(p0Coverage)}% and overall coverage is ${formatCoverage(overallCoverage)}% (minimum: ${gateThresholds.overallCoverageMinimum}%). No P1 requirements detected.`;
   }
-  // Rule 5: P1 coverage 80-89% with P0 at 100% and overall >= 80% → CONCERNS
-  else if (effectiveP1Coverage >= 80) {
+  // Rule 5: P1 coverage between the minimum and target needs follow-up.
+  else if (effectiveP1Coverage >= gateThresholds.p1CoverageMinimum) {
     gateDecision = 'CONCERNS';
     rationale = hasP1Requirements
-      ? `P0 coverage is 100% and overall coverage is ${overallCoverage}% (minimum: 80%), but P1 coverage is ${effectiveP1Coverage}% (target: 90%).`
-      : `P0 coverage is 100% and overall coverage is ${overallCoverage}% (minimum: 80%), but additional non-P1 gaps need mitigation.`;
+      ? `P0 coverage is ${formatCoverage(p0Coverage)}% and overall coverage is ${formatCoverage(overallCoverage)}% (minimum: ${gateThresholds.overallCoverageMinimum}%), but P1 coverage is ${formatCoverage(effectiveP1Coverage)}% (target: ${gateThresholds.p1CoverageTarget}%).`
+      : `P0 coverage is ${formatCoverage(p0Coverage)}% and overall coverage is ${formatCoverage(overallCoverage)}% (minimum: ${gateThresholds.overallCoverageMinimum}%), but additional non-P1 gaps need mitigation.`;
   }
 
   // Rule 6: Manual waiver — deliberately not computed here. Rules 1-5 above are the only rules
@@ -351,18 +484,18 @@ const gateReport = {
 
   gate_criteria: gateEligible
     ? {
-        p0_coverage_required: '100%',
-        p0_coverage_actual: `${p0Coverage}%`,
-        p0_status: p0Coverage === 100 ? 'MET' : 'NOT_MET',
+        p0_coverage_required: `${gateThresholds.p0CoverageRequired}%`,
+        p0_coverage_actual: `${formatCoverage(p0Coverage)}%`,
+        p0_status: p0Coverage >= gateThresholds.p0CoverageRequired ? 'MET' : 'NOT_MET',
 
-        p1_coverage_target: '90%',
-        p1_coverage_minimum: '80%',
-        p1_coverage_actual: `${effectiveP1Coverage}%`,
-        p1_status: effectiveP1Coverage >= 90 ? 'MET' : effectiveP1Coverage >= 80 ? 'PARTIAL' : 'NOT_MET',
+        p1_coverage_target: `${gateThresholds.p1CoverageTarget}%`,
+        p1_coverage_minimum: `${gateThresholds.p1CoverageMinimum}%`,
+        p1_coverage_actual: `${formatCoverage(effectiveP1Coverage)}%`,
+        p1_status: effectiveP1Coverage >= gateThresholds.p1CoverageTarget ? 'MET' : effectiveP1Coverage >= gateThresholds.p1CoverageMinimum ? 'PARTIAL' : 'NOT_MET',
 
-        overall_coverage_minimum: '80%',
-        overall_coverage_actual: `${overallCoverage}%`,
-        overall_status: overallCoverage >= 80 ? 'MET' : 'NOT_MET',
+        overall_coverage_minimum: `${gateThresholds.overallCoverageMinimum}%`,
+        overall_coverage_actual: `${formatCoverage(overallCoverage)}%`,
+        overall_status: overallCoverage >= gateThresholds.overallCoverageMinimum ? 'MET' : 'NOT_MET',
       }
     : null,
 
@@ -488,7 +621,30 @@ const testInventory = {
     ...(rawTestInventory.by_level || {}),
   },
 };
-const blockers = coverageMatrix.blockers || coverageMatrix.test_inventory?.blockers || fallbackInventory.blockers;
+const collectedBlockers = coverageMatrix.blockers || coverageMatrix.test_inventory?.blockers || fallbackInventory.blockers;
+// An unresolvable threshold is carried into the emitted summary rather than raised as an exception,
+// so a pipeline reading only e2e-trace-summary.json can see why the gate failed.
+const thresholdBlockers = thresholdErrors.map((reason, index) => ({
+  id: `gate-threshold-config-${index + 1}`,
+  severity: 'critical',
+  reason,
+}));
+// Same treatment as thresholdBlockers above: an unresolvable coverage value is a data problem a
+// pipeline reading only e2e-trace-summary.json must be able to see, not just infer from the rationale.
+const coverageValueBlockers = coverageValuesValid
+  ? []
+  : [
+      {
+        id: 'gate-coverage-unresolved',
+        severity: 'critical',
+        reason: `Coverage values could not be determined from the coverage matrix (P0: ${formatCoverage(p0Coverage)}%, P1: ${formatCoverage(effectiveP1Coverage)}%, overall: ${formatCoverage(overallCoverage)}%).`,
+      },
+    ];
+// Array.isArray guard: a malformed upstream `blockers` value must not turn a spread into the very
+// mid-script abort this block exists to prevent.
+const blockers = Array.isArray(collectedBlockers)
+  ? [...thresholdBlockers, ...coverageValueBlockers, ...collectedBlockers]
+  : [...thresholdBlockers, ...coverageValueBlockers];
 
 const heuristicCounts = coverageMatrix.coverage_heuristics?.counts || {};
 const endpointGapCount = heuristicCounts.endpoints_without_tests ?? 0;
@@ -533,18 +689,23 @@ const e2eTraceSummary = {
     inventory: {
       covered: stats.fully_covered,
       total: stats.total_requirements,
-      pct: stats.overall_coverage_percentage,
+      // The unrounded value the gate actually compared, not Step 4's rounded one: a summary
+      // reporting `pct: 100` beside a FAIL for incomplete coverage is the confusion this avoids.
+      pct: Number.isFinite(overallCoverage) ? Number(overallCoverage.toFixed(2)) : stats.overall_coverage_percentage,
     },
     priority_breakdown: {
+      // P0/P1 report the same unrounded value the gate compared (see exactCoverage above), not
+      // Step 4's rounded percentage: a `pct: 100` here beside a FAIL gate_criteria value is the
+      // confusion this avoids, matching the fix already applied to coverage.inventory.pct.
       P0: {
         total: priorityBreakdown.P0.total,
         covered: priorityBreakdown.P0.covered,
-        pct: priorityBreakdown.P0.percentage,
+        pct: Number.isFinite(p0Coverage) ? Number(p0Coverage.toFixed(2)) : priorityBreakdown.P0.percentage,
       },
       P1: {
         total: priorityBreakdown.P1.total,
         covered: priorityBreakdown.P1.covered,
-        pct: priorityBreakdown.P1.percentage,
+        pct: Number.isFinite(p1Coverage) ? Number(p1Coverage.toFixed(2)) : priorityBreakdown.P1.percentage,
       },
       P2: {
         total: priorityBreakdown.P2.total,
@@ -607,16 +768,16 @@ const e2eTraceSummary = {
 if (gateEligible) {
   e2eTraceSummary.gate_status = gateDecision;
   e2eTraceSummary.gate_criteria = {
-    p0_coverage_required: '100%',
-    p0_coverage_actual: `${p0Coverage}%`,
-    p0_status: p0Coverage === 100 ? 'MET' : 'NOT_MET',
-    p1_coverage_target: '90%',
-    p1_coverage_minimum: '80%',
-    p1_coverage_actual: `${effectiveP1Coverage}%`,
-    p1_status: effectiveP1Coverage >= 90 ? 'MET' : effectiveP1Coverage >= 80 ? 'PARTIAL' : 'NOT_MET',
-    overall_coverage_minimum: '80%',
-    overall_coverage_actual: `${overallCoverage}%`,
-    overall_status: overallCoverage >= 80 ? 'MET' : 'NOT_MET',
+    p0_coverage_required: `${gateThresholds.p0CoverageRequired}%`,
+    p0_coverage_actual: `${formatCoverage(p0Coverage)}%`,
+    p0_status: p0Coverage >= gateThresholds.p0CoverageRequired ? 'MET' : 'NOT_MET',
+    p1_coverage_target: `${gateThresholds.p1CoverageTarget}%`,
+    p1_coverage_minimum: `${gateThresholds.p1CoverageMinimum}%`,
+    p1_coverage_actual: `${formatCoverage(effectiveP1Coverage)}%`,
+    p1_status: effectiveP1Coverage >= gateThresholds.p1CoverageTarget ? 'MET' : effectiveP1Coverage >= gateThresholds.p1CoverageMinimum ? 'PARTIAL' : 'NOT_MET',
+    overall_coverage_minimum: `${gateThresholds.overallCoverageMinimum}%`,
+    overall_coverage_actual: `${formatCoverage(overallCoverage)}%`,
+    overall_status: overallCoverage >= gateThresholds.overallCoverageMinimum ? 'MET' : 'NOT_MET',
   };
 }
 
@@ -697,9 +858,9 @@ fs.writeFileSync('{outputFile}', reportContent, 'utf8');
 🚨 GATE DECISION: {gateDecision}
 
 📊 Coverage Analysis:
-- P0 Coverage: {p0Coverage}% (Required: 100%) → {p0_status}
-- P1 Coverage: {effectiveP1Coverage}% (PASS target: 90%, minimum: 80%) → {p1_status}
-- Overall Coverage: {overallCoverage}% (Minimum: 80%) → {overall_status}
+- P0 Coverage: {formatCoverage(p0Coverage)}% (Required: {gateThresholds.p0CoverageRequired}%) → {p0_status}
+- P1 Coverage: {formatCoverage(effectiveP1Coverage)}% (PASS target: {gateThresholds.p1CoverageTarget}%, minimum: {gateThresholds.p1CoverageMinimum}%) → {p1_status}
+- Overall Coverage: {formatCoverage(overallCoverage)}% (Minimum: {gateThresholds.overallCoverageMinimum}%) → {overall_status}
 
 ✅ Decision Rationale:
 {rationale}
@@ -784,7 +945,7 @@ Then append the gate decision summary (from section 5 above) to the end of the e
 - `e2e-trace-summary.json` missing or invalid JSON
 - Report missing or incomplete
 
-**Master Rule:** Gate decision MUST be deterministic based on clear criteria (P0 100%, P1 90/80, overall >=80) whenever `allow_gate` is true and `collection_status` is `COLLECTED`. A run with any requirement covered only by recorded live verification MUST NOT return PASS. `e2e-trace-summary.json` MUST be written before the workflow terminates.
+**Master Rule:** Gate decision MUST be deterministic based on the resolved project thresholds whenever `allow_gate` is true and `collection_status` is `COLLECTED` — it MUST NEVER remain `NOT_EVALUATED` in that case. A run with any requirement covered only by recorded live verification MUST NOT return PASS. A run whose thresholds cannot be resolved MUST return FAIL, MUST record the reason as a `critical` blocker, and MUST NOT abort before its outputs are written — an empty or unparsable threshold is a configuration failure, never a relaxed criterion. The same applies when P0, P1, or overall coverage itself cannot be resolved to a finite number: that MUST also return FAIL with a `critical` blocker, never a silent non-decision. Coverage MUST be compared on the unrounded `covered`/`total` counts: a rounded percentage MUST NOT satisfy a threshold the raw counts do not. `e2e-trace-summary.json` MUST be written before the workflow terminates.
 
 ## On Complete
 
