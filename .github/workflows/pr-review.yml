@@ -266,32 +266,38 @@ jobs:
             The reviewed repository is `${{ env.REVIEW_REPOSITORY }}` at `${{ env.TARGET_PATH }}`.
           claude_args: |
             --model claude-haiku-4-5
-            --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
-            --json-schema '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer"},"medium_count":{"type":"integer"},"low_count":{"type":"integer"},"report_markdown":{"type":"string"}},"required":["review_status","high_count","medium_count","low_count","report_markdown"]}'
+            --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill,Write"
+            --json-schema '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer"},"medium_count":{"type":"integer"},"low_count":{"type":"integer"}},"required":["review_status","high_count","medium_count","low_count"]}'
 
       - name: Materialize validated report
         if: always() && steps.diff.outputs.ready == 'true'
         env:
-          REVIEW_OUTCOME: ${{ steps.reviewer.outcome }}
-          REVIEWER_CONCLUSION: ${{ steps.reviewer.outputs.conclusion }}
           STRUCTURED_OUTPUT: ${{ steps.reviewer.outputs.structured_output }}
         run: |
-          structured_output=""
-          if [ "$REVIEW_OUTCOME" = "success" ] && [ "$REVIEWER_CONCLUSION" = "success" ]; then
-            structured_output=$STRUCTURED_OUTPUT
-          fi
+          set -u
+          findings=.pr-review/findings.md
 
-          if printf '%s' "$structured_output" |
-               jq -e '(.report_markdown | type) == "string" and (.report_markdown | length) > 0' \
-                 >/dev/null 2>&1; then
-            printf '%s' "$structured_output" | jq -r '.report_markdown' > .pr-review/report.md
+          if [ -s "$findings" ] && grep -q '^## Automated code review' "$findings"; then
+            cp "$findings" .pr-review/report.md
           else
-            echo "::warning::The reviewer failed or returned invalid structured output; advisory review remains neutral."
+            echo "::warning::The reviewer produced no findings report; advisory review remains neutral."
             cat > .pr-review/report.md <<'EOF'
           ## Automated code review
 
-          The reviewer failed or returned invalid structured output. No findings were published and no merge gate was applied.
+          The reviewer did not produce a findings report. No findings were published and no merge gate was applied.
           EOF
+            exit 0
+          fi
+
+          # The structured summary is advisory metadata only; the report above stands
+          # on its own when the reviewer returns no structured output.
+          if printf '%s' "$STRUCTURED_OUTPUT" |
+               jq -e '(.review_status | type) == "string"' >/dev/null 2>&1; then
+            printf '%s' "$STRUCTURED_OUTPUT" |
+              jq -r '"\n_Reviewer status: \(.review_status) — high \(.high_count), medium \(.medium_count), low \(.low_count)._"' \
+              >> .pr-review/report.md
+          else
+            echo "::warning::The reviewer returned no structured summary; the findings report was published without one."
           fi
 
       - name: Bound report size
