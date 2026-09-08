@@ -1,0 +1,15 @@
+# Team quality-gate policy for bmad-testarch-trace.
+#
+# This is intentionally a team override rather than an edit to the generated
+# trace report or a personal .user.toml file. The 100% rule applies only to an
+# explicitly declared MVP or demo trace target. A whole-repository planning
+# audit must set allow_gate=false and must not be presented as release readiness.
+[workflow]
+p0_coverage_required = "100"
+p1_coverage_target = "100"
+p1_coverage_minimum = "100"
+overall_coverage_minimum = "100"
+
+persistent_facts = [
+  "For a release- or demo-readiness gate, trace only the explicitly declared MVP/demo target. PASS requires 100% FULL coverage of its P0 and P1 criteria, 100% overall oracle coverage within that target, and fresh successful execution evidence for every mapped runnable test. Treat a whole-repository trace as a planning audit: set allow_gate=false unless the complete product is the declared release scope. Record any excluded criterion as out of scope with an owner and follow-up target; never use an aggregate percentage to imply readiness of untraced functionality.",
+]

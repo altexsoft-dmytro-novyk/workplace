@@ -5,6 +5,14 @@
 
 [workflow]
 
+# Quality-gate thresholds are strings because rendered workflow values are
+# substituted into Markdown and JavaScript. A project team can override them in
+# _bmad/custom/bmad-testarch-trace.toml without editing the installed workflow.
+p0_coverage_required = "100"
+p1_coverage_target = "90"
+p1_coverage_minimum = "80"
+overall_coverage_minimum = "80"
+
 # --- Configurable below. Overrides merge per BMad structural rules: ---
 #   scalars: override wins • arrays (persistent_facts, activation_steps_*): append
 
