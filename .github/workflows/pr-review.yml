@@ -266,38 +266,70 @@ jobs:
             The reviewed repository is `${{ env.REVIEW_REPOSITORY }}` at `${{ env.TARGET_PATH }}`.
           claude_args: |
             --model claude-haiku-4-5
-            --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill,Write"
-            --json-schema '{"type":"object","additionalProperties":false,"properties":{"review_status":{"type":"string","enum":["clean","findings","incomplete"]},"high_count":{"type":"integer"},"medium_count":{"type":"integer"},"low_count":{"type":"integer"}},"required":["review_status","high_count","medium_count","low_count"]}'
+            --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
 
-      - name: Materialize validated report
-        if: always() && steps.diff.outputs.ready == 'true'
+      - name: Surface reviewer failure detail
+        if: always() && steps.diff.outputs.ready == 'true' && steps.reviewer.outcome != 'success'
         env:
-          STRUCTURED_OUTPUT: ${{ steps.reviewer.outputs.structured_output }}
+          EXECUTION_FILE: ${{ steps.reviewer.outputs.execution_file }}
         run: |
           set -u
-          findings=.pr-review/findings.md
-
-          if [ -s "$findings" ] && grep -q '^## Automated code review' "$findings"; then
-            cp "$findings" .pr-review/report.md
-          else
-            echo "::warning::The reviewer produced no findings report; advisory review remains neutral."
-            cat > .pr-review/report.md <<'EOF'
-          ## Automated code review
-
-          The reviewer did not produce a findings report. No findings were published and no merge gate was applied.
-          EOF
+          if [ -z "$EXECUTION_FILE" ] || [ ! -s "$EXECUTION_FILE" ]; then
+            echo "::warning::The reviewer wrote no execution log; its failure reason is unavailable."
             exit 0
           fi
 
-          # The structured summary is advisory metadata only; the report above stands
-          # on its own when the reviewer returns no structured output.
-          if printf '%s' "$STRUCTURED_OUTPUT" |
-               jq -e '(.review_status | type) == "string"' >/dev/null 2>&1; then
-            printf '%s' "$STRUCTURED_OUTPUT" |
-              jq -r '"\n_Reviewer status: \(.review_status) — high \(.high_count), medium \(.medium_count), low \(.low_count)._"' \
-              >> .pr-review/report.md
-          else
-            echo "::warning::The reviewer returned no structured summary; the findings report was published without one."
+          # The action prints a sanitized result that omits why the run failed, so
+          # read the reason out of the SDK result message in the execution log.
+          {
+            echo '### Reviewer failure detail'
+            echo
+            echo '```'
+            jq -r '
+              [.[] | select(.type == "result")] | last // {}
+              | "subtype:           \(.subtype // "n/a")",
+                "is_error:          \(.is_error | tostring)",
+                "terminal_reason:   \(.terminal_reason // "n/a")",
+                "api_error_status:  \(.api_error_status // "n/a")",
+                "num_turns:         \(.num_turns // "n/a")",
+                "total_cost_usd:    \(.total_cost_usd // "n/a")",
+                "errors:            \((.errors // []) | join("; "))",
+                "result:            \((.result // "n/a") | tostring | .[0:500])"
+            ' "$EXECUTION_FILE"
+            echo '```'
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Materialize reviewer response
+        if: always() && steps.diff.outputs.ready == 'true'
+        env:
+          REVIEW_OUTCOME: ${{ steps.reviewer.outcome }}
+          EXECUTION_FILE: ${{ steps.reviewer.outputs.execution_file }}
+        run: |
+          set -u
+          published=false
+
+          # The reviewer's final response is the report. It reaches this step only
+          # through the execution log, so read it from the last result message.
+          if [ "$REVIEW_OUTCOME" = "success" ] && [ -n "$EXECUTION_FILE" ] &&
+             [ -s "$EXECUTION_FILE" ]; then
+            if jq -e '
+                 [.[] | select(.type == "result")] | last
+                 | .subtype == "success" and (.is_error | not)
+                   and (.result | type) == "string" and (.result | length) > 0
+               ' "$EXECUTION_FILE" >/dev/null 2>&1; then
+              jq -r '[.[] | select(.type == "result")] | last | .result' \
+                "$EXECUTION_FILE" > .pr-review/report.md
+              published=true
+            fi
+          fi
+
+          if [ "$published" = false ]; then
+            echo "::warning::The reviewer returned no response; advisory review remains neutral."
+            cat > .pr-review/report.md <<'EOF'
+          ## Automated code review
+
+          The reviewer returned no response. No findings were published and no merge gate was applied.
+          EOF
           fi
 
       - name: Bound report size
