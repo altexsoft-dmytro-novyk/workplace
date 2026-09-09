@@ -1158,9 +1158,11 @@ test('the sprint-status generator wrapper runs the guard before invoking sprint_
 // through the supported customization layer rather than by patching the script.
 test('the sprint-planning customization override points the skill at the guard', async () => {
   const override = await fs.readFile(path.join(REPO_ROOT, '_bmad/custom/bmad-sprint-planning.toml'), 'utf8');
+  const prependMatch = override.match(/activation_steps_prepend\s*=\s*\[([\s\S]*?)\]/);
 
   assert.match(override, /\[workflow\]/);
-  assert.match(override, /activation_steps_prepend/);
-  assert.match(override, /scripts\/epic-id-guard\.cjs/);
-  assert.match(override, /sprint-status-generate\.sh/);
+  assert.ok(prependMatch, 'activation_steps_prepend must be defined');
+  assert.match(prependMatch[1], /scripts\/epic-id-guard\.cjs/, 'identity guard must be mandated before generation');
+  assert.match(prependMatch[1], /sprint-status-generate\.sh/, 'wrapper must be mandated before generation, not only on_complete');
+  assert.match(override, /on_complete/);
 });
