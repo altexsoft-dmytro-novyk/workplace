@@ -190,8 +190,6 @@ jobs:
           if [ "$REVIEW_KIND" = "workspace" ]; then
             pathspec+=(
               ':(exclude).tmp/**'
-              ':(exclude)_bmad-output/**'
-              ':(exclude)docs/**'
             )
           fi
 
