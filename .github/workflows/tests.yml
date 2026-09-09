@@ -265,9 +265,13 @@ jobs:
           restore-keys: playwright-${{ runner.os }}-
 
       - name: Install Playwright browsers
-        # `--with-deps` installs OS libraries outside the cached directory, so it
-        # runs on a cache hit too; only the browser download is skipped.
-        run: npx playwright install --with-deps chromium
+        # `--with-deps` runs apt on every cache hit. ubuntu-latest also ships
+        # dl.google.com/linux/chrome-stable/deb; when Google's Release/Packages
+        # CDN desyncs, apt update dies with Hash Sum mismatch and blocks install
+        # even though Playwright ships its own Chromium and never needs that repo.
+        run: |
+          sudo rm -f /etc/apt/sources.list.d/google-chrome.list
+          npx playwright install --with-deps chromium
 
       - name: E2E tests
         # The suite mocks the API at the network layer and starts Vite itself
