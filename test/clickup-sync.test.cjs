@@ -37,7 +37,7 @@ test('workflow creates missing tasks before syncing sprint status', async () => 
   assert.ok(createSteps.some((step) => step.run === 'npm run create:clickup'));
 
   const syncSteps = workflow.jobs.sync.steps;
-  assert.ok(syncSteps.some((step) => step.uses === 'actions/setup-node@v4' && step.with?.['node-version'] === '20'));
+  assert.ok(syncSteps.some((step) => step.uses === 'actions/setup-node@v4' && step.with?.['node-version'] === '24'));
   assert.ok(syncSteps.some((step) => step.run === 'npm ci'));
   assert.deepEqual(syncSteps.find((step) => step.run === 'npm run sync:clickup'), {
     run: 'npm run sync:clickup',
