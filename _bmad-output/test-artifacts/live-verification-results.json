@@ -1,8 +1,8 @@
 {
   "schema_version": "0.1.0",
-  "source_sha": "6f22d85bf222fc0d216d1dd85c472202362e94da",
-  "observed_at": "2026-09-08T11:56:06Z",
-  "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34222307987 (re-resolved locally against the corrected matrix index)",
+  "source_sha": "43d50add983ad70a31064e94576c4a88fb06bf74",
+  "observed_at": "2026-09-09T21:04:27Z",
+  "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34400438569",
   "results": [
     {
       "id": "repo-LIVE-001",
@@ -4448,17 +4448,17 @@
       {
         "kind": "jest",
         "suite": "backend-unit",
-        "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/a37f75c5-b4ea-4193-bc15-0abf5d33e683/scratchpad/rep/report-backend-unit/backend-unit.json"
+        "file": "reports/backend-unit.json"
       },
       {
         "kind": "jest",
         "suite": "backend-e2e",
-        "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/a37f75c5-b4ea-4193-bc15-0abf5d33e683/scratchpad/rep/report-backend-e2e/backend-e2e.json"
+        "file": "reports/backend-e2e.json"
       },
       {
         "kind": "playwright",
         "suite": "frontend-e2e",
-        "file": "/private/tmp/claude-501/-Users-home-bootcamp-workplace/a37f75c5-b4ea-4193-bc15-0abf5d33e683/scratchpad/rep/report-frontend-e2e/frontend-e2e.json"
+        "file": "reports/frontend-e2e.json"
       }
     ],
     "missing_reports": [],
