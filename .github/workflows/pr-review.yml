@@ -343,8 +343,10 @@ jobs:
             --model claude-haiku-4-5
             --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
 
-      - name: Surface reviewer failure detail
-        if: always() && steps.diff.outputs.ready == 'true' && steps.reviewer.outcome != 'success'
+      - name: Surface reviewer diagnostics
+        # Runs on success too. A reviewer that answers without doing the work
+        # still succeeds, and that is precisely the case worth reading.
+        if: always() && steps.diff.outputs.ready == 'true'
         env:
           EXECUTION_FILE: ${{ steps.reviewer.outputs.execution_file }}
         run: |
@@ -357,29 +359,123 @@ jobs:
           fi
 
           if [ ! -s "$execution_file" ]; then
-            echo "::warning::The reviewer wrote no execution log; its failure reason is unavailable."
+            echo "::warning::The reviewer wrote no execution log; its behaviour is unavailable."
             exit 0
           fi
 
-          # The action prints a sanitized result that omits why the run failed, so
-          # read the reason out of the SDK result message in the execution log.
-          {
-            echo '### Reviewer failure detail'
-            echo
-            echo '```'
-            jq -r '
-              [.[] | select(.type == "result")] | last // {}
-              | "subtype:           \(.subtype // "n/a")",
-                "is_error:          \(.is_error | tostring)",
-                "terminal_reason:   \(.terminal_reason // "n/a")",
-                "api_error_status:  \(.api_error_status // "n/a")",
-                "num_turns:         \(.num_turns // "n/a")",
-                "total_cost_usd:    \(.total_cost_usd // "n/a")",
-                "errors:            \((.errors // []) | join("; "))",
-                "result:            \((.result // "n/a") | tostring | .[0:500])"
-            ' "$execution_file"
-            echo '```'
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          # The action prints a sanitized result that omits both what the reviewer
+          # did and why it stopped, so render the execution log into the job
+          # summary: an outcome block, then one line per turn.
+          EXECUTION_FILE="$execution_file" python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json
+          import os
+
+          LINE_CAP = 240
+          TOTAL_CAP = 200_000
+
+          with open(os.environ["EXECUTION_FILE"], encoding="utf-8") as handle:
+              log = json.load(handle)
+          if not isinstance(log, list):
+              log = [log]
+
+          def clip(value, cap=LINE_CAP):
+              text = " ".join(str(value).split())
+              return text if len(text) <= cap else text[: cap - 1] + "…"
+
+          def blocks(entry):
+              content = entry.get("message", {}).get("content", entry.get("content"))
+              if isinstance(content, str):
+                  return [{"type": "text", "text": content}]
+              return content if isinstance(content, list) else []
+
+          print("### Reviewer outcome")
+          print()
+          print("```")
+          results = [e for e in log if e.get("type") == "result"]
+          if results:
+              last = results[-1]
+              for field in (
+                  "subtype",
+                  "is_error",
+                  "terminal_reason",
+                  "api_error_status",
+                  "num_turns",
+                  "duration_ms",
+                  "total_cost_usd",
+              ):
+                  print(f"{field + ':':<20}{last.get(field, 'n/a')}")
+              print(f"{'errors:':<20}{'; '.join(last.get('errors') or []) or 'none'}")
+              print(f"{'result:':<20}{clip(last.get('result', 'n/a'), 800)}")
+          else:
+              print("No result message: the reviewer was cut off before it finished.")
+          print("```")
+          print()
+
+          print("### Reviewer trace")
+          print()
+          print("One line per turn: what the reviewer said, and every tool it called.")
+          print()
+          print("```")
+          emitted = 0
+          truncated = False
+          for entry in log:
+              kind = entry.get("type")
+              if kind not in {"assistant", "user"}:
+                  continue
+              for block in blocks(entry):
+                  btype = block.get("type")
+                  if btype == "text" and block.get("text", "").strip():
+                      line = f"say    {clip(block['text'])}"
+                  elif btype == "tool_use":
+                      name = block.get("name", "?")
+                      raw = block.get("input") or {}
+                      # Surface the argument that identifies the call: a path, a
+                      # command, a skill name, or the head of a subagent prompt.
+                      for key in ("file_path", "path", "pattern", "command",
+                                  "skill", "subagent_type", "prompt",
+                                  "description"):
+                          if raw.get(key):
+                              detail = f"{key}={clip(raw[key], 160)}"
+                              break
+                      else:
+                          detail = clip(json.dumps(raw, ensure_ascii=False), 160)
+                      line = f"call   {name}({detail})"
+                  elif btype == "tool_result":
+                      flag = "ERR " if block.get("is_error") else ""
+                      body = block.get("content")
+                      if isinstance(body, list):
+                          body = " ".join(
+                              part.get("text", "")
+                              for part in body
+                              if isinstance(part, dict)
+                          )
+                      line = f"result {flag}{clip(body)}"
+                  else:
+                      continue
+                  if emitted + len(line) > TOTAL_CAP:
+                      truncated = True
+                      break
+                  emitted += len(line)
+                  print(line)
+              if truncated:
+                  break
+          if truncated:
+              print("… trace truncated; the full log is in the "
+                    "bmad-pr-review-execution-log artifact.")
+          if emitted == 0:
+              print("The reviewer took no recorded turns.")
+          print("```")
+          PY
+
+      - name: Upload reviewer execution log
+        if: always() && steps.diff.outputs.ready == 'true'
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: bmad-pr-review-execution-log
+          path: ${{ steps.reviewer.outputs.execution_file || format('{0}/claude-execution-output.json', runner.temp) }}
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Materialize reviewer response
         if: always() && steps.diff.outputs.ready == 'true'
@@ -404,17 +500,38 @@ jobs:
                    and (.result | type) == "string" and (.result | length) > 0
                ' "$execution_file" >/dev/null 2>&1; then
               jq -r '[.[] | select(.type == "result")] | last | .result' \
-                "$execution_file" > .pr-review/report.md
+                "$execution_file" > .pr-review/candidate.md
               published=true
             fi
           fi
 
-          if [ "$published" = false ]; then
-            echo "::error::The reviewer returned no response; no findings were published."
+          # A reviewer that restates its task instead of doing it still returns a
+          # non-empty string, so a length check alone will publish that verbatim.
+          # Require the headings the prompt mandates before treating the response
+          # as a report.
+          if [ "$published" = true ] &&
+             ! { grep -q '^## Automated review' .pr-review/candidate.md &&
+                 grep -q '^### Findings' .pr-review/candidate.md; }; then
+            published=false
+            echo "::error::The reviewer response is not a report; no findings were published."
+            {
+              echo '### Rejected reviewer response'
+              echo
+              echo '```'
+              head -c 2000 .pr-review/candidate.md
+              echo
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          if [ "$published" = true ]; then
+            mv .pr-review/candidate.md .pr-review/report.md
+          else
+            echo "::error::The reviewer returned no usable response; no findings were published."
             cat > .pr-review/report.md <<'EOF'
           ## Automated review
 
-          The reviewer returned no response. No findings were published.
+          The reviewer returned no usable response. No findings were published.
           EOF
             # The neutral report above is still published by the steps that follow,
             # because each of them runs under always().
