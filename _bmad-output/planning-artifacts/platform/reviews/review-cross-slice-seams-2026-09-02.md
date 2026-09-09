@@ -336,7 +336,7 @@ superseded, never rewrite the 2026-09-01 record.
 | 1.3 `PM/AD-28` honesty | `docs/test-cases/access-control/matrix/full-profile-access` | **Absent as required** — no such directory |
 | 1.3 mentorship gates → `blockers.yaml` IDs | `spec-mentorship-domain/SPEC.md:156` | **Applied** in the SPEC; **not** in `mentorship/epics.md` (S-08) |
 | 1.4 short denial summary links to full rule | `access-control.md:187` | **Applied** |
-| 1.6 `QUALITY-GATE-AC` current state | `_bmad-output/test-artifacts/gate-decision.json` | **Accurate** — `gate_status: FAIL`, `p0_status: NOT_MET`, `critical_open: 1`, evaluated `2026-08-31` |
+| 1.6 `QUALITY-GATE-AC` current state | [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`) | **Accurate** — `gate_status: FAIL`, `p0_status: NOT_MET`, `critical_open: 1`, evaluated `2026-08-31` |
 | 1.8 `POST /users` removed | `api-conventions.md:13`, `:36` | **Already applied** (S-06, V-03) |
 | 1.8 CC-06 assigned-only cancel | `database-schema.md:115` | **Already applied** (V-03) |
 | 1.1 blocker counts 18/8/4 | `blockers.yaml` | **Verified correct** — 30 entries |

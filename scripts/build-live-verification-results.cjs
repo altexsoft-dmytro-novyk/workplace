@@ -12,9 +12,11 @@
  * writes the file and never runs anything to produce it.
  *
  * Mapping a runner result to a requirement is done in two passes:
- *   1. Exact `(file, title)` lookup against the newest
- *      `tea-trace-coverage-matrix*.json`, which already carries the
- *      requirement -> tests mapping the last trace run resolved.
+ *   1. Exact `(file, title)` lookup against `tea-trace-coverage-matrix.json`,
+ *      which already carries the requirement -> tests mapping the last trace
+ *      run resolved. That one canonical name is what a trace run overwrites;
+ *      the glob-and-take-newest below is a safety net for a stray copy, not an
+ *      invitation to keep dated ones.
  *   2. Fallback: scan the test's full title path for an oracle ID derived from
  *      the `docs/test-cases/**` filenames (`um-rel-09-pp-atomic-replace.md` ->
  *      `UM-REL-09`), innermost title first so the most specific describe wins.

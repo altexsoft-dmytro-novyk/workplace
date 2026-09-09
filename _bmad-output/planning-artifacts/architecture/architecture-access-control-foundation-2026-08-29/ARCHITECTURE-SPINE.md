@@ -145,7 +145,7 @@ Local AD headings below are **ACF/AD-1..ACF/AD-4** (`spine_id: ACF`). Parent Peo
 
 | Status | Item | Action / owner |
 | --- | --- | --- |
-| **Historical FAIL preserved** | ACF-1 feature-to-audience mapping and production `/users` wiring | Keep `_bmad-output/test-artifacts/gate-decision.json` unchanged as the historical result. |
+| **Historical FAIL preserved** | ACF-1 feature-to-audience mapping and production `/users` wiring | Keep [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`) unchanged as the historical result. |
 | **OQs resolved; package review approved 2026-08-31** | OQ-3, OQ-4, OQ-6, OQ-7, OQ-11 | ACF/AD-4 is binding input. Frontmatter `package_review_approved: 2026-08-31` and `implementation_status: stage-1-authorized` control dispatch. |
 | **One gate statement** | FR-AMD-1 authority | Architecture decisions are approved and final under `approval_scope: architecture-decision-only`. Kernel package review is approved; Stage-1 follows ACF/AD-1. |
 | **Executable, not assumed** | CAP-8 / ACM-0 on a fresh database | ACM-0 creates and validates the normalized root User at a named entrypoint. No unnamed external prerequisite remains in the package. |

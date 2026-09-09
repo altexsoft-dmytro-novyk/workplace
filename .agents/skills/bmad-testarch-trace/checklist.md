@@ -343,6 +343,7 @@ Knowledge fragments referenced:
 - [ ] P1 oracle-item coverage evaluated (PASS >= `{workflow.p1_coverage_target}`%, CONCERNS from `{workflow.p1_coverage_minimum}`% up to the target, FAIL below `{workflow.p1_coverage_minimum}`%; the CONCERNS band is empty when target and minimum are equal)
 - [ ] Overall test pass rate evaluated (threshold: min_overall_pass_rate)
 - [ ] Overall oracle coverage evaluated (threshold: >= `{workflow.overall_coverage_minimum}`%)
+- [ ] Verified coverage evaluated (PASS >= `{workflow.verified_coverage_target}`%, CONCERNS from `{workflow.verified_coverage_minimum}`% up to the target, FAIL below `{workflow.verified_coverage_minimum}`%); a Phase 1 matrix carrying no verification counts caps the gate at CONCERNS rather than satisfying this criterion
 - [ ] Code coverage considered if available (informational unless explicitly required by policy)
 - [ ] P1 decision recorded: PASS or CONCERNS
 

@@ -78,7 +78,7 @@ Owner: `user-management` / `access-control` contexts. This slice does not schedu
 | Precondition | Severity / status | Binds |
 |---|---|---|
 | `SEC-AUTH-01` | **P0 open** | Any new read surface on the interim adapter inherits `Boolean(userId)` target auth and whole-row `GET /users` serialization. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
-| `QUALITY-GATE-AC` | **closed 2026-09-02** | Was P0. `gate-decision.json` shows `gate_status=PASS`, `p0_status=MET`, `critical_open=0`; ACM3-II-04/05/06 each carry independently approved Stage-2 evidence. No longer a precondition on any story here |
+| `QUALITY-GATE-AC` | **closed 2026-09-02** | Was P0. [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/a62e705/_bmad-output/test-artifacts/gate-decision.json) (`a62e705`) shows `gate_status=PASS`, `p0_status=MET`, `critical_open=0`; ACM3-II-04/05/06 each carry independently approved Stage-2 evidence. No longer a precondition on any story here |
 | `QUALITY-GATE-AC-NFR` | **closed 2026-09-02** | Was P1. NFR-3 / SM-4 proven by ACM-9 final (`acm9-final-…ff94a3e685d1.json`, PASS, 500 targets, warm p95 11.603 ms). **Closure is pinned to resolver revision `f89e034`** — any change under `services/backend/src/access-control/**` invalidates it and requires an ACM-9 rerun |
 | `OQ-PERM-01` | P1 open | "view each dashboard type" is an FR-6 permission; default grants unapproved — **do not seed or infer grants** |
 | `CONFLICT-UM-01` | P1 open (implementation stale) | PM/AD-24 "list endpoints omit invisible rows"; runtime still diverges |

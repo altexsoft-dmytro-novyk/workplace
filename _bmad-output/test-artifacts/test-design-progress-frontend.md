@@ -20,6 +20,6 @@ platform / Access Control (`*-platform.md`) only.
 **Driving finding:** level selection in this area has never been a decision. See
 that document's Level Strategy section for the evidence and the rebalance.
 
-**Inputs read:** `tea-trace-coverage-matrix-repo-2026-09-06.json` (requirement
+**Inputs read:** `tea-trace-coverage-matrix-repo-2026-09-06.json` as of commit `1edec31` (requirement
 inventory, priorities, mapped test levels), the source trees of both services,
 `deferred-work.md` for both areas, and the contract suite landed 2026-09-06.
