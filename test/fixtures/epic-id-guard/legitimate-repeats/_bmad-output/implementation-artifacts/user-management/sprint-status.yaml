@@ -1,0 +1,14 @@
+generated: 09-09-2026 10:00
+last_updated: 09-09-2026 10:00
+project: user-management
+development_status:
+  epic-0: in-progress
+  0-1-adopt-read-path-and-rebind-port: done
+  epic-0-retrospective: optional
+  epic-4: done
+  4-1-change-an-employee-s-manager: done
+  epic-4-retrospective: optional
+  epic-8: backlog
+  8-1-define-a-custom-field-with-declared-visibility: backlog
+  8-2a-set-and-store-custom-field-values-first-half: backlog
+  epic-8-retrospective: optional

@@ -15,6 +15,11 @@ on:
       - scripts/clickup-lib.cjs
       - scripts/create-clickup-task.cjs
       - scripts/sync-clickup.cjs
+      # The guard decides whether either job may write at all, so a change to
+      # the guard or its tests must re-run this workflow just like a change to
+      # the sync scripts does.
+      - scripts/epic-id-guard.cjs
+      - test/epic-id-guard.test.cjs
       - .github/workflows/sync-clickup.yml
   workflow_dispatch: {}
 
@@ -30,6 +35,10 @@ jobs:
         with:
           node-version: '24'
       - run: npm ci
+      # Explicit and before the write step, even though create:clickup runs the
+      # same guard internally: this way the job fails on the guard's own output,
+      # with the file, line and ID, instead of inside the create summary.
+      - run: npm run guard:epic-ids:clickup
       - run: npm run create:clickup
         env:
           CLICKUP_API_TOKEN: ${{ secrets.CLICKUP_API_TOKEN }}
@@ -43,6 +52,9 @@ jobs:
         with:
           node-version: '24'
       - run: npm ci
+      # Re-checked here rather than inherited from create-if-missing: the two
+      # jobs check out independently, and sync writes statuses of its own.
+      - run: npm run guard:epic-ids:clickup
       - run: npm run sync:clickup
         env:
           CLICKUP_API_TOKEN: ${{ secrets.CLICKUP_API_TOKEN }}

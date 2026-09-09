@@ -1,0 +1,17 @@
+generated: 09-09-2026 10:00
+last_updated: 09-09-2026 10:00
+project: platform
+development_status:
+  epic-4: done
+  4-1-generalise-section-access-authorisation: done
+  4-2-default-org-relationship-seed: done
+  epic-4-retrospective: optional
+  epic-8: backlog
+  8-1-project-line-derivation-from-explicit-pm-dm-attachments: backlog
+  8-2-project-line-column-narrowness-and-best-column-merge: backlog
+  epic-8-retrospective: optional
+  dept-epic: backlog
+  dept-1-department-manager-fact-and-direct-derivation: backlog
+  dept-2-profile-timeline-dual-gate-and-dec-um-001: backlog
+  dept-3-full-department-reporting-line-audience: backlog
+  dept-4-timeline-dual-gate-test-fallout: backlog

@@ -7,6 +7,8 @@ file was edited to produce it. Every line number below was read from the working
 Date: 2026-09-04 · workspace `0114d1c` · branch `claude/bmad-testarch-trace-a4ddb9`
 Companion to `BRIEFING.md`. Consumes `chain-fix/authentication-requirement-proposal.md`.
 
+> **Epic-number migration (2026-09-09).** `platform/epics.md` and `user-management/epics.md` each carried two epics under one number. The renumbering was: platform *Project-Line Audience* `PLAT-E4-S4.1`…`S4.4` → `PLAT-E8-S8.1`…`S8.4` (sprint keys `4-n-…` → `8-n-…`), and user-management *Custom Fields as Data* `UM-E6-S6.1`…`S6.3` → `UM-E8-S8.1`…`S8.3` (sprint keys `6-n-…` → `8-n-…`). Platform **Epic 4 — Access Control Authorization Consolidation** and user-management **Epic 6 — Current-State Read Endpoints** kept their numbers. Old IDs below are correct for the date they were written; read them through this map. Full map: `docs/superpowers/plans/2026-09-09-epic-number-collision-audit.md`.
+
 ---
 
 ## 1. Scope and method

@@ -36,9 +36,11 @@ This document decomposes exactly **one canonical PRD requirement** — runtime f
 
 | Context | Responsibility in this slice |
 |---|---|
-| `access-control` | Owns this slice's code (`Policies`, `Permissions`, `UserPolicies`, `isAllowed`) — **not a new bounded context**. AD-5 already confirms `access-control`; this is a new decomposition *file* for an orthogonal capability inside that same confirmed context, exactly as `platform/epics.md`'s PLAT-E1–E7 already do for the audience-resolution half. |
+| `access-control` | Owns this slice's code (`Policies`, `Permissions`, `UserPolicies`, `isAllowed`) — **not a new bounded context**. AD-5 already confirms `access-control`; this is a new decomposition *file* for an orthogonal capability inside that same confirmed context, exactly as `platform/epics.md`'s PLAT-E1–E8 already do for the audience-resolution half. |
 
 > **Cost, named explicitly (product owner ruling, 2026-09-03).** One context, two decomposition documents, is a cost this pass consciously pays, not a default nobody examined. `platform/epics.md` decomposes access-control's audience-*resolution* half (Phase-0 tiers, project-line, department walk, section matrix, shared-link policy) across 1500+ lines and never claims `PM-FR-6` anywhere in that text — folding runtime role/permission administration in as `PLAT-E8`/`PLAT-E9` was considered and rejected specifically to avoid rewriting that document's own scope statement to retroactively admit an eighth concern it never claimed. The trade-off accepted in exchange: `RA-E1`/`RA-E2` and `PLAT-E1`–`E7` both touch `src/access-control/` without one file's index knowing the other exists, so a future reader auditing "everything access-control owns" must check both files — the same convention `spec-functional-roles-catalog/SPEC.md` itself already accepted for the *code* layer ("one context now holds a read-only hot path and a mutating admin surface... the cost is accepted"), extended here to the *planning-document* layer for the same reason.
+
+> **Clarification (2026-09-09, epic-number-collision repair) — the ruling above is unchanged.** On 2026-09-09 `platform/epics.md` gained an `Epic 8` of its own: *Project-Line Audience*, renumbered out of a collision with *Access Control Authorization Consolidation*. That epic belongs to the audience-resolution half and has nothing to do with role administration. The ruling's **decision** stands — role administration was not, and is not, folded into `platform/epics.md`, and no `PLAT-E8`/`PLAT-E9` role-administration epic exists. Only its supporting phrasing ("an eighth concern it never claimed") is now dated: platform does have an eighth epic, just not this one. The ruling text is left verbatim as the 2026-09-03 record.
 | `user-management` | Owns the `/users/:id/policies` HTTP route (role↔user attachment) per AD-2 — this slice supplies the attachment *capability* at the domain/port level and claims no route under `/users`. Also owns `user-management:edit` enforcement once RA-E1 seeds the key (consumed, not defined, here). |
 | `mentorship` | Owns `mentorship:assign` enforcement once RA-E1 seeds the key (consumed, not defined, here). |
 
@@ -100,7 +102,7 @@ Functional roles and their sixteen §2.3 permissions exist as data — created, 
 
 **Standalone:** yes. Needs no default-assignment decision (AD-12 forbids inventing one regardless), and delivers a real, testable engine the moment its Stage-1 scenario document is approved.
 
-**Enables (without depending on):** RA-E2 (consumes this catalog); `user-management/epics.md` Epic UM-E6 (needs the `manage custom fields` key to exist); `platform-capabilities/epics.md` Epic 4 (needs the `user-management:edit` key and a working `isAllowed`).
+**Enables (without depending on):** RA-E2 (consumes this catalog); `user-management/epics.md` Epic UM-E8 (needs the `manage custom fields` key to exist); `platform-capabilities/epics.md` Epic 4 (needs the `user-management:edit` key and a working `isAllowed`).
 
 ### Epic RA-E2: Roles & Permissions Administration Screen
 
@@ -113,7 +115,7 @@ HR Admin views derived access roles read-only and manages functional-role permis
 ### Epic Dependency Graph
 
 - RA-E1 → RA-E2 (consumes the catalog; RA-E2's own gate is independent of RA-E1's completion)
-- RA-E1 → `user-management/epics.md` Epic UM-E6 (external slice; needs `manage custom fields` key)
+- RA-E1 → `user-management/epics.md` Epic UM-E8 (external slice; needs `manage custom fields` key)
 - RA-E1 → `platform-capabilities/epics.md` Epic 4 (external slice; needs `user-management:edit` key + `isAllowed`)
 - `OQ-PERM-01` → RA-E2 only — hard sprint-entry block with no further propagation
 

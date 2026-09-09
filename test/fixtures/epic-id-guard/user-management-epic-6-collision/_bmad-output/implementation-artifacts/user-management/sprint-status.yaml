@@ -1,0 +1,9 @@
+generated: 09-03-2026 10:00
+last_updated: 09-03-2026 10:00
+project: user-management
+development_status:
+  epic-6: in-progress
+  6-1-read-current-manager-and-people-partner: review
+  6-2-read-department-catalog-and-memberships: backlog
+  6-3-list-an-employees-departures: backlog
+  epic-6-retrospective: optional

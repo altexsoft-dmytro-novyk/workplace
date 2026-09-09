@@ -584,7 +584,11 @@ test('collectSyncEntries annotates an epic that has no ClickUp task', async () =
   assert.match(logged[0], /platform: epic-9/);
 });
 
-test('createMissingClickUpTasks annotates the story prefixes it skipped', async () => {
+// The annotation path still exists for the read-only collector (see
+// "collectSyncEntries annotates an epic that has no ClickUp task"), but the
+// create job no longer reaches it: an unmapped numeric story key now stops the
+// run outright rather than being reported from inside a passing job.
+test('createMissingClickUpTasks stops on an unmapped story prefix instead of annotating it', async () => {
   const fixture = await createFixture({
     status: 'backlog',
     storyKey: '9-9-unmapped-prefix-story',
@@ -598,29 +602,27 @@ test('createMissingClickUpTasks annotates the story prefixes it skipped', async 
       'tasks: {}',
     ].join('\n'),
   });
-  const logged = [];
-  const originalLog = console.log;
-  console.log = (line) => logged.push(line);
-  let summary;
-  try {
-    summary = await createMissingClickUpTasks({
+  const writes = [];
+
+  await assert.rejects(
+    createMissingClickUpTasks({
       ...fixture,
       token: 'secret-token',
       sleepImpl: async () => {},
       annotationOptions: { env: { GITHUB_ACTIONS: 'true' } },
       fetchImpl: withClickUpValidation(async (url, init = {}) => {
+        if (init.method === 'POST' || init.method === 'PUT') writes.push({ url, init });
         if (url.endsWith('/team')) return jsonResponse(200, { teams: [{ id: '90122019689' }] });
         if (url.includes('/task?')) return listTasksResponse([]);
         return jsonResponse(200, {});
       }),
-    });
-  } finally {
-    console.log = originalLog;
-  }
+    }),
+    (error) => {
+      assert.equal(error.name, 'EpicIdCollisionError');
+      assert.match(error.message, /9-9-unmapped-prefix-story/);
+      return true;
+    },
+  );
 
-  assert.equal(summary.unmapped, 1);
-  assert.equal(summary.created, 0);
-  const annotation = logged.find((line) => line.startsWith('::warning'));
-  assert.ok(annotation, 'the skipped story must reach the Annotations panel');
-  assert.match(annotation, /platform: 9-9-unmapped-prefix-story/);
+  assert.equal(writes.length, 0);
 });
