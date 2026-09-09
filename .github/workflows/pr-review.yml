@@ -340,7 +340,7 @@ jobs:
             Read `.github/pr-review-prompt.txt` fully and follow it.
             The reviewed repository is `${{ env.REVIEW_REPOSITORY }}` at `${{ env.TARGET_PATH }}`.
           claude_args: |
-            --model claude-haiku-4-5
+            --model claude-sonnet-5
             --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
 
       - name: Surface reviewer diagnostics
