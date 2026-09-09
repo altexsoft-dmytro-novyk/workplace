@@ -57,7 +57,7 @@ jobs:
         run: |
           mkdir -p .pr-review
           cat > .pr-review/report.md <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           Review preparation did not complete. No findings were produced.
           EOF
@@ -76,7 +76,7 @@ jobs:
             echo "valid=false" >> "$GITHUB_OUTPUT"
             echo "::warning::Unsupported reusable review target; advisory review was skipped."
             cat > .pr-review/report.md <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           The reusable caller requested an unsupported repository or checkout path. No findings were produced and no merge gate was applied.
           EOF
@@ -92,7 +92,7 @@ jobs:
             echo "available=false" >> "$GITHUB_OUTPUT"
             echo "::warning::ANTHROPIC_API_KEY is not configured; advisory review was skipped."
             cat > .pr-review/report.md <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           Reviewer credentials are unavailable. The advisory review was skipped; no merge gate was applied.
           EOF
@@ -139,6 +139,7 @@ jobs:
         if: steps.target.outputs.valid == 'true' && steps.credentials.outputs.available == 'true'
         env:
           REVIEW_KIND: ${{ inputs.repository != '' && 'service' || 'workspace' }}
+          MAX_FILE_LINES: '1500'
           WORKSPACE_PR_CHECKOUT: ${{ steps.workspace-pr.outcome }}
           WORKSPACE_ASSETS_CHECKOUT: ${{ steps.workspace-assets.outcome }}
           SERVICE_PR_CHECKOUT: ${{ steps.service-pr.outcome }}
@@ -154,7 +155,7 @@ jobs:
             echo "::warning::A required repository checkout failed; advisory review was skipped."
             echo "ready=false" >> "$GITHUB_OUTPUT"
             cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           A required repository checkout failed. No findings were produced and no merge gate was applied.
           EOF
@@ -165,8 +166,8 @@ jobs:
              [[ ! "$HEAD_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
             echo "::warning::Pull request SHAs are missing or invalid; advisory review was skipped."
             echo "ready=false" >> "$GITHUB_OUTPUT"
-            cat > .pr-review/report.md <<'EOF'
-          ## Automated code review
+            cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
+          ## Automated review
 
           The pull request commit range was invalid. No findings were produced and no merge gate was applied.
           EOF
@@ -179,7 +180,7 @@ jobs:
             echo "::warning::The pull request commit range is unavailable; advisory review was skipped."
             echo "ready=false" >> "$GITHUB_OUTPUT"
             cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           The pull request commit range was unavailable after checkout. No findings were produced and no merge gate was applied.
           EOF
@@ -190,41 +191,116 @@ jobs:
           if [ "$REVIEW_KIND" = "workspace" ]; then
             pathspec+=(
               ':(exclude).tmp/**'
-              ':(exclude)_bmad-output/**'
-              ':(exclude)docs/**'
             )
           fi
 
           range="$BASE_SHA...$HEAD_SHA"
-          if ! git diff --no-ext-diff --name-only --diff-filter=ACDMRT \
+          if ! git diff --no-ext-diff --numstat -z --diff-filter=ACDMRT \
               "$range" -- "${pathspec[@]}" \
-              > "$GITHUB_WORKSPACE/.pr-review/files.txt"; then
+              > "$GITHUB_WORKSPACE/.pr-review/numstat.z"; then
             echo "::warning::The three-dot diff could not be generated; advisory review was skipped."
             echo "ready=false" >> "$GITHUB_OUTPUT"
             cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           The filtered three-dot diff could not be generated. No findings were produced and no merge gate was applied.
           EOF
             exit 0
           fi
 
-          if [ ! -s "$GITHUB_WORKSPACE/.pr-review/files.txt" ]; then
+          # Cap each file's diff rather than excluding whole directories. This
+          # repository's authored documents are the deliverable, but a single
+          # generated artifact beside them can outweigh every one of them and
+          # crowd the reviewer's context. Set aside per file, and name what was
+          # set aside so the report can disclose it.
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+
+          cap = int(os.environ["MAX_FILE_LINES"])
+          out = Path(os.environ["GITHUB_WORKSPACE"]) / ".pr-review"
+          records = (out / "numstat.z").read_bytes().split(b"\0")
+
+          skipped = []
+          index = 0
+          while index < len(records):
+              fields = records[index].split(b"\t")
+              if len(fields) != 3:
+                  index += 1
+                  continue
+              added, deleted, name = fields
+              if name:
+                  index += 1
+              else:
+                  # A rename emits its old and new paths as the next two records.
+                  name = records[index + 2]
+                  index += 3
+              if added == b"-" or deleted == b"-":
+                  skipped.append((name, "binary"))
+              elif int(added) + int(deleted) > cap:
+                  skipped.append((name, f"{int(added) + int(deleted)} changed lines"))
+
+          (out / "skipped.z").write_bytes(b"".join(name + b"\0" for name, _ in skipped))
+          (out / "skipped.txt").write_text(
+              "".join(
+                  f"{name.decode('utf-8', 'replace')}\t{reason}\n"
+                  for name, reason in skipped
+              ),
+              encoding="utf-8",
+          )
+          PY
+
+          # ':(exclude,literal)' takes each path verbatim, so a filename holding
+          # glob characters cannot widen the exclusion.
+          excludes=()
+          if [ -s "$GITHUB_WORKSPACE/.pr-review/skipped.z" ]; then
+            mapfile -d '' -t skipped_paths \
+              < "$GITHUB_WORKSPACE/.pr-review/skipped.z"
+            for skipped_path in "${skipped_paths[@]}"; do
+              excludes+=(":(exclude,literal)$skipped_path")
+            done
+          fi
+
+          if ! git diff --no-ext-diff --name-only --diff-filter=ACDMRT \
+              "$range" -- "${pathspec[@]}" "${excludes[@]}" \
+              > "$GITHUB_WORKSPACE/.pr-review/files.txt"; then
+            echo "::warning::The reviewable file list could not be generated; advisory review was skipped."
             echo "ready=false" >> "$GITHUB_OUTPUT"
             cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
-          ## Automated code review
+          ## Automated review
 
-          No reviewable code paths remained after applying the repository's review filter.
+          The reviewable file list could not be generated. No findings were produced and no merge gate was applied.
           EOF
             exit 0
           fi
 
-          if ! git diff --no-ext-diff --unified=80 "$range" -- "${pathspec[@]}" \
+          if [ ! -s "$GITHUB_WORKSPACE/.pr-review/files.txt" ]; then
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            {
+              echo '## Automated review'
+              echo
+              if [ -s "$GITHUB_WORKSPACE/.pr-review/skipped.txt" ]; then
+                echo "Every changed file was set aside by the ${MAX_FILE_LINES}-line per-file review cap. No findings were produced."
+                echo
+                echo 'Set aside:'
+                echo
+                while IFS=$'\t' read -r skipped_path reason; do
+                  echo "- \`$skipped_path\` ($reason)"
+                done < "$GITHUB_WORKSPACE/.pr-review/skipped.txt"
+              else
+                echo 'No reviewable paths remained after applying the repository review filter.'
+              fi
+            } > "$GITHUB_WORKSPACE/.pr-review/report.md"
+            exit 0
+          fi
+
+          if ! git diff --no-ext-diff --unified=80 "$range" \
+              -- "${pathspec[@]}" "${excludes[@]}" \
               > "$GITHUB_WORKSPACE/.pr-review/diff.patch"; then
             echo "::warning::The filtered patch could not be generated; advisory review was skipped."
             echo "ready=false" >> "$GITHUB_OUTPUT"
             cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           The filtered patch could not be generated. No findings were produced and no merge gate was applied.
           EOF
@@ -234,7 +310,7 @@ jobs:
           if [ ! -s "$GITHUB_WORKSPACE/.pr-review/diff.patch" ]; then
             echo "ready=false" >> "$GITHUB_OUTPUT"
             cat > "$GITHUB_WORKSPACE/.pr-review/report.md" <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           The filtered code diff was empty. No findings were produced.
           EOF
@@ -247,11 +323,12 @@ jobs:
             echo
             echo "- Repository: \`$REVIEW_REPOSITORY\`"
             echo "- Range: \`$BASE_SHA...$HEAD_SHA\`"
-            echo "- Files: $(wc -l < "$GITHUB_WORKSPACE/.pr-review/files.txt")"
+            echo "- Files reviewed: $(wc -l < "$GITHUB_WORKSPACE/.pr-review/files.txt")"
+            echo "- Files set aside: $(wc -l < "$GITHUB_WORKSPACE/.pr-review/skipped.txt")"
             echo "- Patch lines: $(wc -l < "$GITHUB_WORKSPACE/.pr-review/diff.patch")"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Run BMad code review
+      - name: Run BMad review
         id: reviewer
         if: steps.diff.outputs.ready == 'true'
         timeout-minutes: 15
@@ -263,11 +340,13 @@ jobs:
             Read `.github/pr-review-prompt.txt` fully and follow it.
             The reviewed repository is `${{ env.REVIEW_REPOSITORY }}` at `${{ env.TARGET_PATH }}`.
           claude_args: |
-            --model claude-haiku-4-5
+            --model claude-sonnet-5
             --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
 
-      - name: Surface reviewer failure detail
-        if: always() && steps.diff.outputs.ready == 'true' && steps.reviewer.outcome != 'success'
+      - name: Surface reviewer diagnostics
+        # Runs on success too. A reviewer that answers without doing the work
+        # still succeeds, and that is precisely the case worth reading.
+        if: always() && steps.diff.outputs.ready == 'true'
         env:
           EXECUTION_FILE: ${{ steps.reviewer.outputs.execution_file }}
         run: |
@@ -280,29 +359,123 @@ jobs:
           fi
 
           if [ ! -s "$execution_file" ]; then
-            echo "::warning::The reviewer wrote no execution log; its failure reason is unavailable."
+            echo "::warning::The reviewer wrote no execution log; its behaviour is unavailable."
             exit 0
           fi
 
-          # The action prints a sanitized result that omits why the run failed, so
-          # read the reason out of the SDK result message in the execution log.
-          {
-            echo '### Reviewer failure detail'
-            echo
-            echo '```'
-            jq -r '
-              [.[] | select(.type == "result")] | last // {}
-              | "subtype:           \(.subtype // "n/a")",
-                "is_error:          \(.is_error | tostring)",
-                "terminal_reason:   \(.terminal_reason // "n/a")",
-                "api_error_status:  \(.api_error_status // "n/a")",
-                "num_turns:         \(.num_turns // "n/a")",
-                "total_cost_usd:    \(.total_cost_usd // "n/a")",
-                "errors:            \((.errors // []) | join("; "))",
-                "result:            \((.result // "n/a") | tostring | .[0:500])"
-            ' "$execution_file"
-            echo '```'
-          } | tee -a "$GITHUB_STEP_SUMMARY"
+          # The action prints a sanitized result that omits both what the reviewer
+          # did and why it stopped, so render the execution log into the job
+          # summary: an outcome block, then one line per turn.
+          EXECUTION_FILE="$execution_file" python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          import json
+          import os
+
+          LINE_CAP = 240
+          TOTAL_CAP = 200_000
+
+          with open(os.environ["EXECUTION_FILE"], encoding="utf-8") as handle:
+              log = json.load(handle)
+          if not isinstance(log, list):
+              log = [log]
+
+          def clip(value, cap=LINE_CAP):
+              text = " ".join(str(value).split())
+              return text if len(text) <= cap else text[: cap - 1] + "…"
+
+          def blocks(entry):
+              content = entry.get("message", {}).get("content", entry.get("content"))
+              if isinstance(content, str):
+                  return [{"type": "text", "text": content}]
+              return content if isinstance(content, list) else []
+
+          print("### Reviewer outcome")
+          print()
+          print("```")
+          results = [e for e in log if e.get("type") == "result"]
+          if results:
+              last = results[-1]
+              for field in (
+                  "subtype",
+                  "is_error",
+                  "terminal_reason",
+                  "api_error_status",
+                  "num_turns",
+                  "duration_ms",
+                  "total_cost_usd",
+              ):
+                  print(f"{field + ':':<20}{last.get(field, 'n/a')}")
+              print(f"{'errors:':<20}{'; '.join(last.get('errors') or []) or 'none'}")
+              print(f"{'result:':<20}{clip(last.get('result', 'n/a'), 800)}")
+          else:
+              print("No result message: the reviewer was cut off before it finished.")
+          print("```")
+          print()
+
+          print("### Reviewer trace")
+          print()
+          print("One line per turn: what the reviewer said, and every tool it called.")
+          print()
+          print("```")
+          emitted = 0
+          truncated = False
+          for entry in log:
+              kind = entry.get("type")
+              if kind not in {"assistant", "user"}:
+                  continue
+              for block in blocks(entry):
+                  btype = block.get("type")
+                  if btype == "text" and block.get("text", "").strip():
+                      line = f"say    {clip(block['text'])}"
+                  elif btype == "tool_use":
+                      name = block.get("name", "?")
+                      raw = block.get("input") or {}
+                      # Surface the argument that identifies the call: a path, a
+                      # command, a skill name, or the head of a subagent prompt.
+                      for key in ("file_path", "path", "pattern", "command",
+                                  "skill", "subagent_type", "prompt",
+                                  "description"):
+                          if raw.get(key):
+                              detail = f"{key}={clip(raw[key], 160)}"
+                              break
+                      else:
+                          detail = clip(json.dumps(raw, ensure_ascii=False), 160)
+                      line = f"call   {name}({detail})"
+                  elif btype == "tool_result":
+                      flag = "ERR " if block.get("is_error") else ""
+                      body = block.get("content")
+                      if isinstance(body, list):
+                          body = " ".join(
+                              part.get("text", "")
+                              for part in body
+                              if isinstance(part, dict)
+                          )
+                      line = f"result {flag}{clip(body)}"
+                  else:
+                      continue
+                  if emitted + len(line) > TOTAL_CAP:
+                      truncated = True
+                      break
+                  emitted += len(line)
+                  print(line)
+              if truncated:
+                  break
+          if truncated:
+              print("… trace truncated; the full log is in the "
+                    "bmad-pr-review-execution-log artifact.")
+          if emitted == 0:
+              print("The reviewer took no recorded turns.")
+          print("```")
+          PY
+
+      - name: Upload reviewer execution log
+        if: always() && steps.diff.outputs.ready == 'true'
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: bmad-pr-review-execution-log
+          path: ${{ steps.reviewer.outputs.execution_file || format('{0}/claude-execution-output.json', runner.temp) }}
+          if-no-files-found: warn
+          retention-days: 14
 
       - name: Materialize reviewer response
         if: always() && steps.diff.outputs.ready == 'true'
@@ -327,17 +500,38 @@ jobs:
                    and (.result | type) == "string" and (.result | length) > 0
                ' "$execution_file" >/dev/null 2>&1; then
               jq -r '[.[] | select(.type == "result")] | last | .result' \
-                "$execution_file" > .pr-review/report.md
+                "$execution_file" > .pr-review/candidate.md
               published=true
             fi
           fi
 
-          if [ "$published" = false ]; then
-            echo "::error::The reviewer returned no response; no findings were published."
-            cat > .pr-review/report.md <<'EOF'
-          ## Automated code review
+          # A reviewer that restates its task instead of doing it still returns a
+          # non-empty string, so a length check alone will publish that verbatim.
+          # Require the headings the prompt mandates before treating the response
+          # as a report.
+          if [ "$published" = true ] &&
+             ! { grep -q '^## Automated review' .pr-review/candidate.md &&
+                 grep -q '^### Findings' .pr-review/candidate.md; }; then
+            published=false
+            echo "::error::The reviewer response is not a report; no findings were published."
+            {
+              echo '### Rejected reviewer response'
+              echo
+              echo '```'
+              head -c 2000 .pr-review/candidate.md
+              echo
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
-          The reviewer returned no response. No findings were published.
+          if [ "$published" = true ]; then
+            mv .pr-review/candidate.md .pr-review/report.md
+          else
+            echo "::error::The reviewer returned no usable response; no findings were published."
+            cat > .pr-review/report.md <<'EOF'
+          ## Automated review
+
+          The reviewer returned no usable response. No findings were published.
           EOF
             # The neutral report above is still published by the steps that follow,
             # because each of them runs under always().
@@ -350,7 +544,7 @@ jobs:
           if [ ! -s .pr-review/report.md ]; then
             mkdir -p .pr-review
             cat > .pr-review/report.md <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           The findings report was unavailable. No findings were published and no merge gate was applied.
           EOF
@@ -376,7 +570,7 @@ jobs:
               cat .pr-review/report.md
             } >> "$GITHUB_STEP_SUMMARY"
           else
-            echo '## Automated code review' >> "$GITHUB_STEP_SUMMARY"
+            echo '## Automated review' >> "$GITHUB_STEP_SUMMARY"
             echo >> "$GITHUB_STEP_SUMMARY"
             echo 'The report was unavailable. No merge gate was applied.' >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -424,7 +618,7 @@ jobs:
           if [ ! -s pr-review-output/report.md ]; then
             mkdir -p pr-review-output
             cat > pr-review-output/report.md <<'EOF'
-          ## Automated code review
+          ## Automated review
 
           The findings artifact was unavailable. No findings were published and no merge gate was applied.
           EOF
