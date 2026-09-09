@@ -77,12 +77,12 @@ requirements:
     aliases: [UM-FR-16]
     stories:
       - {id: PLAT-E3-S3.4, workboard_id: ACM-1, sprint_key: 3-4-minimal-functional-role-data-foundation-acm-1, status: implemented}
-      - {id: PLAT-E4-S4.1, sprint_key: 4-1-project-line-derivation-from-explicit-pm-dm-attachments, status: specified}
+      - {id: PLAT-E8-S8.1, sprint_key: 8-1-project-line-derivation-from-explicit-pm-dm-attachments, status: specified}
       - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
-    epics: [PLAT-E3, PLAT-E4, UM-E0]
+    epics: [PLAT-E3, PLAT-E8, UM-E0]
     notes: >
       Kernel separation exists; real consumer adoption remains incomplete.
-      PLAT-E4-S4.1 carries one FR-1 testable consequence only — that holding the DM or PM
+      PLAT-E8-S8.1 carries one FR-1 testable consequence only — that holding the DM or PM
       functional role grants no Project-line tier without a project attachment. It does not
       cover FR-1 as a whole. UM-E0-S0.1 remains the adoption owner.
       2026-09-02 CE quality pass: story ID and sprint_key recorded; AC converted to
@@ -94,20 +94,20 @@ requirements:
     stories:
       - {id: PLAT-E2-S2.1, workboard_id: ACF-1, sprint_key: 2-1-resolve-phase-0-audiences-acf-1, status: in-progress}
       - {id: PLAT-E3-S3.1, workboard_id: ACM-3, sprint_key: 3-1-inactive-viewer-bridge-and-target-fail-closed-behavior-acm-3, status: implemented}
-      - {id: PLAT-E4-S4.1, sprint_key: 4-1-project-line-derivation-from-explicit-pm-dm-attachments, status: specified}
-      - {id: PLAT-E4-S4.2, sprint_key: 4-2-project-line-column-narrowness-and-best-column-merge, status: specified}
-      - {id: PLAT-E4-S4.3, sprint_key: 4-3-project-derived-revocation-and-timetracker-outage-withdrawal, status: specified}
-      - {id: PLAT-E4-S4.4, sprint_key: 4-4-project-membership-is-read-only-to-access-control, status: specified}
       - {id: PLAT-E5-S5.1, sprint_key: 5-1-department-management-contributes-reporting-line-over-nested-membership, status: specified}
       - {id: PLAT-E5-S5.2, sprint_key: 5-2-fail-closed-department-walk, status: specified}
       - {id: PLAT-E5-S5.3, sprint_key: 5-3-people-partner-hr-line-bounded-by-ishr, status: specified}
-    epics: [PLAT-E2, PLAT-E3, PLAT-E4, PLAT-E5]
+      - {id: PLAT-E8-S8.1, sprint_key: 8-1-project-line-derivation-from-explicit-pm-dm-attachments, status: specified}
+      - {id: PLAT-E8-S8.2, sprint_key: 8-2-project-line-column-narrowness-and-best-column-merge, status: specified}
+      - {id: PLAT-E8-S8.3, sprint_key: 8-3-project-derived-revocation-and-timetracker-outage-withdrawal, status: specified}
+      - {id: PLAT-E8-S8.4, sprint_key: 8-4-project-membership-is-read-only-to-access-control, status: specified}
+    epics: [PLAT-E2, PLAT-E3, PLAT-E5, PLAT-E8]
     gates: [DEPARTMENT-EDGE, TT-IDENTITY-01, TT-PMDM-01, ARCH-PROJ-WRITER-01]
     notes: >
       Reporting/direct-PP Phase-0 exists; department, project, and PP HR-line are not complete.
       Live TimeTracker gates are TT-IDENTITY-01 and TT-PMDM-01. TIMETRACKER-CONTRACT is
       superseded historical only.
-      2026-09-02 decomposition: PLAT-E4 covers project-line derivation, column narrowness,
+      2026-09-02 decomposition: PLAT-E8 covers project-line derivation, column narrowness,
       revocation timing and the AD-31 read-only membership boundary; PLAT-E5 covers the
       department walk and isHr-bounded PP HR-line. Neither epic can close its own blocking
       gate, so PM-FR-2 stays in-progress on their completion and must not be promoted to
@@ -168,7 +168,7 @@ requirements:
       Product denial oracle is 401/404/403; runtime still maps target deny to 403 and
       bypasses target checks via the interim adapter.
       CONFIRMED 2026-09-02: adoption ownership remains UM-E0-S0.1 (UMAC-1) and is unchanged
-      by the PLAT-E4..E7 decomposition. No story in PLAT-E4, E5, E6 or E7 claims PM-FR-4.
+      by the PLAT-E5..E8 decomposition. No story in PLAT-E5, E6, E7 or E8 claims PM-FR-4.
       Those epics own the audience and section DECISION; user-management owns the response
       assembly and envelope at the HTTP edge (PM/AD-34). A correct section decision in the
       kernel does not imply a correct payload while GET /users still whole-row serializes,
@@ -179,18 +179,18 @@ requirements:
     coverage_status: specified
     aliases: [UM-FR-17]
     stories:
-      - {id: UM-E6-S6.1, sprint_key: 6-1-define-a-custom-field-with-declared-visibility, status: specified}
-      - {id: UM-E6-S6.2, sprint_key: 6-2-set-and-store-custom-field-values, status: specified}
-      - {id: UM-E6-S6.3, sprint_key: 6-3-custom-field-values-respect-section-level-access, status: specified}
+      - {id: UM-E8-S8.1, sprint_key: 8-1-define-a-custom-field-with-declared-visibility, status: specified}
+      - {id: UM-E8-S8.2, sprint_key: 8-2-set-and-store-custom-field-values, status: specified}
+      - {id: UM-E8-S8.3, sprint_key: 8-3-custom-field-values-respect-section-level-access, status: specified}
       - {id: UM-E7-S7.1, sprint_key: 7-1-s16-section-matrix-resolution-for-custom-fields, status: specified}
       - {id: UM-E7-S7.2, sprint_key: 7-2-custom-field-columns-and-filters-read-only-entitled-values, status: specified}
-    epics: [UM-E6, UM-E7]
+    epics: [UM-E7, UM-E8]
     gates: [AC-SECTION-MATRIX-01]
     notes: >
       2026-09-03 decomposition (bmad-create-epics-and-stories re-entry): visibility rule bound
-      by PM/AD-32; storage and declared-visibility half now specified as UM-E6, anti-inference
+      by PM/AD-32; storage and declared-visibility half now specified as UM-E8, anti-inference
       half as UM-E7. UM-E7 remains gated on AC-SECTION-MATRIX-01 (owns S16). PLAT-E6-S6.6 and
-      PMC-E1-S1.8 both gate on UM-E7 specifically, not UM-E6 alone — closing UM-E6 without UM-E7
+      PMC-E1-S1.8 both gate on UM-E7 specifically, not UM-E8 alone — closing UM-E8 without UM-E7
       would ship custom-field filtering ahead of anti-inference enforcement (NFR-1 leak); the two
       must not be unblocked independently. This closes the S16 slice only of the UM-FR-17
       "deferred Profile Projection story" placeholder in user-management/epics.md; the S10/S11
@@ -248,7 +248,7 @@ requirements:
     notes: >
       Storage design is PM/AD-32 typed EAV. User.customFields jsonb is transition debt.
       Standard and derived fields are covered. The custom-field clause is carried only by
-      PMC-E1-S1.8, which depends on PM-FR-5 — now `specified` (2026-09-03) via UM-E6/UM-E7,
+      PMC-E1-S1.8, which depends on PM-FR-5 — now `specified` (2026-09-03) via UM-E8/UM-E7,
       but UM-E7 itself stays gated on AC-SECTION-MATRIX-01; unblocking S1.8 before UM-E7 closes
       risks an NFR-1 leak through the filter side channel UX-DR23 bans. AC-SECTION-MATRIX-01
       added here as a transitive gate for that reason.

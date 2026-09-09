@@ -26,6 +26,10 @@ test('workflow creates missing tasks before syncing sprint status', async () => 
     'scripts/clickup-lib.cjs',
     'scripts/create-clickup-task.cjs',
     'scripts/sync-clickup.cjs',
+    // The guard decides whether either job may write at all, so it belongs in
+    // the trigger set alongside the scripts it gates.
+    'scripts/epic-id-guard.cjs',
+    'test/epic-id-guard.test.cjs',
     '.github/workflows/sync-clickup.yml',
   ]);
   assert.deepEqual(workflow.on.push.branches, ['main']);

@@ -18,18 +18,30 @@ purpose: >-
 
 ## Context — "Epic 4 is done" is true for one small epic
 
-`epics.md` carries a **numbering collision**: two "Epic 4" headings —
+`epics.md` used to carry a **numbering collision**: two "Epic 4" headings —
 "Access Control Authorization Consolidation" (2 stories, done, backend `37a3aa3`)
-and "Project-Line Audience" (4 stories, not started). `sprint-status.yaml:135`:
-the status file "understates remaining platform scope by ~16 stories." The
-access-control system is roughly one third built:
+and "Project-Line Audience" (4 stories, not started). **Resolved 2026-09-09:**
+Project-Line Audience is now **Epic 8** (`PLAT-E4-S4.1`–`S4.4` → `PLAT-E8-S8.1`–`S8.4`);
+Consolidation keeps Epic 4 and its `done` statuses. The same repair registered
+Epics 5–8 and their 16 stories in `sprint-status.yaml` as `backlog`, so that
+file no longer "understates remaining platform scope by ~16 stories" — but
+registering them changed no status and closed no gate. The point of this section
+is unchanged: the access-control system is roughly one third built.
 
 | Program epic | Owns | Status |
 |---|---|---|
-| Epic 4 — Project-Line Audience | project-line derivation, narrowness, revocation, read-only boundary | not started |
 | **Epic 5** | **department-management contribution to reporting line**, PP HR-line | not started |
 | Epic 6 | S2–S16 relationship-derived section columns | not started |
 | Epic 7 | Shared-link column + §2.4 overlay evaluation | not started |
+| Epic 8 — Project-Line Audience *(was Epic 4)* | project-line derivation, narrowness, revocation, read-only boundary | not started |
+
+> **DEPT ↔ Epic 5 — do not double-count (2026-09-09).** Epic 5's three stories
+> (`5-1`…`5-3`) are now tracked in `platform/sprint-status.yaml` alongside
+> `dept-1`…`dept-4`. They are **not** independent additional scope: per §30/§56
+> below, DEPT is the department-management contribution to the reporting line —
+> the same Epic 5 substrate — with DEPT-1/DEPT-3 overlapping stories `5-1` and
+> `5-3`. Remaining platform scope is not 3 + 4, and no `done` may propagate
+> between the two sets in either direction.
 
 Section A below is the slice of Epic 5 that has a near-term dependent
 (`profile:timeline` manual write). B–E are everything else the review turned up.

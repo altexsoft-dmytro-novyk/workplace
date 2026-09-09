@@ -1,4 +1,5 @@
 const path = require('node:path');
+const { assertNoAmbiguousEpicIds } = require('./epic-id-guard.cjs');
 const {
   CLICKUP_API_BASE,
   CREATE_DELAY_MS,
@@ -32,6 +33,16 @@ async function createMissingClickUpTasks(options = {}) {
   const isDryRun = dryRunEnabled(options);
 
   const rootDir = path.resolve(options.rootDir || process.cwd());
+
+  // The whole set is judged before the first request, let alone the first POST.
+  // Discovering a collision mid-loop would leave the board half-written, and a
+  // task created under the wrong epic parent is not undone by reverting a commit.
+  await assertNoAmbiguousEpicIds({
+    rootDir,
+    checkClickUpMappings: true,
+    ...(options.guardOptions || {}),
+  });
+
   const configPath = path.resolve(options.configPath || path.join(rootDir, 'clickup-sync.yaml'));
   const config = await readYaml(configPath, 'ClickUp sync configuration');
   if (config.workspace_id !== EXPECTED_WORKSPACE_ID) {

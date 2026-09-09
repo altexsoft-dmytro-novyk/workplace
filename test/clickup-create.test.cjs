@@ -137,31 +137,37 @@ test('createMissingClickUpTasks creates a subtask when bmad_key is absent', asyn
   assert.deepEqual(sleeps, [700]);
 });
 
-test('createMissingClickUpTasks skips unknown prefixes with an action message', async () => {
+// Previously this asserted that an unmapped numeric prefix was warned about and
+// skipped inside an otherwise green run. That is the behaviour that let 14
+// stories fall off the board unnoticed: a story with no epic parent is a story
+// whose ClickUp identity is unknown, and guessing is worse than stopping.
+test('createMissingClickUpTasks refuses to run when a numeric prefix has no epic mapping', async () => {
   const fixture = await createFixture({ developmentStatus: '9-9-smoke-test-create: backlog\n' });
-  const warnings = [];
-  const originalWarn = console.warn;
-  console.warn = (...args) => { warnings.push(args.join(' ')); };
+  const requests = [];
 
-  try {
-    const summary = await createMissingClickUpTasks({
+  await assert.rejects(
+    createMissingClickUpTasks({
       ...fixture,
       keyFilter: new Set(['9-9-smoke-test-create']),
       token: 'secret-token',
       sleepImpl: async () => {},
-      fetchImpl: authorizedFetch(async (url) => {
+      fetchImpl: authorizedFetch(async (url, init = {}) => {
+        requests.push({ url, init });
         if (url.includes('/list/901221186877/task?')) return listTasksResponse([]);
         return jsonResponse(200, {});
       }),
-    });
+    }),
+    (error) => {
+      assert.equal(error.name, 'EpicIdCollisionError');
+      assert.equal(error.findings.length, 1);
+      assert.equal(error.findings[0].code, 'UNMAPPED_CLICKUP_PARENT');
+      assert.match(error.message, /9-9-smoke-test-create/);
+      assert.match(error.message, /sprint-status\.yaml:2/, 'the failure names the file and line');
+      return true;
+    },
+  );
 
-    assert.equal(summary.created, 0);
-    assert.equal(summary.skipped, 1);
-    assert.ok(warnings.some((message) => message.includes('9-9-smoke-test-create')));
-    assert.ok(warnings.some((message) => message.includes(UNMAPPED_PREFIX_ACTION)));
-  } finally {
-    console.warn = originalWarn;
-  }
+  assert.deepEqual(requests, [], 'the guard runs before the first request, not mid-loop');
 });
 
 test('createMissingClickUpTasks is idempotent when the subtask already exists', async () => {

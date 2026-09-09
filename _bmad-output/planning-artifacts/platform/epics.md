@@ -34,14 +34,14 @@ Cross-cutting planning/test/architecture alignment to spec **v1.5** after resear
 
 **Ratification overlay (2026-09-02):** Epic 1 stories absorb post-ratification documentation debt (denial oracle, blocker register, gate IDs, departure wording). Sprint-status keys are not changed by this CE pass. Guards G1–G5 from `platform/reviews/review-cross-slice-seams-2026-09-02.md` applied 2026-09-02.
 
-**Post-kernel extension (2026-09-02):** Epics 4–7 are added below to decompose the access-control gaps that the Kernel MVP deliberately left open. The ratification overlay's earlier "No Epic 4" note applied to the *documentation* CE pass and is superseded for this planning pass only; it does not reopen any Epic 1 story. **Epics 2 and 3 are not modified by this pass** — their stories are implemented and their acceptance criteria are historical evidence. Epic 4–7 story text never restates, supersedes, or re-scopes an Epic 2 or Epic 3 acceptance criterion.
+**Post-kernel extension (2026-09-02):** Epics 5–8 are added below to decompose the access-control gaps that the Kernel MVP deliberately left open. The ratification overlay's earlier "No Epic 4" note applied to the *documentation* CE pass and is superseded for this planning pass only; it does not reopen any Epic 1 story. **Epics 2 and 3 are not modified by this pass** — their stories are implemented and their acceptance criteria are historical evidence. Epic 5–8 story text never restates, supersedes, or re-scopes an Epic 2 or Epic 3 acceptance criterion.
 
 **Kernel MVP status caveat (verify before scheduling):** every Epic 3 story key is `done` in `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`, but two tracking artifacts disagree with that and are **not** corrected by this planning pass:
 
 - `sprint-status.yaml` still records `epic-3: in-progress` and `epic-2: in-progress` although every child story key is `done`.
 - `global-fr-epic-story-coverage.yaml` records `PLAT-E2-S2.1` as `status: in-progress` while `sprint-status.yaml` records `2-1-resolve-phase-0-audiences-acf-1: done`.
 
-Neither is an Epic 4–7 deliverable. Both are recorded here so that "PLAT-E3 is done" is not treated as mechanically verified when one of the two tracking surfaces still contradicts it. Reconciliation belongs to Platform Story 1.1's traceability matrix.
+Neither is an Epic 5–8 deliverable. Both are recorded here so that "PLAT-E3 is done" is not treated as mechanically verified when one of the two tracking surfaces still contradicts it. Reconciliation belongs to Platform Story 1.1's traceability matrix.
 
 ## Requirements Inventory
 
@@ -49,21 +49,21 @@ Neither is an Epic 4–7 deliverable. Both are recorded here so that "PLAT-E3 is
 
 Exactly the FRs this file owns or extends. Verbatim-sourced from PRD §4.1 / §4.8 / §4.9 and [docs/project-requirements.md](../../../docs/project-requirements.md) §2.1, §3.2, §3.3, §3.4, §5.1.
 
-- **PM-FR-1** *[PRD §4.1 FR-1; requirements §2]*: Separate derived access roles from assigned functional roles. Epics 4–7 carry **one** testable consequence: assigning the DM or PM functional role alone does not grant a Project-line tier (PLAT-E4-S4.1). Kernel separation remains PLAT-E3-S3.4 (ACM-1); consumer adoption remains `UM-E0-S0.1`.
-- **PM-FR-2** *[PRD §4.1 FR-2; requirements §2.1, §5.1]*: Resolve Reporting, Project, and People Partner access transitively with required revocation windows. Epic 4 owns Project-line derivation, column narrowness, 15 min / 4 h withdrawal, and the AD-31 read-only membership boundary. Epic 5 owns the department-management contribution to Reporting line and the `isHr`-bounded PP HR-line. Phase-0 Self / reports-to / direct PP remains ACF-1 / ACM-3 historical evidence (SD-1).
+- **PM-FR-1** *[PRD §4.1 FR-1; requirements §2]*: Separate derived access roles from assigned functional roles. Epics 5–8 carry **one** testable consequence: assigning the DM or PM functional role alone does not grant a Project-line tier (PLAT-E8-S8.1). Kernel separation remains PLAT-E3-S3.4 (ACM-1); consumer adoption remains `UM-E0-S0.1`.
+- **PM-FR-2** *[PRD §4.1 FR-2; requirements §2.1, §5.1]*: Resolve Reporting, Project, and People Partner access transitively with required revocation windows. Epic 8 owns Project-line derivation, column narrowness, 15 min / 4 h withdrawal, and the AD-31 read-only membership boundary. Epic 5 owns the department-management contribution to Reporting line and the `isHr`-bounded PP HR-line. Phase-0 Self / reports-to / direct PP remains ACF-1 / ACM-3 historical evidence (SD-1).
 - **PM-FR-3** *[PRD §4.1 FR-3; requirements §3.2, §3.3]*: Enforce the S1–S16 section matrix. Kernel substrate S1/S10/S11 remains ACM-5 historical evidence. Epic 6 owns S2–S16 relationship-derived columns. Epic 7 owns the Shared-link column and the AD-28 overlay evaluation.
 - **PM/AD-24**: HTTP denial oracle — 401 / 404 / 403 (platform Epic 1 = documentation alignment; runtime `PM-FR-4` owner is `UM-E0-S0.1` per coverage model)
 - **PM-FR-36 / PM-FR-37**: TimeTracker required integration (§5.1) — documentation alignment in Epic 1; identity/population owned by `timetracker/epics.md` and gated by `TT-IDENTITY-01`
 - **PM-FR-38**: PeopleForce optional prefill only (§5.2)
 
-**Referenced but not owned by this slice** (Epics 4–7 consume or bound these; they are not platform deliverables):
+**Referenced but not owned by this slice** (Epics 5–8 consume or bound these; they are not platform deliverables):
 
 - **PM-FR-27** *[PRD §4.8 FR-27; requirements §4.8]*: the **link engine** — creation, recipient authentication, expiry, revocation UI — is owned by the future profile-sharing context per `resourcing/epics.md`. Epic 7 supplies only the §3.2 *Shared link* section-policy port that engine consumes (SD-5). Coverage stays `uncovered`.
 - **PM-FR-39** *[PRD §4.1 FR-39; requirements §2.4]*: `coverage_status: deferred`. Epic 7 evaluates the AD-28 **overlay** given a grant; it implements no grant, revoke, seeding, or last-holder rule (SD-6).
 - **PM-FR-42** *[requirements §4.17]*: owned by `user-management` (PRD §4.0) and covered by `UM-E4-S4.3`. Epic 5 **reads** department structure for audience derivation and claims no part of PM-FR-42 (SD-4).
-- **PM-FR-4** *[PRD §4.1 FR-4]*: runtime owner remains `UM-E0-S0.1` (UMAC-1, **in-progress**). No Epic 4–7 story claims it (SD-7).
-- **PM-FR-5** *[PRD §4.1 FR-5; requirements §3.3.6]*: `coverage_status: specified` (2026-09-03, `user-management/epics.md` `UM-E6`/`UM-E7`) — no longer unowned, but `UM-E7` has not shipped and remains the blocking dependency for S16 (Epic 6 Story 6.6).
-- **UMAC-1 / UM-E0-S0.1**: in-progress consumer adoption of the kernel. Precondition, not a deliverable of Epics 4–7.
+- **PM-FR-4** *[PRD §4.1 FR-4]*: runtime owner remains `UM-E0-S0.1` (UMAC-1, **in-progress**). No Epic 5–8 story claims it (SD-7).
+- **PM-FR-5** *[PRD §4.1 FR-5; requirements §3.3.6]*: `coverage_status: specified` (2026-09-03, `user-management/epics.md` `UM-E8`/`UM-E7`) — no longer unowned, but `UM-E7` has not shipped and remains the blocking dependency for S16 (Epic 6 Story 6.6).
+- **UMAC-1 / UM-E0-S0.1**: in-progress consumer adoption of the kernel. Precondition, not a deliverable of Epics 5–8.
 
 ### Non-Functional Requirements (platform slice)
 
@@ -82,7 +82,7 @@ Exactly the FRs this file owns or extends. Verbatim-sourced from PRD §4.1 / §4
 - CC-06 departure: apply transaction cancels **only open Action Items assigned to the departing person**
 - ACF Inherited Invariants bind PM/AD-22, PM/AD-23 (`applyDepartureEffects` five-field contract), PM/AD-24
 
-**Additional bindings introduced by Epics 4–7:**
+**Additional bindings introduced by Epics 5–8:**
 
 - PM/AD-10: three manager relations, two matrix audiences; Reporting and Project line never collapse; bulk live resolution, never persisted; revocation timing (next request / 15 min / 4 h)
 - PM/AD-13: `User.ttId` identity rule for TimeTracker-sourced project members (population source is `TT-IDENTITY-01`)
@@ -100,15 +100,15 @@ None — no `bmad-ux` contract exists for platform scope.
 
 | FR / ID | Epic | Story |
 |---------|------|-------|
-| PM-FR-1 | PLAT-E2, PLAT-E3, PLAT-E4 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.5; PLAT-E4-S4.1 (functional role alone grants no Project-line tier) |
-| PM-FR-2 | PLAT-E2, PLAT-E3, PLAT-E4, PLAT-E5 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.4; PLAT-E4-S4.1–S4.4; PLAT-E5-S5.1–S5.3 |
+| PM-FR-1 | PLAT-E2, PLAT-E3, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.5; PLAT-E8-S8.1 (functional role alone grants no Project-line tier) |
+| PM-FR-2 | PLAT-E2, PLAT-E3, PLAT-E5, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.4; PLAT-E5-S5.1–S5.3; PLAT-E8-S8.1–S8.4 |
 | PM-FR-3 | PLAT-E3, PLAT-E6, PLAT-E7 | PLAT-E3-S3.6 (S1/S10/S11); PLAT-E6-S6.1–S6.6 (S2–S16); PLAT-E7-S7.1–S7.3 (Shared link column + full-profile overlay) |
 | PM/AD-24 | PLAT-E1 | PLAT-E1-S1.3, PLAT-E1-S1.4 (documentation alignment; runtime owner is UM-E0-S0.1 per coverage model) |
 | PM-FR-36, PM-FR-37, PM-FR-38 | PLAT-E1 | PLAT-E1-S1.6 |
 | PLAT-E1 | PLAT-E1 | PLAT-E1-S1.1–S1.9 |
 | PLAT-E2 | PLAT-E2 | PLAT-E2-S2.1 |
 | PLAT-E3 | PLAT-E3 | PLAT-E3-S3.1–S3.8 |
-| NFR-AC-1 | PLAT-E3, PLAT-E4, PLAT-E5, PLAT-E6 | PLAT-E3-S3.8 (kernel baseline); re-baseline obligation on E4/E5/E6 — see *Post-kernel NFR re-baseline* |
+| NFR-AC-1 | PLAT-E3, PLAT-E5, PLAT-E6, PLAT-E8 | PLAT-E3-S3.8 (kernel baseline); re-baseline obligation on E5/E6/E8 — see *Post-kernel NFR re-baseline* |
 | NFR-AC-2, NFR-AC-3 | PLAT-E1 | PLAT-E1-S1.6 |
 
 **Referenced, not covered by this slice:**
@@ -118,10 +118,12 @@ None — no `bmad-ux` contract exists for platform scope.
 | PM-FR-27 | PLAT-E7 | **Not covered.** Epic 7 delivers the §3.2 Shared-link section-policy port only; the link engine has no owning slice |
 | PM-FR-39 | PLAT-E7 | **Not covered — deferred.** Epic 7 bounds the AD-28 overlay; grant lifecycle is not implemented |
 | PM-FR-42 | — | Owned by `user-management` (`UM-E4-S4.3`). Epic 5 reads department structure and claims no part of it |
-| PM-FR-4 | — | Runtime owner remains `UM-E0-S0.1` (UMAC-1). **No Epic 4–7 story claims PM-FR-4** |
-| PM-FR-5 | — | Owned by `user-management` (`UM-E6`/`UM-E7`, `specified` 2026-09-03). `UM-E7` unshipped remains the blocking dependency for Epic 6 Story 6.6 (S16) |
+| PM-FR-4 | — | Runtime owner remains `UM-E0-S0.1` (UMAC-1). **No Epic 5–8 story claims PM-FR-4** |
+| PM-FR-5 | — | Owned by `user-management` (`UM-E8`/`UM-E7`, `specified` 2026-09-03). `UM-E7` unshipped remains the blocking dependency for Epic 6 Story 6.6 (S16) |
 
 ## Epic List
+
+> **Numbering (2026-09-09).** Epic numbers are **identities, not an execution order**, and this list is written in authoring order. `Epic 8: Project-Line Audience` therefore appears between Epic 4 and Epic 5: it was authored in the 2026-09-02 post-kernel pass as a second `Epic 4`, and was renumbered to 8 on 2026-09-09 to resolve that collision with **Epic 4: Access Control Authorization Consolidation**. The post-kernel set is consequently **Epics 5, 6, 7 and 8** wherever this document used to write "Epics 4–7".
 
 ### Epic 1: Platform Spec v1.5 Alignment
 
@@ -147,7 +149,7 @@ Collapse the per-section authorisation predicates into one section-parameterised
 
 **FRs covered:** PM-FR-3 (hardening), NFR-AC-1
 
-### Epic 4: Project-Line Audience
+### Epic 8: Project-Line Audience
 
 Derive the Project-line matrix audience from explicit PM/DM project attachments, keeping it narrower than and separate from the Reporting line.
 
@@ -177,21 +179,21 @@ Deliver the two §3.2 access paths that are not relationship-derived audiences: 
 
 ---
 
-## Post-Kernel Extension (Epics 4–7) — Binding Conditions
+## Post-Kernel Extension (Epics 5–8) — Binding Conditions
 
-These apply to **every** story in Epics 4, 5, 6, and 7. They are stated once and are not restated per story.
+These apply to **every** story in Epics 5, 6, 7, and 8. They are stated once and are not restated per story.
 
 ### Scope decisions (product owner, 2026-09-02)
 
-- **SD-1 — E2/E3 stories are historical evidence.** ACF-1 and ACM-0..ACM-9 are `done` per `platform/sprint-status.yaml`. This pass does not restate, supersede, or re-scope any Epic 2 or Epic 3 acceptance criterion. Epic 4–7 stories build on that kernel; they do not reopen it.
-- **SD-2 — No `ACM-*` / `ACF-*` workboard IDs.** Those identifiers are stable (PRD §0.2) and are never reassigned by a planning pass. Epic 4–7 stories are addressed only as `PLAT-E{epic}-S{story}`. Assigning workboard IDs is a human follow-up, not a deliverable.
+- **SD-1 — E2/E3 stories are historical evidence.** ACF-1 and ACM-0..ACM-9 are `done` per `platform/sprint-status.yaml`. This pass does not restate, supersede, or re-scope any Epic 2 or Epic 3 acceptance criterion. Epic 5–8 stories build on that kernel; they do not reopen it.
+- **SD-2 — No `ACM-*` / `ACF-*` workboard IDs.** Those identifiers are stable (PRD §0.2) and are never reassigned by a planning pass. Epic 5–8 stories are addressed only as `PLAT-E{epic}-S{story}`. Assigning workboard IDs is a human follow-up, not a deliverable.
 - **SD-3 — `AC-SECTION-MATRIX-01` was proposed and unregistered; registered 2026-09-03.** It now exists in `blockers.yaml` (Access Control, P1, `blocks:` S2–S8 and S14–S16) and is a live coverage `gates:` ID on `PM-FR-3`, `PM-FR-21`, `PM-FR-22`, `PM-FR-26` and `PM-FR-35`. The same registration resolved S12 in favour of `AC-S9-S13`, whose `blocks:` list now names it. **Closing `AC-S9-S13` unblocks S9, S12 and S13 only.**
 - **SD-4 — Epic 5 owns the walk only.** It does not take PM/AD-35 schema ownership and does not claim `PM-FR-42`. Completing Epic 5 does not close `DEPARTMENT-EDGE`.
 - **SD-5 — Epic 7 owns the §3.2 Shared-link port, not the link engine.** `PM-FR-27` stays `uncovered`. A port is not the capability.
 - **SD-6 — Epic 7 overlay evaluation only.** `PM-FR-39` grant lifecycle stays `deferred`. Story 7.3 creates no grant route, revoke route, or seeding path.
-- **SD-7 — No Epic 4–7 story claims PM-FR-4.** Those epics own the audience and section *decision*. User-management owns HTTP assembly and envelope (`UM-E0-S0.1`, PM/AD-34). Whole-row `GET /users` serialization remains transition debt.
-- **SD-8 — ACM-9 re-baseline on every E4/E5/E6 production story.** `QUALITY-GATE-AC-NFR` is pinned to resolver revision `f89e034`. Any change under `services/backend/src/access-control/**` invalidates that pin. A story is not `done` until an ACM-9 rerun under protocol `ACM9-MVP-v1` records `status: PASS` at 500 requested active targets with warm p95 and worst case ≤ 2 s, covering the shape the story introduced.
-- **SD-9 — File-churn split is intentional.** Epics 4–7 all modify `services/backend/src/access-control/**`. They are not consolidated: the split follows risk boundaries (project identity, department schema, section matrix, overlay/share-link), not technical layers. Consolidation would hide independently gated failure modes.
+- **SD-7 — No Epic 5–8 story claims PM-FR-4.** Those epics own the audience and section *decision*. User-management owns HTTP assembly and envelope (`UM-E0-S0.1`, PM/AD-34). Whole-row `GET /users` serialization remains transition debt.
+- **SD-8 — ACM-9 re-baseline on every E5/E6/E8 production story.** `QUALITY-GATE-AC-NFR` is pinned to resolver revision `f89e034`. Any change under `services/backend/src/access-control/**` invalidates that pin. A story is not `done` until an ACM-9 rerun under protocol `ACM9-MVP-v1` records `status: PASS` at 500 requested active targets with warm p95 and worst case ≤ 2 s, covering the shape the story introduced.
+- **SD-9 — File-churn split is intentional.** Epics 5–8 all modify `services/backend/src/access-control/**`. They are not consolidated: the split follows risk boundaries (project identity, department schema, section matrix, overlay/share-link), not technical layers. Consolidation would hide independently gated failure modes.
 
 ### Production-code licensing
 
@@ -199,21 +201,21 @@ These apply to **every** story in Epics 4, 5, 6, and 7. They are stated once and
 
 ### Slice-level preconditions
 
-| Precondition | Severity / status | Effect on Epics 4–7 |
+| Precondition | Severity / status | Effect on Epics 5–8 |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)` and the interim session resolver self-provisions a privileged account. **No story in Epics 4–7 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check widens the blast radius of the existing bypass rather than being protected by it. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
-| `UMAC-1` / `UM-E0-S0.1` | **in-progress** | Kernel consumer adoption is incomplete. Epics 4–7 deliver facade decisions; they do not rebind `/users`. Not a deliverable of this pass. |
+| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)` and the interim session resolver self-provisions a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check widens the blast radius of the existing bypass rather than being protected by it. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
+| `UMAC-1` / `UM-E0-S0.1` | **in-progress** | Kernel consumer adoption is incomplete. Epics 5–8 deliver facade decisions; they do not rebind `/users`. Not a deliverable of this pass. |
 | `OQ-PERM-01` | P1 open | Default role-to-permission matrix is unapproved. No story seeds, infers, or defaults a functional-role grant. |
 | `CC-07` / PM/AD-29 | **P0 open** | No `AccessJournal` table exists. Any story whose behaviour requires a journal entry (Epic 7 shared-link access) may specify the same-transaction contract but cannot produce closure evidence. |
-| Whole-row response projection | ratification §4.2 `absent`; PM/AD-34 `partial` | `GET /users` still serializes whole `User` rows. A correct section decision in the kernel does not imply a correct payload at the HTTP edge; Epics 4–7 own the decision, not the projection (SD-7). |
+| Whole-row response projection | ratification §4.2 `absent`; PM/AD-34 `partial` | `GET /users` still serializes whole `User` rows. A correct section decision in the kernel does not imply a correct payload at the HTTP edge; Epics 5–8 own the decision, not the projection (SD-7). |
 
 ### Post-kernel NFR re-baseline (NFR-AC-1)
 
 `QUALITY-GATE-AC-NFR` was closed on 2026-09-02 against ACM-9 final artifact `acm9-final-acm9-1788173458416-ff94a3e685d1.json`. That closure is pinned to a specific resolver revision — its own closure evidence states that `git diff f89e034..origin/main -- src/access-control/` is empty, so "no resolver change has landed since the measurement."
 
-**Every story in Epics 4, 5, and 6 modifies `services/backend/src/access-control/**` and therefore invalidates that pin.** This is a live regression risk, not bookkeeping: the Epic 5 department walk adds recursive `Department.parentId` traversal and the Epic 6 matrix widens the per-target section join — both are exactly the shapes that consume a 2-second budget.
+**Every story in Epics 5, 6, and 8 modifies `services/backend/src/access-control/**` and therefore invalidates that pin.** This is a live regression risk, not bookkeeping: the Epic 5 department walk adds recursive `Department.parentId` traversal and the Epic 6 matrix widens the per-target section join — both are exactly the shapes that consume a 2-second budget.
 
-Binding rule for Epics 4–6 (SD-8):
+Binding rule for Epics 5, 6 and 8 (SD-8):
 
 - A story is not `done` until an ACM-9 rerun under protocol `ACM9-MVP-v1` records `status: PASS` at 500 requested active targets with warm p95 **and** worst case ≤ 2 s, against the resolver revision that story produced.
 - A rerun that omits the shape the story introduced (nested department depth for Epic 5; multi-section resolution for Epic 6) does not satisfy this.
@@ -223,7 +225,7 @@ Binding rule for Epics 4–6 (SD-8):
 
 `ACF-*`, `ACM-*`, and `UMAC-*` are stable human-assigned workboard identifiers (PRD §0.2) and are **never** reassigned or extended by a planning pass. Epic 3's own preamble records that its ACM definitions "adopt the human-provided workboard IDs and must not be reassigned."
 
-**Epic 4–7 stories therefore carry no `ACM-*` identifier (SD-2).** They are addressed only as `PLAT-E{epic}-S{story}`, following the `PMC-E*` and `RS-E*` precedent. Assigning workboard IDs to these stories is a human decision and is an open follow-up, not a deliverable.
+**Epic 5–8 stories therefore carry no `ACM-*` identifier (SD-2).** They are addressed only as `PLAT-E{epic}-S{story}`, following the `PMC-E*` and `RS-E*` precedent. Assigning workboard IDs to these stories is a human decision and is an open follow-up, not a deliverable.
 
 ### Gate registration gap — `AC-SECTION-MATRIX-01` *(closed 2026-09-03)*
 
@@ -776,10 +778,12 @@ resolver change (AC-owned, its own AD-1). Follows AD-1 per stage.
 
 ---
 
-## Epic 4: Project-Line Audience
+## Epic 8: Project-Line Audience
 
 **Status:** backlog
-**Binding conditions:** see *Post-Kernel Extension (Epics 4–7) — Binding Conditions*. No story reaches production evidence while `SEC-AUTH-01` is open, and every story carries the ACM-9 re-baseline obligation.
+**Binding conditions:** see *Post-Kernel Extension (Epics 5–8) — Binding Conditions*. No story reaches production evidence while `SEC-AUTH-01` is open, and every story carries the ACM-9 re-baseline obligation.
+
+> **Numbering note (renumbered 2026-09-09).** This epic was previously a *second* `Epic 4` in this file, colliding with **Epic 4: Access Control Authorization Consolidation**. It is now **Epic 8**; its four stories moved `PLAT-E4-S4.*` → `PLAT-E8-S8.*` (stories 1–4) and sprint keys `4-n-…` → `8-n-…`. Nothing else changed: scope, acceptance criteria, gates, dependencies and status are as written before. It keeps its authoring position (between Epic 4 and Epic 5) because document order records the post-kernel decomposition order, not the epic number — see the *Numbering* note under **Epic List**. Historical references to `PLAT-E4-S4.*` in specs, story files and test evidence dated before 2026-09-09 denote the **Consolidation** epic and are correct as written.
 
 Derive the **Project line** matrix audience from explicit PM/DM project attachments. Per PM/AD-10 the platform has three manager relations but only two matrix audiences: reports-to and department management feed **Reporting line** (Epic 5); project PM/DM assignment feeds **Project line** and nothing else. The kernel resolves neither.
 
@@ -799,9 +803,9 @@ Additional gates: `TT-PMDM-01` (P1 open — `projectManager` and `deliveryManage
 
 **Evidence caveat (inherited from `blockers.yaml`):** all three gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin. Every finding resting on it is a working-tree observation, not a reproducible baseline claim.
 
-### Story 4.1: Project-Line Derivation from Explicit PM/DM Attachments
+### Story 8.1: Project-Line Derivation from Explicit PM/DM Attachments
 
-**ID:** `PLAT-E4-S4.1` · **Sprint key:** `4-1-project-line-derivation-from-explicit-pm-dm-attachments`
+**ID:** `PLAT-E8-S8.1` · **Sprint key:** `8-1-project-line-derivation-from-explicit-pm-dm-attachments`
 
 As a kernel consumer,
 I want Project line granted only to a viewer holding an explicit project-management attachment on a project the target belongs to,
@@ -851,16 +855,16 @@ So that ordinary membership and unrelated functional roles cannot manufacture ac
 **When** the suite is green
 **Then** the evidence explicitly records that fixtures are seeded, that no production population source exists while `TT-IDENTITY-01` is open, and that green evidence is resolver proof rather than capability proof
 
-### Story 4.2: Project-Line Column Narrowness and Best-Column Merge
+### Story 8.2: Project-Line Column Narrowness and Best-Column Merge
 
-**ID:** `PLAT-E4-S4.2` · **Sprint key:** `4-2-project-line-column-narrowness-and-best-column-merge`
+**ID:** `PLAT-E8-S8.2` · **Sprint key:** `8-2-project-line-column-narrowness-and-best-column-merge`
 
 As a consuming context,
 I want Project line to resolve its own narrower §3.2 column and to combine with Reporting line by strongest-permission,
 So that a project manager never reads a subordinate's profile at reporting-line depth.
 
 **Gates:** `TT-IDENTITY-01`, `SEC-AUTH-01`.
-**Dependency:** Story 4.1. **Fence:** this story is valuable on the kernel substrate (S1/S10/S11) and does **not** require Epic 6 to function. Sections outside the currently implemented substrate are governed by Epic 6; this story does not widen the supported section set.
+**Dependency:** Story 8.1. **Fence:** this story is valuable on the kernel substrate (S1/S10/S11) and does **not** require Epic 6 to function. Sections outside the currently implemented substrate are governed by Epic 6; this story does not widen the supported section set.
 
 **Acceptance Criteria:**
 
@@ -892,16 +896,16 @@ So that a project manager never reads a subordinate's profile at reporting-line 
 **Then** it has not added sections beyond the currently implemented substrate
 **And** S2/S3 `—`, S5 CV/certificates-only, and S7 DM/PM asymmetry remain Epic 6 obligations named here as the column-selection contract, not delivered cells
 
-### Story 4.3: Project-Derived Revocation and TimeTracker Outage Withdrawal
+### Story 8.3: Project-Derived Revocation and TimeTracker Outage Withdrawal
 
-**ID:** `PLAT-E4-S4.3` · **Sprint key:** `4-3-project-derived-revocation-and-timetracker-outage-withdrawal`
+**ID:** `PLAT-E8-S8.3` · **Sprint key:** `8-3-project-derived-revocation-and-timetracker-outage-withdrawal`
 
 As a security owner,
 I want project-derived access to expire on its own clock and to be withdrawn entirely during a prolonged sync failure,
 So that a stale or unavailable integration cannot hold an authorization path open indefinitely.
 
 **Gates:** `TT-IDENTITY-01`, `ARCH-PROJ-WRITER-01` (P1 — production four-hour trigger does not exist while sync is absent), `SEC-AUTH-01`.
-**Dependency:** Story 4.1.
+**Dependency:** Story 8.1.
 
 **Acceptance Criteria:**
 
@@ -934,16 +938,16 @@ So that a stale or unavailable integration cannot hold an authorization path ope
 **Then** the four-hour withdrawal path is proven against a controlled clock/state fixture
 **And** the evidence records that the production trigger does not yet exist
 
-### Story 4.4: Project Membership Is Read-Only to Access Control
+### Story 8.4: Project Membership Is Read-Only to Access Control
 
-**ID:** `PLAT-E4-S4.4` · **Sprint key:** `4-4-project-membership-is-read-only-to-access-control`
+**ID:** `PLAT-E8-S8.4` · **Sprint key:** `8-4-project-membership-is-read-only-to-access-control`
 
 As an architect,
 I want a proven boundary that no path other than TimeTracker sync writes project membership,
 So that two independent writers cannot disagree about who is on a project.
 
 **Gates:** `ARCH-PROJ-WRITER-01`, `SEC-AUTH-01`.
-**Dependency:** none within this epic; enforces PM/AD-31. Independent of S4.1–S4.3 (boundary assertion; no resolver-behaviour change).
+**Dependency:** none within this epic; enforces PM/AD-31. Independent of S8.1–S8.3 (boundary assertion; no resolver-behaviour change).
 
 **Acceptance Criteria:**
 
@@ -975,7 +979,7 @@ So that two independent writers cannot disagree about who is on a project.
 ## Epic 5: Department Walk and People Partner HR-Line
 
 **Status:** backlog
-**Binding conditions:** see *Post-Kernel Extension (Epics 4–7) — Binding Conditions*. The ACM-9 re-baseline obligation applies with particular force here — this epic introduces recursive traversal.
+**Binding conditions:** see *Post-Kernel Extension (Epics 5–8) — Binding Conditions*. The ACM-9 re-baseline obligation applies with particular force here — this epic introduces recursive traversal.
 
 > **Interim backlog — DEPT-EPIC (`_bmad-output/planning-artifacts/platform/dept-epic.md`, opened 2026-09-07).** Two department-manager items are needed before Epic 5 formally starts, because `profile:timeline` manual write (DEC-UM-001) depends on them and the "Access Control Authorization Consolidation" epic left them out of scope: **DEPT-1** — the `Department.managerUserId` fact + one-level `isDirectDeptManager` derivation; **DEPT-2** — `profile:timeline` `canAccessSection` + dual gate + `hr-admin` stopgap removal. Epic 5's **DEPT-3** (full transitive department reporting-line audience) is the larger deliverable and reconciles the scalar fact with the PM/AD-35 AR-grant model. Track in `dept-epic.md` and `sprint-status.yaml` until pulled into this epic's story list.
 
@@ -1137,7 +1141,7 @@ So that a People Partner's non-HR manager does not inherit access to every emplo
 ## Epic 6: Section Matrix Beyond the Kernel Slice
 
 **Status:** backlog
-**Binding conditions:** see *Post-Kernel Extension (Epics 4–7) — Binding Conditions*.
+**Binding conditions:** see *Post-Kernel Extension (Epics 5–8) — Binding Conditions*.
 
 The facade currently returns `none` for every section other than S1, S10, and S11 (`blockers.yaml` `AC-S9-S13`). This epic extends `canAccessSection` to the full normative §3.2 matrix in `docs/project-requirements.md` §3.2, which is the sole source for every cell.
 
@@ -1390,7 +1394,7 @@ I want S16's section decision specified and its blocking dependency stated,
 So that the matrix is not silently reported complete while a per-field side channel remains open.
 
 **Gates:** `AC-SECTION-MATRIX-01` (**P1 open**, registered 2026-09-03 — SD-3); PM/AD-32 (design closed, implementation is transition debt).
-**Dependency:** ACM-5; `user-management/epics.md` Epic `UM-E7` (2026-09-03 — `PM-FR-5` moved `deferred`→`specified` via `UM-E6`/`UM-E7`, so this story's own blocker is no longer "no owner exists" but "the owning epic hasn't shipped yet"; see the updated Given below).
+**Dependency:** ACM-5; `user-management/epics.md` Epic `UM-E7` (2026-09-03 — `PM-FR-5` moved `deferred`→`specified` via `UM-E8`/`UM-E7`, so this story's own blocker is no longer "no owner exists" but "the owning epic hasn't shipped yet"; see the updated Given below).
 
 **Acceptance Criteria:**
 
@@ -1404,7 +1408,7 @@ So that the matrix is not silently reported complete while a per-field side chan
 **Then** `CustomFieldDefinition.visibility` from PM/AD-32 typed EAV is required
 **And** the `User.customFields` jsonb bag (transition debt TD-12) is not queried — it carries no per-field visibility
 
-**Given** `PM-FR-5` is now `specified` (`UM-E6`/`UM-E7`, 2026-09-03) but `UM-E7` has not shipped and `AC-SECTION-MATRIX-01` has not closed
+**Given** `PM-FR-5` is now `specified` (`UM-E8`/`UM-E7`, 2026-09-03) but `UM-E7` has not shipped and `AC-SECTION-MATRIX-01` has not closed
 **When** scheduling is considered
 **Then** this story is **still not schedulable** — a specified owner is not a shipped dependency, and scheduling S16 ahead of either means inventing a business rule this story exists to avoid
 
@@ -1423,7 +1427,7 @@ So that the matrix is not silently reported complete while a per-field side chan
 ## Epic 7: Shared-Link Section Policy and Full-Profile Overlay
 
 **Status:** backlog
-**Binding conditions:** see *Post-Kernel Extension (Epics 4–7) — Binding Conditions*.
+**Binding conditions:** see *Post-Kernel Extension (Epics 5–8) — Binding Conditions*.
 
 Two §3.2 access paths are not relationship-derived audiences: the **Shared link** column, and the **full-profile** overlay that PM/AD-28 defines as sitting outside the matrix entirely. Both are access-control decisions; neither is a lifecycle capability, and this epic owns none of the lifecycle.
 
@@ -1608,59 +1612,59 @@ So that a holder reads every section without gaining write authority anywhere.
 
 ---
 
-## Post-Kernel Dependency Graph (Epics 4–7)
+## Post-Kernel Dependency Graph (Epics 5–8)
 
-- ACF-1, ACM-3 → PLAT-E4-S4.1 → PLAT-E4-S4.2, PLAT-E4-S4.3
-- PLAT-E4-S4.4 is independent of S4.1–S4.3 (boundary assertion, no resolver change)
+- ACF-1, ACM-3 → PLAT-E8-S8.1 → PLAT-E8-S8.2, PLAT-E8-S8.3
+- PLAT-E8-S8.4 is independent of S8.1–S8.3 (boundary assertion, no resolver change)
 - ACF-1, ACM-3 → PLAT-E5-S5.1 → PLAT-E5-S5.2; PLAT-E5-S5.1 → PLAT-E5-S5.3
 - ACM-5 → PLAT-E6-S6.1 … S6.6 (parallel within the epic; each gated separately)
-- PLAT-E4-S4.2 does **not** require Epic 6: column-selection and merge are proven on the kernel substrate (S1/S10/S11). Epic 6 delivers the remaining cells that the column-selection contract named.
+- PLAT-E8-S8.2 does **not** require Epic 6: column-selection and merge are proven on the kernel substrate (S1/S10/S11). Epic 6 delivers the remaining cells that the column-selection contract named.
 - ACM-5 → PLAT-E7-S7.1 → PLAT-E7-S7.2 (S1-default port is valuable without Epic 6; `cfg` / never-share cells beyond S1 wait on Epic 6)
 - ACM-5, PLAT-E6 → PLAT-E7-S7.3 (overlay evaluation over S2–S16 cells)
 
-Epic independence: Epic 4 functions without Epic 5, 6, or 7. Epic 5 functions without Epic 4, 6, or 7. Epic 6 functions without Epic 4, 5, or 7 (it consumes kernel ACM-5). Epic 7 Story 7.1/7.2 S1-default functions without Epic 6; Story 7.3 overlay over the full matrix waits on Epic 6. File churn on `src/access-control/**` is intentional (SD-9).
+Epic independence: Epic 8 functions without Epic 5, 6, or 7. Epic 5 functions without Epic 6, 7, or 8. Epic 6 functions without Epic 5, 7, or 8 (it consumes kernel ACM-5). Epic 7 Story 7.1/7.2 S1-default functions without Epic 6; Story 7.3 overlay over the full matrix waits on Epic 6. File churn on `src/access-control/**` is intentional (SD-9).
 
 External gates, none of which any story here can close:
 
-- `TT-IDENTITY-01` (P0) → all of PLAT-E4 reaching capability coverage
+- `TT-IDENTITY-01` (P0) → all of PLAT-E8 reaching capability coverage
 - `DEPARTMENT-EDGE` + unassigned PM/AD-35 schema ownership → PLAT-E5-S5.1, S5.3 reaching capability coverage
 - `AC-S9-S13` → PLAT-E6-S6.1, S6.2, and the S12 clause of S6.5
 - `AC-SECTION-MATRIX-01` (registered 2026-09-03) → PLAT-E6-S6.3 … S6.6
-- `PM-FR-5` (`specified` 2026-09-03 via `user-management` `UM-E6`/`UM-E7`; `UM-E7` unshipped) → PLAT-E6-S6.6
+- `PM-FR-5` (`specified` 2026-09-03 via `user-management` `UM-E8`/`UM-E7`; `UM-E7` unshipped) → PLAT-E6-S6.6
 - `CC-07` (P0) → PLAT-E7-S7.1 journal enrolment evidence
-- `SEC-AUTH-01` (P0) → production evidence for every story in Epics 4–7
+- `SEC-AUTH-01` (P0) → production evidence for every story in Epics 5–8
 - `UMAC-1` in-progress → consumer adoption; not this pass
 
-## Open Follow-Ups (Epics 4–7) — Not Stories
+## Open Follow-Ups (Epics 5–8) — Not Stories
 
 1. **Assign PM/AD-35 Department schema ownership** to `user-management` or `access-control`. Without it `DEPARTMENT-EDGE` cannot close and `PMC-E2-S2.4`, `RS-E1-S1.1`, `RS-E1-S1.2` stay blocked.
 2. ~~**Register `AC-SECTION-MATRIX-01`** in `blockers.yaml`~~ — **DONE 2026-09-03.** Registered with owner Access Control, severity P1, `blocks:` S2–S8 and S14–S16, and an AD-1 closure condition. `PM-FR-26`, `PM-FR-21`, `PM-FR-22` and `PM-FR-35` repointed from the `AC-S9-S13` stand-in; S12 resolved to `AC-S9-S13`.
-3. **Assign workboard identifiers** for `PLAT-E4-S4.*` … `PLAT-E7-S7.*`, or ratify that these stories carry none (SD-2).
-4. **Create sprint-status keys** for Epics 4–7 in `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` before sprint entry, and reconcile the `epic-2` / `epic-3` status drift noted in the Overview. **Not a deliverable of this pass.**
+3. **Assign workboard identifiers** for `PLAT-E5-S5.*` … `PLAT-E8-S8.*`, or ratify that these stories carry none (SD-2).
+4. ~~**Create sprint-status keys** for Epics 4–7~~ — **sprint-status half DONE 2026-09-09** (epic-number-collision repair): `epic-5`…`epic-8` and their 16 story keys are now registered in `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` as `backlog`. **Still open:** the `epic-2` / `epic-3` status drift noted in the Overview — not a deliverable of that repair.
 5. **Assign an owner for the `PM-FR-27` link engine.** `RS-E1-S1.4` depends on it and Epic 7 supplies only the port (SD-5).
 6. **Decide whether `PM-FR-39` is scheduled** or stays deferred past `CC-07` closure. The Epic 7 boundary holds either way (SD-6).
 
-## Step 4 — Final Validation (Epics 4–7, 2026-09-02)
+## Step 4 — Final Validation (Epics 5–8, 2026-09-02)
 
-**FR coverage:** PM-FR-1 (one consequence, S4.1), PM-FR-2 (S4.1–S4.4, S5.1–S5.3), PM-FR-3 (S6.1–S6.6, S7.1–S7.3) each appear in at least one story. Referenced FRs PM-FR-4, PM-FR-5, PM-FR-27, PM-FR-39, PM-FR-42 are explicitly not covered. Kernel FRs remain on E2/E3 historical stories (SD-1).
+**FR coverage:** PM-FR-1 (one consequence, S8.1), PM-FR-2 (S5.1–S5.3, S8.1–S8.4), PM-FR-3 (S6.1–S6.6, S7.1–S7.3) each appear in at least one story. Referenced FRs PM-FR-4, PM-FR-5, PM-FR-27, PM-FR-39, PM-FR-42 are explicitly not covered. Kernel FRs remain on E2/E3 historical stories (SD-1).
 
-**Architecture:** no starter-template story is required. Tables/entities are created only when a story needs them; Epic 5 creates none (schema unowned, SD-4). E4–E7 are production-code stories under AD-1; `status: final` authorizes the decomposition only.
+**Architecture:** no starter-template story is required. Tables/entities are created only when a story needs them; Epic 5 creates none (schema unowned, SD-4). E5–E8 are production-code stories under AD-1; `status: final` authorizes the decomposition only.
 
-**Story quality:** 16 stories, each sized for a single dev agent, Given/When/Then AC, ID + sprint key + gates. No forward dependency within an epic. S4.2 is fenced so Epic 4 does not require Epic 6.
+**Story quality:** 16 stories, each sized for a single dev agent, Given/When/Then AC, ID + sprint key + gates. No forward dependency within an epic. S8.2 is fenced so Epic 8 does not require Epic 6.
 
-**File churn:** Epics 4–7 all modify `services/backend/src/access-control/**`. Split retained per SD-9 (identity / department / matrix / overlay risk boundaries).
+**File churn:** Epics 5–8 all modify `services/backend/src/access-control/**`. Split retained per SD-9 (identity / department / matrix / overlay risk boundaries).
 
 **Step 4 FAILs / recorded gaps** (honest; not papered over):
 
 | ID | Severity | Why it is not absorbed |
 |---|---|---|
-| `SEC-AUTH-01` | P0 open | Precondition. No E4–E7 story may reach production evidence while open. |
+| `SEC-AUTH-01` | P0 open | Precondition. No E5–E8 story may reach production evidence while open. |
 | `UMAC-1` | in-progress | Precondition. Consumer adoption is not this pass. |
-| `TT-IDENTITY-01` | P0 open | Epic 4 cannot close it. Completing E4 must not promote PM-FR-2 to `implemented`. |
+| `TT-IDENTITY-01` | P0 open | Epic 8 cannot close it. Completing E8 must not promote PM-FR-2 to `implemented`. |
 | `DEPARTMENT-EDGE` | P1 open | Epic 5 cannot close it (PM/AD-35 schema unowned, SD-4). |
 | `AC-SECTION-MATRIX-01` | **registered 2026-09-03**, P1 open | Live coverage `gates:` ID on PM-FR-3, 21, 22, 26, 35. Increment still unapproved. |
-| `PM-FR-5` | deferred *(superseded 2026-09-03 — `specified` via `user-management` `UM-E6`/`UM-E7`, but `UM-E7` unshipped)* | Blocks S16 (S6.6). PM-FR-3 cannot reach `implemented` while S16 is open. |
+| `PM-FR-5` | deferred *(superseded 2026-09-03 — `specified` via `user-management` `UM-E8`/`UM-E7`, but `UM-E7` unshipped)* | Blocks S16 (S6.6). PM-FR-3 cannot reach `implemented` while S16 is open. |
 | `CC-07` | P0 open | S7.1 journal enrolment cannot produce closure evidence. |
 | PLAT-E2-S2.1 status conflict | tracking | Coverage `in-progress` vs sprint-status `done`. Left to Platform Story 1.1. |
 
-**Coverage-model actions of this pass:** add the 16 `PLAT-E4`…`PLAT-E7` story IDs under PM-FR-1 / PM-FR-2 / PM-FR-3; do not add `AC-SECTION-MATRIX-01` to `gates:` *(superseded 2026-09-03 — the ID is registered and is now carried on PM-FR-3, 21, 22, 26, 35)*; do not promote PM-FR-2/3 to `implemented`; do not move PM-FR-27 off `uncovered` or PM-FR-39 off `deferred`.
+**Coverage-model actions of this pass:** add the 16 `PLAT-E5`…`PLAT-E8` story IDs under PM-FR-1 / PM-FR-2 / PM-FR-3; do not add `AC-SECTION-MATRIX-01` to `gates:` *(superseded 2026-09-03 — the ID is registered and is now carried on PM-FR-3, 21, 22, 26, 35)*; do not promote PM-FR-2/3 to `implemented`; do not move PM-FR-27 off `uncovered` or PM-FR-39 off `deferred`.

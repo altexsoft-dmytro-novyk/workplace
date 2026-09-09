@@ -1,0 +1,35 @@
+# Team override for bmad-sprint-planning.
+#
+# Why this exists as a customization layer rather than an edit to the skill:
+# .agents/skills/bmad-sprint-planning/scripts/sprint_plan.py carries no
+# Epic-ID-uniqueness check (parse_epics groups stories by epic number and only
+# rejects a repeated full title slug), parses whatever --epic-file it is handed,
+# and under --fresh recomputes every status from scratch while reporting no
+# dropped orphans. The skill directory is replaced wholesale on every update, so
+# a patch there would vanish silently. The checks are repo-owned
+# (scripts/epic-id-guard.cjs, scripts/sprint-status-diff.cjs) and this override
+# is what makes the workflow use them.
+#
+# What CI adds and what it does not: the PR job runs the identity guard over the
+# committed artifacts, so an ambiguous Epic/Story ID cannot arrive unnoticed. It
+# does NOT detect a status downgrade — a regenerated file with `done` reset to
+# `backlog` is a well-formed file. Only the wrapper compares a candidate against
+# the current state, and only when generation goes through it.
+[workflow]
+
+activation_steps_prepend = [
+  "Run `node {project-root}/scripts/epic-id-guard.cjs --json` before reading any epic file. If `ok` is false, stop and report the findings verbatim: every finding names a file, a line and the ambiguous Epic/Story ID. Do not generate, refresh or repair sprint-status.yaml while any Epic or Story ID resolves to more than one definition — the tracking file cannot record a status against an identifier that names two different things.",
+]
+
+persistent_facts = [
+  "Within one domain, an Epic ID names exactly one epic body and a Story ID names exactly one story. The same number in a different domain is unrelated and legitimate. Repetitions that are NOT second definitions: the `## Epic List` summaries, retirement markers such as `### Story 0.3 — REMOVED`, migration maps recording old IDs, range references such as `Epics 5-8`, and historical quotations.",
+  "A story's `**ID:**` prefix must be the namespace its domain declares in `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml` (`source_slices` gives id and path; `namespace_rules` gives the pattern). A `PLAT-` ID inside the UM slice points at another domain's story.",
+  "Never regenerate a sprint-status.yaml expecting keys to equal the slug of their story heading. Several live keys are hand-shortened (`4-1-generalise-section-access-authorisation`, `6-1-read-current-manager-and-people-partner`), and the `dept-*` records in the platform file are legitimate entries with no epics.md heading at all.",
+  "Never pass `--fresh` to regenerate a tracking file that already records progress. Measured on a copy of the real user-management file, `--fresh` downgraded 21 entries (thirteen stories and five epics from `done`, epic-0 and epic-6 from `in-progress`) and dropped seven more including 6.1's `review`, while reporting zero dropped orphans. If specific statuses really must change, name each one with `--set key=status` so the change is a stated migration rather than a side effect.",
+]
+
+# Generation goes through the repo-owned wrapper: it runs the identity guard on
+# the repository AND on the exact --epic-file arguments passed, then runs the
+# generator against a temporary copy and compares the candidate with the live
+# file key by key and status by status. On refusal the real file is untouched.
+on_complete = "If this run generated or repaired a tracking file, confirm it was produced via `{project-root}/scripts/sprint-status-generate.sh generate ...` (the guarded wrapper around sprint_plan.py), and report the guard result and the candidate comparison alongside the generator's JSON. If the wrapper refused, do not re-run it with SPRINT_STATUS_ALLOW_UNSAFE=1 to get past the refusal — report the dropped keys and unrequested status changes to the user and let them decide."

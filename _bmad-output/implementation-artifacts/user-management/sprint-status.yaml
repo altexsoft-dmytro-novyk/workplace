@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-22-2026 23:36
-last_updated: 09-04-2026 12:00
+last_updated: 09-09-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -113,3 +113,42 @@ development_status:
   6-5-remove-an-employees-photo: backlog
   6-6-combined-active-and-dismissed-directory-view: backlog
   epic-6-retrospective: optional
+
+  # ---------------------------------------------------------------------------
+  # Registered 2026-09-09 by the epic-number-collision repair. Both epics were
+  # defined in planning-artifacts/user-management/epics.md on 2026-09-03 and had
+  # never been tracked here. ALL enter as `backlog`: coverage records these five
+  # stories `status: specified`, which means "a story exists that owns this FR"
+  # — it is NOT `done` and was not converted into a tracking status.
+  # NOTE ON ORDER: Epic 7 depends on Epic 8. Epic numbers are identities, not an
+  # execution sequence — Epic 8 (storage + declared visibility) must land before
+  # Epic 7 (anti-inference). Do not reorder these on the strength of the number.
+  # ---------------------------------------------------------------------------
+
+  # Epic 8 — Custom Fields as Data. RENUMBERED 2026-09-09 from a second "Epic 6"
+  # that collided with Epic 6 — Current-State Read Endpoints above:
+  # UM-E6-S6.1..S6.3 -> UM-E8-S8.1..S8.3, keys 6-n-* -> 8-n-*. The tracked
+  # `epic-6` above is, and always was, the reads epic; its statuses are
+  # untouched. These keys have never been synced anywhere under their old form.
+  # Cross-slice dependency (hard): role-administration RA-E1 must supply the
+  # `manage custom fields` permission key and a working `isAllowed` first. The
+  # check must NOT be stubbed — interim-access-control.adapter.ts's
+  # Boolean(userId) pattern (SEC-AUTH-01) is the named negative example.
+  # Storage is PM/AD-32 typed EAV, never the TD-12 User.customFields jsonb bag.
+  # Enforcement itself belongs to access-control; this epic supplies data only.
+  epic-8: backlog
+  8-1-define-a-custom-field-with-declared-visibility: backlog
+  8-2-set-and-store-custom-field-values: backlog
+  8-3-custom-field-values-respect-section-level-access: backlog
+  epic-8-retrospective: optional
+
+  # Epic 7 — Visibility-Safe Filtering and Columns (PM-FR-5 anti-inference half).
+  # Depends on Epic 8 above. Gate: AC-SECTION-MATRIX-01 (P1 open — owns S16).
+  # Downstream: platform PLAT-E6-S6.6 and platform-capabilities PMC-E1-S1.8 both
+  # gate on THIS epic specifically, not on Epic 8 alone — shipping custom-field
+  # filtering ahead of anti-inference enforcement is the NFR-1 critical leak both
+  # were sequenced last to avoid. The two must not be unblocked independently.
+  epic-7: backlog
+  7-1-s16-section-matrix-resolution-for-custom-fields: backlog
+  7-2-custom-field-columns-and-filters-read-only-entitled-values: backlog
+  epic-7-retrospective: optional

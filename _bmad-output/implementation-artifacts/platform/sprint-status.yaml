@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-07-2026 20:45
+last_updated: 09-09-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -123,6 +123,74 @@ development_status:
   4-2-default-org-relationship-seed: done
   epic-4-retrospective: optional
 
+  # ---------------------------------------------------------------------------
+  # Post-kernel extension (Epics 5-8), registered 2026-09-09 by the epic-number-
+  # collision repair. These 16 stories were defined in
+  # planning-artifacts/platform/epics.md on 2026-09-02 and had never been
+  # tracked here; this closes epics.md Open Follow-Up 4 (sprint-status half).
+  # ALL enter as `backlog`: coverage records them `status: specified`, which
+  # means "a story exists that owns this FR" - it is NOT `done` and was not
+  # converted into a tracking status. No story has execution evidence.
+  # Blocking preconditions are unchanged and are NOT closed by registration:
+  # SEC-AUTH-01 (P0 open) blocks production evidence for every story below, and
+  # each carries the SD-8 ACM-9 re-baseline obligation.
+  # ---------------------------------------------------------------------------
+
+  # Epic 5 - Department Walk and People Partner HR-Line.
+  # Gates: DEPARTMENT-EDGE (P1 open; PM/AD-35 department schema is unowned, so
+  # Epic 5 cannot close it - SD-4), SEC-AUTH-01.
+  # ⚠️ OVERLAPS DEPT-1..DEPT-4 below - these are NOT three additional
+  # independent stories. dept-epic.md:30 scopes DEPT work as the department-
+  # management contribution to the reporting line, i.e. the same substrate as
+  # Epic 5 (dept-epic.md:56 names it "Epic 5 substrate"). Specifically
+  # DEPT-1/DEPT-3 overlap 5-1 and 5-3. Remaining platform scope must not be
+  # counted as 3 + 4; status must NOT propagate in either direction.
+  epic-5: backlog
+  5-1-department-management-contributes-reporting-line-over-nested-membership: backlog  # overlaps DEPT-1/DEPT-3
+  5-2-fail-closed-department-walk: backlog
+  5-3-people-partner-hr-line-bounded-by-ishr: backlog  # overlaps DEPT-3 (may bundle the isHr-bounded PP HR-line)
+  epic-5-retrospective: optional
+
+  # Epic 6 - Section Matrix Beyond the Kernel Slice (S2-S16).
+  # Gates: AC-SECTION-MATRIX-01 (registered 2026-09-03, P1 open - increment
+  # unapproved) on 6-3..6-6; AC-S9-S13 on 6-1, 6-2 and the S12 clause of 6-5;
+  # SEC-AUTH-01. 6-6 is additionally dependency-blocked on user-management
+  # UM-E7 (Visibility-Safe Filtering), which is unshipped - see PM-FR-5.
+  epic-6: backlog
+  6-1-s9-career-timeline-section-decisions: backlog
+  6-2-s13-mentorship-section-decisions-and-closure-note-narrowing: backlog
+  6-3-s2-s5-personal-emergency-employment-and-document-sections: backlog
+  6-4-s6-s8-risks-management-notes-and-feedback: backlog
+  6-5-s12-s14-and-s15-cds-action-items-and-request-history: backlog
+  6-6-s16-custom-fields-specified-and-dependency-blocked: backlog  # blocked on UM-E7
+  epic-6-retrospective: optional
+
+  # Epic 7 - Shared-Link Section Policy and Full-Profile Overlay.
+  # Gates: CC-07 (P0 open - no AccessJournal table, so 7-1 cannot produce
+  # journal-enrolment closure evidence), SEC-AUTH-01. Epic 7 delivers the §3.2
+  # port only; PM-FR-27 stays `uncovered` (SD-5) and PM-FR-39 stays `deferred`
+  # (SD-6). 7-3 (overlay over the full matrix) waits on Epic 6.
+  epic-7: backlog
+  7-1-shared-link-section-policy-port: backlog
+  7-2-never-share-set-and-per-link-re-enablement: backlog
+  7-3-full-profile-overlay-evaluation: backlog
+  epic-7-retrospective: optional
+
+  # Epic 8 - Project-Line Audience. RENUMBERED 2026-09-09 from a second
+  # "Epic 4" that collided with the Access Control Authorization Consolidation
+  # epic above: PLAT-E4-S4.1..S4.4 -> PLAT-E8-S8.1..S8.4, keys 4-n-* -> 8-n-*.
+  # These keys have never been synced anywhere under their old 4-n-* form.
+  # Gates: TT-IDENTITY-01 (P0 open - User.ttId has no population source, so no
+  # Relationship type='project' row can legitimately be created), TT-PMDM-01
+  # (P1), ARCH-PROJ-WRITER-01 / PM-AD-31 (P1), SEC-AUTH-01.
+  # Completing this epic must NOT promote PM-FR-2 to `implemented`.
+  epic-8: backlog
+  8-1-project-line-derivation-from-explicit-pm-dm-attachments: backlog
+  8-2-project-line-column-narrowness-and-best-column-merge: backlog  # fenced: does not require Epic 6
+  8-3-project-derived-revocation-and-timetracker-outage-withdrawal: backlog
+  8-4-project-membership-is-read-only-to-access-control: backlog  # independent of 8-1..8-3
+  epic-8-retrospective: optional
+
   # DEPT-EPIC — Department-manager access control (deferred backlog). Holding
   # epic opened 2026-09-07 (PO) for work that is NOT in the consolidation epic
   # above: the department-manager reporting-line relation (§2.1 relation 2) and
@@ -133,16 +201,18 @@ development_status:
   dept-3-full-department-reporting-line-audience: backlog
   dept-4-timeline-dual-gate-test-fallout: backlog
 
-  # TRACKING GAPS (recorded 2026-09-06, still open 2026-09-07) — NOT resolved
-  # here, they are planning decisions rather than status edits:
-  # - planning-artifacts/platform/epics.md carries a numbering collision: two
-  #   distinct "Epic 4" headings — "Access Control Authorization Consolidation"
-  #   (done, tracked above) and "Project-Line Audience" (4 stories, untracked).
-  # - Epics 5 (Department Walk and People Partner HR-Line, 3 stories), 6
-  #   (Section Matrix Beyond the Kernel Slice, 6 stories) and 7 (Shared-Link
-  #   Section Policy and Full-Profile Overlay, 3 stories) are defined in
-  #   epics.md and appear nowhere in this file.
-  # This file therefore understates remaining platform scope by ~16 stories.
+  # TRACKING GAPS — RESOLVED 2026-09-09 (epic-number-collision repair):
+  # - The numbering collision recorded 2026-09-06 is gone. The second "Epic 4"
+  #   heading in planning-artifacts/platform/epics.md ("Project-Line Audience")
+  #   is now "Epic 8"; "Access Control Authorization Consolidation" keeps
+  #   Epic 4 and every one of its `done` statuses and evidence above.
+  # - Epics 5, 6, 7 and 8 and their 16 stories are now registered above, all
+  #   `backlog`. This file no longer understates platform scope by ~16 stories.
+  #   Registration is bookkeeping only: no gate was closed, no status promoted,
+  #   and the Epic 5 / DEPT-1..DEPT-4 overlap is flagged rather than double-
+  #   counted. Full old->new map:
+  #   docs/superpowers/plans/2026-09-09-epic-number-collision-audit.md
+  # STILL OPEN (unchanged by that repair):
   # - CI gate promotion (spec-ci-promote-backend-unit-frontend-e2e-gates.md,
   #   status done; backend-unit + frontend-e2e now merge-blocking) landed as
   #   ad-hoc work with no story row here; its follow-ups are in platform

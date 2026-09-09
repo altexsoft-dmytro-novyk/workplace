@@ -268,23 +268,31 @@ test('existing bmad_key reports existing without POST', async () => {
   assert.equal(writes.length, 0);
 });
 
-test('unknown epic prefix is skipped safely in dry-run', async () => {
+// Dry-run is the pre-flight for the live job, so it must reach the same verdict
+// the live job would. A dry-run that reports "would skip 1" on an unmapped
+// numeric key reads as a clean rehearsal for a run that is not safe to make.
+test('unknown epic prefix fails the dry-run instead of reporting a safe skip', async () => {
   const fixture = await createFixture({ developmentStatus: '9-9-unknown-prefix: backlog\n' });
   const writes = [];
 
-  const summary = await createMissingClickUpTasks({
-    ...fixture,
-    keyFilter: new Set(['9-9-unknown-prefix']),
-    token: 'secret-token',
-    dryRun: true,
-    fetchImpl: authorizedFetch(async (url, init = {}) => {
-      if (init.method === 'POST' || init.method === 'PUT') writes.push({ url, init });
-      if (url.includes('/list/901221186877/task?')) return listTasksResponse([]);
-      return jsonResponse(200, {});
+  await assert.rejects(
+    createMissingClickUpTasks({
+      ...fixture,
+      keyFilter: new Set(['9-9-unknown-prefix']),
+      token: 'secret-token',
+      dryRun: true,
+      fetchImpl: authorizedFetch(async (url, init = {}) => {
+        if (init.method === 'POST' || init.method === 'PUT') writes.push({ url, init });
+        if (url.includes('/list/901221186877/task?')) return listTasksResponse([]);
+        return jsonResponse(200, {});
+      }),
     }),
-  });
+    (error) => {
+      assert.equal(error.name, 'EpicIdCollisionError');
+      assert.match(error.message, /9-9-unknown-prefix/);
+      return true;
+    },
+  );
 
-  assert.equal(summary.wouldSkip, 1);
-  assert.equal(summary.wouldCreate, 0);
   assert.equal(writes.length, 0);
 });

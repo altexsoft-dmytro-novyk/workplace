@@ -100,9 +100,9 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 | FR-10 | Epic 4 — manager, PP, employee-department, and department-manager changes |
 | FR-6 | Epic 5 — record and apply departure |
 | FR-14 | Handoff — dedicated Mentorship epic, outside User Management |
-| FR-17 (custom-field clause only) | Epic 6, Epic 7 — see note below |
+| FR-17 (custom-field clause only) | Epic 8 (storage + declared visibility), Epic 7 (anti-inference) — see note below |
 
-> **Note (2026-09-03, `bmad-create-epics-and-stories` re-entry for `PM-FR-5`).** `FR-17`'s row above names five things as one deferred "Profile Projection story": S10/S11 colleague narrowing, S16 per-field custom-field visibility, S7/S8 flags, and S1 derived-field immutability. That placeholder predates this document's own Epic 0 sequencing note ("the FR-17 Profile Projection story owns only the S10/S11/S16 colleague views... and is decoupled from this epic") and has never been written as an actual epic — no story body for it exists anywhere in this file. This pass writes the **S16 custom-field-visibility** slice of that placeholder as Epic 6 and Epic 7, closing that portion. The S10/S11 colleague-narrowing, S7/S8 flag, and S1 derived-field-immutability portions remain unwritten and out of this pass's requested scope (`PM-FR-5`, `PM-FR-6`, `PM-FR-9` only) — they stay a real, recorded gap under the global coverage model's `PM-FR-4` alias (`aliases: [UM-FR-16, UM-FR-17]`), not silently closed by Epic 6/7's existence.
+> **Note (2026-09-03, `bmad-create-epics-and-stories` re-entry for `PM-FR-5`).** `FR-17`'s row above names five things as one deferred "Profile Projection story": S10/S11 colleague narrowing, S16 per-field custom-field visibility, S7/S8 flags, and S1 derived-field immutability. That placeholder predates this document's own Epic 0 sequencing note ("the FR-17 Profile Projection story owns only the S10/S11/S16 colleague views... and is decoupled from this epic") and has never been written as an actual epic — no story body for it exists anywhere in this file. This pass writes the **S16 custom-field-visibility** slice of that placeholder as Epic 8 and Epic 7, closing that portion. The S10/S11 colleague-narrowing, S7/S8 flag, and S1 derived-field-immutability portions remain unwritten and out of this pass's requested scope (`PM-FR-5`, `PM-FR-6`, `PM-FR-9` only) — they stay a real, recorded gap under the global coverage model's `PM-FR-4` alias (`aliases: [UM-FR-16, UM-FR-17]`), not silently closed by Epic 8/7's existence.
 
 ## Epic List
 
@@ -138,7 +138,7 @@ Authorized HR actors record departure and the platform applies its complete effe
 Epics 4–5 shipped the write paths for organisational facts and departure but no way to read the current value, the ids a follow-up mutation needs, or names for the UUIDs the access journal and blocker panel render. Six independent UM-owned read endpoints (relationships, department catalog + memberships, departure list, batch identity lookup, photo delete, combined active+dismissed list) so the already-built G4/G5 frontend stops working around gaps.
 **FRs covered:** read completeness for FR-6, FR-9, FR-10, FR-15, §3.4 — no new product behaviour.
 
-### Epic 6: Custom Fields as Data
+### Epic 8: Custom Fields as Data
 *(added 2026-09-03, `bmad-create-epics-and-stories` re-entry — closes the S16 custom-field-visibility slice of the `FR-17` "deferred Profile Projection story" placeholder; see the FR Coverage Map note above)*
 
 A holder of `manage custom fields` (role-administration's catalog) defines a new custom field with a declared visibility level, values are set on profiles through typed EAV storage (PM/AD-32), and a viewer's profile response includes a field's value only when both their resolved section access and the field's own visibility permit it.
@@ -151,8 +151,8 @@ A holder of `manage custom fields` (role-administration's catalog) defines a new
 
 A directory user's columns, sort options, filter options, and filter results for any custom field are limited to values their resolved tier actually permits — no combination of filters, including result-count differencing, lets a viewer infer a value they cannot see.
 **FRs covered:** PM-FR-5 (anti-inference completion)
-**Depends on:** Epic 6 (this file)
-**Gate note:** `PMC-E1-S1.8` (`platform-capabilities/epics.md`) and `PLAT-E6-S6.6` (`platform/epics.md`) both gate specifically on **this epic**, not on Epic 6 alone — closing Epic 6 without Epic 7 would ship custom-field filtering ahead of anti-inference enforcement, the exact NFR-1 critical leak both of those stories were sequenced last to avoid. Per their own recorded text, the two must not be unblocked independently of each other.
+**Depends on:** Epic 8 (this file) — *Custom Fields as Data*, renumbered from Epic 6 on 2026-09-09. A higher epic number is **not** a later slot: numbers are identities, so Epic 7 legitimately depends on Epic 8
+**Gate note:** `PMC-E1-S1.8` (`platform-capabilities/epics.md`) and `PLAT-E6-S6.6` (`platform/epics.md`) both gate specifically on **this epic**, not on Epic 8 alone — closing Epic 8 without Epic 7 would ship custom-field filtering ahead of anti-inference enforcement, the exact NFR-1 critical leak both of those stories were sequenced last to avoid. Per their own recorded text, the two must not be unblocked independently of each other.
 
 ### Epic Sequencing / Parallelization
 
@@ -722,13 +722,15 @@ persists). 6.4's identity-minimum projection must match §3.3.4 — coordinate i
 Stage-1 with whoever owns the colleague-view field rules. Each story's
 production stage writes no data and adds no journal row.
 
-## Epic 6: Custom Fields as Data
+## Epic 8: Custom Fields as Data
 
 *(added 2026-09-03 — see FR Coverage Map note)*
 
-### Story 6.1: Define a Custom Field with Declared Visibility
+> **Numbering note (renumbered 2026-09-09).** This epic was previously a *second* `Epic 6` in this file, colliding with **Epic 6: Current-State Read Endpoints**. It is now **Epic 8**; its three stories moved `UM-E6-S6.*` → `UM-E8-S8.*` (stories 1–3) and sprint keys `6-n-…` → `8-n-…`. Scope, acceptance criteria, the `RA-E1` cross-slice dependency, the PM/AD-32 vs TD-12 storage constraint and the `access-control` enforcement boundary are unchanged. **Epic 7 depends on this epic** — a higher number is not a later slot. Every `Epic 6` reference elsewhere in this file still means *Current-State Read Endpoints*.
 
-**ID:** `UM-E6-S6.1` · **Sprint key:** `6-1-define-a-custom-field-with-declared-visibility`
+### Story 8.1: Define a Custom Field with Declared Visibility
+
+**ID:** `UM-E8-S8.1` · **Sprint key:** `8-1-define-a-custom-field-with-declared-visibility`
 
 As a holder of the *manage custom fields* permission,
 I want to define a new custom field with a type and a visibility level,
@@ -748,9 +750,9 @@ So that organisational data the product didn't ship with can be captured without
 **When** the field is created
 **Then** it defaults to `management` (§3.3.6)
 
-### Story 6.2: Set and Store Custom Field Values
+### Story 8.2: Set and Store Custom Field Values
 
-**ID:** `UM-E6-S6.2` · **Sprint key:** `6-2-set-and-store-custom-field-values`
+**ID:** `UM-E8-S8.2` · **Sprint key:** `8-2-set-and-store-custom-field-values`
 
 As a user entitled to edit a profile's custom field,
 I want to set its value,
@@ -766,9 +768,9 @@ So that the field carries real organisational data.
 **When** a value is set twice for the same user and field
 **Then** the second write updates the existing row rather than creating a duplicate
 
-### Story 6.3: Custom Field Values Respect Section-Level Access
+### Story 8.3: Custom Field Values Respect Section-Level Access
 
-**ID:** `UM-E6-S6.3` · **Sprint key:** `6-3-custom-field-values-respect-section-level-access`
+**ID:** `UM-E8-S8.3` · **Sprint key:** `8-3-custom-field-values-respect-section-level-access`
 
 As a viewer of a profile,
 I want a custom field's value to appear only when my resolved access and the field's visibility both permit it,

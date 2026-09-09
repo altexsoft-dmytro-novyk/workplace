@@ -65,6 +65,32 @@ jobs:
       - run: npm ci
       - run: npm run test:trace-gate
 
+  # Two Epic ID collisions (platform Epic 4, user-management Epic 6) reached
+  # main because every consumer degraded gracefully: sprint_plan.py merged the
+  # two bodies under one number and the ClickUp collector warned and kept the
+  # first description. Neither failed, so nothing stopped the change.
+  #
+  # This job fails the run on either defect. Note what that does and does not
+  # cover: it checks the artifacts as committed, so it catches an ambiguous ID
+  # arriving in a PR. It cannot see a status downgrade, which is a legitimate
+  # edit as far as the file is concerned — that is the generator wrapper's job
+  # (scripts/sprint-status-generate.sh), and a direct `uv run sprint_plan.py`
+  # bypasses it. Whether a failure here prevents a merge depends on the
+  # repository's required-status-check settings, which live in GitHub, not here.
+  epic-id-guard:
+    name: Workspace · Epic/Story ID guard
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+      - run: npm ci
+      # The repository's own artifacts must be unambiguous ...
+      - run: npm run guard:epic-ids
+      # ... and the guard itself must still catch both original defects.
+      - run: npm run test:epic-ids
+
   # ── Service suites ───────────────────────────────────────────────────────
   # Two of the three now gate. `backend-unit` (19/19) and `frontend-e2e`
   # (124/124, no flaky cases) were observed green on a run at the currently

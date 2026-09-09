@@ -17,6 +17,10 @@ const EPIC_BY_TRACK = {
     { prefix: '2-', epicId: '869euphdh' },
     { prefix: '3-', epicId: '869euphgj' },
     { prefix: '4-', epicId: '869ew04c9' },
+    { prefix: '5-', epicId: '869ezmy89' },
+    { prefix: '6-', epicId: '869ezmyg7' },
+    { prefix: '7-', epicId: '869ezmynx' },
+    { prefix: '8-', epicId: '869ezmyy0' },
   ],
   'user-management': [
     { prefix: '0-', epicId: '869euphpm' },
@@ -26,6 +30,8 @@ const EPIC_BY_TRACK = {
     { prefix: '4-', epicId: '869evau1q' },
     { prefix: '5-', epicId: '869evau97' },
     { prefix: '6-', epicId: '869ew04uk' },
+    { prefix: '7-', epicId: '869ezmz6b' },
+    { prefix: '8-', epicId: '869ezmzdb' },
   ],
 };
 
@@ -828,6 +834,7 @@ function bmadKeyLookupEnabled(config) {
 
 module.exports = {
   EXPECTED_WORKSPACE_ID,
+  INCLUDED_TRACKS,
   CLICKUP_API_BASE,
   CREATE_DELAY_MS,
   SYNC_DELAY_MS,

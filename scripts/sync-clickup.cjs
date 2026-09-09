@@ -1,4 +1,5 @@
 const path = require('node:path');
+const { assertNoAmbiguousEpicIds } = require('./epic-id-guard.cjs');
 const {
   CLICKUP_API_BASE,
   EXPECTED_WORKSPACE_ID,
@@ -136,6 +137,16 @@ async function syncClickUp(options = {}) {
   const fetchImpl = options.fetchImpl || globalThis.fetch;
   if (typeof fetchImpl !== 'function') throw new Error('A fetch implementation is required');
   const rootDir = path.resolve(options.rootDir || process.cwd());
+
+  // Same contract as create: the entire run is validated before the first PUT.
+  // A status written onto a task whose identity is ambiguous is worse than an
+  // unsynced status, because the board then looks authoritative.
+  await assertNoAmbiguousEpicIds({
+    rootDir,
+    checkClickUpMappings: true,
+    ...(options.guardOptions || {}),
+  });
+
   const configPath = path.resolve(options.configPath || path.join(rootDir, 'clickup-sync.yaml'));
   const config = await readYaml(configPath, 'ClickUp sync configuration');
   if (config.workspace_id !== EXPECTED_WORKSPACE_ID) {

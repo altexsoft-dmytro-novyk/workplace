@@ -738,7 +738,7 @@ The machine-readable row-level model is `_bmad-output/planning-artifacts/global-
 
 | Normative source | Canonical product FRs | Primary domain/capability | Owning slice | Current delivery posture |
 |---|---|---|---|---|
-| §2–§3 | PM-FR-1–7, PM-FR-39–40 | Access Control | PLAT, UM, RA | Kernel implemented; broader matrix/adoption partial or gated. PM-FR-1–4 `in-progress`, PM-FR-7/40 `specified`, PM-FR-5 `specified` (`UM-E6`/`UM-E7`, gated on `AC-SECTION-MATRIX-01`), PM-FR-6 `specified` (`RA-E1`; `RA-E2` gated on `OQ-PERM-01`), PM-FR-39 `deferred` |
+| §2–§3 | PM-FR-1–7, PM-FR-39–40 | Access Control | PLAT, UM, RA | Kernel implemented; broader matrix/adoption partial or gated. PM-FR-1–4 `in-progress`, PM-FR-7/40 `specified`, PM-FR-5 `specified` (`UM-E8`/`UM-E7`, gated on `AC-SECTION-MATRIX-01`), PM-FR-6 `specified` (`RA-E1`; `RA-E2` gated on `OQ-PERM-01`), PM-FR-39 `deferred` |
 | §4.1 | PM-FR-8–11 | Directory | PMC | PM-FR-8, 10, 11 `specified`; PM-FR-9 `specified` (`PMC-E4`, added 2026-09-03 — depends on `RA-E1` and, for its custom-field clause, `UM-E7`) |
 | §4.2–§4.3 | PM-FR-12–14 | User Management | UM | PM-FR-12 `in-progress`; PM-FR-13, 14 `specified` |
 | §4.4 | PM-FR-15–18 | Dashboards | PMC | PM-FR-15, 18 `specified`; **PM-FR-16, 17 `uncovered`** — `PMC-E3` carries no stories, gated on `TT-IDENTITY-01` |
