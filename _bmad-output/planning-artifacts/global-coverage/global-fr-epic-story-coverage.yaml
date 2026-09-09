@@ -127,6 +127,8 @@ requirements:
     coverage_status: in-progress
     stories:
       - {id: PLAT-E3-S3.6, workboard_id: ACM-5, sprint_key: 3-6-base-section-access-for-s1-s10-and-s11-acm-5, status: implemented}
+      - {id: PLAT-E4-S4.1, sprint_key: 4-1-generalise-section-access-authorisation, status: implemented}
+      - {id: PLAT-E4-S4.2, sprint_key: 4-2-default-org-relationship-seed, status: implemented}
       - {id: PLAT-E6-S6.1, sprint_key: 6-1-s9-career-timeline-section-decisions, status: specified}
       - {id: PLAT-E6-S6.2, sprint_key: 6-2-s13-mentorship-section-decisions-and-closure-note-narrowing, status: specified}
       - {id: PLAT-E6-S6.3, sprint_key: 6-3-s2-s5-personal-emergency-employment-and-document-sections, status: specified}
@@ -137,11 +139,11 @@ requirements:
       - {id: PLAT-E7-S7.2, sprint_key: 7-2-never-share-set-and-per-link-re-enablement, status: specified}
       - {id: PLAT-E7-S7.3, sprint_key: 7-3-full-profile-overlay-evaluation, status: specified}
       - {id: UM-E0-S0.1, workboard_id: UMAC-1, sprint_key: 0-1-adopt-read-path-and-rebind-port, status: in-progress}
-    epics: [PLAT-E3, PLAT-E6, PLAT-E7, UM-E0]
+    epics: [PLAT-E3, PLAT-E4, PLAT-E6, PLAT-E7, UM-E0]
     gates: [AC-S9-S13, AC-SECTION-MATRIX-01]
     notes: >
-      Only the base S1/S10/S11 kernel slice is implemented; the facade returns 'none' for
-      every other section.
+      The base S1/S10/S11 kernel slice and PLAT-E4 authorization-consolidation hardening
+      are implemented; the facade still returns 'none' for every other section.
       2026-09-02 decomposition: PLAT-E6 covers S2-S16 relationship-derived audiences;
       PLAT-E7 covers the two non-audience paths — the §3.2 Shared link column and the
       PM/AD-28 read-only full-profile overlay.
@@ -150,8 +152,9 @@ requirements:
       list having been corrected to name S12 explicitly. This requirement owns the whole
       section matrix and therefore carries both gates. Closing AC-S9-S13 unblocks S9, S12 and
       S13 only and must not be reported as unblocking any AC-SECTION-MATRIX-01 section.
-      PM-FR-3 cannot reach implemented while PLAT-E6-S6.6 (S16) is open, and S6.6 is
-      blocked on PM-FR-5, which is deferred with no stories and no owner.
+      PM-FR-3 cannot reach implemented while PLAT-E6-S6.6 (S16) is open. S6.6 is
+      blocked on PM-FR-5: UM-E8 and UM-E7 now specify that requirement, but UM-E7's
+      anti-inference enforcement remains unshipped.
       NFR regression risk: every PLAT-E6 story modifies services/backend/src/access-control/**
       and therefore invalidates the QUALITY-GATE-AC-NFR closure, which is pinned to resolver
       revision f89e034. An ACM-9 rerun is a completion condition, not bookkeeping.

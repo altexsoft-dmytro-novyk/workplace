@@ -102,13 +102,13 @@ None — no `bmad-ux` contract exists for platform scope.
 |---------|------|-------|
 | PM-FR-1 | PLAT-E2, PLAT-E3, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.5; PLAT-E8-S8.1 (functional role alone grants no Project-line tier) |
 | PM-FR-2 | PLAT-E2, PLAT-E3, PLAT-E5, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.4; PLAT-E5-S5.1–S5.3; PLAT-E8-S8.1–S8.4 |
-| PM-FR-3 | PLAT-E3, PLAT-E6, PLAT-E7 | PLAT-E3-S3.6 (S1/S10/S11); PLAT-E6-S6.1–S6.6 (S2–S16); PLAT-E7-S7.1–S7.3 (Shared link column + full-profile overlay) |
+| PM-FR-3 | PLAT-E3, PLAT-E4, PLAT-E6, PLAT-E7 | PLAT-E3-S3.6 (S1/S10/S11); PLAT-E4-S4.1–S4.2 (implemented consolidation hardening); PLAT-E6-S6.1–S6.6 (S2–S16); PLAT-E7-S7.1–S7.3 (Shared link column + full-profile overlay) |
 | PM/AD-24 | PLAT-E1 | PLAT-E1-S1.3, PLAT-E1-S1.4 (documentation alignment; runtime owner is UM-E0-S0.1 per coverage model) |
 | PM-FR-36, PM-FR-37, PM-FR-38 | PLAT-E1 | PLAT-E1-S1.6 |
 | PLAT-E1 | PLAT-E1 | PLAT-E1-S1.1–S1.9 |
 | PLAT-E2 | PLAT-E2 | PLAT-E2-S2.1 |
 | PLAT-E3 | PLAT-E3 | PLAT-E3-S3.1–S3.8 |
-| NFR-AC-1 | PLAT-E3, PLAT-E5, PLAT-E6, PLAT-E8 | PLAT-E3-S3.8 (kernel baseline); re-baseline obligation on E5/E6/E8 — see *Post-kernel NFR re-baseline* |
+| NFR-AC-1 | PLAT-E3, PLAT-E4, PLAT-E5, PLAT-E6, PLAT-E8 | PLAT-E3-S3.8 (kernel baseline); Epic 4's residual `seeded-two-level` measurement question remains unresolved; re-baseline obligation on E5/E6/E8 — see *Post-kernel NFR re-baseline*. This row does not claim NFR closure. |
 | NFR-AC-2, NFR-AC-3 | PLAT-E1 | PLAT-E1-S1.6 |
 
 **Referenced, not covered by this slice:**
@@ -123,7 +123,7 @@ None — no `bmad-ux` contract exists for platform scope.
 
 ## Epic List
 
-> **Numbering (2026-09-09).** Epic numbers are **identities, not an execution order**, and this list is written in authoring order. `Epic 8: Project-Line Audience` therefore appears between Epic 4 and Epic 5: it was authored in the 2026-09-02 post-kernel pass as a second `Epic 4`, and was renumbered to 8 on 2026-09-09 to resolve that collision with **Epic 4: Access Control Authorization Consolidation**. The post-kernel set is consequently **Epics 5, 6, 7 and 8** wherever this document used to write "Epics 4–7".
+> **Numbering (2026-09-09).** Epic numbers are **identities, not an execution order**. This summary is displayed in numeric order; the full Epic 8 body retains its original authoring position between Epics 4 and 5 so historical line-based evidence remains stable. Project-Line Audience was authored as a second `Epic 4` and renumbered to 8 on 2026-09-09 to resolve its collision with **Epic 4: Access Control Authorization Consolidation**. The post-kernel set is consequently **Epics 5, 6, 7 and 8** wherever this document used to write "Epics 4–7".
 
 ### Epic 1: Platform Spec v1.5 Alignment
 
@@ -149,13 +149,6 @@ Collapse the per-section authorisation predicates into one section-parameterised
 
 **FRs covered:** PM-FR-3 (hardening), NFR-AC-1
 
-### Epic 8: Project-Line Audience
-
-Derive the Project-line matrix audience from explicit PM/DM project attachments, keeping it narrower than and separate from the Reporting line.
-
-**FRs covered:** PM-FR-2, PM-FR-1 (one testable consequence)
-**Blocking gate:** `TT-IDENTITY-01` (**P0 open**)
-
 ### Epic 5: Department Walk and People Partner HR-Line
 
 Complete the Reporting-line inputs the kernel left fail-closed: department-management access over nested department membership, and People Partner propagation bounded by the HR line.
@@ -176,6 +169,13 @@ Deliver the two §3.2 access paths that are not relationship-derived audiences: 
 
 **FRs covered:** PM-FR-3
 **Bounds without covering:** PM-FR-27 (port only), PM-FR-39 (deferred — design boundary only)
+
+### Epic 8: Project-Line Audience
+
+Derive the Project-line matrix audience from explicit PM/DM project attachments, keeping it narrower than and separate from the Reporting line.
+
+**FRs covered:** PM-FR-2, PM-FR-1 (one testable consequence)
+**Blocking gate:** `TT-IDENTITY-01` (**P0 open**)
 
 ---
 
@@ -671,9 +671,12 @@ production. No dispatch may span two stages.
 
 **Production code (kernel + UM adoption).** Crosses the AC/UM boundary
 deliberately — unlike Epic 3, which was headless.
-**Status:** backlog
+**Status:** done
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 **Raised by:** `dn-um-implementation` code review, 2026-09-03 (Dmytro Novyk)
+
+**Delivery evidence:** backend commits `b311589`, `ef03c88`, `4ce8bd8`,
+`8ec35fd`, `de508c9`, and `37a3aa3`; both tracker stories are `done`.
 
 `AccessControlFacadeAdapter` hand-writes one authorisation predicate per
 section/feature. Almost every target-scoped route asks the same question that
@@ -684,6 +687,8 @@ spec at once. Separately, `canAccessSection` still takes legacy `S1`/`S10`/`S11`
 strings — section keys must be human names (`profile:identity`, …).
 
 ### Story 4.1: Generalise section-access authorisation + human section keys
+
+**ID:** `PLAT-E4-S4.1` · **Sprint key:** `4-1-generalise-section-access-authorisation`
 
 As a consuming context and a reviewer of authorisation code,
 I want one section-parameterised gate (`@RequireSectionAccess`) driven by
@@ -697,9 +702,9 @@ sections, and reads the same as the §3.2 matrix it enforces.
 identity-card edit is a §2.2 dual gate; the feature half is a code constant
 `DEFAULT_PERMISSIONS` (per-person section-write keys every active employee
 holds), union'd with the explicit FR grant chain in the `isAllowed` evaluator.
-No `employee` policy row, no seed/bootstrap change. **Blocked on:** the
-architect solution-design pass only — the `@RequireSectionAccess` decorator/guard
-shape and the section→endpoint map.
+No `employee` policy row, no seed/bootstrap change. The architect
+solution-design prerequisite — the `@RequireSectionAccess` decorator/guard shape
+and section→endpoint map — was completed before delivery.
 
 **Full ticket:**
 `_bmad-output/implementation-artifacts/platform/story-4-1-generalise-section-access-authorisation.md`
@@ -718,11 +723,12 @@ shape and the section→endpoint map.
 - Closes the two access-control deferred-work entries ("Generalise
   section-access authorisation"; the `profile:timeline` rename follow-up).
 
-**Story split:** decided during the architect pass. Do not move 4.1 to
-`ready-for-dev` before that design and the composition decision exist. Follows
-AD-1 in separate dispatches per stage.
+**Story split:** completed during the architect pass and delivered through the
+recorded AD-1 increments.
 
 ### Story 4.2: Default org-relationship seed + retire the identity-card FR override
+
+**ID:** `PLAT-E4-S4.2` · **Sprint key:** `4-2-default-org-relationship-seed`
 
 As the person running a fresh deployment (and as a developer on a seeded dev DB),
 I want the seed to place the root identity at the top of a real reporting tree
@@ -772,9 +778,9 @@ seeded root cannot write those without being the person's PP; §2.4 is read-only
   `prisma/seed.ts` and `bootstrap-access-control.ts`; ACM-1 invariant suite
   green.
 
-**Depends on:** 4.1's composition decision (land alongside; 4.2 is not
-hard-blocked). **Blocked on:** architect solution-design for the upward-walk
-resolver change (AC-owned, its own AD-1). Follows AD-1 per stage.
+**Depends on:** 4.1's composition decision. The architect solution-design for
+the upward-walk resolver and the separate AD-1 stages were completed before
+delivery.
 
 ---
 

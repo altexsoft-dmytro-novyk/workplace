@@ -300,3 +300,52 @@ scripts/sprint-status-generate.sh generate ... <missing temp output> → OK, out
 1. **§D provenance — resolved locally.** The six literals match the six user-supplied URLs 6/6. The previous “likely fabricated” conclusion is withdrawn; the source is recorded in §D.
 2. **§C.6 first-generation ENOENT — fixed.** The wrapper passes `--status-file` to its second guard invocation only when the target exists; it still checks the explicitly passed epic files. The new wrapper-level regression test was red then green, and an actual-generator run created a missing status file in a temporary directory.
 3. **Live work — NOT RUN, deferred (no API access).** ClickUp preflight, live dry-run, the merge gate, live create/sync, and verification of present task state/parentage/status remain outstanding. This is not a local-QA failure and not an integration PASS. No commit, push, merge, or ClickUp API call occurred in this follow-up.
+
+---
+
+## F. Post-repair staleness and coverage follow-up
+
+**Verdict: LOCAL PASS.** This is a maintainer follow-up to the independent QA
+record above, not a rewrite of that review's historical observations.
+
+- The Pact documentation now records the current split accurately: both pinned
+  service revisions contain `@pact-foundation/pact`, `test:contract`, frontend
+  consumer suites, and backend provider verification; workspace
+  `.github/workflows/tests.yml` still runs neither contract script. The dated
+  2026-09-04 pipeline artifact preserves its setup-time decision and explicitly
+  states that it no longer describes current `main`.
+- Platform Stories 1.4 and 1.5 moved `backlog` → `done` only after every AC
+  was checked against the PM/ACF spines, canonical blocker supersessions, and
+  `docs/architecture/dashboards.md`. Epic 1 remains `in-progress`; Stories 1.1,
+  1.2, 1.3, and 1.6 remain open.
+- The recorded Consolidation coverage gap is closed. `PLAT-E4-S4.1` and
+  `PLAT-E4-S4.2` are explicit story IDs and `implemented` `PM-FR-3` coverage;
+  `PLAT-E4` is a co-owner. `PM-FR-3` remains `in-progress`. `NFR-AC-*` remains
+  outside the 42-row global FR model, and Epic 4's slice-local performance
+  measurement question remains unresolved.
+- Both Epic List summaries now display numeric order. The full body blocks retain
+  authoring order to avoid a noisy move and to keep historical line-based
+  evidence useful.
+- The service-promotion comments no longer call historical evidence SHAs the
+  revisions that `main` "currently pins".
+- The reported backend gitlink issue was **not changed**: root pins `cb23d239`,
+  the shared submodule checkout is detached at `f7c0385`, and local
+  `origin/main` is `f1eea3c`. The local object database cannot prove ancestry
+  between the pinned commit and `f1eea3c`, so the claim that the pin is "one
+  commit behind" is unverified; repointing it would risk including or regressing
+  unrelated backend work.
+
+Follow-up verification:
+
+```text
+node --test test/epic-id-guard.test.cjs                    60 pass, 0 fail
+npm run test:clickup                                        75 pass, 0 fail
+node scripts/epic-id-guard.cjs --root . --clickup-mappings PASS
+verify-coverage.py                                          2 known baseline FAILs only
+sprint_plan.py validate (platform)                          valid=false, the same five DEPT records only
+git diff --check                                            PASS
+```
+
+No ClickUp API call was made. ClickUp preflight, live dry-run, merge gate,
+live create/sync, and present task-state verification remain **NOT RUN — deferred
+(no API access)**. This is neither a local-QA failure nor an integration PASS.

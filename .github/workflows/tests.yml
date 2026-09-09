@@ -92,10 +92,10 @@ jobs:
       - run: npm run test:epic-ids
 
   # ── Service suites ───────────────────────────────────────────────────────
-  # Two of the three now gate. `backend-unit` (19/19) and `frontend-e2e`
-  # (124/124, no flaky cases) were observed green on a run at the currently
-  # pinned service SHAs — backend 20ed2a08, frontend cfbed35 — so they run
-  # without `continue-on-error` and a red result there is a real failure.
+  # Two of the three now gate. backend-unit passed 19/19 at backend 20ed2a08,
+  # and frontend-e2e passed 124/124 with no flaky cases at frontend cfbed35,
+  # on the promotion run. They therefore run without `continue-on-error`, and
+  # a red result is a real failure.
   #
   # `backend-e2e` stays informational. AD-1 commits Stage-2 tests red on
   # purpose: the test lands before the production code, and mentorship

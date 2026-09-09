@@ -106,6 +106,11 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 
 ## Epic List
 
+> **Numbering (2026-09-09).** Epic numbers are identities, not execution order.
+> This summary is displayed numerically even though Epic 7 depends on Epic 8;
+> the full bodies retain their authoring order to preserve historical evidence
+> references.
+
 ### Epic 0: Access Control Adoption
 Rebind `ACCESS_CONTROL_PORT` in `user-management.module.ts` to a real `AccessControlFacade`-backed adapter in `src/user-management/infrastructure/` and delete the interim adapter in the same cutover (AD-21, no dual-running). Adopt the `GET /users/:id` read path now — `200` with `{ data, canEdit }` (`data` = the minimal **S1 identity card**, `canEdit` = the read-only dual-gate hint, `false` for all until `user-management:edit` is seeded) for any active viewer over an active target (Self, reporting, assigned PP, **or colleague**: §3.2 S1 row is `R` for the Colleague column); denials are `401` (unresolved session) and `403` (authenticated active viewer, empty audience). Story 0.1 replaces `toUserResponse`'s whole-row spread with the `{ data, canEdit }` mapper on that handler; the `{ data, canEdit }` envelope becomes the section/detail-read convention (rolled onto other routes as its own item). Put `PATCH /users/:id` and `PUT /users/:id/photo` behind the §2.2 dual gate once a `user-management:edit` permission exists. Proven by a real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E with no provider overrides (AD-3). A **dedicated small epic**, not a story under Epic 1, because it is a cross-cutting port-rebind cutover touching the same controller as Epic 1 Story 1.2 and needs its own real-consumer E2E (architect handoff §1). **Numbered Epic 0** so it runs before Epic 1's write paths; its read path can start now because ACM-8 made the facade DI-resolvable from `AppModule`.
 **FRs covered:** FR-16. (FR-17 — the further S10/S11/S16 colleague narrowing on their own surfaces — is the deferred Profile Projection story and is no longer coupled to this epic.)
@@ -138,14 +143,6 @@ Authorized HR actors record departure and the platform applies its complete effe
 Epics 4–5 shipped the write paths for organisational facts and departure but no way to read the current value, the ids a follow-up mutation needs, or names for the UUIDs the access journal and blocker panel render. Six independent UM-owned read endpoints (relationships, department catalog + memberships, departure list, batch identity lookup, photo delete, combined active+dismissed list) so the already-built G4/G5 frontend stops working around gaps.
 **FRs covered:** read completeness for FR-6, FR-9, FR-10, FR-15, §3.4 — no new product behaviour.
 
-### Epic 8: Custom Fields as Data
-*(added 2026-09-03, `bmad-create-epics-and-stories` re-entry — closes the S16 custom-field-visibility slice of the `FR-17` "deferred Profile Projection story" placeholder; see the FR Coverage Map note above)*
-
-A holder of `manage custom fields` (role-administration's catalog) defines a new custom field with a declared visibility level, values are set on profiles through typed EAV storage (PM/AD-32), and a viewer's profile response includes a field's value only when both their resolved section access and the field's own visibility permit it.
-**FRs covered:** PM-FR-5 (storage + declared visibility half)
-**Depends on (outside this file):** `role-administration/epics.md` Epic RA-E1 — the `manage custom fields` permission key and a working `isAllowed` must exist before this epic's enforcement has anything to check. **Do not stub the check** — `interim-access-control.adapter.ts`'s `Boolean(userId)` pattern (`SEC-AUTH-01`) is the negative example this epic must not repeat.
-**Cross-boundary note:** visibility is *declared* here and *stored* here, but it is *enforced* by `access-control`'s facade before filter/sort execution (PM/AD-32) — this epic supplies data, not the enforcement point. `PLAT-E6-S6.6` (S16 section-matrix resolution) consumes `CustomFieldDefinition.visibility` from this epic's storage.
-
 ### Epic 7: Visibility-Safe Filtering and Columns
 *(same addition)*
 
@@ -153,6 +150,14 @@ A directory user's columns, sort options, filter options, and filter results for
 **FRs covered:** PM-FR-5 (anti-inference completion)
 **Depends on:** Epic 8 (this file) — *Custom Fields as Data*, renumbered from Epic 6 on 2026-09-09. A higher epic number is **not** a later slot: numbers are identities, so Epic 7 legitimately depends on Epic 8
 **Gate note:** `PMC-E1-S1.8` (`platform-capabilities/epics.md`) and `PLAT-E6-S6.6` (`platform/epics.md`) both gate specifically on **this epic**, not on Epic 8 alone — closing Epic 8 without Epic 7 would ship custom-field filtering ahead of anti-inference enforcement, the exact NFR-1 critical leak both of those stories were sequenced last to avoid. Per their own recorded text, the two must not be unblocked independently of each other.
+
+### Epic 8: Custom Fields as Data
+*(added 2026-09-03, `bmad-create-epics-and-stories` re-entry — closes the S16 custom-field-visibility slice of the `FR-17` "deferred Profile Projection story" placeholder; see the FR Coverage Map note above)*
+
+A holder of `manage custom fields` (role-administration's catalog) defines a new custom field with a declared visibility level, values are set on profiles through typed EAV storage (PM/AD-32), and a viewer's profile response includes a field's value only when both their resolved section access and the field's own visibility permit it.
+**FRs covered:** PM-FR-5 (storage + declared visibility half)
+**Depends on (outside this file):** `role-administration/epics.md` Epic RA-E1 — the `manage custom fields` permission key and a working `isAllowed` must exist before this epic's enforcement has anything to check. **Do not stub the check** — `interim-access-control.adapter.ts`'s `Boolean(userId)` pattern (`SEC-AUTH-01`) is the negative example this epic must not repeat.
+**Cross-boundary note:** visibility is *declared* here and *stored* here, but it is *enforced* by `access-control`'s facade before filter/sort execution (PM/AD-32) — this epic supplies data, not the enforcement point. `PLAT-E6-S6.6` (S16 section-matrix resolution) consumes `CustomFieldDefinition.visibility` from this epic's storage.
 
 ### Epic Sequencing / Parallelization
 
