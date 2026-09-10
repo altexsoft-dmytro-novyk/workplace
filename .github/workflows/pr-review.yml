@@ -342,7 +342,9 @@ jobs:
           ref: ${{ github.event.pull_request.base.ref }}
           fetch-depth: 1
           persist-credentials: false
-          sparse-checkout: .agents
+          sparse-checkout: |
+            .agents
+            .claude
           sparse-checkout-cone-mode: false
           path: .review-assets
 
@@ -392,8 +394,17 @@ jobs:
               echo "::error::The base-branch skill tree could not be checked out; refusing to review with instructions from the pull request."
               exit 1
             fi
-            rm -rf .agents
-            mv .review-assets/.agents .agents
+            # Both trees carry the same skills, and the agent reaches for
+            # whichever it finds. Pinning only one leaves the other as a way to
+            # hand the reviewer instructions written by the pull request.
+            for tree in .agents .claude; do
+              if [ ! -d ".review-assets/$tree" ]; then
+                echo "::error::$tree is missing from the base branch checkout; refusing to review with instructions from the pull request."
+                exit 1
+              fi
+              rm -rf "$tree"
+              mv ".review-assets/$tree" "$tree"
+            done
             rm -rf .review-assets
           fi
 
@@ -636,20 +647,39 @@ jobs:
           # A reviewer that restates its task instead of doing it still returns a
           # non-empty string, so a length check alone will publish that verbatim.
           # Require the headings the prompt mandates before treating the response
-          # as a report.
-          if [ "$published" = true ] &&
-             ! { grep -q '^## Automated review' .pr-review/candidate.md &&
-                 grep -q '^### Findings' .pr-review/candidate.md; }; then
-            published=false
-            echo "::error::The reviewer response is not a report; no findings were published."
-            {
-              echo '### Rejected reviewer response'
-              echo
-              echo '```'
-              head -c 2000 .pr-review/candidate.md
-              echo
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
+          # as a report — but salvage a real report wrapped in a code fence or
+          # introduced by a preamble first. The gate exists to catch "this is not
+          # a report", not to reject one over its packaging.
+          if [ "$published" = true ]; then
+            if python3 - <<'PY'; then
+          import re
+          import sys
+          from pathlib import Path
+
+          path = Path(".pr-review/candidate.md")
+          text = path.read_text(encoding="utf-8", errors="replace")
+
+          fence = re.match(r"\s*```[a-zA-Z]*\n(.*?)\n?```\s*\Z", text, re.DOTALL)
+          if fence:
+              text = fence.group(1)
+
+          start = re.search(r"^## Automated review\s*$", text, re.MULTILINE)
+          if not start or not re.search(r"^### Findings\s*$", text, re.MULTILINE):
+              sys.exit(1)
+
+          path.write_text(text[start.start():].strip() + "\n", encoding="utf-8")
+          PY
+              :
+            else
+              published=false
+              echo "::error::The reviewer response is not a report; no findings were published."
+              {
+                echo '--- rejected reviewer response (first 2000 bytes) ---'
+                head -c 2000 .pr-review/candidate.md
+                echo
+                echo '--- end rejected reviewer response ---'
+              } | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
           fi
 
           if [ "$published" = true ]; then
