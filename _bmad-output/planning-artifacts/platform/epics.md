@@ -325,13 +325,33 @@ So that PF vacancies SoT and dual-required integrations are not planned as manda
 
 **Acceptance Criteria:**
 
-- `test-design-architecture-platform`, QA, handoff, and validation cite v1.5 / current SoT.
+- The platform test-design architecture, QA, handoff and validation artifacts cite v1.5 / current SoT. Since the 2026-09-10 test-design consolidation the canonical set is: `_bmad-output/test-artifacts/test-design-architecture.md` and `test-design-qa.md` (the single platform pair, which supersedes the former [`test-design-architecture-platform.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-architecture-platform.md) / [`test-design-qa-platform.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-qa-platform.md)), the single handoff `_bmad-output/test-artifacts/test-design/people-management-handoff.md` (the former duplicate [`people-management-platform-handoff.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design/people-management-platform-handoff.md) is retired), and `_bmad-output/test-artifacts/test-design-validation-report.md`. The index is `_bmad-output/test-artifacts/test-design/README.md`; the disposition record is `_bmad-output/test-artifacts/test-design/migration-map.md`. Four of those canonical filenames **reuse** a filename that previously held different content, so any claim about what the superseded artifacts *said* must cite them at commit `76a7220701ac6f16843dad8b303934f9a958b54c`.
 - PeopleForce = optional prefill; no PF vacancies SoT as required.
 - Timetracker is the only required integration; DoD negatives for narrowed project-line noted; PR-B-04 re-gated.
 - **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`, whose rationale names ACM3-II-06 as the uncovered critical requirement) explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
 - **QUALITY-GATE-AC-NFR:** ACM-9 500-target / 2s performance evidence is tracked separately from the functional P0 gate; baseline and final artifacts are referenced by path.
 - Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01` — not superseded `TIMETRACKER-CONTRACT`.
 - **Evidence caveat:** Both TimeTracker gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin — record the caveat verbatim alongside gate IDs; committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4 evidence baseline).
+
+**Recorded debt (added 2026-09-10 by the test-design consolidation; this story is _not_ declared complete).**
+The consolidation updated artifact identities and dependency references only. It granted no approval,
+ran no validation, executed no suite and produced no coverage or gate result, so it does not by itself
+satisfy any acceptance criterion above.
+
+- The canonical `test-design-validation-report.md` carries verdict **NOT RUN**, and every artifact in the
+  canonical set is **approval ungranted**. A new document does not inherit the superseded documents' 2026-08-25
+  human approval or validation PASS.
+- `_bmad-output/planning-artifacts/platform/reviews/review-cross-slice-seams-2026-09-02.md:66` records that
+  completing this story would **falsely close `PM-FR-15`**. That warning stands and is not discharged here.
+- Whether this story is satisfied, partially satisfied, or made obsolete by the consolidation is **open** and
+  belongs to the platform epic owner — `_bmad-output/test-artifacts/test-design/migration-map.md` §10, **U-16**.
+  The sprint-status key `1-6-platform-test-design-refresh-v1-2-v1-5` is unchanged at `backlog`, and no coverage
+  field, FR mapping or gate identity was altered.
+- `QUALITY-GATE-AC-NFR` above is evaluated on ACM-9 facade-resolver evidence, while `PMC-E1-S1.9` routes
+  **directory-list** evidence into the same gate name. Which subject the gate governs is **open** — migration-map
+  §10, **U-25** (§6, F-15). The All Employees list ≤2-second requirement itself has **no measurement and no chosen
+  harness** (**U-24**); ACM-9 and P6 measure different subjects and are not evidence for it. Nothing here reopens,
+  closes or renames the blocker, and the standing decision that the ACM-9 CI job stays informational is undisturbed.
 
 ### Story 1.7: UM Planning Residual (Non–Epic-2–4 Scope)
 
