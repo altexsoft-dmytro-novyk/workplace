@@ -752,7 +752,7 @@ full wording and history, is `test-design/migration-map.md` §10.
 | **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect | Platform epic owner + Architect | `PG-01` (in `test-design-qa.md` § Release and design gates) |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk | Owner of `docs/test-cases/user-management/**` | Out of scope for this migration, which modifies no scenario file |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap | DEV + QA | Frontend obligations |
-| **U-23** | The current implemented-test count | QA | Estimates. Until someone re-counts, implemented-test figures stay **unverified** |
+| **U-23** | **Resolved 2026-09-11** — implemented-test inventory re-counted in `test-design-qa.md` § Implemented-test inventory | QA | Backend e2e **506** (488 + 18 `it.todo`); unit **50**; contract **18** pact interactions; frontend Playwright **124** |
 | **U-24** | **Resolved with authority** — `DIRA1-MVP-v1` (`docs/architecture/testing-strategy.md` § DIR-A1) | Platform/DevOps + QA | [NFR contract references](#nfr-contract-references), `PR-006` |
 | **U-25** | **Resolved with authority** — `QUALITY-GATE-AC-NFR` governs contract **B** only; contract **A** uses release gate **`PG-04`** | Access Control + Quality Engineering + the platform-capabilities epic owner | [NFR contract references](#nfr-contract-references) |
 

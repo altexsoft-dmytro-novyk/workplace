@@ -64,16 +64,17 @@ HTTP/list route), contract **B** (the ACM-9 facade resolver) and contract **C** 
 is **never** evidence for another. See [NFR measurement contracts](#nfr-measurement-contracts).
 
 **What this document deliberately does not settle.** Nineteen open questions — U-2, U-4, U-5, U-6,
-U-9, U-10, U-11, U-12, U-13, U-16 and U-17..U-19, U-21..U-23 — remain open; **U-20**, **U-24**,
-and **U-25** are resolved below. This document **answers none of the still-open items
+U-9, U-10, U-11, U-12, U-13, U-16 and U-17..U-19, U-21..U-22 — remain open; **U-20**, **U-23**,
+**U-24**, and **U-25** are resolved below. This document **answers none of the still-open items
 them**. `DEC-UM-012` remains a **draft decision**. No unknown threshold is filled in anywhere. See
 [Unknown thresholds](#unknown-thresholds) and [Open questions](#open-questions).
 
 **Counts in this document, and what they are not.** Planning volumes, planning rows, net-new case
 counts and implemented-test counts are four different things and are never added together. The
-implemented-test counts carried here are **UNVERIFIED** and self-contradictory at source; they are
-labelled as such and no pass rate is derived from them. See [Effort](#effort) and
-[Planning volume](#planning-volume).
+implemented-test counts are **VERIFIED** (U-23 resolved 2026-09-11) in
+[Implemented-test inventory](#implemented-test-inventory--verified-u-23-resolved-2026-09-11). Pass
+rate from the recount is informational only and is not derived into estimates. See [Effort](#effort)
+and [Planning volume](#planning-volume).
 
 ---
 
@@ -198,19 +199,34 @@ a signal to look, not a number to satisfy. The associated `um-epic:nfr/maintaina
 ("a domain rule is verifiable without a database") is tracked here as that tripwire and as nothing
 else.
 
-### Observed level distribution — **UNVERIFIED**
+### Implemented-test inventory — **VERIFIED** (U-23 resolved 2026-09-11)
 
-These are **document assertions dated 2026-09-06**, carried with their date and their label. They
-were **not re-measured** by this migration, and **no pass rate is asserted from them.**
+Re-counted **2026-09-11** against workspace gitlinks `services/backend` `3bc801a…` and
+`services/frontend` `fa3d319…`. **Inventory only** — discovery via the canonical npm scripts and
+jest/playwright configs (`test/jest-e2e.json`, default `package.json` jest, `test/jest-contract.json`,
+`playwright.config.ts`, `vitest.contract.config.ts`). **Not** raw `find`. Pass rate is reported
+separately and is **not** an estimate input.
 
-| Stack | Reported by its source | Status |
-| --- | --- | --- |
-| Backend | 340 e2e cases · 5 unit · 18 contract | **UNVERIFIED.** The same source document also states **406** cases at another line — 340 and 406 are both presented as the current e2e count on the same date. |
-| Backend suite files | "43 files" | **UNVERIFIED and it does not reproduce.** At the pinned backend gitlink `f1eea3c0…`, `find test -name '*.e2e-spec.ts'` returns **54**. Which subset "43" counted was not determined. |
-| Frontend | 124 Playwright e2e · 0 component · 0 unit | **UNVERIFIED.** Consistent with the frontend having no unit or component layer at all today (`@testing-library/react` and a second vitest config do not exist — U-12). |
+| Stack | Layer | Files (suites) | Cases | Status |
+| --- | --- | ---: | ---: | --- |
+| Backend | e2e | 54 (`test/jest-e2e.json`) | **506** discovered (**488** executable + **18** `it.todo`) | **VERIFIED** — supersedes contradictory 340 / 406 / "43 files" (2026-09-06) |
+| Backend | unit | 10 (`src/**/*.spec.ts`) | **50** | **VERIFIED** — supersedes "5 unit" (2026-09-06) |
+| Backend | contract | 5 (`test/jest-contract.json`) | **18** pact interactions (1 provider suite) | **VERIFIED** |
+| Frontend | Playwright e2e | 7 | **124** | **VERIFIED** — matches 2026-09-06 source |
+| Frontend | component / unit | 0 | 0 | **VERIFIED** — no layer yet (U-12) |
+| Frontend | Pact consumer | 5 | **18** | **VERIFIED** |
 
-**Consequence, stated so nobody re-derives a baseline from these numbers:** implemented-test counts
-are excluded from every estimate in this document. Re-counting them is **U-23**, and it is open.
+**Recount commands (authority):** `npm run test:e2e -- --json` · `npm test -- --json` ·
+`npm run test:contract -- --json` (backend) · `npx playwright test --list` ·
+`npm run test:contract -- --reporter=json` (frontend).
+
+**Pass rate at recount (informational, local Postgres, not a release verdict):** backend e2e
+**459 pass / 29 fail / 18 todo**; unit **50 pass**; backend contract provider suite **pass**;
+frontend Playwright inventory only (not executed in this recount).
+
+**Consequence:** implemented-test inventory is now a **verified baseline** for planning references.
+It remains **category 1** — still **excluded from the category-2 net-new estimate** (the 15–23
+engineer-day figure counts only net-new authoring).
 
 ---
 
@@ -293,11 +309,12 @@ disagrees with the newer measured observations below, and all of them are `unver
 - **Backend end-to-end evidence is `api-e2e`: real HTTP + PostgreSQL**, backend Jest + supertest
   against a migrated database. It is not substitutable by `contract (Pact)` and not substitutable
   by `component`.
-- **Observed timings — UNVERIFIED, dated 2026-09-06, not re-measured by this migration:** unit
-  0.4 s; e2e "43 files / 406 cases / 90 s with `--runInBand`"; contract ~50 s. The file count does
-  not reproduce (**54** `*.e2e-spec.ts` files at the pinned gitlink, not 43) and the same source
-  states **340** e2e cases elsewhere. Carried as observations with their date; **no pass rate is
-  asserted.**
+- **Inventory — VERIFIED 2026-09-11 (U-23):** 54 e2e suites / **506** cases (**488** executable +
+  **18** `it.todo`); 10 unit files / **50** cases; 5 contract files / **18** pact interactions.
+  Supersedes the contradictory 2026-09-06 figures (340 vs 406 cases; "43 files").
+- **Observed timings — VERIFIED 2026-09-11 on the same gitlink (local, `--runInBand`):** unit ~1.1 s;
+  e2e ~97 s; contract ~2 s. **Pass rate is informational** (459 pass / 29 fail / 18 todo on e2e at
+  recount) and is not asserted as a CI or release guarantee.
 
 #### Backend isolation
 
@@ -1261,14 +1278,11 @@ That label is inseparable from the number.
 **Four categories, never added together.** The plan requires implemented tests, net-new tests,
 planning rows, shared infrastructure and deferred candidates to stay distinguishable. They do.
 
-### Category 1 — implemented tests: **UNVERIFIED, and unusable as a baseline**
+### Category 1 — implemented tests: **VERIFIED inventory (U-23 resolved)**
 
-Carried as observations dated 2026-09-06 and **excluded from every estimate here**. See
-[Observed level distribution](#observed-level-distribution--unverified) for the three checks that
-show why: the source disagrees with itself (**340** versus **406** cases), the file count does not
-reproduce (**43** claimed versus **54** actual `*.e2e-spec.ts` files at the pinned gitlink), and the
-frontend has **no unit or component layer at all**. **No suite was executed by this migration and
-no pass rate is reported.** Re-counting is **U-23**.
+See [Implemented-test inventory](#implemented-test-inventory--verified-u-23-resolved-2026-09-11).
+**Excluded from the category-2 net-new estimate** — implemented tests and net-new authoring are
+never added together. Pass rate from the 2026-09-11 recount is informational only.
 
 ### Category 2 — net-new tests: the only category estimated
 
@@ -1478,7 +1492,7 @@ history, is `test-design/migration-map.md` §10.
 | **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect against the blocker register and a current re-verification record | Platform epic owner + Architect | [`PG-01`](#release-and-design-gates) |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk | Owner of `docs/test-cases/user-management/**` | Out of scope for this migration, which modifies no scenario file |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap | DEV + QA | Frontend obligations |
-| **U-23** | The current implemented-test count | QA | [Effort](#effort). Until someone re-counts, implemented-test figures stay **unverified** |
+| **U-23** | **Resolved 2026-09-11** — implemented-test inventory re-counted; authority is jest/playwright configs at gitlinks `3bc801a…` / `fa3d319…` | QA | [Implemented-test inventory](#implemented-test-inventory--verified-u-23-resolved-2026-09-11). Backend e2e **506** cases (488 executable + 18 `it.todo`); unit **50**; contract **18** pact interactions; frontend Playwright **124**. Supersedes 340 / 406 / "43 files". |
 | **U-24** | **Resolved with authority** — `DIRA1-MVP-v1` via `npm run measure:user-management:dira1` (`docs/architecture/testing-strategy.md` § DIR-A1) | Platform/DevOps + QA | `PG-04`, [contract A](#contract-a--all-employees-httplist-route) |
 | **U-25** | **Resolved with authority** — `QUALITY-GATE-AC-NFR` governs contract **B** (ACM-9 facade) only; contract **A** / the All Employees list uses release gate **`PG-04`**. `PMC-E1-S1.9` cites `PG-04` for directory-list evidence | Access Control + Quality Engineering + the platform-capabilities epic owner | `PG-04`, [contract A](#contract-a--all-employees-httplist-route), `QUALITY-GATE-AC-NFR` (contract **B** only) |
 

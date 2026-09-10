@@ -350,7 +350,7 @@ conventions · **U-13** proactive logout · **U-16** whether platform Story 1.6 
 self-contradiction in `docs/architecture/testing-strategy.md` · **U-19** which access-control
 scenario file covers which `TR-*` row · **U-21** the
 20 history-only retired scenario files · **U-22** the `useAuth().userId` consumption gap ·
-**U-23** the current implemented-test count
+**U-23** resolved — implemented-test inventory in `test-design-qa.md` § Implemented-test inventory
 `QUALITY-GATE-AC-NFR` conflation.
 
 ---

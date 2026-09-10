@@ -49,7 +49,7 @@ here; each epic is validated separately when
 - **Product readiness.** This is document and workflow validation. It is not, and can never
   become, a release verdict.
 - **Test execution.** No suite is run by this report and no pass rate is derived. Implemented
-  test counts remain **unverified** (U-23).
+  implemented-test inventory is **verified** (U-23 resolved 2026-09-11).
 - **Per-epic validation.** An epic is validated by
   `test-design-validation-report-epic-{domain}-{number}.md`. **None of those files exists,
   because no epic has been validated.** An epic validation report **never** overwrites this
@@ -111,7 +111,7 @@ Listed so the absence of a verdict is legible, and so nobody mistakes this list 
 | 9 | The three performance contracts are stated separately; contract A's statistic, environment and load model are bound by `DIRA1-MVP-v1`; harness `npm run measure:user-management:dira1` | **UNEVALUATED** |
 | 10 | The All Employees list NFR is stated as **P0** | **UNEVALUATED** |
 | 11 | No output asks anyone to establish an approval state for a `docs/test-cases/**` scenario document, and the access-control inventory is stated as **101** files across `access-control-foundation/` and `access-control-kernel/` | **UNEVALUATED** |
-| 12 | Open decisions U-2, U-4, U-5, U-6, U-9..U-13, U-16, U-17..U-23 are still open in the outputs (**U-20**, **U-24**, **U-25** resolved); `DEC-UM-012` is still draft | **UNEVALUATED** |
+| 12 | Open decisions U-2, U-4, U-5, U-6, U-9..U-13, U-16, U-17..U-22 are still open in the outputs (**U-20**, **U-23**, **U-24**, **U-25** resolved); `DEC-UM-012` is still draft | **UNEVALUATED** |
 | 13 | No current consumer points at a removed artifact, and no historical statement was rewritten to new semantics | **UNEVALUATED** |
 | 14 | No scenario file, stored execution result, trace or coverage JSON, sprint status, coverage field, service file or gitlink changed | **UNEVALUATED** |
 
