@@ -1,14 +1,15 @@
-Invoke the installed bmad-review skill through the Skill tool, then carry out the
-instructions it loads, against `.pr-review/diff.patch`. Let the skill select its
-own lenses from the content class it detects; do not name lenses.
+Invoke the installed bmad-review skill, then carry out the instructions it loads,
+against `.pr-review/diff.patch`. Let the skill select its own lenses from the
+content class it detects; do not name lenses.
 
 The skill does not run on its own. Invoking it only loads its instructions into
 your turn: you are the one who executes them, in that same turn. There is no
 background job, nothing to poll, and nothing to wait for. Never end your turn to
 wait for the skill, and never report that it is still running — do the work.
 
-If the Skill tool is unavailable or the skill cannot be invoked, say so plainly in
-the report under Limitations rather than reviewing the patch unaided.
+If the skill cannot be invoked, read `.agents/skills/bmad-review/SKILL.md` and
+follow it directly. If neither is possible, say so plainly under Limitations
+rather than reviewing the patch unaided.
 
 This repository's authored documents are deliverables, not incidental notes, so the
 patch normally mixes prose and code. Review whatever the patch contains.
