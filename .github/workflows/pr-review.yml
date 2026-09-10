@@ -349,6 +349,8 @@ jobs:
       - name: Install Cursor CLI
         id: cursor-cli
         if: steps.diff.outputs.ready == 'true'
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
           set -u
           curl https://cursor.com/install -fsS | bash
@@ -363,7 +365,8 @@ jobs:
             echo '```'
             "$HOME/.cursor/bin/agent" --version 2>&1 | head -5 || true
             echo
-            "$HOME/.cursor/bin/agent" --help 2>&1 | head -80 || true
+            CURSOR_API_KEY="$CURSOR_API_KEY" \
+              "$HOME/.cursor/bin/agent" --list-models 2>&1 | head -40 || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -399,11 +402,19 @@ jobs:
             model_args=(--model "$REVIEWER_MODEL")
           fi
 
-          # No --force and no --yolo: without either, print mode proposes edits
-          # instead of applying them, so the reviewer is read-only by
-          # construction rather than by an allowlist it might grow past.
+          # --plan is what makes the reviewer read-only. Print mode alone does
+          # not: `agent --help` states -p "has access to all tools, including
+          # write and shell", and --force only removes the approval prompt.
+          # Plan mode analyses and proposes without editing, which is the whole
+          # job here.
+          #
+          # --trust answers the workspace-trust prompt, which otherwise blocks
+          # any non-interactive run. It grants no command approval of its own;
+          # --force and --yolo, which would, are deliberately not passed.
           set +e
           agent -p \
+            --plan \
+            --trust \
             --output-format stream-json \
             "${model_args[@]}" \
             "$(cat .github/pr-review-prompt.txt)
