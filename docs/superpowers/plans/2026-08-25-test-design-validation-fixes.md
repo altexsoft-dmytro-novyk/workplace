@@ -2,6 +2,32 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> ### Citation anchor (added 2026-09-10; this plan's own text is unchanged)
+>
+> **Nothing in this plan was rewritten.** Every statement, line number, `rg` command and expected
+> content below is the 2026-08-25 record, preserved exactly as it was evaluated then.
+>
+> What changed is outside this document. The 2026-09-10 test-design consolidation
+> (`docs/superpowers/plans/2026-09-10-test-design-consolidation.md`) **reuses five of the filenames
+> this plan cites** for new, platform-scoped, **approval-ungranted** documents:
+> `_bmad-output/test-artifacts/test-design-architecture.md`, `test-design-qa.md`,
+> `test-design-progress-system.md`, `test-design-validation-report.md`, and
+> `test-design/people-management-handoff.md`. Read by filename alone at `HEAD`, this plan's content
+> claims would silently start describing those new documents instead of the User Management
+> artifacts it actually evaluated.
+>
+> **Therefore: every artifact path this plan names resolves at commit
+> `76a7220701ac6f16843dad8b303934f9a958b54c`, not at `HEAD`.** Link form:
+> `https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/<path>`
+> — for example
+> [`test-design-qa.md` @ `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-qa.md).
+>
+> The 2026-08-25 human approval and the "PASS — Approved for ATDD" verdict this plan worked toward
+> belong to those pinned files **only**; they do **not** transfer to the current documents at the
+> same paths, which are ungranted with validation NOT RUN. The disposition of every obligation is
+> recorded in `_bmad-output/test-artifacts/test-design/migration-map.md`; the current-artifact index
+> is `_bmad-output/test-artifacts/test-design/README.md`.
+
 **Goal:** Bring the derived user-management test-design artifacts from `WARN — Conditionally Complete` to checklist-ready review without changing normative requirements, frozen stories, scenario documents, automated tests, or production code.
 
 **Architecture:** Treat the validation report as a gap inventory, not as a new source of product behavior. Fix mechanical checklist gaps in the architecture, QA, handoff, and progress artifacts; preserve the user-approved B-01..B-05 and OQ1–OQ5 decision set; then rerun the repository's Test Design Validate workflow to regenerate the report from evidence.

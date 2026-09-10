@@ -1,0 +1,5 @@
+[workflow]
+persistent_facts = ["file:docs/test-design-workflow-contract.md"]
+activation_steps_prepend = [
+  "Before workflow mode selection, read {project-root}/_bmad-output/test-artifacts/test-design/README.md and {project-root}/docs/test-design-workflow-contract.md; resolve the requested scope exactly as the contract requires before choosing or writing any input, output, checkpoint, edit target, resume target, or validation report. On ambiguity or identity mismatch, halt without writes.",
+]

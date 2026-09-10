@@ -1,350 +1,147 @@
-# Test Design Validation Report — System Level
-
-**Workflow:** `bmad-testarch-test-design` — Validate (`steps-v/step-01-validate.md`)  
-**Run:** Re-validation after documentation edits; **human approval + propagation completed 2026-08-25**  
-**Validated at:** 2026-08-25 (second pass)  
-**Validator:** TEA Master Test Architect (full checklist review)  
-**Checklist:** `.claude/skills/bmad-testarch-test-design/checklist.md`  
-**Scope:** System-level architecture, QA, handoff, progress, and critical-review outputs. **No TEA source artifacts were modified in this run.**
-
----
-
-## Delta from Prior Validation (First Pass, Same Day)
-
-The first validation flagged **4 critical documentation gaps**. All four are **resolved** in the current artifacts:
-
-| Prior finding | Was | Now | Evidence |
-| --- | --- | --- | --- |
-| Mitigation plans for all high risks (≥6) | **FAIL** — only R-001..R-003 | **PASS** | Architecture § Risk Mitigation Plans: R-001..R-005 each have numbered Strategy + Owner + Timeline + Status + Verification |
-| QA coverage for medium/low risks | **FAIL** — R-007, R-010–R-014 missing | **PASS** | QA § Risk Assessment lines 124–134 cover every R-001..R-014 |
-| Risk category legend | **FAIL** | **PASS** | Architecture line 87: TECH · SEC · PERF · DATA · BUS · OPS |
-| Residual risk documented | **FAIL** | **PASS** | Architecture § Residual Risk After Planned Mitigation (R-001..R-005 rows) |
-
-**Additional improvements since first pass:**
-
-| Area | Change |
-| --- | --- |
-| P0 distribution | Reduced ~18 → **~8** (~14%); multi-epic rationale documented in QA P0 section |
-| Cross-doc status | Aligned: both docs **“Draft — Decision Set Approved; Full Test-Design Review Pending”** |
-| Handoff risk mapping | Complete **R-001..R-014** (was 9/14) |
-| KB traceability | `probability-impact.md` and `nfr-criteria.md` added to QA Appendix B |
-| Quick Guide format | **🚨 SCOPED GATES** tier added (conditional gates vs unresolved decisions) |
-| Exit criteria | R-001..R-005 evidence/waiver + **≥80% FR coverage** threshold added |
-| Coverage ownership | QA paragraph assigns QA / Platform / Backend / Product-Architecture roles |
-| Handoff P0 gates | Updated to match revised P0 set (~8 scenarios) |
-
----
-
-## Artifact Snapshot
-
-| Artifact | Lines | Role |
-| --- | ---: | --- |
-| `test-design-architecture.md` | 262 | WHAT/WHY — risks, gates, mitigations, residuals |
-| `test-design-qa.md` | 365 | HOW — scenarios, fixtures, execution, evidence |
-| `test-design/people-management-handoff.md` | 122 | BMAD integration — epics, stories, risk mapping |
-| `test-design-progress-system.md` | 102 | Workflow checkpoint |
-| `critical-review-existing-artifacts.md` | 236 | Supporting — gap analysis vs 28 scenarios |
-
-**Config:** `tea_use_playwright_utils: true` — QA code example complies ( `apiRequest` fixture, `expect` from `@playwright/test`, assertions present, no banned vanilla patterns).
-
----
-
-## Post-Approval Update (2026-08-25)
-
-Human approval received. Normative propagation and stage-1 scenario updates are **complete**. Next gate: per-file developer approval → `/bmad-testarch-atdd`.
-
----
-
-## Overall Verdict: **PASS — Approved for ATDD (with per-file review gate)**
-
-Documentation checklist compliance is **materially improved** and **ready for human review**. Unconditional sign-off is **not** supported: human approval, normative propagation, team scheduling, and implementation/runtime evidence remain open.
-
-| Section | Verdict | Summary |
-| --- | --- | --- |
-| Prerequisites | **WARN** | Sources present; normative ambiguity remains until propagation |
-| Process Steps (1–4) | **PASS** | Context, risk, NFR, coverage, deliverables complete |
-| Output Validation | **PASS** | Matrices, estimates, execution strategy compliant |
-| Quality Checks | **WARN** | P0 ~14% with documented rationale; team should confirm strictness |
-| Integration Points | **WARN** | KB cited; ATDD/automate gated on approval |
-| Accountability & Logistics | **PASS** | Scope, entry/exit, regression documented |
-| System-Level Two-Document | **PASS** | Required sections, plans, legend, all-risk QA coverage |
-| Cross-Document Consistency | **PASS** | IDs, counts, gates, status aligned |
-| Document Quality | **WARN** | Architecture 262 lines exceeds soft ~150–200 guideline |
-| BMAD Handoff | **PASS** | Complete inventory, epic/story guidance, full risk mapping |
-| **Completion Criteria (strict)** | **FAIL** | Human approval + runtime evidence not yet true |
-
-**Two verdicts, intentionally distinct:**
-
-- **Handoff / documentation:** WARN — Conditionally Complete (usable for review)
-- **Strict checklist Completion Criteria:** FAIL — not all completion conditions are true yet
-
----
-
-## Critical Findings
-
-### Resolved (no longer blocking documentation sign-off)
-
-All four prior critical documentation failures are **PASS** on fresh evidence (see Delta table above).
-
-### Remaining — Minor Template Deviations (WARN, not blockers)
-
-| # | Finding | Severity | Detail |
-| --- | --- | --- | --- |
-| 1 | Appendix A title | WARN | Checklist expects **“Appendix A: Code Examples & Tagging”**; QA uses **“Appendix A: Tags”**. Code example lives in § Dependencies (acceptable placement; heading name differs). |
-| 2 | Architecture plan steps reference QA work | WARN | R-002 step 2 (“E2E asserts…”) and R-004 step 3 (“Approve and automate…”) mention test activities. Owners remain Backend/Architect; verification is correctly cross-team. Not a checklist failure, but blurs strict arch-only boundary slightly. |
-| 3 | P0 ratio | WARN | **~8/~57 (~14%)** exceeds <10% best-practice heuristic. QA documents multi-epic rationale; team should confirm each P0 has no safe workaround. |
-| 4 | Architecture length | WARN | **262 lines** vs soft target ~150–200. Content is required (5 plans + residuals); no bloat finding. |
-
-### Remaining — Human / External Gates (expected FAIL/WARN)
-
-| # | Gate | Status |
-| --- | --- | --- |
-| 1 | Full human test-design + critical-review approval | **Pending** — all artifacts state this explicitly |
-| 2 | Normative propagation (B-01..B-05, R-003/R-004, OQ1–OQ5) | **Pending** |
-| 3 | Team review scheduled/recorded | **Not evidenced** |
-| 4 | Schema-per-worker before parallel CI workers | **Pending** — one-worker + UUID isolation active |
-| 5 | P0/P1 runtime pass evidence, k6 baseline, R-001..R-005 implementation evidence | **Not in scope** — deferred to implementation / `nfr-assess` |
-
----
-
-## Checklist Evaluation (Full)
-
-### 1. Prerequisites (System-Level)
-
-| Criterion | Result |
-| --- | --- |
-| PRD with FR/NFR | **PASS** |
-| ADR exists | **PASS** — ARCHITECTURE-SPINE AD-1..AD-14 |
-| Architecture document available | **PASS** |
-| Requirements testable and unambiguous | **WARN** — derived decisions approved; normative copy pending |
-
-### 2. Process Steps
-
-#### Step 1 — Context Loading
-
-| Criterion | Result |
-| --- | --- |
-| PRD read | **PASS** |
-| Epics loaded | **PASS** |
-| Story AC analyzed | **PASS** |
-| Architecture reviewed | **PASS** |
-| Existing coverage analyzed | **PASS** |
-| KB fragments loaded | **PASS** |
-| `nfr-criteria.md` for system mode | **PASS** |
-
-#### Step 2 — Risk Assessment
-
-| Criterion | Result |
-| --- | --- |
-| Genuine risks (not features) | **PASS** — 14 failure-mode risks |
-| Categories TECH/SEC/PERF/DATA/BUS/OPS | **PASS** |
-| P and I scored 1–3 | **PASS** |
-| P×I calculated | **PASS** |
-| Score ≥6 flagged | **PASS** — R-001..R-005 |
-| Mitigation plans for high risks | **PASS** |
-| Owners assigned | **PASS** |
-| Timelines set | **PASS** |
-| Residual risk documented | **PASS** |
-
-#### Step 2A — NFR Planning
-
-| Criterion | Result |
-| --- | --- |
-| Categories identified | **PASS** |
-| Thresholds extracted | **PASS** |
-| Unknowns marked | **PASS** |
-| Missing → risks/assumptions | **PASS** |
-| Evidence sources planned | **PASS** |
-| NFR risks in register | **PASS** |
-
-#### Step 3 — Coverage Design
-
-| Criterion | Result |
-| --- | --- |
-| Atomic scenarios | **PASS** — ~57 Test IDs |
-| Test levels selected | **PASS** |
-| No duplicate coverage | **WARN** — small intentional overlaps documented |
-| Priorities P0–P3 | **PASS** |
-| P0 strict criteria | **WARN** — ~14%; rationale documented |
-| NFR → scenarios | **PASS** |
-| No final NFR verdict | **PASS** |
-| Data prerequisites | **PASS** |
-| Tooling/access | **PASS** |
-| Execution order | **PASS** |
-
-#### Step 4 — Deliverables
-
-| Criterion | Result |
-| --- | --- |
-| Risk matrix | **PASS** |
-| Coverage matrix | **PASS** |
-| Execution order | **PASS** |
-| Resource estimates (intervals) | **PASS** |
-| Quality gate criteria | **PASS** — in Exit Criteria (no forbidden standalone section title) |
-| NFR summary | **PASS** |
-| Correct output location | **PASS** |
-| Template structure | **PASS** |
-
-### 3. Output Validation
-
-| Group | Result | Notes |
-| --- | --- | --- |
-| Risk Assessment Matrix | **PASS** | Legend, IDs, scores, actionable mitigations |
-| Coverage Matrix | **PASS** | Ownership paragraph satisfies owner requirement |
-| Execution Strategy | **PASS** | PR / Nightly / Weekly; philosophy stated |
-| Resource Estimates | **PASS** | Intervals only; no false precision |
-| Quality Gate Criteria | **PASS** | P0 100%, P1 ≥95%, ≥80% FR coverage, R-001..R-005 evidence |
-
-### 4. Quality Checks
-
-| Group | Result |
-| --- | --- |
-| Evidence-based assessment | **PASS** |
-| Risk classification accuracy | **PASS** |
-| Priority ≠ execution timing | **PASS** |
-| P0–P3 criteria alignment | **WARN** — P0 ratio |
-| Test level selection | **PASS** |
-
-### 5. Integration Points
-
-| Criterion | Result |
-| --- | --- |
-| KB fragments referenced | **PASS** |
-| Status file integration | **PASS** |
-| ATDD with P0 scenarios | **WARN** — gated on human/scenario approval |
-| ATDD separate workflow | **PASS** |
-| Automate workflow readiness | **WARN** — approval pending |
-| Gate/CI integration | **WARN** — schema-per-worker pending |
-
-### 6. Accountability & Logistics
-
-| Criterion | Result |
-| --- | --- |
-| Not in scope + mitigations | **PASS** |
-| Entry criteria | **PASS** |
-| Exit criteria | **PASS** |
-| Interworking/regression | **PASS** |
-| Tooling/access | **PASS** |
-
-### 7. System-Level Two-Document Validation
-
-#### Architecture (`test-design-architecture.md`)
-
-| Criterion | Result |
-| --- | --- |
-| Purpose + Executive Summary | **PASS** |
-| Quick Guide tiers (blockers/high/info) | **PASS** — scoped-gates wording intentional |
-| Actionable risk assessment + legend | **PASS** |
-| Testability concerns (actionable first) | **PASS** |
-| Mitigation plans R-001..R-005 (all fields) | **PASS** |
-| Residual risk table | **PASS** |
-| Assumptions/dependencies (arch only) | **PASS** |
-| No code/scripts/scenario checklists | **PASS** |
-| Concise NFR requirements | **PASS** |
-| No forbidden recipe sections | **PASS** |
-| Cross-ref to QA | **PASS** |
-
-#### QA (`test-design-qa.md`)
-
-| Criterion | Result |
-| --- | --- |
-| Purpose + Executive Summary | **PASS** |
-| Dependencies/blockers near top | **PASS** |
-| playwright-utils example | **PASS** |
-| Risk assessment all R-001..R-014 | **PASS** |
-| Test Coverage Plan P0–P3 + note | **PASS** |
-| NFR plan (no final verdict) | **PASS** |
-| Execution Strategy by tool | **PASS** |
-| QA effort intervals only | **PASS** |
-| Appendix A (tags/code) | **WARN** — heading name only |
-| Appendix B KB refs | **PASS** |
-| No forbidden bloat sections | **PASS** |
-
-### 8. Cross-Document Consistency
-
-| Criterion | Result |
-| --- | --- |
-| Same risk IDs | **PASS** |
-| Consistent priorities/counts | **PASS** |
-| Same blockers/gates | **PASS** |
-| No material duplication | **PASS** |
-| Dates/authors/status | **PASS** |
-| ADR/PRD refs | **PASS** |
-
-### 9. Document Quality
-
-| Criterion | Result |
-| --- | --- |
-| No excessive repetition | **PASS** |
-| WHAT/WHY vs HOW separation | **PASS** |
-| Professional tone | **PASS** |
-| Architecture line guideline | **WARN** — 262 lines |
-| QA proportionate to scope | **PASS** |
-
-### 10. BMAD Handoff
-
-| Criterion | Result |
-| --- | --- |
-| Correct path | **PASS** |
-| Artifacts inventory | **PASS** |
-| Epic-level guidance | **PASS** |
-| Story-level guidance | **PASS** |
-| Risk-to-story R-001..R-014 | **PASS** |
-| Workflow sequence | **PASS** |
-| Phase transition gates | **PASS** |
-
----
-
-## Completion Criteria (Strict)
-
-| Criterion | Result |
-| --- | --- |
-| All prerequisites met | **WARN** |
-| All process steps completed | **PASS** |
-| All output validations passed | **PASS** |
-| All quality checks passed | **WARN** |
-| Integration points verified | **WARN** |
-| Outputs complete and well-formatted | **PASS** |
-| System-level both documents validated | **PASS** |
-| System-level handoff validated | **PASS** |
-| Team review scheduled | **FAIL** |
-
-**Strict overall: FAIL** — documentation ready; human and runtime gates open.
-
----
-
-## Post-Workflow Actions Status
-
-| Action | Result |
-| --- | --- |
-| Review risk assessment with team | **Pending** |
-| Prioritize high-risk mitigations | **Pending** — plans exist; implementation not evidenced |
-| Allocate resources | **Pending** |
-| Run `/bmad-testarch-atdd` | **Blocked** — awaits full approval + scenario updates |
-| Set up factories/fixtures | **Partially planned** — not provisioned |
-| Schedule team review | **Pending** |
-
----
-
-## Sign-Off Block
+# Test Design Validation Report — Platform (system-level)
+
+> ## Verdict: **NOT RUN.**
+>
+> **No validation has been performed against the artifact set identified below.** This document
+> currently establishes the report's **scope and identity** — what would be evaluated, against
+> which baseline, and using which exact content — and nothing else.
+>
+> - **Verdict:** `NOT RUN`. Not PASS. Not CONCERNS. Not FAIL. Not a partial pass.
+> - **No criterion below is marked evaluated**, because none has been evaluated.
+> - **No coverage percentage and no pass rate appears anywhere in this document.**
+> - **This document inherits nothing.** At `76a7220701ac6f16843dad8b303934f9a958b54c` this
+>   path held the **2026-08-25 User Management** validation report, whose Overall Verdict read
+>   "**PASS — Approved for ATDD (with per-file review gate)**" and whose strict completion
+>   section read "**FAIL — documentation ready; human and runtime gates open**", followed by a
+>   "Post-Approval Update (2026-08-25): Human approval received." **None of that transfers.**
+>   A new document does not inherit an old document's validation PASS, its ~110-row checklist
+>   result, or its approval. Read the superseded report at its commit:
+>   `https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-validation-report.md`
+>
+> A reader who needs a verdict must run Validate. Until then the honest answer to "has the
+> migrated artifact set been validated?" is **no**.
 
 | Field | Value |
 | --- | --- |
-| **Documentation checklist** | **PASS with WARNs** (minor template/length/P0-ratio items) |
-| **Handoff verdict** | **WARN — Conditionally Complete** |
-| **Strict completion** | **FAIL — human/runtime gates open** |
-| **Prior 4 critical gaps** | **All resolved** |
-| **Blocking next phase?** | Yes — human approval + normative propagation |
-| **Validated by** | TEA Validate step (re-validation) |
-| **Date** | 2026-08-25 |
-| **Scope** | System-level — `user-management` (Epics 1–4) |
-| **Files changed this run** | `_bmad-output/test-artifacts/test-design-validation-report.md` only |
+| Report scope | **Platform (system-level).** `runScope: system-level`, `runKey: system` |
+| Verdict | **NOT RUN** |
+| Date this scope was established | 2026-09-10 |
+| Established by | Test-design consolidation migration, Task 3 (`docs/superpowers/plans/2026-09-10-test-design-consolidation.md`) |
+| Baseline commit | `76a7220701ac6f16843dad8b303934f9a958b54c` |
+| Backend pin | `f1eea3c048821011da96fba20d9b517f7d0e4f1b` |
+| Frontend pin | `fa3d3198aa9921c26d22307542ab72834a03b899` |
+| Worktree branch | `docs/2026-09-10-test-design-consolidation` (created from the baseline commit) |
+| Matching checkpoint | `test-design-progress-system.md` (`workflowStatus: generated`, approval **ungranted**) |
 
 ---
 
-## Self-Review
+## Scope of this report
 
-- Full checklist read and every section evaluated against current artifact content.
-- Prior critical findings re-checked from source files, not assumed from earlier report.
-- No edits to architecture, QA, handoff, progress, or critical-review artifacts.
-- `workflow.on_complete` resolver returned empty — no post-hook action.
+**In scope.** Per `docs/test-design-workflow-contract.md` §4.5, system Validate evaluates only
+the canonical architecture/QA pair and the literal handoff listed under
+[Evaluated inputs](#evaluated-inputs). The current-artifact index records this report's
+validation entry. Epic plans, epic checkpoints, and per-epic validation are **out of scope**
+here; each epic is validated separately when
+`test-design-validation-report-epic-{domain}-{number}.md` is written.
+
+**Out of scope, explicitly.**
+
+- **Product readiness.** This is document and workflow validation. It is not, and can never
+  become, a release verdict.
+- **Test execution.** No suite is run by this report and no pass rate is derived. Implemented
+  test counts remain **unverified** (U-23).
+- **Per-epic validation.** An epic is validated by
+  `test-design-validation-report-epic-{domain}-{number}.md`. **None of those files exists,
+  because no epic has been validated.** An epic validation report **never** overwrites this
+  system report.
+- **Runtime evidence, human approvals, and the open product decisions.** Those remain
+  separate work and are not converted into evidence by any document movement.
+- Source documents, scenario files, trace and coverage JSON, sprint statuses, service files and
+  service gitlinks — none of which this migration touches.
+
+---
+
+## Evaluated inputs
+
+**Identified by path and SHA-256 content hash**, so that a later Validate run can prove it
+evaluated exactly this set, and so a reader can detect drift. Hashes were computed with
+`shasum -a 256` in the migration worktree on 2026-09-10, at the moment this section was
+written. Paths are relative to `_bmad-output/test-artifacts/`.
+
+**Recording a hash is not evaluating the file.** Every row below is **unevaluated**.
+
+### Platform artifacts
+
+| Path | SHA-256 | Evaluated? |
+| --- | --- | --- |
+| `test-design-architecture.md` | `ad0c675f5ffa6512366e1b2899e162727072ebf5917540e2c83605ef06b61a65` | **No** |
+| `test-design-qa.md` | `436ac635e0013350394288428e11c1d2caf7142d6045ba7b58fe85df6bf57c1c` | **No** |
+| `test-design/people-management-handoff.md` | `535a61b4307125d77ec5e551dbdaaae314f7e6896ab6d1c7efb73184898296b4` | **No** |
+
+### Reference inputs, not subjects of the verdict
+
+| Path | SHA-256 | Role |
+| --- | --- | --- |
+| `test-design/migration-map.md` | `21ee95fa8d8c646deac951d821844d0a2edc7e44556df3d1ed32f8134a92c8ec` | The disposition ledger a Validate run checks the outputs **against**. Not itself under verdict. |
+| `docs/project-requirements.md` | `495017d0bc2f1c01ae5c7b1cdd6d4753f9c32410eb2ba1e2e3ca88003f4bf0d8` | v1.5, normative product authority |
+| `docs/architecture/testing-strategy.md` | `af0733325b2a3831e3445b137fd760e632f846888b4fff2c96cae9e622e2e77f` | Binding: measurement protocols, ordering rule, and the 2026-09-04 stage-approval removal |
+| `docs/architecture/user-management-test-decisions.md` | `e361c88b276591adb48295133304efe28f91bb1ea70e2efdd7b152ff2d7dbed3` | `DEC-UM-001..012`; `DEC-UM-012` is **draft** |
+
+**A hash mismatch at Validate time is a finding, not a formality.** If any file above differs
+when a Validate run reads it, the run evaluated a different document than this scope names, and
+must record that before producing any verdict.
+
+---
+
+## What a Validate run would have to establish
+
+Listed so the absence of a verdict is legible, and so nobody mistakes this list for a result.
+**Every item is UNEVALUATED.**
+
+| # | Criterion | State |
+| --- | --- | --- |
+| 1 | Every ledger row's `target_path_and_anchor` resolves to a section that exists in the named output | **UNEVALUATED** |
+| 2 | Every `retire` row's obligation is absent from the outputs as an active obligation, and its authority is recorded | **UNEVALUATED** |
+| 3 | Every `merge` row's origins all resolve to the one declared successor, and every split resolves to all declared successors | **UNEVALUATED** |
+| 4 | No output asserts an approval, a validation verdict, coverage or a pass rate | **UNEVALUATED** |
+| 5 | Architecture owns risk identity and rationale; QA owns evidence and execution; no shared rule is stated twice | **UNEVALUATED** |
+| 6 | Every epic plan has exactly one matching checkpoint with the correct `runKey`, canonical `epicId` and source path | **OUT OF SYSTEM SCOPE** — epic Validate |
+| 7 | No plan exists for an epic that received no transferred obligation, and none is missing for one that did | **OUT OF SYSTEM SCOPE** — epic Validate and index audit |
+| 8 | The index resolves every scope, including the unplanned scopes, each with an owner | **OUT OF SYSTEM SCOPE** — index is not a system Validate subject |
+| 9 | The three performance contracts are stated separately; contract A's statistic, environment and load model are UNKNOWN and its harness UNDECIDED; no current-choice harness is named | **UNEVALUATED** |
+| 10 | The All Employees list NFR is stated as **P0** | **UNEVALUATED** |
+| 11 | No output asks anyone to establish an approval state for a `docs/test-cases/**` scenario document, and the access-control inventory is stated as **101** files across `access-control-foundation/` and `access-control-kernel/` | **UNEVALUATED** |
+| 12 | Open decisions U-2, U-4, U-5, U-6, U-9..U-13, U-16, U-17..U-25 are still open in the outputs, and `DEC-UM-012` is still draft | **UNEVALUATED** |
+| 13 | No current consumer points at a removed artifact, and no historical statement was rewritten to new semantics | **UNEVALUATED** |
+| 14 | No scenario file, stored execution result, trace or coverage JSON, sprint status, coverage field, service file or gitlink changed | **UNEVALUATED** |
+
+**Two verdicts, not one.** The superseded report deliberately carried a documentation verdict
+and a distinct **strict** completion verdict, and they disagreed. That distinction is
+worth keeping: a document set can be internally complete while human approvals and runtime
+gates remain open. A future Validate run should report both rather than collapsing them —
+and neither of the superseded verdicts is carried here.
+
+---
+
+## Supersession history
+
+- **2026-08-25** — a Validate run at this path evaluated the then-current **User Management**
+  artifact set and recorded "PASS — Approved for ATDD" plus a strict "FAIL". **Superseded.**
+  Historical only, readable at `76a7220…`.
+- **2026-08-29** — [`test-design-validation-report-platform.md` at `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-validation-report-platform.md) recorded that the refreshed
+  v1.5 platform Create run carried **no** validation verdict and that the 2026-08-25 v1.2
+  validation was historical. **The document is superseded; the invariant it stated survives**
+  and is the rule this report applies: *a Create run is not a Validate run, and generation is
+  not validation.*
+- **2026-09-10** — this report's scope and identity are established by the consolidation
+  migration. **No verdict is issued.**
+
+---
+
+## Boundary
+
+This report grants no approval, authorises no ATDD, implementation, deployment or release
+activity, and asserts no coverage. The whole-repository trace remains a planning audit with
+`allow_gate=false`; no `gate-decision.json` is produced and no trace artifact is regenerated.
+Product readiness, human approval, runtime evidence and the open product decisions are
+separate work.
