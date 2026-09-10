@@ -360,10 +360,26 @@ jobs:
           curl https://cursor.com/install -fsS | bash
           echo "$HOME/.cursor/bin" >> "$GITHUB_PATH"
 
-          if [ ! -x "$HOME/.cursor/bin/agent" ]; then
-            echo "::error::The Cursor CLI did not install; the reviewer cannot run."
+          # Locate the binary rather than assume where the installer put it.
+          # GITHUB_PATH only takes effect in later steps, so PATH cannot be
+          # consulted here, and the layout has already moved once.
+          agent_bin=""
+          for candidate in "$HOME/.cursor/bin/agent" "$HOME/.cursor/bin/cursor-agent" \
+                           "$HOME/.local/bin/agent" "$HOME/.local/bin/cursor-agent"; do
+            if [ -x "$candidate" ]; then
+              agent_bin="$candidate"
+              break
+            fi
+          done
+
+          if [ -z "$agent_bin" ]; then
+            echo "::error::The Cursor CLI did not install where expected; the reviewer cannot run."
+            echo "--- what the installer left behind ---"
+            ls -la "$HOME/.cursor" "$HOME/.cursor/bin" "$HOME/.local/bin" 2>&1 | head -40
             exit 1
           fi
+          echo "Using Cursor CLI at $agent_bin"
+          echo "agent_bin=$agent_bin" >> "$GITHUB_OUTPUT"
 
           # Record what this CLI build actually accepts. The installer tracks a
           # fast-moving build, so the flags the docs describe and the flags this
@@ -374,9 +390,9 @@ jobs:
             echo '### Cursor CLI'
             echo
             echo '```'
-            "$HOME/.cursor/bin/agent" --version 2>/dev/null | head -5 || true
+            "$agent_bin" --version 2>/dev/null | head -5 || true
             echo
-            "$HOME/.cursor/bin/agent" --list-models 2>/dev/null | head -40 || true
+            "$agent_bin" --list-models 2>/dev/null | head -40 || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -388,6 +404,7 @@ jobs:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
           REVIEW_KIND: ${{ inputs.repository != '' && 'service' || 'workspace' }}
           REVIEWER_ASSETS: ${{ steps.reviewer-assets.outcome }}
+          AGENT_BIN: ${{ steps.cursor-cli.outputs.agent_bin }}
           # Leave empty to use the Cursor account's default model.
           REVIEWER_MODEL: ''
         run: |
@@ -430,8 +447,9 @@ jobs:
           # --trust answers the workspace-trust prompt, which otherwise blocks
           # any non-interactive run. It grants no command approval of its own;
           # --force and --yolo, which would, are deliberately not passed.
+          # Use the path the install step resolved, not a name on PATH.
           set +e
-          agent -p \
+          "${AGENT_BIN:-agent}" -p \
             --plan \
             --trust \
             --output-format stream-json \
