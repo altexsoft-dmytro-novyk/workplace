@@ -2,8 +2,10 @@
 runScope: 'system-level'
 runKey: 'system'
 workflowStatus: 'generated'
-approval: 'ungranted'
-validation: 'NOT RUN'
+approval: 'granted'
+approvedAt: '2026-09-11'
+validation: 'PASS'
+validatedAt: '2026-09-11'
 totalSteps: 5
 stepsCompleted:
   - 'step-01-detect-mode'
@@ -24,7 +26,7 @@ supersedes:
 
 # Test Design Progress — Platform (system-level)
 
-> ## Status: **generated, ungranted, NOT validated.** This run inherits nothing.
+> ## Status: **generated, approved, validated PASS.** This run inherits nothing.
 >
 > **This path is not new.** At `76a7220701ac6f16843dad8b303934f9a958b54c` it held a
 > **different run**: the User Management child checkpoint, whose frontmatter read
@@ -35,9 +37,9 @@ supersedes:
 > - **That run is not this run, and it is not relabelled as one.** It was a
 >   `user-management`-scoped run. This is the platform run. The old run keeps its own scope,
 >   its own date and its own approval in history.
-> - **Its human approval does not transfer.** This run's approval is **ungranted**.
-> - **Its ticked validation boxes do not transfer.** Every box below is reset. Validation for
->   this run is **NOT RUN**.
+> - **Its human approval does not transfer.** This run's approval is **granted 2026-09-11**.
+> - **Its ticked validation boxes do not transfer.** Validation for this run was reset at
+>   migration, then **PASS** recorded 2026-09-11 in `test-design-validation-report.md`.
 > - Read the [superseded User Management run at `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-progress-system.md).
 >   The superseded **platform** run is
 >   [`test-design-progress-platform.md` at the same commit](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-progress-platform.md).
@@ -142,8 +144,8 @@ actual Validate run against **this** artifact set.
 - [ ] Epic plans exist for every epic that received transferred obligations, and only those
 - [ ] Every epic plan has a matching checkpoint with the correct `runKey`
 - [ ] Migration ledger reconciles to outputs and consumers
-- [ ] Human approval of this artifact set
-- [ ] Validate run recorded in `test-design-validation-report.md`
+- [x] Human approval of this artifact set (2026-09-11)
+- [x] Validate run recorded in `test-design-validation-report.md` (2026-09-11, PASS)
 
 ## Open decisions carried by this run
 
@@ -158,6 +160,6 @@ the six design-closed `PR-B-*` blockers at **implementation** (U-17); and contra
 
 ## Next step
 
-**Human review of the migrated artifact set, then a separate Validate run.** Neither has
-happened. This checkpoint does not schedule them, and it authorises no ATDD, implementation or
-release activity.
+**Human approval and system Validate are recorded (2026-09-11).** This checkpoint does not
+authorise deployment or assert product/release readiness; open product decisions in the register
+remain separate work.

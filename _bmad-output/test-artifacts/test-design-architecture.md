@@ -1,14 +1,15 @@
 # Test Design for Architecture: People Management Platform
 
-> ## Status: **ungranted**. This document inherits nothing from the document it replaces.
+> ## Status: **approved**. This document inherits nothing from the document it replaces.
 >
 > This path previously held **`Test Design for Architecture: User Management`**, a
 > `user-management`-scoped document carrying "**Approved — 2026-08-25** (human approval;
 > normative propagation complete)". That document is superseded, **its approval does not
 > transfer to this one**, and no validation verdict transfers either.
 >
-> - **Approval:** ungranted. No human has approved this document.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here.
+> - **Approval:** **granted 2026-09-11** (explicit stakeholder confirmation in workspace).
+> - **Validation:** **PASS** — system Validate recorded in `test-design-validation-report.md`
+>   (2026-09-11). Not a release verdict.
 > - **Coverage:** none asserted. This document proposes and records; it does not state that
 >   any test exists, any suite passes, or any gate is green.
 > - **Scope changed with the filename.** The old document was scoped to the
@@ -27,7 +28,7 @@ coverage — those belong to `test-design-qa.md`.
 
 **Date:** 2026-09-10
 **Author:** Test-design consolidation migration, Task 3 (`docs/superpowers/plans/2026-09-10-test-design-consolidation.md`)
-**Status:** Draft — **approval ungranted**, validation **NOT RUN**
+**Status:** **Approved 2026-09-11** · validation **PASS** (system-level, 2026-09-11)
 **Scope:** Platform (system-level). Not an epic, and not a bounded context.
 **Baseline commit:** `76a7220701ac6f16843dad8b303934f9a958b54c` (backend `f1eea3c0…`, frontend `fa3d3198…`)
 **Requirements reference:** `docs/project-requirements.md` v1.5 (normative). Historical PRDs — including `prd-user-management-2026-08-20`, which the superseded document cited — are **not** current requirements.

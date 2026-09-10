@@ -8,15 +8,17 @@ generatedAt: '2026-09-10'
 projectName: 'people management'
 runScope: 'system-level'
 runKey: 'system'
-approval: 'ungranted'
-validation: 'NOT RUN'
-status: 'draft — approval ungranted, validation NOT RUN'
+approval: 'granted'
+approvedAt: '2026-09-11'
+validation: 'PASS'
+validatedAt: '2026-09-11'
+status: 'approved — validation PASS (system-level, 2026-09-11)'
 baselineCommit: '76a7220701ac6f16843dad8b303934f9a958b54c'
 ---
 
 # TEA → BMAD Integration Handoff (Platform)
 
-> ## Status: **ungranted**. This document inherits nothing from the two documents it replaces.
+> ## Status: **approved**. This document inherits nothing from the two documents it replaces.
 >
 > This path previously held the **User Management** handoff, whose frontmatter read
 > `status: 'approved'` and whose footer read "**Status:** Approved 2026-08-25. Stage-1
@@ -25,8 +27,9 @@ baselineCommit: '76a7220701ac6f16843dad8b303934f9a958b54c'
 > [`test-design/people-management-platform-handoff.md` at `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design/people-management-platform-handoff.md), was an
 > explicitly unapproved 2026-08-29 v1.5 draft.
 >
-> - **Approval:** ungranted. No human has approved this document.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here.
+> - **Approval:** **granted 2026-09-11** (explicit stakeholder confirmation in workspace).
+> - **Validation:** **PASS** — system Validate recorded in `test-design-validation-report.md`
+>   (2026-09-11). Not a release verdict.
 > - **Coverage:** none asserted. No pass rate, no percentage and no green gate appears
 >   anywhere in it.
 > - **Scope changed with the filename.** The old document at this path was scoped to the

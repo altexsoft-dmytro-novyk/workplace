@@ -6,9 +6,9 @@
 > able to reach the right system document and the right epic plan from here **without opening
 > any superseded file**.
 >
-> - **No row grants an approval, a validation verdict, or coverage.** Every artifact listed
->   below is **approval ungranted** and **validation NOT RUN**. A new document never inherits
->   an old document's human approval or validation PASS.
+> - **Platform (system-level) artifacts are approved and validated PASS (2026-09-11).** Epic
+>   plans remain **approval ungranted** and **validation NOT RUN** until separately approved and
+>   validated. A new document never inherits an old document's human approval or validation PASS.
 > - **No percentage, pass rate or green gate appears anywhere in this index.**
 > - Nothing here is a release-readiness statement. The whole-repository trace remains a
 >   planning audit with `allow_gate=false`.
@@ -49,8 +49,8 @@ renumbered** and no ClickUp mapping is touched.
 
 | Scope | Canonical epic ID / source | Outputs | Checkpoints | Status |
 | --- | --- | --- | --- | --- |
-| **Platform (system-level)** | **Not an epic.** Sources: `docs/project-requirements.md` v1.5 (normative) · `_bmad-output/planning-artifacts/prds/prd-people-management-2026-08-24/prd.md` + `addendum.md` · `…/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` (PM spine) · the binding rendered rules under `docs/architecture/` | `test-design-architecture.md` · `test-design-qa.md` · `test-design/people-management-handoff.md` | `test-design-progress-system.md` (`runScope: system-level`, `runKey: system`, `workflowStatus: generated`) | **WRITTEN.** Approval **ungranted**. Validation **NOT RUN**. Coverage: none asserted. |
-| **Platform validation** | — | `test-design-validation-report.md` | — | **WRITTEN — scope only. Verdict: NOT RUN.** System Validate (contract §4.5) evaluates only the architecture/QA pair and literal handoff; this report identifies those inputs by path **and SHA-256 content hash** plus the baseline commit. No epic validation may overwrite it. |
+| **Platform (system-level)** | **Not an epic.** Sources: `docs/project-requirements.md` v1.5 (normative) · `_bmad-output/planning-artifacts/prds/prd-people-management-2026-08-24/prd.md` + `addendum.md` · `…/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` (PM spine) · the binding rendered rules under `docs/architecture/` | `test-design-architecture.md` · `test-design-qa.md` · `test-design/people-management-handoff.md` | `test-design-progress-system.md` (`runScope: system-level`, `runKey: system`, `workflowStatus: generated`) | **WRITTEN.** Approval **granted 2026-09-11**. Validation **PASS** (2026-09-11). Coverage: none asserted. |
+| **Platform validation** | — | `test-design-validation-report.md` | — | **PASS (2026-09-11).** System Validate (contract §4.5) evaluated the architecture/QA pair and literal handoff at the content hashes recorded in the report. No epic validation may overwrite it. |
 | **Migration record** | — | `test-design/migration-map.md` | — | **WRITTEN.** A disposition ledger — not a strategy, not coverage, not an approval. 565 rows; findings F-1..F-18; decision register U-1..U-25. |
 | **Workflow routing** | — | `docs/test-design-workflow-contract.md` · `_bmad/custom/bmad-testarch-test-design.toml` | — | **ACTIVE TEAM POLICY.** Resolves system and domain-qualified epic identities consistently for Create, context loading, Edit, Resume and Validate. It grants no approval or evidence. |
 | **This index** | — | `test-design/README.md` | — | **WRITTEN.** Current as of 2026-09-10. |
