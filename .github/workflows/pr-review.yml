@@ -354,21 +354,29 @@ jobs:
         env:
           CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
-          set -u
+          # pipefail matters here: without it a failed download pipes nothing
+          # into bash, which exits 0 and leaves the step green with no CLI.
+          set -uo pipefail
           curl https://cursor.com/install -fsS | bash
           echo "$HOME/.cursor/bin" >> "$GITHUB_PATH"
+
+          if [ ! -x "$HOME/.cursor/bin/agent" ]; then
+            echo "::error::The Cursor CLI did not install; the reviewer cannot run."
+            exit 1
+          fi
 
           # Record what this CLI build actually accepts. The installer tracks a
           # fast-moving build, so the flags the docs describe and the flags this
           # binary takes can differ, and that difference is invisible otherwise.
+          # Only stdout reaches the summary: this call is authenticated, and its
+          # error text is not something to publish unread.
           {
             echo '### Cursor CLI'
             echo
             echo '```'
-            "$HOME/.cursor/bin/agent" --version 2>&1 | head -5 || true
+            "$HOME/.cursor/bin/agent" --version 2>/dev/null | head -5 || true
             echo
-            CURSOR_API_KEY="$CURSOR_API_KEY" \
-              "$HOME/.cursor/bin/agent" --list-models 2>&1 | head -40 || true
+            "$HOME/.cursor/bin/agent" --list-models 2>/dev/null | head -40 || true
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -663,11 +671,23 @@ jobs:
           if fence:
               text = fence.group(1)
 
-          start = re.search(r"^## Automated review\s*$", text, re.MULTILINE)
-          if not start or not re.search(r"^### Findings\s*$", text, re.MULTILINE):
+          # The agent's narration is concatenated into the answer without
+          # separators, so the heading routinely lands mid-line ("...anchors
+          # myself.## Automated review"). Anchor on the heading text itself, and
+          # accept the first occurrence that actually has a findings section
+          # after it, so a heading merely quoted in the narration is skipped.
+          # Requiring the heading to end its line separates the real one from a
+          # heading the narration merely quotes ("emit \"## Automated review\"
+          # first"), which otherwise wins by appearing earlier.
+          start = -1
+          for match in re.finditer(r"## Automated review[ \t]*(?:\r?\n|\Z)", text):
+              if re.search(r"^### Findings\s*$", text[match.start():], re.MULTILINE):
+                  start = match.start()
+                  break
+          if start < 0:
               sys.exit(1)
 
-          path.write_text(text[start.start():].strip() + "\n", encoding="utf-8")
+          path.write_text(text[start:].strip() + "\n", encoding="utf-8")
           PY
               :
             else
