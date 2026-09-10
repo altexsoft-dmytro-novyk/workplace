@@ -79,7 +79,7 @@ Owner: `user-management` / `access-control` contexts. This slice does not schedu
 |---|---|---|
 | `SEC-AUTH-01` | **P0 open** | Any new read surface on the interim adapter inherits `Boolean(userId)` target auth and whole-row `GET /users` serialization. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
 | `QUALITY-GATE-AC` | **closed 2026-09-02** | Was P0. [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/a62e705/_bmad-output/test-artifacts/gate-decision.json) (`a62e705`) shows `gate_status=PASS`, `p0_status=MET`, `critical_open=0`; ACM3-II-04/05/06 each carry independently approved Stage-2 evidence. No longer a precondition on any story here |
-| `QUALITY-GATE-AC-NFR` | **closed 2026-09-02** | Was P1. NFR-3 / SM-4 proven by ACM-9 final (`acm9-final-…ff94a3e685d1.json`, PASS, 500 targets, warm p95 11.603 ms). **Closure is pinned to resolver revision `f89e034`** — any change under `services/backend/src/access-control/**` invalidates it and requires an ACM-9 rerun |
+| `QUALITY-GATE-AC-NFR` | **closed 2026-09-02** | Was P1. **Contract B only** — the ACM-9 AccessControl facade resolver at 500 requested active targets (`acm9-final-…ff94a3e685d1.json`, PASS, warm p95 11.603 ms). **Does not discharge `PG-04` or the All Employees list requirement (contract A).** **Closure is pinned to resolver revision `f89e034`** — any change under `services/backend/src/access-control/**` invalidates it and requires an ACM-9 rerun |
 | `OQ-PERM-01` | P1 open | "view each dashboard type" is an FR-6 permission; default grants unapproved — **do not seed or infer grants** |
 | `CONFLICT-UM-01` | P1 open (implementation stale) | PM/AD-24 "list endpoints omit invisible rows"; runtime still diverges |
 | `PM/AD-32` | design closed, impl `transition-debt` (TD-12) | Custom-field storage behind `PM-FR-8` |
@@ -216,7 +216,7 @@ Extracted from EXPERIENCE.md §Information Architecture, §Component Patterns, �
 | `PM-FR-17` — Project Manager dashboard | Epic 3 | DM configuration scoped to the PM's own projects; per SD-2 |
 | PRD §4.5 feature NFR — tier resolution per referenced employee | Epic 2 + Epic 3 | Every widget resolves tier per referenced employee; `.wscope` footer states the policy evaluated |
 | NFR-1 (leak = critical), NFR-2 (seeded data only) | All epics | Negative tests per audience on list rows, export columns, and widget payloads; seeded population only |
-| NFR-3 / SM-4 (2s at 500+ rows incl. permission resolution) | Epic 1 **+ Epic 2** | Binds both, because the `PM-FR-15` people-table is the same read model as the directory (see *Shared read model* below). Evidence is measured **once on the shared read model**, not per surface; `QUALITY-GATE-AC-NFR` precondition |
+| NFR-3 / SM-4 (2s at 500+ rows incl. permission resolution) | Epic 1 **+ Epic 2** | Binds both, because the `PM-FR-15` people-table is the same read model as the directory (see *Shared read model* below). Evidence is measured **once on the shared read model**, not per surface. **Release gate `PG-04` / contract A** governs the list measurement (`PMC-E1-S1.9`). `QUALITY-GATE-AC-NFR` is the separate ACM-9 facade protocol (contract B) and does **not** substitute for `PG-04` |
 | NFR-4 (graceful integration degradation) | Epic 1 + Epic 3 | Timetracker-stale amber banner with 4h project-access fallback (UX-DR16); Epic 3 owns the project-access withdrawal path |
 | NFR-5 (responsive + accessible), NFR-6 (English only) | All epics | UX-DR17–UX-DR21 |
 | NFR-7 (revocation timing) | All epics | Immediate functional-permission revocation and next-request relationship effect; PM/AD-25 TD-11 five-minute `staleTime` recorded as the divergence to close. The 15-minute project-derived window and 4-hour withdrawal are Epic 3's. |
@@ -758,8 +758,9 @@ So that the NFR-3 claim rests on measurement rather than assumption — once, fo
 **Then** the first filter, sort, or column shape exceeding two seconds is identified explicitly, or the run records that none did within the tested envelope
 
 **Given** the recorded evidence artifact
-**When** `QUALITY-GATE-AC-NFR` is evaluated
+**When** release gate **`PG-04`** (contract A — the All Employees list) is evaluated
 **Then** the artifact is cited by path and the gate state reflects the measured result rather than a narrative claim
+**And** a closed `QUALITY-GATE-AC-NFR` (contract B — ACM-9 facade) does **not** discharge `PG-04`
 
 **Given** the evidence artifact exists
 **When** Epic 2's people-table consumes the same read model

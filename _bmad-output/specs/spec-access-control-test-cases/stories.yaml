@@ -70,7 +70,8 @@
   spec_checkpoint: true
   done_checkpoint: true
   invoke_dev_with: >-
-    Review-only. When complete, all 171 stage-1 files are AD-1 approved and
-    README file counts match disk. Handoff: stage-2 E2E translation is
+    Review-only. When complete, the retired suite record matches disk history and
+    the active 101-file inventory under access-control-foundation/ and
+    access-control-kernel/ is reconciled. Handoff: stage-2 E2E translation is
     dispatched from spec-access-control-facade-audience-resolution/stories.yaml
     (stories 1–2 there). This spec's scope ends here — prose only, no E2E.

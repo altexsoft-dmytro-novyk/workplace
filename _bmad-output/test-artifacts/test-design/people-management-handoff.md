@@ -193,14 +193,14 @@ Restated here only because a story author reading a handoff is exactly who confl
 
 | Contract | Subject | State |
 | --- | --- | --- |
-| **A** | The **All Employees list** at 500+ records with arbitrary filters and derived fields, including permission resolution, ≤ 2 seconds (v1.5 §7). Release gate `PG-04`. **Priority P0.** | **Statistic, environment and load model are UNKNOWN. Harness is UNDECIDED (U-24) — no binding document names one.** No measurement of this subject exists. |
+| **A** | The **All Employees list** at 500+ records with arbitrary filters and derived fields, including permission resolution, ≤ 2 seconds (v1.5 §7). Release gate `PG-04`. **Priority P0.** | Harness **`DIRA1-MVP-v1`** (`npm run measure:user-management:dira1`). Pass: warm p95 **and** worst case ≤ 2 s per gate. **No qualifying artifact recorded yet.** |
 | **B** | The **AccessControl facade resolver** at 500 requested active targets, per-shape gates, `ACM9-MVP-v1`. | A binding protocol with its own thresholds. Its CI job is **informational** and this migration proposes no promotion of it to a blocking check. |
 | **C** | The **`resolveAudiences` function**, P6 measurement in milliseconds. | A measurement record, **not a gate**, and must never be treated as one. |
 
 **B and C are not evidence for A.** A story that cites an ACM-9 or P6 artifact against the
-All Employees requirement is citing the wrong subject. The blocker `QUALITY-GATE-AC-NFR` is
-recorded **closed** on contract-B evidence while `PMC-E1-S1.9` routes contract-A evidence into
-the same gate name; that collision is **U-25**, open, and is not resolved here.
+All Employees requirement is citing the wrong subject. **`QUALITY-GATE-AC-NFR` governs contract B
+only** (U-25 resolved). Directory-list evidence is evaluated against release gate **`PG-04`** /
+contract **A**; `PMC-E1-S1.9` cites `PG-04`, not `QUALITY-GATE-AC-NFR`.
 
 ---
 
@@ -237,8 +237,9 @@ percentage against any of them.*
 > `docs/test-cases/access-control/` does not exist. The gate is nevertheless **not** promoted to
 > schedulable: three currently open blockers (`SEC-AUTH-01` P0, `CC-07` P0,
 > `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1) independently keep it unschedulable, none of which is
-> an approval state. What recorded condition would make it schedulable, and who evaluates it, is
-> **U-20** — open.
+> an approval state. **Schedulable condition (U-20 resolved):** all four blockers closed at
+> implementation in the current blocker register; evaluated by Platform epic owner + Architect with
+> a current re-verification record.
 
 > **The whole-repository trace remains a planning audit run with `allow_gate=false`.** Its
 > aggregate percentage is never release readiness. This migration issues no verdict and
@@ -304,14 +305,14 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 | `TD-UM-LIST-01..04` | UM handoff § Story-Level | `test-design-epic-user-management-1.md`, with the visibility-safe half in `test-design-epic-user-management-7.md` | Net-new on 2026-08-25. |
 | `TD-UM-REL-01..08` | UM handoff § Story-Level | `test-design-epic-user-management-4.md`; the mentorship split (`REL-04/05/06` and half of `REL-07`) to `test-design-epic-mentorship-1.md` | Mentorship became its own domain; the re-home is not inheritance. |
 | `TD-UM-AC-01` | UM handoff cross-epic gate | `test-design-epic-user-management-0.md` | With `legacy-um:R-001`'s epic half. |
-| `TD-UM-NFR-*` | UM handoff / QA design | `test-design-qa.md` § NFR measurement contracts | `TD-UM-NFR-PERF-01` becomes **contract A**, harness UNDECIDED. `TD-UM-EXP-02` stays **retired** — its "if limits specified" trigger is unmet (U-11). |
+| `TD-UM-NFR-*` | UM handoff / QA design | `test-design-qa.md` § NFR measurement contracts | `TD-UM-NFR-PERF-01` becomes **contract A**; harness **`DIRA1-MVP-v1`** (U-24 resolved). `TD-UM-EXP-02` stays **retired** — its "if limits specified" trigger is unmet (U-11). |
 | `TR-*` (119 rows) | platform handoff and QA design | `test-design-qa.md` § Normative coverage map | Identifiers unchanged. |
 
 ### Gate, blocker and decision identifiers
 
 | Source family | Successor location | Note |
 | --- | --- | --- |
-| `PG-01`..`PG-06` | `test-design-qa.md` § Release gates | Identifiers unchanged. `PG-01` keeps its conclusion on a **replaced** rationale; `PG-04` is bound to contract A. |
+| `PG-01`..`PG-06` | `test-design-qa.md` § Release and design gates | Identifiers unchanged. `PG-01` keeps its conclusion on a **replaced** rationale with a recorded schedulable condition (U-20 resolved). `PG-04` is bound to contract A; `QUALITY-GATE-AC-NFR` is contract B only (U-25 resolved). |
 | `DG-01`..`DG-04` | `test-design-qa.md` § Design gates | `DG-01` restated under D-1. **`DG-05` is retired with no successor** — it was a child-ownership gate premised on the split this migration dissolves. |
 | `PR-B-01`..`PR-B-04`, `PR-B-06`, HR-Admin half of `PR-B-05` | `test-design-architecture.md` § Ratified design decisions | Closed **at design**; implementation or evidence work may remain. |
 | `PR-B-05` (default-role half), `PR-B-07`..`PR-B-09` | `test-design-architecture.md` § Open blockers | Open at design and/or implementation; none closed at implementation. |
@@ -347,9 +348,9 @@ budgets, accessibility requirements and photo-upload limits · **U-12** test-fil
 conventions · **U-13** proactive logout · **U-16** whether platform Story 1.6 is satisfied ·
 **U-17** what closes the six design-closed blockers at implementation · **U-18** the
 self-contradiction in `docs/architecture/testing-strategy.md` · **U-19** which access-control
-scenario file covers which `TR-*` row · **U-20** what makes `PG-01` schedulable · **U-21** the
+scenario file covers which `TR-*` row · **U-21** the
 20 history-only retired scenario files · **U-22** the `useAuth().userId` consumption gap ·
-**U-23** the current implemented-test count · **U-24** contract A's harness · **U-25** the
+**U-23** the current implemented-test count
 `QUALITY-GATE-AC-NFR` conflation.
 
 ---

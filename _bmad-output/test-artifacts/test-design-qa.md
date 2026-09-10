@@ -64,7 +64,8 @@ HTTP/list route), contract **B** (the ACM-9 facade resolver) and contract **C** 
 is **never** evidence for another. See [NFR measurement contracts](#nfr-measurement-contracts).
 
 **What this document deliberately does not settle.** Nineteen open questions — U-2, U-4, U-5, U-6,
-U-9, U-10, U-11, U-12, U-13, U-16 and U-17..U-25 — remain open, and this document **answers none of
+U-9, U-10, U-11, U-12, U-13, U-16 and U-17..U-19, U-21..U-23 — remain open; **U-20**, **U-24**,
+and **U-25** are resolved below. This document **answers none of the still-open items
 them**. `DEC-UM-012` remains a **draft decision**. No unknown threshold is filled in anywhere. See
 [Unknown thresholds](#unknown-thresholds) and [Open questions](#open-questions).
 
@@ -125,7 +126,7 @@ superseded documents.**
    correction of a prior error, and are never a current input.
 2. **`k6` is not a repository decision.** No binding document selects a harness for the All
    Employees list requirement. The string does not appear in this document as a current choice
-   anywhere. See [contract A](#contract-a--all-employees-httplist-route) and U-24.
+   anywhere. See [contract A](#contract-a--all-employees-httplist-route) (`DIRA1-MVP-v1`).
 
 ---
 
@@ -393,7 +394,7 @@ The nightly slot carries what is too slow or too environment-dependent for the P
 **The subject of the old nightly performance slot is replaced.** It was described as a k6 run of a
 `GET /users` list SLA. The surviving obligation is
 [contract A](#contract-a--all-employees-httplist-route) — the composed All Employees route
-including permission resolution — and **its harness is UNDECIDED and does not exist** (U-24). There
+including permission resolution — harness **`DIRA1-MVP-v1`**; **no qualifying artifact recorded yet**. There
 is no nightly performance job to schedule until that is decided.
 
 ### Weekly / pre-release
@@ -465,7 +466,7 @@ nothing**.
 | `PR-003` — People Partner contract ahead of sign-off / journal | The `PR-S-01` sign-off trace, then PP concurrency and one-PP-per-employee invariants, then journal enrolment | manual sign-off trace + `api-e2e` + `@concurrency` | Sign-off **ungranted**; `PR-B-07` open |
 | `PR-004` — full-profile overlay precedence | Projection **positives and negatives** together — a partial implementation can satisfy Self while widening the overlay | `api-e2e` projection positives/negatives | Design unblocked (`PR-B-06` closed at design); implementation absent |
 | `PR-005` — unknown timetracker contract | Contract review of the real provider contract, then identity-mapping and event-versus-state evidence against the test environment | contract review + `integration-live` | Blocked on `PR-B-08` |
-| `PR-006` — All Employees list latency | **[Contract A](#contract-a--all-employees-httplist-route) only.** No ACM-9 result and no P6 result is evidence for it | measurement, **harness UNDECIDED** | **No measurement of this subject exists** |
+| `PR-006` — All Employees list latency | **[Contract A](#contract-a--all-employees-httplist-route) only.** No ACM-9 result and no P6 result is evidence for it | measurement — **`DIRA1-MVP-v1`** | **No qualifying artifact recorded yet** |
 | `PR-007` — aggregate drift | Contract review of the four fixed dashboard read models, then cross-context invariants across dashboards, resourcing and campaigns | contract review + cross-context `api-e2e` | `PR-B-02` closed at design; implementation **absent** |
 | `PR-008` — departure contract ahead of sign-off / controls | The `PR-S-02` sign-off trace, then worker evidence (lag, retry, lease, cutoff) and a deployment rehearsal against one validated timezone and database | worker evidence + deployment rehearsal | Sign-off **ungranted**; `PR-B-09` open |
 | `PR-009` — scenario documents counted as coverage | The **three coverage states kept distinct** in every reporting surface (see [Coverage-state vocabulary](#coverage-state-vocabulary)), plus the end-to-end suites actually executing in CI | `repository-audit` | **Live and less mitigated than in 2026-08-29** — the e2e job is `continue-on-error` |
@@ -519,14 +520,14 @@ measurement of one be reported as evidence for another.
   shape the user actually experiences on first load**, so "2 seconds at 500+ rows" cannot be
   satisfied by measuring a small page of a large set.
 - **Threshold:** **≤ 2 seconds.**
-- **Statistic the threshold binds to:** **UNKNOWN.** The story requires p50/p95/worst to be
-  *recorded* and requires exceeding shapes to be *named*; it never says which figure is the
-  pass/fail one.
-- **Environment:** **UNKNOWN.** A PostgreSQL version must be recorded, but **no target environment
-  is named anywhere.**
-- **Load model:** **UNKNOWN.** No concurrent-user model is stated.
-- **Harness:** **UNDECIDED, and it does not exist.** Not ACM-9, not P6. No binding document in this
-  repository selects one; `PMC-E1-S1.9` names **no** harness at all. Choosing one is **U-24**.
+- **Statistic the threshold binds to:** warm **p95** and **absolute worst case** per gate — both must
+  be ≤ 2 seconds (`DIRA1-MVP-v1`, binding since 2026-09-11).
+- **Environment:** local PostgreSQL via `npm run db:up` in `services/backend`, recorded through
+  `DIRA1-MANIFEST-v1` hashes.
+- **Load model:** one HTTP client, sequential requests, one request in flight (`DIRA1-MVP-v1`).
+- **Harness:** **`DIRA1-MVP-v1`** — `npm run measure:user-management:dira1 -- --role baseline|final`
+  in `services/backend`, selected by `test/jest-dira1.json`. Not ACM-9, not P6, not k6.
+  **U-24 resolved.**
 - **Reporting rule:** the first filter/sort/column shape exceeding two seconds is named explicitly,
   or the run records that none did.
 - **Failure semantics:** a measured miss opens optimization as a **separately gated story**, and
@@ -536,20 +537,16 @@ measurement of one be reported as evidence for another.
 - **Risk owner:** `PR-006`, in `test-design-architecture.md`.
 
 > **The rule that follows, and it is the load-bearing sentence of this section.**
-> **No ACM-9 result and no P6 result is evidence for contract A.** In particular, contract B's
-> "warm p95 **and** worst case" **pass rule is not read into contract A's open statistic
-> question** merely because contract A also requires p95 and worst case to be *recorded*.
-> Recording a statistic and binding a threshold to it are different acts, and **no authority
-> performs the second for contract A**. Contract A's statistic, environment and load model stay
-> UNKNOWN and its harness stays UNDECIDED.
+> **No ACM-9 result and no P6 result is evidence for contract A.** Contract A's pass rule is
+> defined only by **`DIRA1-MVP-v1`** (`docs/architecture/testing-strategy.md` § DIR-A1). Contract B's
+> ACM-9 thresholds do not substitute for it.
 
-> **A live conflation hazard, recorded and not resolved here.** The blocker `QUALITY-GATE-AC-NFR`
-> is recorded **closed** (2026-09-02) on an ACM-9 **facade-resolver** artifact — every clause of its
-> closure condition is contract **B** — while `PMC-E1-S1.9` routes the **directory-list** evidence
-> (contract **A**) into that same gate name. A reader who checks the gate finds `closed` and may
-> conclude the All Employees list requirement has evidence. **It does not: contract A has no
-> measurement at all.** Resolving the collision belongs to the gate's owners — **U-25**. This
-> document neither reopens, closes nor renames the blocker.
+> **Gate identity (U-25 resolved).** `QUALITY-GATE-AC-NFR` governs **contract B** (the ACM-9
+> AccessControl facade resolver) only. Its closed state does **not** discharge **`PG-04`** or
+> contract **A** (the All Employees HTTP/list route). Directory-list evidence is evaluated against
+> **`PG-04`** / contract **A** only. `PMC-E1-S1.9` cites `PG-04` for that evidence. This document
+> does not reopen, close or rename `QUALITY-GATE-AC-NFR`, and **the standing decision that the ACM-9
+> CI job remains informational is not disturbed.**
 
 #### Contract B — ACM-9 AccessControl facade resolver
 
@@ -688,7 +685,7 @@ independent sources say so and both are preserved.
 | **Timeout, retry count, backoff, circuit** thresholds | DevOps + Architect + Security | U-5 |
 | **Browser support beyond Chromium** — the frontend is Chromium-only today; "no new validation; the gap is named, not filled" | Product Owner | U-10 |
 | **Frontend performance budgets** (bundle size, LCP, interaction latency), frontend accessibility requirements, photo-upload size limits | Product Owner | U-11 |
-| Contract A's **statistic**, **target environment** and **concurrent-user / load model** | Product Owner (statistic); Platform/DevOps (environment, load model) | U-3 residue, with U-24 for the harness |
+| Contract A measurement parameters | **`DIRA1-MVP-v1`** (`docs/architecture/testing-strategy.md` § DIR-A1) | U-3 and U-24 resolved |
 | **Non-departure observability thresholds**; audit-log retention and any broader profile-read audit | Architect + Security | U-5 |
 
 **Percentile definitions for the 2-second list result are explicitly among these.** They are not
@@ -748,7 +745,7 @@ generated test cases and not coverage**, per the source's own statement. Every r
 | `P0-PLAT-05` | Timetracker identity, atomic sync, freshness, outage cutoff | `integration-live` | `E2E DEPENDENCY` — `PR-B-08`; owner `TT-E2` | `PR-002/005/010` |
 | `P0-PLAT-06` | Departure cutoff and atomic effective-date effects | api / worker e2e | `READY FOR FORMAL SIGN-OFF` — PM/AD-20; `PR-S-02` **ungranted**; owner `UM-E5` | `PR-002/008` |
 | `P0-PLAT-07` | Seed import / auth cutover; no create or deactivate legacy surface | api / import e2e + route negative | `READY NOW` — PM/AD-16, AD-21; owner `UM-E1-S1.1` | — |
-| `P0-PLAT-08` | **500+ directory ≤ 2 seconds** | **measurement — harness UNDECIDED** | `E2E DEPENDENCY` — the harness does not exist (U-24) | `PR-006` |
+| `P0-PLAT-08` | **500+ directory ≤ 2 seconds** | **measurement — `DIRA1-MVP-v1`** | `E2E DEPENDENCY` — harness exists; no qualifying artifact yet | `PR-006` |
 
 **`P0-PLAT-07` is the platform statement of the same cutover that retires the `legacy-um`
 registration and deactivation family.** The two must agree, and they do.
@@ -935,7 +932,7 @@ v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 | `TR-6-04` | v1.5 §6 | Seeded user, timetracker user and optional candidate use durable IDs; email insufficient | Contract + API/integration negatives | E2E DEPENDENCY | `ttId` and candidate-ID mapping contract |
 | `TR-7-01` | v1.5 §7 | Access correctness directly tested per audience/path/section | API E2E | AC STAGE-1 DRAFT | Phase 1 only; full DoD requires deferred suites |
 | `TR-7-02` | v1.5 §7 | Only seeded test population; no real PII in contexts/logs/screenshots/repository | CI scan + manual provenance audit | READY NOW | Use synthetic identifiers and delivered seed only |
-| `TR-7-03` | v1.5 §7 | All Employees with 500+ records and permission resolution responds within 2 seconds | measurement — **harness UNDECIDED**; [contract A](#contract-a--all-employees-httplist-route) only | E2E DEPENDENCY | Composed directory route and the 500+ dataset. The harness does not exist and none has been chosen (U-24) |
+| `TR-7-03` | v1.5 §7 | All Employees with 500+ records and permission resolution responds within 2 seconds | measurement — **`DIRA1-MVP-v1`**; [contract A](#contract-a--all-employees-httplist-route) only | E2E DEPENDENCY | Composed directory route and the 500+ dataset. Harness exists; **no qualifying artifact recorded yet** |
 | `TR-7-04` | v1.5 §7 | Integration failures do not take down app within §5.1 limits | Reliability E2E | E2E DEPENDENCY | Timetracker failure contract |
 | `TR-7-05` | v1.5 §7 | Accessible and responsive list/profile/dashboard | Automated accessibility + manual viewport/keyboard review | E2E DEPENDENCY | No numeric WCAG target is sourced; do not invent one |
 | `TR-8-01` | v1.5 §8 | BMAD use and deliberate migration decisions | Repository/process audit | READY NOW | Manual evidence, not product E2E |
@@ -1006,7 +1003,7 @@ may ship.** Every gate below is **ungranted** — naming a gate is not passing i
 | **`PG-01`** | **Access control is NOT schedulable.** | `repository-audit` | **Not schedulable — on a new, evidenced rationale.** See below. |
 | **`PG-02`** | Required **live** timetracker leaves / projects / people evidence over the seeded population. | `integration-live` | v1.5 §5.1, §9. Blocked on `PR-B-08`. |
 | **`PG-03`** | `PR-S-01`/`PR-S-02` sign-off precedes PP and departure E2E; **zero unresolved** leak, stale-access, self-assignment or due-departure defects. | `api-e2e` + sign-off trace | PM/AD-19, AD-20, AD-12. Sign-offs **ungranted**. |
-| **`PG-04`** | **All Employees list ≤ 2 seconds at 500+ records, including permission resolution** (v1.5 §7 verbatim). | **[Contract A](#contract-a--all-employees-httplist-route) — harness UNDECIDED. Not ACM-9. Not P6.** | Evidence owner `PMC-E1-S1.9`. **No measurement of this subject exists.** See the conflation hazard (U-25). |
+| **`PG-04`** | **All Employees list ≤ 2 seconds at 500+ records, including permission resolution** (v1.5 §7 verbatim). | **[Contract A](#contract-a--all-employees-httplist-route) — `DIRA1-MVP-v1`. Not ACM-9. Not P6.** | Evidence owner `PMC-E1-S1.9`. **No qualifying artifact recorded yet.** `QUALITY-GATE-AC-NFR` does **not** discharge this gate — contract **B** only (U-25 resolved). |
 | **`PG-05`** | Every required v1.5 trace row has accepted evidence; `OUT OF SCOPE` is used **only** for GOOD TO HAVE or §10 exclusions. | `repository-audit` | Unchanged. |
 | **`PG-06`** | After `PR-B-09`: a deployed, demonstrable product; AD-1 history; parallel ownership; current intelligent-repository specs. | deployment evidence | v1.5 §8, §9. |
 
@@ -1030,9 +1027,14 @@ rationale.**
   `…/blocker-verification-2026-09-03.md`.
 - **This is a replacement of the rationale, not a re-derivation of the same conclusion from the
   same removed premise**, and it is **not** an assertion that any of those blockers will close.
-- **`PG-01` is not schedulable.** What *recorded condition* would make it schedulable, and who
-  evaluates that condition, is **U-20** — open. The current state could change without anyone being
-  obliged to notice, which is precisely why the question is recorded.
+- **`PG-01` is not schedulable today.** **Schedulable condition (U-20 resolved):** access control
+  becomes schedulable when **`SEC-AUTH-01`**, **`CC-07`**, **`AC-S9-S13`**, and
+  **`AC-SECTION-MATRIX-01`** are all **closed at implementation** in the current blocker register
+  (`…/architecture-people-management-ratification-2026-09-02/blockers.yaml` or its successor).
+  **Evaluator:** Platform epic owner + Architect. **Evidence:** the blocker register shows all four
+  closed at implementation, plus a current re-verification record (for example
+  `…/blocker-verification-2026-09-03.md` or a successor dated after the last closure). Until that
+  evidence exists, `PG-01` stays **not schedulable**.
 
 ### Gate thresholds carried from the handoff
 
@@ -1294,8 +1296,8 @@ no pass rate is reported.** Re-counting is **U-23**.
 >
 > **It must never be added to** the `plat` 79–124 planning rows / ~12–20 QA weeks, the ~57 legacy
 > scenarios, the unverified implemented-test counts, the UNKNOWN shared-infrastructure work
-> (including the **All-Employees-list harness that does not exist and has not been chosen** —
-> U-24), or the 31 deferred `it.todo` cases. **None of those shares its basis.**
+> (including **DIRA1-MVP-v1 artifact collection**, which is separate from planning rows), or the 31
+> deferred `it.todo` cases. **None of those shares its basis.**
 
 ### Effort — platform planning interval (category 3)
 
@@ -1314,9 +1316,8 @@ Three items, **none of them inside the 15–23 engineer-days**:
 1. **`@testing-library/react` plus a second vitest config** — a prerequisite for **every one of the
    85 frontend cases**; its file-location convention is an open decision (U-12), so it is not
    scheduled here.
-2. **An All-Employees-list measurement harness** — it does not exist **and none has been chosen**
-   (U-24). ACM-9 and P6 measure **different subjects**, so no existing harness discharges contract
-   A.
+2. **DIRA1-MVP-v1 baseline/final artifacts** — harness exists (`npm run measure:user-management:dira1`);
+   **no qualifying artifact recorded yet**. ACM-9 and P6 measure **different subjects**.
 3. **Schema-per-worker** — explicitly **not** to be built (see [backend isolation](#backend-isolation)),
    so it carries **no** estimate rather than a zero.
 
@@ -1354,8 +1355,9 @@ eight unticked already.
 - [ ] Outbound port DI tokens are available, email in particular.
 - [ ] Controllable clock and timezone seams are available.
 - [ ] The timetracker test environment is reachable and `PR-B-08` is resolved.
-- [ ] A measurement harness for [contract A](#contract-a--all-employees-httplist-route) has been
-      **chosen** (U-24) — it does not exist today.
+- [ ] A **`DIRA1-MVP-v1`** baseline/final artifact exists for
+      [contract A](#contract-a--all-employees-httplist-route) before TR-7-03 / `PG-04` evidence is
+      claimed.
 
 *Frontend entry criteria — the test-file location convention, the second vitest config and the
 component-testing library (U-12) — are **open decisions** and are tracked in the owning epic plans'
@@ -1459,7 +1461,7 @@ history, is `test-design/migration-map.md` §10.
 | # | Question | Owner | Bears on |
 | --- | --- | --- | --- |
 | **U-2** | Formal Product Owner / Architect sign-off for `PR-S-01` and `PR-S-02`. A binding architecture direction is not a sign-off | Product Owner + Architect | `DG-03`, `PG-03` |
-| **U-3** *(residue)* | For [contract A](#contract-a--all-employees-httplist-route): which statistic the 2-second threshold binds to; the target environment; the concurrent-user / load model | Product Owner (statistic); Platform/DevOps (environment, load model) | `PG-04`, `P0-PLAT-08` |
+| **U-3** | **Resolved with authority** — contract A binds warm p95 and worst case per gate; environment is local docker-compose PostgreSQL; load model is single sequential client (`DIRA1-MVP-v1`) | Product Owner + Platform/DevOps | `PG-04`, [contract A](#contract-a--all-employees-httplist-route) |
 | **U-4** | WCAG conformance level and viewport set | Product Owner | [Unknown thresholds](#unknown-thresholds), `P2-PLAT-01` |
 | **U-5** | Uptime SLO, RTO, RPO, backup and retention, timeout/retry/backoff, circuit thresholds | DevOps + Architect + Security | [Unknown thresholds](#unknown-thresholds); gated by `PR-B-09` |
 | **U-6** | `DEC-UM-012` — whether a deactivated user's `workEmail` is treated identically to an unknown email for the magic-link route. It remains an explicit **draft decision** and does **not** inherit the DEC-UM-001..011 approval | Product | Epic plans; recorded here so a draft decision is not read as settled |
@@ -1472,12 +1474,12 @@ history, is `test-design/migration-map.md` §10.
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the five register entries that remain open | Architect + the per-entry owners | `DG-02`, the coverage plan's blocked rows |
 | **U-18** | `docs/architecture/testing-strategy.md` retains the removed per-stage approval clause in **two** places (`:84` and `:117–119`), contradicting its own lines 25–38. Which sentence does the document intend to keep? | Owner of `docs/architecture/testing-strategy.md` (Architect) | `DG-01`. **This migration edits nothing under `docs/architecture/`** |
 | **U-19** | Which of the **101** access-control scenario files covers which of the **119** normative trace rows | Access Control owners + QA | [Normative coverage map](#normative-coverage-map). Currently unanswerable from any artifact, and **must not be guessed from filenames** |
-| **U-20** | Now that the per-file-approval rationale is retired, what **recorded condition** makes access control schedulable, and who evaluates it | Platform epic owner + Architect | [`PG-01`](#release-gates). The gate correctly stays **not schedulable**; its replacement rationale is three currently-open blockers, a state that could change without anyone being obliged to notice |
+| **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect against the blocker register and a current re-verification record | Platform epic owner + Architect | [`PG-01`](#release-and-design-gates) |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk | Owner of `docs/test-cases/user-management/**` | Out of scope for this migration, which modifies no scenario file |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap | DEV + QA | Frontend obligations |
 | **U-23** | The current implemented-test count | QA | [Effort](#effort). Until someone re-counts, implemented-test figures stay **unverified** |
-| **U-24** | **Which harness measures [contract A](#contract-a--all-employees-httplist-route). It does not exist, and no binding document selects one** | Platform/DevOps + QA | `PG-04`, `P0-PLAT-08`, the nightly slot |
-| **U-25** | `QUALITY-GATE-AC-NFR` is closed on facade-resolver evidence while a canonical story routes directory-list evidence into the same gate name. Which subject does the gate govern, and does the list requirement need its own gate identity? | Access Control + Quality Engineering + the platform-capabilities epic owner | `PG-04`, [contract A](#contract-a--all-employees-httplist-route) |
+| **U-24** | **Resolved with authority** — `DIRA1-MVP-v1` via `npm run measure:user-management:dira1` (`docs/architecture/testing-strategy.md` § DIR-A1) | Platform/DevOps + QA | `PG-04`, [contract A](#contract-a--all-employees-httplist-route) |
+| **U-25** | **Resolved with authority** — `QUALITY-GATE-AC-NFR` governs contract **B** (ACM-9 facade) only; contract **A** / the All Employees list uses release gate **`PG-04`**. `PMC-E1-S1.9` cites `PG-04` for directory-list evidence | Access Control + Quality Engineering + the platform-capabilities epic owner | `PG-04`, [contract A](#contract-a--all-employees-httplist-route), `QUALITY-GATE-AC-NFR` (contract **B** only) |
 
 ---
 

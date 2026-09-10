@@ -123,15 +123,15 @@ silently lost. **None of them counts as requirement coverage.**
    `docs/project-requirements.md:614`, release gate `PG-04`, and `PMC-E1-S1.9`'s closing
    criterion. Both underlying risk scores stay **6**; no P0 percentage was normalised.
 2. **Three performance contracts stay separate.** **A** = the All Employees list including
-   permission resolution (v1.5 §7, `PG-04`) — **statistic, environment and load model UNKNOWN,
-   harness UNDECIDED (U-24)**, and **no measurement of this subject exists**. **B** = the ACM-9
+   permission resolution (v1.5 §7, `PG-04`) — harness **`DIRA1-MVP-v1`** (U-24 resolved); **no
+   qualifying artifact recorded yet**. **B** = the ACM-9
    AccessControl facade resolver, a binding protocol with its own thresholds, whose CI job is
    **informational and is not promoted here**. **C** = the P6 `resolveAudiences` measurement,
    **not a gate**. B and C are not evidence for A.
-3. **`PG-01` is not schedulable.** Its per-file-approval rationale is retired, and its
-   conclusion is carried on a replaced rationale — three currently open blockers
-   (`SEC-AUTH-01` P0, `CC-07` P0, `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1), none of which is an
-   approval state. What recorded condition would make it schedulable is **U-20**, open.
+3. **`PG-01` is not schedulable today.** Its per-file-approval rationale is retired; its
+   conclusion rests on three currently open blockers (`SEC-AUTH-01` P0, `CC-07` P0,
+   `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1). **Schedulable when all four are closed at
+   implementation** (U-20 resolved); evaluated by Platform epic owner + Architect.
 
 ---
 
@@ -191,12 +191,11 @@ Untouched by this migration, and not indexed here as test-design artifacts:
 - It does not say any test passes, any gate is green, or any coverage percentage.
 - It resolves no open decision. The register is `test-design/migration-map.md` §10:
   **U-2, U-4, U-5, U-6, U-9, U-10, U-11, U-12, U-13, U-16** remain open from Task 1 and
-  **U-17..U-25** were opened by the reconciliation. Still open and answered nowhere in this
-  index: both `PR-S-*` sign-offs; the implementation work behind the six `PR-B-*` blockers that
-  closed **at design only** (none closed at implementation); contract A's statistic,
-  environment, load model and harness (U-3, U-24); whether `QUALITY-GATE-AC-NFR` — recorded
-  closed on ACM-9 resolver evidence — also governs the directory-list requirement (U-25); WCAG
-  level and viewport set (U-4); and draft `DEC-UM-012` (U-6).
+  **U-17..U-23** remain open from the reconciliation (**U-20**, **U-24**, and **U-25**
+  resolved). Still open and answered nowhere in this index: both `PR-S-*` sign-offs; the
+  implementation work behind the six `PR-B-*` blockers that closed **at design only** (none
+  closed at implementation); contract A's WCAG level and viewport set (U-4); and draft
+  `DEC-UM-012` (U-6).
 - It does not treat ACM-9 or P6 measurements as evidence for the All Employees list requirement.
 - It does not carry any retired obligation forward as an active one.
 - It changes no epic number, story ID, sprint key, ClickUp mapping, sprint status, coverage

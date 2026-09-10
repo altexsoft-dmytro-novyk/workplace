@@ -187,9 +187,9 @@ The shared measurement contracts are owned by `test-design-qa.md` § NFR measure
 Two boundaries matter to a reader of this plan and are **referenced, not restated**:
 
 - **The All Employees list ≤ 2-second requirement is P0**, and it is **contract A** of three
-  contracts that must stay separate. Its **statistic, target environment and load model are
-  UNKNOWN**, and its **harness is UNDECIDED** (open as **U-24**). It is **not** ACM-9 and
-  **not** P6. Nothing in this plan measures it or names a harness for it.
+  contracts that must stay separate. Its **statistic, environment and load model are bound by
+  `DIRA1-MVP-v1`** (U-3 and U-24 resolved). It is **not** ACM-9 and **not** P6. Nothing in
+  this plan runs the harness or records the artifact.
 - **Configuration-owned thresholds** (production TTLs, rate limits, retry counts and backoff)
   stay operational configuration; tests inject deterministic values and verify boundaries.
 

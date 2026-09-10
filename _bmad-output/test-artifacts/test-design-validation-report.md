@@ -108,10 +108,10 @@ Listed so the absence of a verdict is legible, and so nobody mistakes this list 
 | 6 | Every epic plan has exactly one matching checkpoint with the correct `runKey`, canonical `epicId` and source path | **OUT OF SYSTEM SCOPE** — epic Validate |
 | 7 | No plan exists for an epic that received no transferred obligation, and none is missing for one that did | **OUT OF SYSTEM SCOPE** — epic Validate and index audit |
 | 8 | The index resolves every scope, including the unplanned scopes, each with an owner | **OUT OF SYSTEM SCOPE** — index is not a system Validate subject |
-| 9 | The three performance contracts are stated separately; contract A's statistic, environment and load model are UNKNOWN and its harness UNDECIDED; no current-choice harness is named | **UNEVALUATED** |
+| 9 | The three performance contracts are stated separately; contract A's statistic, environment and load model are bound by `DIRA1-MVP-v1`; harness `npm run measure:user-management:dira1` | **UNEVALUATED** |
 | 10 | The All Employees list NFR is stated as **P0** | **UNEVALUATED** |
 | 11 | No output asks anyone to establish an approval state for a `docs/test-cases/**` scenario document, and the access-control inventory is stated as **101** files across `access-control-foundation/` and `access-control-kernel/` | **UNEVALUATED** |
-| 12 | Open decisions U-2, U-4, U-5, U-6, U-9..U-13, U-16, U-17..U-25 are still open in the outputs, and `DEC-UM-012` is still draft | **UNEVALUATED** |
+| 12 | Open decisions U-2, U-4, U-5, U-6, U-9..U-13, U-16, U-17..U-23 are still open in the outputs (**U-20**, **U-24**, **U-25** resolved); `DEC-UM-012` is still draft | **UNEVALUATED** |
 | 13 | No current consumer points at a removed artifact, and no historical statement was rewritten to new semantics | **UNEVALUATED** |
 | 14 | No scenario file, stored execution result, trace or coverage JSON, sprint status, coverage field, service file or gitlink changed | **UNEVALUATED** |
 

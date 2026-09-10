@@ -280,8 +280,8 @@ at design as `PR-B-01 / OQ-114`); one bulk resolution plan; a representative see
 query observability on the composed directory endpoint. *Owner:* Architect + Profile Backend
 + DBA/DevOps. *Timeline:* before directory release.
 
-*State:* **no measurement of this subject exists**, and no harness for it exists or has been
-chosen (see [Open questions](#open-questions), U-24).
+*State:* harness **`DIRA1-MVP-v1`** exists (`docs/architecture/testing-strategy.md` § DIR-A1);
+**no qualifying baseline/final artifact recorded yet** (U-24 resolved; artifact collection open).
 
 #### PR-007 — Aggregate drift across dashboards, resourcing and campaigns (DATA, 6)
 
@@ -597,22 +597,17 @@ open statistic question merely because contract A also requires p95 and worst ca
 *recorded*: recording a statistic and binding a threshold to it are different acts, and no
 authority performs the second for contract A.
 
-**Three things about contract A that must not be filled in by anyone drafting from this
-document.** Its statistic, its environment and its load model are **UNKNOWN**, and its
-harness is **UNDECIDED**. No binding document in this repository selects a harness for it —
-the name that appears in the superseded test-design set appears in no architecture document,
-no requirement, no scenario and no `package.json`, and the one planning document that
-proposes it is marked `Status: Planned`. A proposal inside a superseded artifact is not a
-decision. See [Open questions](#open-questions), U-24 and U-3's residue.
+**Contract A measurement (U-24 resolved).** Harness **`DIRA1-MVP-v1`**
+(`docs/architecture/testing-strategy.md` § DIR-A1): `npm run measure:user-management:dira1` in
+`services/backend`. Pass rule: warm p95 **and** worst case ≤ 2 s per gate; environment: local
+PostgreSQL via `db:up`; load model: single sequential HTTP client.
 
-**A live conflation hazard, recorded and not resolved here.** The blocker
-`QUALITY-GATE-AC-NFR` is recorded **closed** on an ACM-9 **facade-resolver** artifact, while
-the canonical story `PMC-E1-S1.9` routes the **directory-list** evidence into that same gate
-name. A reader who checks the gate finds `closed` and may conclude the All Employees list
-requirement has evidence. **It does not** — contract A has no measurement at all. Resolving
-the collision belongs to the gate's owners ([Open questions](#open-questions), U-25). This
-document neither reopens, closes nor renames the blocker, and **the standing decision that
-the ACM-9 CI job remains informational is not disturbed.**
+**Gate identity (U-25 resolved).** `QUALITY-GATE-AC-NFR` governs **contract B** (the ACM-9
+AccessControl facade resolver) only. Its closed state does **not** discharge **`PG-04`** or
+contract **A** (the All Employees HTTP/list route). Directory-list evidence is evaluated against
+**`PG-04`** / contract **A** only; `PMC-E1-S1.9` cites `PG-04` for that evidence. This document
+neither reopens, closes nor renames `QUALITY-GATE-AC-NFR`, and **the standing decision that the
+ACM-9 CI job remains informational is not disturbed.**
 
 ### Other NFR categories — architecture consequence only
 
@@ -741,7 +736,7 @@ full wording and history, is `test-design/migration-map.md` §10.
 | # | Question | Owner | Bears on |
 | --- | --- | --- | --- |
 | **U-2** | Formal Product Owner / Architect sign-off for `PR-S-01` and `PR-S-02`. A binding architecture direction is not a sign-off | Product Owner + Architect | [Sign-off-ready packages](#sign-off-ready-packages), `PR-003`, `PR-008` |
-| **U-3** *(residue)* | For contract A: which statistic the 2-second threshold binds to; the target environment; the concurrent-user / load model | Product Owner (statistic); Platform/DevOps (environment, load model) | [NFR contract references](#nfr-contract-references), `PR-006` |
+| **U-3** | **Resolved with authority** — `DIRA1-MVP-v1` binds warm p95 and worst case; local PostgreSQL; single sequential client | Product Owner + Platform/DevOps | [NFR contract references](#nfr-contract-references), `PR-006` |
 | **U-4** | WCAG conformance level and viewport set | Product Owner | NFR categories |
 | **U-5** | Uptime SLO, RTO, RPO, backup and retention, timeout/retry/backoff, circuit thresholds | DevOps + Architect + Security | Gated by `OPERATIONAL-ENVELOPE` |
 | **U-6** | `DEC-UM-012` — whether a deactivated user's `workEmail` is treated identically to an unknown email for the magic-link route. It remains an explicit **draft decision** and does **not** inherit the DEC-UM-001..011 approval | Product | Epic plans; recorded here because a draft decision must not be read as settled |
@@ -754,12 +749,12 @@ full wording and history, is `test-design/migration-map.md` §10.
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the five register entries that remain open | Architect + the per-entry owners | [Ratified design decisions](#ratified-design-decisions), [Open blockers](#open-blockers) |
 | **U-18** | `docs/architecture/testing-strategy.md` retains the removed per-stage approval clause in **two** places (`:84` and `:117–119`), contradicting its own lines 25–38. Which sentence does the document intend to keep? | Owner of `docs/architecture/testing-strategy.md` (Architect) | `PR-009`; the ordering rule in [Ready now](#ready-now). **This migration edits nothing under `docs/architecture/`** |
 | **U-19** | Which of the **101** access-control scenario files covers which of the **119** normative trace rows | Access Control owners + QA | `PR-009`. Currently unanswerable from any artifact, and **must not be guessed from filenames** |
-| **U-20** | Now that the per-file-approval rationale is retired, what **recorded condition** makes access control schedulable, and who evaluates it | Platform epic owner + Architect | `PG-01` (in `test-design-qa.md`). The gate correctly stays **not schedulable**; its replacement rationale is three currently-open blockers, a state that could change without anyone being obliged to notice |
+| **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect | Platform epic owner + Architect | `PG-01` (in `test-design-qa.md` § Release and design gates) |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk | Owner of `docs/test-cases/user-management/**` | Out of scope for this migration, which modifies no scenario file |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap | DEV + QA | Frontend obligations |
 | **U-23** | The current implemented-test count | QA | Estimates. Until someone re-counts, implemented-test figures stay **unverified** |
-| **U-24** | Which harness measures contract A. **It does not exist, and no binding document selects one** | Platform/DevOps + QA | [NFR contract references](#nfr-contract-references), `PR-006` |
-| **U-25** | `QUALITY-GATE-AC-NFR` is closed on facade-resolver evidence while a canonical story routes directory-list evidence into the same gate name. Which subject does the gate govern, and does the list requirement need its own gate identity? | Access Control + Quality Engineering + the platform-capabilities epic owner | [NFR contract references](#nfr-contract-references) |
+| **U-24** | **Resolved with authority** — `DIRA1-MVP-v1` (`docs/architecture/testing-strategy.md` § DIR-A1) | Platform/DevOps + QA | [NFR contract references](#nfr-contract-references), `PR-006` |
+| **U-25** | **Resolved with authority** — `QUALITY-GATE-AC-NFR` governs contract **B** only; contract **A** uses release gate **`PG-04`** | Access Control + Quality Engineering + the platform-capabilities epic owner | [NFR contract references](#nfr-contract-references) |
 
 ---
 

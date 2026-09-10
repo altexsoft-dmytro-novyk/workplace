@@ -251,6 +251,59 @@ chains run on the order of 5-10 levels, so the shipped range uses about 0.5% of
 the two-second budget. The deep shapes are a canary for algorithmic change, not
 a description of production load.
 
+### DIR-A1 operational measurement protocol — `DIRA1-MVP-v1`
+
+Contract **A** (release gate `PG-04`): the composed **All Employees HTTP/list
+route** (`GET /users`), end to end, including permission resolution — **not**
+the AccessControl facade resolver (contract B / ACM-9) and **not**
+`resolveAudiences` (contract C / P6).
+
+This sequence is a repeatable MVP measurement method, not normative list-handler
+behavior:
+
+1. Every started run first reserves a new immutable append-only artifact path
+   with a run id and role (`baseline` or `final`). Reservation is atomic and
+   precedes every fallible step. Finalization rewrites only the status and
+   results block to `PASS`, `FAIL`, or `INCOMPLETE`. Never overwrite a prior run.
+2. Boot the real `AppModule` (real HTTP, real PostgreSQL, no provider overrides
+   on database or access-control ports). The viewer holds a live
+   `user-management:list` functional-role grant.
+3. Seed **500+ active employees** with representative relationship breadth
+   (balanced depth-4 reporting tree) and record fixture breadth/depth in the
+   artifact. No real personal data.
+4. Measure three independent list gates — do not aggregate a slow gate into a
+   combined percentile:
+   - `default-first-page` — `GET /users?page=1&pageSize=25` (active-only default,
+     includes total-count query);
+   - `filtered-first-page` —
+     `GET /users?country=Poland&position=Engineer&page=1&pageSize=25`;
+   - `filtered-deep-page` — `GET /users?country=Poland&page=3&pageSize=50`.
+5. Each gate uses five discarded warm-up requests and twenty measured requests.
+   Timing is wall-clock HTTP end to end through the Nest application. Run
+   `EXPLAIN (ANALYZE, BUFFERS)` separately from latency samples on a
+   representative count predicate for the gate.
+6. Record p50, p95, and worst case per gate. **Pass rule:** warm **p95** and
+   **absolute worst case** must both be ≤ 2 seconds per gate. Fail and stop
+   immediately when either bound is breached on a measured gate.
+7. **Load model:** one HTTP client, sequential requests, one request in flight.
+8. **Environment:** local PostgreSQL started via `npm run db:up` in
+   `services/backend`, recorded via versioned `DIRA1-MANIFEST-v1` hashes (same
+   canonical JSON rules as `ACM9-MANIFEST-v1`).
+9. Each artifact records protocol version, fixture/environment manifests and
+   hashes, source/workspace revisions, PostgreSQL configuration, migration
+   revision, gate results, first breach, and stop reason. A `final` artifact
+   references an approved `baseline` run id and must match its protocol, fixture,
+   and environment hashes to be `comparable`.
+10. **Harness:** `npm run measure:user-management:dira1 -- --role baseline|final`
+    in `services/backend`. Selected by `test/jest-dira1.json`; normal
+    `npm test` and `npm run test:e2e` do not include it.
+
+**Binding authority for contract A statistic, environment, and load model
+(2026-09-11):** warm p95 **and** worst case per gate; local docker-compose
+PostgreSQL; single sequential client. This protocol does **not** discharge
+`QUALITY-GATE-AC-NFR` (contract B). The DIR-A1 CI job, if added, stays
+**informational** until repository governance promotes it.
+
 ## Test data isolation (DEC-UM-010)
 
 Gate E2E for `user-management` follows an approved two-phase progression:
