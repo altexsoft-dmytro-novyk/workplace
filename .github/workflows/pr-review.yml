@@ -26,7 +26,7 @@ on:
         required: true
         type: string
     secrets:
-      ANTHROPIC_API_KEY:
+      CURSOR_API_KEY:
         required: true
       SUBMODULES_TOKEN:
         required: true
@@ -86,11 +86,11 @@ jobs:
         id: credentials
         if: steps.target.outputs.valid == 'true'
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
         run: |
-          if [ -z "$ANTHROPIC_API_KEY" ]; then
+          if [ -z "$CURSOR_API_KEY" ]; then
             echo "available=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::ANTHROPIC_API_KEY is not configured; advisory review was skipped."
+            echo "::warning::CURSOR_API_KEY is not configured; advisory review was skipped."
             cat > .pr-review/report.md <<'EOF'
           ## Automated review
 
@@ -328,55 +328,209 @@ jobs:
             echo "- Patch lines: $(wc -l < "$GITHUB_WORKSPACE/.pr-review/diff.patch")"
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # The skill tree is the reviewer's own instructions, and on a workspace
+      # pull request it arrives from the pull request itself. Take it from the
+      # base branch instead, so a pull request cannot rewrite the review it is
+      # about to receive. The reusable service path already checks the workspace
+      # out at main, so its copy is trusted for the same reason.
+      - name: Check out reviewer instructions from the base branch
+        id: reviewer-assets
+        if: steps.diff.outputs.ready == 'true' && inputs.repository == ''
+        continue-on-error: true
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout: |
+            .agents
+            .claude
+          sparse-checkout-cone-mode: false
+          path: .review-assets
+
+      - name: Install Cursor CLI
+        id: cursor-cli
+        if: steps.diff.outputs.ready == 'true'
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+        run: |
+          # pipefail matters here: without it a failed download pipes nothing
+          # into bash, which exits 0 and leaves the step green with no CLI.
+          set -uo pipefail
+          curl https://cursor.com/install -fsS | bash
+          echo "$HOME/.cursor/bin" >> "$GITHUB_PATH"
+
+          # Locate the binary rather than assume where the installer put it.
+          # GITHUB_PATH only takes effect in later steps, so PATH cannot be
+          # consulted here, and the layout has already moved once.
+          agent_bin=""
+          for candidate in "$HOME/.cursor/bin/agent" "$HOME/.cursor/bin/cursor-agent" \
+                           "$HOME/.local/bin/agent" "$HOME/.local/bin/cursor-agent"; do
+            if [ -x "$candidate" ]; then
+              agent_bin="$candidate"
+              break
+            fi
+          done
+
+          if [ -z "$agent_bin" ]; then
+            echo "::error::The Cursor CLI did not install where expected; the reviewer cannot run."
+            echo "--- what the installer left behind ---"
+            ls -la "$HOME/.cursor" "$HOME/.cursor/bin" "$HOME/.local/bin" 2>&1 | head -40
+            exit 1
+          fi
+          echo "Using Cursor CLI at $agent_bin"
+          echo "agent_bin=$agent_bin" >> "$GITHUB_OUTPUT"
+
+          # Record what this CLI build actually accepts. The installer tracks a
+          # fast-moving build, so the flags the docs describe and the flags this
+          # binary takes can differ, and that difference is invisible otherwise.
+          # Only stdout reaches the summary: this call is authenticated, and its
+          # error text is not something to publish unread.
+          {
+            echo '### Cursor CLI'
+            echo
+            echo '```'
+            "$agent_bin" --version 2>/dev/null | head -5 || true
+            echo
+            "$agent_bin" --list-models 2>/dev/null | head -40 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Run BMad review
         id: reviewer
         if: steps.diff.outputs.ready == 'true'
         timeout-minutes: 15
-        uses: anthropics/claude-code-action@v1
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          github_token: ${{ github.token }}
-          prompt: |
-            Read `.github/pr-review-prompt.txt` fully and follow it.
-            The reviewed repository is `${{ env.REVIEW_REPOSITORY }}` at `${{ env.TARGET_PATH }}`.
-          claude_args: |
-            --model claude-sonnet-5
-            --allowedTools "Read,Glob,Grep,Task,TodoWrite,Skill"
+        env:
+          CURSOR_API_KEY: ${{ secrets.CURSOR_API_KEY }}
+          REVIEW_KIND: ${{ inputs.repository != '' && 'service' || 'workspace' }}
+          REVIEWER_ASSETS: ${{ steps.reviewer-assets.outcome }}
+          AGENT_BIN: ${{ steps.cursor-cli.outputs.agent_bin }}
+          # Leave empty to use the Cursor account's default model.
+          REVIEWER_MODEL: ''
+        run: |
+          set -u
+          if [ -z "$CURSOR_API_KEY" ]; then
+            echo "::error::CURSOR_API_KEY is not configured; the reviewer cannot run."
+            exit 1
+          fi
+
+          if [ "$REVIEW_KIND" = "workspace" ]; then
+            if [ "$REVIEWER_ASSETS" != "success" ]; then
+              echo "::error::The base-branch skill tree could not be checked out; refusing to review with instructions from the pull request."
+              exit 1
+            fi
+            # Both trees carry the same skills, and the agent reaches for
+            # whichever it finds. Pinning only one leaves the other as a way to
+            # hand the reviewer instructions written by the pull request.
+            for tree in .agents .claude; do
+              if [ ! -d ".review-assets/$tree" ]; then
+                echo "::error::$tree is missing from the base branch checkout; refusing to review with instructions from the pull request."
+                exit 1
+              fi
+              rm -rf "$tree"
+              mv ".review-assets/$tree" "$tree"
+            done
+            rm -rf .review-assets
+          fi
+
+          model_args=()
+          if [ -n "$REVIEWER_MODEL" ]; then
+            model_args=(--model "$REVIEWER_MODEL")
+          fi
+
+          # --plan is what makes the reviewer read-only. Print mode alone does
+          # not: `agent --help` states -p "has access to all tools, including
+          # write and shell", and --force only removes the approval prompt.
+          # Plan mode analyses and proposes without editing, which is the whole
+          # job here.
+          #
+          # --trust answers the workspace-trust prompt, which otherwise blocks
+          # any non-interactive run. It grants no command approval of its own;
+          # --force and --yolo, which would, are deliberately not passed.
+          # Use the path the install step resolved, not a name on PATH.
+          set +e
+          "${AGENT_BIN:-agent}" -p \
+            --plan \
+            --trust \
+            --output-format stream-json \
+            "${model_args[@]}" \
+            "$(cat .github/pr-review-prompt.txt)
+
+          The reviewed repository is \`$REVIEW_REPOSITORY\` at \`$TARGET_PATH\`." \
+            > "$GITHUB_WORKSPACE/.pr-review/agent-output.jsonl" \
+            2> "$GITHUB_WORKSPACE/.pr-review/agent-stderr.txt"
+          status=$?
+          set -e
+
+          # Keep stderr in the step's own log as well as the file. Routing it
+          # only to the file left a failing step with an empty log.
+          if [ -s "$GITHUB_WORKSPACE/.pr-review/agent-stderr.txt" ]; then
+            echo "--- reviewer stderr ---"
+            cat "$GITHUB_WORKSPACE/.pr-review/agent-stderr.txt"
+            echo "--- end reviewer stderr ---"
+          fi
+
+          if [ "$status" -ne 0 ]; then
+            echo "::error::The reviewer exited with status $status."
+            # The CLI's own usage text names the flags this version accepts,
+            # which is what a flag error needs and stderr may not carry.
+            echo "--- agent --help ---"
+            agent --help 2>&1 | head -60 || true
+          fi
+          exit "$status"
 
       - name: Surface reviewer diagnostics
         # Runs on success too. A reviewer that answers without doing the work
-        # still succeeds, and that is precisely the case worth reading.
+        # still succeeds, and that is precisely the case worth reading. This step
+        # also extracts the reviewer's final answer, so the agent log is parsed
+        # once and the publishing step below only has to judge what came out.
         if: always() && steps.diff.outputs.ready == 'true'
-        env:
-          EXECUTION_FILE: ${{ steps.reviewer.outputs.execution_file }}
         run: |
           set -u
-          # A failing composite action may not propagate its outputs, so fall back
-          # to the fixed path the action writes its execution log to.
-          execution_file="$EXECUTION_FILE"
-          if [ -z "$execution_file" ]; then
-            execution_file="$RUNNER_TEMP/claude-execution-output.json"
+          cd "$GITHUB_WORKSPACE"
+
+          if [ -s .pr-review/agent-stderr.txt ]; then
+            {
+              echo '### Reviewer stderr'
+              echo
+              echo '```'
+              head -c 4000 .pr-review/agent-stderr.txt
+              echo
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          if [ ! -s "$execution_file" ]; then
-            echo "::warning::The reviewer wrote no execution log; its behaviour is unavailable."
+          if [ ! -s .pr-review/agent-output.jsonl ]; then
+            echo "::warning::The reviewer produced no output; its behaviour is unavailable."
             exit 0
           fi
 
-          # The action prints a sanitized result that omits both what the reviewer
-          # did and why it stopped, so render the execution log into the job
-          # summary: an outcome block, then one line per turn.
-          EXECUTION_FILE="$execution_file" python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          python3 - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import json
-          import os
+          from pathlib import Path
 
           LINE_CAP = 240
           TOTAL_CAP = 200_000
 
-          with open(os.environ["EXECUTION_FILE"], encoding="utf-8") as handle:
-              log = json.load(handle)
-          if not isinstance(log, list):
-              log = [log]
+          raw = Path(".pr-review/agent-output.jsonl").read_text(
+              encoding="utf-8", errors="replace"
+          )
+
+          # Accept either shape without being told which: --output-format json
+          # emits one object, stream-json emits one object per line.
+          records = []
+          try:
+              parsed = json.loads(raw)
+              records = parsed if isinstance(parsed, list) else [parsed]
+          except json.JSONDecodeError:
+              for line in raw.splitlines():
+                  line = line.strip()
+                  if not line:
+                      continue
+                  try:
+                      records.append(json.loads(line))
+                  except json.JSONDecodeError:
+                      continue
 
           def clip(value, cap=LINE_CAP):
               text = " ".join(str(value).split())
@@ -388,26 +542,49 @@ jobs:
                   return [{"type": "text", "text": content}]
               return content if isinstance(content, list) else []
 
+          # The agent's final answer is the report. Look for it by the documented
+          # `result` field first, then fall back to the last assistant text, so an
+          # unfamiliar record shape costs the trace rather than the whole review.
+          answer = ""
+          for entry in reversed(records):
+              value = entry.get("result")
+              if isinstance(value, str) and value.strip():
+                  answer = value
+                  break
+          if not answer:
+              texts = [
+                  block.get("text", "")
+                  for entry in records
+                  if entry.get("type") in {"assistant", "message"}
+                  for block in blocks(entry)
+                  if block.get("type") == "text"
+              ]
+              answer = texts[-1] if texts else ""
+          Path(".pr-review/candidate.md").write_text(answer, encoding="utf-8")
+
           print("### Reviewer outcome")
           print()
           print("```")
-          results = [e for e in log if e.get("type") == "result"]
-          if results:
-              last = results[-1]
+          print(f"{'records:':<20}{len(records)}")
+          terminal = next(
+              (e for e in reversed(records) if e.get("type") in {"result", "final"}),
+              None,
+          )
+          if terminal:
               for field in (
+                  "type",
                   "subtype",
                   "is_error",
-                  "terminal_reason",
-                  "api_error_status",
-                  "num_turns",
+                  "error",
                   "duration_ms",
+                  "num_turns",
                   "total_cost_usd",
               ):
-                  print(f"{field + ':':<20}{last.get(field, 'n/a')}")
-              print(f"{'errors:':<20}{'; '.join(last.get('errors') or []) or 'none'}")
-              print(f"{'result:':<20}{clip(last.get('result', 'n/a'), 800)}")
+                  if field in terminal:
+                      print(f"{field + ':':<20}{clip(terminal[field], 200)}")
           else:
-              print("No result message: the reviewer was cut off before it finished.")
+              print("No terminal record: the reviewer was cut off before it finished.")
+          print(f"{'answer chars:':<20}{len(answer)}")
           print("```")
           print()
 
@@ -418,40 +595,39 @@ jobs:
           print("```")
           emitted = 0
           truncated = False
-          for entry in log:
-              kind = entry.get("type")
-              if kind not in {"assistant", "user"}:
-                  continue
+          for entry in records:
+              rendered = []
               for block in blocks(entry):
                   btype = block.get("type")
                   if btype == "text" and block.get("text", "").strip():
-                      line = f"say    {clip(block['text'])}"
-                  elif btype == "tool_use":
+                      rendered.append(f"say    {clip(block['text'])}")
+                  elif btype in {"tool_use", "tool_call"}:
                       name = block.get("name", "?")
-                      raw = block.get("input") or {}
+                      args = block.get("input") or block.get("arguments") or {}
                       # Surface the argument that identifies the call: a path, a
                       # command, a skill name, or the head of a subagent prompt.
+                      detail = clip(json.dumps(args, ensure_ascii=False), 160)
                       for key in ("file_path", "path", "pattern", "command",
                                   "skill", "subagent_type", "prompt",
                                   "description"):
-                          if raw.get(key):
-                              detail = f"{key}={clip(raw[key], 160)}"
+                          if isinstance(args, dict) and args.get(key):
+                              detail = f"{key}={clip(args[key], 160)}"
                               break
-                      else:
-                          detail = clip(json.dumps(raw, ensure_ascii=False), 160)
-                      line = f"call   {name}({detail})"
-                  elif btype == "tool_result":
+                      rendered.append(f"call   {name}({detail})")
+                  elif btype in {"tool_result", "tool_output"}:
                       flag = "ERR " if block.get("is_error") else ""
-                      body = block.get("content")
+                      body = block.get("content", block.get("output"))
                       if isinstance(body, list):
                           body = " ".join(
                               part.get("text", "")
                               for part in body
                               if isinstance(part, dict)
                           )
-                      line = f"result {flag}{clip(body)}"
-                  else:
-                      continue
+                      rendered.append(f"result {flag}{clip(body)}")
+              if not rendered and entry.get("type") not in {None, "result", "final"}:
+                  # An unrecognized record still says what the agent was doing.
+                  rendered.append(f"{entry.get('type'):<6} {clip(json.dumps(entry, ensure_ascii=False))}")
+              for line in rendered:
                   if emitted + len(line) > TOTAL_CAP:
                       truncated = True
                       break
@@ -461,19 +637,22 @@ jobs:
                   break
           if truncated:
               print("… trace truncated; the full log is in the "
-                    "bmad-pr-review-execution-log artifact.")
+                    "bmad-pr-review-agent-log artifact.")
           if emitted == 0:
               print("The reviewer took no recorded turns.")
           print("```")
           PY
 
-      - name: Upload reviewer execution log
+      - name: Upload reviewer agent log
         if: always() && steps.diff.outputs.ready == 'true'
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: bmad-pr-review-execution-log
-          path: ${{ steps.reviewer.outputs.execution_file || format('{0}/claude-execution-output.json', runner.temp) }}
+          name: bmad-pr-review-agent-log
+          path: |
+            .pr-review/agent-output.jsonl
+            .pr-review/agent-stderr.txt
+          include-hidden-files: true
           if-no-files-found: warn
           retention-days: 14
 
@@ -481,47 +660,64 @@ jobs:
         if: always() && steps.diff.outputs.ready == 'true'
         env:
           REVIEW_OUTCOME: ${{ steps.reviewer.outcome }}
-          EXECUTION_FILE: ${{ steps.reviewer.outputs.execution_file }}
         run: |
           set -u
           published=false
 
-          execution_file="$EXECUTION_FILE"
-          if [ -z "$execution_file" ]; then
-            execution_file="$RUNNER_TEMP/claude-execution-output.json"
-          fi
-
-          # The reviewer's final response is the report. It reaches this step only
-          # through the execution log, so read it from the last result message.
-          if [ "$REVIEW_OUTCOME" = "success" ] && [ -s "$execution_file" ]; then
-            if jq -e '
-                 [.[] | select(.type == "result")] | last
-                 | .subtype == "success" and (.is_error | not)
-                   and (.result | type) == "string" and (.result | length) > 0
-               ' "$execution_file" >/dev/null 2>&1; then
-              jq -r '[.[] | select(.type == "result")] | last | .result' \
-                "$execution_file" > .pr-review/candidate.md
-              published=true
-            fi
+          # The diagnostics step above already pulled the reviewer's final answer
+          # out of the agent log and wrote it here.
+          if [ "$REVIEW_OUTCOME" = "success" ] && [ -s .pr-review/candidate.md ]; then
+            published=true
           fi
 
           # A reviewer that restates its task instead of doing it still returns a
           # non-empty string, so a length check alone will publish that verbatim.
           # Require the headings the prompt mandates before treating the response
-          # as a report.
-          if [ "$published" = true ] &&
-             ! { grep -q '^## Automated review' .pr-review/candidate.md &&
-                 grep -q '^### Findings' .pr-review/candidate.md; }; then
-            published=false
-            echo "::error::The reviewer response is not a report; no findings were published."
-            {
-              echo '### Rejected reviewer response'
-              echo
-              echo '```'
-              head -c 2000 .pr-review/candidate.md
-              echo
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
+          # as a report — but salvage a real report wrapped in a code fence or
+          # introduced by a preamble first. The gate exists to catch "this is not
+          # a report", not to reject one over its packaging.
+          if [ "$published" = true ]; then
+            if python3 - <<'PY'; then
+          import re
+          import sys
+          from pathlib import Path
+
+          path = Path(".pr-review/candidate.md")
+          text = path.read_text(encoding="utf-8", errors="replace")
+
+          fence = re.match(r"\s*```[a-zA-Z]*\n(.*?)\n?```\s*\Z", text, re.DOTALL)
+          if fence:
+              text = fence.group(1)
+
+          # The agent's narration is concatenated into the answer without
+          # separators, so the heading routinely lands mid-line ("...anchors
+          # myself.## Automated review"). Anchor on the heading text itself, and
+          # accept the first occurrence that actually has a findings section
+          # after it, so a heading merely quoted in the narration is skipped.
+          # Requiring the heading to end its line separates the real one from a
+          # heading the narration merely quotes ("emit \"## Automated review\"
+          # first"), which otherwise wins by appearing earlier.
+          start = -1
+          for match in re.finditer(r"## Automated review[ \t]*(?:\r?\n|\Z)", text):
+              if re.search(r"^### Findings\s*$", text[match.start():], re.MULTILINE):
+                  start = match.start()
+                  break
+          if start < 0:
+              sys.exit(1)
+
+          path.write_text(text[start:].strip() + "\n", encoding="utf-8")
+          PY
+              :
+            else
+              published=false
+              echo "::error::The reviewer response is not a report; no findings were published."
+              {
+                echo '--- rejected reviewer response (first 2000 bytes) ---'
+                head -c 2000 .pr-review/candidate.md
+                echo
+                echo '--- end rejected reviewer response ---'
+              } | tee -a "$GITHUB_STEP_SUMMARY"
+            fi
           fi
 
           if [ "$published" = true ]; then
