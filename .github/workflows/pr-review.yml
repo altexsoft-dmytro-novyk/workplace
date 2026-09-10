@@ -354,6 +354,19 @@ jobs:
           curl https://cursor.com/install -fsS | bash
           echo "$HOME/.cursor/bin" >> "$GITHUB_PATH"
 
+          # Record what this CLI build actually accepts. The installer tracks a
+          # fast-moving build, so the flags the docs describe and the flags this
+          # binary takes can differ, and that difference is invisible otherwise.
+          {
+            echo '### Cursor CLI'
+            echo
+            echo '```'
+            "$HOME/.cursor/bin/agent" --version 2>&1 | head -5 || true
+            echo
+            "$HOME/.cursor/bin/agent" --help 2>&1 | head -80 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Run BMad review
         id: reviewer
         if: steps.diff.outputs.ready == 'true'
@@ -389,6 +402,7 @@ jobs:
           # No --force and no --yolo: without either, print mode proposes edits
           # instead of applying them, so the reviewer is read-only by
           # construction rather than by an allowlist it might grow past.
+          set +e
           agent -p \
             --output-format stream-json \
             "${model_args[@]}" \
@@ -397,6 +411,25 @@ jobs:
           The reviewed repository is \`$REVIEW_REPOSITORY\` at \`$TARGET_PATH\`." \
             > "$GITHUB_WORKSPACE/.pr-review/agent-output.jsonl" \
             2> "$GITHUB_WORKSPACE/.pr-review/agent-stderr.txt"
+          status=$?
+          set -e
+
+          # Keep stderr in the step's own log as well as the file. Routing it
+          # only to the file left a failing step with an empty log.
+          if [ -s "$GITHUB_WORKSPACE/.pr-review/agent-stderr.txt" ]; then
+            echo "--- reviewer stderr ---"
+            cat "$GITHUB_WORKSPACE/.pr-review/agent-stderr.txt"
+            echo "--- end reviewer stderr ---"
+          fi
+
+          if [ "$status" -ne 0 ]; then
+            echo "::error::The reviewer exited with status $status."
+            # The CLI's own usage text names the flags this version accepts,
+            # which is what a flag error needs and stderr may not carry.
+            echo "--- agent --help ---"
+            agent --help 2>&1 | head -60 || true
+          fi
+          exit "$status"
 
       - name: Surface reviewer diagnostics
         # Runs on success too. A reviewer that answers without doing the work
