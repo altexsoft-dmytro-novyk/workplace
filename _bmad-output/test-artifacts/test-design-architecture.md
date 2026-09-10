@@ -280,8 +280,8 @@ at design as `PR-B-01 / OQ-114`); one bulk resolution plan; a representative see
 query observability on the composed directory endpoint. *Owner:* Architect + Profile Backend
 + DBA/DevOps. *Timeline:* before directory release.
 
-*State:* harness **`DIRA1-MVP-v1`** exists (`docs/architecture/testing-strategy.md` § DIR-A1);
-**no qualifying baseline/final artifact recorded yet** (U-24 resolved; artifact collection open).
+*State:* harness **`DIRA1-MVP-v1`**; **PASS** final artifact
+`performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` (local env; U-24 resolved).
 
 #### PR-007 — Aggregate drift across dashboards, resourcing and campaigns (DATA, 6)
 

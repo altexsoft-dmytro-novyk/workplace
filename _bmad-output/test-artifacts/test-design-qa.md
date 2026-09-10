@@ -394,7 +394,8 @@ The nightly slot carries what is too slow or too environment-dependent for the P
 **The subject of the old nightly performance slot is replaced.** It was described as a k6 run of a
 `GET /users` list SLA. The surviving obligation is
 [contract A](#contract-a--all-employees-httplist-route) — the composed All Employees route
-including permission resolution — harness **`DIRA1-MVP-v1`**; **no qualifying artifact recorded yet**. There
+including permission resolution — harness **`DIRA1-MVP-v1`**; **PASS final artifact**
+`performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` (local env). There
 is no nightly performance job to schedule until that is decided.
 
 ### Weekly / pre-release
@@ -466,7 +467,7 @@ nothing**.
 | `PR-003` — People Partner contract ahead of sign-off / journal | The `PR-S-01` sign-off trace, then PP concurrency and one-PP-per-employee invariants, then journal enrolment | manual sign-off trace + `api-e2e` + `@concurrency` | Sign-off **ungranted**; `PR-B-07` open |
 | `PR-004` — full-profile overlay precedence | Projection **positives and negatives** together — a partial implementation can satisfy Self while widening the overlay | `api-e2e` projection positives/negatives | Design unblocked (`PR-B-06` closed at design); implementation absent |
 | `PR-005` — unknown timetracker contract | Contract review of the real provider contract, then identity-mapping and event-versus-state evidence against the test environment | contract review + `integration-live` | Blocked on `PR-B-08` |
-| `PR-006` — All Employees list latency | **[Contract A](#contract-a--all-employees-httplist-route) only.** No ACM-9 result and no P6 result is evidence for it | measurement — **`DIRA1-MVP-v1`** | **No qualifying artifact recorded yet** |
+| `PR-006` — All Employees list latency | **[Contract A](#contract-a--all-employees-httplist-route) only.** No ACM-9 result and no P6 result is evidence for it | measurement — **`DIRA1-MVP-v1`** | **PASS** — `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` |
 | `PR-007` — aggregate drift | Contract review of the four fixed dashboard read models, then cross-context invariants across dashboards, resourcing and campaigns | contract review + cross-context `api-e2e` | `PR-B-02` closed at design; implementation **absent** |
 | `PR-008` — departure contract ahead of sign-off / controls | The `PR-S-02` sign-off trace, then worker evidence (lag, retry, lease, cutoff) and a deployment rehearsal against one validated timezone and database | worker evidence + deployment rehearsal | Sign-off **ungranted**; `PR-B-09` open |
 | `PR-009` — scenario documents counted as coverage | The **three coverage states kept distinct** in every reporting surface (see [Coverage-state vocabulary](#coverage-state-vocabulary)), plus the end-to-end suites actually executing in CI | `repository-audit` | **Live and less mitigated than in 2026-08-29** — the e2e job is `continue-on-error` |
@@ -745,7 +746,7 @@ generated test cases and not coverage**, per the source's own statement. Every r
 | `P0-PLAT-05` | Timetracker identity, atomic sync, freshness, outage cutoff | `integration-live` | `E2E DEPENDENCY` — `PR-B-08`; owner `TT-E2` | `PR-002/005/010` |
 | `P0-PLAT-06` | Departure cutoff and atomic effective-date effects | api / worker e2e | `READY FOR FORMAL SIGN-OFF` — PM/AD-20; `PR-S-02` **ungranted**; owner `UM-E5` | `PR-002/008` |
 | `P0-PLAT-07` | Seed import / auth cutover; no create or deactivate legacy surface | api / import e2e + route negative | `READY NOW` — PM/AD-16, AD-21; owner `UM-E1-S1.1` | — |
-| `P0-PLAT-08` | **500+ directory ≤ 2 seconds** | **measurement — `DIRA1-MVP-v1`** | `E2E DEPENDENCY` — harness exists; no qualifying artifact yet | `PR-006` |
+| `P0-PLAT-08` | **500+ directory ≤ 2 seconds** | **measurement — `DIRA1-MVP-v1`** | **PASS** — `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` | `PR-006` |
 
 **`P0-PLAT-07` is the platform statement of the same cutover that retires the `legacy-um`
 registration and deactivation family.** The two must agree, and they do.
@@ -932,7 +933,7 @@ v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 | `TR-6-04` | v1.5 §6 | Seeded user, timetracker user and optional candidate use durable IDs; email insufficient | Contract + API/integration negatives | E2E DEPENDENCY | `ttId` and candidate-ID mapping contract |
 | `TR-7-01` | v1.5 §7 | Access correctness directly tested per audience/path/section | API E2E | AC STAGE-1 DRAFT | Phase 1 only; full DoD requires deferred suites |
 | `TR-7-02` | v1.5 §7 | Only seeded test population; no real PII in contexts/logs/screenshots/repository | CI scan + manual provenance audit | READY NOW | Use synthetic identifiers and delivered seed only |
-| `TR-7-03` | v1.5 §7 | All Employees with 500+ records and permission resolution responds within 2 seconds | measurement — **`DIRA1-MVP-v1`**; [contract A](#contract-a--all-employees-httplist-route) only | E2E DEPENDENCY | Composed directory route and the 500+ dataset. Harness exists; **no qualifying artifact recorded yet** |
+| `TR-7-03` | v1.5 §7 | All Employees with 500+ records and permission resolution responds within 2 seconds | measurement — **`DIRA1-MVP-v1`**; [contract A](#contract-a--all-employees-httplist-route) only | **PASS** (local) | Composed directory route and the 500+ dataset. `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` |
 | `TR-7-04` | v1.5 §7 | Integration failures do not take down app within §5.1 limits | Reliability E2E | E2E DEPENDENCY | Timetracker failure contract |
 | `TR-7-05` | v1.5 §7 | Accessible and responsive list/profile/dashboard | Automated accessibility + manual viewport/keyboard review | E2E DEPENDENCY | No numeric WCAG target is sourced; do not invent one |
 | `TR-8-01` | v1.5 §8 | BMAD use and deliberate migration decisions | Repository/process audit | READY NOW | Manual evidence, not product E2E |
@@ -1003,7 +1004,7 @@ may ship.** Every gate below is **ungranted** — naming a gate is not passing i
 | **`PG-01`** | **Access control is NOT schedulable.** | `repository-audit` | **Not schedulable — on a new, evidenced rationale.** See below. |
 | **`PG-02`** | Required **live** timetracker leaves / projects / people evidence over the seeded population. | `integration-live` | v1.5 §5.1, §9. Blocked on `PR-B-08`. |
 | **`PG-03`** | `PR-S-01`/`PR-S-02` sign-off precedes PP and departure E2E; **zero unresolved** leak, stale-access, self-assignment or due-departure defects. | `api-e2e` + sign-off trace | PM/AD-19, AD-20, AD-12. Sign-offs **ungranted**. |
-| **`PG-04`** | **All Employees list ≤ 2 seconds at 500+ records, including permission resolution** (v1.5 §7 verbatim). | **[Contract A](#contract-a--all-employees-httplist-route) — `DIRA1-MVP-v1`. Not ACM-9. Not P6.** | Evidence owner `PMC-E1-S1.9`. **No qualifying artifact recorded yet.** `QUALITY-GATE-AC-NFR` does **not** discharge this gate — contract **B** only (U-25 resolved). |
+| **`PG-04`** | **All Employees list ≤ 2 seconds at 500+ records, including permission resolution** (v1.5 §7 verbatim). | **[Contract A](#contract-a--all-employees-httplist-route) — `DIRA1-MVP-v1`. Not ACM-9. Not P6.** | Evidence owner `PMC-E1-S1.9`. **PASS** — `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` (comparable baseline `dira1-1789080425159-ab0a0a57396f`; local env). `QUALITY-GATE-AC-NFR` does **not** discharge this gate — contract **B** only (U-25 resolved). |
 | **`PG-05`** | Every required v1.5 trace row has accepted evidence; `OUT OF SCOPE` is used **only** for GOOD TO HAVE or §10 exclusions. | `repository-audit` | Unchanged. |
 | **`PG-06`** | After `PR-B-09`: a deployed, demonstrable product; AD-1 history; parallel ownership; current intelligent-repository specs. | deployment evidence | v1.5 §8, §9. |
 
@@ -1316,8 +1317,8 @@ Three items, **none of them inside the 15–23 engineer-days**:
 1. **`@testing-library/react` plus a second vitest config** — a prerequisite for **every one of the
    85 frontend cases**; its file-location convention is an open decision (U-12), so it is not
    scheduled here.
-2. **DIRA1-MVP-v1 baseline/final artifacts** — harness exists (`npm run measure:user-management:dira1`);
-   **no qualifying artifact recorded yet**. ACM-9 and P6 measure **different subjects**.
+2. **DIRA1-MVP-v1 artifacts** — collected (`performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json`,
+   PASS, local env). ACM-9 and P6 measure **different subjects**.
 3. **Schema-per-worker** — explicitly **not** to be built (see [backend isolation](#backend-isolation)),
    so it carries **no** estimate rather than a zero.
 

@@ -152,7 +152,8 @@ U-6, U-9, U-10, U-11, U-12, U-13, U-16** remain open from Task 1; **U-17..U-19**
 remain open from the reconciliation; **U-20**, **U-24**, and **U-25** were resolved 2026-09-11.
 Notably open and load-bearing for any later verdict: both `PR-S-*` sign-offs (U-2); what closes
 the six design-closed `PR-B-*` blockers at **implementation** (U-17); and contract A's qualifying
-**baseline/final artifact** (harness `DIRA1-MVP-v1` exists; none recorded yet).
+**baseline/final artifact** — PASS `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json`
+(local env).
 
 ## Next step
 

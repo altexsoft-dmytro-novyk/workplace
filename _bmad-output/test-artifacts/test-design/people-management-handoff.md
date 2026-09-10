@@ -193,7 +193,7 @@ Restated here only because a story author reading a handoff is exactly who confl
 
 | Contract | Subject | State |
 | --- | --- | --- |
-| **A** | The **All Employees list** at 500+ records with arbitrary filters and derived fields, including permission resolution, ≤ 2 seconds (v1.5 §7). Release gate `PG-04`. **Priority P0.** | Harness **`DIRA1-MVP-v1`** (`npm run measure:user-management:dira1`). Pass: warm p95 **and** worst case ≤ 2 s per gate. **No qualifying artifact recorded yet.** |
+| **A** | The **All Employees list** at 500+ records with arbitrary filters and derived fields, including permission resolution, ≤ 2 seconds (v1.5 §7). Release gate `PG-04`. **Priority P0.** | Harness **`DIRA1-MVP-v1`**. **PASS** — `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` (local env). |
 | **B** | The **AccessControl facade resolver** at 500 requested active targets, per-shape gates, `ACM9-MVP-v1`. | A binding protocol with its own thresholds. Its CI job is **informational** and this migration proposes no promotion of it to a blocking check. |
 | **C** | The **`resolveAudiences` function**, P6 measurement in milliseconds. | A measurement record, **not a gate**, and must never be treated as one. |
 
