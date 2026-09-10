@@ -259,9 +259,12 @@ percentage against any of them.*
    blocker/dependency states through the index and the owning epic plan.
 4. **Progress sign-off-ready Stage-1 design** — PP work under `PR-S-01` with AD-19; scheduled
    departure under `PR-S-02` with AD-20. Obtain formal sign-off before E2E or implementation.
-5. **Resolve slice-specific open blockers** — `CC-05`, `OQ-105`/`114`/`115`/`116`/`117`,
-   `PR-B-07 / CC-07`, `PR-B-08` timetracker, `PR-B-09` operational envelope, each only within
-   its stated boundary.
+5. **Record implementation and evidence work for ratified decisions and remaining open blockers**
+   — For design-closed items (`PR-B-01`..`04`, `PR-B-06`, and the HR-Admin half of `PR-B-05`),
+   complete the named successor work in `test-design-architecture.md` § Ratified design decisions
+   without reopening design discovery. For live blockers (`PR-B-05` default-role half,
+   `PR-B-07 / CC-07`, `PR-B-08`, `PR-B-09`), satisfy the closure conditions in § Open blockers,
+   each only within its stated boundary.
 6. **TEA ATDD as a separate explicit workflow** — produce committed-red Stage-2 evidence under
    the current `DG-01` ordering.
 7. **BMAD implementation** — only against red evidence and current architecture contracts.
@@ -296,7 +299,8 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 | `TD-UM-PF-01..04` | UM handoff § Story-Level | `test-design-epic-user-management-1.md` | Survive. |
 | `TD-UM-REG-01..13` | UM handoff § Story-Level | largely **retired**; surviving identity invariants in `test-design-epic-user-management-1.md` | Retired under the v1.5 no-create-path cutover (PM/AD-16, AD-21; DEC-UM-006 and DEC-UM-008 RETIRED). **Retired obligations must not reappear as active ones.** |
 | `TD-UM-DEACT-01..03` | UM handoff § Story-Level | **retired or replaced**; successors in `test-design-epic-user-management-5.md` | PM/AD-21, AD-22. |
-| `TD-UM-CT-01..08` | UM handoff § Story-Level | `test-design-epic-user-management-3.md` | Survive. |
+| `TD-UM-CT-01` | UM handoff § Story-Level | `test-design-epic-user-management-1.md` | **Re-homed** under DEC-UM-008 (`joined_company` in import row transaction); cross-references `UM-E3`. |
+| `TD-UM-CT-02..08` | UM handoff § Story-Level | `test-design-epic-user-management-3.md` | Survive. |
 | `TD-UM-LIST-01..04` | UM handoff § Story-Level | `test-design-epic-user-management-1.md`, with the visibility-safe half in `test-design-epic-user-management-7.md` | Net-new on 2026-08-25. |
 | `TD-UM-REL-01..08` | UM handoff § Story-Level | `test-design-epic-user-management-4.md`; the mentorship split (`REL-04/05/06` and half of `REL-07`) to `test-design-epic-mentorship-1.md` | Mentorship became its own domain; the re-home is not inheritance. |
 | `TD-UM-AC-01` | UM handoff cross-epic gate | `test-design-epic-user-management-0.md` | With `legacy-um:R-001`'s epic half. |
@@ -309,7 +313,8 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 | --- | --- | --- |
 | `PG-01`..`PG-06` | `test-design-qa.md` § Release gates | Identifiers unchanged. `PG-01` keeps its conclusion on a **replaced** rationale; `PG-04` is bound to contract A. |
 | `DG-01`..`DG-04` | `test-design-qa.md` § Design gates | `DG-01` restated under D-1. **`DG-05` is retired with no successor** — it was a child-ownership gate premised on the split this migration dissolves. |
-| `PR-B-01`..`PR-B-09` | `test-design-architecture.md` § Open blockers | Six closed **at design only**; none at implementation. |
+| `PR-B-01`..`PR-B-04`, `PR-B-06`, HR-Admin half of `PR-B-05` | `test-design-architecture.md` § Ratified design decisions | Closed **at design**; implementation or evidence work may remain. |
+| `PR-B-05` (default-role half), `PR-B-07`..`PR-B-09` | `test-design-architecture.md` § Open blockers | Open at design and/or implementation; none closed at implementation. |
 | `PR-S-01 / CC-04`, `PR-S-02 / CC-06` | `test-design-architecture.md` § Sign-off-ready packages | Both **ungranted**. |
 | `DEC-UM-001`..`DEC-UM-012` | `docs/architecture/user-management-test-decisions.md` (unchanged by this migration) | `DEC-UM-012` stays **draft**. `DEC-UM-006` and `DEC-UM-008` are RETIRED. |
 | Legacy story numbers `1.1`..`4.2` | canonical `UM-E{n}-S{n.m}` identities in the epic plans | Nothing is renumbered; the old bare numbers were never canonical epic identities. Story 1.4 "Deactivate" has **no** canonical successor under PM/AD-16 / AD-22. |

@@ -5,8 +5,8 @@
 **Output root:** `_bmad-output/test-artifacts/` (unchanged).
 **Current-artifact index:** `_bmad-output/test-artifacts/test-design/README.md`.
 
-This contract makes one scope identity select one plan, one checkpoint, and one validation
-report without relying on a bare epic number. It controls document selection and filenames;
+This contract maps each scope identity to one plan, one checkpoint, and one validation report
+without relying on a bare epic number. It controls document selection and filenames;
 it grants no approval, validation verdict, test coverage, gate result, or release status.
 
 ## 1. Precedence over the stock workflow — including the Resume override

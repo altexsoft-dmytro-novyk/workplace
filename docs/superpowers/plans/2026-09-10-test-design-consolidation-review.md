@@ -1,6 +1,10 @@
 # Independent review — test-design consolidation plan
 
-**Final verdict: READY FOR AUTHORIZED EXECUTION.** Independent re-review confirms R1–R3 are addressed in the revised plan. This is plan readiness only: the migration and workflow exercises remain unexecuted. The proposed single platform pair and domain-qualified real epic plans are supported.
+> **Frozen pre-execution record.** This review was written before Tasks 1–5 ran. It is pinned to
+> subject commit `76a7220701ac6f16843dad8b303934f9a958b54c`. For execution outcomes see
+> `docs/superpowers/plans/2026-09-10-test-design-consolidation-verification.md`.
+
+**Final verdict: READY FOR AUTHORIZED EXECUTION.** Independent re-review confirms R1–R3 are addressed in the revised plan. This is plan readiness only: at the time of this review the migration and workflow exercises had not run. The proposed single platform pair and domain-qualified real epic plans are supported.
 
 **Reviewed:** `docs/superpowers/plans/2026-09-10-test-design-consolidation.md`, initial uncommitted draft on workspace `76a7220701ac6f16843dad8b303934f9a958b54c`. This is a plan review, not execution or a product readiness verdict. Only this review report was written.
 
@@ -55,4 +59,4 @@ Read the complete candidate plan, installed test-design entrypoint/customization
 
 Read the revised plan in full and checked the changed target identity contract, Task 4 commands, and Task 5 acceptance exercises against R1–R3. All three findings are closed at the planning level. No further blocking plan defect was identified within this bounded review. No implementation, workflow exercise, runtime test, external action, or release verification was performed.
 
-**READY FOR AUTHORIZED EXECUTION — plan only; workflow remains unexecuted.**
+**READY FOR AUTHORIZED EXECUTION — plan only; frozen before execution.**

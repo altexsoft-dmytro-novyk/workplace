@@ -1,10 +1,10 @@
 # Test-Design Consolidation Verification
 
-**Verification status:** **PASS — Task 5 migration and routing verification is complete.**
+**Verification status:** **PASS — Task 5 routing mechanics and preservation checks are complete.**
 **Task 4 routing configuration:** **PASS.**
 **Task 5 platform trace/planning-row subset check:** **PASS.**
 **Task 5 full 56-ID legacy-priority checker:** **PASS after a verified RED/GREEN fix wave.**
-**Task 5 copied-entrypoint exercises:** **Observed after the fix wave through both copied entrypoints.**
+**Task 5 copied-entrypoint exercises:** **PASS for routing outcomes; generated-prose quality was not assessed.**
 **Product readiness verdict:** none; this report is not a gate decision.
 
 The post-fix `.claude` report records 22 isolated Git-copy cases covering the primary and
@@ -119,11 +119,13 @@ no fixture artifact, test, report, checkpoint, plan, or repository file.
 
 ## 5. Observed post-fix routing matrix
 
-Evidence sources are
-`/private/tmp/test-design-routing-fixture-20260910-01/sdd-task5/claude-entrypoint-rerun-report.md`,
-`/private/tmp/test-design-routing-fixture-20260910-01/sdd-task5/agents-entrypoint-rerun-report.md`,
-and the independent reconciliation in
-`/private/tmp/test-design-routing-fixture-20260910-01/sdd-task5/postfix-independent-review.md`.
+**Reproducibility note.** The original entrypoint exercise reports lived under
+`/private/tmp/test-design-routing-fixture-20260910-01/` and are **not committed**. That matrix
+is therefore **not independently inspectable from the repository alone**. Reproducible routing
+coverage is provided by `scripts/test-design-workflow-routing.cjs` and
+`npm run test:test-design-routing`, which enforce the contract's terminal `nextStep`, system
+Validate scope, Resume refusal rules, and plan/checkpoint hash pairing on the committed artifact
+set.
 
 | Case | Observed post-fix outcome |
 | --- | --- |
@@ -214,8 +216,8 @@ No trace completion hook or live integration was invoked.
 | Candidate | SHA-256 |
 | --- | --- |
 | `_bmad/custom/bmad-testarch-test-design.toml` | `1c2a1da9bf67d2aac165a20c70783e2bba88e756ee88cc3ee68813d9bbb29bf9` |
-| `docs/test-design-workflow-contract.md` | `9f96f356a974eb4fb5f01b80a75885063c44959843e7b88edffe86a1c4a7f9c6` |
-| `test-design-architecture.md` | `6d5b5b1b8f0fedad893cc252c64b03289b712de497de5726c45b9c51dc1436a9` |
+| `docs/test-design-workflow-contract.md` | `1212e87968a6e08de455afd5f100bd862196b829bd4031677ea42d85fcc09151` |
+| `test-design-architecture.md` | `ad0c675f5ffa6512366e1b2899e162727072ebf5917540e2c83605ef06b61a65` |
 | `test-design-qa.md` | `436ac635e0013350394288428e11c1d2caf7142d6045ba7b58fe85df6bf57c1c` |
 | `test-design-epic-mentorship-1.md` | `f6a28ff7c5fe706159416d9b1332faeda31de8eedc3b735dae883b9cd10e33d2` |
 | `test-design-epic-platform-capabilities-1.md` | `f9a5a44286d3cb4defd02879e72e6adc18973cb72e542a938e68fc0f6c540728` |
@@ -226,23 +228,23 @@ No trace completion hook or live integration was invoked.
 | `test-design-epic-user-management-4.md` | `32fb1b841351d3b7295e631afad5ab3de45fcc8836c445d373040833306ac7ac` |
 | `test-design-epic-user-management-5.md` | `2ff9124fc30c4b582805bd1b03eba3b3685011f499bdf3d9eacba61165f2fcb7` |
 | `test-design-epic-user-management-7.md` | `fedaea30065f5d8c01a1b5c942b81bfe5b1e33dbd7e63e681005ca35e2e8892c` |
-| `test-design-progress-system.md` | `9f809bb2d1d5516337805310e8c86aab238dce4778a501a2df07a14fac2faacb` |
-| `test-design-progress-epic-mentorship-1.md` | `6e139ee880ae792faf3ab0f977e3c836fc71830e4e23385d21b91a29c8c3b93d` |
-| `test-design-progress-epic-platform-capabilities-1.md` | `404f65c647e75686d6343a1e24df07ca345a262cfc520fc6bd48d6641db83c2c` |
-| `test-design-progress-epic-user-management-0.md` | `d65b544dbb26cd7340bd23c340cd37a9223ff1f73c5c2cf38592ccf774fc9d8a` |
-| `test-design-progress-epic-user-management-1.md` | `8cae5a490ae9b8dfdc19e3808a8acbd179077be90e5f659262545749ae602a31` |
-| `test-design-progress-epic-user-management-2.md` | `cf5d596b1ab77694f6579b0ebfd2e77831e641e00f23a03c445feed73648093e` |
-| `test-design-progress-epic-user-management-3.md` | `16a51a9670aa07a0b013f80e1d810f951c5fed5e8818d60340e1d68737742fd1` |
-| `test-design-progress-epic-user-management-4.md` | `114c3baf811983055e027199b115beb0b4b1dfe43a0bb9917d41b59143a5e1da` |
-| `test-design-progress-epic-user-management-5.md` | `e5158048e7bc0ef2e86b50912e07478eda29c39dac26d1e34b8b11a28e7a9fc8` |
-| `test-design-progress-epic-user-management-7.md` | `316c82d5cf7a3520dcc7bb27d7a11c3ff0822c57faa4dcaa8e60973cc9b3f401` |
-| `test-design-validation-report.md` | `9fed33d61f9dd5740bf260be8bbbc8784dd621fb89619c38849d99bb75acb675` |
-| `test-design/people-management-handoff.md` | `7db8f0a4720fee9aca3094b4ac3d08b3318728a495a297073e39b745dfa9aa5a` |
-| `test-design/README.md` | `04c222233f87368a032084f2029ba57facadaaa58eab7db1a30315fbb7b9ae22` |
+| `test-design-progress-system.md` | `701bd5818e881e9158ec263f24003c08c11d528cbbf7042aeca98983364b13cf` |
+| `test-design-progress-epic-mentorship-1.md` | `088e3f890c7daef2e450abb5b946f40406d521d80b97bde4ec798f0e4b07c1ff` |
+| `test-design-progress-epic-platform-capabilities-1.md` | `43da65f27208daee3c523011cbe37b1f88c78c8a420bf33858d66c926f0e0a67` |
+| `test-design-progress-epic-user-management-0.md` | `4abf5efeb87664ee949f5f25e1f503ff99f0f3dfc3ae0b7a1425d7f4d006de29` |
+| `test-design-progress-epic-user-management-1.md` | `2c82c02e3b2fcc653f78498800cf4b3a600936f1e1c245d729589c1bbcefc913` |
+| `test-design-progress-epic-user-management-2.md` | `8ef0d71669d02511ebe0ebcb53e4d973665d66fc4266e4661706918f81011f53` |
+| `test-design-progress-epic-user-management-3.md` | `0d6cc0e6b657539e0e0872256f45abf36a9e94344b2ae48c09d4fe3ac83dc352` |
+| `test-design-progress-epic-user-management-4.md` | `d528c492b3cf572d18c8f3ff1d7f758a14f56387f65c96605d48e36189923ba4` |
+| `test-design-progress-epic-user-management-5.md` | `882d5c2cdf07b6821c627a273714602923bb7bf9c674b14a03f7f0f038b197e7` |
+| `test-design-progress-epic-user-management-7.md` | `2049bf307aebc7c12ef973dede283e7cd50bd170f593325693a1b4aa60cff722` |
+| `test-design-validation-report.md` | `0174ba6598c7a9ccf50e929a6776104974b0089ddd7e65a3fa37ea022ee9d095` |
+| `test-design/people-management-handoff.md` | `535a61b4307125d77ec5e551dbdaaae314f7e6896ab6d1c7efb73184898296b4` |
+| `test-design/README.md` | `6c32dfdb2f0b20267903adaaabff279a8f838f0212c89f7cf8a107f6a9e6d76b` |
 | `test-design/migration-map.md` | `9f2dd6b27f68dd2f83fd61ee4ea00e54bf6b188ae1e98f8b37c888a1408d2a32` |
 
-These changed-artifact hashes were captured after the Task 5 fix wave and before this verification
-report update. The unchanged artifact hashes remain as previously recorded.
+These hashes were captured after the PR review fix wave on 2026-09-11 and match the committed
+files at that moment (`npm run test:test-design-routing` verifies plan/checkpoint pairing).
 
 ## 10. Commands and outcomes
 
@@ -299,7 +301,7 @@ Final SHA-256 recheck confirmed the override hash as
 `1c2a1da9bf67d2aac165a20c70783e2bba88e756ee88cc3ee68813d9bbb29bf9`; the complete
 candidate table above was compared mechanically with the current files with no mismatch.
 
-Task 5 migration and routing verification is therefore complete. Task 6 is not started, and no
-integration commit is created. Service behavior, browser/API behavior, generated-prose quality,
-product readiness, approval state, coverage, and gate status remain unverified and are not
-claimed by this report.
+Task 5 **routing mechanics and preservation verification** is therefore complete. Generated-prose
+quality was not assessed and is not claimed. Task 6 is not started, and no integration commit is
+created. Service behavior, browser/API behavior, product readiness, approval state, coverage, and
+gate status remain unverified and are not claimed by this report.

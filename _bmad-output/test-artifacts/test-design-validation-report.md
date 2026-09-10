@@ -3,8 +3,8 @@
 > ## Verdict: **NOT RUN.**
 >
 > **No validation has been performed against the artifact set identified below.** This document
-> currently establishes the report's **scope and identity** — what would be evaluated, at which
-> baseline, at which exact content — and nothing else.
+> currently establishes the report's **scope and identity** — what would be evaluated, against
+> which baseline, and using which exact content — and nothing else.
 >
 > - **Verdict:** `NOT RUN`. Not PASS. Not CONCERNS. Not FAIL. Not a partial pass.
 > - **No criterion below is marked evaluated**, because none has been evaluated.
@@ -37,11 +37,12 @@
 
 ## Scope of this report
 
-**In scope.** The platform (system-level) migration-era artifact set listed under
-[Evaluated inputs](#evaluated-inputs): the platform architecture and QA pair, the single
-platform handoff, the current-artifact index, the nine epic plans, the system checkpoint and
-the nine epic checkpoints, evaluated against the disposition ledger
-`test-design/migration-map.md`.
+**In scope.** Per `docs/test-design-workflow-contract.md` §4.5, system Validate evaluates only
+the canonical architecture/QA pair and the literal handoff listed under
+[Evaluated inputs](#evaluated-inputs). The current-artifact index records this report's
+validation entry. Epic plans, epic checkpoints, and per-epic validation are **out of scope**
+here; each epic is validated separately when
+`test-design-validation-report-epic-{domain}-{number}.md` is written.
 
 **Out of scope, explicitly.**
 
@@ -73,39 +74,9 @@ written. Paths are relative to `_bmad-output/test-artifacts/`.
 
 | Path | SHA-256 | Evaluated? |
 | --- | --- | --- |
-| `test-design-architecture.md` | `6d5b5b1b8f0fedad893cc252c64b03289b712de497de5726c45b9c51dc1436a9` | **No** |
-| `test-design-qa.md` | `7fa8509f40d52ba1117b9bf51b69b7fb6cdb66f878802b77076238f71f3c673b` | **No** |
-| `test-design/people-management-handoff.md` | `8917ca6c1ab336410c4d15bdcc953e05c5e31bc878ab889d392f2dabc37a6880` | **No** |
-| `test-design/README.md` | `5170f86834260f619e82359e59e2ed8677b713fcb4c798212ffe99585653b2fc` | **No** |
-| `test-design-progress-system.md` | `f9975c4947ae8e5d9123ff3f63cc815b971f30ce7dd5d35cda600044f1cf3822` | **No** |
-
-### Epic plans
-
-| Path | SHA-256 | Evaluated? |
-| --- | --- | --- |
-| `test-design-epic-user-management-0.md` | `0cb8db5f0b1c2b905a925da6862f6c22d4f23b9766b66bc8bc8d9eefa8bec391` | **No** |
-| `test-design-epic-user-management-1.md` | `6a5d311d33f9a133b8da91966a93e4e20b71917e1f811e7669e583651fad8fbf` | **No** |
-| `test-design-epic-user-management-2.md` | `1e3e1de153f3178472e495461532128869530edd5b197adeac7123abd0a2d1a9` | **No** |
-| `test-design-epic-user-management-3.md` | `350b366aa7e2496a1320aa24c8532aae588de0513c254fcecf80c1ed79c868c4` | **No** |
-| `test-design-epic-user-management-4.md` | `b659dc6ab91d8f3308db164a765a1e32ae1f713c5dbdb98d003ae6c0923be687` | **No** |
-| `test-design-epic-user-management-5.md` | `bb13f3d63ab1f1fc7c65032229f4493d1da55b00a7f75a772d765db17b59ef25` | **No** |
-| `test-design-epic-user-management-7.md` | `fbe7c83285a36b0b15a1e10dbf9c7ed22bdfd55ff21a04208c3b54052c058a91` | **No** |
-| `test-design-epic-mentorship-1.md` | `f342382dc23412f33b11443f015b9b4721621b9fd04858d0e51c947158d5db03` | **No** |
-| `test-design-epic-platform-capabilities-1.md` | `733e50d40960bc31869f9752d2452b27d063cebffaf9b9791d8c86cba6f9cf40` | **No** |
-
-### Epic checkpoints
-
-| Path | SHA-256 | Evaluated? |
-| --- | --- | --- |
-| `test-design-progress-epic-user-management-0.md` | `958e6561843ee0e0d308357fc563d900970abd52e40828ff8624069d7dcaa064` | **No** |
-| `test-design-progress-epic-user-management-1.md` | `739388fe678124e1ff56e5aa673e1bd64f9b79930585530fa62c11c0dd670e2a` | **No** |
-| `test-design-progress-epic-user-management-2.md` | `cc359bf09386002f37fb0c88f80e2c40d19c5c872df8b69929a697d3e08bfdf4` | **No** |
-| `test-design-progress-epic-user-management-3.md` | `9e4955e151e69827c4655f10bd937b044aadfae8f9ae4350126bde92e2d9a852` | **No** |
-| `test-design-progress-epic-user-management-4.md` | `c2cf173d2de23cf7d1fc1e18f2047a3be5b0ff68fa390682be2f02b1fa250935` | **No** |
-| `test-design-progress-epic-user-management-5.md` | `6d731d8fc25f9f031ff58de865adb31ff4c81fd801c7c3849545e6d61386e857` | **No** |
-| `test-design-progress-epic-user-management-7.md` | `e9ad1917db16e134434258b0ee2ba063e674fae15f14baefd4cfb3f26efb8e8d` | **No** |
-| `test-design-progress-epic-mentorship-1.md` | `3e8951dafddb8036b19a662dfe09db576fa5fbbbdfe7d5cbd830a642b9df2d1e` | **No** |
-| `test-design-progress-epic-platform-capabilities-1.md` | `8bbae24894ecfb24f8913a02bb3b933dbbd6cb35983c742a7df12ab30a94958e` | **No** |
+| `test-design-architecture.md` | `ad0c675f5ffa6512366e1b2899e162727072ebf5917540e2c83605ef06b61a65` | **No** |
+| `test-design-qa.md` | `436ac635e0013350394288428e11c1d2caf7142d6045ba7b58fe85df6bf57c1c` | **No** |
+| `test-design/people-management-handoff.md` | `535a61b4307125d77ec5e551dbdaaae314f7e6896ab6d1c7efb73184898296b4` | **No** |
 
 ### Reference inputs, not subjects of the verdict
 
@@ -134,9 +105,9 @@ Listed so the absence of a verdict is legible, and so nobody mistakes this list 
 | 3 | Every `merge` row's origins all resolve to the one declared successor, and every split resolves to all declared successors | **UNEVALUATED** |
 | 4 | No output asserts an approval, a validation verdict, coverage or a pass rate | **UNEVALUATED** |
 | 5 | Architecture owns risk identity and rationale; QA owns evidence and execution; no shared rule is stated twice | **UNEVALUATED** |
-| 6 | Every epic plan has exactly one matching checkpoint with the correct `runKey`, canonical `epicId` and source path | **UNEVALUATED** |
-| 7 | No plan exists for an epic that received no transferred obligation, and none is missing for one that did | **UNEVALUATED** |
-| 8 | The index resolves every scope, including the unplanned scopes, each with an owner | **UNEVALUATED** |
+| 6 | Every epic plan has exactly one matching checkpoint with the correct `runKey`, canonical `epicId` and source path | **OUT OF SYSTEM SCOPE** — epic Validate |
+| 7 | No plan exists for an epic that received no transferred obligation, and none is missing for one that did | **OUT OF SYSTEM SCOPE** — epic Validate and index audit |
+| 8 | The index resolves every scope, including the unplanned scopes, each with an owner | **OUT OF SYSTEM SCOPE** — index is not a system Validate subject |
 | 9 | The three performance contracts are stated separately; contract A's statistic, environment and load model are UNKNOWN and its harness UNDECIDED; no current-choice harness is named | **UNEVALUATED** |
 | 10 | The All Employees list NFR is stated as **P0** | **UNEVALUATED** |
 | 11 | No output asks anyone to establish an approval state for a `docs/test-cases/**` scenario document, and the access-control inventory is stated as **101** files across `access-control-foundation/` and `access-control-kernel/` | **UNEVALUATED** |

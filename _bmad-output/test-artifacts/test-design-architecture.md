@@ -582,7 +582,7 @@ passing measurement of one be reported as evidence for another.
 | | **A — All Employees list** | **B — ACM-9 facade resolver** | **C — P6 `resolveAudiences`** |
 | --- | --- | --- | --- |
 | Subject | The composed All Employees **HTTP/list route**, end to end, including permission resolution | The **public AccessControl facade call**, end to end, including transaction and result mapping — **not** an HTTP list route | The **`resolveAudiences` function** |
-| Authority | `docs/project-requirements.md:614` (v1.5 §7, **normative**) | `docs/architecture/testing-strategy.md` § ACM-9 operational measurement protocol (`ACM9-MVP-v1`), binding | `_bmad-output/test-artifacts/performance/p6-resolve-audiences-postgresql.md` |
+| Authority | `docs/project-requirements.md:614` (v1.5 §7, **normative**) | `docs/architecture/testing-strategy.md` § ACM-9 operational measurement protocol (`ACM9-MVP-v1`), binding | [`p6-resolve-audiences-postgresql.md` at `3a3cd71`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/p6-resolve-audiences-postgresql.md) |
 | Dataset | 500+ seeded employees, representative relationship breadth and depth, no real personal data | 500 **requested active targets** | 500 synthetic users |
 | Statistic | p50, p95 **and** worst case are all *recorded* — **which one the threshold binds to is UNKNOWN** | p50/p95 by nearest rank over 20 measured calls after 5 discarded warm-ups, plus absolute worst case | cold/warm p50/p95/worst, in milliseconds |
 | Threshold | **≤ 2 seconds** | warm p95 **and** worst case ≤ 2 s, **per shape** | **None. C is a measurement record, not a gate**, and must never be treated as one |

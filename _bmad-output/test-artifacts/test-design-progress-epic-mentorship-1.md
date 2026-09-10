@@ -38,7 +38,7 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-mentorship-1.md'
 >   was validated and it does not mean anyone approved it. Those are three different states,
 >   and this checkpoint asserts only the first.
 >
-> This run does **not** succeed, resume or inherit the 2026-09-06 `runKey: 'user-management'`
+> This run does **not** resume or inherit state from the 2026-09-06 `runKey: 'user-management'`
 > or `runKey: 'frontend'` runs. Those were **domain**-scoped and **area**-scoped runs, not epic
 > runs; a `runKey` mismatch is not resumable. Read them at
 > [`test-design-progress-user-management.md` at `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-progress-user-management.md) and
@@ -90,7 +90,7 @@ hashes are recorded once, in `test-design-validation-report.md` § Evaluated inp
 
 | Output | SHA-256 at the moment this checkpoint was written | Approval | Validation |
 | --- | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-mentorship-1.md` | `f342382dc23412f33b11443f015b9b4721621b9fd04858d0e51c947158d5db03` | ungranted | NOT RUN |
+| `_bmad-output/test-artifacts/test-design-epic-mentorship-1.md` | `f6a28ff7c5fe706159416d9b1332faeda31de8eedc3b735dae883b9cd10e33d2` | ungranted | NOT RUN |
 
 ## What this run did not do
 

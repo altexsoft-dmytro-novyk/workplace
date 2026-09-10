@@ -12,7 +12,7 @@ stepsCompleted:
   - 'step-04-coverage-plan'
   - 'step-05-generate-output'
 lastStep: 'step-05-generate-output'
-nextStep: 'human review, then a separate Validate run'
+nextStep: 'document generation is complete; no Create step remains; proceed with human review, then choose Validate, Edit, or a fresh Create'
 lastSaved: '2026-09-10'
 baselineCommit: '76a7220701ac6f16843dad8b303934f9a958b54c'
 backendPin: 'f1eea3c048821011da96fba20d9b517f7d0e4f1b'
