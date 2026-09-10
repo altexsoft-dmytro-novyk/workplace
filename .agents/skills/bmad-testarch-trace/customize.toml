@@ -12,7 +12,7 @@
 # Markdown and JavaScript. A project team overrides them in
 # _bmad/custom/bmad-testarch-trace.toml without editing this installed workflow.
 #
-# These four keys are load-bearing, not decorative: steps-c/step-05-gate-decision.md,
+# These six keys are load-bearing, not decorative: steps-c/step-05-gate-decision.md,
 # checklist.md, and trace-template.md all reference them as {workflow.*} tokens, and the
 # renderer requires a default here for every token it resolves. This file carries a
 # "DO NOT EDIT -- overwritten on every update" header, so a skill update that ships without
@@ -24,6 +24,13 @@ p0_coverage_required = "100"
 p1_coverage_target = "90"
 p1_coverage_minimum = "80"
 overall_coverage_minimum = "80"
+
+# Verification thresholds. Coverage asks whether a test is mapped to a requirement; these ask
+# whether that test was observed passing at the commit under trace. A run whose Phase 1 matrix
+# reports no verification counts at all is capped at CONCERNS rather than failed, because absent
+# evidence is unproven, not disproven.
+verified_coverage_target = "100"
+verified_coverage_minimum = "90"
 
 # Steps to run before the standard activation (config load, greet).
 # Overrides append. Use for pre-flight loads, compliance checks, etc.

@@ -8,7 +8,7 @@
     "demo:readiness:sync": "node scripts/sync-readiness-map.cjs",
     "demo:readiness:build": "node scripts/build-readiness-map.cjs",
     "test:readiness": "node --test test/readiness-map.test.cjs test/readiness-sync.test.cjs",
-    "test:trace-gate": "node --test test/trace-gate-thresholds.test.cjs test/trace-gate-decision-logic.test.cjs",
+    "test:trace-gate": "node --test test/trace-gate-thresholds.test.cjs test/trace-gate-decision-logic.test.cjs test/trace-artifact-naming.test.cjs",
     "guard:epic-ids": "node scripts/epic-id-guard.cjs",
     "guard:epic-ids:clickup": "node scripts/epic-id-guard.cjs --clickup-mappings",
     "test:epic-ids": "node --test test/epic-id-guard.test.cjs",

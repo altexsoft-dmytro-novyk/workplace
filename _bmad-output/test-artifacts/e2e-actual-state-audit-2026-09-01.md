@@ -90,7 +90,7 @@ be "identical before and after" the port rebind.
 
 ### 3a. Suites exist and map to `approvals.yaml`
 
-14 spec files, 99 cases (`e2e-trace-summary.json`). All ACM groups present:
+14 spec files, 99 cases ([`e2e-trace-summary.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/e2e-trace-summary.json) at `c342138`). All ACM groups present:
 `acm0-root-user-prerequisite`, `acm1r-fr-foundation`, `acm2-is-allowed`,
 `acm3-{cycle-acyclicity, fail-closed-identity, inactive-identity,
 inactive-pp-endpoint, path-local-visited-state, termination-taxonomy}`,
@@ -103,7 +103,7 @@ inactive-pp-endpoint, path-local-visited-state, termination-taxonomy}`,
 
 ### 3b. ACM3-II-06 — the P0 trace-gate FAIL, documented precisely
 
-**Gate:** `gate-decision.json` → `gate_status: FAIL`, `p0_status: NOT_MET`,
+**Gate:** [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`) → `gate_status: FAIL`, `p0_status: NOT_MET`,
 "P0 coverage is 95% (required: 100%). 1 critical requirement(s) uncovered:
 ACM3-II-06."
 
@@ -119,7 +119,7 @@ ACM3-II-06."
    `Tess → {'reporting'}`; asserts completion inside the adapter's 2-second
    statement timeout.
 
-2. **No Stage-2 committed(-red-then-green) test exists.** `traceability-matrix.md`
+2. **No Stage-2 committed(-red-then-green) test exists.** [`traceability-matrix.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/traceability-matrix.md) (`c342138`)
    line 136: `ACM3-II-06 … **NONE**`. Inspection confirms
    `acm3-cycle-acyclicity.e2e-spec.ts` has `describe` blocks for **`ACM3-II-07`
    and `ACM3-II-08` only** (`:175,207`); its own header (`:9-13`) says "the two
@@ -130,7 +130,7 @@ ACM3-II-06."
    > `* Scope: these two scenarios only. ACM3-II-06/07/08 are covered in`
    > `* acm3-cycle-acyclicity.e2e-spec.ts and are not restated here.`
    The `06` in "ACM3-II-06/07/08" is wrong — `acm3-cycle-acyclicity` covers only
-   07/08. This is `traceability-matrix.md` Finding **TRACE-1** (documentation
+   07/08. This is [`traceability-matrix.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/traceability-matrix.md) (`c342138`) Finding **TRACE-1** (documentation
    defect, not a behavior defect).
 
 **Remediation (top item — a separate follow-up, NOT this no-code pass):**
@@ -149,7 +149,7 @@ ACM3-II-06."
 > single item blocking the Kernel MVP trace gate.
 
 **Two MED recommendations (do not block the gate on their own, but II-04 and
-II-05 are also P0 and also short of FULL — per `traceability-matrix.md:300`, all
+II-05 are also P0 and also short of FULL — per `traceability-matrix.md:300` ([the file at `c342138`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/traceability-matrix.md); the line number is this audit's own and was not re-verified), all
 three must reach FULL for 100%):**
 
 - **ACM3-II-04** — "empty target list → empty map, zero graph-port calls" is

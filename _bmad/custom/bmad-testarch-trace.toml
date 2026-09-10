@@ -10,6 +10,28 @@ p1_coverage_target = "100"
 p1_coverage_minimum = "100"
 overall_coverage_minimum = "100"
 
+# Coverage at 100% makes the PASS band binary, which leaves CONCERNS with nothing to express on the
+# coverage axis. Verification carries it instead: PASS demands every mapped test observed passing at
+# the commit under trace, and the 90% floor is the point below which a complete mapping stops being
+# credible evidence. This is the mechanical form of the "fresh successful execution evidence for
+# every mapped runnable test" clause in the persistent fact below.
+verified_coverage_target = "100"
+verified_coverage_minimum = "90"
+
+# Step 4 writes the Phase 1 coverage matrix to /tmp under a timestamped name, which is correct for a
+# temp file but is not a name anything may keep. This repo persists a copy because
+# scripts/build-readiness-map.cjs and scripts/build-live-verification-results.cjs read it, and for a
+# long time that copy was made by hand — which is how the timestamp leaked in and accumulated a
+# folder of dated near-duplicates. Persisting it is part of the workflow now, under one fixed name.
+on_complete = """
+Copy the Phase 1 coverage matrix from the path recorded as `tempCoverageMatrixPath` in the trace \
+report frontmatter to `{test_artifacts}/tea-trace-coverage-matrix.json`, overwriting whatever is \
+there. Keep that exact filename: never persist it under a timestamped, dated or otherwise \
+run-specific name, and never leave a second copy beside it. The superseded version stays available \
+in git history. Then confirm that `run_summary.matrix_used` in \
+`{test_artifacts}/live-verification-results.json`, if that file exists, still names this same path.\
+"""
+
 persistent_facts = [
   "For a release- or demo-readiness gate, trace only the explicitly declared MVP/demo target. PASS requires 100% FULL coverage of its P0 and P1 criteria, 100% overall oracle coverage within that target, and fresh successful execution evidence for every mapped runnable test. Treat a whole-repository trace as a planning audit: set allow_gate=false unless the complete product is the declared release scope. Record any excluded criterion as out of scope with an owner and follow-up target; never use an aggregate percentage to imply readiness of untraced functionality.",
 ]

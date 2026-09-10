@@ -59,8 +59,11 @@ The `Live verification evidence` job downloads the three runner reports and call
 which writes `_bmad-output/test-artifacts/live-verification-results.json` in the
 schema trace expects. It maps each executed test to a requirement two ways:
 
-1. exact `(file, title)` lookup against the newest
-   `_bmad-output/test-artifacts/tea-trace-coverage-matrix*.json`;
+1. exact `(file, title)` lookup against
+   `_bmad-output/test-artifacts/tea-trace-coverage-matrix.json`, the mapping the
+   last trace run resolved. The lookup globs `tea-trace-coverage-matrix*.json`
+   and takes the newest by `generated_at`, so a stray copy cannot shadow the
+   canonical file — but only that one name should ever be committed;
 2. failing that, the first oracle ID found in the test's title chain, innermost
    describe first (`um-rel-09-pp-atomic-replace.md` → `UM-REL-09`). A single
    trailing letter is treated as a sub-case of the same scenario, so

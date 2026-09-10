@@ -6,7 +6,7 @@ const path=require('node:path');
 const {syncOnce}=require('../scripts/sync-readiness-map.cjs');
 const evidence=()=>({source_sha:'abc',observed_at:'2026-09-07T12:00:00Z',producer:'CI',
   results:[{requirement_id:'ACF-AU-01',status:'fail',title:'<script>bad()</script>',evidence:'unit: example'}],
-  run_summary:{missing_reports:[],matrix_used:'_bmad-output/test-artifacts/tea-trace-coverage-matrix-repo-2026-09-06.json'}});
+  run_summary:{missing_reports:[],matrix_used:'_bmad-output/test-artifacts/tea-trace-coverage-matrix.json'}});
 function fixture(t){const dir=fs.mkdtempSync(path.join(os.tmpdir(),'readiness-test-'));t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));return path.join(dir,'index.html');}
 
 // Builds an isolated `root` directory carrying only the minimal files build-readiness-map.cjs
@@ -22,7 +22,7 @@ function fixtureRoot(t){
   fs.writeFileSync(path.join(dir,'docs/demo/readiness-template.html'),
     '<!doctype html><html><body><script type="application/json" id="workplace-data">__READINESS_DATA__</script></body></html>');
   fs.mkdirSync(path.join(dir,'_bmad-output/test-artifacts'),{recursive:true});
-  fs.writeFileSync(path.join(dir,'_bmad-output/test-artifacts/tea-trace-coverage-matrix-repo-2026-09-06.json'),JSON.stringify({
+  fs.writeFileSync(path.join(dir,'_bmad-output/test-artifacts/tea-trace-coverage-matrix.json'),JSON.stringify({
     generated_at:'2026-09-06',
     requirements:[{id:'ACF-AU-01',title:'Example requirement',area:'auth',priority:'P0',coverage:'FULL',impl_state:'done',doc:'',tests:[]}],
   }));

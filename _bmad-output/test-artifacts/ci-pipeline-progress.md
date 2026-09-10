@@ -107,8 +107,10 @@ run from `contract_static` to observed evidence.
 
 Requirement resolution, in order:
 
-1. exact `(file, title)` lookup against the newest
-   `tea-trace-coverage-matrix*.json` — the mapping the last trace run resolved;
+1. exact `(file, title)` lookup against `tea-trace-coverage-matrix.json` — the
+   mapping the last trace run resolved. The lookup globs
+   `tea-trace-coverage-matrix*.json` and takes the newest by `generated_at`, so a
+   stray copy cannot shadow the canonical file;
 2. fallback: longest oracle ID found in the test's title chain, innermost first.
    Oracle IDs are derived from `docs/test-cases/**` filenames
    (`um-rel-09-pp-atomic-replace.md` → `UM-REL-09`, `acm1r-fb-16-…` → `ACM1R-FB-16`).

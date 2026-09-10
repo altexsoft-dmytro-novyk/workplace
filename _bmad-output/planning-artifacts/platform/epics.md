@@ -328,7 +328,7 @@ So that PF vacancies SoT and dual-required integrations are not planned as manda
 - `test-design-architecture-platform`, QA, handoff, and validation cite v1.5 / current SoT.
 - PeopleForce = optional prefill; no PF vacancies SoT as required.
 - Timetracker is the only required integration; DoD negatives for narrowed project-line noted; PR-B-04 re-gated.
-- **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite `gate-decision.json` ACM3-II-06 explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
+- **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`, whose rationale names ACM3-II-06 as the uncovered critical requirement) explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
 - **QUALITY-GATE-AC-NFR:** ACM-9 500-target / 2s performance evidence is tracked separately from the functional P0 gate; baseline and final artifacts are referenced by path.
 - Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01` — not superseded `TIMETRACKER-CONTRACT`.
 - **Evidence caveat:** Both TimeTracker gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin — record the caveat verbatim alongside gate IDs; committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4 evidence baseline).

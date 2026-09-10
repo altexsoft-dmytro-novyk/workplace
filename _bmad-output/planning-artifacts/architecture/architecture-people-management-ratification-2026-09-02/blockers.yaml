@@ -153,7 +153,7 @@ blockers:
       - services/backend/test/access-control/acm3-cycle-acyclicity.e2e-spec.ts
       - _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml
     closure_condition: >
-      Closed 2026-09-02: gate-decision.json shows gate_status=PASS, p0_status=MET,
+      Closed 2026-09-02: gate-decision.json at commit a62e705 shows gate_status=PASS, p0_status=MET,
       critical_open=0. ACM3-II-04, ACM3-II-05, and ACM3-II-06 each have
       independently approved Stage-2 evidence (sixth, sixth, and fifth increments).
     note: >

@@ -113,10 +113,28 @@ const p0Coverage = exactCoverage(priorityBreakdown.P0, priorityBreakdown.P0.perc
 const p1Coverage = exactCoverage(priorityBreakdown.P1, priorityBreakdown.P1.percentage);
 const hasP1Requirements = (priorityBreakdown.P1.total || 0) > 0;
 const effectiveP1Coverage = hasP1Requirements ? p1Coverage : 100;
+// Step 4 emits this count as `fully_covered`; matrices in the wild also carry it as
+// `covered_requirements`. Reading only the first name is not a silent no-op: the percentage below
+// still resolves through its rounded fallback, but every count derived from it lands as NaN.
+const fullyCoveredCount = Number(stats.fully_covered ?? stats.covered_requirements);
 const overallCoverage = exactCoverage(
-  { total: stats.total_requirements, covered: stats.fully_covered },
+  { total: stats.total_requirements, covered: fullyCoveredCount },
   stats.overall_coverage_percentage,
 );
+// Coverage and verification are different axes: a requirement counts as covered once a test is
+// mapped to it, whether or not that test was ever observed passing. The denominator here is the
+// covered requirements, not every requirement — measured against the full inventory, a 100% verified
+// target would silently also demand 100% coverage and make `overall_coverage_minimum` unreachable.
+// Phase 1's own `overall_verified_percentage` uses the full inventory, so it is deliberately not
+// read as a fallback; a matrix without `verified_requirements` leaves verification unproven rather
+// than satisfied, and the overlay below caps such a run at CONCERNS instead of letting it PASS.
+const verifiedRequirementCount = Number(stats.verified_requirements);
+const verifiedCoverageAvailable = Number.isFinite(verifiedRequirementCount) && Number.isFinite(fullyCoveredCount);
+const verifiedCoverage = !verifiedCoverageAvailable
+  ? NaN
+  : fullyCoveredCount === 0
+    ? 100 // matches exactCoverage(): an empty bucket is vacuously complete
+    : (verifiedRequirementCount / fullyCoveredCount) * 100;
 // `covered` counts FULL only, so `total - covered` is every requirement short of FULL, PARTIAL
 // included. The overall minimum spans P0-P3 by design, which means a P2/P3 gap can decide the gate;
 // naming the priorities that carry the gap keeps that from reading as an unexplained failure.
@@ -311,6 +329,8 @@ const GATE_THRESHOLD_FALLBACKS = {
   p1CoverageTarget: 90,
   p1CoverageMinimum: 80,
   overallCoverageMinimum: 80,
+  verifiedCoverageTarget: 100,
+  verifiedCoverageMinimum: 90,
 };
 const thresholdErrors = [];
 const parseGateThreshold = (rawValue, name, fallback) => {
@@ -347,11 +367,27 @@ const gateThresholds = {
     'overall coverage minimum',
     GATE_THRESHOLD_FALLBACKS.overallCoverageMinimum,
   ),
+  verifiedCoverageTarget: parseGateThreshold(
+    '{workflow.verified_coverage_target}',
+    'verified coverage target',
+    GATE_THRESHOLD_FALLBACKS.verifiedCoverageTarget,
+  ),
+  verifiedCoverageMinimum: parseGateThreshold(
+    '{workflow.verified_coverage_minimum}',
+    'verified coverage minimum',
+    GATE_THRESHOLD_FALLBACKS.verifiedCoverageMinimum,
+  ),
 };
 if (gateThresholds.p1CoverageTarget < gateThresholds.p1CoverageMinimum) {
   thresholdErrors.push(
     `The P1 coverage target (${gateThresholds.p1CoverageTarget}%) is lower than the P1 coverage minimum ` +
       `(${gateThresholds.p1CoverageMinimum}%), which leaves no PASS band.`,
+  );
+}
+if (gateThresholds.verifiedCoverageTarget < gateThresholds.verifiedCoverageMinimum) {
+  thresholdErrors.push(
+    `The verified coverage target (${gateThresholds.verifiedCoverageTarget}%) is lower than the verified coverage ` +
+      `minimum (${gateThresholds.verifiedCoverageMinimum}%), which leaves no PASS band.`,
   );
 }
 const gateThresholdsValid = thresholdErrors.length === 0;
@@ -402,7 +438,7 @@ else if (!coverageValuesValid) {
     gateDecision = 'FAIL';
     rationale =
       `Overall coverage is ${formatCoverage(overallCoverage)}% (minimum: ${gateThresholds.overallCoverageMinimum}%). ` +
-      `${stats.total_requirements - stats.fully_covered} of ${stats.total_requirements} requirements short of FULL ` +
+      `${stats.total_requirements - fullyCoveredCount} of ${stats.total_requirements} requirements short of FULL ` +
       `(by priority — ${priorityGapSummary}).` +
       (overallGapIsLowPriorityOnly
         ? ` P0 and P1 are complete; this gate failed on P2/P3 alone, because the overall minimum spans every priority.`
@@ -465,6 +501,30 @@ else if (!coverageValuesValid) {
       `observed at ${liveEvidence.recorded_source_sha || 'an unrecorded commit'}. Live evidence is a point-in-time ` +
       `observation with no re-runnable artifact, so it is capped at CONCERNS.`;
   }
+
+  // Verification overlay. The coverage rules above answer "is a test mapped to this requirement";
+  // this one answers "was that test observed passing at the commit under trace". Both are required
+  // for PASS, so this overlay only ever lowers a decision and can never lift a FAIL.
+  if (['PASS', 'CONCERNS'].includes(gateDecision)) {
+    if (!verifiedCoverageAvailable) {
+      gateDecision = 'CONCERNS';
+      rationale =
+        `${rationale} Phase 1 reported no verification counts, so no requirement can be shown to have been ` +
+        `observed passing. Coverage alone does not carry a PASS.`;
+    } else if (verifiedCoverage < gateThresholds.verifiedCoverageMinimum) {
+      gateDecision = 'FAIL';
+      rationale =
+        `${rationale} Verified coverage is ${formatCoverage(verifiedCoverage)}% ` +
+        `(minimum: ${gateThresholds.verifiedCoverageMinimum}%). Mapped tests exist, but too few of them were ` +
+        `observed passing at the commit under trace for the mapping to stand as evidence.`;
+    } else if (verifiedCoverage < gateThresholds.verifiedCoverageTarget) {
+      gateDecision = 'CONCERNS';
+      rationale =
+        `${rationale} Verified coverage is ${formatCoverage(verifiedCoverage)}% ` +
+        `(target: ${gateThresholds.verifiedCoverageTarget}%). The remaining requirements are mapped to tests that ` +
+        `were not observed passing at the commit under trace.`;
+    }
+  }
 }
 ```
 
@@ -496,6 +556,17 @@ const gateReport = {
         overall_coverage_minimum: `${gateThresholds.overallCoverageMinimum}%`,
         overall_coverage_actual: `${formatCoverage(overallCoverage)}%`,
         overall_status: overallCoverage >= gateThresholds.overallCoverageMinimum ? 'MET' : 'NOT_MET',
+
+        verified_coverage_target: `${gateThresholds.verifiedCoverageTarget}%`,
+        verified_coverage_minimum: `${gateThresholds.verifiedCoverageMinimum}%`,
+        verified_coverage_actual: verifiedCoverageAvailable ? `${formatCoverage(verifiedCoverage)}%` : 'UNAVAILABLE',
+        verified_status: !verifiedCoverageAvailable
+          ? 'UNAVAILABLE'
+          : verifiedCoverage >= gateThresholds.verifiedCoverageTarget
+            ? 'MET'
+            : verifiedCoverage >= gateThresholds.verifiedCoverageMinimum
+              ? 'PARTIAL'
+              : 'NOT_MET',
       }
     : null,
 
@@ -687,7 +758,7 @@ const e2eTraceSummary = {
 
   coverage: {
     inventory: {
-      covered: stats.fully_covered,
+      covered: fullyCoveredCount,
       total: stats.total_requirements,
       // The unrounded value the gate actually compared, not Step 4's rounded one: a summary
       // reporting `pct: 100` beside a FAIL for incomplete coverage is the confusion this avoids.
@@ -778,6 +849,16 @@ if (gateEligible) {
     overall_coverage_minimum: `${gateThresholds.overallCoverageMinimum}%`,
     overall_coverage_actual: `${formatCoverage(overallCoverage)}%`,
     overall_status: overallCoverage >= gateThresholds.overallCoverageMinimum ? 'MET' : 'NOT_MET',
+    verified_coverage_target: `${gateThresholds.verifiedCoverageTarget}%`,
+    verified_coverage_minimum: `${gateThresholds.verifiedCoverageMinimum}%`,
+    verified_coverage_actual: verifiedCoverageAvailable ? `${formatCoverage(verifiedCoverage)}%` : 'UNAVAILABLE',
+    verified_status: !verifiedCoverageAvailable
+      ? 'UNAVAILABLE'
+      : verifiedCoverage >= gateThresholds.verifiedCoverageTarget
+        ? 'MET'
+        : verifiedCoverage >= gateThresholds.verifiedCoverageMinimum
+          ? 'PARTIAL'
+          : 'NOT_MET',
   };
 }
 
@@ -804,6 +885,7 @@ if (gateEligible && ['PASS', 'CONCERNS', 'FAIL', 'WAIVED'].includes(gateDecision
     p0_status: e2eTraceSummary.gate_criteria.p0_status,
     p1_status: e2eTraceSummary.gate_criteria.p1_status,
     overall_status: e2eTraceSummary.gate_criteria.overall_status,
+    verified_status: e2eTraceSummary.gate_criteria.verified_status,
     critical_open: e2eTraceSummary.risk_summary.critical_open,
     links: e2eTraceSummary.links,
   };
