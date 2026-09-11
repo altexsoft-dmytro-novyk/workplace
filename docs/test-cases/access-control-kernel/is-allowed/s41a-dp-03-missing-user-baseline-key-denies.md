@@ -8,6 +8,7 @@
 - [access-control.md § Functional-role Kernel MVP (AD-4)](../../../architecture/access-control.md#functional-role-kernel-mvp-ad-4) — the active-User join is a required member on every eligibility path; absent data denies.
 - Story [`spec-4-1a-default-permissions-baseline.md`](../../../../_bmad-output/implementation-artifacts/platform/spec-4-1a-default-permissions-baseline.md) — this increment's own spec.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — real module, real PostgreSQL.
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — functional-role evaluation underlying "roles remain separate") — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

@@ -20,6 +20,7 @@
 - Spec [`spec-4-2c-full-profile-access-overlay.md`](../../../../_bmad-output/implementation-artifacts/platform/spec-4-2c-full-profile-access-overlay.md) — Always list, "The overlay can only ever move `'none' → 'read'`. It must never upgrade an existing `'write'`…"; Tasks & Acceptance Acceptance Criteria — "Given the same synthetic row, when a holder resolves it over a target they have no `'write'`-granting relation to, then the result is never `'write'`."; I/O & Edge-Case Matrix, "Overlay never upgrades to write" row.
 - Solution design [`solution-design-full-profile-access-overlay.md`](../../../../_bmad-output/implementation-artifacts/access-control/solution-design-full-profile-access-overlay.md) §5.3 — the recommended overlay literal, `best = 'read'` (never any other rank), guarded by `if (best !== 'write')` so an existing write is also never touched (the complementary half of this same ceiling property).
 - [access-control.md § Multi-audience merge](../../../architecture/access-control.md#multi-audience-merge) point 4 (`:284`) — "the overlay never supplies write and never bypasses functional permissions, command rules, field/record restrictions."
+- **U-19 normative coverage:** Partial evidence for `TR-2.4-01` and weak/mechanism-only evidence for `TR-2.4-AC` — same synthetic-matrix caveat as `ACM11-FPO-03`. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

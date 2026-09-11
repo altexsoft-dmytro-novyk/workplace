@@ -7,6 +7,7 @@
 - [access-control.md § Audience columns](../../../architecture/access-control.md#audience-columns-32) — PP row: "`Relationship type='people_partner'` + the assigned PP's `direct` HR line above (§2.1, AD-19)"; Self row for the identity-before-derivation ordering.
 - [access-control.md § Fail-closed, always (AD-11, AD-12)](../../../architecture/access-control.md#fail-closed-always-ad-11-ad-12).
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp).
+- **U-19 normative coverage:** Mechanism-level robustness evidence for `TR-2.1-02`, and negative/boundary evidence for `TR-2.1-05`/`TR-2.1-05A` (v1.5 §2.1 — direct and recursive PP) — headless-facade proof, not API E2E; see caveats in `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

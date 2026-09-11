@@ -102,13 +102,13 @@ None — no `bmad-ux` contract exists for platform scope.
 |---------|------|-------|
 | PM-FR-1 | PLAT-E2, PLAT-E3, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.5; PLAT-E8-S8.1 (functional role alone grants no Project-line tier) |
 | PM-FR-2 | PLAT-E2, PLAT-E3, PLAT-E5, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.4; PLAT-E5-S5.1–S5.3; PLAT-E8-S8.1–S8.4 |
-| PM-FR-3 | PLAT-E3, PLAT-E6, PLAT-E7 | PLAT-E3-S3.6 (S1/S10/S11); PLAT-E6-S6.1–S6.6 (S2–S16); PLAT-E7-S7.1–S7.3 (Shared link column + full-profile overlay) |
+| PM-FR-3 | PLAT-E3, PLAT-E4, PLAT-E6, PLAT-E7 | PLAT-E3-S3.6 (S1/S10/S11); PLAT-E4-S4.1–S4.2 (implemented consolidation hardening); PLAT-E6-S6.1–S6.6 (S2–S16); PLAT-E7-S7.1–S7.3 (Shared link column + full-profile overlay) |
 | PM/AD-24 | PLAT-E1 | PLAT-E1-S1.3, PLAT-E1-S1.4 (documentation alignment; runtime owner is UM-E0-S0.1 per coverage model) |
 | PM-FR-36, PM-FR-37, PM-FR-38 | PLAT-E1 | PLAT-E1-S1.6 |
 | PLAT-E1 | PLAT-E1 | PLAT-E1-S1.1–S1.9 |
 | PLAT-E2 | PLAT-E2 | PLAT-E2-S2.1 |
 | PLAT-E3 | PLAT-E3 | PLAT-E3-S3.1–S3.8 |
-| NFR-AC-1 | PLAT-E3, PLAT-E5, PLAT-E6, PLAT-E8 | PLAT-E3-S3.8 (kernel baseline); re-baseline obligation on E5/E6/E8 — see *Post-kernel NFR re-baseline* |
+| NFR-AC-1 | PLAT-E3, PLAT-E4, PLAT-E5, PLAT-E6, PLAT-E8 | PLAT-E3-S3.8 (kernel baseline); Epic 4's residual `seeded-two-level` measurement question remains unresolved; re-baseline obligation on E5/E6/E8 — see *Post-kernel NFR re-baseline*. This row does not claim NFR closure. |
 | NFR-AC-2, NFR-AC-3 | PLAT-E1 | PLAT-E1-S1.6 |
 
 **Referenced, not covered by this slice:**
@@ -123,7 +123,7 @@ None — no `bmad-ux` contract exists for platform scope.
 
 ## Epic List
 
-> **Numbering (2026-09-09).** Epic numbers are **identities, not an execution order**, and this list is written in authoring order. `Epic 8: Project-Line Audience` therefore appears between Epic 4 and Epic 5: it was authored in the 2026-09-02 post-kernel pass as a second `Epic 4`, and was renumbered to 8 on 2026-09-09 to resolve that collision with **Epic 4: Access Control Authorization Consolidation**. The post-kernel set is consequently **Epics 5, 6, 7 and 8** wherever this document used to write "Epics 4–7".
+> **Numbering (2026-09-09).** Epic numbers are **identities, not an execution order**. This summary is displayed in numeric order; the full Epic 8 body retains its original authoring position between Epics 4 and 5 so historical line-based evidence remains stable. Project-Line Audience was authored as a second `Epic 4` and renumbered to 8 on 2026-09-09 to resolve its collision with **Epic 4: Access Control Authorization Consolidation**. The post-kernel set is consequently **Epics 5, 6, 7 and 8** wherever this document used to write "Epics 4–7".
 
 ### Epic 1: Platform Spec v1.5 Alignment
 
@@ -149,13 +149,6 @@ Collapse the per-section authorisation predicates into one section-parameterised
 
 **FRs covered:** PM-FR-3 (hardening), NFR-AC-1
 
-### Epic 8: Project-Line Audience
-
-Derive the Project-line matrix audience from explicit PM/DM project attachments, keeping it narrower than and separate from the Reporting line.
-
-**FRs covered:** PM-FR-2, PM-FR-1 (one testable consequence)
-**Blocking gate:** `TT-IDENTITY-01` (**P0 open**)
-
 ### Epic 5: Department Walk and People Partner HR-Line
 
 Complete the Reporting-line inputs the kernel left fail-closed: department-management access over nested department membership, and People Partner propagation bounded by the HR line.
@@ -177,6 +170,13 @@ Deliver the two §3.2 access paths that are not relationship-derived audiences: 
 **FRs covered:** PM-FR-3
 **Bounds without covering:** PM-FR-27 (port only), PM-FR-39 (deferred — design boundary only)
 
+### Epic 8: Project-Line Audience
+
+Derive the Project-line matrix audience from explicit PM/DM project attachments, keeping it narrower than and separate from the Reporting line.
+
+**FRs covered:** PM-FR-2, PM-FR-1 (one testable consequence)
+**Blocking gate:** `TT-IDENTITY-01` (**P0 open**)
+
 ---
 
 ## Post-Kernel Extension (Epics 5–8) — Binding Conditions
@@ -197,13 +197,13 @@ These apply to **every** story in Epics 5, 6, 7, and 8. They are stated once and
 
 ### Production-code licensing
 
-**Production code.** Like Epics 2 and 3, every story runs the full AD-1 three-stage gate: scenario prose → independent human approval → approved red E2E → production. `status: final` on this document records that the *decomposition* is agreed; it authorizes no implementation and grants no AD-1 stage in advance.
+**Production code.** Like Epics 2 and 3, every story runs the full AD-1 three-stage **ordering**: scenario prose → committed-red E2E → production. The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI stand in its place. `status: final` on this document records that the *decomposition* is agreed; it authorizes no implementation.
 
 ### Slice-level preconditions
 
 | Precondition | Severity / status | Effect on Epics 5–8 |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)` and the interim session resolver self-provisions a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check widens the blast radius of the existing bypass rather than being protected by it. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
+| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` **returned** `Boolean(userId)` and the interim session resolver **self-provisioned** a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check would widen the blast radius of that bypass rather than being protected by it. *(Corrected 2026-09-11: the bypass described above no longer exists in code. `interim-session-resolver.adapter.ts` and `interim-access-control.adapter.ts` were deleted in `services/backend` `37a339a` (2026-09-04); `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`), and the `Bearer <token:persona>` shorthand survives only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`. The precondition stays **open pending re-adjudication** — closure needs this project's own verification run, per `blockers.yaml` `status_note` — but it no longer rests on the evidence stated here.)* |
 | `UMAC-1` / `UM-E0-S0.1` | **in-progress** | Kernel consumer adoption is incomplete. Epics 5–8 deliver facade decisions; they do not rebind `/users`. Not a deliverable of this pass. |
 | `OQ-PERM-01` | P1 open | Default role-to-permission matrix is unapproved. No story seeds, infers, or defaults a functional-role grant. |
 | `CC-07` / PM/AD-29 | **P0 open** | No `AccessJournal` table exists. Any story whose behaviour requires a journal entry (Epic 7 shared-link access) may specify the same-transaction contract but cannot produce closure evidence. |
@@ -231,7 +231,7 @@ Binding rule for Epics 5, 6 and 8 (SD-8):
 
 **Historical statement, retained for traceability.** As written on 2026-09-02: `AC-S9-S13` in `blockers.yaml` declared `blocks: [Career timeline writes, Mentorship profile projection and closure-note visibility]` — that is **S9 and S13**. Epic 6 spans S2–S16. Sections S2–S8, S14, S15, and S16 had **no** live gate ID, and S12 sat inside the `AC-S9-S13` id range while being absent from both its `blocks:` list and the Gate binding table below.
 
-**Closed 2026-09-03.** `AC-SECTION-MATRIX-01` is registered in `blockers.yaml` — owner Access Control, severity P1, `blocks:` S2–S8 and S14–S16 (naming S6, S8, S14, S15 explicitly), closure condition *an approved AD-1 increment covering S2-S8 and S14-S16, then production evidence*. It is no longer a placeholder and is cited as a live coverage `gates:` ID. The registration prerequisite on Epic 6 entering a sprint is satisfied; the **increment** remains unapproved and the gate remains open. Closing `AC-S9-S13` must not be read as unblocking any section other than S9, S12 and S13.
+**Closed 2026-09-03.** `AC-SECTION-MATRIX-01` is registered in `blockers.yaml` — owner Access Control, severity P1, `blocks:` S2–S8 and S14–S16 (naming S6, S8, S14, S15 explicitly), closure condition *a delivered AD-1 increment covering S2-S8 and S14-S16, then production evidence* — quoted from `blockers.yaml` as reworded 2026-09-11 (`revision: 2026-09-11-ad1-stage-approval-alignment`). The former *approved* qualifier tracked the per-stage human approval retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); the **increment** and its production-evidence bar are unchanged and the gate remains open. It is no longer a placeholder and is cited as a live coverage `gates:` ID. The registration prerequisite on Epic 6 entering a sprint is satisfied; the **increment** remains undelivered and the gate remains open. Closing `AC-S9-S13` must not be read as unblocking any section other than S9, S12 and S13.
 
 > Recorded consequence, **resolved 2026-09-03**: `PM-FR-26` cited `AC-S9-S13` as the gate for **S15**, outside that blocker's declared scope. On registration, `PM-FR-26` — together with `PM-FR-21`, `PM-FR-22` (S6) and `PM-FR-35` (S8) — was repointed to `AC-SECTION-MATRIX-01` and its `GATE SCOPE DEFECT` annotation retired.
 
@@ -325,13 +325,32 @@ So that PF vacancies SoT and dual-required integrations are not planned as manda
 
 **Acceptance Criteria:**
 
-- `test-design-architecture-platform`, QA, handoff, and validation cite v1.5 / current SoT.
+- The platform test-design architecture, QA, handoff and validation artifacts cite v1.5 / current SoT. Since the 2026-09-10 test-design consolidation the canonical set is: `_bmad-output/test-artifacts/test-design-architecture.md` and `test-design-qa.md` (the single platform pair, which supersedes the former [`test-design-architecture-platform.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-architecture-platform.md) / [`test-design-qa-platform.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-qa-platform.md)), the single handoff `_bmad-output/test-artifacts/test-design/people-management-handoff.md` (the former duplicate [`people-management-platform-handoff.md`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design/people-management-platform-handoff.md) is retired), and `_bmad-output/test-artifacts/test-design-validation-report.md`. The index is `_bmad-output/test-artifacts/test-design/README.md`; the disposition record is `_bmad-output/test-artifacts/test-design/migration-map.md`. Four of those canonical filenames **reuse** a filename that previously held different content, so any claim about what the superseded artifacts *said* must cite them at commit `76a7220701ac6f16843dad8b303934f9a958b54c`.
 - PeopleForce = optional prefill; no PF vacancies SoT as required.
 - Timetracker is the only required integration; DoD negatives for narrowed project-line noted; PR-B-04 re-gated.
-- **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite `gate-decision.json` ACM3-II-06 explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
-- **QUALITY-GATE-AC-NFR:** ACM-9 500-target / 2s performance evidence is tracked separately from the functional P0 gate; baseline and final artifacts are referenced by path.
+- **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`, whose rationale names ACM3-II-06 as the uncovered critical requirement) explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
+- **QUALITY-GATE-AC-NFR:** ACM-9 500-target / 2s performance evidence is tracked separately from the functional P0 gate; baseline and final artifacts are referenced by commit-pinned path.
 - Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01` — not superseded `TIMETRACKER-CONTRACT`.
 - **Evidence caveat:** Both TimeTracker gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin — record the caveat verbatim alongside gate IDs; committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4 evidence baseline).
+
+**Recorded debt (added 2026-09-10 by the test-design consolidation; this story is _not_ declared complete).**
+The consolidation updated artifact identities and dependency references only. It granted no approval,
+ran no validation, executed no suite and produced no coverage or gate result, so it does not by itself
+satisfy any acceptance criterion above.
+
+- The canonical `test-design-validation-report.md` carries verdict **NOT RUN**, and every artifact in the
+  canonical set is **approval ungranted**. A new document does not inherit the superseded documents' 2026-08-25
+  human approval or validation PASS.
+- `_bmad-output/planning-artifacts/platform/reviews/review-cross-slice-seams-2026-09-02.md:66` records that
+  completing this story would **falsely close `PM-FR-15`**. That warning stands and is not discharged here.
+- Whether this story is satisfied, partially satisfied, or made obsolete by the consolidation is **open** and
+  belongs to the platform epic owner — [`migration-map.md` §10, **U-16** at `d99b1dc`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/d99b1dcc6634e1a579d3b92dcbc3d8b7b1910f38/_bmad-output/test-artifacts/test-design/migration-map.md).
+  The sprint-status key `1-6-platform-test-design-refresh-v1-2-v1-5` is unchanged at `backlog`, and no coverage
+  field, FR mapping or gate identity was altered.
+- `QUALITY-GATE-AC-NFR` above is evaluated on ACM-9 facade-resolver evidence, while `PMC-E1-S1.9` routes
+  **directory-list** evidence into the same gate name. Which subject the gate governs is **open** — [`migration-map.md` §10, **U-25** (§6, F-15) at `d99b1dc`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/d99b1dcc6634e1a579d3b92dcbc3d8b7b1910f38/_bmad-output/test-artifacts/test-design/migration-map.md). The All Employees list ≤2-second requirement itself has **no measurement and no chosen
+  harness** (**U-24**); ACM-9 and P6 measure different subjects and are not evidence for it. Nothing here reopens,
+  closes or renames the blocker, and the standing decision that the ACM-9 CI job stays informational is undisturbed.
 
 ### Story 1.7: UM Planning Residual (Non–Epic-2–4 Scope)
 
@@ -372,7 +391,7 @@ So that Alignment work is visible for the weekend build.
 
 ## Epic 2: Access Control Foundation
 
-**Production code.** Every story runs the full AD-1 three-stage gate (scenario prose → human approval → red E2E → production).  
+**Production code.** Every story runs the full AD-1 three-stage **ordering** (scenario prose → committed-red E2E → production). The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI running the suites stand in its place.  
 **Status:** in-progress  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
@@ -384,7 +403,7 @@ As a consuming bounded context,
 I want a fail-closed Access Control facade that resolves Phase-0 relationship audiences for one or more employee targets,
 So that User Management can later replace its interim target-access adapter without re-implementing relationship logic.
 
-**Implementation gate:** The dedicated `spec-access-control-audience-foundation` Stage-1 scenarios must receive independent human AD-1 approval, then be translated to independently approved red E2E before production code begins.
+**Implementation gate:** The dedicated `spec-access-control-audience-foundation` Stage-1 scenarios must be translated to a **committed-red** E2E before production code begins. The former *independent human AD-1 approval* on each stage was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`) — nothing now blocks a Stage-2 test or production code on a reviewer; the ordering itself still holds, enforced by PR review and CI.
 
 **Acceptance Criteria:**
 
@@ -396,7 +415,7 @@ So that User Management can later replace its interim target-access adapter with
 
 ## Epic 3: Access Control Kernel MVP
 
-**Production code.** Every story runs the full AD-1 three-stage gate (scenario prose → human approval → red E2E → production).  
+**Production code.** Every story runs the full AD-1 three-stage **ordering** (scenario prose → committed-red E2E → production). The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI running the suites stand in its place.  
 **Status:** in-progress  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
@@ -471,7 +490,7 @@ So that a later section evaluator can combine the applicable matrix columns.
 - ACM-4 is validation-only and changes no production code, so it runs under the
   named validation-only evidence exception in `testing-strategy.md`. Any missing
   approved scenario coverage or concrete behavior gap halts Stage 2 onward,
-  opens a separately approved AD-1 sequence, and requires a Story Breakdown
+  opens a separate AD-1 sequence (ordering only — the per-stage approval was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`)), and requires a Story Breakdown
   re-run before the package resumes.
 
 ### Story 3.3: Deploy-Time Root User Prerequisite (ACM-0)
@@ -663,17 +682,22 @@ state, not free-text ordering:
   separately AD-1-gated remediation; a rerun that omits the failing shape does
   not supersede it.
 
-Every new behavior follows AD-1 in separate dispatches: Stage-1 scenario prose,
-human approval, Stage-2 approved red kernel integration evidence, then
-production. No dispatch may span two stages.
+Every new behavior follows the AD-1 ordering: Stage-1 scenario prose, Stage-2
+**committed-red** kernel integration evidence, then production. The per-stage
+human approval was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`),
+and with it the rule that no dispatch may span two stages — a dispatch may now
+span more than one, provided the ordering itself holds.
 
 ## Epic 4: Access Control Authorization Consolidation
 
 **Production code (kernel + UM adoption).** Crosses the AC/UM boundary
 deliberately — unlike Epic 3, which was headless.
-**Status:** backlog
+**Status:** done
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 **Raised by:** `dn-um-implementation` code review, 2026-09-03 (Dmytro Novyk)
+
+**Delivery evidence:** backend commits `b311589`, `ef03c88`, `4ce8bd8`,
+`8ec35fd`, `de508c9`, and `37a3aa3`; both tracker stories are `done`.
 
 `AccessControlFacadeAdapter` hand-writes one authorisation predicate per
 section/feature. Almost every target-scoped route asks the same question that
@@ -684,6 +708,8 @@ spec at once. Separately, `canAccessSection` still takes legacy `S1`/`S10`/`S11`
 strings — section keys must be human names (`profile:identity`, …).
 
 ### Story 4.1: Generalise section-access authorisation + human section keys
+
+**ID:** `PLAT-E4-S4.1` · **Sprint key:** `4-1-generalise-section-access-authorisation`
 
 As a consuming context and a reviewer of authorisation code,
 I want one section-parameterised gate (`@RequireSectionAccess`) driven by
@@ -697,9 +723,9 @@ sections, and reads the same as the §3.2 matrix it enforces.
 identity-card edit is a §2.2 dual gate; the feature half is a code constant
 `DEFAULT_PERMISSIONS` (per-person section-write keys every active employee
 holds), union'd with the explicit FR grant chain in the `isAllowed` evaluator.
-No `employee` policy row, no seed/bootstrap change. **Blocked on:** the
-architect solution-design pass only — the `@RequireSectionAccess` decorator/guard
-shape and the section→endpoint map.
+No `employee` policy row, no seed/bootstrap change. The architect
+solution-design prerequisite — the `@RequireSectionAccess` decorator/guard shape
+and section→endpoint map — was completed before delivery.
 
 **Full ticket:**
 `_bmad-output/implementation-artifacts/platform/story-4-1-generalise-section-access-authorisation.md`
@@ -718,11 +744,12 @@ shape and the section→endpoint map.
 - Closes the two access-control deferred-work entries ("Generalise
   section-access authorisation"; the `profile:timeline` rename follow-up).
 
-**Story split:** decided during the architect pass. Do not move 4.1 to
-`ready-for-dev` before that design and the composition decision exist. Follows
-AD-1 in separate dispatches per stage.
+**Story split:** completed during the architect pass and delivered through the
+recorded AD-1 increments.
 
 ### Story 4.2: Default org-relationship seed + retire the identity-card FR override
+
+**ID:** `PLAT-E4-S4.2` · **Sprint key:** `4-2-default-org-relationship-seed`
 
 As the person running a fresh deployment (and as a developer on a seeded dev DB),
 I want the seed to place the root identity at the top of a real reporting tree
@@ -772,9 +799,9 @@ seeded root cannot write those without being the person's PP; §2.4 is read-only
   `prisma/seed.ts` and `bootstrap-access-control.ts`; ACM-1 invariant suite
   green.
 
-**Depends on:** 4.1's composition decision (land alongside; 4.2 is not
-hard-blocked). **Blocked on:** architect solution-design for the upward-walk
-resolver change (AC-owned, its own AD-1). Follows AD-1 per stage.
+**Depends on:** 4.1's composition decision. The architect solution-design for
+the upward-walk resolver and the separate AD-1 stages were completed before
+delivery.
 
 ---
 

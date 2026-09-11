@@ -6,6 +6,7 @@
 - [access-control.md § Multi-audience merge](../../../architecture/access-control.md#multi-audience-merge) — applicable audience columns are computed independently rather than collapsed.
 - [access-control.md § Audience columns](../../../architecture/access-control.md#audience-columns-32) — PP is a separate column from Reporting.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — Stage 2 uses the public facade, real module, Prisma adapters, and migrated PostgreSQL.
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — strongest applicable audience is per section) — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

@@ -43,6 +43,7 @@
 - [access-control.md § Multi-audience merge](../../../architecture/access-control.md#multi-audience-merge) point 4 (`:284`) — "Full-profile is read-only: effective access is `max(Self, full-profile)` with write > read > none…" — the sentence AF-1's ruling disambiguates.
 - `services/backend/src/access-control/application/access-control.facade.ts:22-25` — constructor takes `resolver` and `functionalRoles`; `fullProfileOverlay: FullProfileOverlayService` is the new, third dependency this scenario's harness must supply. `:73-76` unknown-section early return; `:78-83` audience resolution and empty-target early return (both prior to the overlay branch); `:85-93` the best-of-audience loop the overlay branch runs after.
 - `services/backend/src/access-control/domain/constants/section-access-matrix.ts:12-33` — the real, unmocked matrix, exhaustively confirmed to have zero `'none'` cells across all three rows (the fact this scenario's own banner explains).
+- **U-19 normative coverage:** Partial evidence for `TR-2.4-01` and weak/mechanism-only evidence for `TR-2.4-AC` (v1.5 §2.4 — overlay over all sections) — unit-level proof against a synthetic `jest.mock`'d matrix, not an HTTP-observable effect on any shipped section today. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

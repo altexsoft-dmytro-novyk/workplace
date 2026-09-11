@@ -471,6 +471,24 @@ const p0CoveragePercentage = safePct(p0Covered, p0Total);
 const p1CoveragePercentage = safePct(p1Covered, p1Total);
 const p2CoveragePercentage = safePct(p2Covered, p2Total);
 const p3CoveragePercentage = safePct(p3Covered, p3Total);
+
+// Verification counts. `observed_pass` is the only live_observation value that means every test
+// mapped to the requirement was seen green at the commit under trace; `failing`, `observed_partial`,
+// `not_observed` and `skipped_only` all leave the mapping unproven and must not be counted here.
+const isVerified = (r) => r.live_observation === 'observed_pass';
+const verifiedRequirements = traceabilityMatrix.filter(isVerified).length;
+const verifiedPercentage = safePct(verifiedRequirements, totalRequirements);
+
+const verifiedInPriority = (priority) => traceabilityMatrix.filter((r) => r.priority === priority && isVerified(r)).length;
+const p0Verified = verifiedInPriority('P0');
+const p1Verified = verifiedInPriority('P1');
+const p2Verified = verifiedInPriority('P2');
+const p3Verified = verifiedInPriority('P3');
+
+const p0VerifiedPercentage = safePct(p0Verified, p0Total);
+const p1VerifiedPercentage = safePct(p1Verified, p1Total);
+const p2VerifiedPercentage = safePct(p2Verified, p2Total);
+const p3VerifiedPercentage = safePct(p3Verified, p3Total);
 ```
 
 ---
@@ -619,11 +637,19 @@ const coverageMatrix = {
     uncovered: uncoveredRequirements.length,
     overall_coverage_percentage: coveragePercentage,
 
+    // Verification is the second axis Step 5's gate reads, and it is not derivable from the coverage
+    // counts above: a requirement is verified only when every test mapped to it was observed passing
+    // at the commit under trace, which is `live_observation === 'observed_pass'` on the requirement.
+    // Emit these counts whenever live evidence was resolved. Omitting them is not neutral — Step 5
+    // reads their absence as verification unproven and caps the gate at CONCERNS.
+    verified_requirements: verifiedRequirements,
+    overall_verified_percentage: verifiedPercentage,
+
     priority_breakdown: {
-      P0: { total: p0Total, covered: p0Covered, percentage: p0CoveragePercentage },
-      P1: { total: p1Total, covered: p1Covered, percentage: p1CoveragePercentage },
-      P2: { total: p2Total, covered: p2Covered, percentage: p2CoveragePercentage },
-      P3: { total: p3Total, covered: p3Covered, percentage: p3CoveragePercentage },
+      P0: { total: p0Total, covered: p0Covered, percentage: p0CoveragePercentage, verified: p0Verified, verified_percentage: p0VerifiedPercentage },
+      P1: { total: p1Total, covered: p1Covered, percentage: p1CoveragePercentage, verified: p1Verified, verified_percentage: p1VerifiedPercentage },
+      P2: { total: p2Total, covered: p2Covered, percentage: p2CoveragePercentage, verified: p2Verified, verified_percentage: p2VerifiedPercentage },
+      P3: { total: p3Total, covered: p3Covered, percentage: p3CoveragePercentage, verified: p3Verified, verified_percentage: p3VerifiedPercentage },
     },
   },
 

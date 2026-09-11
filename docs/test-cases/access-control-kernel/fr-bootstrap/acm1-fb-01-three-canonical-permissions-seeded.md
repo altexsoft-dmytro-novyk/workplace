@@ -120,6 +120,7 @@
 - FR-AMD-1 Fixed Kernel Inputs — "The kernel seeds exactly three canonical permission keys: `user-management:create`, `user-management:deactivate`, and `user-management:list`."
 - [database-schema.md § Permissions](../../../architecture/database-schema.md) — "**MVP reduction:** the deploy-time permission catalog is seed/migration-owned, has no HTTP mutation surface, and contains exactly" the three keys above.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — "ACM-0 sits inside the same boundary but has no facade call to make: its subject is the deploy-time root User step, so its Stage-2 evidence runs against migrated PostgreSQL directly." ACM-1's bootstrap step is the same shape: no facade call, direct database evidence.
+- **U-19 normative coverage:** Weak/partial evidence for `TR-2.3-04` (v1.5 §2.3 — HR Admin default starting-role permission assignments) — this file records the default `hr-admin` permission set and the PO ruling (AF-2) approving it, but is seed-time evidence only, not the configuration-review/UI mechanism the row otherwise implies. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

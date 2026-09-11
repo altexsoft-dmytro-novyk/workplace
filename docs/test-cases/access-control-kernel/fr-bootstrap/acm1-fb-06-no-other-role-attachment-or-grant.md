@@ -22,6 +22,7 @@
 - FR-AMD-1 [Seed Contract](../../../../_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/fr-architecture-amendment.md) — "There are no other seed-owned default grants."
 - [database-schema.md § Kernel MVP seed contract](../../../architecture/database-schema.md) — "There are no other seed-owned default grants."
 - [access-control.md § Functional-role Kernel MVP (AD-4)](../../../architecture/access-control.md) — "There are no other seed-owned default grants. On a fresh database those are the exact FR rows."
+- **U-19 normative coverage:** Weak/partial evidence for `TR-2.3-04` (v1.5 §2.3 — HR Admin default starting-role permission assignments) — proves no extra default grant exists beyond the canonical set; also confirms by omission that `TR-2.3-01`'s runtime role/permission catalog has no scenario here (this suite adds no `/roles` surface). See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

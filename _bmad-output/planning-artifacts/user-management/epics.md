@@ -16,9 +16,9 @@ updated: 2026-09-03
 
 ## Overview
 
-This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
+This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
 
-Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../../docs/architecture/api-conventions.md), [database-schema.md](../../../../docs/architecture/database-schema.md), and the stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../../docs/test-cases/user-management/README.md). **Note (2026-08-27):** CAP-1 `registration/um-reg-*` retired per spec v1.5; Story 1.1 uses `um-seed-*`.
+Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../docs/architecture/api-conventions.md), [database-schema.md](../../../docs/architecture/database-schema.md), and the stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../docs/test-cases/user-management/README.md). **Note (2026-08-27):** CAP-1 `registration/um-reg-*` retired per spec v1.5; Story 1.1 uses `um-seed-*`.
 
 ## Requirements Inventory
 
@@ -81,6 +81,13 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 
 ### FR Coverage Map
 
+### Canonical People Management PRD traceability
+
+| Canonical requirement | Scope in this slice | Story links |
+|---|---|---|
+| `PM-FR-13` | Employee self-service: upload a personal photo | `UM-E1-S1.3` (mentoring availability is in `M-E1-S1.1`) |
+| `PM-FR-40` | Relationship and grant journal | `UM-E4-S4.1`, `UM-E4-S4.2`, `UM-E4-S4.3` |
+
 | FR | Epic |
 |---|---|
 | FR-16 | Epic 0 — real facade adoption + `ACCESS_CONTROL_PORT` rebind (interim adapter removed) + minimal S1-card projection |
@@ -105,6 +112,11 @@ N/A — no UX design contract exists for this domain (no `bmad-ux` run has produ
 > **Note (2026-09-03, `bmad-create-epics-and-stories` re-entry for `PM-FR-5`).** `FR-17`'s row above names five things as one deferred "Profile Projection story": S10/S11 colleague narrowing, S16 per-field custom-field visibility, S7/S8 flags, and S1 derived-field immutability. That placeholder predates this document's own Epic 0 sequencing note ("the FR-17 Profile Projection story owns only the S10/S11/S16 colleague views... and is decoupled from this epic") and has never been written as an actual epic — no story body for it exists anywhere in this file. This pass writes the **S16 custom-field-visibility** slice of that placeholder as Epic 8 and Epic 7, closing that portion. The S10/S11 colleague-narrowing, S7/S8 flag, and S1 derived-field-immutability portions remain unwritten and out of this pass's requested scope (`PM-FR-5`, `PM-FR-6`, `PM-FR-9` only) — they stay a real, recorded gap under the global coverage model's `PM-FR-4` alias (`aliases: [UM-FR-16, UM-FR-17]`), not silently closed by Epic 8/7's existence.
 
 ## Epic List
+
+> **Numbering (2026-09-09).** Epic numbers are identities, not execution order.
+> This summary is displayed numerically even though Epic 7 depends on Epic 8;
+> the full bodies retain their authoring order to preserve historical evidence
+> references.
 
 ### Epic 0: Access Control Adoption
 Rebind `ACCESS_CONTROL_PORT` in `user-management.module.ts` to a real `AccessControlFacade`-backed adapter in `src/user-management/infrastructure/` and delete the interim adapter in the same cutover (AD-21, no dual-running). Adopt the `GET /users/:id` read path now — `200` with `{ data, canEdit }` (`data` = the minimal **S1 identity card**, `canEdit` = the read-only dual-gate hint, `false` for all until `user-management:edit` is seeded) for any active viewer over an active target (Self, reporting, assigned PP, **or colleague**: §3.2 S1 row is `R` for the Colleague column); denials are `401` (unresolved session) and `403` (authenticated active viewer, empty audience). Story 0.1 replaces `toUserResponse`'s whole-row spread with the `{ data, canEdit }` mapper on that handler; the `{ data, canEdit }` envelope becomes the section/detail-read convention (rolled onto other routes as its own item). Put `PATCH /users/:id` and `PUT /users/:id/photo` behind the §2.2 dual gate once a `user-management:edit` permission exists. Proven by a real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E with no provider overrides (AD-3). A **dedicated small epic**, not a story under Epic 1, because it is a cross-cutting port-rebind cutover touching the same controller as Epic 1 Story 1.2 and needs its own real-consumer E2E (architect handoff §1). **Numbered Epic 0** so it runs before Epic 1's write paths; its read path can start now because ACM-8 made the facade DI-resolvable from `AppModule`.
@@ -138,14 +150,6 @@ Authorized HR actors record departure and the platform applies its complete effe
 Epics 4–5 shipped the write paths for organisational facts and departure but no way to read the current value, the ids a follow-up mutation needs, or names for the UUIDs the access journal and blocker panel render. Six independent UM-owned read endpoints (relationships, department catalog + memberships, departure list, batch identity lookup, photo delete, combined active+dismissed list) so the already-built G4/G5 frontend stops working around gaps.
 **FRs covered:** read completeness for FR-6, FR-9, FR-10, FR-15, §3.4 — no new product behaviour.
 
-### Epic 8: Custom Fields as Data
-*(added 2026-09-03, `bmad-create-epics-and-stories` re-entry — closes the S16 custom-field-visibility slice of the `FR-17` "deferred Profile Projection story" placeholder; see the FR Coverage Map note above)*
-
-A holder of `manage custom fields` (role-administration's catalog) defines a new custom field with a declared visibility level, values are set on profiles through typed EAV storage (PM/AD-32), and a viewer's profile response includes a field's value only when both their resolved section access and the field's own visibility permit it.
-**FRs covered:** PM-FR-5 (storage + declared visibility half)
-**Depends on (outside this file):** `role-administration/epics.md` Epic RA-E1 — the `manage custom fields` permission key and a working `isAllowed` must exist before this epic's enforcement has anything to check. **Do not stub the check** — `interim-access-control.adapter.ts`'s `Boolean(userId)` pattern (`SEC-AUTH-01`) is the negative example this epic must not repeat.
-**Cross-boundary note:** visibility is *declared* here and *stored* here, but it is *enforced* by `access-control`'s facade before filter/sort execution (PM/AD-32) — this epic supplies data, not the enforcement point. `PLAT-E6-S6.6` (S16 section-matrix resolution) consumes `CustomFieldDefinition.visibility` from this epic's storage.
-
 ### Epic 7: Visibility-Safe Filtering and Columns
 *(same addition)*
 
@@ -153,6 +157,14 @@ A directory user's columns, sort options, filter options, and filter results for
 **FRs covered:** PM-FR-5 (anti-inference completion)
 **Depends on:** Epic 8 (this file) — *Custom Fields as Data*, renumbered from Epic 6 on 2026-09-09. A higher epic number is **not** a later slot: numbers are identities, so Epic 7 legitimately depends on Epic 8
 **Gate note:** `PMC-E1-S1.8` (`platform-capabilities/epics.md`) and `PLAT-E6-S6.6` (`platform/epics.md`) both gate specifically on **this epic**, not on Epic 8 alone — closing Epic 8 without Epic 7 would ship custom-field filtering ahead of anti-inference enforcement, the exact NFR-1 critical leak both of those stories were sequenced last to avoid. Per their own recorded text, the two must not be unblocked independently of each other.
+
+### Epic 8: Custom Fields as Data
+*(added 2026-09-03, `bmad-create-epics-and-stories` re-entry — closes the S16 custom-field-visibility slice of the `FR-17` "deferred Profile Projection story" placeholder; see the FR Coverage Map note above)*
+
+A holder of `manage custom fields` (role-administration's catalog) defines a new custom field with a declared visibility level, values are set on profiles through typed EAV storage (PM/AD-32), and a viewer's profile response includes a field's value only when both their resolved section access and the field's own visibility permit it.
+**FRs covered:** PM-FR-5 (storage + declared visibility half)
+**Depends on (outside this file):** `role-administration/epics.md` Epic RA-E1 — the `manage custom fields` permission key and a working `isAllowed` must exist before this epic's enforcement has anything to check. **Do not stub the check** — `interim-access-control.adapter.ts`'s `Boolean(userId)` pattern (`SEC-AUTH-01`) is the negative example this epic must not repeat.
+**Cross-boundary note:** visibility is *declared* here and *stored* here, but it is *enforced* by `access-control`'s facade before filter/sort execution (PM/AD-32) — this epic supplies data, not the enforcement point. `PLAT-E6-S6.6` (S16 section-matrix resolution) consumes `CustomFieldDefinition.visibility` from this epic's storage.
 
 ### Epic Sequencing / Parallelization
 

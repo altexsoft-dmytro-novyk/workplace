@@ -19,7 +19,7 @@ updated: 2026-09-02
 
 This document is a **new bounded-context slice** decomposing exactly **4 canonical PRD requirements** into implementable stories: the platform-owned resourcing request lifecycle (`PM-FR-23`–`PM-FR-26`).
 
-**Canonical requirement source:** [prd.md](../prds/prd-people-management-2026-08-24/prd.md) §4.8 — `PM-FR-*` IDs and §-refs are taken from there and from [docs/project-requirements.md](../../docs/project-requirements.md) §4.7.
+**Canonical requirement source:** [prd.md](../prds/prd-people-management-2026-08-24/prd.md) §4.8 — `PM-FR-*` IDs and §-refs are taken from there and from [docs/project-requirements.md](../../../docs/project-requirements.md) §4.7.
 
 **User journey anchor:** UJ-1 (Carlos the DM evaluates a proposed internal candidate via a request-bound share link, or reviews an external candidate by stored PeopleForce ID).
 
@@ -61,7 +61,7 @@ Stories in this slice use **`RS-E{epic}-S{story}`**.
 
 | Precondition | Severity / status | Why it precedes every epic |
 |---|---|---|
-| `SEC-AUTH-01` — interim target-auth cutover | **P0 open** | Interim adapter permits every operation on every target. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
+| `SEC-AUTH-01` — interim target-auth cutover | **P0 open** | The interim adapter **permitted** every operation on every target. *(Corrected 2026-09-11: the bypass described above no longer exists in code. `interim-session-resolver.adapter.ts` and `interim-access-control.adapter.ts` were deleted in `services/backend` `37a339a` (2026-09-04); `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`), and the `Bearer <token:persona>` shorthand survives only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`. The precondition stays **open pending re-adjudication** — closure needs this project's own verification run, per `blockers.yaml` `status_note` — but it no longer rests on the evidence stated here.)* |
 | `DEPARTMENT-EDGE` | **P1 open** | Department entity and membership writer absent; routing is undefined without it |
 | `OQ-PERM-01` | **P1 open** | `create` / `fulfil` / `approve` / `close` resourcing permissions are FR-6 grants; default matrix unapproved — do not seed or infer |
 | S15 facade support | **P1 open** | `AccessControlFacade` supports S1/S10/S11 kernel only (ACM-5); S15 read projection needs an access-control increment |

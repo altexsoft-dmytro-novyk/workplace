@@ -6,7 +6,7 @@ updated: '2026-08-30'
 revision: 2
 status: 'awaiting-user-management-owner'
 blocks:
-  - ACF-1 gate (FAIL — see _bmad-output/test-artifacts/gate-decision.json)
+  - ACF-1 gate (FAIL — see https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json at c342138)
   - spec-access-control-facade-audience-resolution (whole slice)
 context:
   - '{project-root}/_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md'

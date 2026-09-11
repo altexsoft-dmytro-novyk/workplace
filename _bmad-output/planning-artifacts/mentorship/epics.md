@@ -92,6 +92,14 @@ profile section have no UX contract yet; recorded for later.
 | FR-M2, FR-M8, FR-M15, FR-M16, FR-M17 | `M-E1-S1.5` | Story 1.5 — S13 projection, profile-header mentor, directory filter |
 | FR-M14 | `M-E1-S1.6` | Story 1.6 — Departure auto-close |
 
+### Canonical People Management PRD traceability
+
+| Canonical requirement | Scope in this slice | Story links |
+|---|---|---|
+| `PM-FR-13` | Employee self-service: mentoring availability | `M-E1-S1.1` (personal photo upload is in `UM-E1-S1.3`) |
+| `PM-FR-33` | Mentorship assignment, manual closure, and departure auto-close | `M-E1-S1.3`, `M-E1-S1.4`, `M-E1-S1.6` |
+| `PM-FR-34` | Willing pool, pair views, mentor header, and directory status | `M-E1-S1.2`, `M-E1-S1.5` |
+
 ## Epic List
 
 ### Epic 1: Mentorship Hub

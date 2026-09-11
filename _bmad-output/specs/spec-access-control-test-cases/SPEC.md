@@ -13,7 +13,11 @@ sources: []
 > (`_generate_matrix.py`, `_generate_hand.py`) were deleted with it. This file is
 > kept as the record of what was authored and why, not as an active contract.
 
-> **Canonical contract.** This SPEC and the files in `companions:` are the complete, preservation-validated contract for what to build, test, and validate. **171 Phase 1 scenario files are drafted** under `docs/test-cases/access-control/` — pending per-file AD-1 approval before stage-2 E2E.
+> **Historical contract (superseded).** The text below describes the retired 171-file suite.
+> Active access-control scenarios live under `docs/test-cases/access-control-foundation/` (9 scenario documents)
+> and `docs/test-cases/access-control-kernel/` (90 scenario documents), for 99 scenario documents;
+> the two README files bring the raw Markdown count to 101. Per-file AD-1 approval between stages
+> was removed 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`).
 
 # Access-Control Test-Case Suite (Phase 1)
 

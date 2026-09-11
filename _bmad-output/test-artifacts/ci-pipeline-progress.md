@@ -25,7 +25,7 @@ Operator: User. Date: 2026-09-04.
 | `test_framework`      | Jest (backend, unit + e2e) and Playwright (frontend)                          |
 | `ci_platform`         | `github-actions` (existing `.github/workflows/`)                              |
 | Node version          | 24 — `services/backend/.nvmrc`; frontend has no `.nvmrc`, same major applied  |
-| `tea_use_pactjs_utils`| true in config, **no contract artifacts in repo** → jobs skipped              |
+| `tea_use_pactjs_utils`| true in config; no contract artifacts at the service SHAs inspected on 2026-09-04 → contract jobs skipped in this setup run |
 | `tea_use_playwright_utils` | true in config, **`@seontechnologies/playwright-utils` absent** → burn-in runner unavailable |
 
 ### Local test execution
@@ -91,10 +91,12 @@ against one shared Postgres and cannot be split without per-shard databases. The
 frontend suite could shard, but fragmenting the JSON reports complicates the
 evidence aggregation before a first clean run exists.
 
-**Contract testing: skipped, with reason.** `tea_use_pactjs_utils` is true, but
-there is no `pact/` or `tests/contract/` directory, no `.pacttest.ts` file, and
-neither `@pact-foundation/pact` nor `@seontechnologies/pactjs-utils` is a
-dependency. Wiring the jobs in would fail every build on a missing script.
+**Contract testing was skipped in the 2026-09-04 setup run.** At the service
+SHAs inspected in that run, there was no Pact suite or `test:contract` script,
+so wiring a job then would have failed. This no longer describes current
+`main`: both pinned services now contain Pact suites and scripts, although the
+workspace workflow still does not invoke them. See `docs/ci.md` for current
+status.
 
 ## Step 3b — Live verification evidence (additional scope)
 
@@ -105,8 +107,10 @@ run from `contract_static` to observed evidence.
 
 Requirement resolution, in order:
 
-1. exact `(file, title)` lookup against the newest
-   `tea-trace-coverage-matrix*.json` — the mapping the last trace run resolved;
+1. exact `(file, title)` lookup against `tea-trace-coverage-matrix.json` — the
+   mapping the last trace run resolved. The lookup globs
+   `tea-trace-coverage-matrix*.json` and takes the newest by `generated_at`, so a
+   stray copy cannot shadow the canonical file;
 2. fallback: longest oracle ID found in the test's title chain, innermost first.
    Oracle IDs are derived from `docs/test-cases/**` filenames
    (`um-rel-09-pp-atomic-replace.md` → `UM-REL-09`, `acm1r-fb-16-…` → `ACM1R-FB-16`).

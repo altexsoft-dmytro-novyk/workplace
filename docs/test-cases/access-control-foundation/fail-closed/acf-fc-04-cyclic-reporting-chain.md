@@ -2,6 +2,8 @@
 
 **Trace:** §7 · AD-11 · AD-12 · ACF-1
 
+**U-19 normative coverage:** Robustness evidence for `TR-2.1-02` (v1.5 §2.1 — transitive Reporting line) and meta-level support for `TR-7-01`. Already uses the resolver audience-set assertion pattern; not invalidated. See `test-design-qa.md` § Normative coverage map.
+
 **Approved:** Anna Pikula, 2026-08-30
 
 ## Scenario

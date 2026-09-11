@@ -1,8 +1,8 @@
 # Test-Case Authoring Pattern
 
-**Binding for every feature area.** This is stage 1 of the three-stage quality gate ([testing-strategy.md](../architecture/testing-strategy.md), AD-1): scenario doc → developer approval → E2E translated from it line by line (committed red) → production code. No production code without an approved scenario file behind it.
+**Binding for every feature area.** This is stage 1 of the three-stage quality gate ([testing-strategy.md](../architecture/testing-strategy.md), AD-1): scenario doc → E2E translated from it line by line (committed red) → production code. No production code without its corresponding committed-red Stage-2 test in history.
 
-`access-control/` is the reference implementation — v1.5 Phase 1 scenarios live in [access-control/](access-control/) (167 draft files, 2026-08-29). Contract: [SPEC-access-control-test-cases](../../_bmad-output/specs/spec-access-control-test-cases/SPEC.md). [`user-management/`](user-management/) remains the approved worked example for workflow scenarios; treat "proven in access-control's suite" as **draft until AD-1 per-file approval**.
+`access-control-foundation/` and `access-control-kernel/` are the reference implementation — v1.5 Phase 1 scenarios live in [access-control-foundation/](access-control-foundation/) and [access-control-kernel/](access-control-kernel/) (99 scenario documents combined: 9 foundation and 90 kernel, verified 2026-09-11 with README files excluded; the raw Markdown count is 101 when both READMEs are included — see [Implemented-test inventory](../../_bmad-output/test-artifacts/test-design-qa.md#implemented-test-inventory--verified-u-23-resolved-2026-09-11); supersedes the dead `access-control/` path and the 167/171 figures). Contract: [SPEC-access-control-test-cases](../../_bmad-output/specs/spec-access-control-test-cases/SPEC.md). [`user-management/`](user-management/) remains the worked example for workflow scenarios; treat "proven in access-control's suite" as present scenario evidence only — **unexecuted until a corresponding committed-red Stage-2 test exists**.
 
 ## Structure
 

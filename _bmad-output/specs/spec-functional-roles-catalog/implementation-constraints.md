@@ -72,7 +72,7 @@ foundation. The exact catalog decomposition follows its Stage-1 document.
 
 ## Verification obligations
 
-Production work starts only after independently approved Stage-1 scenarios and Stage-2 E2E committed red (AD-1). No dispatch spans two stages.
+Production work starts only after Stage-1 scenarios exist and Stage-2 E2E are committed red (AD-1 ordering only — the per-stage human approval was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`), and with it the rule that no dispatch spans two stages).
 
 Automation candidates:
 

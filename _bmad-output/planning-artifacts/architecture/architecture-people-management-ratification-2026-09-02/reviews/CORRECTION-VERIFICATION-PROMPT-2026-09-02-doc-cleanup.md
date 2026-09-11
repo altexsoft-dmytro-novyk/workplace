@@ -73,7 +73,7 @@ with mechanical counts recomputed from `blockers.yaml`.
 
 UMAC `approvals.yaml` / `stories.yaml` bodies / umac-05 / committed-red tests;
 both spines’ pre-2026-09-02 amendment history; approved Sprint Change Proposal
-bodies; `gate-decision.json` ACM3-II-06 FAIL; ratification memlog prior entries;
+bodies; [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`) ACM3-II-06 FAIL; ratification memlog prior entries;
 `TD-10` retired row retained; `CONFLICT-UM-01` dual-axis status model.
 
 ## Mechanical validation

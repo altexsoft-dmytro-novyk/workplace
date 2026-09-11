@@ -31,10 +31,10 @@ It runs, it publishes, its conclusion stays neutral, and no branch protection
 rule can block a merge on it.
 
 Backend unit and Frontend Playwright started out under that same posture and
-have since been **promoted**. Both were observed green on a run at the service
-SHAs `main` currently pins — backend `20ed2a08` at 19/19, frontend `cfbed35` at
-124/124 with the Playwright report showing no flaky cases — so their
-`continue-on-error` is gone and a red result there fails the run for real.
+have since been **promoted**. On the promotion run, backend `20ed2a08` passed
+19/19 and frontend `cfbed35` passed 124/124, with the Playwright report showing
+no flaky cases. Their `continue-on-error` is therefore gone and a red result
+now fails the run for real.
 
 Promoting `backend-e2e` means deleting **all four** of its
 `continue-on-error: true` lines: the job-level one and the three on
@@ -59,8 +59,11 @@ The `Live verification evidence` job downloads the three runner reports and call
 which writes `_bmad-output/test-artifacts/live-verification-results.json` in the
 schema trace expects. It maps each executed test to a requirement two ways:
 
-1. exact `(file, title)` lookup against the newest
-   `_bmad-output/test-artifacts/tea-trace-coverage-matrix*.json`;
+1. exact `(file, title)` lookup against
+   `_bmad-output/test-artifacts/tea-trace-coverage-matrix.json`, the mapping the
+   last trace run resolved. The lookup globs `tea-trace-coverage-matrix*.json`
+   and takes the newest by `generated_at`, so a stray copy cannot shadow the
+   canonical file — but only that one name should ever be committed;
 2. failing that, the first oracle ID found in the test's title chain, innermost
    describe first (`um-rel-09-pp-atomic-replace.md` → `UM-REL-09`). A single
    trailing letter is treated as a sub-case of the same scenario, so
@@ -125,10 +128,14 @@ apply migrations, run the suite, write a jest JSON report.
   not a dependency, so the `runBurnIn` selector the TEA guidance prefers is not
   available. Now worth revisiting for the two promoted suites, which do have a
   green baseline; `backend-e2e` still does not.
-- **Contract testing.** `tea_use_pactjs_utils` is on in `_bmad/tea/config.yaml`,
-  but the repo has no pact directory, no `.pacttest.ts` files, and neither
-  `@pact-foundation/pact` nor `@seontechnologies/pactjs-utils` as a dependency.
-  Wiring the jobs in now would fail every build on a missing script.
+- **Contract testing.** Both service revisions pinned by workspace `main`
+  provide a `test:contract` script and use `@pact-foundation/pact` directly.
+  The frontend has five consumer suites under `contract/` and a recorded pact
+  under `pacts/`; the backend has provider verification under `test/contract/`.
+  `.github/workflows/tests.yml` does not currently invoke either script, so
+  contract testing exists in the services but is not run by workspace CI.
+  `@seontechnologies/pactjs-utils` is not a dependency and is not required by
+  these suites.
 
 ## Troubleshooting
 

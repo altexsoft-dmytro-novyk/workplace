@@ -68,7 +68,7 @@ nobody yet.
 
 The systemic gaps — missing AD-1 approval, the provisional HTTP mapping, and the
 dormant module — are recorded separately as `gate_status: FAIL` in
-`_bmad-output/test-artifacts/gate-decision.json`. These entries are the specific
+[`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`). These entries are the specific
 technical ones underneath that verdict.
 
 - source_spec: none

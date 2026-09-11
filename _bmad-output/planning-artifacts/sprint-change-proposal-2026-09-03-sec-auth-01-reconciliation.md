@@ -43,7 +43,7 @@ Discovered via manual cross-branch code review (this session), not a failing sto
 
 **Rationale for not closing the blocker outright:**
 - The evidence lives on an unmerged, unreviewed branch.
-- This project closes P0 blockers only through its own verification process (cf. `QUALITY-GATE-AC`, closed against an independently-evaluated `gate-decision.json`) — nothing here has gone through that.
+- This project closes P0 blockers only through its own verification process (cf. `QUALITY-GATE-AC`, closed against an independently-evaluated [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/a62e705/_bmad-output/test-artifacts/gate-decision.json) (`PASS` at `a62e705`)) — nothing here has gone through that.
 - `TD-02`'s `deploy_gate` is explicitly independent of the code fix itself — deployment-readiness and defect-fixed-in-diff are different questions.
 
 **Effort:** Low (12 targeted edits, all additive). **Risk:** Low (no rewritten content; `verify-coverage.py` re-run confirms all 7 validator sections still `PASS`).

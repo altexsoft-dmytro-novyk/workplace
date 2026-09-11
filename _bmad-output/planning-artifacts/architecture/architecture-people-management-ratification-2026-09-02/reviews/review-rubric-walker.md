@@ -106,7 +106,7 @@ weakens the "latent, not live" framing. Refusing to downgrade on latency is the 
 
 ### A7. `QUALITY-GATE-AC` matches the gate artifact verbatim
 
-`_bmad-output/test-artifacts/gate-decision.json`: `gate_status: FAIL`, `p0_status: NOT_MET`,
+[`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`): `gate_status: FAIL`, `p0_status: NOT_MET`,
 `critical_open: 1`, `evaluated_at: 2026-08-31`, rationale naming `ACM3-II-06`. Every element of the
 blocker note is present in the artifact. Naming the requirement explicitly is the right call: it stops
 an uncovered fail-closed security invariant reading as paperwork.
@@ -579,7 +579,7 @@ action:** note it as deliberately out of scope in `OQ-118`, or accept as-is.
 #### L5. Minor: the `ACM-0..ACM-9` range label is not exact
 
 §11 refers to *"ACF-1, ACM-0..ACM-9"*. The AC spine actually carries `ACM-0`…`ACM-5`, `ACM-8`, `ACM-9`
-— `ACM-6` and `ACM-7` do not appear. The range label matches `gate-decision.json`'s target label
+— `ACM-6` and `ACM-7` do not appear. The range label matches [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json)'s (`c342138`) target label
 (*"Access Control Kernel MVP (ACM-0..ACM-9)"*), so it is inherited rather than invented. Only worth
 fixing when C1 is addressed and these IDs get enumerated individually.
 

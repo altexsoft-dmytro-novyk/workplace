@@ -382,6 +382,7 @@ Note: This workflow does not generate tests. If gaps exist, run `/bmad-testarch-
 | P1 Test Pass Rate      | ≥{min_p1_pass_rate}%      | {p1_pass_rate}%      | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
 | Overall Test Pass Rate | ≥{min_overall_pass_rate}% | {overall_pass_rate}% | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
 | Overall Coverage       | ≥{workflow.overall_coverage_minimum}% | {overall_coverage}% | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
+| Verified Coverage      | ≥{workflow.verified_coverage_target}% PASS / ≥{workflow.verified_coverage_minimum}% CONCERNS | {verified_coverage}% | {✅ PASS | ⚠️ CONCERNS | ❌ FAIL} |
 
 **P1 Evaluation**: {✅ ALL PASS | ⚠️ SOME CONCERNS | ❌ FAILED}
 
