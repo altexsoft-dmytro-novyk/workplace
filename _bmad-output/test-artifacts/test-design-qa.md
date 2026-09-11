@@ -990,14 +990,14 @@ may ship.** Every gate below is **ungranted** — naming a gate is not passing i
 > "approved UM" set that becomes epic plans with **ungranted** approval. **No successor gate.** The
 > targeted follow-up it named is executed by the migration itself.
 
-> **A recorded conflict this document does not resolve, and does not rely on.**
-> `docs/architecture/testing-strategy.md` contradicts itself about per-stage approval in **two**
-> places — line **84** ("Each scenario still stops for its own human approval before stage 2") and
-> lines **117–119** ("Preserve AD-1 unchanged: scenario prose, independent human approval, …") —
-> against its own lines 25–38. Ruling D-1 resolves it in favour of lines 25–38 for this document's
-> purposes. **No gate here relies on line 84 or on lines 117–119.** A binding document contradicting
-> itself twice is a defect **its owner must fix** — that is **U-18**, and **this migration edits
-> nothing under `docs/architecture/`.**
+> **U-18 resolved 2026-09-11 by the document's owner (Architect).**
+> `docs/architecture/testing-strategy.md` used to contradict itself about per-stage approval in
+> **two** places — line **84** ("Each scenario still stops for its own human approval before stage
+> 2") and lines **117–119** ("Preserve AD-1 unchanged: scenario prose, independent human approval,
+> …") — against its own lines 25–38. Ruling D-1 had already resolved which reading governs this
+> document's purposes (lines 25–38); the owner has now edited both contradicting locations to match
+> that authority, so neither line states a per-stage human-approval requirement any more. See §10.1
+> and the `plat:DG-01` row of `test-design/migration-map.md` §5.8 for the closure record.
 
 ### Release gates
 
@@ -1470,7 +1470,7 @@ history, is `test-design/migration-map.md` §10.
 | **U-13** | Whether the application should proactively log out on a timer or `visibilitychange` | Product | [Not in scope — frontend](#not-in-scope--frontend) |
 | **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete | Platform epic owner | Story 1.6 artifact references |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the five register entries that remain open | Architect + the per-entry owners | `DG-02`, the coverage plan's blocked rows |
-| **U-18** | `docs/architecture/testing-strategy.md` retains the removed per-stage approval clause in **two** places (`:84` and `:117–119`), contradicting its own lines 25–38. Which sentence does the document intend to keep? | Owner of `docs/architecture/testing-strategy.md` (Architect) | `DG-01`. **This migration edits nothing under `docs/architecture/`** |
+| **U-18** | **Resolved 2026-09-11** — the document's owner (Architect) edited both `:84` and `:117–119` to match the authority named by ruling D-1 (lines 25–38); no reading of `docs/architecture/testing-strategy.md` now states a per-stage human-approval requirement | Owner of `docs/architecture/testing-strategy.md` (Architect) | `DG-01` |
 | **U-19** | Which of the **101** access-control scenario files covers which of the **119** normative trace rows | Access Control owners + QA | [Normative coverage map](#normative-coverage-map). Currently unanswerable from any artifact, and **must not be guessed from filenames** |
 | **U-20** | Now that the per-file-approval rationale is retired, what **recorded condition** makes access control schedulable, and who evaluates it | Platform epic owner + Architect | [`PG-01`](#release-gates). The gate correctly stays **not schedulable**; its replacement rationale is three currently-open blockers, a state that could change without anyone being obliged to notice |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk | Owner of `docs/test-cases/user-management/**` | Out of scope for this migration, which modifies no scenario file |
