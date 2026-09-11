@@ -80,7 +80,7 @@ HTTP/list route), contract **B** (the ACM-9 facade resolver) and contract **C** 
 is **never** evidence for another. See [NFR measurement contracts](#nfr-measurement-contracts).
 
 **What this document deliberately does not settle.** Open questions — U-4, U-5, U-6, U-9, U-10,
-U-11, U-13, U-16, U-17, U-21..U-22 — remain open; **U-2**, **U-12**, **U-18**, **U-19**, **U-20**,
+U-11, U-13, U-17, U-21..U-22 — remain open; **U-2**, **U-12**, **U-16**, **U-18**, **U-19**, **U-20**,
 **U-23**, **U-24**, and **U-25** are resolved below. This document **answers none of the still-open items
 them**. `DEC-UM-012` remains a **draft decision**. No unknown threshold is filled in anywhere. See
 [Unknown thresholds](#unknown-thresholds) and [Open questions](#open-questions).
@@ -651,7 +651,12 @@ result mapping — **not** an HTTP list route.
 plus the absolute worst case.
 - **Threshold:** **fail when warm p95 *or* worst case exceeds 2 s**, per shape.
 - **Evidence:** `measurement (ACM9-MVP-v1)`; artifacts under
-`_bmad-output/test-artifacts/performance/`. Tracked as blocker `QUALITY-GATE-AC-NFR`.
+`_bmad-output/test-artifacts/performance/`. The immutable paired evidence is the
+[baseline JSON at `3a3cd71`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-baseline-acm9-1788721821722-afd2fdac4a45.json)
+and [final JSON at `3a3cd71`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-final-acm9-1788722145229-13b089a4cb9f.json).
+Both are `PASS`; the final records the baseline run ID. They are **Contract B only** and
+cannot discharge functional P0 coverage or the Contract A / `PG-04` directory gate. Tracked as
+blocker `QUALITY-GATE-AC-NFR`.
 - **The ACM-9 CI job stays informational.** That is a standing repository decision, it is **not
 disturbed here**, and **this document proposes no promotion of it to a blocking check.**
 Promoting an informational job to a required check is repository governance, outside a migration
@@ -1276,6 +1281,16 @@ percentage must **never** be presented as release readiness, and `gate-decision.
 unless a run issues a verdict. **This migration issues no verdict and regenerates no trace
 artifact.** (AGENTS.md § Trace artifacts; `_bmad/custom/bmad-testarch-trace.toml`.)
 
+### Historical functional P0 baseline — not a current verdict
+
+The immutable [historical `gate-decision.json` at `c342138`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138035e8189665955453e5b5308a20a2ed00/_bmad-output/test-artifacts/gate-decision.json)
+evaluated the Access Control Kernel MVP on 2026-08-31. It recorded `gate_status: FAIL`,
+`p0_status: NOT_MET`, `critical_open: 1`, with `ACM3-II-06` as the uncovered critical requirement.
+This is open functional-P0 debt, not a green result to inherit or paper over. That historical gate
+could close only with `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and coverage of
+`ACM3-II-06`. It does not create a current release verdict; the current whole-repository trace
+remains a planning audit as stated above.
+
 ---
 
 
@@ -1752,7 +1767,7 @@ owner is not resolving a question. The register of record is `test-design/migrat
 | **U-11** | Frontend performance budgets, frontend accessibility requirements, photo-upload size limits                                                                                                                                                                    | Product Owner                                                               | [Unknown thresholds](#unknown-thresholds), `P2-PLAT-01`                                                                                                                                                                                                                  |
 | **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx` next to the file under test; a second config, `vitest.config.ts`, separate from `vitest.contract.config.ts` and `playwright.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. Backend keeps its existing co-located `*.spec.ts` under `src/`. Authority is `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), proven by two passing specs; **not yet merged to `main`** | DEV                                                                         | [Frontend execution](#frontend) — was a prerequisite for **all** frontend net-new work; unblocked once the branch merges                                                                                                                                                |
 | **U-13** | Whether the application should proactively log out on a timer or `visibilitychange`                                                                                                                                                                            | Product                                                                     | [Not in scope — frontend](#not-in-scope--frontend)                                                                                                                                                                                                                       |
-| **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete                                                                                                                                                                      | Platform epic owner                                                         | Story 1.6 artifact references                                                                                                                                                                                                                                            |
+| **U-16** | **Resolved 2026-09-12** — Story 1.6 is satisfied as a documentation/evidence refresh; its completion does not close functional P0 debt, a runtime gate, or a product requirement | Platform epic owner | Story 1.6 completion record; historical P0 baseline and Contract-B evidence above |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the **six** register entries that remain open (corrected 2026-09-11 — was "five"; `test-design-architecture.md` § Dependencies names them). **Partially re-verified, not resolved**: `CC-07` and `CC-05` were re-checked against the actual baseline commit — both were **partial**, not "absent" as previously recorded; see `test-design-architecture.md` § Open blockers and § Ratified design decisions for the corrected rows and named remaining gaps | Architect + the per-entry owners                                            | `DG-02`, the coverage plan's blocked rows                                                                                                                                                                                                                                |
 | **U-18** | **Resolved 2026-09-11** — the document's owner (Architect) edited both `:84` and `:117–119` to match the authority named by ruling D-1 (lines 25–38); no reading of `docs/architecture/testing-strategy.md` now states a per-stage human-approval requirement | Owner of `docs/architecture/testing-strategy.md` (Architect) | `DG-01` |
 | **U-19** *(resolved 2026-09-11)* | **Resolved** — 14 of 119 `TR-*` rows receive partial evidence from the 99 scenario documents (none full coverage); 105 receive none. Matched via each document's own `**Trace:**` §-citation, never guessed from filenames. **Does not affect `PG-01`** (governed by U-20 alone) | Access Control owners + QA                                                  | [§ U-19 normative coverage — scenario file mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11), immediately after the [Normative coverage map](#normative-coverage-map)                                                                                                                                  |

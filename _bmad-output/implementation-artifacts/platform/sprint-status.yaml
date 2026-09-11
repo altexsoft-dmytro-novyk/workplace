@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-09-2026 00:00
+last_updated: 09-12-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -52,7 +52,10 @@ development_status:
   # and project-scoped counter facts; implementation remains explicitly absent
   # per PM/AD-33.
   1-5-dashboards-4-4-v1-5-fixed-facts: done
-  1-6-platform-test-design-refresh-v1-2-v1-5: backlog
+  # DONE 2026-09-12: current v1.5 test-design set records the historical P0
+  # baseline, commit-pinned Contract-B evidence, and corrected TimeTracker
+  # provenance. Documentation closure only; runtime gates remain independent.
+  1-6-platform-test-design-refresh-v1-2-v1-5: done
   1-7-um-planning-residual-non-epic-2-4-scope: done  # CAP-1 is seed; registration folder retired
   1-8-doc-pass-create-path-removal-from-binding-docs: done  # api-conventions + DEC-UM-006/008 retired
   1-9-register-epic-in-platform-sprint-status: done

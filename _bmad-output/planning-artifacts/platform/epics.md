@@ -53,8 +53,8 @@ Exactly the FRs this file owns or extends. Verbatim-sourced from PRD §4.1 / §4
 - **PM-FR-2** *[PRD §4.1 FR-2; requirements §2.1, §5.1]*: Resolve Reporting, Project, and People Partner access transitively with required revocation windows. Epic 8 owns Project-line derivation, column narrowness, 15 min / 4 h withdrawal, and the AD-31 read-only membership boundary. Epic 5 owns the department-management contribution to Reporting line and the `isHr`-bounded PP HR-line. Phase-0 Self / reports-to / direct PP remains ACF-1 / ACM-3 historical evidence (SD-1).
 - **PM-FR-3** *[PRD §4.1 FR-3; requirements §3.2, §3.3]*: Enforce the S1–S16 section matrix. Kernel substrate S1/S10/S11 remains ACM-5 historical evidence. Epic 6 owns S2–S16 relationship-derived columns. Epic 7 owns the Shared-link column and the AD-28 overlay evaluation.
 - **PM/AD-24**: HTTP denial oracle — 401 / 404 / 403 (platform Epic 1 = documentation alignment; runtime `PM-FR-4` owner is `UM-E0-S0.1` per coverage model)
-- **PM-FR-36 / PM-FR-37**: TimeTracker required integration (§5.1) — documentation alignment in Epic 1; identity/population owned by `timetracker/epics.md` and gated by `TT-IDENTITY-01`
-- **PM-FR-38**: PeopleForce optional prefill only (§5.2)
+- **PM-FR-36 / PM-FR-37**: TimeTracker required integration (§5.1) — owned by the TimeTracker delivery epics. Epic 1 records documentation alignment only and is not an FR delivery owner.
+- **PM-FR-38**: PeopleForce optional prefill only (§5.2) — deferred; Epic 1 records the scope boundary and is not an FR delivery owner.
 
 **Referenced but not owned by this slice** (Epics 5–8 consume or bound these; they are not platform deliverables):
 
@@ -104,7 +104,6 @@ None — no `bmad-ux` contract exists for platform scope.
 | PM-FR-2 | PLAT-E2, PLAT-E3, PLAT-E5, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.4; PLAT-E5-S5.1–S5.3; PLAT-E8-S8.1–S8.4 |
 | PM-FR-3 | PLAT-E3, PLAT-E4, PLAT-E6, PLAT-E7 | PLAT-E3-S3.6 (S1/S10/S11); PLAT-E4-S4.1–S4.2 (implemented consolidation hardening); PLAT-E6-S6.1–S6.6 (S2–S16); PLAT-E7-S7.1–S7.3 (Shared link column + full-profile overlay) |
 | PM/AD-24 | PLAT-E1 | PLAT-E1-S1.3, PLAT-E1-S1.4 (documentation alignment; runtime owner is UM-E0-S0.1 per coverage model) |
-| PM-FR-36, PM-FR-37, PM-FR-38 | PLAT-E1 | PLAT-E1-S1.6 |
 | PLAT-E1 | PLAT-E1 | PLAT-E1-S1.1–S1.9 |
 | PLAT-E2 | PLAT-E2 | PLAT-E2-S2.1 |
 | PLAT-E3 | PLAT-E3 | PLAT-E3-S3.1–S3.8 |
@@ -129,7 +128,8 @@ None — no `bmad-ux` contract exists for platform scope.
 
 Cross-cutting planning, spec, architecture, and test-design alignment to v1.5 SoT plus 2026-09-02 ratification documentation debt. Planning artifacts only — no application code.
 
-**FRs covered:** PM/AD-24 (documentation alignment), PM-FR-36, PM-FR-37, PM-FR-38, NFR-AC-2, NFR-AC-3
+**Scope:** documentation alignment only. Epic 1 has no product-FR delivery coverage; it records
+the relevant requirements and evidence boundaries for their delivery owners.
 
 ### Epic 2: Access Control Foundation
 
@@ -331,26 +331,34 @@ So that PF vacancies SoT and dual-required integrations are not planned as manda
 - **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`, whose rationale names ACM3-II-06 as the uncovered critical requirement) explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
 - **QUALITY-GATE-AC-NFR:** ACM-9 500-target / 2s performance evidence is tracked separately from the functional P0 gate; baseline and final artifacts are referenced by commit-pinned path.
 - Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01` — not superseded `TIMETRACKER-CONTRACT`.
-- **Evidence caveat:** Both TimeTracker gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin — record the caveat verbatim alongside gate IDs; committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4 evidence baseline).
+- **Evidence provenance (corrected):** `docs/integrations/timetracker-external-api.json` is tracked at the
+  ratification baseline [`76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/docs/integrations/timetracker-external-api.json).
+  The former “untracked at the ratification pin” caveat is false and retired. File presence does not close
+  `TT-IDENTITY-01` or `TT-PMDM-01`: their substantive contract defects remain open.
 
-**Recorded debt (added 2026-09-10 by the test-design consolidation; this story is _not_ declared complete).**
-The consolidation updated artifact identities and dependency references only. It granted no approval,
-ran no validation, executed no suite and produced no coverage or gate result, so it does not by itself
-satisfy any acceptance criterion above.
+**Completion record (2026-09-12).** The 2026-09-10 consolidation alone did not satisfy this story;
+its “NOT RUN / approval ungranted” statement is preserved as a historical boundary. Subsequent human
+approval and system documentation validation PASS are recorded in `test-design-validation-report.md`,
+and the following current evidence satisfies the documentation-refresh acceptance criteria:
 
-- The canonical `test-design-validation-report.md` carries verdict **NOT RUN**, and every artifact in the
-  canonical set is **approval ungranted**. A new document does not inherit the superseded documents' 2026-08-25
-  human approval or validation PASS.
-- `_bmad-output/planning-artifacts/platform/reviews/review-cross-slice-seams-2026-09-02.md:66` records that
-  completing this story would **falsely close `PM-FR-15`**. That warning stands and is not discharged here.
-- Whether this story is satisfied, partially satisfied, or made obsolete by the consolidation is **open** and
-  belongs to the platform epic owner — [`migration-map.md` §10, **U-16** at `d99b1dc`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/d99b1dcc6634e1a579d3b92dcbc3d8b7b1910f38/_bmad-output/test-artifacts/test-design/migration-map.md).
-  The sprint-status key `1-6-platform-test-design-refresh-v1-2-v1-5` is unchanged at `backlog`, and no coverage
-  field, FR mapping or gate identity was altered.
-- `QUALITY-GATE-AC-NFR` above is evaluated on ACM-9 facade-resolver evidence, while `PMC-E1-S1.9` routes
-  **directory-list** evidence into the same gate name. Which subject the gate governs is **open** — [`migration-map.md` §10, **U-25** (§6, F-15) at `d99b1dc`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/d99b1dcc6634e1a579d3b92dcbc3d8b7b1910f38/_bmad-output/test-artifacts/test-design/migration-map.md). The All Employees list ≤2-second requirement itself has **no measurement and no chosen
-  harness** (**U-24**); ACM-9 and P6 measure different subjects and are not evidence for it. Nothing here reopens,
-  closes or renames the blocker, and the standing decision that the ACM-9 CI job stays informational is undisturbed.
+- The canonical architecture, QA, handoff, validation, index and migration set uses v1.5/current SoT
+  and commit `76a7220` for claims about superseded content.
+- PeopleForce remains optional prefill; no PeopleForce vacancy source of truth is required. TimeTracker
+  remains the only required integration; project-line negatives and the `PR-B-04` re-registration are
+  recorded without treating design closure as implementation closure.
+- The canonical QA document records the historical functional-P0 result at `c342138`: `FAIL`,
+  `NOT_MET`, `critical_open: 1`, `ACM3-II-06` uncovered. This is open debt, **not** a current PASS.
+- The canonical QA document cites the paired baseline and final `ACM9-MVP-v1` artifacts at immutable
+  commit `3a3cd71`; that Contract-B evidence remains separate from functional P0 and directory-list
+  performance.
+- The canonical architecture uses `TT-IDENTITY-01` / `TT-PMDM-01`, retires
+  `TIMETRACKER-CONTRACT`, and records the corrected OpenAPI provenance beside those live successor gates.
+
+**U-16 resolution and boundary.** Story 1.6 is **satisfied as documentation/evidence work**; its
+sprint key may move to `done`. This decision does not close `QUALITY-GATE-AC`, either TimeTracker
+successor, `PM-FR-15`, or any product/release requirement. The erroneous `PM-FR-36` / `PM-FR-37` /
+`PM-FR-38` attachment is removed from this epic's FR coverage map: those requirements are owned by
+the TimeTracker delivery epics (with `PM-FR-38` deferred), not by a test-design refresh.
 
 ### Story 1.7: UM Planning Residual (Non–Epic-2–4 Scope)
 
@@ -828,7 +836,11 @@ Consequence for this epic, stated so it cannot be misread as progress:
 
 Additional gates: `TT-PMDM-01` (P1 open — `projectManager` and `deliveryManager` are untyped strings; joining an authorization edge on an unformatted display name is a fail-open risk) and `ARCH-PROJ-WRITER-01` / PM/AD-31 (P1 open — sync is the sole writer; sync is absent).
 
-**Evidence caveat (inherited from `blockers.yaml`):** all three gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin. Every finding resting on it is a working-tree observation, not a reproducible baseline claim.
+**Evidence provenance (corrected):** all three gates cite
+`docs/integrations/timetracker-external-api.json`, which is tracked at the ratification baseline
+[`76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/docs/integrations/timetracker-external-api.json).
+The earlier untracked-file claim is retired; the gates remain open for their stated substantive
+contract defects, not for file availability.
 
 ### Story 8.1: Project-Line Derivation from Explicit PM/DM Attachments
 

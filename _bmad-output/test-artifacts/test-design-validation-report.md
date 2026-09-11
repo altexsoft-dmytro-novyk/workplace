@@ -115,3 +115,13 @@ runtime evidence, and epic-level validation are separate work.
 This report's prior statement that both `PR-S-*` sign-offs were ungranted is point-in-time
 validation evidence, not a rewritten historical claim. Current state is the
 [2026-09-11 PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md): the user's explicit Product Owner + Architect approval grants sign-off for `PR-S-01` / `CC-04` and `PR-S-02` / `CC-06`. PM/AD-19 and PM/AD-20 are directions, not approval. The decision does not close `CC-04`, `CC-06`, `CC-07`, `CC-08`, `CC-09`, or `OPERATIONAL-ENVELOPE`, and does not assert implementation, production, evidence, or release readiness.
+
+## 2026-09-12 current-state clarification — Story 1.6 closure
+
+The `U-16` item in the strict-completion summary is a 2026-09-11 validation snapshot. On
+2026-09-12, Story 1.6 was resolved as a **documentation/evidence refresh only**: the canonical
+QA document now pins the historical functional-P0 result and the ACM-9 Contract-B evidence, while
+the architecture document corrects TimeTracker source provenance beside its live successor gates.
+This removes Story 1.6's false product-FR attachment and changes its sprint key to `done`; it does
+not close a runtime gate, product requirement, or release condition. This clarification does not
+claim a new System Validate run or revise the hashes recorded above.

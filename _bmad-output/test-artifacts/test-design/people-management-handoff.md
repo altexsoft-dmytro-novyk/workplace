@@ -113,7 +113,7 @@ enough to route a reader:
 | Epic plans (nine) | `test-design-epic-{domain}-{number}.md` | Per-epic scenario and risk coverage for story acceptance criteria |
 | System checkpoint | `test-design-progress-system.md` | Platform run state (`runScope: system-level`, `runKey: system`) |
 | Epic checkpoints (nine) | `test-design-progress-epic-{domain}-{number}.md` | Per-epic run state |
-| Validation report | `test-design-validation-report.md` | Migration-era validation **scope**; currently **NOT RUN** |
+| Validation report | `test-design-validation-report.md` | System-level documentation validation **PASS** (2026-09-11); later document edits require a new Validate run for byte-exact attestation |
 | Index | `test-design/README.md` | Scope index, unplanned scopes and owners |
 | Migration record | `test-design/migration-map.md` | Where every obligation went, and on whose authority |
 
@@ -257,8 +257,8 @@ percentage against any of them.*
 
 1. **Human review of the migrated artifact set** — the architecture design, the QA design, this
    handoff, the epic plans and the index. Do not reuse any superseded validation verdict.
-2. **Validate run** — a separate workflow. `test-design-validation-report.md` currently records
-   scope only, with verdict **NOT RUN**.
+2. **Validate run** — a separate workflow. System documentation validation **PASS** is recorded
+   for 2026-09-11; run it again when a byte-exact current attestation is required.
 3. **BMAD epic/story decomposition** — map stories to stable `TR-*`, `PR-*` and exact
    blocker/dependency states through the index and the owning epic plan.
 4. **Progress sign-off-ready Stage-1 design** — PP work under `PR-S-01` with AD-19; scheduled
@@ -350,7 +350,7 @@ permission keys get seeded · **U-10** browser support beyond Chromium · **U-11
 budgets, accessibility requirements and photo-upload limits · **U-12** resolved by DEV
 (2026-09-11) — co-located `*.test.ts`/`*.test.tsx`, second vitest config,
 `@testing-library/react`; `services/frontend` branch `feat/u-12-unit-component-testing`
-(`60bc882`), not yet merged · **U-13** proactive logout · **U-16** whether platform Story 1.6 is satisfied ·
+(`60bc882`), not yet merged · **U-13** proactive logout · **U-16** resolved 2026-09-12 — platform Story 1.6 is satisfied as documentation/evidence work only ·
 **U-17** what closes the six design-closed blockers at implementation · **U-18** resolved —
 `docs/architecture/testing-strategy.md` self-contradiction fixed by its owner (2026-09-11) · **U-19** which access-control
 scenario file covers which `TR-*` row · **U-21** the
