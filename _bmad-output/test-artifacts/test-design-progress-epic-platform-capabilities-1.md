@@ -90,7 +90,7 @@ hashes are recorded once, in `test-design-validation-report.md` § Evaluated inp
 
 | Output | SHA-256 at the moment this checkpoint was written | Approval | Validation |
 | --- | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-platform-capabilities-1.md` | `f9a5a44286d3cb4defd02879e72e6adc18973cb72e542a938e68fc0f6c540728` | ungranted | NOT RUN |
+| `_bmad-output/test-artifacts/test-design-epic-platform-capabilities-1.md` | `3e09b5ae9a7e2f1eb6265d587aea06f1c71c3ab2a943abf00f10ef9b2348972f` | ungranted | NOT RUN |
 
 ## What this run did not do
 

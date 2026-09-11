@@ -6,6 +6,7 @@
 - SPEC [CAP-4](../../../../_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md#capabilities) — functional permission evaluation is separate and reads only `type='FR'` data.
 - [access-control.md § Core API](../../../architecture/access-control.md#core-api) — `isAllowed` and `resolveAudiences` are distinct public operations.
 - [access-control.md § Audience columns](../../../architecture/access-control.md#audience-columns-32) — Colleague is the audience floor where no relationship exists.
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (roles remain separate) and `TR-2.3-03` (v1.5 §2.3 — functional permissions never widen data) — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

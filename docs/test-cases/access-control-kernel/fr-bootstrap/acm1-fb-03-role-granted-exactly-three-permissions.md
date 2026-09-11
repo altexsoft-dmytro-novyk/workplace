@@ -19,6 +19,7 @@
 - FR-AMD-1 [OQ-3 — Role-to-Permission Storage](../../../../_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/fr-architecture-amendment.md) — "`PRIMARY KEY (policyId, permissionId)` is the uniqueness rule and prevents duplicate grants ... `policyType` is stored `NOT NULL DEFAULT 'FR'` and constrained by `CHECK (policyType = 'FR')`."
 - [database-schema.md § PolicyPermissions](../../../architecture/database-schema.md) — `PRIMARY KEY: (policyId, permissionId)`.
 - [access-control.md § Functional-role Kernel MVP (AD-4)](../../../architecture/access-control.md) — "`PolicyPermissions(policyId, permissionId, policyType)` stores the role's permission set and rejects duplicate pairs."
+- **U-19 normative coverage:** Weak/partial evidence for `TR-2.3-04` (v1.5 §2.3 — HR Admin default starting-role permission assignments) — proves the seeded `hr-admin` role is granted exactly the canonical permission set; seed-time evidence only. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

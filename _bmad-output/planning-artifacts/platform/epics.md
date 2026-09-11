@@ -197,13 +197,13 @@ These apply to **every** story in Epics 5, 6, 7, and 8. They are stated once and
 
 ### Production-code licensing
 
-**Production code.** Like Epics 2 and 3, every story runs the full AD-1 three-stage gate: scenario prose → independent human approval → approved red E2E → production. `status: final` on this document records that the *decomposition* is agreed; it authorizes no implementation and grants no AD-1 stage in advance.
+**Production code.** Like Epics 2 and 3, every story runs the full AD-1 three-stage **ordering**: scenario prose → committed-red E2E → production. The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI stand in its place. `status: final` on this document records that the *decomposition* is agreed; it authorizes no implementation.
 
 ### Slice-level preconditions
 
 | Precondition | Severity / status | Effect on Epics 5–8 |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` returns `Boolean(userId)` and the interim session resolver self-provisions a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check widens the blast radius of the existing bypass rather than being protected by it. *(2026-09-03 correct-course note: implementation evidence exists on the unmerged `dn-um-implementation` branch — see `blockers.yaml` `status_note`. Not yet merged or independently verified; this precondition stays open.)* |
+| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` **returned** `Boolean(userId)` and the interim session resolver **self-provisioned** a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check would widen the blast radius of that bypass rather than being protected by it. *(Corrected 2026-09-11: the bypass described above no longer exists in code. `interim-session-resolver.adapter.ts` and `interim-access-control.adapter.ts` were deleted in `services/backend` `37a339a` (2026-09-04); `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`), and the `Bearer <token:persona>` shorthand survives only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`. The precondition stays **open pending re-adjudication** — closure needs this project's own verification run, per `blockers.yaml` `status_note` — but it no longer rests on the evidence stated here.)* |
 | `UMAC-1` / `UM-E0-S0.1` | **in-progress** | Kernel consumer adoption is incomplete. Epics 5–8 deliver facade decisions; they do not rebind `/users`. Not a deliverable of this pass. |
 | `OQ-PERM-01` | P1 open | Default role-to-permission matrix is unapproved. No story seeds, infers, or defaults a functional-role grant. |
 | `CC-07` / PM/AD-29 | **P0 open** | No `AccessJournal` table exists. Any story whose behaviour requires a journal entry (Epic 7 shared-link access) may specify the same-transaction contract but cannot produce closure evidence. |
@@ -231,7 +231,7 @@ Binding rule for Epics 5, 6 and 8 (SD-8):
 
 **Historical statement, retained for traceability.** As written on 2026-09-02: `AC-S9-S13` in `blockers.yaml` declared `blocks: [Career timeline writes, Mentorship profile projection and closure-note visibility]` — that is **S9 and S13**. Epic 6 spans S2–S16. Sections S2–S8, S14, S15, and S16 had **no** live gate ID, and S12 sat inside the `AC-S9-S13` id range while being absent from both its `blocks:` list and the Gate binding table below.
 
-**Closed 2026-09-03.** `AC-SECTION-MATRIX-01` is registered in `blockers.yaml` — owner Access Control, severity P1, `blocks:` S2–S8 and S14–S16 (naming S6, S8, S14, S15 explicitly), closure condition *an approved AD-1 increment covering S2-S8 and S14-S16, then production evidence*. It is no longer a placeholder and is cited as a live coverage `gates:` ID. The registration prerequisite on Epic 6 entering a sprint is satisfied; the **increment** remains unapproved and the gate remains open. Closing `AC-S9-S13` must not be read as unblocking any section other than S9, S12 and S13.
+**Closed 2026-09-03.** `AC-SECTION-MATRIX-01` is registered in `blockers.yaml` — owner Access Control, severity P1, `blocks:` S2–S8 and S14–S16 (naming S6, S8, S14, S15 explicitly), closure condition *a delivered AD-1 increment covering S2-S8 and S14-S16, then production evidence* — quoted from `blockers.yaml` as reworded 2026-09-11 (`revision: 2026-09-11-ad1-stage-approval-alignment`). The former *approved* qualifier tracked the per-stage human approval retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); the **increment** and its production-evidence bar are unchanged and the gate remains open. It is no longer a placeholder and is cited as a live coverage `gates:` ID. The registration prerequisite on Epic 6 entering a sprint is satisfied; the **increment** remains undelivered and the gate remains open. Closing `AC-S9-S13` must not be read as unblocking any section other than S9, S12 and S13.
 
 > Recorded consequence, **resolved 2026-09-03**: `PM-FR-26` cited `AC-S9-S13` as the gate for **S15**, outside that blocker's declared scope. On registration, `PM-FR-26` — together with `PM-FR-21`, `PM-FR-22` (S6) and `PM-FR-35` (S8) — was repointed to `AC-SECTION-MATRIX-01` and its `GATE SCOPE DEFECT` annotation retired.
 
@@ -391,7 +391,7 @@ So that Alignment work is visible for the weekend build.
 
 ## Epic 2: Access Control Foundation
 
-**Production code.** Every story runs the full AD-1 three-stage gate (scenario prose → human approval → red E2E → production).  
+**Production code.** Every story runs the full AD-1 three-stage **ordering** (scenario prose → committed-red E2E → production). The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI running the suites stand in its place.  
 **Status:** in-progress  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
@@ -403,7 +403,7 @@ As a consuming bounded context,
 I want a fail-closed Access Control facade that resolves Phase-0 relationship audiences for one or more employee targets,
 So that User Management can later replace its interim target-access adapter without re-implementing relationship logic.
 
-**Implementation gate:** The dedicated `spec-access-control-audience-foundation` Stage-1 scenarios must receive independent human AD-1 approval, then be translated to independently approved red E2E before production code begins.
+**Implementation gate:** The dedicated `spec-access-control-audience-foundation` Stage-1 scenarios must be translated to a **committed-red** E2E before production code begins. The former *independent human AD-1 approval* on each stage was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`) — nothing now blocks a Stage-2 test or production code on a reviewer; the ordering itself still holds, enforced by PR review and CI.
 
 **Acceptance Criteria:**
 
@@ -415,7 +415,7 @@ So that User Management can later replace its interim target-access adapter with
 
 ## Epic 3: Access Control Kernel MVP
 
-**Production code.** Every story runs the full AD-1 three-stage gate (scenario prose → human approval → red E2E → production).  
+**Production code.** Every story runs the full AD-1 three-stage **ordering** (scenario prose → committed-red E2E → production). The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI running the suites stand in its place.  
 **Status:** in-progress  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
@@ -490,7 +490,7 @@ So that a later section evaluator can combine the applicable matrix columns.
 - ACM-4 is validation-only and changes no production code, so it runs under the
   named validation-only evidence exception in `testing-strategy.md`. Any missing
   approved scenario coverage or concrete behavior gap halts Stage 2 onward,
-  opens a separately approved AD-1 sequence, and requires a Story Breakdown
+  opens a separate AD-1 sequence (ordering only — the per-stage approval was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`)), and requires a Story Breakdown
   re-run before the package resumes.
 
 ### Story 3.3: Deploy-Time Root User Prerequisite (ACM-0)
@@ -682,9 +682,11 @@ state, not free-text ordering:
   separately AD-1-gated remediation; a rerun that omits the failing shape does
   not supersede it.
 
-Every new behavior follows AD-1 in separate dispatches: Stage-1 scenario prose,
-human approval, Stage-2 approved red kernel integration evidence, then
-production. No dispatch may span two stages.
+Every new behavior follows the AD-1 ordering: Stage-1 scenario prose, Stage-2
+**committed-red** kernel integration evidence, then production. The per-stage
+human approval was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`),
+and with it the rule that no dispatch may span two stages — a dispatch may now
+span more than one, provided the ordering itself holds.
 
 ## Epic 4: Access Control Authorization Consolidation
 

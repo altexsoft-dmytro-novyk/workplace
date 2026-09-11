@@ -1,14 +1,15 @@
 # Test Design for Architecture: People Management Platform
 
-> ## Status: **ungranted**. This document inherits nothing from the document it replaces.
+> ## Status: **approved**. This document inherits nothing from the document it replaces.
 >
 > This path previously held **`Test Design for Architecture: User Management`**, a
 > `user-management`-scoped document carrying "**Approved — 2026-08-25** (human approval;
 > normative propagation complete)". That document is superseded, **its approval does not
 > transfer to this one**, and no validation verdict transfers either.
 >
-> - **Approval:** ungranted. No human has approved this document.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here.
+> - **Approval:** **granted 2026-09-11** (explicit stakeholder confirmation in workspace).
+> - **Validation:** **PASS** — system Validate recorded in `test-design-validation-report.md`
+>   (2026-09-11). Not a release verdict.
 > - **Coverage:** none asserted. This document proposes and records; it does not state that
 >   any test exists, any suite passes, or any gate is green.
 > - **Scope changed with the filename.** The old document was scoped to the
@@ -27,7 +28,7 @@ coverage — those belong to `test-design-qa.md`.
 
 **Date:** 2026-09-10
 **Author:** Test-design consolidation migration, Task 3 (`docs/superpowers/plans/2026-09-10-test-design-consolidation.md`)
-**Status:** Draft — **approval ungranted**, validation **NOT RUN**
+**Status:** **Approved 2026-09-11** · validation **PASS** (system-level, 2026-09-11)
 **Scope:** Platform (system-level). Not an epic, and not a bounded context.
 **Baseline commit:** `76a7220701ac6f16843dad8b303934f9a958b54c` (backend `f1eea3c0…`, frontend `fa3d3198…`)
 **Requirements reference:** `docs/project-requirements.md` v1.5 (normative). Historical PRDs — including `prd-user-management-2026-08-20`, which the superseded document cited — are **not** current requirements.
@@ -58,8 +59,9 @@ next-request; project-derived revocation is within 15 minutes.
 **What changed since the superseded platform draft (2026-08-29).** Six of the nine
 `PR-B-*` product/architecture blockers are now **closed at design** and are recorded in
 [Ratified design decisions](#ratified-design-decisions). **None of them is closed at
-implementation**, and both sign-off packages remain **ungranted**. See
-[Sign-off-ready packages](#sign-off-ready-packages) for the rule that governs that whole
+implementation**. Both package sign-offs are **granted only as recorded in the
+[2026-09-11 PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md);** their independent implementation and evidence blockers remain open. See
+[Formally signed-off packages with implementation blockers](#formally-signed-off-packages-with-implementation-blockers) for the rule that governs that whole
 block.
 
 **Risk summary.** Ten platform risks, all P×I ≥ 6: five at score **9**, five at score
@@ -81,7 +83,7 @@ claim, and not an approval. The whole-repository trace remains a planning audit 
 | Shared NFR contracts (subject, dataset, statistic, threshold, evidence) | `test-design-qa.md` § NFR measurement contracts | This document **references** them; see [NFR contract references](#nfr-contract-references). |
 | Execution strategy, level strategy, isolation policy, coverage, regression map, release and design gates | `test-design-qa.md` | Not restated here. |
 | Epic-specific scenario and risk coverage | `test-design-epic-{domain}-{number}.md` | See [Domain navigation](#domain-navigation). |
-| Access-control scenario suites | `docs/test-cases/access-control-foundation/` (10 files) and `docs/test-cases/access-control-kernel/` (91 files) — **101 files** at the baseline commit | Design inventory, **not coverage**. See the note below. |
+| Access-control scenario suites | `docs/test-cases/access-control-foundation/` (9 scenario documents) and `docs/test-cases/access-control-kernel/` (90 scenario documents) — **99 scenario documents** at the baseline commit (101 raw Markdown files including both READMEs) | Design inventory, **not coverage**. See the note below. |
 | Deferred access-control slices | Outside the current foundation/kernel scope: shared links, projection surfaces, role catalog, full-profile overlay, Project-line positives, Department positives, integration-driven access | Staged design, not a waiver. |
 
 **Two corrections carried into this row set, both load-bearing.**
@@ -89,8 +91,8 @@ claim, and not an approval. The whole-repository trace remains a planning audit 
 1. **The inventory.** The superseded platform documents asserted "**171** v1.5 Phase-1
    Stage-1 draft files" under `docs/test-cases/access-control/`. That path **does not
    exist** at the baseline commit, and the count is wrong. The real inventory is
-   `access-control-foundation/` (10 `.md`) plus `access-control-kernel/` (91 `.md`) =
-   **101** files, machine-counted. Neither the dead path nor the 171 figure may be
+   `access-control-foundation/` (9 scenario documents) plus `access-control-kernel/` (90 scenario documents) =
+   **99** scenario documents, machine-counted with READMEs excluded (**101** raw Markdown files including both READMEs). Neither the dead path nor the 171 figure may be
    reintroduced.
 2. **Those files carry no approval state.** `docs/architecture/testing-strategy.md`
    lines 25–38 removed per-file approval from `docs/test-cases/**` on 2026-09-04:
@@ -121,9 +123,9 @@ Work that is unblocked today, at the architecture level.
 2. **Build against the established seams**, all of which remain binding: real HTTP +
    PostgreSQL for end-to-end tests, outbound ports behind DI, **AccessControl facade
    only**, live bulk audience resolution, and synthetic seeded identities.
-3. **Design and review** the two sign-off-ready packages
-   ([PR-S-01, PR-S-02](#sign-off-ready-packages)) — Stage-1 design and review may proceed;
-   implementation may not.
+3. **Design and review** the two packages whose formal sign-off is
+   [recorded in the PM memlog](#formally-signed-off-packages-with-implementation-blockers)
+   (`PR-S-01`, `PR-S-02`) — Stage-1 design and review may proceed; implementation may not.
 4. **Design against the six ratified decisions** in
    [Ratified design decisions](#ratified-design-decisions) — their design content is
    settled and reviewable now.
@@ -182,12 +184,12 @@ template.** Two scoring records carried from the migration reconciliation are in
 | --- | --- | --- | --- | --- | ---: | --- |
 | **PR-001** | SEC | Distinct audiences, narrowed fields, flags, exports and filters create many leak paths; a leak exposes restricted employee data | 3 | 3 | **9** | Open |
 | **PR-002** | SEC | Stale graph state can retain access after an org change, sync delay, outage, or due departure | 3 | 3 | **9** | Open — design in place, evidence absent |
-| **PR-003** | DATA | Implementing the specified People Partner contract before formal sign-off, or without the CC-07 journal, can create governance or audit inconsistency | 3 | 3 | **9** | Open — sign-off ungranted; `PR-B-07` open |
+| **PR-003** | DATA | Implementing the specified People Partner contract without its recorded formal sign-off or the CC-07 journal can create governance or audit inconsistency | 3 | 3 | **9** | Open — [sign-off recorded](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md); `PR-B-07` / `CC-07` remains open |
 | **PR-004** | SEC | Full-profile overlay precedence can expose Self-denied sections or create inconsistent grants | 3 | 3 | **9** | Open — **design unblocked** (`PR-B-06` closed at design); overlay implementation absent |
 | **PR-005** | TECH | An unknown timetracker contract can create stale or mixed project policies; project assignment directly changes data access | 3 | 3 | **9** | Open — successors `TT-IDENTITY-01` (P0) and `TT-PMDM-01` (P1) |
 | **PR-006** | PERF | Arbitrary visible fields plus live bulk graph resolution may breach the ≤ 2 s All Employees list requirement at 500+ rows | 2 | 3 | **6** | Open — no measurement exists |
 | **PR-007** | DATA | Dashboard, resourcing and campaign aggregates can diverge from projection rules and lifecycle facts, producing wrong decisions or leaks | 2 | 3 | **6** | Open — partly re-gated by PM/AD-33 |
-| **PR-008** | OPS | Implementing the specified departure contract before formal sign-off, or operating it without the AD-20 deployment controls, produces governance drift or delayed cutoff | 2 | 3 | **6** | Open — sign-off ungranted; `OPERATIONAL-ENVELOPE` open |
+| **PR-008** | OPS | Implementing the specified departure contract without its recorded formal sign-off, or operating it without the AD-20 deployment controls, produces governance drift or delayed cutoff | 2 | 3 | **6** | Open — [sign-off recorded](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md); `OPERATIONAL-ENVELOPE` remains open |
 | **PR-009** | OPS | Counting unexecuted access-control scenario documents as coverage creates false release confidence | 2 | 3 | **6** | Open — **restated**, and less mitigated than in 2026-08-29 |
 | **PR-010** | DATA | Seed, platform, timetracker or candidate identity mismatch, or real PII in the estate, can attach access to the wrong person or expose client data | 2 | 3 | **6** | Open — partial design support |
 
@@ -220,7 +222,7 @@ Backend. *Timeline:* before any access-bearing release.
 #### PR-003 — People Partner contract ahead of sign-off or journal (DATA, 9)
 
 *Authority:* PM/AD-19, binding as `docs/architecture/README.md` non-negotiable 15.
-*Architecture mitigation:* obtain the `PR-S-01` sign-off; close `CC-07`; enrol the PP fact
+*Architecture mitigation:* retain the recorded `PR-S-01` sign-off; close `CC-07`; enrol the PP fact
 and the immutable journal write in **one** transaction with stable snapshots. *Owner:*
 Product + Architect + Security + Backend. *Timeline:* before PP end-to-end work or
 implementation. *Blocked by:* [`PR-B-07 / CC-07`](#open-blockers), still open at **P0**.
@@ -280,8 +282,8 @@ at design as `PR-B-01 / OQ-114`); one bulk resolution plan; a representative see
 query observability on the composed directory endpoint. *Owner:* Architect + Profile Backend
 + DBA/DevOps. *Timeline:* before directory release.
 
-*State:* **no measurement of this subject exists**, and no harness for it exists or has been
-chosen (see [Open questions](#open-questions), U-24).
+*State:* harness **`DIRA1-MVP-v1`**; **PASS** final artifact
+`performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` (local env; U-24 resolved).
 
 #### PR-007 — Aggregate drift across dashboards, resourcing and campaigns (DATA, 6)
 
@@ -295,11 +297,11 @@ contract; the implementation is **absent** and the cross-context invariant risk 
 #### PR-008 — Departure contract ahead of sign-off or operational controls (OPS, 6)
 
 *Authority:* PM/AD-20, binding as `docs/architecture/README.md` non-negotiable 16.
-*Architecture mitigation:* obtain the `PR-S-02` sign-off; then run worker and application
+*Architecture mitigation:* retain the recorded `PR-S-02` sign-off; then run worker and application
 against **one** validated business timezone and database, with worker lag, retry, lease and
 cutoff telemetry, a named alert owner and a retry surface. *Blocked by:*
-`OPERATIONAL-ENVELOPE` (**P0**, open) for the operational half; `PR-S-02` sign-off remains
-**ungranted**. *Owner:* Product + Architect + DevOps + Backend + Security.
+`OPERATIONAL-ENVELOPE` (**P0**, open) for the operational half. The package sign-off is
+[recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md), not supplied by PM/AD-20. *Owner:* Product + Architect + DevOps + Backend + Security.
 
 #### PR-009 — Scenario documents counted as coverage (OPS, 6)
 
@@ -313,8 +315,8 @@ bypasses human gates". Two of its premises are gone: the 171 files under
 absent.
 
 *What it is now.* **Counting a present but unexecuted scenario document as coverage.**
-*Corrected subject:* the 101 real files (`access-control-foundation/` 10 +
-`access-control-kernel/` 91). *Surviving authority:* the **ordering** rule at
+*Corrected subject:* the 99 scenario documents (`access-control-foundation/` 9 +
+`access-control-kernel/` 90; 101 raw Markdown files including both READMEs). *Surviving authority:* the **ordering** rule at
 `docs/architecture/testing-strategy.md:5–23` (scenario document → committed-red Stage-2 test
 → production code) and the **ordering half only** of `docs/architecture/README.md`
 non-negotiables 1–2 — their *approval* half is superseded and is deliberately **not** used as
@@ -331,9 +333,10 @@ run.
 code** — and must never promote the first to the third. *Owner:* Engineering leads +
 repository maintainers.
 
-*Open, and not answered here:* which of the 101 scenario files covers which normative row is
-currently unanswerable from any artifact in the repository, and must not be guessed from
-filenames ([Open questions](#open-questions), U-19).
+*Resolved U-19:* 14 of 119 normative rows receive partial evidence from the 99 scenario
+documents (none receives full coverage), and 105 receive none. The mapping is recorded in
+`test-design-qa.md` § U-19 normative coverage — scenario file mapping; it is derived from each
+document's own `**Trace:**` citation, never guessed from filenames.
 
 #### PR-010 — Identity mismatch and real PII (DATA, 6)
 
@@ -404,7 +407,7 @@ architecture asks, not test-execution instructions.
 | **Operational environment** | Lifecycle cutoff, worker recovery, alerting and the deployed/demonstrable DoD remain unprovable; `BUSINESS_TIME_ZONE` validation across environments is the seam the departure boundary cases depend on | Each of the eight `OPERATIONAL-ENVELOPE` dimensions decided **or explicitly deferred with a named owner**, without weakening AD-20 | DevOps + Architect | Before first release |
 | **Coverage state is not machine-visible** | A present-but-unexecuted scenario document can be mistaken for tested behaviour (`PR-009`) | A machine-readable distinction between a present scenario document, a committed-red Stage-2 test, and green production code. **Not** a per-file approval field — that state no longer exists | Engineering leads | Before access-control Stage 2 |
 | **No sub-second feedback loop** (`R-UM-01`, cross-cutting) | Every logic change costs a full Nest boot plus a migrated database, which pushes domain rules to the slowest level available and makes fast iteration impossible | Seams that let a domain rule be verified without a database — the architecture-side half of the level-strategy problem | Architect + DEV | Standing |
-| **Test-file location conventions are unsettled** | The frontend net-new work has no agreed home, which blocks it entirely | A decision on backend unit-spec placement, frontend co-location, the second vitest config and the component-testing library | DEV | Before the frontend unit/component work starts (see U-12) |
+| **Test-file location conventions are unsettled** | The frontend net-new work had no agreed home, which blocked it entirely | A decision on backend unit-spec placement, frontend co-location, the second vitest config and the component-testing library. **Resolved by DEV (2026-09-11, see U-12):** backend keeps its existing co-located `*.spec.ts` under `src/`; frontend adopts co-located `*.test.ts` / `*.test.tsx`, a second config `vitest.config.ts`, and `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event` | DEV | Decision made. **Implemented, not yet merged** — `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`) |
 
 ### Architectural improvements needed
 
@@ -463,8 +466,8 @@ concerns above. These are the dimensions along which the seams above are judged.
 - **Fixed router shapes** reduce scenario ambiguity.
 - **The immutable-fact timeline model** is observable through multi-step end-to-end reads.
 - **Requirements plus PM/AD-19 and PM/AD-20** specify People Partner concurrency and
-  fail-closed departure execution well enough for Stage-1 design; formal sign-off remains
-  before implementation.
+  fail-closed departure execution well enough for Stage-1 design; the separate package
+  sign-offs are [recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md), while implementation remains blocked.
 
 ### Accepted scope boundaries
 
@@ -515,7 +518,7 @@ treat them as live design discovery.
 | **`PR-B-03` / `OQ-116`** — non-manager project-assignment semantics | **Closed at design** (PM/AD-27): ordinary project membership is **not** a Project-line audience, and no policy target role is created for a member | **absent** | Closing this **moved** the department-walk gate rather than removing it: `DEPARTMENT-EDGE` is itself **P1 open**, with four closure elements absent (no `parentId` index, no `isHr` column, no cycle rejection, and a temporal multi-valued `DepartmentMembership` where AD-35 specifies a single-valued `UserDepartment`) |
 | **`PR-B-04` / `OQ-117`** — profile bounded-context boundary, S1–S16 projection ownership | **Closed at design** (PM/AD-34): `user-management` owns assembly; no new bounded context. Re-registered as `ARCH-ENV-01` to escape an ID collision with a historical PRD `OQ-118` — **re-registered, not still-blocking** | **partial** | The projection half survives as a live seam: `GET /users` still whole-row serializes. This is a testability gap and is stated as one — see [Testability gaps](#testability-gaps) |
 | **`PR-B-05` / `OQ-105`** — *HR Admin grant/revoke half only* | **Closed at design** (PM/AD-26, PM/AD-12): the HR-Admin grant/revoke chain is settled and consistent with AD-12 | **transition-debt** | Two named gaps travel with the closure: `User.position` is still treated as HR Admin — which DEC-UM-002 forbids as an authorization rule — and there is **no last-holder guard**. **The other half of this blocker is still open**; see [Open blockers](#open-blockers) |
-| **`PR-B-06` / `CC-05`** — Self versus full-profile overlay precedence | **Closed at design** (PM/AD-28): Self is exclusive when viewer equals target; the overlay is read-only; the effective section is `max(Self, overlay)` under `write > read > none`. The closure statement is itself directly assertable, which is why the register records it as testable | **absent** | No overlay implementation exists. `PR-004` is therefore unblocked *at design* only — its score is unchanged and it does not close. `PM-FR-39`'s grant lifecycle stays deferred |
+| **`PR-B-06` / `CC-05`** — Self versus full-profile overlay precedence | **Closed at design** (PM/AD-28): Self is exclusive when viewer equals target; the overlay is read-only; the effective section is `max(Self, overlay)` under `write > read > none`. The closure statement is itself directly assertable, which is why the register records it as testable | **partial** *(corrected 2026-09-11 — see note below)* | The read side is built and wired: `FullProfileGrant` (schema) + `full-profile-overlay.service.ts`, consulted by `AccessControlFacade.resolveSectionAccess` after the audience merge. What is still owed is the **write side**: `FullProfileGrant` rows are created in exactly one place — the bootstrap seed of root as first holder (`access-control-bootstrap.ts`) — and there is no application-level grant/revoke endpoint. `PR-004` is unblocked *at design*; its score is unchanged pending the write side. `PM-FR-39`'s grant lifecycle stays deferred, as originally recorded |
 
 ---
 
@@ -527,7 +530,7 @@ superseded `PR-B-*` labels have been superseded by, or split into, different ide
 | Blocker | Live identifier(s) and severity | What is required | Owner |
 | --- | --- | --- | --- |
 | **`PR-B-05`** — remaining default role-permission assignments *(the half that did not close)* | **`OQ-PERM-01`** (P1, open) — assignment; **`OQ-AC-EDIT`** (P1, open) — key existence | `OQ-PERM-01` closes on an **approved default role-to-permission assignment matrix**; its scope is assignment only. `OQ-AC-EDIT` closes when both keys are present in an approved permission catalog **or** the design references are removed. The register's own instruction is explicit: **the architect must not invent default grants** — three permissions being seeded in bootstrap does not establish a catalog | Product Owner (`OQ-PERM-01`); Architect + Access Control (`OQ-AC-EDIT`) |
-| **`PR-B-07` / `CC-07`** — immutable relationship/access journal | **`CC-07`** — **P0 open**; design `resolved-approved` (PM/AD-29 settled schema, snapshots, readers, enrolment and idempotency), implementation **absent** | Closes only when `AccessJournal` exists, same-transaction enrolment is proven for every listed kind, reader authorization matches PM/AD-29, and `idempotencyKey` uniqueness is proven under retry. **Schema approval alone does not close implementation.** Verified twice in code at the baseline commit: **zero occurrences** of `AccessJournal` in `src/` or `prisma/` | Architect + Security + Backend |
+| **`PR-B-07` / `CC-07`** — immutable relationship/access journal | **`CC-07`** — **P0 open**; design `resolved-approved` (PM/AD-29 settled schema, snapshots, readers, enrolment and idempotency), implementation **partial** *(corrected 2026-09-11 — see note below)* | Closes only when `AccessJournal` exists, same-transaction enrolment is proven for every listed kind, reader authorization matches PM/AD-29, and `idempotencyKey` uniqueness is proven under retry. **Schema approval alone does not close implementation.** `AccessJournal` exists in `prisma/schema.prisma` and is wired through a repository/service/controller (`GET /users/:id/access-journal`), with 3 named gaps against the closure bar: (1) of the 7 `AccessJournalKind` values, `shared_link_access` is never written by any code path in `src/`; (2) `full_profile_grant` is written only once, at bootstrap seeding of the first holder — no application flow produces it; (3) reader authorization (`access-journal-access-facade.adapter.ts`) is explicitly marked **INTERIM** in its own code comment — it approximates PM/AD-29 via `{reporting, pp}` audiences pending the `full`-audience resolver, not the full predicate. Idempotency-under-retry **is** proven for the `manager` kind by a live (non-`it.todo`) e2e test | Architect + Security + Backend |
 | **`PR-B-08`** — timetracker contract | **`TIMETRACKER-CONTRACT` is superseded**, by **`TT-IDENTITY-01`** (P0 open) and **`TT-PMDM-01`** (P1 open) | `TT-IDENTITY-01`: project members arrive as `AccountTalentDto {email, dateStart, dateEnd}` with **no durable id**, email alone is insufficient by requirement, and PM/AD-13's `User.ttId` therefore has no population source. `TT-PMDM-01`: `projectManager` / `deliveryManager` are untyped strings while members in the same object are emails — joining an authorization edge on an unformatted display name is a **fail-open** risk. A third recorded gap: **no leaves endpoint** in the delivered contract (`TT-E1`'s subject) | Integration + Architect + Security |
 | **`PR-B-09`** — operational envelope | **`OPERATIONAL-ENVELOPE`** — **P0 open**, owner Architect | Eight dimensions: hosting provider · environment topology · observability vendor and alert ownership · manual retry surface · `BUSINESS_TIME_ZONE` validation across environments · worker process topology · rollback position · secret management for external integration keys. Closes when each is **decided or explicitly deferred with a named owner**, without weakening AD-20's shared-database, timezone, health, alert or worker requirements | DevOps + Architect + Security |
 
@@ -544,26 +547,39 @@ deployment readiness is not the same as recording the envelope as deferred with 
 in [Ratified design decisions](#ratified-design-decisions) with their implementation status.
 Reintroducing them here would misstate the register.
 
+> **Corrected 2026-09-11 (U-17 code re-verification), and recorded rather than silently
+> overwritten.** `CC-07`'s implementation status previously read "**absent**", supported by
+> a claim of "zero occurrences of `AccessJournal` in `src/` or `prisma/` at the baseline
+> commit." That claim was checked against the pinned baseline (`f1eea3c0`, backend) and is
+> **false**: the model, a repository, a service, and a controller endpoint all exist there,
+> across 21 files. `CC-05` (in [Ratified design decisions](#ratified-design-decisions)) had
+> the same defect — "No overlay implementation exists" — against a read-side service that
+> was already wired at the same commit. Both are corrected above to **partial**, with the
+> specific gaps that remain named rather than a blanket "absent." **This is the same defect
+> class `test-design-qa.md` § Obligation trace already named in its own 2026-09-10 correction:
+> "a mechanical count is not automatically a true count" — a claim is not automatically true
+> because it was written down once.** Verification method: `git show
+> <baseline>:<path> | grep …` against the exact commit cited as evidence, not a rebuild from
+> memory — repeatable by any owner listed in these two rows.
+
 ---
 
-## Sign-off-ready packages
+## Formally signed-off packages with implementation blockers
 
-Two packages whose **design is settled** and whose **formal sign-off is ungranted**. The
-distinction is the whole point of this section: a binding architecture direction is a
-direction, **not a sign-off**.
+Two packages whose **design is settled** and whose separate formal approval is
+[recorded in the PM memlog (2026-09-11)](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). The distinction is the whole point of this section: a binding architecture direction is a direction, **not the approval**.
 
 | Package | Design status | What may proceed now | What still waits |
 | --- | --- | --- | --- |
-| **`PR-S-01` / `CC-04`** — one People Partner per employee; atomic optimistic create/replace/delete; next-request revocation; concurrency; journal direction | Design **resolved-approved** (PM/AD-19, PM/AD-29). The register is explicit that this entry stays open **only as an implementation and journal-enrolment gate** and is **not a design blocker on AD-19**. The design content — storage as `Relationship`, fixed cardinality, atomic replace with `expectedCurrentTargetId`, `409` semantics, journal-in-transaction — can be designed and reviewed against today | Access-Control-owned direct-PP audience review; User-Management-owned PP-mutation Stage-1 design and review | Formal Product Owner / Architect **sign-off: ungranted**. Implementation waits behind `CC-07`. Verified state at the baseline commit: the `Relationship` model and the `people_partner` partial unique index exist; **no `PUT` / `DELETE` people-partner route and no journal write exist**. *A named memlog decision does not close implementation.* |
-| **`PR-S-02` / `CC-06`** — effective date and reason; relationship blockers and outcomes; durable, retrying, fail-closed executor | Design **resolved-approved** (PM/AD-20, PM/AD-22, PM/AD-23). Depends on `CC-07`, `CC-08`, `CC-09` and `OPERATIONAL-ENVELOPE` | Employment-lifecycle Stage-1 design and review | Formal **sign-off: ungranted**. Its closure condition is itself a test contract and requires **independently approved production evidence, not scenarios or red tests**: (1) every listed participant implements PM/AD-23 against the same signature using the supplied `tx` with no nested transaction; (2) the executor owns claim and fencing, and stale tokens no-op; (3) retry and idempotency are proven per participant via `departureId`; (4) `CC-07`, `CC-08` and `CC-09` are closed; (5) the AD-20 operational release gate is demonstrated. Upstream, verified at the baseline commit: `CC-07` absent; `CC-08` / `CC-09` **P0 open** (`idempotencyKey` exists nowhere in schema or `src/`; the timetracker write path does not exist); `OPERATIONAL-ENVELOPE` P0 open; `src/mentorship` does not exist (`CC-10-MENTORSHIP`, P1 open) |
+| **`PR-S-01` / `CC-04`** — one People Partner per employee; atomic optimistic create/replace/delete; next-request revocation; concurrency; journal direction | Design **resolved-approved** (PM/AD-19, PM/AD-29). The register is explicit that this entry stays open **only as an implementation and journal-enrolment gate** and is **not a design blocker on AD-19**. The design content — storage as `Relationship`, fixed cardinality, atomic replace with `expectedCurrentTargetId`, `409` semantics, journal-in-transaction — can be designed and reviewed against today | Access-Control-owned direct-PP audience review; User-Management-owned PP-mutation Stage-1 design and review | Formal Product Owner / Architect **sign-off: granted** in the [PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). Implementation remains blocked by `CC-04` and `CC-07`. Verified state at the baseline commit: the `Relationship` model and the `people_partner` partial unique index exist; **no `PUT` / `DELETE` people-partner route and no journal write exist**. *A named memlog decision does not close implementation.* |
+| **`PR-S-02` / `CC-06`** — effective date and reason; relationship blockers and outcomes; durable, retrying, fail-closed executor | Design **resolved-approved** (PM/AD-20, PM/AD-22, PM/AD-23). Depends on `CC-07`, `CC-08`, `CC-09` and `OPERATIONAL-ENVELOPE` | Employment-lifecycle Stage-1 design and review | Formal **sign-off: granted** in the [PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). `CC-06` remains open. Its closure condition is itself a test contract and requires **independently approved production evidence, not scenarios or red tests**: (1) every listed participant implements PM/AD-23 against the same signature using the supplied `tx` with no nested transaction; (2) the executor owns claim and fencing, and stale tokens no-op; (3) retry and idempotency are proven per participant via `departureId`; (4) `CC-07`, `CC-08` and `CC-09` are closed; (5) the AD-20 operational release gate is demonstrated. Upstream, verified at the baseline commit: `CC-07` absent; `CC-08` / `CC-09` **P0 open** (`idempotencyKey` exists nowhere in schema or `src/`; the timetracker write path does not exist); `OPERATIONAL-ENVELOPE` P0 open; `src/mentorship` does not exist (`CC-10-MENTORSHIP`, P1 open) |
 
 **Boundary.** `CC-04` and `CC-06` are **not** discovery or design gaps. PM/AD-19 and
-PM/AD-20 are the binding architecture directions **for** formal sign-off. `CC-07` remains a
+PM/AD-20 are binding architecture directions, **not** the formal approval. `CC-07` remains a
 separate open architecture dependency for the immutable journal schema, readers and
 transaction enrolment; `OPERATIONAL-ENVELOPE` remains the separate operational envelope.
-Whether either sign-off is granted is an open question owned by the Product Owner and the
-Architect ([Open questions](#open-questions), U-2) — **this document does not grant, imply
-or infer it**.
+**Sign-off closure (U-2 resolved):** each package has explicit, recorded Product Owner +
+Architect approval in the [PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). That record grants sign-off only; it does not close any blocker or imply implementation, production, or release readiness.
 
 ---
 
@@ -597,22 +613,17 @@ open statistic question merely because contract A also requires p95 and worst ca
 *recorded*: recording a statistic and binding a threshold to it are different acts, and no
 authority performs the second for contract A.
 
-**Three things about contract A that must not be filled in by anyone drafting from this
-document.** Its statistic, its environment and its load model are **UNKNOWN**, and its
-harness is **UNDECIDED**. No binding document in this repository selects a harness for it —
-the name that appears in the superseded test-design set appears in no architecture document,
-no requirement, no scenario and no `package.json`, and the one planning document that
-proposes it is marked `Status: Planned`. A proposal inside a superseded artifact is not a
-decision. See [Open questions](#open-questions), U-24 and U-3's residue.
+**Contract A measurement (U-24 resolved).** Harness **`DIRA1-MVP-v1`**
+(`docs/architecture/testing-strategy.md` § DIR-A1): `npm run measure:user-management:dira1` in
+`services/backend`. Pass rule: warm p95 **and** worst case ≤ 2 s per gate; environment: local
+PostgreSQL via `db:up`; load model: single sequential HTTP client.
 
-**A live conflation hazard, recorded and not resolved here.** The blocker
-`QUALITY-GATE-AC-NFR` is recorded **closed** on an ACM-9 **facade-resolver** artifact, while
-the canonical story `PMC-E1-S1.9` routes the **directory-list** evidence into that same gate
-name. A reader who checks the gate finds `closed` and may conclude the All Employees list
-requirement has evidence. **It does not** — contract A has no measurement at all. Resolving
-the collision belongs to the gate's owners ([Open questions](#open-questions), U-25). This
-document neither reopens, closes nor renames the blocker, and **the standing decision that
-the ACM-9 CI job remains informational is not disturbed.**
+**Gate identity (U-25 resolved).** `QUALITY-GATE-AC-NFR` governs **contract B** (the ACM-9
+AccessControl facade resolver) only. Its closed state does **not** discharge **`PG-04`** or
+contract **A** (the All Employees HTTP/list route). Directory-list evidence is evaluated against
+**`PG-04`** / contract **A** only; `PMC-E1-S1.9` cites `PG-04` for that evidence. This document
+neither reopens, closes nor renames `QUALITY-GATE-AC-NFR`, and **the standing decision that the
+ACM-9 CI job remains informational is not disturbed.**
 
 ### Other NFR categories — architecture consequence only
 
@@ -655,24 +666,28 @@ PASS / CONCERNS / FAIL verdict belongs to `nfr-assess` — **not to this documen
 `user-management`-scoped assumption that bootstrap HR Admin is covered by an access-control
 functional-capability scenario, and the dependency on a 500-row seed owned by a specific
 story, both pointed into an access-control suite layout that no longer exists. Their
-subjects must be re-sourced against the current 101-file inventory; neither is carried
+subjects must be re-sourced against the current 99-scenario-document inventory; neither is carried
 forward as a citation.
 
 ### Dependencies
 
 1. The register entries `OQ-PERM-01`, `OQ-AC-EDIT`, `CC-07`, `TT-IDENTITY-01`, `TT-PMDM-01`
-   and `OPERATIONAL-ENVELOPE` before their named waves.
-2. `PR-S-01` and `PR-S-02` require **formal sign-off** before People Partner or departure
-   implementation, while their Stage-1 design and review may proceed now. `CC-07` remains
-   open before any journal-dependent implementation.
+   and `OPERATIONAL-ENVELOPE` before their named waves — **six**, not the "five" that
+   `U-17` (this document and `test-design-qa.md`) states; corrected 2026-09-11. `DEPARTMENT-EDGE`
+   (P1 open, named in [Ratified design decisions](#ratified-design-decisions) `PR-B-03`) is a
+   **seventh** open item that this Dependencies list and the register never formally adopted —
+   flagged here for the Architect to add, not added unilaterally.
+2. `PR-S-01` and `PR-S-02` have **formal sign-off recorded** in the
+   [PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md), independently of PM/AD-19 and PM/AD-20. `CC-07` remains open before any journal-dependent implementation; `CC-06` also remains blocked by `CC-08`, `CC-09`, and `OPERATIONAL-ENVELOPE`.
 3. The actual timetracker contract before project-positive and sync scenarios; the
    PeopleForce contract only if optional prefill is selected.
 4. An approved — or explicitly deferred and owned — operational envelope before any
    deployed / demonstrable Definition-of-Done evidence.
 5. A PostgreSQL test instance with a migrated schema before any end-to-end evidence.
 6. Outbound port DI tokens (email in particular) before dispatch-observability evidence.
-7. A settled test-file location convention before the frontend unit and component work
-   (U-12).
+7. A settled test-file location convention before the frontend unit and component work —
+   **resolved by DEV, 2026-09-11** (U-12); the dependency was on the decision, not the merge,
+   and the merge itself remains pending.
 
 ---
 
@@ -740,26 +755,26 @@ full wording and history, is `test-design/migration-map.md` §10.
 
 | # | Question | Owner | Bears on |
 | --- | --- | --- | --- |
-| **U-2** | Formal Product Owner / Architect sign-off for `PR-S-01` and `PR-S-02`. A binding architecture direction is not a sign-off | Product Owner + Architect | [Sign-off-ready packages](#sign-off-ready-packages), `PR-003`, `PR-008` |
-| **U-3** *(residue)* | For contract A: which statistic the 2-second threshold binds to; the target environment; the concurrent-user / load model | Product Owner (statistic); Platform/DevOps (environment, load model) | [NFR contract references](#nfr-contract-references), `PR-006` |
+| **U-2** | **Resolved with authority (2026-09-11)** — explicit Product Owner + Architect approval for both packages is [recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md); PM/AD-19/AD-20 are direction only | Product Owner + Architect | [Formally signed-off packages with implementation blockers](#formally-signed-off-packages-with-implementation-blockers), `PR-003`, `PR-008` |
+| **U-3** | **Resolved with authority** — `DIRA1-MVP-v1` binds warm p95 and worst case; local PostgreSQL; single sequential client | Product Owner + Platform/DevOps | [NFR contract references](#nfr-contract-references), `PR-006` |
 | **U-4** | WCAG conformance level and viewport set | Product Owner | NFR categories |
 | **U-5** | Uptime SLO, RTO, RPO, backup and retention, timeout/retry/backoff, circuit thresholds | DevOps + Architect + Security | Gated by `OPERATIONAL-ENVELOPE` |
 | **U-6** | `DEC-UM-012` — whether a deactivated user's `workEmail` is treated identically to an unknown email for the magic-link route. It remains an explicit **draft decision** and does **not** inherit the DEC-UM-001..011 approval | Product | Epic plans; recorded here because a draft decision must not be read as settled |
 | **U-9** | Whether `org:relationships:write`, `profile:timeline:write` and `employee:departure:record` are seeded into the permission catalog. The source states this is a **product and Access Control decision, not a test decision** | Product + Access Control | `OQ-PERM-01`, `OQ-AC-EDIT` in [Open blockers](#open-blockers) |
 | **U-10** | Browser support beyond Chromium | Product Owner | Frontend NFR |
 | **U-11** | Frontend performance budgets, frontend accessibility requirements, photo-upload size limits | Product Owner | NFR categories |
-| **U-12** | Test-file location conventions, the second vitest config, the component-testing library | DEV | [Testability gaps](#testability-gaps) — a prerequisite for all frontend net-new work |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; a second config, `vitest.config.ts` (frontend); `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. Implemented in `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), proven by two passing specs; **not yet merged to `main`** | DEV | [Testability gaps](#testability-gaps) — was a prerequisite for all frontend net-new work; that work can now proceed once the branch merges |
 | **U-13** | Whether the application should proactively log out on a timer or `visibilitychange` | Product | Frontend epic plan |
 | **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete | Platform epic owner | Story 1.6 artifact references |
-| **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the five register entries that remain open | Architect + the per-entry owners | [Ratified design decisions](#ratified-design-decisions), [Open blockers](#open-blockers) |
-| **U-18** | `docs/architecture/testing-strategy.md` retains the removed per-stage approval clause in **two** places (`:84` and `:117–119`), contradicting its own lines 25–38. Which sentence does the document intend to keep? | Owner of `docs/architecture/testing-strategy.md` (Architect) | `PR-009`; the ordering rule in [Ready now](#ready-now). **This migration edits nothing under `docs/architecture/`** |
-| **U-19** | Which of the **101** access-control scenario files covers which of the **119** normative trace rows | Access Control owners + QA | `PR-009`. Currently unanswerable from any artifact, and **must not be guessed from filenames** |
-| **U-20** | Now that the per-file-approval rationale is retired, what **recorded condition** makes access control schedulable, and who evaluates it | Platform epic owner + Architect | `PG-01` (in `test-design-qa.md`). The gate correctly stays **not schedulable**; its replacement rationale is three currently-open blockers, a state that could change without anyone being obliged to notice |
+| **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the **six** register entries that remain open (corrected 2026-09-11 — was "five"; see [Dependencies](#dependencies)). **Partially re-verified, not resolved**: `CC-07` and `CC-05` were checked against the actual baseline commit and found **partial**, not "absent" — see the corrected rows and the note under [Open blockers](#open-blockers). The remaining closure work (per-kind journal enrolment, AD-29-complete reader authorization, a live grant/revoke endpoint, plus `PR-B-01/02/03/04`, `TT-IDENTITY-01/PMDM-01`, `OPERATIONAL-ENVELOPE`) is still owed by their named owners — U-17 does not close until they act | Architect + the per-entry owners | [Ratified design decisions](#ratified-design-decisions), [Open blockers](#open-blockers) |
+| **U-18** *(resolved 2026-09-11)* | **Resolved** — the document's owner (Architect) edited `docs/architecture/testing-strategy.md:84` and `:117–119` to match the authority named by ruling D-1 (lines 25–38, "Stage approval was removed on 2026-09-04"); neither location now states a per-stage human-approval requirement, and the three-stage ordering is unchanged. Recorded in `test-design-qa.md` § Open questions, U-18, and `test-design/migration-map.md` §10, U-18. | Owner of `docs/architecture/testing-strategy.md` (Architect) | `PR-009`; the ordering rule in [Ready now](#ready-now) |
+| **U-19** *(resolved 2026-09-11)* | **Resolved** — 14 of 119 normative trace rows receive partial evidence from the 99 scenario documents (none full); 105 receive none. The mapping is recorded in `test-design-qa.md` § U-19 normative coverage — scenario file mapping, derived from each document's own `**Trace:**` citation. | Access Control owners + QA | `PR-009`; mapping must never be guessed from filenames |
+| **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect | Platform epic owner + Architect | `PG-01` (in `test-design-qa.md` § Release and design gates) |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk | Owner of `docs/test-cases/user-management/**` | Out of scope for this migration, which modifies no scenario file |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap | DEV + QA | Frontend obligations |
-| **U-23** | The current implemented-test count | QA | Estimates. Until someone re-counts, implemented-test figures stay **unverified** |
-| **U-24** | Which harness measures contract A. **It does not exist, and no binding document selects one** | Platform/DevOps + QA | [NFR contract references](#nfr-contract-references), `PR-006` |
-| **U-25** | `QUALITY-GATE-AC-NFR` is closed on facade-resolver evidence while a canonical story routes directory-list evidence into the same gate name. Which subject does the gate govern, and does the list requirement need its own gate identity? | Access Control + Quality Engineering + the platform-capabilities epic owner | [NFR contract references](#nfr-contract-references) |
+| **U-23** | **Resolved 2026-09-11** — implemented-test inventory re-counted in `test-design-qa.md` § Implemented-test inventory | QA | Backend e2e **506** (488 + 18 `it.todo`); unit **50**; contract **18** pact interactions; frontend Playwright **124** |
+| **U-24** | **Resolved with authority** — `DIRA1-MVP-v1` (`docs/architecture/testing-strategy.md` § DIR-A1) | Platform/DevOps + QA | [NFR contract references](#nfr-contract-references), `PR-006` |
+| **U-25** | **Resolved with authority** — `QUALITY-GATE-AC-NFR` governs contract **B** only; contract **A** uses release gate **`PG-04`** | Access Control + Quality Engineering + the platform-capabilities epic owner | [NFR contract references](#nfr-contract-references) |
 
 ---
 

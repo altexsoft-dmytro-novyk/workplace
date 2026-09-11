@@ -187,9 +187,9 @@ The shared measurement contracts are owned by `test-design-qa.md` § NFR measure
 Two boundaries matter to a reader of this plan and are **referenced, not restated**:
 
 - **The All Employees list ≤ 2-second requirement is P0**, and it is **contract A** of three
-  contracts that must stay separate. Its **statistic, target environment and load model are
-  UNKNOWN**, and its **harness is UNDECIDED** (open as **U-24**). It is **not** ACM-9 and
-  **not** P6. Nothing in this plan measures it or names a harness for it.
+  contracts that must stay separate. Its **statistic, environment and load model are bound by
+  `DIRA1-MVP-v1`** (U-3 and U-24 resolved). It is **not** ACM-9 and **not** P6. Nothing in
+  this plan runs the harness or records the artifact.
 - **Configuration-owned thresholds** (production TTLs, rate limits, retry counts and backoff)
   stay operational configuration; tests inject deterministic values and verify boundaries.
 
@@ -230,8 +230,8 @@ Open, and **answered nowhere in this document**. Register of record:
 | Question | Subject | Owner |
 | --- | --- | --- |
 | **U-11** | Photo-upload size limits (with frontend performance budgets and accessibility requirements). | Product Owner |
-| **U-12** | Test-file location conventions, the second vitest config and `@testing-library/react` — a **prerequisite for all 85 frontend net-new cases**. | DEV |
-| **U-23** | The current implemented-test count, and which of "340 e2e" / "406 cases / 43 files" is right. | QA |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; second config `vitest.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), **not yet merged**. | DEV |
+| **U-23** | **Resolved** — see `test-design-qa.md` § Implemented-test inventory (506 e2e cases / 54 suites at recount). | QA |
 | **U-24** | Which harness measures the All Employees list ≤ 2-second requirement. | Platform / DevOps |
 
 ---

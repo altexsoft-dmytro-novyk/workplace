@@ -2,8 +2,10 @@
 runScope: 'system-level'
 runKey: 'system'
 workflowStatus: 'generated'
-approval: 'ungranted'
-validation: 'NOT RUN'
+approval: 'granted'
+approvedAt: '2026-09-11'
+validation: 'PASS'
+validatedAt: '2026-09-11'
 totalSteps: 5
 stepsCompleted:
   - 'step-01-detect-mode'
@@ -24,7 +26,7 @@ supersedes:
 
 # Test Design Progress — Platform (system-level)
 
-> ## Status: **generated, ungranted, NOT validated.** This run inherits nothing.
+> ## Status: **generated, approved, validated PASS.** This run inherits nothing.
 >
 > **This path is not new.** At `76a7220701ac6f16843dad8b303934f9a958b54c` it held a
 > **different run**: the User Management child checkpoint, whose frontmatter read
@@ -35,9 +37,9 @@ supersedes:
 > - **That run is not this run, and it is not relabelled as one.** It was a
 >   `user-management`-scoped run. This is the platform run. The old run keeps its own scope,
 >   its own date and its own approval in history.
-> - **Its human approval does not transfer.** This run's approval is **ungranted**.
-> - **Its ticked validation boxes do not transfer.** Every box below is reset. Validation for
->   this run is **NOT RUN**.
+> - **Its human approval does not transfer.** This run's approval is **granted 2026-09-11**.
+> - **Its ticked validation boxes do not transfer.** Validation for this run was reset at
+>   migration, then **PASS** recorded 2026-09-11 in `test-design-validation-report.md`.
 > - Read the [superseded User Management run at `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-progress-system.md).
 >   The superseded **platform** run is
 >   [`test-design-progress-platform.md` at the same commit](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-progress-platform.md).
@@ -142,20 +144,25 @@ actual Validate run against **this** artifact set.
 - [ ] Epic plans exist for every epic that received transferred obligations, and only those
 - [ ] Every epic plan has a matching checkpoint with the correct `runKey`
 - [ ] Migration ledger reconciles to outputs and consumers
-- [ ] Human approval of this artifact set
-- [ ] Validate run recorded in `test-design-validation-report.md`
+- [x] Human approval of this artifact set (2026-09-11)
+- [x] Validate run recorded in `test-design-validation-report.md` (2026-09-11, PASS)
 
 ## Open decisions carried by this run
 
-None is answered here. The register is `test-design/migration-map.md` §10: **U-2, U-4, U-5,
-U-6, U-9, U-10, U-11, U-12, U-13, U-16** remain open from Task 1, and **U-17..U-25** were
-opened by the reconciliation. Notably open and load-bearing for any later verdict: both
-`PR-S-*` sign-offs (U-2); what closes the six design-closed `PR-B-*` blockers at
-**implementation** (U-17); and contract A's statistic, environment, load model and **harness** —
-the last of which no binding document names (U-3, U-24).
+None is answered here. The register is `test-design/migration-map.md` §10: **U-4, U-5,
+U-6, U-9, U-10, U-11, U-13, U-16** remain open from Task 1; **U-17..U-19** and **U-21..U-22**
+remain open from the reconciliation; **U-2**, **U-12**, **U-20**, **U-23**, **U-24**, and **U-25**
+were resolved 2026-09-11. Of those, **U-12** (test-file location conventions, second vitest
+config, `@testing-library/react`) was resolved by DEV and is implemented on `services/frontend`
+branch `feat/u-12-unit-component-testing` (`60bc882`), **not yet merged**.
+Notably open and load-bearing for any later verdict: `PR-S-*` sign-offs are [recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md) (U-2
+resolved), while what closes
+the six design-closed `PR-B-*` blockers at **implementation** (U-17); and contract A's qualifying
+**baseline/final artifact** — PASS `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json`
+(local env).
 
 ## Next step
 
-**Human review of the migrated artifact set, then a separate Validate run.** Neither has
-happened. This checkpoint does not schedule them, and it authorises no ATDD, implementation or
-release activity.
+**Human approval and system Validate are recorded (2026-09-11).** This checkpoint does not
+authorise deployment or assert product/release readiness; open product decisions in the register
+remain separate work.

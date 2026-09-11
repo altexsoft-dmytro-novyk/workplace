@@ -2,6 +2,8 @@
 
 **Trace:** §7 · AD-10 · ACF-1
 
+**U-19 normative coverage:** Meta-level support for `TR-7-01` (v1.5 §7 — access correctness tested per audience/path/section, Phase-1 only); not tied to a specific `TR-2.x`/`TR-3.x` row. See `test-design-qa.md` § Normative coverage map.
+
 **Approved:** Anna Pikula, 2026-08-30
 
 ## Scenario

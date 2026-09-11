@@ -29,9 +29,10 @@ filters and pagination against that population.
   never N per-row calls.** An `N+1` pattern against the facade is a defect.
 
 > **Stage classification.** This is a **Stage-2 performance note**, not a
-> Stage-1 behavioural scenario. The wall-clock assertion belongs in a dedicated
-> perf/load spec (tagged `@perf`, seeded to 500+ rows) or is deferred to the
-> `deferred-work.md` §3.3.1 projection suite that owns the §7 budget. The
+> Stage-1 behavioural scenario. Wall-clock evidence for contract **A** /
+> release gate `PG-04` is collected by **`DIRA1-MVP-v1`**
+> (`docs/architecture/testing-strategy.md` § DIR-A1;
+> `npm run measure:user-management:dira1` in `services/backend`). The
 > **call-count** assertion (one facade call, no `N+1`) is checkable in the
 > Stage-2 E2E now via a spy/counter on the `ACCESS_CONTROL_PORT` binding.
 

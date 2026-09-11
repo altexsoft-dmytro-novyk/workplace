@@ -2,6 +2,8 @@
 
 **Trace:** §2.1 · §3.2 PP · AD-19 · ACF-1
 
+**U-19 normative coverage:** Primary evidence for `TR-2.1-05` (v1.5 §2.1 — direct assigned-PP audience derivation). HTTP-level allow case; the production route is not yet wired to this facade (`SEC-AUTH-01` open P0). See `test-design-qa.md` § Normative coverage map.
+
 **Approved:** Anna Pikula, 2026-08-30
 
 ## Scenario

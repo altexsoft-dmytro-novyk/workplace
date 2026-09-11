@@ -7,6 +7,7 @@
 - [access-control.md § Audience columns](../../../architecture/access-control.md#audience-columns-32) — Self row: "An **unconfirmed** viewer or target yields an empty audience `Set` — never Self, never the Colleague floor." Unconfirmed covers absent as well as inactive.
 - [access-control.md § Fail-closed, always (AD-11, AD-12)](../../../architecture/access-control.md#fail-closed-always-ad-11-ad-12).
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp).
+- **U-19 normative coverage:** Mechanism-level robustness evidence for `TR-2.1-02` (v1.5 §2.1 — transitive reports-to Reporting line) — headless-facade proof, not API E2E; see caveats in `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

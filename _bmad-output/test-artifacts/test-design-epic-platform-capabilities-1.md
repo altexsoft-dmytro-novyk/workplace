@@ -118,16 +118,16 @@ This epic carries **no epic-local NFR obligation** in the ledger, and none is in
 **A boundary that matters to a reader of this plan, referenced and not restated.** The
 **All Employees list ≤ 2-second requirement is P0**, and it is **contract A** of the three
 performance contracts that must stay separate, owned by `test-design-qa.md` § NFR measurement
-contracts → The three performance contracts must stay separate. Its **statistic, target
-environment and load model are UNKNOWN**, and its **harness is UNDECIDED** (open as **U-24**;
-no binding document selects one). It is **not** ACM-9 (the facade resolver) and **not** P6
-(`resolveAudiences`). `PMC-E1-S1.9` "Directory Performance Evidence at 500+ Rows" is the
-story that will carry that evidence, and **no obligation for it is routed to this plan by the
-ledger**. **Nothing in this plan measures it or names a harness for it.**
+contracts → The three performance contracts must stay separate. Its **statistic, environment
+and load model are bound by `DIRA1-MVP-v1`** (U-3 and U-24 resolved; see
+`docs/architecture/testing-strategy.md` § DIR-A1). It is **not** ACM-9 (the facade resolver)
+and **not** P6 (`resolveAudiences`). `PMC-E1-S1.9` "Directory Performance Evidence at 500+
+Rows" is the story that will carry that evidence, and **no obligation for it is routed to this
+plan by the ledger**. **Nothing in this plan runs the harness or records the artifact.**
 
-A related conflation hazard is recorded and **not resolved here**: blocker
-`QUALITY-GATE-AC-NFR` is recorded closed on ACM-9 facade-resolver evidence, while
-`PMC-E1-S1.9` routes the *directory-list* evidence into that same gate name. Open as **U-25**.
+**Gate identity (U-25 resolved):** `QUALITY-GATE-AC-NFR` governs contract **B** (ACM-9 facade)
+only. Directory-list evidence is evaluated against release gate **`PG-04`** / contract **A**;
+`PMC-E1-S1.9` cites `PG-04`.
 
 ---
 
@@ -165,9 +165,9 @@ Open, and **answered nowhere in this document**. Register of record:
 | Question | Subject | Owner |
 | --- | --- | --- |
 | **U-3** | Percentile definition, concurrent-user / load model and target environment for the All Employees ≤ 2-second requirement. Partially resolved by `PMC-E1-S1.9`; **three parameters stay open.** | Product Owner (threshold), Platform / DevOps (environment) |
-| **U-24** | Which harness measures the All Employees list ≤ 2-second requirement (contract **A**). It does not exist, and no binding document selects one. | Platform / DevOps + QA (harness); Product Owner (threshold semantics) |
-| **U-25** | Which subject the `QUALITY-GATE-AC-NFR` gate governs, given it is recorded closed on ACM-9 evidence while `PMC-E1-S1.9` routes directory-list evidence into the same gate name. | Platform epic owner + QA |
-| **U-12** | Test-file location conventions, the second vitest config and `@testing-library/react` — a **prerequisite for the frontend net-new cases in this plan**. | DEV |
+| **U-24** | **Resolved** — `DIRA1-MVP-v1` (`docs/architecture/testing-strategy.md` § DIR-A1) | Platform / DevOps + QA |
+| **U-25** | **Resolved** — `QUALITY-GATE-AC-NFR` = contract **B** only; `PG-04` = contract **A** | Platform epic owner + QA |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; second config `vitest.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), **not yet merged**. | DEV |
 | **U-10** | Browser support beyond Chromium. | Product Owner |
 
 ---

@@ -81,7 +81,7 @@ Negative cases are first-class: every `—` cell of the §3.2 access matrix, unf
 
 The narrowed Project-line cells (S2/S3 denied, S5 CV/certificates only), named-recipient share links, organisational self-assignment denial/journaling, runtime role creation, and departure revocation require explicit regression scenarios. If good-to-have notifications are built, automate negative content checks per notification type and audience; delivery totals are not a privacy oracle.
 
-For AD-19/AD-20, stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario still stops for its own human approval before stage 2.
+For AD-19/AD-20, stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario is written and committed before Stage 2 begins; per "Stage approval was removed on 2026-09-04" above, no human approval gates that transition.
 
 **Kernel MVP exception.** The scoped AD-20 amendment in
 `_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/fr-architecture-amendment.md` defers request-time due/departure evaluation and
@@ -114,9 +114,10 @@ scoped Stage-2 boundary for ACM-1, ACM-2, ACM-3, ACM-4, ACM-5, and ACM-8:
 - Do not fake an Access Control repository and do not override a User
   Management provider.
 - Do not create a test-only, debug, or artificial HTTP endpoint.
-- Preserve AD-1 unchanged: scenario prose, independent human approval, a
-  separate Stage-2 dispatch committed red and independently approved, then a
-  separate production dispatch.
+- Preserve AD-1 as currently defined above: scenario prose, then a separate
+  Stage-2 dispatch committed red, then a separate production dispatch — no
+  human approval gates any of these transitions (per "Stage approval was
+  removed on 2026-09-04" above).
 
 ACM-0 sits inside the same boundary but has no facade call to make: its subject
 is the deploy-time root User step, so its Stage-2 evidence runs against migrated
@@ -250,6 +251,59 @@ so depth 499 costs ~960 ms while depths 5-50 cost 9-12 ms. Real reporting
 chains run on the order of 5-10 levels, so the shipped range uses about 0.5% of
 the two-second budget. The deep shapes are a canary for algorithmic change, not
 a description of production load.
+
+### DIR-A1 operational measurement protocol — `DIRA1-MVP-v1`
+
+Contract **A** (release gate `PG-04`): the composed **All Employees HTTP/list
+route** (`GET /users`), end to end, including permission resolution — **not**
+the AccessControl facade resolver (contract B / ACM-9) and **not**
+`resolveAudiences` (contract C / P6).
+
+This sequence is a repeatable MVP measurement method, not normative list-handler
+behavior:
+
+1. Every started run first reserves a new immutable append-only artifact path
+   with a run id and role (`baseline` or `final`). Reservation is atomic and
+   precedes every fallible step. Finalization rewrites only the status and
+   results block to `PASS`, `FAIL`, or `INCOMPLETE`. Never overwrite a prior run.
+2. Boot the real `AppModule` (real HTTP, real PostgreSQL, no provider overrides
+   on database or access-control ports). The viewer holds a live
+   `user-management:list` functional-role grant.
+3. Seed **500+ active employees** with representative relationship breadth
+   (balanced depth-4 reporting tree) and record fixture breadth/depth in the
+   artifact. No real personal data.
+4. Measure three independent list gates — do not aggregate a slow gate into a
+   combined percentile:
+   - `default-first-page` — `GET /users?page=1&pageSize=25` (active-only default,
+     includes total-count query);
+   - `filtered-first-page` —
+     `GET /users?country=Poland&position=Engineer&page=1&pageSize=25`;
+   - `filtered-deep-page` — `GET /users?country=Poland&page=3&pageSize=50`.
+5. Each gate uses five discarded warm-up requests and twenty measured requests.
+   Timing is wall-clock HTTP end to end through the Nest application. Run
+   `EXPLAIN (ANALYZE, BUFFERS)` separately from latency samples on a
+   representative count predicate for the gate.
+6. Record p50, p95, and worst case per gate. **Pass rule:** warm **p95** and
+   **absolute worst case** must both be ≤ 2 seconds per gate. Fail and stop
+   immediately when either bound is breached on a measured gate.
+7. **Load model:** one HTTP client, sequential requests, one request in flight.
+8. **Environment:** local PostgreSQL started via `npm run db:up` in
+   `services/backend`, recorded via versioned `DIRA1-MANIFEST-v1` hashes (same
+   canonical JSON rules as `ACM9-MANIFEST-v1`).
+9. Each artifact records protocol version, fixture/environment manifests and
+   hashes, source/workspace revisions, PostgreSQL configuration, migration
+   revision, gate results, first breach, and stop reason. A `final` artifact
+   references an approved `baseline` run id and must match its protocol, fixture,
+   and environment hashes to be `comparable`.
+10. **Harness:** `npm run measure:user-management:dira1 -- --role baseline|final`
+    in `services/backend`. Selected by `test/jest-dira1.json`; normal
+    `npm test` and `npm run test:e2e` do not include it.
+
+**Binding authority for contract A statistic, environment, and load model
+(2026-09-11):** warm p95 **and** worst case per gate; local docker-compose
+PostgreSQL; single sequential client. This protocol does **not** discharge
+`QUALITY-GATE-AC-NFR` (contract B). The DIR-A1 CI job, if added, stays
+**informational** until repository governance promotes it.
 
 ## Test data isolation (DEC-UM-010)
 

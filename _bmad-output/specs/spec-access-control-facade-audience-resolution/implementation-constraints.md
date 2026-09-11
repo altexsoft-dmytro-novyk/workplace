@@ -43,7 +43,7 @@ src/access-control/
 
 ## Verification obligations
 
-Production work starts only after independently approved stage-1 scenarios and stage-2 E2E are committed red.
+Production work starts only after stage-1 scenarios exist and stage-2 E2E are committed red (AD-1 ordering only — the per-stage human approval was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`)).
 
 Automation candidates:
 

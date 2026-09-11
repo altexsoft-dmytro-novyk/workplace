@@ -6,6 +6,7 @@
 - [access-control.md § Audience columns](../../../architecture/access-control.md#audience-columns-32) — Colleague is for an authenticated employee with none of the other audience facts.
 - [access-control.md § Multi-audience merge](../../../architecture/access-control.md#multi-audience-merge) — stronger independently computed columns are not collapsed into the fallback.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp).
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — strongest applicable audience is per section) — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

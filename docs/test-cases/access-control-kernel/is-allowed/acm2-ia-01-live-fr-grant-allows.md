@@ -9,6 +9,7 @@
 - [access-control.md § Functional-role Kernel MVP (AD-4)](../../../architecture/access-control.md#functional-role-kernel-mvp-ad-4) — the evaluator joins the active user, attachment, FR policy, grant, and canonical key.
 - [database-schema.md §§ Permissions, PolicyPermissions, UserPolicies](../../../architecture/database-schema.md#permissions) — canonical key, FR grant join, and attachment join.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — real module, Prisma adapters, migrated PostgreSQL, and no invented HTTP endpoint.
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — functional-role evaluation underlying "roles remain separate") — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

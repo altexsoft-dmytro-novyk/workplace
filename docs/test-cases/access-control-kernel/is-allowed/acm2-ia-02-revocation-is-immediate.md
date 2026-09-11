@@ -9,6 +9,7 @@
 - [access-control.md § Functional-role Kernel MVP (AD-4)](../../../architecture/access-control.md#functional-role-kernel-mvp-ad-4) — `isAllowed` is live and data-driven.
 - [database-schema.md §§ Permissions, PolicyPermissions, UserPolicies](../../../architecture/database-schema.md#permissions) — the permission/grant/attachment rows that make the join reachable.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — evaluate through the public facade against real PostgreSQL.
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` and `TR-2.3-02` (v1.5 §2.3 — removal immediate half only; "independently grantable via UI" half has no scenario) — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

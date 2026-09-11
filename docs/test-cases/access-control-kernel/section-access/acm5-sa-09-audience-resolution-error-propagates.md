@@ -8,6 +8,7 @@
 - Architecture spine [AD-3](../../../../_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/ARCHITECTURE-SPINE.md#ad-3--kernel-evidence-and-consumer-evidence-are-separate-amended-2026-08-30-p2) — the kernel subject is the public facade, never an invented HTTP endpoint.
 - [access-control.md § The AccessControl facade](../../../architecture/access-control.md#the-accesscontrol-facade-ad-9) and [§ Audience columns](../../../architecture/access-control.md#audience-columns-32) — section access consumes the live audience result and does not substitute a policy-table decision.
 - [testing-strategy.md § The gate (AD-1)](../../../architecture/testing-strategy.md#the-gate-ad-1--no-exceptions-to-ordering-or-stage-separation) and [§ Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — this is Stage-1 prose for the facade gate.
+- **U-19 normative coverage:** Weak mechanism-level support for `TR-3.1-01` (v1.5 §3.1 — server assembles sections per request) — headless-facade edge-case proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

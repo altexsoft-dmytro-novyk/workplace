@@ -8,15 +8,17 @@ generatedAt: '2026-09-10'
 projectName: 'people management'
 runScope: 'system-level'
 runKey: 'system'
-approval: 'ungranted'
-validation: 'NOT RUN'
-status: 'draft — approval ungranted, validation NOT RUN'
+approval: 'granted'
+approvedAt: '2026-09-11'
+validation: 'PASS'
+validatedAt: '2026-09-11'
+status: 'approved — validation PASS (system-level, 2026-09-11)'
 baselineCommit: '76a7220701ac6f16843dad8b303934f9a958b54c'
 ---
 
 # TEA → BMAD Integration Handoff (Platform)
 
-> ## Status: **ungranted**. This document inherits nothing from the two documents it replaces.
+> ## Status: **approved**. This document inherits nothing from the two documents it replaces.
 >
 > This path previously held the **User Management** handoff, whose frontmatter read
 > `status: 'approved'` and whose footer read "**Status:** Approved 2026-08-25. Stage-1
@@ -25,8 +27,9 @@ baselineCommit: '76a7220701ac6f16843dad8b303934f9a958b54c'
 > [`test-design/people-management-platform-handoff.md` at `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design/people-management-platform-handoff.md), was an
 > explicitly unapproved 2026-08-29 v1.5 draft.
 >
-> - **Approval:** ungranted. No human has approved this document.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here.
+> - **Approval:** **granted 2026-09-11** (explicit stakeholder confirmation in workspace).
+> - **Validation:** **PASS** — system Validate recorded in `test-design-validation-report.md`
+>   (2026-09-11). Not a release verdict.
 > - **Coverage:** none asserted. No pass rate, no percentage and no green gate appears
 >   anywhere in it.
 > - **Scope changed with the filename.** The old document at this path was scoped to the
@@ -138,9 +141,9 @@ Every platform story records **exactly one** planning state. The definitions are
 > separate rule that a **present scenario document is not coverage**.
 
 **Open blockers and sign-off packages** are owned by `test-design-architecture.md` § Open
-blockers and § Sign-off-ready packages. Six of the nine `PR-B-*` blockers are closed **at
-design only**; **none is closed at implementation**, and both `PR-S-01` and `PR-S-02` sign-offs
-remain **ungranted** (U-2). A design artifact is not mitigation completion.
+blockers and § Formally signed-off packages with implementation blockers. Six of the nine `PR-B-*` blockers are closed **at
+design only**; **none is closed at implementation**, and both `PR-S-01` and `PR-S-02` sign-offs are
+[recorded in the PM memlog](../../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). A design artifact is not mitigation completion; neither approval closes an implementation or evidence blocker.
 
 ---
 
@@ -193,14 +196,14 @@ Restated here only because a story author reading a handoff is exactly who confl
 
 | Contract | Subject | State |
 | --- | --- | --- |
-| **A** | The **All Employees list** at 500+ records with arbitrary filters and derived fields, including permission resolution, ≤ 2 seconds (v1.5 §7). Release gate `PG-04`. **Priority P0.** | **Statistic, environment and load model are UNKNOWN. Harness is UNDECIDED (U-24) — no binding document names one.** No measurement of this subject exists. |
+| **A** | The **All Employees list** at 500+ records with arbitrary filters and derived fields, including permission resolution, ≤ 2 seconds (v1.5 §7). Release gate `PG-04`. **Priority P0.** | Harness **`DIRA1-MVP-v1`**. **PASS** — `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json` (local env). |
 | **B** | The **AccessControl facade resolver** at 500 requested active targets, per-shape gates, `ACM9-MVP-v1`. | A binding protocol with its own thresholds. Its CI job is **informational** and this migration proposes no promotion of it to a blocking check. |
 | **C** | The **`resolveAudiences` function**, P6 measurement in milliseconds. | A measurement record, **not a gate**, and must never be treated as one. |
 
 **B and C are not evidence for A.** A story that cites an ACM-9 or P6 artifact against the
-All Employees requirement is citing the wrong subject. The blocker `QUALITY-GATE-AC-NFR` is
-recorded **closed** on contract-B evidence while `PMC-E1-S1.9` routes contract-A evidence into
-the same gate name; that collision is **U-25**, open, and is not resolved here.
+All Employees requirement is citing the wrong subject. **`QUALITY-GATE-AC-NFR` governs contract B
+only** (U-25 resolved). Directory-list evidence is evaluated against release gate **`PG-04`** /
+contract **A**; `PMC-E1-S1.9` cites `PG-04`, not `QUALITY-GATE-AC-NFR`.
 
 ---
 
@@ -232,13 +235,14 @@ percentage against any of them.*
 > rationale ("while the **171** Phase-1 files await **per-file approval**") is retired in full:
 > the per-file approval gate was removed on 2026-09-04 and was the gate's only stated support,
 > and the 171-file subject does not exist. **Correction, explicitly labelled and not a current
-> input:** the real inventory is **101** files — `docs/test-cases/access-control-foundation/`
-> (10) and `docs/test-cases/access-control-kernel/` (91). The cited path
+> input:** the real inventory is **99 scenario documents** — `docs/test-cases/access-control-foundation/`
+> (9) and `docs/test-cases/access-control-kernel/` (90), with **101** raw Markdown files when both READMEs are included. The cited path
 > `docs/test-cases/access-control/` does not exist. The gate is nevertheless **not** promoted to
 > schedulable: three currently open blockers (`SEC-AUTH-01` P0, `CC-07` P0,
 > `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1) independently keep it unschedulable, none of which is
-> an approval state. What recorded condition would make it schedulable, and who evaluates it, is
-> **U-20** — open.
+> an approval state. **Schedulable condition (U-20 resolved):** all four blockers closed at
+> implementation in the current blocker register; evaluated by Platform epic owner + Architect with
+> a current re-verification record.
 
 > **The whole-repository trace remains a planning audit run with `allow_gate=false`.** Its
 > aggregate percentage is never release readiness. This migration issues no verdict and
@@ -288,7 +292,7 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 | Source family | Source | Successor location | Note |
 | --- | --- | --- | --- |
 | `R-001`..`R-014` (scope key `legacy-um:`) | UM handoff § Risk-to-Story Mapping | `test-design-architecture.md` § Risk register and the owning epic plans; per-ID in migration map §4.1 | **Not renumbered.** `R-003`, `R-004`, `R-013` are **retired** (their decisions became normative: DEC-UM-004, DEC-UM-005; and PM/AD-16 removes the create path). `R-005` **merges into `PR-006`** — same All Employees latency risk, different stated subject. `R-008` merges into `test-design-qa.md` § Execution strategy. `R-012` merges into `PR-010`. |
-| `PR-001`..`PR-010` (scope key `plat:`) | platform handoff § Risk-to-Domain Mapping | `test-design-architecture.md` § Risk register, with evidence in `test-design-qa.md` § Risk → evidence map | All ten keep their identifier, score and P×I. **No score is renormalised.** `PR-009`'s subject is restated against the real 101-file access-control inventory; `PR-006` absorbs `legacy-um:R-005`; `PR-010` absorbs `legacy-um:R-012`. |
+| `PR-001`..`PR-010` (scope key `plat:`) | platform handoff § Risk-to-Domain Mapping | `test-design-architecture.md` § Risk register, with evidence in `test-design-qa.md` § Risk → evidence map | All ten keep their identifier, score and P×I. **No score is renormalised.** `PR-009`'s subject is restated against the real 99-scenario-document access-control inventory; `PR-006` absorbs `legacy-um:R-005`; `PR-010` absorbs `legacy-um:R-012`. |
 | `R-UM-*`, `R-FE-*` | the retired area plans, not the handoffs | the owning epic plans, or the QA improvement backlog where no product epic owns them | Listed here because handoff readers meet them next. `R-UM-04` scores **6**; its "Medium (Score 3–4)" heading was the defect, not the score. |
 
 ### Test and trace identifiers
@@ -304,18 +308,18 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 | `TD-UM-LIST-01..04` | UM handoff § Story-Level | `test-design-epic-user-management-1.md`, with the visibility-safe half in `test-design-epic-user-management-7.md` | Net-new on 2026-08-25. |
 | `TD-UM-REL-01..08` | UM handoff § Story-Level | `test-design-epic-user-management-4.md`; the mentorship split (`REL-04/05/06` and half of `REL-07`) to `test-design-epic-mentorship-1.md` | Mentorship became its own domain; the re-home is not inheritance. |
 | `TD-UM-AC-01` | UM handoff cross-epic gate | `test-design-epic-user-management-0.md` | With `legacy-um:R-001`'s epic half. |
-| `TD-UM-NFR-*` | UM handoff / QA design | `test-design-qa.md` § NFR measurement contracts | `TD-UM-NFR-PERF-01` becomes **contract A**, harness UNDECIDED. `TD-UM-EXP-02` stays **retired** — its "if limits specified" trigger is unmet (U-11). |
+| `TD-UM-NFR-*` | UM handoff / QA design | `test-design-qa.md` § NFR measurement contracts | `TD-UM-NFR-PERF-01` becomes **contract A**; harness **`DIRA1-MVP-v1`** (U-24 resolved). `TD-UM-EXP-02` stays **retired** — its "if limits specified" trigger is unmet (U-11). |
 | `TR-*` (119 rows) | platform handoff and QA design | `test-design-qa.md` § Normative coverage map | Identifiers unchanged. |
 
 ### Gate, blocker and decision identifiers
 
 | Source family | Successor location | Note |
 | --- | --- | --- |
-| `PG-01`..`PG-06` | `test-design-qa.md` § Release gates | Identifiers unchanged. `PG-01` keeps its conclusion on a **replaced** rationale; `PG-04` is bound to contract A. |
+| `PG-01`..`PG-06` | `test-design-qa.md` § Release and design gates | Identifiers unchanged. `PG-01` keeps its conclusion on a **replaced** rationale with a recorded schedulable condition (U-20 resolved). `PG-04` is bound to contract A; `QUALITY-GATE-AC-NFR` is contract B only (U-25 resolved). |
 | `DG-01`..`DG-04` | `test-design-qa.md` § Design gates | `DG-01` restated under D-1. **`DG-05` is retired with no successor** — it was a child-ownership gate premised on the split this migration dissolves. |
 | `PR-B-01`..`PR-B-04`, `PR-B-06`, HR-Admin half of `PR-B-05` | `test-design-architecture.md` § Ratified design decisions | Closed **at design**; implementation or evidence work may remain. |
 | `PR-B-05` (default-role half), `PR-B-07`..`PR-B-09` | `test-design-architecture.md` § Open blockers | Open at design and/or implementation; none closed at implementation. |
-| `PR-S-01 / CC-04`, `PR-S-02 / CC-06` | `test-design-architecture.md` § Sign-off-ready packages | Both **ungranted**. |
+| `PR-S-01 / CC-04`, `PR-S-02 / CC-06` | `test-design-architecture.md` § Formally signed-off packages with implementation blockers | **Granted** by the [recorded PO + Architect decision](../../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md); independent implementation blockers remain open. |
 | `DEC-UM-001`..`DEC-UM-012` | `docs/architecture/user-management-test-decisions.md` (unchanged by this migration) | `DEC-UM-012` stays **draft**. `DEC-UM-006` and `DEC-UM-008` are RETIRED. |
 | Legacy story numbers `1.1`..`4.2` | canonical `UM-E{n}-S{n.m}` identities in the epic plans | Nothing is renumbered; the old bare numbers were never canonical epic identities. Story 1.4 "Deactivate" has **no** canonical successor under PM/AD-16 / AD-22. |
 | `frontend` as an epic identity | **retired** | `frontend` is not a domain and not an epic. Its obligations re-home to epic plans or the QA improvement backlog. |
@@ -340,17 +344,20 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 Recorded so a story author does not mistake silence for resolution. Full register:
 `test-design/migration-map.md` §10.
 
-**U-2** both `PR-S-*` sign-offs · **U-4** WCAG level and viewport set · **U-5** uptime SLO,
+**U-2** resolved — `PR-S-*` sign-off closure rule · **U-4** WCAG level and viewport set · **U-5** uptime SLO,
 RTO, RPO, backup and retry envelope · **U-6** draft `DEC-UM-012` · **U-9** whether the three
 permission keys get seeded · **U-10** browser support beyond Chromium · **U-11** frontend
-budgets, accessibility requirements and photo-upload limits · **U-12** test-file location
-conventions · **U-13** proactive logout · **U-16** whether platform Story 1.6 is satisfied ·
-**U-17** what closes the six design-closed blockers at implementation · **U-18** the
-self-contradiction in `docs/architecture/testing-strategy.md` · **U-19** which access-control
-scenario file covers which `TR-*` row · **U-20** what makes `PG-01` schedulable · **U-21** the
+budgets, accessibility requirements and photo-upload limits · **U-12** resolved by DEV
+(2026-09-11) — co-located `*.test.ts`/`*.test.tsx`, second vitest config,
+`@testing-library/react`; `services/frontend` branch `feat/u-12-unit-component-testing`
+(`60bc882`), not yet merged · **U-13** proactive logout · **U-16** whether platform Story 1.6 is satisfied ·
+**U-17** what closes the six design-closed blockers at implementation · **U-18** resolved —
+`docs/architecture/testing-strategy.md` self-contradiction fixed by its owner (2026-09-11) · **U-19** which access-control
+scenario file covers which `TR-*` row · **U-21** the
 20 history-only retired scenario files · **U-22** the `useAuth().userId` consumption gap ·
-**U-23** the current implemented-test count · **U-24** contract A's harness · **U-25** the
-`QUALITY-GATE-AC-NFR` conflation.
+**U-23** resolved — implemented-test inventory in `test-design-qa.md` § Implemented-test inventory ·
+**U-24** resolved — contract A's harness is `DIRA1-MVP-v1` · **U-25** resolved — the
+`QUALITY-GATE-AC-NFR` conflation (governs contract B only; contract A uses `PG-04`).
 
 ---
 

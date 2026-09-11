@@ -657,7 +657,7 @@ requirements:
       so project-line managers entitled to S12 RW by §3.2 reach nothing. Must not be promoted
       beyond capped while that traversal is absent.
       GATE SCOPE CONTEST (not the same defect class as PM-FR-21/22/26/35): AC-S9-S13's id and
-      closure_condition ("an approved AD-1 increment for S9-S13") DO cover S12, but its blocks:
+      closure_condition ("a delivered AD-1 increment for S9-S13") DO cover S12, but its blocks:
       field names only S9 and S13, and PLAT-E6-S6.5 gates S12 on the unregistered
       AC-SECTION-MATRIX-01 instead. platform/epics.md's Gate binding table lists S12 in no row.
       This slice uses the registered ID; access-control owes a resolution before either slice is
