@@ -226,8 +226,8 @@ separately and is **not** an estimate input.
 | Stack    | Layer            | Files (suites)                | Cases                                                      | Status                                                                      |
 | -------- | ---------------- | ----------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------- |
 | Backend  | e2e              | 54 (`test/jest-e2e.json`)     | **506** discovered (**488** executable + **18** `it.todo`) | **VERIFIED** — supersedes contradictory 340 / 406 / "43 files" (2026-09-06) |
-| Backend  | unit             | 10 (`src/**/*.spec.ts`)       | **50**                                                     | **VERIFIED** — supersedes "5 unit" (2026-09-06)                             |
-| Backend  | contract         | 5 (`test/jest-contract.json`) | **18** pact interactions (1 provider suite)                | **VERIFIED**                                                                |
+| Backend  | unit             | 6 (`src/**/*.spec.ts`)        | **50**                                                     | **VERIFIED** — supersedes "5 unit" (2026-09-06)                             |
+| Backend  | contract         | 1 (`test/jest-contract.json`) | **18** pact interactions (1 provider suite)                | **VERIFIED**                                                                |
 | Frontend | Playwright e2e   | 7                             | **124**                                                    | **VERIFIED** — matches 2026-09-06 source                                    |
 | Frontend | component / unit | 0                             | 0                                                          | **VERIFIED** — no layer yet (U-12)                                          |
 | Frontend | Pact consumer    | 5                             | **18**                                                     | **VERIFIED**                                                                |
@@ -337,7 +337,7 @@ disagrees with the newer measured observations below, and all of them are `unver
 against a migrated database. It is not substitutable by `contract (Pact)` and not substitutable
 by `component`.
 - **Inventory — VERIFIED 2026-09-11 (U-23):** 54 e2e suites / **506** cases (**488** executable +
-**18** `it.todo`); 10 unit files / **50** cases; 5 contract files / **18** pact interactions.
+**18** `it.todo`); 6 unit files / **50** cases; 1 contract file / **18** pact interactions.
 Supersedes the contradictory 2026-09-06 figures (340 vs 406 cases; "43 files").
 - **Observed timings — VERIFIED 2026-09-11 on the same gitlink (local,** `--runInBand`**):** unit ~1.1 s;
 e2e ~97 s; contract ~2 s. **Pass rate is informational** (459 pass / 29 fail / 18 todo on e2e at

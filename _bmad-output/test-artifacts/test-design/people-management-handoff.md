@@ -353,8 +353,9 @@ conventions · **U-13** proactive logout · **U-16** whether platform Story 1.6 
 self-contradiction in `docs/architecture/testing-strategy.md` · **U-19** which access-control
 scenario file covers which `TR-*` row · **U-21** the
 20 history-only retired scenario files · **U-22** the `useAuth().userId` consumption gap ·
-**U-23** resolved — implemented-test inventory in `test-design-qa.md` § Implemented-test inventory
-`QUALITY-GATE-AC-NFR` conflation.
+**U-23** resolved — implemented-test inventory in `test-design-qa.md` § Implemented-test inventory ·
+**U-24** resolved — contract A's harness is `DIRA1-MVP-v1` · **U-25** resolved — the
+`QUALITY-GATE-AC-NFR` conflation (governs contract B only; contract A uses `PG-04`).
 
 ---
 
