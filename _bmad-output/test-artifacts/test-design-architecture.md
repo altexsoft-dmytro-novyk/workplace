@@ -320,7 +320,7 @@ absent.
 `docs/architecture/testing-strategy.md:5–23` (scenario document → committed-red Stage-2 test
 → production code) and the **ordering half only** of `docs/architecture/README.md`
 non-negotiables 1–2 — their *approval* half is superseded and is deliberately **not** used as
-authority here (see [Open questions](#open-questions), U-18).
+authority here (see the **resolved** U-18 record in [Open questions](#open-questions)).
 
 *Why it is less mitigated than the source described.* `testing-strategy.md:48–53` states
 plainly that removing the gate removed a real safeguard, and that "if the suites are not run
