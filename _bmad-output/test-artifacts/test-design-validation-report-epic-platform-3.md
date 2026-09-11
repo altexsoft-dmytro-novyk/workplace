@@ -504,47 +504,6 @@ this validation grants no approval.
 
 ---
 
-## Remediation record (appended 2026-09-12)
-
-**This report is not rewritten.** Everything above describes the plan and checkpoint **as
-evaluated**, at the content hashes it records. Those hashes no longer match current content: the
-plan and checkpoint were corrected the same day against these findings, following the precedent
-the index already sets for `PLAT-E2`.
-
-| Finding | Disposition |
-| --- | --- |
-| F-1 identifier collision | **Fixed.** Both files now use ACM order (C01=ACM-0 … C08=ACM-9); the plan states the identifier contract. |
-| F-2 unrecorded status caveat | **Fixed in the plan.** An execution-state caveat records that every Epic 3 story key is `done` and reframes the ~56–94 h estimate as evidence work against shipped behaviour. The canonical `epics.md` caveat — itself wrong about `sprint-status.yaml`, and mis-citing the coverage YAML path — is **not** corrected: that is Platform Story 1.1's traceability work. |
-| F-3 no AC traceability / five unnamed ACs | **Fixed.** An Acceptance-Criterion Traceability table maps every canonical AC to an obligation, a superseded marker, or a named external owner. |
-| F-4 restated gate thresholds | **Fixed.** Thresholds quoted verbatim, the access-control-suite clause restored, *covered* ≠ *pass* stated, and the Interworking "references rather than restates" claim corrected to "quotes where an obligation depends on it". |
-| F-5 priority inversion / no P0 criteria | **Fixed.** Priority criteria added; the P1-gates-P0 inversion is stated and reconciled with the Kernel Dependency Graph — execution follows the graph, not the P-label. |
-| F-6 missing sections | **Fixed.** Residual-risk table, `PG-03` defect exit gate, risk-category legend, per-priority criteria, knowledge-base appendix, and `PR-001`/`PR-002` linkage added. |
-| F-7 DEPT ownership / unpinned baseline | **Fixed.** Open item 3 names DEPT-2 and DEPT-4 (not "E4-owned"), retires the stale-test-lock claim, and states the AF-2 `profile:timeline:write` deviation; Open item 2 pins the `3a3cd71` baseline/final pair. |
-
-**Also corrected, from an independent requirements review run against the same plan** — outside
-this report's own findings and recorded here so the audit trail is complete:
-
-- The plan re-asserted the canonical ACM-8 criterion "`ACCESS_CONTROL_PORT` remains bound to
-  `InterimAccessControlAdapter`" as a **P0** obligation. That criterion is superseded: the port
-  binds `AccessControlFacadeAdapter` (`services/backend/src/user-management/user-management.module.ts:215`),
-  the interim adapter was deleted in backend `37a339a`, and `ACM8-KC-02` already asserts the
-  facade-backed adapter. Marked superseded; the three surviving ACM-8 obligations kept.
-- Requirements §2.1 *Timing of revocation* [NORMATIVE] had no obligation anywhere, though the epic
-  claims `PM-FR-2`. Added as `PLAT-E3-R07` with per-call re-resolution obligations on
-  `E3-C03`/`C04`/`C06`.
-- Requirements §3.2 note ¹ (manager / people partner / department are displayed in S1 but not
-  writable through it) had no negative obligation against `E3-C06`'s base `write`. Added as
-  `PLAT-E3-R08`.
-- S10/S11 Colleague field narrowing, S1 photo mutation, PM/AD-20 departure enforcement and the
-  `CC-07` journal gap are now recorded with their owner or deferral identifier instead of being
-  silent exclusions.
-
-**Verdict unchanged.** CONCERNS stands. This appendix is a remediation record, not a re-validation:
-no suite was executed, no approval is granted, and a byte-exact attestation of the corrected text
-requires a fresh Epic Validate run.
-
----
-
 **Completed by:** Anna Pikula (session), acting as Master Test Architect
 **Date:** 2026-09-12
 **Epic:** `PLAT-E3` — Access Control Kernel MVP

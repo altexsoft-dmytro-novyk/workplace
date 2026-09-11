@@ -132,12 +132,15 @@ Scores of 6+ require planned mitigation. Category legend: `SEC` security, `BUS` 
 
 Applied after [`test-design-validation-report-epic-platform-3.md`](test-design-validation-report-epic-platform-3.md)
 returned **CONCERNS** and an independent requirements review of the same plan returned
-*revisions needed*. The validation report is **not** rewritten: it accurately describes the
-pre-correction text, and its recorded plan hash therefore no longer matches current content.
+*revisions needed*. The validation report is left exactly as its run wrote it — a verdict is an
+attestation and is not hand-edited by a correction pass — so its recorded plan hash no longer
+matches current content. **A fresh Epic Validate run against the corrected text is required and
+pending.**
 
-- **Files changed in this correction:** this checkpoint, `test-design-epic-platform-3.md`, the
-  `PLAT-E3` row in `test-design/README.md`, and a remediation note appended to
-  `test-design-validation-report-epic-platform-3.md`.
+- **Files changed in this correction:** this checkpoint, `test-design-epic-platform-3.md`, and the
+  `PLAT-E3` row in `test-design/README.md` — exactly the set Step 1 declares. An earlier draft of
+  this pass also appended a remediation note to
+  `test-design-validation-report-epic-platform-3.md`; that was withdrawn as out of set.
 - **Deliberately not changed:** the canonical `epics.md` (its *Kernel MVP status caveat* is itself
   wrong about `sprint-status.yaml` and mis-cites the coverage YAML path — that correction is
   **Platform Story 1.1's** traceability work, and the file is additionally under a concurrent
@@ -161,4 +164,6 @@ residual-risk table, `PG-03` defect exit gate, risk legend and knowledge-base ap
 baseline pinned with discovery framing; PM/AD-20 and `CC-07` named as deferrals.
 
 **Result:** correction only. No suite was executed, no approval is granted, and the CONCERNS
-verdict stands until a fresh Epic Validate runs against the corrected text.
+verdict stands until a fresh Epic Validate runs against the corrected text. That run is the next
+action, not an optional follow-up: leaving a stale verdict against a changed document is the same
+class of defect this correction records against the canonical `epics.md` caveat.

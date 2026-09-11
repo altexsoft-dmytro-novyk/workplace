@@ -13,14 +13,17 @@ date: '2026-09-12'
 
 # Test Design: PLAT-E3 — Access Control Kernel MVP
 
-**Status:** Written — approval ungranted; validation CONCERNS (2026-09-12), plan corrected the same day.
+**Status:** Written — approval ungranted; last validation verdict CONCERNS (2026-09-12) against the pre-correction text; plan corrected the same day; **re-validation pending**.
 **Scope:** Epic-level test design for the deployable, headless Access Control kernel.
 **Canonical source:** `_bmad-output/planning-artifacts/platform/epics.md`, `## Epic 3: Access Control Kernel MVP`.
 
 > **Correction record (2026-09-12).** This plan was corrected after
 > [`test-design-validation-report-epic-platform-3.md`](test-design-validation-report-epic-platform-3.md)
-> returned CONCERNS. The report describes the **pre-correction** text and is not rewritten.
-> The corrections are listed in [Correction log](#correction-log).
+> returned CONCERNS. That report evaluated the **pre-correction** text and is left exactly as its
+> validation run wrote it — a verdict is an attestation and is never hand-edited. Its recorded
+> hashes therefore no longer match this file. **A fresh Epic Validate run against this corrected
+> text is required and pending**; until it completes, CONCERNS is the last verdict any validation
+> actually produced. The corrections are listed in [Correction log](#correction-log).
 
 ## Executive Summary
 
@@ -350,6 +353,10 @@ Applied 2026-09-12 after validation CONCERNS. Ordered by severity.
 | 13 | PM/AD-20 departure deferral named with its identifier; `CC-07` journal gap recorded. | Requirements review F8 |
 | 14 | The `hr-admin` reconciliation recorded as open at both ends with no accepting owner. | Validation cross-link |
 
+The pre-correction draft of this pass also appended a remediation record to the validation report
+itself. That was withdrawn: the report is written by a Validate run, and a correction pass editing
+it blurs who attested what. This log is the correction record; the report stays as its run left it.
+
 Not applied: the canonical `epics.md` *Kernel MVP status caveat* is itself factually wrong about
 `sprint-status.yaml` and cites `global-fr-epic-story-coverage.yaml` at a path it does not occupy.
 Correcting the epic source is **Platform Story 1.1's** traceability work and is outside this
@@ -359,7 +366,8 @@ plan's allowed file set; the discrepancy is recorded in the execution-state cave
 
 No approval is granted by this Create run or by this correction. Human review may approve this
 plan; validation is a separate Epic Validate operation and returned **CONCERNS** on the
-pre-correction text.
+pre-correction text. A correction pass cannot clear a validation verdict — only a fresh Epic
+Validate run against this text can, and it has not yet run.
 
 ## References
 
