@@ -51,8 +51,8 @@ renumbered** and no ClickUp mapping is touched.
 
 | Scope | Canonical epic ID / source | Outputs | Checkpoints | Status |
 | --- | --- | --- | --- | --- |
-| **Platform (system-level)** | **Not an epic.** Sources: `docs/project-requirements.md` v1.5 (normative) · `_bmad-output/planning-artifacts/prds/prd-people-management-2026-08-24/prd.md` + `addendum.md` · `…/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` (PM spine) · the binding rendered rules under `docs/architecture/` | `test-design-architecture.md` · `test-design-qa.md` · `test-design/people-management-handoff.md` | `test-design-progress-system.md` (`runScope: system-level`, `runKey: system`, `workflowStatus: generated`) | **WRITTEN.** Approval **granted 2026-09-11**. Validation **PASS** (2026-09-11). Coverage: none asserted. |
-| **Platform validation** | — | `test-design-validation-report.md` | — | **PASS (2026-09-11).** System Validate (contract §4.5) evaluated the architecture/QA pair and literal handoff at the content hashes recorded in the report. No epic validation may overwrite it. |
+| **Platform (system-level)** | **Not an epic.** Sources: `docs/project-requirements.md` v1.5 (normative) · `_bmad-output/planning-artifacts/prds/prd-people-management-2026-08-24/prd.md` + `addendum.md` · `…/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md` (PM spine) · the binding rendered rules under `docs/architecture/` | `test-design-architecture.md` · `test-design-qa.md` · `test-design/people-management-handoff.md` | `test-design-progress-system.md` (`runScope: system-level`, `runKey: system`, `workflowStatus: generated`) | **WRITTEN.** Approval **granted 2026-09-11**. Validation **PASS** (2026-09-11). Coverage: none asserted. **`test-design-qa.md` was edited the same day, after the PASS below was recorded** — a System Edit (contract §4.3) correcting three stale `(invalidated)` cross-references in § U-19 to match the `ACF-FC-01`/`ACF-FC-02` rework. See that file's own "Post-validation correction" note. |
+| **Platform validation** | — | `test-design-validation-report.md` | — | **PASS (2026-09-11).** System Validate (contract §4.5) evaluated the architecture/QA pair and literal handoff at the content hashes recorded in the report. No epic validation may overwrite it. **That hash for `test-design-qa.md` no longer matches current content** after the same-day post-PASS correction noted above; the report itself is unchanged and still accurately describes what it evaluated at the time. Re-validate for a byte-exact current attestation. |
 | **Migration record** | — | `test-design/migration-map.md` | — | **WRITTEN.** A disposition ledger — not a strategy, not coverage, not an approval. 565 rows; findings F-1..F-18; decision register U-1..U-25. |
 | **Workflow routing** | — | `docs/test-design-workflow-contract.md` · `_bmad/custom/bmad-testarch-test-design.toml` | — | **ACTIVE TEAM POLICY.** Resolves system and domain-qualified epic identities consistently for Create, context loading, Edit, Resume and Validate. It grants no approval or evidence. |
 | **This index** | — | `test-design/README.md` | — | **WRITTEN.** Current as of 2026-09-10. |
@@ -81,17 +81,33 @@ checkpoint. Superseded epics are excluded.
 | User Management — Visibility-Safe Filtering and Columns | `UM-E7` · `### Epic 7` | `test-design-epic-user-management-7.md` | `…-epic-user-management-7.md` (`epic-user-management-7`) | **WRITTEN.** Holds the anti-inference half of the directory filter cluster; the `UM-E1-S1.5` / `UM-E7` boundary is settled (identity-field whitelist → `UM-E1-S1.5`; `PM-FR-5` anti-inference including result-count differencing → `UM-E7`). Ungranted · NOT RUN. |
 | Mentorship — Mentorship Hub | `M-E1` · `planning-artifacts/mentorship/epics.md` `### Epic 1` | `test-design-epic-mentorship-1.md` | `test-design-progress-epic-mentorship-1.md` (`epic-mentorship-1`) | **WRITTEN.** Holds the mentorship split of `TD-UM-REL-04/05/06` and half of `REL-07`, re-homed out of the `legacy-um` `REL-*` family. Ungranted · NOT RUN. |
 | Platform Capabilities — Permission-Safe People Directory | `PMC-E1` · `planning-artifacts/platform-capabilities/epics.md` `### Epic 1` | `test-design-epic-platform-capabilities-1.md` | `…-epic-platform-capabilities-1.md` (`epic-platform-capabilities-1`) | **WRITTEN.** Holds `fe-epic:R-FE-05` / `PersonPicker`, directory sort stability and directory search. Ungranted · NOT RUN. |
+| Platform — Platform Spec v1.5 Alignment | `PLAT-E1` · `planning-artifacts/platform/epics.md` `## Epic 1` | `test-design-epic-platform-1.md` | `…-epic-platform-1.md` (`epic-platform-1`) | **WRITTEN 2026-09-11.** First plan created under the active-epic policy (below). **Carries no transferred obligation — 0 ledger rows target it**; its 21 `plat-e1:AV-*` artifact-verification obligations are newly stated from the epic's own acceptance criteria and are **not test cases**. Documentation-alignment epic: evidence levels are `repository-audit` / `manual-review` only. Ungranted · NOT RUN. |
+| Platform — Access Control Foundation | `PLAT-E2` · `planning-artifacts/platform/epics.md` `## Epic 2: Access Control Foundation` | `test-design-epic-platform-2.md` | `test-design-progress-epic-platform-2.md` (`epic-platform-2`) | **WRITTEN (2026-09-11).** Created under the one-plan-per-active-epic policy, **not** from a transferred obligation — the ledger routes zero rows here. A rework/evidence-integrity plan for `ACF-1`. **`ACF-RW-01..03` (the Stage-1/Stage-2 divergence at `da7d1fa`) executed and closed the same day** — `ACF-AU-05`/`ACF-FC-01`/`ACF-FC-02` carry a fresh AD-1 approval. Still open: the four allow cases that assert `200` on an unwired route, and the Contract C (P6) reading. Ungranted · NOT RUN. |
 
 **Epic validation reports do not exist.** `test-design-validation-report-epic-{domain}-{number}.md`
 is written **when an epic is actually validated**, and **no epic has been validated**. An epic
 validation report never overwrites the system report.
 
-**No plan is created** for `UM-E8`, any `PLAT-E*`, `RA-E*`, `TT-E*`, `RS-E*`, `RISK-E*`,
-`CDS-E*`, `PSH-E*`, `FB-E*` or `ENG-E*` epic, because no obligation in the superseded set
-transfers to them. Their platform-level coverage lives in the `TR-*` normative coverage map in
-`test-design-qa.md`. `ENG-E3` and `ENG-E4` are marked *(superseded)* in their source and no
-plan may be created for them. **A domain with no plan is not a statement that the domain needs
-no test design.** `UM-E6` is a separate case — see [§4](#4-unplanned-scopes-and-owners).
+**The blanket "no plan is created" rule is retired (2026-09-11).** It previously read: *"No plan
+is created for `UM-E8`, any `PLAT-E*`, `RA-E*`, `TT-E*`, `RS-E*`, `RISK-E*`, `CDS-E*`, `PSH-E*`,
+`FB-E*` or `ENG-E*` epic, because no obligation in the superseded set transfers to them."* Under
+the active-epic policy stated at the top of this section, **absence of a transferred obligation is
+no longer a reason not to plan an epic**, and that sentence contradicted the section's own opening
+rule. `PLAT-E1` is the first scope re-planned under the new policy and is indexed above.
+
+**What is retired is the rule, not the fact.** No obligation in the superseded set transfers to
+those epics; that remains true and is why `PLAT-E1`'s plan states obligations derived from its own
+acceptance criteria rather than migrated ones. Their platform-level coverage continues to live in
+the `TR-*` normative coverage map in `test-design-qa.md`, which no epic plan restates.
+
+**Still unplanned, and now simply _not yet created_ rather than forbidden:** `UM-E8`,
+`PLAT-E3`–`PLAT-E8`, `RA-E*`, `TT-E*`, `RS-E*`, `RISK-E*`, `CDS-E*`, `PSH-E*`, `FB-E*` and the
+active `ENG-E*` epics. Each needs its own Create run, and **each run asserts nothing about the
+others.** Two runs have happened under this policy, both on 2026-09-11: the `epic-platform-1` run
+that retired the blanket rule, and the `epic-platform-2` run that removed `PLAT-E2` from this list. `ENG-E3` and `ENG-E4` are marked *(superseded)* in their
+source and remain excluded — the active-epic policy covers active epics only. **A domain with no
+plan is not a statement that the domain needs no test design.** `UM-E6` is a separate case — see
+[§4](#4-unplanned-scopes-and-owners).
 
 **`frontend` is not a domain and not an epic.** The `frontend` epic identity is retired.
 Frontend obligations live in the product epic they serve, as a test-level subsection inside
@@ -125,11 +141,15 @@ silently lost. **None of them counts as requirement coverage.**
    `docs/project-requirements.md:614`, release gate `PG-04`, and `PMC-E1-S1.9`'s closing
    criterion. Both underlying risk scores stay **6**; no P0 percentage was normalised.
 2. **Three performance contracts stay separate.** **A** = the All Employees list including
-   permission resolution (v1.5 §7, `PG-04`) — harness **`DIRA1-MVP-v1`** (U-24 resolved); **no
-   qualifying artifact recorded yet**. **B** = the ACM-9
+   permission resolution (v1.5 §7, `PG-04`) — harness **`DIRA1-MVP-v1`** (U-24 resolved).
+   **PASS**, recorded 2026-09-10/11:
+   [`performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json`](../performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json)
+   (comparable baseline `dira1-1789080425159-ab0a0a57396f`; local PostgreSQL environment;
+   binding since 2026-09-11 — `PG-04` row in `test-design-qa.md` § Release and design gates).
+   **B** = the ACM-9
    AccessControl facade resolver, a binding protocol with its own thresholds, whose CI job is
    **informational and is not promoted here**. **C** = the P6 `resolveAudiences` measurement,
-   **not a gate**. B and C are not evidence for A.
+   **not a gate**. B and C are not evidence for A, and a PASS on A is not evidence for either.
 3. **`PG-01` is not schedulable today.** Its per-file-approval rationale is retired; its
    conclusion rests on three currently open blockers (`SEC-AUTH-01` P0, `CC-07` P0,
    `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1). **Schedulable when all four are closed at
@@ -193,8 +213,8 @@ Untouched by this migration, and not indexed here as test-design artifacts:
 - It does not say any test passes, any gate is green, or any coverage percentage.
 - It resolves no open decision. The register is `test-design/migration-map.md` §10:
   **U-4, U-5, U-6, U-9, U-10, U-11, U-13, U-16** remain open from Task 1 and
-  **U-17..U-22** remain open from the reconciliation (**U-2**, **U-12**, **U-20**, **U-23**,
-  **U-24**, and **U-25** resolved). **U-12** was resolved by DEV (2026-09-11): co-located
+  **U-17, U-21, U-22** remain open from the reconciliation (**U-2**, **U-12**, **U-18**, **U-19**,
+  **U-20**, **U-23**, **U-24**, and **U-25** resolved). **U-12** was resolved by DEV (2026-09-11): co-located
   `*.test.ts`/`*.test.tsx`, second vitest config, `@testing-library/react` — implemented on
   `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), not yet merged.
   Still open and answered nowhere in this index: both `PR-S-*` sign-offs; the

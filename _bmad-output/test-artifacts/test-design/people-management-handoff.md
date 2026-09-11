@@ -351,8 +351,8 @@ budgets, accessibility requirements and photo-upload limits · **U-12** resolved
 (2026-09-11) — co-located `*.test.ts`/`*.test.tsx`, second vitest config,
 `@testing-library/react`; `services/frontend` branch `feat/u-12-unit-component-testing`
 (`60bc882`), not yet merged · **U-13** proactive logout · **U-16** whether platform Story 1.6 is satisfied ·
-**U-17** what closes the six design-closed blockers at implementation · **U-18** the
-self-contradiction in `docs/architecture/testing-strategy.md` · **U-19** which access-control
+**U-17** what closes the six design-closed blockers at implementation · **U-18** resolved —
+`docs/architecture/testing-strategy.md` self-contradiction fixed by its owner (2026-09-11) · **U-19** which access-control
 scenario file covers which `TR-*` row · **U-21** the
 20 history-only retired scenario files · **U-22** the `useAuth().userId` consumption gap ·
 **U-23** resolved — implemented-test inventory in `test-design-qa.md` § Implemented-test inventory ·

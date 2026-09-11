@@ -21,6 +21,19 @@
 > that was written before 2026-09-10 describes the old document, not this one. Read the superseded
 > content at its commit:
 > `https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-qa.md`
+>
+> **Post-validation correction — 2026-09-11 (same day, after the PASS recorded above).** Three
+> `(invalidated)` cross-references in § U-19's normative-coverage table (`TR-2.1-02`, `TR-2.1-05A`)
+> and one paragraph beneath it pointed at `ACF-FC-01` and `ACF-FC-02` as invalidated pending rework.
+> Both files were reworked and freshly approved the same day (Anna Pikula, retro-anchor; see each
+> file). This edit corrects the stale cross-references to match. **This is a System Edit under
+> `docs/test-design-workflow-contract.md` §4.3, applied through the explicitly confirmed member
+> `test-design-qa.md`, not a Create or Validate run.** It changes this file's content after
+> `test-design-validation-report.md` recorded its SHA-256 hash, so that report's hash for this file
+> **no longer matches current content**. The report is not rewritten as a side effect of this edit
+> — only Validate may do that — and its PASS verdict stands as an accurate record of what it
+> evaluated on 2026-09-11 before this correction. Re-validate if a byte-exact attestation of the
+> current file is needed.
 
 **Purpose:** The one platform **execution and coverage strategy**. It owns evidence contracts,
 execution strategy, isolation policy, level strategy, the risk → evidence map, the coverage plan,
@@ -67,7 +80,7 @@ HTTP/list route), contract **B** (the ACM-9 facade resolver) and contract **C** 
 is **never** evidence for another. See [NFR measurement contracts](#nfr-measurement-contracts).
 
 **What this document deliberately does not settle.** Open questions — U-4, U-5, U-6, U-9, U-10,
-U-11, U-13, U-16, U-17, U-18, U-21..U-22 — remain open; **U-2**, **U-12**, **U-19**, **U-20**,
+U-11, U-13, U-16, U-17, U-21..U-22 — remain open; **U-2**, **U-12**, **U-18**, **U-19**, **U-20**,
 **U-23**, **U-24**, and **U-25** are resolved below. This document **answers none of the still-open items
 them**. `DEC-UM-012` remains a **draft decision**. No unknown threshold is filled in anywhere. See
 [Unknown thresholds](#unknown-thresholds) and [Open questions](#open-questions).
@@ -1106,9 +1119,9 @@ appended `**Trace:**` bullet) recording the same finding at the point of use.
 | `TR-*` row | Evidence level | Scenario file(s) |
 | --- | --- | --- |
 | `TR-2.1-01` | Facade/unit-level only, not API E2E | `ACM4R-MA-01..06`, `ACM2-IA-01..10`, `S4.1a-DP-01..03`, `ACM5-SA-05` |
-| `TR-2.1-02` | HTTP allow case (route unprotected, `SEC-AUTH-01` open) + facade robustness; 2 of the HTTP files invalidated pending rework | `ACF-AU-02` (component), `ACF-AU-03` (primary), `ACF-FC-01` (invalidated), `ACF-FC-04`, `ACM3-II-01..14` |
+| `TR-2.1-02` | HTTP allow case (route unprotected, `SEC-AUTH-01` open) + facade robustness; 2 of the HTTP files were invalidated and reworked to the resolver audience-set assertion, 2026-09-11 | `ACF-AU-02` (component), `ACF-AU-03` (primary), `ACF-FC-01` (reworked 2026-09-11), `ACF-FC-04`, `ACM3-II-01..14` |
 | `TR-2.1-05` | HTTP allow case (same route caveat) + facade | `ACF-AU-04`, `ACM3-II-11` (boundary) |
-| `TR-2.1-05A` | Negative/boundary only — positive walk stays `PRODUCT/ARCH BLOCKED`, no file proves it | `ACF-FC-02` (invalidated), `ACM3-II-11` |
+| `TR-2.1-05A` | Negative/boundary only — positive walk stays `PRODUCT/ARCH BLOCKED`, no file proves it | `ACF-FC-02` (reworked 2026-09-11), `ACM3-II-11` |
 | `TR-2.3-02` | Only the "removal immediate" half; "independently grantable via UI" half has no scenario | `ACM2-IA-02` |
 | `TR-2.3-03` | Facade-level only | `ACM4R-MA-05` |
 | `TR-2.3-04` | Seed-time default grant only, not the configuration-review/UI mechanism | `ACM1-FB-01`, `ACM1-FB-03`, `ACM1-FB-06` |
@@ -1136,9 +1149,14 @@ from any artifact. **It does not change `PG-01`.** `PG-01` schedulability is gov
 **U-20** (`SEC-AUTH-01`, `CC-07`, `AC-S9-S13`, `AC-SECTION-MATRIX-01` all closed at implementation);
 none of those four close by mapping files to rows, and none of the mapped files above constitute
 production-wired evidence — most are themselves still draft, pending their own independent AD-1
-Stage-1 approval (`approvals.yaml` records only nine `ACM1-FB` and three `ACM3-II` as approved), and
-three foundation files' expected results are invalidated pending rework (see each suite's own
-README).
+Stage-1 approval (`approvals.yaml` records only nine `ACM1-FB` and three `ACM3-II` as approved).
+Three foundation files' expected results were invalidated 2026-09-01 and have since been reworked
+to the resolver audience-set assertion and freshly approved (Anna Pikula, 2026-09-11, recorded as a
+retro-anchor — the underlying resolver behaviour and its e2e coverage at `da7d1fa` predate this
+approval); see each file and the suite's own README. This closes the "invalidated" state, not the
+draft/approval gap the rest of this paragraph describes — none of the three constitutes
+production-wired evidence, since `GET /users/:id` is still not adopted by User Management
+(`UM-E0-S0.1`).
 
 ---
 
