@@ -126,9 +126,10 @@ word applies.
 **Two corrections carried from the migration, both load-bearing and neither re-derivable from the
 superseded documents.**
 
-1. **The access-control inventory is 101 files**, machine-counted at `76a7220`:
-  `docs/test-cases/access-control-foundation/` (**10** `.md`) plus
-   `docs/test-cases/access-control-kernel/` (**91** `.md`). The figure "**171**" and the path
+1. **The access-control inventory is 99 scenario documents**, machine-counted at `76a7220` with
+   README files excluded: `docs/test-cases/access-control-foundation/` (**9**) plus
+   `docs/test-cases/access-control-kernel/` (**90**). The raw Markdown count is **101** when the
+   two README files are included. The figure "**171**" and the path
    `docs/test-cases/access-control/` that five superseded documents repeat are **wrong** — that
    path does not exist. They appear in this document only here, as an explicitly labelled
    correction of a prior error, and are never a current input.
@@ -216,8 +217,9 @@ else.
 
 ### Implemented-test inventory — **VERIFIED** (U-23 resolved 2026-09-11)
 
-Re-counted **2026-09-11** against workspace gitlinks `services/backend` `3bc801a…` and
-`services/frontend` `fa3d319…`. **Inventory only** — discovery via the canonical npm scripts and
+Re-counted **2026-09-11** against workspace gitlinks `services/backend`
+`3bc801a7317540ad445f5f95479a81a4351dcbb9` and `services/frontend`
+`60bc8822bd90f046eb8dba14e1d35706d7fe9325`. **Inventory only** — discovery via the canonical npm scripts and
 jest/playwright configs (`test/jest-e2e.json`, default `package.json` jest, `test/jest-contract.json`,
 `playwright.config.ts`, `vitest.contract.config.ts`). **Not** raw `find`. Pass rate is reported
 separately and is **not** an estimate input.
@@ -466,8 +468,9 @@ any measurement contract whose harness exists.
 Preserved from `plat:S4#e2e-and-integration-dependencies`. Item 1's inventory is corrected; items
 2–7 stand unchanged.
 
-1. **The access-control scenario inventory** — `docs/test-cases/access-control-foundation/` (10)
-  and `docs/test-cases/access-control-kernel/` (91), **101 files** at `76a7220`. *(Correction of a
+1. **The access-control scenario inventory** — `docs/test-cases/access-control-foundation/` (9)
+  and `docs/test-cases/access-control-kernel/` (90), **99 scenario documents** at `76a7220` with
+   README files excluded (**101** Markdown files including the two READMEs). *(Correction of a
    prior error: the superseded documents named* `docs/test-cases/access-control/` *and "171 files";
    that path does not exist. Neither the dead path nor the 171 figure is a current input.)*
 2. A PostgreSQL test instance with a migrated schema.
@@ -487,7 +490,8 @@ Preserved from `plat:S4#e2e-and-integration-dependencies`. Item 1's inventory is
 Access control is a **dependency of almost every other evidence surface**, and it is the reason
 `PG-01` exists.
 
-- The real inventory is the **101** files named above. No approval state is sought for them (D-1).
+- The real inventory is the **99 scenario documents** named above (or **101** Markdown files when
+  the two READMEs are included). No approval state is sought for them (D-1).
 - The **AccessControl facade is the sole authorization entry** (`docs/architecture/README.md`
 non-negotiable 7). Every route class needs its denial evidence through the facade, never through
 a direct policy read.
@@ -838,7 +842,7 @@ generated test cases and not coverage**, per the source's own statement. Every r
 
 | Row          | Subject                                                                    | Level                             | State / blocker                                                                   | Risks                |
 | ------------ | -------------------------------------------------------------------------- | --------------------------------- | --------------------------------------------------------------------------------- | -------------------- |
-| `P0-PLAT-01` | §2–§3 audience derivation and S1–S16 negatives                             | `api-e2e`                         | `AC STAGE-1 DRAFT` *(source state; inventory pointer corrected to the 101 files)* | `PR-001`, `PR-009`   |
+| `P0-PLAT-01` | §2–§3 audience derivation and S1–S16 negatives                             | `api-e2e`                         | `AC STAGE-1 DRAFT` *(source state; inventory pointer corrected to the 99 scenario documents)* | `PR-001`, `PR-009`   |
 | `P0-PLAT-02` | Project / Department / PP-HR / full / shared overlays                      | `api-e2e` + integration           | `PRODUCT/ARCH BLOCKED` — `PR-B-03`, `PR-B-06`, `PR-B-08`                          | `PR-001/002/004/005` |
 | `P0-PLAT-03` | Projection leak prevention across list, filter, export, profile and errors | api / ui / download e2e           | `READY NOW` — consumer-owned; v1.5 §3.3                                           | `PR-001`             |
 | `P0-PLAT-04` | Runtime permission removal; no data widening                               | api / ui e2e                      | `READY NOW` — role catalog canonical as `RA-E1`                                   | `PR-001/007`         |
@@ -936,7 +940,7 @@ v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 > **The dependency column, and the one clause retired from it.** Where a source dependency cell
 > read "approval pending", that clause named the per-file approval gate removed on 2026-09-04. It
 > is **retired under ruling D-1** and is marked inline rather than carried as a live obligation.
-> **Which of the 101 access-control scenario files covers which of these 119 rows** — that is
+> **Which of the 99 access-control scenario documents covers which of these 119 rows** — that is
 > **U-19**, **resolved 2026-09-11**: see [§ U-19 normative coverage — scenario file
 > mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11) immediately after
 > this table. 14 of 119 rows receive partial evidence; 105 receive none. Does not affect `PG-01`.
@@ -1056,7 +1060,7 @@ v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 | `TR-8-04`     | v1.5 §8     | Foundation topics have named owners and written alignment before implementation                                                                                         | Repository/review audit                                                                    | READY NOW                             | Manual evidence                                                                                                                                                                                                 |
 | `TR-8-05`     | v1.5 §8     | Communication and status are captured                                                                                                                                   | Repository/process audit                                                                   | READY NOW                             | Manual evidence                                                                                                                                                                                                 |
 | `TR-9-01`     | v1.5 §9     | Shipped behavior matches §§2–3 and all required functionality                                                                                                           | Trace audit + release regression                                                           | E2E DEPENDENCY                        | Requires all child evidence                                                                                                                                                                                     |
-| `TR-9-02`     | v1.5 §9     | Every `—`, narrowed Project-line cell, S7 employee/PM flags, colleague whitelist/campaign exception proven                                                              | API/projection E2E                                                                         | E2E DEPENDENCY                        | The access-control scenario inventory does not cover all deferred DoD slices *(the source cell said "171 drafts"; corrected to the real 101-file inventory — see [Ownership](#ownership))*                      |
+| `TR-9-02`     | v1.5 §9     | Every `—`, narrowed Project-line cell, S7 employee/PM flags, colleague whitelist/campaign exception proven                                                              | API/projection E2E                                                                         | E2E DEPENDENCY                        | The access-control scenario inventory does not cover all deferred DoD slices *(the source cell said "171 drafts"; corrected to the real 99-scenario-document inventory — see [Ownership](#ownership))*                      |
 | `TR-9-03`     | v1.5 §9     | Runtime role creation/permission UI works without deploy                                                                                                                | UI E2E                                                                                     | E2E DEPENDENCY                        | Role-catalog consumer                                                                                                                                                                                           |
 | `TR-9-04`     | v1.5 §9     | Org changes/full grants reject self-assignment and journal                                                                                                              | API/UI E2E                                                                                 | PRODUCT/ARCH BLOCKED                  | PP Stage-1 is PR-S-01 sign-off ready; journal execution remains PR-B-07 / CC-07, full-profile remains PR-B-06 / CC-05, and Department scope remains PR-B-03 / OQ-116                                            |
 | `TR-9-05`     | v1.5 §9     | Shared link named/authenticated, creator rechecked, always revocable                                                                                                    | API/UI E2E                                                                                 | E2E DEPENDENCY                        | Shared-link child                                                                                                                                                                                               |
@@ -1088,11 +1092,11 @@ are architecture and product approvals, not the removed per-file scenario gate.
 
 ### U-19 normative coverage — scenario file mapping (resolved 2026-09-11)
 
-**Method.** Each of the 101 `docs/test-cases/access-control-foundation/` and
-`access-control-kernel/` scenario files was read against its own `**Trace:**` citation (a v1.5
+**Method.** Each of the 99 scenario documents in `docs/test-cases/access-control-foundation/` and
+`access-control-kernel/` (9 + 90, README files excluded) was read against its own `**Trace:**` citation (a v1.5
 `§`-section number, confirmed as the same `docs/project-requirements.md` **Version: 1.5** these
 `TR-*` rows are drawn from) and cross-checked against the cited row's actual requirement-statement
-text — never inferred from a filename. Confirmed by grep: **zero of the 101 files cite a `TR-*` id
+text — never inferred from a filename. Confirmed by grep: **zero of the 99 scenario documents cite a `TR-*` id
 anywhere**; the five apparent matches are all the unrelated scenario id `S4.2b-TR-01`. Each matched
 file now also carries an inline `**U-19 normative coverage:**` note (or, for kernel files, an
 appended `**Trace:**` bullet) recording the same finding at the point of use.
@@ -1116,7 +1120,7 @@ appended `**Trace:**` bullet) recording the same finding at the point of use.
 | `TR-3.2-S11` | Shape only — no "colleague project name only" field restriction | `ACM5-SA-04` |
 | `TR-7-01` | Same partial set as above; row's own text already says "Phase 1 only" | `ACF-FC-03`, `ACF-FC-04`, plus everything above |
 
-**The remaining 105 of 119 rows have zero evidence from any of the 101 files** — not a search gap:
+**The remaining 105 of 119 rows have zero evidence from any of the 99 scenario documents** — not a search gap:
 `docs/test-cases/access-control-foundation/README.md` and `access-control-kernel/README.md` each
 state their own scope exclusions (Project line, Department, PP HR-line positive walk; every section
 but S1/S10/S11; `/roles` catalog CRUD; projection/whitelist; PP/Department-mutation journal), and
@@ -1189,8 +1193,8 @@ rationale.**
 - **The stated rationale is retired in full**, with ruling D-1 as authority. It read: access control
 is not schedulable "while the **171** Phase-1 files await **per-file approval**". Both halves fail
 — the per-file approval gate was removed on 2026-09-04 and **was the gate's only stated support**,
-and the 171-file subject does not exist. *(The real inventory is **101** files across*
-`access-control-foundation/` *and* `access-control-kernel/`*. This is an explicitly labelled
+and the 171-file subject does not exist. *(The real inventory is **99 scenario documents** across*
+`access-control-foundation/` *and* `access-control-kernel/`, with **101** Markdown files when the two READMEs are included. This is an explicitly labelled
 correction of a prior error, not a current input.)*
 - **The gate is nevertheless NOT promoted to schedulable**, because three *currently open* blockers
 independently keep access control unschedulable, **none of which is an approval state**:
@@ -1718,11 +1722,11 @@ owner is not resolving a question. The register of record is `test-design/migrat
 | **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete                                                                                                                                                                      | Platform epic owner                                                         | Story 1.6 artifact references                                                                                                                                                                                                                                            |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the **six** register entries that remain open (corrected 2026-09-11 — was "five"; `test-design-architecture.md` § Dependencies names them). **Partially re-verified, not resolved**: `CC-07` and `CC-05` were re-checked against the actual baseline commit — both were **partial**, not "absent" as previously recorded; see `test-design-architecture.md` § Open blockers and § Ratified design decisions for the corrected rows and named remaining gaps | Architect + the per-entry owners                                            | `DG-02`, the coverage plan's blocked rows                                                                                                                                                                                                                                |
 | **U-18** | **Resolved 2026-09-11** — the document's owner (Architect) edited both `:84` and `:117–119` to match the authority named by ruling D-1 (lines 25–38); no reading of `docs/architecture/testing-strategy.md` now states a per-stage human-approval requirement | Owner of `docs/architecture/testing-strategy.md` (Architect) | `DG-01` |
-| **U-19** *(resolved 2026-09-11)* | **Resolved** — 14 of 119 `TR-*` rows receive partial evidence from the 101 scenario files (none full coverage); 105 receive none. Matched via each file's own `**Trace:**` §-citation, never guessed from filenames. **Does not affect `PG-01`** (governed by U-20 alone) | Access Control owners + QA                                                  | [§ U-19 normative coverage — scenario file mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11), immediately after the [Normative coverage map](#normative-coverage-map)                                                                                                                                  |
+| **U-19** *(resolved 2026-09-11)* | **Resolved** — 14 of 119 `TR-*` rows receive partial evidence from the 99 scenario documents (none full coverage); 105 receive none. Matched via each document's own `**Trace:**` §-citation, never guessed from filenames. **Does not affect `PG-01`** (governed by U-20 alone) | Access Control owners + QA                                                  | [§ U-19 normative coverage — scenario file mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11), immediately after the [Normative coverage map](#normative-coverage-map)                                                                                                                                  |
 | **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect against the blocker register and a current re-verification record | Platform epic owner + Architect                                             | `[PG-01](#release-and-design-gates)`                                                                                                                                                                                                                                     |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk                                                                                                                                                                                       | Owner of `docs/test-cases/user-management/`**                               | Out of scope for this migration, which modifies no scenario file                                                                                                                                                                                                         |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap                                                                                                                                                                                 | DEV + QA                                                                    | Frontend obligations                                                                                                                                                                                                                                                     |
-| **U-23** | **Resolved 2026-09-11** — implemented-test inventory re-counted; authority is jest/playwright configs at gitlinks `3bc801a…` / `fa3d319…`                                                                                                                      | QA                                                                          | [Implemented-test inventory](#implemented-test-inventory--verified-u-23-resolved-2026-09-11). Backend e2e **506** cases (488 executable + 18 `it.todo`); unit **50**; contract **18** pact interactions; frontend Playwright **124**. Supersedes 340 / 406 / "43 files". |
+| **U-23** | **Resolved 2026-09-11** — implemented-test inventory re-counted; authority is jest/playwright configs at gitlinks `3bc801a7317540ad445f5f95479a81a4351dcbb9` / `60bc8822bd90f046eb8dba14e1d35706d7fe9325`                                                                                                                      | QA                                                                          | [Implemented-test inventory](#implemented-test-inventory--verified-u-23-resolved-2026-09-11). Backend e2e **506** cases (488 executable + 18 `it.todo`); unit **50**; contract **18** pact interactions; frontend Playwright **124**. Supersedes 340 / 406 / "43 files". |
 | **U-24** | **Resolved with authority** — `DIRA1-MVP-v1` via `npm run measure:user-management:dira1` (`docs/architecture/testing-strategy.md` § DIR-A1)                                                                                                                    | Platform/DevOps + QA                                                        | `PG-04`, [contract A](#contract-a--all-employees-httplist-route)                                                                                                                                                                                                         |
 | **U-25** | **Resolved with authority** — `QUALITY-GATE-AC-NFR` governs contract **B** (ACM-9 facade) only; contract **A** / the All Employees list uses release gate `PG-04`. `PMC-E1-S1.9` cites `PG-04` for directory-list evidence                                     | Access Control + Quality Engineering + the platform-capabilities epic owner | `PG-04`, [contract A](#contract-a--all-employees-httplist-route), `QUALITY-GATE-AC-NFR` (contract **B** only)                                                                                                                                                            |
 

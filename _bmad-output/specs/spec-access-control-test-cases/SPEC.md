@@ -14,8 +14,9 @@ sources: []
 > kept as the record of what was authored and why, not as an active contract.
 
 > **Historical contract (superseded).** The text below describes the retired 171-file suite.
-> Active access-control scenarios live under `docs/test-cases/access-control-foundation/` (10 files)
-> and `docs/test-cases/access-control-kernel/` (91 files). Per-file AD-1 approval between stages
+> Active access-control scenarios live under `docs/test-cases/access-control-foundation/` (9 scenario documents)
+> and `docs/test-cases/access-control-kernel/` (90 scenario documents), for 99 scenario documents;
+> the two README files bring the raw Markdown count to 101. Per-file AD-1 approval between stages
 > was removed 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`).
 
 # Access-Control Test-Case Suite (Phase 1)

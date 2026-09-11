@@ -235,8 +235,8 @@ percentage against any of them.*
 > rationale ("while the **171** Phase-1 files await **per-file approval**") is retired in full:
 > the per-file approval gate was removed on 2026-09-04 and was the gate's only stated support,
 > and the 171-file subject does not exist. **Correction, explicitly labelled and not a current
-> input:** the real inventory is **101** files — `docs/test-cases/access-control-foundation/`
-> (10) and `docs/test-cases/access-control-kernel/` (91). The cited path
+> input:** the real inventory is **99 scenario documents** — `docs/test-cases/access-control-foundation/`
+> (9) and `docs/test-cases/access-control-kernel/` (90), with **101** raw Markdown files when both READMEs are included. The cited path
 > `docs/test-cases/access-control/` does not exist. The gate is nevertheless **not** promoted to
 > schedulable: three currently open blockers (`SEC-AUTH-01` P0, `CC-07` P0,
 > `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1) independently keep it unschedulable, none of which is
@@ -292,7 +292,7 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 | Source family | Source | Successor location | Note |
 | --- | --- | --- | --- |
 | `R-001`..`R-014` (scope key `legacy-um:`) | UM handoff § Risk-to-Story Mapping | `test-design-architecture.md` § Risk register and the owning epic plans; per-ID in migration map §4.1 | **Not renumbered.** `R-003`, `R-004`, `R-013` are **retired** (their decisions became normative: DEC-UM-004, DEC-UM-005; and PM/AD-16 removes the create path). `R-005` **merges into `PR-006`** — same All Employees latency risk, different stated subject. `R-008` merges into `test-design-qa.md` § Execution strategy. `R-012` merges into `PR-010`. |
-| `PR-001`..`PR-010` (scope key `plat:`) | platform handoff § Risk-to-Domain Mapping | `test-design-architecture.md` § Risk register, with evidence in `test-design-qa.md` § Risk → evidence map | All ten keep their identifier, score and P×I. **No score is renormalised.** `PR-009`'s subject is restated against the real 101-file access-control inventory; `PR-006` absorbs `legacy-um:R-005`; `PR-010` absorbs `legacy-um:R-012`. |
+| `PR-001`..`PR-010` (scope key `plat:`) | platform handoff § Risk-to-Domain Mapping | `test-design-architecture.md` § Risk register, with evidence in `test-design-qa.md` § Risk → evidence map | All ten keep their identifier, score and P×I. **No score is renormalised.** `PR-009`'s subject is restated against the real 99-scenario-document access-control inventory; `PR-006` absorbs `legacy-um:R-005`; `PR-010` absorbs `legacy-um:R-012`. |
 | `R-UM-*`, `R-FE-*` | the retired area plans, not the handoffs | the owning epic plans, or the QA improvement backlog where no product epic owns them | Listed here because handoff readers meet them next. `R-UM-04` scores **6**; its "Medium (Score 3–4)" heading was the defect, not the score. |
 
 ### Test and trace identifiers

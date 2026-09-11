@@ -79,8 +79,8 @@ on the evaluated branch.
 | 8 | Index resolves every scope with owner | **OUT OF SYSTEM SCOPE** | Index audit |
 | 9 | Three performance contracts separate; contract A bound to `DIRA1-MVP-v1` | **PASS** | U-24/U-25 resolved; harness documented |
 | 10 | All Employees list NFR stated as **P0** | **PASS** | `P0-PLAT-08` / `PG-04` |
-| 11 | No per-scenario approval state; AC inventory **101** files | **PASS** | Stage-approval removal respected |
-| 12 | Open decisions U-4..U-22 documented; U-2/U-20/U-23/U-24/U-25 resolved; `DEC-UM-012` draft | **PASS** | U-2 defines sign-off closure; both `PR-S-*` remain ungranted |
+| 11 | No per-scenario approval state; AC inventory **99 scenario documents** (9 foundation + 90 kernel; 101 raw Markdown files including READMEs) | **PASS** | Stage-approval removal respected |
+| 12 | Open decisions U-4..U-22 documented; U-2/U-19/U-20/U-23/U-24/U-25 resolved; `DEC-UM-012` draft | **PASS** | U-2 defines sign-off closure; both `PR-S-*` remain ungranted |
 | 13 | No consumer points at removed artifact with rewritten semantics | **PASS** | Historical citations use commit links |
 | 14 | Migration boundary: no scenario/trace/sprint mutation | **PASS** | Post-migration doc updates only (DIRA1, U-23); no scenario file edits in validate scope |
 

@@ -83,7 +83,7 @@ claim, and not an approval. The whole-repository trace remains a planning audit 
 | Shared NFR contracts (subject, dataset, statistic, threshold, evidence) | `test-design-qa.md` § NFR measurement contracts | This document **references** them; see [NFR contract references](#nfr-contract-references). |
 | Execution strategy, level strategy, isolation policy, coverage, regression map, release and design gates | `test-design-qa.md` | Not restated here. |
 | Epic-specific scenario and risk coverage | `test-design-epic-{domain}-{number}.md` | See [Domain navigation](#domain-navigation). |
-| Access-control scenario suites | `docs/test-cases/access-control-foundation/` (10 files) and `docs/test-cases/access-control-kernel/` (91 files) — **101 files** at the baseline commit | Design inventory, **not coverage**. See the note below. |
+| Access-control scenario suites | `docs/test-cases/access-control-foundation/` (9 scenario documents) and `docs/test-cases/access-control-kernel/` (90 scenario documents) — **99 scenario documents** at the baseline commit (101 raw Markdown files including both READMEs) | Design inventory, **not coverage**. See the note below. |
 | Deferred access-control slices | Outside the current foundation/kernel scope: shared links, projection surfaces, role catalog, full-profile overlay, Project-line positives, Department positives, integration-driven access | Staged design, not a waiver. |
 
 **Two corrections carried into this row set, both load-bearing.**
@@ -91,8 +91,8 @@ claim, and not an approval. The whole-repository trace remains a planning audit 
 1. **The inventory.** The superseded platform documents asserted "**171** v1.5 Phase-1
    Stage-1 draft files" under `docs/test-cases/access-control/`. That path **does not
    exist** at the baseline commit, and the count is wrong. The real inventory is
-   `access-control-foundation/` (10 `.md`) plus `access-control-kernel/` (91 `.md`) =
-   **101** files, machine-counted. Neither the dead path nor the 171 figure may be
+   `access-control-foundation/` (9 scenario documents) plus `access-control-kernel/` (90 scenario documents) =
+   **99** scenario documents, machine-counted with READMEs excluded (**101** raw Markdown files including both READMEs). Neither the dead path nor the 171 figure may be
    reintroduced.
 2. **Those files carry no approval state.** `docs/architecture/testing-strategy.md`
    lines 25–38 removed per-file approval from `docs/test-cases/**` on 2026-09-04:
@@ -315,8 +315,8 @@ bypasses human gates". Two of its premises are gone: the 171 files under
 absent.
 
 *What it is now.* **Counting a present but unexecuted scenario document as coverage.**
-*Corrected subject:* the 101 real files (`access-control-foundation/` 10 +
-`access-control-kernel/` 91). *Surviving authority:* the **ordering** rule at
+*Corrected subject:* the 99 scenario documents (`access-control-foundation/` 9 +
+`access-control-kernel/` 90; 101 raw Markdown files including both READMEs). *Surviving authority:* the **ordering** rule at
 `docs/architecture/testing-strategy.md:5–23` (scenario document → committed-red Stage-2 test
 → production code) and the **ordering half only** of `docs/architecture/README.md`
 non-negotiables 1–2 — their *approval* half is superseded and is deliberately **not** used as
@@ -333,9 +333,10 @@ run.
 code** — and must never promote the first to the third. *Owner:* Engineering leads +
 repository maintainers.
 
-*Open, and not answered here:* which of the 101 scenario files covers which normative row is
-currently unanswerable from any artifact in the repository, and must not be guessed from
-filenames ([Open questions](#open-questions), U-19).
+*Resolved U-19:* 14 of 119 normative rows receive partial evidence from the 99 scenario
+documents (none receives full coverage), and 105 receive none. The mapping is recorded in
+`test-design-qa.md` § U-19 normative coverage — scenario file mapping; it is derived from each
+document's own `**Trace:**` citation, never guessed from filenames.
 
 #### PR-010 — Identity mismatch and real PII (DATA, 6)
 
@@ -665,7 +666,7 @@ PASS / CONCERNS / FAIL verdict belongs to `nfr-assess` — **not to this documen
 `user-management`-scoped assumption that bootstrap HR Admin is covered by an access-control
 functional-capability scenario, and the dependency on a 500-row seed owned by a specific
 story, both pointed into an access-control suite layout that no longer exists. Their
-subjects must be re-sourced against the current 101-file inventory; neither is carried
+subjects must be re-sourced against the current 99-scenario-document inventory; neither is carried
 forward as a citation.
 
 ### Dependencies
@@ -767,7 +768,7 @@ full wording and history, is `test-design/migration-map.md` §10.
 | **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete | Platform epic owner | Story 1.6 artifact references |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the **six** register entries that remain open (corrected 2026-09-11 — was "five"; see [Dependencies](#dependencies)). **Partially re-verified, not resolved**: `CC-07` and `CC-05` were checked against the actual baseline commit and found **partial**, not "absent" — see the corrected rows and the note under [Open blockers](#open-blockers). The remaining closure work (per-kind journal enrolment, AD-29-complete reader authorization, a live grant/revoke endpoint, plus `PR-B-01/02/03/04`, `TT-IDENTITY-01/PMDM-01`, `OPERATIONAL-ENVELOPE`) is still owed by their named owners — U-17 does not close until they act | Architect + the per-entry owners | [Ratified design decisions](#ratified-design-decisions), [Open blockers](#open-blockers) |
 | **U-18** | `docs/architecture/testing-strategy.md` retains the removed per-stage approval clause in **two** places (`:84` and `:117–119`), contradicting its own lines 25–38. Which sentence does the document intend to keep? | Owner of `docs/architecture/testing-strategy.md` (Architect) | `PR-009`; the ordering rule in [Ready now](#ready-now). **This migration edits nothing under `docs/architecture/`** |
-| **U-19** | Which of the **101** access-control scenario files covers which of the **119** normative trace rows | Access Control owners + QA | `PR-009`. Currently unanswerable from any artifact, and **must not be guessed from filenames** |
+| **U-19** *(resolved 2026-09-11)* | **Resolved** — 14 of 119 normative trace rows receive partial evidence from the 99 scenario documents (none full); 105 receive none. The mapping is recorded in `test-design-qa.md` § U-19 normative coverage — scenario file mapping, derived from each document's own `**Trace:**` citation. | Access Control owners + QA | `PR-009`; mapping must never be guessed from filenames |
 | **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect | Platform epic owner + Architect | `PG-01` (in `test-design-qa.md` § Release and design gates) |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk | Owner of `docs/test-cases/user-management/**` | Out of scope for this migration, which modifies no scenario file |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap | DEV + QA | Frontend obligations |
