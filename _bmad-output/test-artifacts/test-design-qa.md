@@ -1214,18 +1214,33 @@ is not schedulable "while the **171** Phase-1 files await **per-file approval**"
 and the 171-file subject does not exist. *(The real inventory is **99 scenario documents** across*
 `access-control-foundation/` *and* `access-control-kernel/`, with **101** Markdown files when the two READMEs are included. This is an explicitly labelled
 correction of a prior error, not a current input.)*
-- **The gate is nevertheless NOT promoted to schedulable**, because three *currently open* blockers
+- **The gate is nevertheless NOT promoted to schedulable**, because the blockers listed below
 independently keep access control unschedulable, **none of which is an approval state**:
-  - `SEC-AUTH-01` **— P0 open.** `interim-session-resolver.adapter.ts` is still wired as
-  `SESSION_RESOLVER_PORT` and still self-provisions `position: 'HR Admin'`.
+  - `SEC-AUTH-01` **— P0 open pending re-adjudication (corrected 2026-09-11).** The support
+  previously stated here — that `interim-session-resolver.adapter.ts` "is still wired as
+  `SESSION_RESOLVER_PORT` and still self-provisions `position: 'HR Admin'`" — is **false**. That
+  file was deleted in `services/backend` `37a339a` on **2026-09-04**, and is absent at the gitlink
+  this branch replaces (`81a5dc6`), at the one it introduces (`3bc801a`), and at backend `main`
+  (`d1ef680`). `user-management.module.ts:214` binds `SESSION_RESOLVER_PORT` to
+  `JwtSessionResolverAdapter`; the `Bearer <token:persona>` shorthand and `Root` self-provisioning
+  survive only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`
+  (`src/config/env.validation.ts:109`). **This does not close the blocker here** — closure requires
+  the project's own verification run (the `QUALITY-GATE-AC` pattern, per
+  `sprint-change-proposal-2026-09-03-sec-auth-01-reconciliation.md`), and `blockers.yaml` stays the
+  authority. It removes this bullet's stated support, nothing more.
   - `CC-07` **— P0 open, implementation `partial` (corrected 2026-09-11; was misstated here and in
   `test-design-architecture.md` § Open blockers as "zero occurrences" — the table, repository,
   service and controller endpoint exist, but per-kind enrolment, AD-29-complete reader
   authorization and a live grant/revoke endpoint are still owed). This correction does not change
   `PG-01`'s conclusion: `SEC-AUTH-01` and `AC-S9-S13`/`AC-SECTION-MATRIX-01` remain independently
   open regardless of `CC-07`'s true state.
-  - `AC-S9-S13` **/** `AC-SECTION-MATRIX-01` **— P1 open.** `access-control.facade.ts:52-54` literally
-  early-returns `none` for every section but S1 / S10 / S11.
+  - `AC-S9-S13` **/** `AC-SECTION-MATRIX-01` **— P1 open.** `SECTION_ACCESS_MATRIX`
+  (`src/access-control/domain/constants/section-access-matrix.ts`) carries exactly three rows —
+  `profile:identity`, `profile:leave`, `profile:projects`, the renamed S1 / S10 / S11 — and the
+  facade returns `none` for every key absent from it. *(Citation corrected 2026-09-11: the former
+  `access-control.facade.ts:52-54` reference predates the rename from hardcoded branches to a
+  matrix lookup. Verified unchanged in substance — this bullet, unlike `SEC-AUTH-01`'s, still holds
+  on the code.)*
 - **Authority:** `…/architecture-people-management-ratification-2026-09-02/blockers.yaml` and
 `…/blocker-verification-2026-09-03.md`.
 - **This is a replacement of the rationale, not a re-derivation of the same conclusion from the

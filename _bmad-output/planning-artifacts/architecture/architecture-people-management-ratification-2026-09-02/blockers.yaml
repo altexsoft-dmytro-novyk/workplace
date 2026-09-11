@@ -463,6 +463,26 @@ blockers:
       at 25afb15; they are kept because they still resolve at the pre-979f225
       revisions the original assessment was written against.
 
+      Correction, 2026-09-11: path (1) is closed, and the note above is now stale
+      in the opposite direction - it understates the code. interim-session-resolver.adapter.ts
+      was deleted in services/backend 37a339a "User management implementation (#8)"
+      on 2026-09-04. It is absent at the gitlink this branch replaces (81a5dc6),
+      at the one it introduces (3bc801a), and at services/backend main (d1ef680).
+      user-management.module.ts:214 binds SESSION_RESOLVER_PORT to
+      JwtSessionResolverAdapter; the `Bearer <token:persona>` shorthand and the
+      Root -> position 'HR Admin' self-provisioning survive only behind
+      ALLOW_TEST_SESSION_TOKENS, which src/config/env.validation.ts:109 gates on
+      NODE_ENV. ACCESS_CONTROL_PORT binds AccessControlFacadeAdapter
+      (user-management.module.ts:215). Both limbs of this entry's own
+      closure_condition - interim adapters fail closed, OR are removed from the
+      production module - therefore read as satisfied against the code.
+      STATUS IS NOT FLIPPED HERE. Closure requires this project's own verification
+      process (the QUALITY-GATE-AC pattern), per
+      sprint-change-proposal-2026-09-03-sec-auth-01-reconciliation.md, and that run
+      has not happened. This correction retires the factual claim, not the blocker:
+      SEC-AUTH-01 is open pending re-adjudication, no longer open on stated evidence.
+      Downstream artifacts still carrying the retired claim are listed in that SCP.
+
   - id: CC-08
     owner: Architect
     severity: P0

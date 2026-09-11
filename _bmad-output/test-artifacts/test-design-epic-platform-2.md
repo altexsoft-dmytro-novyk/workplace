@@ -127,7 +127,7 @@ documents and it applies unchanged to these 9.
 
 | Item | Reasoning | Mitigation |
 | --- | --- | --- |
-| **Production `GET /users/:id` authorization** | The route is not wired to the facade; `ACCESS_CONTROL_PORT` stays bound to `InterimAccessControlAdapter` in `user-management.module.ts`. Adoption is `UM-E0-S0.1`, not this epic | Cross-epic dependency, tracked under `R-PLAT2-01` and `R-PLAT2-03`; the rework in P0 removes this plan's dependence on the route |
+| **Production `GET /users/:id` authorization** | *(Corrected 2026-09-11: the route **is** now wired — `@Get(':id')` carries `@RequireSectionAccess('profile:identity', 'read')` behind `SectionAccessGuard`, and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter`, not `InterimAccessControlAdapter`, at `user-management.module.ts:215`.)* It stays out of scope on the unchanged reason: the **route contract** — the `PM/AD-24` three-code denial oracle — is owned by `UM-E0-S0.1`, not this epic | Cross-epic dependency, tracked under `R-PLAT2-01` and `R-PLAT2-03`; the rework in P0 removes this plan's dependence on the route |
 | **Section matrix, `canAccessSection`, `isAllowed`** | Kernel substrate is `PLAT-E3` (`ACM-5`, `ACM-2`); S2–S16 is `PLAT-E6` | Consumed as cross-epic evidence; see Interworking |
 | **Multi-audience merge semantics** | `CAP-2` / `ACM-4R` is `PLAT-E3` | `ACF-AU-06` (P1) covers only the *Phase-0 boundary consequence*: this suite's own "one audience per viewer×target" scope claim is stale |
 | **Project line, Department walk, PP HR-line** | Explicitly fail-closed and out of Phase 0; owned by `PLAT-E8` / `PLAT-E5` | `ACF-FC-02` proves the *withholding*, not the positive walk; recorded as such |
@@ -144,7 +144,7 @@ documents and it applies unchanged to these 9.
 
 | Risk ID | Category | Description | P | I | Score | Mitigation | Owner | Timeline |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `R-PLAT2-01` | SEC | **`SEC-AUTH-01` (P0, open).** Every `ACF-AU-*` HTTP case authenticates through `InterimSessionResolverAdapter`, which resolves *any* `Bearer <token:persona>` to a session, and `isAllowedForTarget` returns `Boolean(userId)` for every target check. This epic's HTTP-level evidence is produced on an auth substrate that fails **open** | 3 | 3 | **9** | Move every allow case off the route and onto the facade (P0 `ACF-AU-R1`). Closure of `SEC-AUTH-01` itself is Architect + Security, **not this epic** | Architect and Security | Before first shared-environment deploy |
+| `R-PLAT2-01` | SEC | **`SEC-AUTH-01` (P0, open pending re-adjudication).** **Premise corrected 2026-09-11:** neither `InterimSessionResolverAdapter` nor the `Boolean(userId)` `isAllowedForTarget` stub exists at this branch's gitlink (`3bc801a`), the one it replaces (`81a5dc6`), or backend `main` (`d1ef680`) — both were deleted by `37a339a` (2026-09-04). `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`). The **fail-open substrate this risk was scored on no longer exists**, so the residual exposure is the persona shorthand behind `ALLOW_TEST_SESSION_TOKENS` (Joi-gated on `NODE_ENV`), not an unconditional bypass. Score kept at 9 pending re-adjudication with `SEC-AUTH-01` itself — QA does not re-score a security risk unilaterally | 3 | 3 | **9** | Move every allow case off the route and onto the facade (P0 `ACF-AU-R1`). Closure of `SEC-AUTH-01` itself is Architect + Security, **not this epic** | Architect and Security | Before first shared-environment deploy |
 | `R-PLAT2-02` | TECH | **MITIGATED 2026-09-11.** ~~Stage-1 and Stage-2 disagreed~~: `services/backend` commit `da7d1fa` (2026-09-03) reworked the `403` assertions for `ACF-AU-05`/`ACF-FC-01`/`ACF-FC-02` into resolver audience-label checks, while all three scenario documents still carried the invalidated `403` expected result. All three now carry a fresh `**Reworked & approved:** Anna Pikula, 2026-09-11` marker, explicitly recorded as a retro-anchor rather than a mechanical status swap | 3 | 2 | **6** (mitigated) | P0 `ACF-RW-01..03` — **done**. Rewrote the three scenario documents to the audience-set expectation, matching the code and test already at `da7d1fa` | Access Control owners + QA | Closed 2026-09-11 |
 | `R-PLAT2-03` | TECH | **`ACF-AU-01..04` can pass for the wrong reason.** All four assert HTTP `200` on `GET /users/:id`. Since 2026-09-01 that route returns the S1 identity card `200` to *any* active authenticated viewer, so the assertion no longer discriminates the audience it names. `ACF-AU-01` (Self) additionally has **no `TR-*` row at all** | 3 | 2 | **6** | P0 `ACF-AU-R1`: re-express all four as facade audience-set assertions, the pattern `ACF-FC-04` already uses. Catalog gap handled by P2 `ACF-TR-01` | QA + Access Control owners | With the P0 rework |
 
@@ -360,9 +360,16 @@ opens its own transaction on a pooled connection.
 ### `R-PLAT2-01`: `SEC-AUTH-01` fail-open auth substrate (Score 9)
 
 **Strategy:** Two separable halves. (1) **Owned here:** move every `PLAT-E2` allow case off
-`GET /users/:id` and onto `AccessControlFacade.resolveAudiences`, so this epic's evidence no longer
-passes through the interim session resolver. (2) **Not owned here:** closing `SEC-AUTH-01` — interim
+`GET /users/:id` and onto `AccessControlFacade.resolveAudiences`, so this epic's evidence asserts an
+audience set rather than a route outcome. (2) **Not owned here:** closing `SEC-AUTH-01` — interim
 adapters fail closed or leave the production module.
+
+**Premise correction, 2026-09-11.** Half (1) was justified as removing this epic's dependence on the
+*interim session resolver*. That resolver no longer exists (see the risk row), so the stated
+justification is retired. **The rework is still worth doing on its own merits** — a facade-level
+audience-set assertion tests the thing this epic owns, while an HTTP status conflates the route
+contract (`PM/AD-24`, owned by `UM-E0-S0.1`) with the audience decision. Retained on that reasoning,
+not on the retired one.
 **Owner:** Architect and Security (closure) · QA + AC (the rework half).
 **Timeline:** rework with P0; closure before the first shared-environment deploy.
 **Status:** Planned.
