@@ -174,7 +174,7 @@ Open, and **answered nowhere in this document**. Register of record:
 
 | Question | Subject | Owner |
 | --- | --- | --- |
-| **U-12** | Test-file location conventions, the second vitest config and `@testing-library/react` — a **prerequisite for the frontend net-new cases in this plan**. | DEV |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; second config `vitest.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), **not yet merged**. | DEV |
 | **U-14** *(recorded as resolved, listed for navigation)* | Which epic owns the directory/list boundary cases. Resolved with authority: `PersonPicker` → `PMC-E1`. This plan consumes it and does not own it. | QA + the two domain owners |
 
 ---

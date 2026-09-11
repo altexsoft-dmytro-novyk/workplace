@@ -183,7 +183,7 @@ Open, and **answered nowhere in this document**. Register of record:
 | **U-6** | `DEC-UM-012` — whether a deactivated user's `workEmail` is treated identically to an unknown email for `POST /auth/magic-link`. | Product (explicit confirmation required) |
 | **U-13** | Whether the app should proactively log out on a timer / `visibilitychange`, rather than relying on the 401 interceptor. Only the predicate-testing half of `fe-epic:R-FE-06` is a test obligation, and that half is placed above. | Product |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified — no G1 component reads it" gap. | DEV + QA |
-| **U-12** | Test-file location conventions, the second vitest config and `@testing-library/react` — a **prerequisite for the frontend net-new cases in this plan**. | DEV |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; second config `vitest.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), **not yet merged**. | DEV |
 
 ---
 

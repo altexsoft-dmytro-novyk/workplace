@@ -230,7 +230,7 @@ Open, and **answered nowhere in this document**. Register of record:
 | Question | Subject | Owner |
 | --- | --- | --- |
 | **U-11** | Photo-upload size limits (with frontend performance budgets and accessibility requirements). | Product Owner |
-| **U-12** | Test-file location conventions, the second vitest config and `@testing-library/react` — a **prerequisite for all 85 frontend net-new cases**. | DEV |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; second config `vitest.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), **not yet merged**. | DEV |
 | **U-23** | **Resolved** — see `test-design-qa.md` § Implemented-test inventory (506 e2e cases / 54 suites at recount). | QA |
 | **U-24** | Which harness measures the All Employees list ≤ 2-second requirement. | Platform / DevOps |
 

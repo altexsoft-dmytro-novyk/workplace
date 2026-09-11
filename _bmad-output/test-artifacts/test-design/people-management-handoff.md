@@ -347,8 +347,10 @@ Recorded so a story author does not mistake silence for resolution. Full registe
 **U-2** resolved — `PR-S-*` sign-off closure rule · **U-4** WCAG level and viewport set · **U-5** uptime SLO,
 RTO, RPO, backup and retry envelope · **U-6** draft `DEC-UM-012` · **U-9** whether the three
 permission keys get seeded · **U-10** browser support beyond Chromium · **U-11** frontend
-budgets, accessibility requirements and photo-upload limits · **U-12** test-file location
-conventions · **U-13** proactive logout · **U-16** whether platform Story 1.6 is satisfied ·
+budgets, accessibility requirements and photo-upload limits · **U-12** resolved by DEV
+(2026-09-11) — co-located `*.test.ts`/`*.test.tsx`, second vitest config,
+`@testing-library/react`; `services/frontend` branch `feat/u-12-unit-component-testing`
+(`60bc882`), not yet merged · **U-13** proactive logout · **U-16** whether platform Story 1.6 is satisfied ·
 **U-17** what closes the six design-closed blockers at implementation · **U-18** the
 self-contradiction in `docs/architecture/testing-strategy.md` · **U-19** which access-control
 scenario file covers which `TR-*` row · **U-21** the

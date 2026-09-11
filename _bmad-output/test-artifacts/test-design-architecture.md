@@ -406,7 +406,7 @@ architecture asks, not test-execution instructions.
 | **Operational environment** | Lifecycle cutoff, worker recovery, alerting and the deployed/demonstrable DoD remain unprovable; `BUSINESS_TIME_ZONE` validation across environments is the seam the departure boundary cases depend on | Each of the eight `OPERATIONAL-ENVELOPE` dimensions decided **or explicitly deferred with a named owner**, without weakening AD-20 | DevOps + Architect | Before first release |
 | **Coverage state is not machine-visible** | A present-but-unexecuted scenario document can be mistaken for tested behaviour (`PR-009`) | A machine-readable distinction between a present scenario document, a committed-red Stage-2 test, and green production code. **Not** a per-file approval field — that state no longer exists | Engineering leads | Before access-control Stage 2 |
 | **No sub-second feedback loop** (`R-UM-01`, cross-cutting) | Every logic change costs a full Nest boot plus a migrated database, which pushes domain rules to the slowest level available and makes fast iteration impossible | Seams that let a domain rule be verified without a database — the architecture-side half of the level-strategy problem | Architect + DEV | Standing |
-| **Test-file location conventions are unsettled** | The frontend net-new work has no agreed home, which blocks it entirely | A decision on backend unit-spec placement, frontend co-location, the second vitest config and the component-testing library | DEV | Before the frontend unit/component work starts (see U-12) |
+| **Test-file location conventions are unsettled** | The frontend net-new work had no agreed home, which blocked it entirely | A decision on backend unit-spec placement, frontend co-location, the second vitest config and the component-testing library. **Resolved by DEV (2026-09-11, see U-12):** backend keeps its existing co-located `*.spec.ts` under `src/`; frontend adopts co-located `*.test.ts` / `*.test.tsx`, a second config `vitest.config.ts`, and `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event` | DEV | Decision made. **Implemented, not yet merged** — `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`) |
 
 ### Architectural improvements needed
 
@@ -665,8 +665,9 @@ forward as a citation.
    deployed / demonstrable Definition-of-Done evidence.
 5. A PostgreSQL test instance with a migrated schema before any end-to-end evidence.
 6. Outbound port DI tokens (email in particular) before dispatch-observability evidence.
-7. A settled test-file location convention before the frontend unit and component work
-   (U-12).
+7. A settled test-file location convention before the frontend unit and component work —
+   **resolved by DEV, 2026-09-11** (U-12); the dependency was on the decision, not the merge,
+   and the merge itself remains pending.
 
 ---
 
@@ -742,7 +743,7 @@ full wording and history, is `test-design/migration-map.md` §10.
 | **U-9** | Whether `org:relationships:write`, `profile:timeline:write` and `employee:departure:record` are seeded into the permission catalog. The source states this is a **product and Access Control decision, not a test decision** | Product + Access Control | `OQ-PERM-01`, `OQ-AC-EDIT` in [Open blockers](#open-blockers) |
 | **U-10** | Browser support beyond Chromium | Product Owner | Frontend NFR |
 | **U-11** | Frontend performance budgets, frontend accessibility requirements, photo-upload size limits | Product Owner | NFR categories |
-| **U-12** | Test-file location conventions, the second vitest config, the component-testing library | DEV | [Testability gaps](#testability-gaps) — a prerequisite for all frontend net-new work |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; a second config, `vitest.config.ts` (frontend); `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. Implemented in `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), proven by two passing specs; **not yet merged to `main`** | DEV | [Testability gaps](#testability-gaps) — was a prerequisite for all frontend net-new work; that work can now proceed once the branch merges |
 | **U-13** | Whether the application should proactively log out on a timer or `visibilitychange` | Product | Frontend epic plan |
 | **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete | Platform epic owner | Story 1.6 artifact references |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the five register entries that remain open | Architect + the per-entry owners | [Ratified design decisions](#ratified-design-decisions), [Open blockers](#open-blockers) |

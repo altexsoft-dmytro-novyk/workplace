@@ -67,7 +67,7 @@ HTTP/list route), contract **B** (the ACM-9 facade resolver) and contract **C** 
 is **never** evidence for another. See [NFR measurement contracts](#nfr-measurement-contracts).
 
 **What this document deliberately does not settle.** Open questions — U-4, U-5, U-6, U-9, U-10,
-U-11, U-12, U-13, U-16 and U-17..U-19, U-21..U-22 — remain open; **U-2**, **U-20**, **U-23**,
+U-11, U-13, U-16 and U-17..U-19, U-21..U-22 — remain open; **U-2**, **U-12**, **U-20**, **U-23**,
 **U-24**, and **U-25** are resolved below. This document **answers none of the still-open items
 them**. `DEC-UM-012` remains a **draft decision**. No unknown threshold is filled in anywhere. See
 [Unknown thresholds](#unknown-thresholds) and [Open questions](#open-questions).
@@ -229,7 +229,7 @@ separately and is **not** an estimate input.
 | Backend  | unit             | 6 (`src/**/*.spec.ts`)        | **50**                                                     | **VERIFIED** — supersedes "5 unit" (2026-09-06)                             |
 | Backend  | contract         | 1 (`test/jest-contract.json`) | **18** pact interactions (1 provider suite)                | **VERIFIED**                                                                |
 | Frontend | Playwright e2e   | 7                             | **124**                                                    | **VERIFIED** — matches 2026-09-06 source                                    |
-| Frontend | component / unit | 0                             | 0                                                          | **VERIFIED** — no layer yet (U-12)                                          |
+| Frontend | component / unit | 0 on `main`                   | 0 on `main`                                                | **VERIFIED** — no layer on `main` yet; 2 files / 4 cases on unmerged branch `feat/u-12-unit-component-testing` (`60bc882`) (U-12) |
 | Frontend | Pact consumer    | 5                             | **18**                                                     | **VERIFIED**                                                                |
 
 
@@ -403,10 +403,12 @@ fact.
 - **Observed timings — UNVERIFIED, dated 2026-09-06:** 124 cases / 19 s; unit `< 2 s` target;
 component `< 10 s` target; contract ~2 s. The unit and component targets are **targets for a layer
 that does not exist yet**, not measurements.
-- **Prerequisite, and it blocks all frontend net-new work:** `vitest` + `jsdom` are present;
-`@testing-library/react` and a **second vitest config** are not. The file-location convention,
-the second config and the component-testing library are an **open decision (U-12)**, tracked in
-the owning epic plans' entry criteria. Nothing here invents an answer.
+- **Prerequisite, formerly blocking all frontend net-new work — resolved by DEV (2026-09-11,
+U-12):** co-located `*.test.ts` / `*.test.tsx`; a second vitest config, `vitest.config.ts`;
+`@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`.
+Implemented on `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`),
+proven by two passing specs. **Not yet merged to `main`** — net-new frontend work stays
+blocked until it is.
 - `data-testid` **selector requirements** are preserved from the superseded handoff and are **no
 longer "deferred behind an API-first gate"** — the frontend exists, with 124 Playwright cases.
 Stable test ids are a frontend obligation now, and they belong to the component and e2e levels.
@@ -1482,8 +1484,8 @@ The migration's adjudication removed **none** of them — the three that gate th
 Three items, **none of them inside the 15–23 engineer-days**:
 
 1. `@testing-library/react` **plus a second vitest config** — a prerequisite for **every one of the
-  85 frontend cases**; its file-location convention is an open decision (U-12), so it is not
-   scheduled here.
+  85 frontend cases**; its file-location convention is **resolved by DEV (U-12)**, but the
+   85 cases themselves are not authored yet and their effort is not scheduled here.
 2. **DIRA1-MVP-v1 artifacts** — collected (`performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json`,
   PASS, local env). ACM-9 and P6 measure **different subjects**.
 3. **Schema-per-worker** — explicitly **not** to be built (see [backend isolation](#backend-isolation)),
@@ -1534,8 +1536,9 @@ eight unticked already.
   ```
 
 *Frontend entry criteria — the test-file location convention, the second vitest config and the
-component-testing library (U-12) — are **open decisions** and are tracked in the owning epic plans'
-entry criteria, not resolved here.*
+component-testing library (U-12) — are **resolved by DEV (2026-09-11)**, tracked in the owning
+epic plans' entry criteria, not resolved here. The entry-criteria boxes themselves stay unticked
+until the implementing branch merges — a decision is not evidence.*
 
 ## Exit criteria
 
@@ -1654,7 +1657,7 @@ owner is not resolving a question. The register of record is `test-design/migrat
 | **U-9**  | Whether `org:relationships:write`, `profile:timeline:write` and `employee:departure:record` are seeded into the permission catalog. The source states this is a **product and Access Control decision, not a test decision**                                   | Product + Access Control                                                    | [Security contract](#nfr-measurement-contracts--security)                                                                                                                                                                                                                |
 | **U-10** | Browser support beyond Chromium                                                                                                                                                                                                                                | Product Owner                                                               | `P3-PLAT-01`, [Not in scope — frontend](#not-in-scope--frontend)                                                                                                                                                                                                         |
 | **U-11** | Frontend performance budgets, frontend accessibility requirements, photo-upload size limits                                                                                                                                                                    | Product Owner                                                               | [Unknown thresholds](#unknown-thresholds), `P2-PLAT-01`                                                                                                                                                                                                                  |
-| **U-12** | Test-file location conventions, the second vitest config, the component-testing library                                                                                                                                                                        | DEV                                                                         | [Frontend execution](#frontend) — a prerequisite for **all** frontend net-new work                                                                                                                                                                                       |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx` next to the file under test; a second config, `vitest.config.ts`, separate from `vitest.contract.config.ts` and `playwright.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. Backend keeps its existing co-located `*.spec.ts` under `src/`. Authority is `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), proven by two passing specs; **not yet merged to `main`** | DEV                                                                         | [Frontend execution](#frontend) — was a prerequisite for **all** frontend net-new work; unblocked once the branch merges                                                                                                                                                |
 | **U-13** | Whether the application should proactively log out on a timer or `visibilitychange`                                                                                                                                                                            | Product                                                                     | [Not in scope — frontend](#not-in-scope--frontend)                                                                                                                                                                                                                       |
 | **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete                                                                                                                                                                      | Platform epic owner                                                         | Story 1.6 artifact references                                                                                                                                                                                                                                            |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the five register entries that remain open                                                                                                                  | Architect + the per-entry owners                                            | `DG-02`, the coverage plan's blocked rows                                                                                                                                                                                                                                |

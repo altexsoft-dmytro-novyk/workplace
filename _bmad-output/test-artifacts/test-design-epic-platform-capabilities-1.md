@@ -167,7 +167,7 @@ Open, and **answered nowhere in this document**. Register of record:
 | **U-3** | Percentile definition, concurrent-user / load model and target environment for the All Employees ≤ 2-second requirement. Partially resolved by `PMC-E1-S1.9`; **three parameters stay open.** | Product Owner (threshold), Platform / DevOps (environment) |
 | **U-24** | **Resolved** — `DIRA1-MVP-v1` (`docs/architecture/testing-strategy.md` § DIR-A1) | Platform / DevOps + QA |
 | **U-25** | **Resolved** — `QUALITY-GATE-AC-NFR` = contract **B** only; `PG-04` = contract **A** | Platform epic owner + QA |
-| **U-12** | Test-file location conventions, the second vitest config and `@testing-library/react` — a **prerequisite for the frontend net-new cases in this plan**. | DEV |
+| **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx`; second config `vitest.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), **not yet merged**. | DEV |
 | **U-10** | Browser support beyond Chromium. | Product Owner |
 
 ---
