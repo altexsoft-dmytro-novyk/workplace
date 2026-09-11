@@ -16,9 +16,9 @@ updated: 2026-09-03
 
 ## Overview
 
-This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
+This document provides the complete epic and story breakdown for the `user-management` bounded context, decomposing the requirements from the [user-management PRD](../prds/prd-user-management-2026-08-20/prd.md) and the [Architecture Spine](../architecture/architecture-people-management-2026-08-19/ARCHITECTURE-SPINE.md) into implementable stories. No UX design contract exists for this domain yet (no `bmad-ux` run has been done), so this pass has no UX-Design-Requirements input.
 
-Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../../docs/architecture/api-conventions.md), [database-schema.md](../../../../docs/architecture/database-schema.md), and the stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../../docs/test-cases/user-management/README.md). **Note (2026-08-27):** CAP-1 `registration/um-reg-*` retired per spec v1.5; Story 1.1 uses `um-seed-*`.
+Supporting sources folded in for precise, testable acceptance criteria (endpoint shapes, field names, persona names): [api-conventions.md](../../../docs/architecture/api-conventions.md), [database-schema.md](../../../docs/architecture/database-schema.md), and the stage-1 AD-1 scenario docs at [docs/test-cases/user-management/](../../../docs/test-cases/user-management/README.md). **Note (2026-08-27):** CAP-1 `registration/um-reg-*` retired per spec v1.5; Story 1.1 uses `um-seed-*`.
 
 ## Requirements Inventory
 
@@ -80,6 +80,13 @@ From the Architecture Spine and its companion docs:
 N/A — no UX design contract exists for this domain (no `bmad-ux` run has produced a `DESIGN.md`/`EXPERIENCE.md` pair or legacy UX doc). This section will stay empty unless the user points to one.
 
 ### FR Coverage Map
+
+### Canonical People Management PRD traceability
+
+| Canonical requirement | Scope in this slice | Story links |
+|---|---|---|
+| `PM-FR-13` | Employee self-service: upload a personal photo | `UM-E1-S1.3` (mentoring availability is in `M-E1-S1.1`) |
+| `PM-FR-40` | Relationship and grant journal | `UM-E4-S4.1`, `UM-E4-S4.2`, `UM-E4-S4.3` |
 
 | FR | Epic |
 |---|---|

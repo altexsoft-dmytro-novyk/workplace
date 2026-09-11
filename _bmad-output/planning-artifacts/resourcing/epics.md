@@ -19,7 +19,7 @@ updated: 2026-09-02
 
 This document is a **new bounded-context slice** decomposing exactly **4 canonical PRD requirements** into implementable stories: the platform-owned resourcing request lifecycle (`PM-FR-23`–`PM-FR-26`).
 
-**Canonical requirement source:** [prd.md](../prds/prd-people-management-2026-08-24/prd.md) §4.8 — `PM-FR-*` IDs and §-refs are taken from there and from [docs/project-requirements.md](../../docs/project-requirements.md) §4.7.
+**Canonical requirement source:** [prd.md](../prds/prd-people-management-2026-08-24/prd.md) §4.8 — `PM-FR-*` IDs and §-refs are taken from there and from [docs/project-requirements.md](../../../docs/project-requirements.md) §4.7.
 
 **User journey anchor:** UJ-1 (Carlos the DM evaluates a proposed internal candidate via a request-bound share link, or reviews an external candidate by stored PeopleForce ID).
 
