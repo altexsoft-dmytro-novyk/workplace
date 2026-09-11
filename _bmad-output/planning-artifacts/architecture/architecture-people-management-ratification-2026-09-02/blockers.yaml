@@ -1,6 +1,6 @@
 version: 2
 baseline_date: 2026-09-02
-revision: 2026-09-03-section-matrix-gate-registration
+revision: 2026-09-11-ad1-stage-approval-alignment
 rule: Open blockers remain fail-closed and are not resolved by ratification
 status_enums:
   - open
@@ -14,6 +14,15 @@ note: >
   OQ-117, ARCH-ENV-01. Architecture OQ-118 and CC-11 are superseded IDs
   (replaced by ARCH-ENV-01 and ARCH-PROJ-WRITER-01). Implementation blockers
   remain open until their closure conditions are met with production evidence.
+  2026-09-11 ALIGNMENT: closure conditions that demanded an *approved* AD-1
+  increment, or *independently approved* AD-1 Stage-2 evidence, were reworded to
+  'delivered' / 'committed-red'. The per-stage human approval inside AD-1 was
+  retired 2026-09-04 (docs/architecture/testing-strategy.md:25-38, ruling D-1).
+  The three-stage ordering, the increment itself, and the production-evidence bar
+  are unchanged - no gate is weakened and no blocker is closed by this rewording.
+  Design approvals (design_status: resolved-approved, PM/AD decisions,
+  architecture ratification) are a SEPARATE gate that was not retired and was not
+  touched. Dated historical records elsewhere are left verbatim.
 evidence_caveat: >
   docs/integrations/timetracker-external-api.json is UNTRACKED and does not exist at the
   pinned workplace SHA. Every finding resting on it - TIMETRACKER-CONTRACT,
@@ -46,7 +55,7 @@ blockers:
       - services/backend/prisma/migrations/20260830010000_access_control_relationships/migration.sql
     closure_condition: >
       Close only when CC-07 is closed AND PUT/DELETE people-partner routes exist
-      with journal-in-transaction behind independently approved AD-1 Stage-2
+      with journal-in-transaction behind committed-red AD-1 Stage-2
       evidence. A named memlog decision does not close implementation. Do not
       require architecture-approvals.yaml or a second architecture approver.
     note: >
@@ -341,16 +350,16 @@ blockers:
     severity: P1
     blocks: [Career timeline writes (S9), Mentorship profile projection and closure-note visibility (S13), CDS registry and CDS directory filters (S12)]
     status: open
-    design_status: target-approved-increment-not-approved
+    design_status: target-approved-increment-not-delivered
     implementation_status: absent
     decision_refs: [PM/AD-1]
     evidence:
       - docs/project-requirements.md
       - services/backend/src/access-control/application/access-control.facade.ts
-    closure_condition: An approved AD-1 increment for S9-S13, then production evidence
+    closure_condition: A delivered AD-1 increment for S9-S13, then production evidence
     note: >
-      Two different things, reported separately: the target section matrix is approved,
-      the increment is not. The facade returns 'none' for every section other than
+      Two different things, reported separately: the target section matrix is approved
+      (design approval, a separate and still-live gate), the increment is not delivered. The facade returns 'none' for every section other than
       S1/S10/S11.
       2026-09-03 SCOPE RESOLUTION: S12 is owned by THIS entry, not by AC-SECTION-MATRIX-01.
       The blocks: list previously named only S9 and S13 while the id and closure_condition
@@ -368,7 +377,7 @@ blockers:
     severity: P1
     blocks: [Section resolution for S2-S8 and S14-S16, Risk section S6, Feedback section S8, Action items section S14, Request history section S15]
     status: open
-    design_status: target-approved-increment-not-approved
+    design_status: target-approved-increment-not-delivered
     implementation_status: absent
     depends_on: []
     decision_refs: [PM/AD-1]
@@ -377,7 +386,7 @@ blockers:
       - services/backend/src/access-control/application/access-control.facade.ts
       - _bmad-output/planning-artifacts/platform/epics.md
     closure_condition: >
-      An approved AD-1 increment covering S2-S8 and S14-S16, then production evidence.
+      A delivered AD-1 increment covering S2-S8 and S14-S16, then production evidence.
       Same shape and same evidence bar as AC-S9-S13; this entry exists because that one's
       declared scope is S9-S13 and cannot be stretched over the remaining sections.
     note: >
@@ -534,7 +543,7 @@ blockers:
       - docs/architecture/mentorship.md
     closure_condition: >
       Close only when src/mentorship exists with the approved aggregates, routes,
-      and AD-23 participant, behind independently approved AD-1 Stage-2 evidence.
+      and AD-23 participant, behind committed-red AD-1 Stage-2 evidence.
       This batch sign-off closes the design-approval gap only.
     note: Mentorship design approved 2026-09-02. No source context exists.
 

@@ -100,8 +100,9 @@ projection, or UI ownership.
 - P1: 2 scenario obligations / **3** tests (~6–10 h)
 - P2: 2 obligations / **1** test + 1 measurement + 1 documentation item (~4–8 h)
 - P3: 1 scenario obligation / **1** test (~1–2 h)
-- **Total: ~25–42 h (~4–6 days)**, excluding human AD-1 approval latency, which is not estimable
-  here.
+- **Total: ~25–42 h (~4–6 days)**. No approval-latency exclusion applies: AD-1 stage approval was
+  retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`), so ordinary PR review is the
+  only gate on these changes.
 
 ---
 
@@ -111,7 +112,7 @@ projection, or UI ownership.
 | --- | --- |
 | Stage-1 scenario documents | **9** under `docs/test-cases/access-control-foundation/` (5 `ACF-AU-*`, 4 `ACF-FC-*`), each carrying `**Approved:** Anna Pikula, 2026-08-30` |
 | Stage-2 e2e | `services/backend/test/access-control/audience-resolution.e2e-spec.ts` — **10** tests against real PostgreSQL |
-| Scenario documents whose expected result was **invalidated, then reworked** | **3** — `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02` (superseded 2026-09-01, reworked and freshly approved 2026-09-11) |
+| Scenario documents whose expected result was **invalidated, then reworked** | **3** — `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02` (superseded 2026-09-01, reworked 2026-09-11) |
 | `TR-*` rows receiving evidence from this suite | `TR-2.1-02`, `TR-2.1-05`, `TR-2.1-05A`, `TR-7-01` — **partial in every case**, per `test-design-qa.md` § U-19 |
 | `TR-*` rows receiving **full** evidence | **none** |
 | Performance record | `measurement (P6)` — `performance/p6-resolve-audiences-postgresql.md`, **a record, never a gate** |
@@ -192,7 +193,7 @@ independent of how that reconciliation lands.
 
 | NFR Category | Requirement / Threshold | Risk Link | Planned Validation | Evidence Needed |
 | --- | --- | --- | --- | --- |
-| Security | Fail-closed: broken or orphaned relationship data reduces access and never grants it | `R-PLAT2-01`, `R-PLAT2-04` | Facade-level audience-set assertions (`ACF-RW-01..03` — **done 2026-09-11**, `ACF-FC-05` — planned) against real PostgreSQL | Committed e2e run in `test/access-control/`; the three reworked scenario documents carry a fresh AD-1 approval marker |
+| Security | Fail-closed: broken or orphaned relationship data reduces access and never grants it | `R-PLAT2-01`, `R-PLAT2-04` | Facade-level audience-set assertions (`ACF-RW-01..03` — **done 2026-09-11**, `ACF-FC-05` — planned) against real PostgreSQL | Committed e2e run in `test/access-control/`; the three reworked scenario documents carry a rework/attribution marker (evidence-integrity record, **not** a gate — see Quality Gate Criteria) |
 | Security | Three-code denial oracle — `401` invalid/inactive session · `404` hidden/missing · `403` visible but forbidden | `R-PLAT2-01` | **Not validated by this epic.** The oracle is a *route* contract; `PLAT-E2` owns no route | Owned by `UM-E0-S0.1`; recorded here only as the seam |
 | Performance | **Contract C — P6 `resolveAudiences`. Threshold: none.** A measurement record, and **never a gate** | `R-PLAT2-05` | `measurement (P6)` — `test/measurement/resolve-audiences.measurement-spec.ts`, `measurementOnly: true`, asserts nothing about timings | `performance/p6-resolve-audiences-postgresql.{md,json}` |
 | Performance | **Contract B — ACM-9 facade resolver**, 2 s per-gate budget | — | **Not this epic's.** Owned by `PLAT-E3-S3.8`. Its CI job stays **informational** and this plan proposes **no** promotion to blocking | `measurement (ACM9-MVP-v1)` |
@@ -217,7 +218,7 @@ follow-up story. That story is **not** created by this plan.
 - [ ] The canonical epic tuple (`PLAT-E2` · `platform` · `epics.md` `## Epic 2`) is unchanged
 - [ ] Real PostgreSQL available to `test/access-control/` (this suite does not run on a stub)
 - [ ] The foundation fixture (Alice, Bob, Carol, Paula, Hana, Colin, Erin, InactiveMgr, Frank, CycleA/B) seeds through Prisma in test setup
-- [x] ~~An AD-1 Stage-1 reviewer is available for the three rework documents~~ — **done 2026-09-11**: `ACF-RW-01..03` rewritten and approved (Anna Pikula, retro-anchor)
+- [x] The three rework documents are rewritten — **done 2026-09-11**: `ACF-RW-01..03` (Anna Pikula, retro-anchor). No reviewer-availability gate applies: AD-1 stage approval was retired 2026-09-04
 - [ ] This plan has been human-reviewed (it is currently **approval ungranted**)
 
 ## Exit Criteria
@@ -240,11 +241,11 @@ follow-up story. That story is **not** created by this plan.
 | Requirement / obligation | Test Level | Risk Link | Test Count | Owner | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `ACF-RW-01` — rewrite `ACF-AU-05` expected result: `resolveAudiences(Colin,[Alice])` yields `{colleague}`, not `403` | Component (facade) | `R-PLAT2-02` | 1 | QA + AC | **DONE 2026-09-11.** Test was already green at `da7d1fa`; the document and its fresh approval were the deliverable |
-| `ACF-RW-02` — rewrite `ACF-FC-01`: `resolveAudiences(Frank,[Erin])` yields `{colleague}` and **not** `reporting` | Component | `R-PLAT2-02` | 1 | QA + AC | **DONE 2026-09-11.** Retro-anchors an existing green test to a freshly approved scenario |
+| `ACF-RW-02` — rewrite `ACF-FC-01`: `resolveAudiences(Frank,[Erin])` yields `{colleague}` and **not** `reporting` | Component | `R-PLAT2-02` | 1 | QA + AC | **DONE 2026-09-11.** Retro-anchors an existing green test to a reworked scenario |
 | `ACF-RW-03` — rewrite `ACF-FC-02`: `resolveAudiences(Hana,[Alice])` yields `{colleague}`, **no** `pp`, **no** `reporting` | Component | `R-PLAT2-02` | 1 | QA + AC | **DONE 2026-09-11.** Proves PP withholding only; the positive HR-line walk stays `PRODUCT/ARCH BLOCKED` under `PLAT-E5` |
 | `ACF-AU-R1` — re-express the four allow cases (`AU-01` Self, `AU-02` direct, `AU-03` transitive, `AU-04` PP) as facade audience-set assertions | Component | `R-PLAT2-01`, `R-PLAT2-03` | 4 | QA + AC | Removes the epic's dependence on an unprotected route. HTTP cases may be **kept as a separate marked-provisional layer**, never as the primary assertion |
 
-**Total P0:** 7 tests, **~14–22 h** (includes three human-gated AD-1 Stage-1 passes).
+**Total P0:** 7 tests, **~14–22 h** (includes three scenario-document rework passes).
 
 ### P1 (High)
 
@@ -315,7 +316,7 @@ inside the PR budget. `ACF-PERF-01` is opt-in and belongs to neither PR nor a bl
 | P1 | 3 tests / 2 obligations | ~6–10 | New scenarios, new tests |
 | P2 | 1 run + 1 doc | ~4–8 | Measurement protocol care dominates |
 | P3 | 1 test | ~1–2 | Fixture extension |
-| **Total** | **12 tests + 1 run + 1 doc** | **~25–42** | **~4–6 days**, excluding AD-1 approval latency |
+| **Total** | **12 tests + 1 run + 1 doc** | **~25–42** | **~4–6 days**; no approval-latency exclusion (AD-1 stage approval retired 2026-09-04) |
 
 ### Prerequisites
 
@@ -340,7 +341,10 @@ opens its own transaction on a pooled connection.
 - P1 pass rate: ≥ 95 %, waivers recorded
 - P2/P3 pass rate: ≥ 90 %, informational
 - High-risk (≥6) mitigations: complete or explicitly waived
-- Every reworked scenario document carries a **fresh** AD-1 Stage-1 approval
+- Every reworked scenario document lands through ordinary **PR review** — the gate named by ruling
+  `D-1` / `DG-01` since AD-1 stage approval was retired 2026-09-04. The `Reworked & approved: Anna
+  Pikula` markers are a voluntary evidence-integrity and attribution record, **not** evidence that a
+  required gate was satisfied
 
 **Non-negotiable for this epic:**
 
@@ -367,10 +371,12 @@ closure is verified against `blockers.yaml`, not against this plan.
 
 ### `R-PLAT2-02`: Stage-1 / Stage-2 divergence (Score 6) — MITIGATED 2026-09-11
 
-**Strategy:** Rewrote `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02` to the audience-set expectation and put
-each through a fresh AD-1 Stage-1 approval. This was deliberately a **retro-anchor**: the code and
-tests already existed and were green, so the normal scenario → approval → red → production order
-could not be re-run. The approval record says so plainly rather than implying the order was followed.
+**Strategy:** Rewrote `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02` to the audience-set expectation, each
+reviewed on rework. This was deliberately a **retro-anchor**: the code and tests already existed and
+were green, so the normal scenario → red → production order could not be re-run. The rework record
+says so plainly rather than implying the order was followed. That review was **voluntary** — AD-1
+stage approval had already been retired on 2026-09-04 — and is kept for evidence integrity, not as a
+satisfied gate.
 **Owner:** Access Control owners + QA.
 **Status:** Complete.
 **Verification:** each file carries a `**Reworked & approved:** Anna Pikula, 2026-09-11` marker
@@ -409,7 +415,7 @@ facade test goes red while the HTTP case would have stayed green.
 
 ### Dependencies
 
-1. ~~**An AD-1 Stage-1 reviewer** — blocks `ACF-RW-01..03` entirely.~~ **Resolved 2026-09-11** — Anna Pikula reviewed and approved all three rework documents in-session.
+1. ~~**An AD-1 Stage-1 reviewer** — blocks `ACF-RW-01..03` entirely.~~ **Withdrawn — no such dependency exists.** AD-1 stage approval was retired 2026-09-04, before this plan was written; nothing blocks a Stage-2 test or production code on a reviewer. `ACF-RW-01..03` were reworked and reviewed in-session on 2026-09-11 (Anna Pikula) as a voluntary record.
 2. **`PLAT-E3` kernel evidence** — `ACM3-II-01` / `ACM3-II-03` already close `R-PLAT2-08`; this plan
    consumes that rather than duplicating it.
 3. **Platform Story 1.1 reconciliation** — resolves the status conflict; **not** a precondition for
@@ -434,7 +440,7 @@ facade test goes red while the HTTP case would have stayed green.
 
 | Service / Component | Impact | Regression Scope |
 | --- | --- | --- |
-| `services/backend` `src/access-control/` | The facade and `AudienceResolverService` are the subject | All of `test/access-control/` must stay green — 13 suites at the last recorded full run |
+| `services/backend` `src/access-control/` | The facade and `AudienceResolverService` are the subject | All of `test/access-control/` must stay green — **every** suite under that path, not a fixed subset (21 `*.e2e-spec.ts` files at run baseline `28d8e20`) |
 | `PLAT-E3` kernel (`ACM-3` inactive identity) | **Consumed, not duplicated.** `ACM3-II-01` (inactive viewer at chain top) and `ACM3-II-03` (inactive target under a live manager) are what actually closed `R-PLAT2-08` | `acm3-inactive-identity.e2e-spec.ts` must stay green; this plan adds no equivalent case |
 | `PLAT-E3` (`ACM-4R` multi-audience) | Owns merge precedence. `ACF-AU-06` must not restate it | `acm4r-multi-audience.e2e-spec.ts` |
 | `UM-E0` access-control adoption | Consumes `resolveAudiences`; the `403`/`401` route oracle is theirs | `test/user-management/access-control-adoption/` |
