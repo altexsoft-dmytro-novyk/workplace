@@ -562,9 +562,9 @@ direction, **not a sign-off**.
 PM/AD-20 are the binding architecture directions **for** formal sign-off. `CC-07` remains a
 separate open architecture dependency for the immutable journal schema, readers and
 transaction enrolment; `OPERATIONAL-ENVELOPE` remains the separate operational envelope.
-Whether either sign-off is granted is an open question owned by the Product Owner and the
-Architect ([Open questions](#open-questions), U-2) — **this document does not grant, imply
-or infer it**.
+**Sign-off closure (U-2 resolved):** each package closes only on explicit, recorded Product Owner +
+Architect sign-off. PM/AD-19 and PM/AD-20 are binding direction, **not** sign-off. Both remain
+**ungranted** until recorded — **this document does not grant, imply or infer sign-off**.
 
 ---
 
@@ -736,7 +736,7 @@ full wording and history, is `test-design/migration-map.md` §10.
 
 | # | Question | Owner | Bears on |
 | --- | --- | --- | --- |
-| **U-2** | Formal Product Owner / Architect sign-off for `PR-S-01` and `PR-S-02`. A binding architecture direction is not a sign-off | Product Owner + Architect | [Sign-off-ready packages](#sign-off-ready-packages), `PR-003`, `PR-008` |
+| **U-2** | **Resolved with authority (2026-09-11)** — sign-off = explicit recorded Product Owner + Architect approval per package; PM/AD-19/AD-20 are direction only. Both **ungranted** until recorded | Product Owner + Architect | [Sign-off-ready packages](#sign-off-ready-packages), `PR-003`, `PR-008` |
 | **U-3** | **Resolved with authority** — `DIRA1-MVP-v1` binds warm p95 and worst case; local PostgreSQL; single sequential client | Product Owner + Platform/DevOps | [NFR contract references](#nfr-contract-references), `PR-006` |
 | **U-4** | WCAG conformance level and viewport set | Product Owner | NFR categories |
 | **U-5** | Uptime SLO, RTO, RPO, backup and retention, timeout/retry/backoff, circuit thresholds | DevOps + Architect + Security | Gated by `OPERATIONAL-ENVELOPE` |

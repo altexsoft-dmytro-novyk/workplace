@@ -6,7 +6,7 @@
 > Human approval was granted the same date (explicit stakeholder confirmation in workspace).
 >
 > - **Verdict:** **PASS** for documentation and workflow validation. Not a release verdict.
-> - **Strict completion:** **CONCERNS** — open product decisions remain in the register (U-2, U-4,
+> - **Strict completion:** **CONCERNS** — open product decisions remain in the register (U-4,
 >   U-5, U-6, U-9..U-13, U-16, U-17..U-22); `DEC-UM-012` remains draft; runtime gates and
 >   product blockers are separate work.
 > - **No coverage percentage and no test pass rate is asserted by this report.**
@@ -80,7 +80,7 @@ on the evaluated branch.
 | 9 | Three performance contracts separate; contract A bound to `DIRA1-MVP-v1` | **PASS** | U-24/U-25 resolved; harness documented |
 | 10 | All Employees list NFR stated as **P0** | **PASS** | `P0-PLAT-08` / `PG-04` |
 | 11 | No per-scenario approval state; AC inventory **101** files | **PASS** | Stage-approval removal respected |
-| 12 | Open decisions U-2..U-22 documented; U-20/U-23/U-24/U-25 resolved; `DEC-UM-012` draft | **PASS** | Open items remain explicitly open |
+| 12 | Open decisions U-4..U-22 documented; U-2/U-20/U-23/U-24/U-25 resolved; `DEC-UM-012` draft | **PASS** | U-2 defines sign-off closure; both `PR-S-*` remain ungranted |
 | 13 | No consumer points at removed artifact with rewritten semantics | **PASS** | Historical citations use commit links |
 | 14 | Migration boundary: no scenario/trace/sprint mutation | **PASS** | Post-migration doc updates only (DIRA1, U-23); no scenario file edits in validate scope |
 

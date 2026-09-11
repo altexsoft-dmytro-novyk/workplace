@@ -190,9 +190,9 @@ Untouched by this migration, and not indexed here as test-design artifacts:
 
 - It does not say any test passes, any gate is green, or any coverage percentage.
 - It resolves no open decision. The register is `test-design/migration-map.md` §10:
-  **U-2, U-4, U-5, U-6, U-9, U-10, U-11, U-12, U-13, U-16** remain open from Task 1 and
-  **U-17..U-22** remain open from the reconciliation (**U-20**, **U-23**, **U-24**, and **U-25**
-  resolved). Still open and answered nowhere in this index: both `PR-S-*` sign-offs; the
+  **U-4, U-5, U-6, U-9, U-10, U-11, U-12, U-13, U-16** remain open from Task 1 and
+  **U-17..U-22** remain open from the reconciliation (**U-2**, **U-20**, **U-23**, **U-24**, and
+  **U-25** resolved). Still open and answered nowhere in this index: both `PR-S-*` sign-offs; the
   implementation work behind the six `PR-B-*` blockers that closed **at design only** (none
   closed at implementation); contract A's WCAG level and viewport set (U-4); and draft
   `DEC-UM-012` (U-6).

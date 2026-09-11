@@ -143,7 +143,7 @@ Every platform story records **exactly one** planning state. The definitions are
 **Open blockers and sign-off packages** are owned by `test-design-architecture.md` § Open
 blockers and § Sign-off-ready packages. Six of the nine `PR-B-*` blockers are closed **at
 design only**; **none is closed at implementation**, and both `PR-S-01` and `PR-S-02` sign-offs
-remain **ungranted** (U-2). A design artifact is not mitigation completion.
+remain **ungranted** until recorded (U-2 resolved — closure rule defined). A design artifact is not mitigation completion.
 
 ---
 
@@ -319,7 +319,7 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 | `DG-01`..`DG-04` | `test-design-qa.md` § Design gates | `DG-01` restated under D-1. **`DG-05` is retired with no successor** — it was a child-ownership gate premised on the split this migration dissolves. |
 | `PR-B-01`..`PR-B-04`, `PR-B-06`, HR-Admin half of `PR-B-05` | `test-design-architecture.md` § Ratified design decisions | Closed **at design**; implementation or evidence work may remain. |
 | `PR-B-05` (default-role half), `PR-B-07`..`PR-B-09` | `test-design-architecture.md` § Open blockers | Open at design and/or implementation; none closed at implementation. |
-| `PR-S-01 / CC-04`, `PR-S-02 / CC-06` | `test-design-architecture.md` § Sign-off-ready packages | Both **ungranted**. |
+| `PR-S-01 / CC-04`, `PR-S-02 / CC-06` | `test-design-architecture.md` § Sign-off-ready packages | **Ungranted** until explicit PO + Architect sign-off recorded (U-2 resolved). |
 | `DEC-UM-001`..`DEC-UM-012` | `docs/architecture/user-management-test-decisions.md` (unchanged by this migration) | `DEC-UM-012` stays **draft**. `DEC-UM-006` and `DEC-UM-008` are RETIRED. |
 | Legacy story numbers `1.1`..`4.2` | canonical `UM-E{n}-S{n.m}` identities in the epic plans | Nothing is renumbered; the old bare numbers were never canonical epic identities. Story 1.4 "Deactivate" has **no** canonical successor under PM/AD-16 / AD-22. |
 | `frontend` as an epic identity | **retired** | `frontend` is not a domain and not an epic. Its obligations re-home to epic plans or the QA improvement backlog. |
@@ -344,7 +344,7 @@ superseded handoff to where its obligation now lives. Per-ID rows are in
 Recorded so a story author does not mistake silence for resolution. Full register:
 `test-design/migration-map.md` §10.
 
-**U-2** both `PR-S-*` sign-offs · **U-4** WCAG level and viewport set · **U-5** uptime SLO,
+**U-2** resolved — `PR-S-*` sign-off closure rule · **U-4** WCAG level and viewport set · **U-5** uptime SLO,
 RTO, RPO, backup and retry envelope · **U-6** draft `DEC-UM-012` · **U-9** whether the three
 permission keys get seeded · **U-10** browser support beyond Chromium · **U-11** frontend
 budgets, accessibility requirements and photo-upload limits · **U-12** test-file location
