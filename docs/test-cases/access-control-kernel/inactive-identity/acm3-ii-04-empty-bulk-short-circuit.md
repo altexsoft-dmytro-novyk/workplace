@@ -7,6 +7,7 @@
 - [access-control.md § Bulk short-circuit](../../../architecture/access-control.md#bulk-short-circuit) — "`resolveAudiences(viewerId, [])` returns an empty map immediately — no graph walks or policy queries."
 - [access-control.md § Bulk, live, never stored](../../../architecture/access-control.md#bulk-live-never-stored) — the 500-record / 2-second §7 budget the short-circuit protects.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp).
+- **U-19 normative coverage:** Mechanism-level robustness evidence for `TR-2.1-02` (v1.5 §2.1 — transitive reports-to Reporting line) — headless-facade proof, not API E2E; see caveats in `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

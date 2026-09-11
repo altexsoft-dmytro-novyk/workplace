@@ -8,6 +8,7 @@
 - Inherited AD-11 / AD-12 (fail-closed) — Capability→Architecture Map row "Inactive identity results (ACM-3) ... empty `Set` for inactive viewer/target."
 - [access-control.md § Effective-departure cutoff (AD-20)](../../../architecture/access-control.md#effective-departure-cutoff-ad-20) — "**Kernel MVP deferral:** ACM-1/ACM-2 do not implement this section... The rules below remain the binding future target, including the dismissed-target projection." Table row "Target employee: The current manager/PP may still resolve access to the read-only dismissed-target projection" — the future behavior this scenario is explicitly *not* implementing.
 - [testing-strategy.md § Kernel MVP exception](../../../architecture/testing-strategy.md#the-gate-ad-1--no-exceptions-to-ordering-or-stage-separation) — "Stage-1 dispatches inside that package must not reintroduce the due/departure items listed above as binding coverage."
+- **U-19 normative coverage:** Mechanism-level robustness evidence for `TR-2.1-02` (v1.5 §2.1 — transitive reports-to Reporting line) — headless-facade proof, not API E2E; see caveats in `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

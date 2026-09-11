@@ -24,6 +24,7 @@
 - `services/backend/src/access-control/domain/services/audience-resolver.service.ts:91-102` — the unconditional `'colleague'` floor for any confirmed active target with no Reporting/PP relation, confirmed by direct read.
 - [`ACM5-SA-01`](../section-access/acm5-sa-01-s1-self-or-colleague-read.md) through [`ACM5-SA-05`](../section-access/acm5-sa-05-strongest-merged-audience-wins.md) — the pre-existing, already-approved-in-spirit `canAccessSection` scenarios this file re-proves are undisturbed, not a rewrite of them.
 - Spec's Verification table — `npm run test:e2e -- acm11-full-profile-overlay-resolution` is described as "already-passing regression lock for `acm11-fpo-06`."
+- **U-19 normative coverage:** Partial evidence for `TR-2.4-01` — regression lock over today's three live sections. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

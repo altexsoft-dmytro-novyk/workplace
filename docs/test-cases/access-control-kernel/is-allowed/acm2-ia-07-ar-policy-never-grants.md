@@ -9,6 +9,7 @@
 - [access-control.md § Functional-role Kernel MVP (AD-4)](../../../architecture/access-control.md#functional-role-kernel-mvp-ad-4) — only FR policies participate in the evaluator join.
 - [database-schema.md §§ Policies, Permissions, PolicyPermissions, UserPolicies](../../../architecture/database-schema.md#policies) — partial `targetRole` uniqueness, AR row shape, impossible AR grant, and attachment join.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — evaluate the public facade against migrated PostgreSQL.
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — roles remain separate; AR/FR type separation specifically) — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

@@ -23,6 +23,7 @@
 - `services/backend/src/access-control/domain/services/audience-resolver.service.ts:76-82` — "Missing or deactivated target: empty, never Self and never the Colleague floor," confirmed by direct read: `if (!confirmed.has(id)) { audiences.set(id, new Set<Audience>()); continue; }`. This is the mechanism that produces the empty `targetAudiences` set `canAccessSection`'s early return consumes — for both a nonexistent id and a deactivated one, the same branch fires.
 - [access-control.md § Audience columns (§3.2)](../../../architecture/access-control.md#audience-columns-32) and [§ Fail-closed, always (AD-11, AD-12)](../../../architecture/access-control.md#fail-closed-always-ad-11-ad-12) — the broader fail-closed discipline this scenario extends to the overlay specifically.
 - [`ACM5-SA-07`](../section-access/acm5-sa-07-missing-target-returns-none.md) / [`ACM5-SA-08`](../section-access/acm5-sa-08-empty-audiences-return-none.md) — the pre-existing sibling scenarios proving this same early-return path for a non-holder viewer; this scenario is their holder-viewer counterpart, proving the overlay adds no exception to a rule those two already pin.
+- **U-19 normative coverage:** Partial evidence for `TR-2.4-01` (v1.5 §2.4 — full-profile grant, leak-prevention half). See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

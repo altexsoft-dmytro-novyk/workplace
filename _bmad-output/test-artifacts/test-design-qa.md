@@ -67,8 +67,8 @@ HTTP/list route), contract **B** (the ACM-9 facade resolver) and contract **C** 
 is **never** evidence for another. See [NFR measurement contracts](#nfr-measurement-contracts).
 
 **What this document deliberately does not settle.** Open questions — U-4, U-5, U-6, U-9, U-10,
-U-11, U-13, U-16 and U-17..U-19, U-21..U-22 — remain open; **U-2**, **U-12**, **U-20**, **U-23**,
-**U-24**, and **U-25** are resolved below. This document **answers none of the still-open items
+U-11, U-13, U-16, U-17, U-18, U-21..U-22 — remain open; **U-2**, **U-12**, **U-19**, **U-20**,
+**U-23**, **U-24**, and **U-25** are resolved below. This document **answers none of the still-open items
 them**. `DEC-UM-012` remains a **draft decision**. No unknown threshold is filled in anywhere. See
 [Unknown thresholds](#unknown-thresholds) and [Open questions](#open-questions).
 
@@ -936,9 +936,10 @@ v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 > **The dependency column, and the one clause retired from it.** Where a source dependency cell
 > read "approval pending", that clause named the per-file approval gate removed on 2026-09-04. It
 > is **retired under ruling D-1** and is marked inline rather than carried as a live obligation.
-> **Which of the 101 access-control scenario files covers which of these 119 rows is currently
-> unanswerable from any artifact, and must not be guessed from filenames** — that is **U-19**, and
-> it is open.
+> **Which of the 101 access-control scenario files covers which of these 119 rows** — that is
+> **U-19**, **resolved 2026-09-11**: see [§ U-19 normative coverage — scenario file
+> mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11) immediately after
+> this table. 13 of 119 rows receive partial evidence; 106 receive none. Does not affect `PG-01`.
 
 
 | Trace ID      | v1.5 source | Requirement statement (preserved)                                                                                                                                       | Planned level                                                                              | Planning state at source (2026-08-29) | Dependency / ownership                                                                                                                                                                                          |
@@ -1082,6 +1083,58 @@ statement stays auditable; **it is not an active approval obligation.**
 "default starting-role permission assignments **approved by PO**" (`TR-2.3-04`), and the resourcing
 rows where "approved" describes a **request's** state (`TR-4.7-04`, `TR-4.7-05`, `TR-4.7-06`). These
 are architecture and product approvals, not the removed per-file scenario gate.
+
+---
+
+### U-19 normative coverage — scenario file mapping (resolved 2026-09-11)
+
+**Method.** Each of the 101 `docs/test-cases/access-control-foundation/` and
+`access-control-kernel/` scenario files was read against its own `**Trace:**` citation (a v1.5
+`§`-section number, confirmed as the same `docs/project-requirements.md` **Version: 1.5** these
+`TR-*` rows are drawn from) and cross-checked against the cited row's actual requirement-statement
+text — never inferred from a filename. Confirmed by grep: **zero of the 101 files cite a `TR-*` id
+anywhere**; the five apparent matches are all the unrelated scenario id `S4.2b-TR-01`. Each matched
+file now also carries an inline `**U-19 normative coverage:**` note (or, for kernel files, an
+appended `**Trace:**` bullet) recording the same finding at the point of use.
+
+**Result: 13 of the 119 rows receive any evidence, and none receives full coverage.**
+
+| `TR-*` row | Evidence level | Scenario file(s) |
+| --- | --- | --- |
+| `TR-2.1-01` | Facade/unit-level only, not API E2E | `ACM4R-MA-01..06`, `ACM2-IA-01..10`, `S4.1a-DP-01..03`, `ACM5-SA-05` |
+| `TR-2.1-02` | HTTP allow case (route unprotected, `SEC-AUTH-01` open) + facade robustness; 2 of the HTTP files invalidated pending rework | `ACF-AU-02` (component), `ACF-AU-03` (primary), `ACF-FC-01` (invalidated), `ACF-FC-04`, `ACM3-II-01..14` |
+| `TR-2.1-05` | HTTP allow case (same route caveat) + facade | `ACF-AU-04`, `ACM3-II-11` (boundary) |
+| `TR-2.1-05A` | Negative/boundary only — positive walk stays `PRODUCT/ARCH BLOCKED`, no file proves it | `ACF-FC-02` (invalidated), `ACM3-II-11` |
+| `TR-2.3-02` | Only the "removal immediate" half; "independently grantable via UI" half has no scenario | `ACM2-IA-02` |
+| `TR-2.3-03` | Facade-level only | `ACM4R-MA-05` |
+| `TR-2.3-04` | Seed-time default grant only, not the configuration-review/UI mechanism | `ACM1-FB-01`, `ACM1-FB-03`, `ACM1-FB-06` |
+| `TR-2.4-01` | Missing self-assignment rejection and last-holder guard entirely (out of this folder's scope) | `ACM11-FPO-01..06` |
+| `TR-2.4-AC` | Mechanism-only, against a synthetic mock; kernel README's own words: "no HTTP-observable effect today" | `ACM11-FPO-03`, `ACM11-FPO-04` |
+| `TR-3.1-01` | Facade edge-case only | `ACM5-SA-05..09` |
+| `TR-3.2-S01` | Read/write/none shape only — no photo exception, no field matrix | `ACM5-SA-01`, `ACM5-SA-02` |
+| `TR-3.2-S10` | Shape only — no "colleague dates only" field restriction | `ACM5-SA-03` |
+| `TR-3.2-S11` | Shape only — no "colleague project name only" field restriction | `ACM5-SA-04` |
+| `TR-7-01` | Same partial set as above; row's own text already says "Phase 1 only" | `ACF-FC-03`, `ACF-FC-04`, plus everything above |
+
+**The remaining 106 of 119 rows have zero evidence from any of the 101 files** — not a search gap:
+`docs/test-cases/access-control-foundation/README.md` and `access-control-kernel/README.md` each
+state their own scope exclusions (Project line, Department, PP HR-line positive walk; every section
+but S1/S10/S11; `/roles` catalog CRUD; projection/whitelist; PP/Department-mutation journal), and
+everything under v1.5 §4–§6, §8–§9 (directory, dashboards, resourcing, CDS, mentorship, campaigns,
+timetracker, repository process) belongs to epics this suite does not touch.
+
+**Orphan finding:** `ACF-AU-01` (Self) has no corresponding `TR-*` row at all — no `TR-2.1-*` or
+`TR-3.2-S*` row names Self as a distinct subject, even though §3.2 defines it. This is a gap in the
+`TR-*` catalog, not in scenario coverage, and is recorded here rather than silently left unmapped.
+
+**This closes U-19 as originally scoped** — "which file covers which row" is no longer unanswerable
+from any artifact. **It does not change `PG-01`.** `PG-01` schedulability is governed separately by
+**U-20** (`SEC-AUTH-01`, `CC-07`, `AC-S9-S13`, `AC-SECTION-MATRIX-01` all closed at implementation);
+none of those four close by mapping files to rows, and none of the mapped files above constitute
+production-wired evidence — most are themselves still draft, pending their own independent AD-1
+Stage-1 approval (`approvals.yaml` records only nine `ACM1-FB` and three `ACM3-II` as approved), and
+three foundation files' expected results are invalidated pending rework (see each suite's own
+README).
 
 ---
 
@@ -1667,7 +1720,7 @@ owner is not resolving a question. The register of record is `test-design/migrat
 | **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete                                                                                                                                                                      | Platform epic owner                                                         | Story 1.6 artifact references                                                                                                                                                                                                                                            |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the **six** register entries that remain open (corrected 2026-09-11 — was "five"; `test-design-architecture.md` § Dependencies names them). **Partially re-verified, not resolved**: `CC-07` and `CC-05` were re-checked against the actual baseline commit — both were **partial**, not "absent" as previously recorded; see `test-design-architecture.md` § Open blockers and § Ratified design decisions for the corrected rows and named remaining gaps | Architect + the per-entry owners                                            | `DG-02`, the coverage plan's blocked rows                                                                                                                                                                                                                                |
 | **U-18** | `docs/architecture/testing-strategy.md` retains the removed per-stage approval clause in **two** places (`:84` and `:117–119`), contradicting its own lines 25–38. Which sentence does the document intend to keep?                                            | Owner of `docs/architecture/testing-strategy.md` (Architect)                | `DG-01`. **This migration edits nothing under** `docs/architecture/`                                                                                                                                                                                                     |
-| **U-19** | Which of the **101** access-control scenario files covers which of the **119** normative trace rows                                                                                                                                                            | Access Control owners + QA                                                  | [Normative coverage map](#normative-coverage-map). Currently unanswerable from any artifact, and **must not be guessed from filenames**                                                                                                                                  |
+| **U-19** *(resolved 2026-09-11)* | **Resolved** — 13 of 119 `TR-*` rows receive partial evidence from the 101 scenario files (none full coverage); 106 receive none. Matched via each file's own `**Trace:**` §-citation, never guessed from filenames. **Does not affect `PG-01`** (governed by U-20 alone) | Access Control owners + QA                                                  | [§ U-19 normative coverage — scenario file mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11), immediately after the [Normative coverage map](#normative-coverage-map)                                                                                                                                  |
 | **U-20** | **Resolved with authority** — schedulable when `SEC-AUTH-01`, `CC-07`, `AC-S9-S13` and `AC-SECTION-MATRIX-01` are all closed at implementation; evaluated by Platform epic owner + Architect against the blocker register and a current re-verification record | Platform epic owner + Architect                                             | `[PG-01](#release-and-design-gates)`                                                                                                                                                                                                                                     |
 | **U-21** | Whether the 20 history-only retired scenario files should remain on disk                                                                                                                                                                                       | Owner of `docs/test-cases/user-management/`**                               | Out of scope for this migration, which modifies no scenario file                                                                                                                                                                                                         |
 | **U-22** | What covers the "`useAuth().userId` / `decodeJwtSub` output is unverified" gap                                                                                                                                                                                 | DEV + QA                                                                    | Frontend obligations                                                                                                                                                                                                                                                     |

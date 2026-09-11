@@ -2,6 +2,8 @@
 
 **Trace:** §3.2 Self · AD-10 · ACF-1
 
+**U-19 normative coverage:** No corresponding `TR-*` row exists — v1.5 §3.2 defines Self generally, but no `TR-2.1-*` or `TR-3.2-S*` row names Self as a distinct requirement subject. See `test-design-qa.md` § Normative coverage map.
+
 **Approved:** Anna Pikula, 2026-08-30
 
 ## Scenario

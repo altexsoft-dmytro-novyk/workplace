@@ -6,6 +6,7 @@
 - `services/backend/src/access-control/infrastructure/prisma-relationship-graph.adapter.ts` — the documented contract on the statement-timeout guard: "A timeout surfaces as a thrown error, never as an empty map, so a degraded resolution cannot be mistaken for 'no audience applies'."
 - [access-control.md § Fail-closed, always (AD-11, AD-12)](../../../architecture/access-control.md#fail-closed-always-ad-11-ad-12) — fail-closed means denying a resolvable request, not silently answering an unresolvable one.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — no repository fake, no provider override, no artificial endpoint.
+- **U-19 normative coverage:** Mechanism-level robustness evidence for `TR-2.1-02` (v1.5 §2.1 — transitive reports-to Reporting line) — headless-facade proof, not API E2E; see caveats in `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

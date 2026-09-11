@@ -23,6 +23,7 @@
 - `services/backend/prisma/schema.prisma:101` `AccessJournal.actorUserId` — `String`, **not** nullable, confirmed by direct read. This is why the bootstrap-seeded journal row self-references root as its actor (below), mirroring `prisma/seed.ts:149`'s `createdBy: rootId`.
 - `services/backend/src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts:111-128` `acquireBootstrapLock`, called at `:310`; `:308-423` the locked `$transaction` this scenario's new seeding step joins, not a second transaction; `:326` `root` bound and revalidated.
 - `services/backend/src/user-management/infrastructure/org-relationship.repository.ts:60-104` `assignManager` — the fact-row-plus-journal-row-in-one-transaction pattern the bootstrap-seed write mirrors (generate the id up front, write both rows in one `$transaction`, `skipDuplicates: true` on the journal insert).
+- **U-19 normative coverage:** Partial evidence for `TR-2.4-01` (v1.5 §2.4 — full-profile grant: seeded first holder, journal) — proves the seed-time first-holder grant and its paired `AccessJournal` row; does not cover self-assignment rejection or the last-holder guard (out of this folder's scope). See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

@@ -6,6 +6,7 @@
 - SPEC [CAP-1](../../../../_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md#capabilities) — each distinct requested target has one map entry and duplicate targets collapse to one key.
 - [access-control.md § Multi-audience merge](../../../architecture/access-control.md#multi-audience-merge) — applicable columns retain their independent meaning.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp).
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — strongest applicable audience is per section) — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

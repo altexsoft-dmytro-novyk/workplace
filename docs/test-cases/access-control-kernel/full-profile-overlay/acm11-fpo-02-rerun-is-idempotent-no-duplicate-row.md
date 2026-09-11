@@ -16,6 +16,7 @@
 - Solution design §1.2 — the `FullProfileGrant` model's `UNIQUE (holderUserId) WHERE revokedAt IS NULL` partial-unique index: the backstop that makes a duplicate *live* row for the same holder unrepresentable even if the count-under-lock check were ever bypassed.
 - `services/backend/src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts:1-13` header comment — the script's re-runnable-by-design contract.
 - `services/backend/src/access-control/infrastructure/bootstrap/access-control-bootstrap.ts:111-128` `acquireBootstrapLock` — the same advisory lock already serializing the FR-policy singleton check now also scopes the `full_profile_grants` count-under-lock read.
+- **U-19 normative coverage:** Partial evidence for `TR-2.4-01` (v1.5 §2.4 — full-profile grant) — proves the seed step is idempotent on rerun. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

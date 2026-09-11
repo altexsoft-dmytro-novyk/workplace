@@ -2,6 +2,8 @@
 
 **Trace:** §3.2 Reporting line · AD-11 · AD-12 · ACF-1
 
+**U-19 normative coverage:** Weak fail-closed-edge evidence for `TR-2.1-02` (v1.5 §2.1 — transitive Reporting line), but this file's own expected result is invalidated (2026-09-01, see this suite's README) and needs rework before it can count as evidence. See `test-design-qa.md` § Normative coverage map.
+
 **Approved:** Anna Pikula, 2026-08-30
 
 > **Expected result superseded — 2026-09-01.** The fail-closed *principle* here is unchanged and still load-bearing: a deactivated intermediate manager must not bridge reach to their ancestors. But the way this file observes it — a `403` on `GET /users/:id` — no longer holds, because User Management now returns the S1 identity card (`200`) to any colleague, and Frank *is* a colleague to Erin ([adoption SPEC](../../../../_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md)). The rework: assert `resolveAudiences(Frank, [Erin])` yields `{colleague}` and does **not** contain `reporting` — the broken edge did not promote him. That is its own AD-1 pass and needs fresh approval. Do not translate the `403` below.

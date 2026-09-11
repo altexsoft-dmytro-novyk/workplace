@@ -7,6 +7,7 @@
 - Inherited AD-11 / AD-12 (fail-closed relationship facts).
 - [access-control.md § Bulk, live, never stored](../../../architecture/access-control.md#bulk-live-never-stored) — "An edge whose **endpoint is inactive** is treated as **no edge** — the walk terminates fail-closed there, with no transitive continuation past the dead node," and the reporting-walk fail-closed filter comment in `PrismaRelationshipGraphAdapter`: "a deactivated person is neither a reachable node nor a bridge."
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp).
+- **U-19 normative coverage:** Mechanism-level robustness evidence for `TR-2.1-02` (v1.5 §2.1 — transitive reports-to Reporting line) — headless-facade proof, not API E2E; see caveats in `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 
