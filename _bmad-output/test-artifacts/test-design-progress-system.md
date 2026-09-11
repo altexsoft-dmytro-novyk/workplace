@@ -153,8 +153,8 @@ None is answered here. The register is `test-design/migration-map.md` §10: **U-
 U-6, U-9, U-10, U-11, U-12, U-13, U-16** remain open from Task 1; **U-17..U-19** and **U-21..U-22**
 remain open from the reconciliation; **U-20**, **U-23**, **U-24**, and **U-25** were resolved
 2026-09-11.
-Notably open and load-bearing for any later verdict: `PR-S-*` sign-offs remain **ungranted** (U-2
-resolved — closure rule recorded); what closes
+Notably open and load-bearing for any later verdict: `PR-S-*` sign-offs are [recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md) (U-2
+resolved), while what closes
 the six design-closed `PR-B-*` blockers at **implementation** (U-17); and contract A's qualifying
 **baseline/final artifact** — PASS `performance/dira1-final-dira1-1789080461725-944ce5c2a33a.json`
 (local env).

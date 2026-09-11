@@ -109,3 +109,9 @@ on the evaluated branch.
 This report does **not** authorise deployment or assert product/release readiness. The
 whole-repository trace remains a planning audit with `allow_gate=false`. Open product decisions,
 runtime evidence, and epic-level validation are separate work.
+
+## 2026-09-11 current-state clarification — formal package sign-off
+
+This report's prior statement that both `PR-S-*` sign-offs were ungranted is point-in-time
+validation evidence, not a rewritten historical claim. Current state is the
+[2026-09-11 PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md): the user's explicit Product Owner + Architect approval grants sign-off for `PR-S-01` / `CC-04` and `PR-S-02` / `CC-06`. PM/AD-19 and PM/AD-20 are directions, not approval. The decision does not close `CC-04`, `CC-06`, `CC-07`, `CC-08`, `CC-09`, or `OPERATIONAL-ENVELOPE`, and does not assert implementation, production, evidence, or release readiness.

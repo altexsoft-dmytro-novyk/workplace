@@ -59,8 +59,9 @@ next-request; project-derived revocation is within 15 minutes.
 **What changed since the superseded platform draft (2026-08-29).** Six of the nine
 `PR-B-*` product/architecture blockers are now **closed at design** and are recorded in
 [Ratified design decisions](#ratified-design-decisions). **None of them is closed at
-implementation**, and both sign-off packages remain **ungranted**. See
-[Sign-off-ready packages](#sign-off-ready-packages) for the rule that governs that whole
+implementation**. Both package sign-offs are **granted only as recorded in the
+[2026-09-11 PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md);** their independent implementation and evidence blockers remain open. See
+[Formally signed-off packages with implementation blockers](#formally-signed-off-packages-with-implementation-blockers) for the rule that governs that whole
 block.
 
 **Risk summary.** Ten platform risks, all P×I ≥ 6: five at score **9**, five at score
@@ -122,9 +123,9 @@ Work that is unblocked today, at the architecture level.
 2. **Build against the established seams**, all of which remain binding: real HTTP +
    PostgreSQL for end-to-end tests, outbound ports behind DI, **AccessControl facade
    only**, live bulk audience resolution, and synthetic seeded identities.
-3. **Design and review** the two sign-off-ready packages
-   ([PR-S-01, PR-S-02](#sign-off-ready-packages)) — Stage-1 design and review may proceed;
-   implementation may not.
+3. **Design and review** the two packages whose formal sign-off is
+   [recorded in the PM memlog](#formally-signed-off-packages-with-implementation-blockers)
+   (`PR-S-01`, `PR-S-02`) — Stage-1 design and review may proceed; implementation may not.
 4. **Design against the six ratified decisions** in
    [Ratified design decisions](#ratified-design-decisions) — their design content is
    settled and reviewable now.
@@ -183,12 +184,12 @@ template.** Two scoring records carried from the migration reconciliation are in
 | --- | --- | --- | --- | --- | ---: | --- |
 | **PR-001** | SEC | Distinct audiences, narrowed fields, flags, exports and filters create many leak paths; a leak exposes restricted employee data | 3 | 3 | **9** | Open |
 | **PR-002** | SEC | Stale graph state can retain access after an org change, sync delay, outage, or due departure | 3 | 3 | **9** | Open — design in place, evidence absent |
-| **PR-003** | DATA | Implementing the specified People Partner contract before formal sign-off, or without the CC-07 journal, can create governance or audit inconsistency | 3 | 3 | **9** | Open — sign-off ungranted; `PR-B-07` open |
+| **PR-003** | DATA | Implementing the specified People Partner contract without its recorded formal sign-off or the CC-07 journal can create governance or audit inconsistency | 3 | 3 | **9** | Open — [sign-off recorded](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md); `PR-B-07` / `CC-07` remains open |
 | **PR-004** | SEC | Full-profile overlay precedence can expose Self-denied sections or create inconsistent grants | 3 | 3 | **9** | Open — **design unblocked** (`PR-B-06` closed at design); overlay implementation absent |
 | **PR-005** | TECH | An unknown timetracker contract can create stale or mixed project policies; project assignment directly changes data access | 3 | 3 | **9** | Open — successors `TT-IDENTITY-01` (P0) and `TT-PMDM-01` (P1) |
 | **PR-006** | PERF | Arbitrary visible fields plus live bulk graph resolution may breach the ≤ 2 s All Employees list requirement at 500+ rows | 2 | 3 | **6** | Open — no measurement exists |
 | **PR-007** | DATA | Dashboard, resourcing and campaign aggregates can diverge from projection rules and lifecycle facts, producing wrong decisions or leaks | 2 | 3 | **6** | Open — partly re-gated by PM/AD-33 |
-| **PR-008** | OPS | Implementing the specified departure contract before formal sign-off, or operating it without the AD-20 deployment controls, produces governance drift or delayed cutoff | 2 | 3 | **6** | Open — sign-off ungranted; `OPERATIONAL-ENVELOPE` open |
+| **PR-008** | OPS | Implementing the specified departure contract without its recorded formal sign-off, or operating it without the AD-20 deployment controls, produces governance drift or delayed cutoff | 2 | 3 | **6** | Open — [sign-off recorded](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md); `OPERATIONAL-ENVELOPE` remains open |
 | **PR-009** | OPS | Counting unexecuted access-control scenario documents as coverage creates false release confidence | 2 | 3 | **6** | Open — **restated**, and less mitigated than in 2026-08-29 |
 | **PR-010** | DATA | Seed, platform, timetracker or candidate identity mismatch, or real PII in the estate, can attach access to the wrong person or expose client data | 2 | 3 | **6** | Open — partial design support |
 
@@ -221,7 +222,7 @@ Backend. *Timeline:* before any access-bearing release.
 #### PR-003 — People Partner contract ahead of sign-off or journal (DATA, 9)
 
 *Authority:* PM/AD-19, binding as `docs/architecture/README.md` non-negotiable 15.
-*Architecture mitigation:* obtain the `PR-S-01` sign-off; close `CC-07`; enrol the PP fact
+*Architecture mitigation:* retain the recorded `PR-S-01` sign-off; close `CC-07`; enrol the PP fact
 and the immutable journal write in **one** transaction with stable snapshots. *Owner:*
 Product + Architect + Security + Backend. *Timeline:* before PP end-to-end work or
 implementation. *Blocked by:* [`PR-B-07 / CC-07`](#open-blockers), still open at **P0**.
@@ -296,11 +297,11 @@ contract; the implementation is **absent** and the cross-context invariant risk 
 #### PR-008 — Departure contract ahead of sign-off or operational controls (OPS, 6)
 
 *Authority:* PM/AD-20, binding as `docs/architecture/README.md` non-negotiable 16.
-*Architecture mitigation:* obtain the `PR-S-02` sign-off; then run worker and application
+*Architecture mitigation:* retain the recorded `PR-S-02` sign-off; then run worker and application
 against **one** validated business timezone and database, with worker lag, retry, lease and
 cutoff telemetry, a named alert owner and a retry surface. *Blocked by:*
-`OPERATIONAL-ENVELOPE` (**P0**, open) for the operational half; `PR-S-02` sign-off remains
-**ungranted**. *Owner:* Product + Architect + DevOps + Backend + Security.
+`OPERATIONAL-ENVELOPE` (**P0**, open) for the operational half. The package sign-off is
+[recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md), not supplied by PM/AD-20. *Owner:* Product + Architect + DevOps + Backend + Security.
 
 #### PR-009 — Scenario documents counted as coverage (OPS, 6)
 
@@ -464,8 +465,8 @@ concerns above. These are the dimensions along which the seams above are judged.
 - **Fixed router shapes** reduce scenario ambiguity.
 - **The immutable-fact timeline model** is observable through multi-step end-to-end reads.
 - **Requirements plus PM/AD-19 and PM/AD-20** specify People Partner concurrency and
-  fail-closed departure execution well enough for Stage-1 design; formal sign-off remains
-  before implementation.
+  fail-closed departure execution well enough for Stage-1 design; the separate package
+  sign-offs are [recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md), while implementation remains blocked.
 
 ### Accepted scope boundaries
 
@@ -547,24 +548,22 @@ Reintroducing them here would misstate the register.
 
 ---
 
-## Sign-off-ready packages
+## Formally signed-off packages with implementation blockers
 
-Two packages whose **design is settled** and whose **formal sign-off is ungranted**. The
-distinction is the whole point of this section: a binding architecture direction is a
-direction, **not a sign-off**.
+Two packages whose **design is settled** and whose separate formal approval is
+[recorded in the PM memlog (2026-09-11)](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). The distinction is the whole point of this section: a binding architecture direction is a direction, **not the approval**.
 
 | Package | Design status | What may proceed now | What still waits |
 | --- | --- | --- | --- |
-| **`PR-S-01` / `CC-04`** — one People Partner per employee; atomic optimistic create/replace/delete; next-request revocation; concurrency; journal direction | Design **resolved-approved** (PM/AD-19, PM/AD-29). The register is explicit that this entry stays open **only as an implementation and journal-enrolment gate** and is **not a design blocker on AD-19**. The design content — storage as `Relationship`, fixed cardinality, atomic replace with `expectedCurrentTargetId`, `409` semantics, journal-in-transaction — can be designed and reviewed against today | Access-Control-owned direct-PP audience review; User-Management-owned PP-mutation Stage-1 design and review | Formal Product Owner / Architect **sign-off: ungranted**. Implementation waits behind `CC-07`. Verified state at the baseline commit: the `Relationship` model and the `people_partner` partial unique index exist; **no `PUT` / `DELETE` people-partner route and no journal write exist**. *A named memlog decision does not close implementation.* |
-| **`PR-S-02` / `CC-06`** — effective date and reason; relationship blockers and outcomes; durable, retrying, fail-closed executor | Design **resolved-approved** (PM/AD-20, PM/AD-22, PM/AD-23). Depends on `CC-07`, `CC-08`, `CC-09` and `OPERATIONAL-ENVELOPE` | Employment-lifecycle Stage-1 design and review | Formal **sign-off: ungranted**. Its closure condition is itself a test contract and requires **independently approved production evidence, not scenarios or red tests**: (1) every listed participant implements PM/AD-23 against the same signature using the supplied `tx` with no nested transaction; (2) the executor owns claim and fencing, and stale tokens no-op; (3) retry and idempotency are proven per participant via `departureId`; (4) `CC-07`, `CC-08` and `CC-09` are closed; (5) the AD-20 operational release gate is demonstrated. Upstream, verified at the baseline commit: `CC-07` absent; `CC-08` / `CC-09` **P0 open** (`idempotencyKey` exists nowhere in schema or `src/`; the timetracker write path does not exist); `OPERATIONAL-ENVELOPE` P0 open; `src/mentorship` does not exist (`CC-10-MENTORSHIP`, P1 open) |
+| **`PR-S-01` / `CC-04`** — one People Partner per employee; atomic optimistic create/replace/delete; next-request revocation; concurrency; journal direction | Design **resolved-approved** (PM/AD-19, PM/AD-29). The register is explicit that this entry stays open **only as an implementation and journal-enrolment gate** and is **not a design blocker on AD-19**. The design content — storage as `Relationship`, fixed cardinality, atomic replace with `expectedCurrentTargetId`, `409` semantics, journal-in-transaction — can be designed and reviewed against today | Access-Control-owned direct-PP audience review; User-Management-owned PP-mutation Stage-1 design and review | Formal Product Owner / Architect **sign-off: granted** in the [PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). Implementation remains blocked by `CC-04` and `CC-07`. Verified state at the baseline commit: the `Relationship` model and the `people_partner` partial unique index exist; **no `PUT` / `DELETE` people-partner route and no journal write exist**. *A named memlog decision does not close implementation.* |
+| **`PR-S-02` / `CC-06`** — effective date and reason; relationship blockers and outcomes; durable, retrying, fail-closed executor | Design **resolved-approved** (PM/AD-20, PM/AD-22, PM/AD-23). Depends on `CC-07`, `CC-08`, `CC-09` and `OPERATIONAL-ENVELOPE` | Employment-lifecycle Stage-1 design and review | Formal **sign-off: granted** in the [PM memlog decision](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). `CC-06` remains open. Its closure condition is itself a test contract and requires **independently approved production evidence, not scenarios or red tests**: (1) every listed participant implements PM/AD-23 against the same signature using the supplied `tx` with no nested transaction; (2) the executor owns claim and fencing, and stale tokens no-op; (3) retry and idempotency are proven per participant via `departureId`; (4) `CC-07`, `CC-08` and `CC-09` are closed; (5) the AD-20 operational release gate is demonstrated. Upstream, verified at the baseline commit: `CC-07` absent; `CC-08` / `CC-09` **P0 open** (`idempotencyKey` exists nowhere in schema or `src/`; the timetracker write path does not exist); `OPERATIONAL-ENVELOPE` P0 open; `src/mentorship` does not exist (`CC-10-MENTORSHIP`, P1 open) |
 
 **Boundary.** `CC-04` and `CC-06` are **not** discovery or design gaps. PM/AD-19 and
-PM/AD-20 are the binding architecture directions **for** formal sign-off. `CC-07` remains a
+PM/AD-20 are binding architecture directions, **not** the formal approval. `CC-07` remains a
 separate open architecture dependency for the immutable journal schema, readers and
 transaction enrolment; `OPERATIONAL-ENVELOPE` remains the separate operational envelope.
-**Sign-off closure (U-2 resolved):** each package closes only on explicit, recorded Product Owner +
-Architect sign-off. PM/AD-19 and PM/AD-20 are binding direction, **not** sign-off. Both remain
-**ungranted** until recorded — **this document does not grant, imply or infer sign-off**.
+**Sign-off closure (U-2 resolved):** each package has explicit, recorded Product Owner +
+Architect approval in the [PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). That record grants sign-off only; it does not close any blocker or imply implementation, production, or release readiness.
 
 ---
 
@@ -658,9 +657,8 @@ forward as a citation.
 
 1. The register entries `OQ-PERM-01`, `OQ-AC-EDIT`, `CC-07`, `TT-IDENTITY-01`, `TT-PMDM-01`
    and `OPERATIONAL-ENVELOPE` before their named waves.
-2. `PR-S-01` and `PR-S-02` require **formal sign-off** before People Partner or departure
-   implementation, while their Stage-1 design and review may proceed now. `CC-07` remains
-   open before any journal-dependent implementation.
+2. `PR-S-01` and `PR-S-02` have **formal sign-off recorded** in the
+   [PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md), independently of PM/AD-19 and PM/AD-20. `CC-07` remains open before any journal-dependent implementation; `CC-06` also remains blocked by `CC-08`, `CC-09`, and `OPERATIONAL-ENVELOPE`.
 3. The actual timetracker contract before project-positive and sync scenarios; the
    PeopleForce contract only if optional prefill is selected.
 4. An approved — or explicitly deferred and owned — operational envelope before any
@@ -736,7 +734,7 @@ full wording and history, is `test-design/migration-map.md` §10.
 
 | # | Question | Owner | Bears on |
 | --- | --- | --- | --- |
-| **U-2** | **Resolved with authority (2026-09-11)** — sign-off = explicit recorded Product Owner + Architect approval per package; PM/AD-19/AD-20 are direction only. Both **ungranted** until recorded | Product Owner + Architect | [Sign-off-ready packages](#sign-off-ready-packages), `PR-003`, `PR-008` |
+| **U-2** | **Resolved with authority (2026-09-11)** — explicit Product Owner + Architect approval for both packages is [recorded in the PM memlog](../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md); PM/AD-19/AD-20 are direction only | Product Owner + Architect | [Formally signed-off packages with implementation blockers](#formally-signed-off-packages-with-implementation-blockers), `PR-003`, `PR-008` |
 | **U-3** | **Resolved with authority** — `DIRA1-MVP-v1` binds warm p95 and worst case; local PostgreSQL; single sequential client | Product Owner + Platform/DevOps | [NFR contract references](#nfr-contract-references), `PR-006` |
 | **U-4** | WCAG conformance level and viewport set | Product Owner | NFR categories |
 | **U-5** | Uptime SLO, RTO, RPO, backup and retention, timeout/retry/backoff, circuit thresholds | DevOps + Architect + Security | Gated by `OPERATIONAL-ENVELOPE` |

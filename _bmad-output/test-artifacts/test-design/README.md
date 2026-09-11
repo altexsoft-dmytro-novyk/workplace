@@ -12,6 +12,8 @@
 > - **No percentage, pass rate or green gate appears anywhere in this index.**
 > - Nothing here is a release-readiness statement. The whole-repository trace remains a
 >   planning audit with `allow_gate=false`.
+> - `PR-S-01` / `CC-04` and `PR-S-02` / `CC-06` have formal Product Owner + Architect sign-off
+>   [recorded in the PM memlog](../../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md). This does not close their implementation or evidence blockers.
 > - Five of these filenames **reuse** a filename that previously held different,
 >   human-approved content. See [§6](#6-historical-artifacts--read-at-their-commit-not-by-filename).
 

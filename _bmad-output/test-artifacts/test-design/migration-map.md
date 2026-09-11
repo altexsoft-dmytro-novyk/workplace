@@ -2645,3 +2645,9 @@ measurement run, any ClickUp operation.
 | Twelve `_bmad-output/planning-artifacts/*/epics.md` | Canonical epic sources | The epic inventory in §12, including the absence of a `frontend` domain and the superseded `ENG-E3`/`ENG-E4`. |
 | `_bmad-output/planning-artifacts/platform/epics.md` Story 1.6 | Named consumer | Its exact deliverable references, gate identities and evidence caveat (§13.2, §6 F-7). |
 | `_bmad/config.toml`, both `workflow.yaml` copies, both `customize.toml` copies | Workflow contract inputs | Output roots, the `project_name` space problem, the epic-output derivation, and the unconditional validation-report path (§5.3, §13.2). |
+
+## 2026-09-11 current-state clarification — formal package sign-off
+
+This migration map remains a point-in-time record of its source migration and validation. Its
+earlier `ungranted` statements describe that historical state and are not rewritten. Current
+state is the [2026-09-11 PM memlog decision](../../planning-artifacts/architecture/architecture-people-management-2026-08-19/.memlog.md): the user's explicit Product Owner + Architect approval grants sign-off for `PR-S-01` / `CC-04` and `PR-S-02` / `CC-06`. PM/AD-19 and PM/AD-20 remain directions, not the approval. This clarification does not close `CC-04`, `CC-06`, `CC-07`, `CC-08`, `CC-09`, or `OPERATIONAL-ENVELOPE`, and makes no implementation, production, evidence, or release-readiness claim.
