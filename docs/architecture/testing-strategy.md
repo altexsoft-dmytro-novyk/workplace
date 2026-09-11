@@ -81,7 +81,7 @@ Negative cases are first-class: every `—` cell of the §3.2 access matrix, unf
 
 The narrowed Project-line cells (S2/S3 denied, S5 CV/certificates only), named-recipient share links, organisational self-assignment denial/journaling, runtime role creation, and departure revocation require explicit regression scenarios. If good-to-have notifications are built, automate negative content checks per notification type and audience; delivery totals are not a privacy oracle.
 
-For AD-19/AD-20, stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario still stops for its own human approval before stage 2.
+For AD-19/AD-20, stage-1 scenario contracts explicitly cover: PP zero-or-one cardinality, concurrent absent/create and replace/replace CAS, expected-current `409`, self/authorization negatives, journal rollback, and HR-boundary negative traversal; departure blocker matrix, leak-safe remediation plan, explicit platform-owned one-click re-parenting and stale blocker version, sync-owned PM/DM refusal until external remediation is confirmed, idempotency-key replay/hash mismatch/authorization recheck, stored timezone/dueAt boundary, due/overdue pickup order, duplicate workers, delayed stale worker after lease reclaim, uncertain commit, retry/backoff/manual retry conflicts, legacy-blocker incident, actor cutoff, due target projection, and negative traversal through due manager/PP nodes. Each scenario is written and committed before Stage 2 begins; per "Stage approval was removed on 2026-09-04" above, no human approval gates that transition.
 
 **Kernel MVP exception.** The scoped AD-20 amendment in
 `_bmad-output/planning-artifacts/architecture/architecture-access-control-foundation-2026-08-29/fr-architecture-amendment.md` defers request-time due/departure evaluation and
@@ -114,9 +114,10 @@ scoped Stage-2 boundary for ACM-1, ACM-2, ACM-3, ACM-4, ACM-5, and ACM-8:
 - Do not fake an Access Control repository and do not override a User
   Management provider.
 - Do not create a test-only, debug, or artificial HTTP endpoint.
-- Preserve AD-1 unchanged: scenario prose, independent human approval, a
-  separate Stage-2 dispatch committed red and independently approved, then a
-  separate production dispatch.
+- Preserve AD-1 as currently defined above: scenario prose, then a separate
+  Stage-2 dispatch committed red, then a separate production dispatch — no
+  human approval gates any of these transitions (per "Stage approval was
+  removed on 2026-09-04" above).
 
 ACM-0 sits inside the same boundary but has no facade call to make: its subject
 is the deploy-time root User step, so its Stage-2 evidence runs against migrated
