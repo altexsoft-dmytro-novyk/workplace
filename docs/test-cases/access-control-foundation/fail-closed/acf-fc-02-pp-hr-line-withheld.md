@@ -2,6 +2,8 @@
 
 **Trace:** §2.1 · §3.2 PP · AD-19 · AD-12 · ACF-1
 
+**U-19 normative coverage:** Negative/boundary evidence only for `TR-2.1-05A` (v1.5 §2.1 — recursive PP HR line) — proves the recursive walk is withheld, not the positive walk the row requires (still `PRODUCT/ARCH BLOCKED`); this file's own expected result is also invalidated (2026-09-01, see this suite's README). See `test-design-qa.md` § Normative coverage map.
+
 **Approved:** Anna Pikula, 2026-08-30
 
 > **Expected result superseded — 2026-09-01.** The fail-closed *principle* is unchanged: PP resolution stops at the directly assigned endpoint and does not walk the PP's own manager chain. But the `403` on `GET /users/:id` no longer holds — User Management now returns the S1 identity card (`200`) to any colleague, and Hana is a colleague to Alice ([adoption SPEC](../../../../_bmad-output/specs/spec-user-management-access-control-adoption/SPEC.md)). The rework: assert `resolveAudiences(Hana, [Alice])` yields `{colleague}` and does **not** contain `pp`. That is its own AD-1 pass and needs fresh approval. Do not translate the `403` below.

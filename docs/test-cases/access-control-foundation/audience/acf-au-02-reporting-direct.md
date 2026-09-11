@@ -2,6 +2,8 @@
 
 **Trace:** §2.1 relation 1 · §3.2 Reporting line · AD-10 · ACF-1
 
+**U-19 normative coverage:** Component evidence for `TR-2.1-02` (v1.5 §2.1 — transitive reports-to Reporting line; the direct case is depth 1 of that walk). HTTP-level allow case; the production route is not yet wired to this facade (`SEC-AUTH-01` open P0). See `test-design-qa.md` § Normative coverage map.
+
 **Approved:** Anna Pikula, 2026-08-30
 
 ## Scenario
