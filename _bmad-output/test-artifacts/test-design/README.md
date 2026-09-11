@@ -67,8 +67,8 @@ that template; the workflow contract pins it so a display-name space cannot crea
 
 ## 3. Epic scope
 
-A plan exists **only** for an epic that received real transferred obligations. Empty plans for
-every epic are forbidden. Every plan has exactly one matching checkpoint.
+Every active canonical epic has exactly one Epic-Level test-design plan and one matching
+checkpoint. Superseded epics are excluded.
 
 | Scope | Canonical epic ID · source | Plan | Checkpoint (`runKey`) | Status |
 | --- | --- | --- | --- | --- |
