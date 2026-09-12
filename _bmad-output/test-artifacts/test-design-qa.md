@@ -34,6 +34,11 @@
 > — only Validate may do that — and its PASS verdict stands as an accurate record of what it
 > evaluated on 2026-09-11 before this correction. Re-validate if a byte-exact attestation of the
 > current file is needed.
+>
+> **System Edit — 2026-09-12.** § U-19 was aligned with the retired per-file AD-1 approval gate
+> and the production wiring now present on `GET /users/:id`. This is another content-only System
+> Edit: the 2026-09-11 validation report remains historical evidence for the bytes it evaluated
+> and is not rewritten here.
 
 **Purpose:** The one platform **execution and coverage strategy**. It owns evidence contracts,
 execution strategy, isolation policy, level strategy, the risk → evidence map, the coverage plan,
@@ -1124,7 +1129,7 @@ appended `**Trace:**` bullet) recording the same finding at the point of use.
 | `TR-*` row | Evidence level | Scenario file(s) |
 | --- | --- | --- |
 | `TR-2.1-01` | Facade/unit-level only, not API E2E | `ACM4R-MA-01..06`, `ACM2-IA-01..10`, `S4.1a-DP-01..03`, `ACM5-SA-05` |
-| `TR-2.1-02` | HTTP allow case (route unprotected, `SEC-AUTH-01` open) + facade robustness; 2 of the HTTP files were invalidated and reworked to the resolver audience-set assertion, 2026-09-11 | `ACF-AU-02` (component), `ACF-AU-03` (primary), `ACF-FC-01` (reworked 2026-09-11), `ACF-FC-04`, `ACM3-II-01..14` |
+| `TR-2.1-02` | HTTP allow case on the production-wired route + facade robustness; 2 of the HTTP files were invalidated and reworked to the resolver audience-set assertion, 2026-09-11. HTTP `200` is UM-owned route evidence, not PLAT-E2 audience-set evidence | `ACF-AU-02` (component), `ACF-AU-03` (primary), `ACF-FC-01` (reworked 2026-09-11), `ACF-FC-04`, `ACM3-II-01..14` |
 | `TR-2.1-05` | HTTP allow case (same route caveat) + facade | `ACF-AU-04`, `ACM3-II-11` (boundary) |
 | `TR-2.1-05A` | Negative/boundary only — positive walk stays `PRODUCT/ARCH BLOCKED`, no file proves it | `ACF-FC-02` (reworked 2026-09-11), `ACM3-II-11` |
 | `TR-2.3-02` | Only the "removal immediate" half; "independently grantable via UI" half has no scenario | `ACM2-IA-02` |
@@ -1152,16 +1157,17 @@ timetracker, repository process) belongs to epics this suite does not touch.
 **This closes U-19 as originally scoped** — "which file covers which row" is no longer unanswerable
 from any artifact. **It does not change `PG-01`.** `PG-01` schedulability is governed separately by
 **U-20** (`SEC-AUTH-01`, `CC-07`, `AC-S9-S13`, `AC-SECTION-MATRIX-01` all closed at implementation);
-none of those four close by mapping files to rows, and none of the mapped files above constitute
-production-wired evidence — most are themselves still draft, pending their own independent AD-1
-Stage-1 approval (`approvals.yaml` records only nine `ACM1-FB` and three `ACM3-II` as approved).
+none of those four close by mapping files to rows, and the mapped files above do not by themselves
+constitute complete production evidence. Per-file AD-1 stage approval was retired 2026-09-04;
+historical approval records are provenance, not a current gate.
 Three foundation files' expected results were invalidated 2026-09-01 and have since been reworked
 to the resolver audience-set assertion and freshly approved (Anna Pikula, 2026-09-11, recorded as a
 retro-anchor — the underlying resolver behaviour and its e2e coverage at `da7d1fa` predate this
-approval); see each file and the suite's own README. This closes the "invalidated" state, not the
-draft/approval gap the rest of this paragraph describes — none of the three constitutes
-production-wired evidence, since `GET /users/:id` is still not adopted by User Management
-(`UM-E0-S0.1`).
+approval); see each file and the suite's own README. This closes the "invalidated" state. The
+production route is now wired: `GET /users/:id` carries
+`@RequireSectionAccess('profile:identity', 'read')` behind `SectionAccessGuard`, and
+`ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter`. Its HTTP contract remains UM-owned, so
+an HTTP `200` is not evidence that PLAT-E2 returned the exact audience set.
 
 ---
 

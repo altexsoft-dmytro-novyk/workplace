@@ -13,6 +13,7 @@
     "guard:epic-ids:clickup": "node scripts/epic-id-guard.cjs --clickup-mappings",
     "test:epic-ids": "node --test test/epic-id-guard.test.cjs",
     "test:test-design-routing": "node --test test/test-design-workflow-routing.test.cjs",
+    "test:test-design-lifecycle": "node --test test/test-design-lifecycle-state.test.cjs",
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync:clickup": "node scripts/sync-clickup.cjs",
     "create:clickup": "node scripts/create-clickup-task.cjs",

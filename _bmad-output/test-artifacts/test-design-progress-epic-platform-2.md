@@ -7,8 +7,12 @@ epicSourceHeading: '## Epic 2: Access Control Foundation'
 runScope: 'epic'
 runKey: 'epic-platform-2'
 workflowStatus: 'generated'
-approvalStatus: 'ungranted'
-validationStatus: 'not-run'
+approvalStatus: 'granted'
+approvalGrantedBy: 'Anna Pikula'
+approvalGrantedDate: '2026-09-12'
+validationStatus: 'PASS'
+validationDate: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md'
 totalSteps: 5
 stepsCompleted:
   [
@@ -20,7 +24,7 @@ stepsCompleted:
   ]
 lastStep: 'step-05-generate-output'
 nextStep: 'document generation is complete; no Create step remains; proceed with human review, then choose Validate, Edit, or a fresh Create'
-lastSaved: '2026-09-11'
+lastSaved: '2026-09-12'
 runBaselineHead: '28d8e2049d457b103cd7eee31587add7a970f4fc'
 planPath: '_bmad-output/test-artifacts/test-design-epic-platform-2.md'
 ---
@@ -33,11 +37,13 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-platform-2.md'
 **Run baseline `HEAD`:** `28d8e2049d457b103cd7eee31587add7a970f4fc` (captured before this run's first write)
 
 > **`workflowStatus: generated` means only that documents were written.** Approval, validation,
-> coverage, execution evidence, and release readiness are separate states and none of them is
-> claimed here (contract §5).
+> coverage, execution evidence, and release readiness are separate fields; current values are
+> stated below (contract §5).
 >
-> - Approval: **ungranted**
-> - Validation: **NOT RUN** — `test-design-validation-report-epic-platform-2.md` does not exist
+> - Approval: **granted 2026-09-12 by Anna Pikula, the requester**
+> - Validation: **PASS (2026-09-12)** —
+>   `test-design-validation-report-epic-platform-2.md`, synchronized with
+>   `test-design/README.md`
 > - Coverage: **none asserted**
 >
 > This is the canonical **terminal successful document-generation state** of contract §4.4. Resume
@@ -136,19 +142,20 @@ classification remain **UNKNOWN** — no value was invented.
 
 ## Step 4 — Coverage plan
 
-Planned, not achieved: **12 tests + 1 measurement run + 1 documentation item**, ~25–42 h (~4–6 days),
-excluding human AD-1 approval latency.
+Planned, not achieved: **8 API-E2E cases + 1 measurement run + 9 document/audit items**,
+~31–53 h (~1–2 weeks). Counts separate executable tests from evidence-maintenance work; current
+AD-1 has no per-stage approval latency.
 
 | Priority | Obligations | Tests | Hours |
 | --- | --- | --- | --- |
-| P0 | `ACF-RW-01..03`, `ACF-AU-R1` | 7 | ~14–22 |
-| P1 | `ACF-AU-06`, `ACF-FC-05` | 3 | ~6–10 |
-| P2 | `ACF-PERF-01`, `ACF-TR-01` | 1 run + 1 doc | ~4–8 |
+| P0 | `ACF-RW-01..04`, `ACF-AU-R1` | 4 API-E2E + 4 docs | ~16–26 |
+| P1 | `ACF-FC-05`, `ACF-NC-01` | 3 API-E2E + 1 audit | ~9–15 |
+| P2 | `ACF-PERF-01`, `ACF-TR-01`, `ACF-DOC-01`, `ACF-SCOPE-01/02` | 1 run + 4 audits | ~5–10 |
 | P3 | `ACF-FC-07` | 1 | ~1–2 |
 
-All functional scenarios are facade-level against real PostgreSQL and fit the PR budget;
-`ACF-PERF-01` is opt-in and is wired into no gate. `ACM3-II-01/03` and `ACM-4R` are **consumed** as
-cross-epic evidence rather than duplicated.
+All functional scenarios are API E2E through the headless facade against real PostgreSQL and fit
+the PR budget; `ACF-PERF-01` is opt-in and wired into no gate. `ACM3-II-01/03` and `ACM-4R` are
+**consumed** as cross-epic evidence rather than duplicated.
 
 ---
 
@@ -228,13 +235,53 @@ plan and this checkpoint should say about that risk's status.
   remains planned.
 - No sprint-status, coverage YAML, trace, or gate-decision file was touched.
 
-**State unchanged by this action:** `workflowStatus: generated`, approval of *this plan* still
-**ungranted**, validation still **NOT RUN**. The fresh approval recorded above is an AD-1 approval
+**State at the prior validation:** `workflowStatus: generated`, approval of *this plan* still
+**ungranted**, validation was **CONCERNS (2026-09-12)**. The fresh approval recorded above is an AD-1 approval
 of three Stage-1 scenario documents — a different approval from, and not a substitute for, human
 approval of this test-design plan.
 
 ## Result
 
-**WRITTEN · approval ungranted · validation NOT RUN.** One planned P0 obligation (`ACF-RW-01..03`)
-was executed and its scenario documents carry a fresh AD-1 approval; the plan itself remains
-unapproved and unvalidated.
+**Prior validation result:** **WRITTEN · approval ungranted · validation CONCERNS (2026-09-12).** `ACF-RW-01..03` were
+executed as validation-only characterization repairs with voluntary attribution; the plan was
+still unapproved at that point. A fresh Validate was required after the remediation below.
+
+## Step 6 — Post-validation remediation after independent reviews (2026-09-12)
+
+Two read-only agents independently reviewed the plan: one against the full Epic-Level TEA
+checklist, one against all five Story 2.1 acceptance criteria and current primary sources. The Edit
+addressed every plan-quality blocker they agreed would prevent PASS:
+
+- added explicit AC1–AC5 traceability and repository-audit obligations for AC4/AC5;
+- required exact `{self}` and other exact audience sets;
+- reclassified real-Nest/PostgreSQL facade checks as API E2E, not Component;
+- replaced Smoke/P-tier execution timing with PR/Nightly/Weekly;
+- corrected the tracker section to the single deliberate coverage divergence;
+- removed duplicate PLAT-E3 multi-audience work and made `ACF-DOC-01` concrete;
+- captured the still-contradictory `ACF-FC-04` as open `ACF-RW-04`;
+- added non-cache/non-persistence verification, reconciled counts/estimates, and removed obsolete
+  scenario-approval and “Validate not run” language.
+
+External source/scenario inconsistencies are planned obligations, not claims of completed work.
+This Edit changed neither approval nor the prior validation verdict; the fresh Validate below
+supersedes that prior CONCERNS result. No runtime code, scenario file, source SPEC, tracker, ClickUp, trace, gate, or
+other epic artifact was changed.
+
+## Validation projection (2026-09-12)
+
+**Fresh independent Epic-Level Validate:** **PASS.** The selected plan and canonical system pair
+were re-evaluated against the complete checklist. ACF-NC-01 now counts its dynamic API-E2E proof
+and repository audit consistently across the P1 row and all totals; current §U-19 no longer states
+a live per-file AD-1 approval gate or that `GET /users/:id` is unprotected/not adopted; and the
+checkpoint retains the canonical five Create steps and terminal Resume metadata. No runtime
+coverage, approval, gate, or release-readiness claim is made. Canonical report:
+`test-design-validation-report-epic-platform-2.md`.
+
+## Human approval (2026-09-12)
+
+Anna Pikula, the requester, explicitly approved this PLAT-E2 test design after the independent
+validation returned PASS. Approval covers the plan's design content only and remains separate
+from validation. It grants no runtime coverage, execution evidence, gate result, NFR verdict, or
+release-readiness state, and it closes none of the plan's open implementation/evidence
+obligations. The validation report is retained unchanged as the evidence record of its run; its
+approval wording describes the state at validation time.

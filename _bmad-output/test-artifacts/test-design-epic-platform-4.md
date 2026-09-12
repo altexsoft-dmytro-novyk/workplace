@@ -7,7 +7,9 @@ epicSourcePath: '_bmad-output/planning-artifacts/platform/epics.md'
 epicNumber: 4
 workflowStatus: 'generated'
 approval: 'ungranted'
-validation: 'not-run'
+validation: 'CONCERNS'
+validatedAt: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-4.md'
 generated: '2026-09-12'
 ---
 
@@ -15,7 +17,9 @@ generated: '2026-09-12'
 
 **Date:** 2026-09-12  
 **Author:** User  
-**Status:** Draft — approval ungranted; validation not run
+**Status:** Written — approval ungranted; validation **CONCERNS (2026-09-12)**
+**Validation report:** `test-design-validation-report-epic-platform-4.md`, synchronized with
+`test-design/README.md`.
 
 ## Executive Summary
 
@@ -189,7 +193,7 @@ These are test-design completion criteria, not an executable release verdict:
 - [ ] Architecture / technical review
 - [ ] QA review
 
-No approval is implied by the generated document. Epic validation has not run.
+No approval is implied by the generated document. Epic validation is **CONCERNS (2026-09-12)**.
 
 ## References
 

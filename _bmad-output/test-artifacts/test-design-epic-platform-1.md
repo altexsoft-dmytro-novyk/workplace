@@ -1,5 +1,19 @@
+---
+runScope: 'epic'
+runKey: 'epic-platform-1'
+epicId: 'PLAT-E1'
+epicDomain: 'platform'
+epicNumber: 1
+validationStatus: 'PASS'
+validationDate: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-1.md'
+---
+
 # Test Design — Epic: Platform 1, Platform Spec v1.5 Alignment
 
+> **Validation projection:** synchronized with `test-design/README.md` and
+> `test-design-validation-report-epic-platform-1.md`.
+>
 > ## Status: **written, approved, validation PASS (2026-09-12).** This document retains its
 > Create-run baseline and inherits no earlier run's approval or verdict.
 >

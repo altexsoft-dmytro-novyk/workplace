@@ -5,6 +5,12 @@
 **Output root:** `_bmad-output/test-artifacts/` (unchanged).
 **Current-artifact index:** `_bmad-output/test-artifacts/test-design/README.md`.
 
+**Lifecycle-state authority:** the canonical validation report is the evidence record for a
+Validate run. Its verdict, date, and path are synchronously projected into the current-artifact
+index, selected plan, and selected progress checkpoint. Those four surfaces must agree; the
+workflow and repository guard perform the synchronization so a human never reconciles them by
+hand.
+
 This contract maps each scope identity to one plan, one checkpoint, and one validation report
 without relying on a bare epic number. It controls document selection and filenames;
 it grants no approval, validation verdict, test coverage, gate result, or release status.
@@ -159,6 +165,11 @@ domainless `test-design-epic-{number}.md`, or a second handoff. If a matching ch
 progress, ask whether to Resume or start over; starting over may replace only that same
 checkpoint after the user chooses it.
 
+Create initializes the selected plan and checkpoint to validation `NOT RUN`. A later Validate run
+must update their designated validation projection fields and status prose together with the
+canonical report and current-artifact index. Never leave an unqualified “validation report does
+not exist” claim after the report has been created.
+
 An existing plan without its canonical checkpoint, or a checkpoint without its canonical plan,
 is an inconsistent partial run. Do not silently manufacture the missing half: report the pair,
 ask whether the user intends a fresh Create, and write nothing until that choice is explicit. A
@@ -251,18 +262,27 @@ Every validation report records:
 - the repository `HEAD` captured before the run's first write, labelled as the run baseline;
 - checklist results and any checks not executed.
 
-After writing the report, update only that scope's validation entry in the current-artifact index.
-An epic validation never overwrites the system report, another epic report, plan, or checkpoint.
-A system validation never overwrites an epic report. Validation does not edit the evaluated
-outputs and does not inherit a historical verdict or approval.
+After writing the report, synchronously update that scope's validation entry in the
+current-artifact index and the validation projection in the selected plan and checkpoint. These
+projection-only edits do not change the evaluated design substance; report hashes describe the
+pre-projection content evaluated by the run. An epic validation never touches another epic's
+report, plan, checkpoint, or index row. A system validation never touches an epic artifact.
+Validation does not inherit a historical verdict or approval.
 
-Treat the report plus its one index update as one logical change. If either write fails, restore
-the pre-run content of both files and report the failed validation run; do not leave a report and
-index describing different states.
+The report, index row, plan projection, and checkpoint projection are one logical change. Each
+must reproduce the same scope identity, verdict, validation date, and canonical report path.
+Treat the run as incomplete until `npm run test:test-design-lifecycle` passes. If any write fails,
+restore all four surfaces to their pre-run content; never leave them describing different states.
+The guard must discover every canonical epic validation report; a hard-coded roster is
+insufficient.
 
 ## 5. State, history, and evidence invariants
 
 - `workflowStatus: generated` means only that documents were written.
+- A validation report is evidence for its named run. Its matching index row, plan projection, and
+  checkpoint projection must cite it and match its identity, verdict, and date.
+- Agents run `npm run test:test-design-lifecycle` after every workflow mode and repair any
+  projection drift before completing; a human is never asked to reconcile documents manually.
 - Approval, validation, coverage, execution evidence, and release readiness are separate states.
 - New or rewritten files start approval-ungranted unless a new explicit approval is recorded.
 - Historical files and claims are read at their pinned commit; reused filenames at `HEAD` do not

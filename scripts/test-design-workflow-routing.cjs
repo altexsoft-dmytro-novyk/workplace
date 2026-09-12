@@ -172,6 +172,143 @@ function epicValidateWriteSet(domain, number) {
   };
 }
 
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function epicValidationReports(rootDir) {
+  const artifactsRoot = path.join(rootDir, '_bmad-output/test-artifacts');
+  return fs
+    .readdirSync(artifactsRoot)
+    .filter((name) => /^test-design-validation-report-epic-[a-z0-9-]+\.md$/.test(name))
+    .sort()
+    .map((name) => {
+      const text = fs.readFileSync(path.join(artifactsRoot, name), 'utf8');
+      return { name, text, frontmatter: parseFrontmatter(text) };
+    });
+}
+
+function auditValidationIndex(rootDir) {
+  const findings = [];
+  const artifactsRoot = path.join(rootDir, '_bmad-output/test-artifacts');
+  const indexPath = path.join(
+    rootDir,
+    '_bmad-output/test-artifacts/test-design/README.md',
+  );
+  const indexText = fs.readFileSync(indexPath, 'utf8');
+
+  for (const report of epicValidationReports(rootDir)) {
+    const metadata = report.frontmatter || {};
+    const verdict = metadata.verdict;
+    const validationDate = metadata.validationDate || metadata.date;
+    const expectedSuffix = report.name
+      .replace(/^test-design-validation-report-epic-/, '')
+      .replace(/\.md$/, '');
+    const expectedRunKey = `epic-${expectedSuffix}`;
+
+    if (metadata.runKey !== expectedRunKey) {
+      findings.push({
+        code: 'VALIDATION_REPORT_RUNKEY_MISMATCH',
+        report: report.name,
+        expected: expectedRunKey,
+        actual: metadata.runKey || null,
+      });
+      continue;
+    }
+    if (!verdict || !validationDate) {
+      findings.push({
+        code: 'VALIDATION_REPORT_METADATA_MISSING',
+        report: report.name,
+      });
+      continue;
+    }
+
+    const indexRows = indexText
+      .split(/\r?\n/)
+      .filter((line) => line.startsWith('|') && line.includes(report.name));
+    if (indexRows.length === 0) {
+      findings.push({ code: 'VALIDATION_REPORT_NOT_INDEXED', report: report.name });
+      continue;
+    }
+    if (indexRows.length > 1) {
+      findings.push({
+        code: 'VALIDATION_REPORT_INDEXED_MULTIPLE_TIMES',
+        report: report.name,
+        count: indexRows.length,
+      });
+      continue;
+    }
+    const [indexRow] = indexRows;
+
+    const verdictPattern = new RegExp(
+      `Validation\\s+\\*\\*${escapeRegExp(verdict)}\\s+\\(${escapeRegExp(validationDate)}(?:[^)]*)\\)\\*\\*`,
+      'i',
+    );
+    if (!verdictPattern.test(indexRow)) {
+      findings.push({
+        code: 'VALIDATION_INDEX_VERDICT_DRIFT',
+        report: report.name,
+        verdict,
+        validationDate,
+      });
+    }
+
+    for (const artifactName of [
+      `test-design-epic-${expectedSuffix}.md`,
+      `test-design-progress-epic-${expectedSuffix}.md`,
+    ]) {
+      const artifactPath = path.join(artifactsRoot, artifactName);
+      if (!fs.existsSync(artifactPath)) {
+        findings.push({
+          code: 'VALIDATED_ARTIFACT_MISSING',
+          report: report.name,
+          artifact: artifactName,
+        });
+        continue;
+      }
+
+      const artifactText = fs.readFileSync(artifactPath, 'utf8');
+      const artifactMetadata = parseFrontmatter(artifactText) || {};
+      const artifactVerdict = artifactMetadata.validationStatus || artifactMetadata.validation;
+      const artifactDate = artifactMetadata.validationDate || artifactMetadata.validatedAt;
+      const artifactReport = artifactMetadata.validationReport;
+      if (
+        artifactVerdict !== verdict ||
+        artifactDate !== validationDate ||
+        path.basename(artifactReport || '') !== report.name
+      ) {
+        findings.push({
+          code: 'VALIDATION_ARTIFACT_PROJECTION_DRIFT',
+          report: report.name,
+          artifact: artifactName,
+          expected: { verdict, validationDate, validationReport: report.name },
+          actual: {
+            verdict: artifactVerdict || null,
+            validationDate: artifactDate || null,
+            validationReport: artifactReport || null,
+          },
+        });
+      }
+
+      const escapedReportName = escapeRegExp(report.name);
+      const directAbsenceClaim = new RegExp(
+        `${escapedReportName}[^.\\n]{0,80}does not exist`,
+        'i',
+      );
+      const genericAbsenceClaim = /no epic validation\s*>?\s*report exists for this epic/i;
+      if (directAbsenceClaim.test(artifactText) || genericAbsenceClaim.test(artifactText)) {
+        findings.push({
+          code: 'STALE_VALIDATION_REPORT_ABSENCE_CLAIM',
+          report: report.name,
+          artifact: artifactName,
+        });
+      }
+    }
+  }
+
+  return { ok: findings.length === 0, findings };
+}
+
 function planCheckpointPair(rootDir, runKey) {
   const suffix = runKey.replace(/^epic-/, '');
   const plan = `test-design-epic-${suffix}.md`;
@@ -219,6 +356,8 @@ function auditRoutingContract(rootDir) {
     }
   }
 
+  findings.push(...auditValidationIndex(rootDir).findings);
+
   return { ok: findings.length === 0, findings, contract };
 }
 
@@ -238,6 +377,8 @@ module.exports = {
   resumeDecision,
   systemValidateWriteSet,
   epicValidateWriteSet,
+  epicValidationReports,
+  auditValidationIndex,
   planCheckpointPair,
   auditRoutingContract,
 };

@@ -2,14 +2,15 @@
 runScope: 'epic'
 runKey: 'epic-platform-3'
 workflowStatus: 'generated'
-totalSteps: 9
-stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction', 'step-07-post-revalidation-edit', 'step-08-open-item-12-widened', 'step-09-post-third-validate-edit']
-lastStep: 'step-09-post-third-validate-edit'
-nextStep: 'Third Epic Validate returned CONCERNS on two findings; both closed by this Edit. C-2 remains recorded, not resolved — plan Open item 12, now seven artifacts, root at SPEC CAP-6, owner the in-flight `ACM-8R-scenarios` story (this supersedes the earlier DEPT-4 suggestion). Four WARNs from the third run are open and were out of this Edit''s requested scope. An Edit cannot clear a verdict — a further Epic Validate is required to supersede CONCERNS'
+totalSteps: 11
+stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction', 'step-07-post-revalidation-edit', 'step-08-open-item-12-widened', 'step-09-post-third-validate-edit', 'step-10-post-fourth-validate-edit', 'step-11-fresh-independent-validate']
+lastStep: 'step-11-fresh-independent-validate'
+nextStep: 'Validation complete; no Create step remains. Human review and separate evidence workflows remain available. Approval remains granted and separate.'
 approvalStatus: 'granted'
 approvalGrantedBy: 'Anna Pikula'
 approvalGrantedDate: '2026-09-12'
-validationStatus: 'CONCERNS (2026-09-12, third run)'
+validationStatus: 'PASS'
+validationDate: '2026-09-12'
 validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-3.md'
 lastSaved: '2026-09-12'
 epicId: 'PLAT-E3'
@@ -54,6 +55,9 @@ pact_mcp_reachable: false
 ---
 
 # Progress — PLAT-E3 Access Control Kernel MVP
+
+**Validation projection:** **PASS (2026-09-12, fresh independent validation)** —
+`test-design-validation-report-epic-platform-3.md`, synchronized with `test-design/README.md`.
 
 ## Step 1 — Detect mode and prerequisites
 
@@ -317,3 +321,33 @@ only when one does.
 **Result:** correction only. No suite was executed, no approval changed, and an Edit cannot clear a
 verdict. `CONCERNS (2026-09-12, third run)` stands until a further Epic Validate runs against this
 text. With both concerns closed, the findings remaining against this pair are WARN-level only.
+
+## Step 10 — Edit after the fourth Epic Validate (2026-09-12)
+
+The fourth independent Epic Validate returned **CONCERNS** on two current-source consistency
+findings. Both are closed in the selected plan:
+
+- **C-1:** the execution-state caveat now states the authoritative tracker result (`epic-3` and
+  `3-1` … `3-8` are `done`), records that the source caveat agrees, and isolates the remaining
+  stale Epic 3 body header instead of describing four conflicting surfaces.
+- **C-2:** Open item 12 now records committed CAP-6 amendment and committed owner
+  `ACM-8R-scenarios` at root revision `bfd43be`; it counts the six still-stale scenario/index/comment
+  surfaces and no longer labels the owner as uncommitted future work.
+
+This Edit changes no validation verdict or approval. The current **CONCERNS (2026-09-12, fourth
+run)** report remains the evidence record until another Epic Validate runs. No suite, runtime
+coverage, release gate, service code, scenario file, source epic, sprint status, or ClickUp data
+was changed.
+
+## Step 11 — Fresh independent Epic Validate (2026-09-12)
+
+The fresh independent Epic-Level validation evaluated the full checklist against current primary
+sources. Both prior concerns are closed: the execution-state caveat matches the authoritative
+tracker and isolates only the stale Epic 3 source header; Open item 12 correctly records committed
+CAP-6/`ACM-8R-scenarios` state and six stale downstream targets. The report records **PASS** with
+four bounded WARNs (threshold disclosure, omitted test count, not-applicable Pact inventory, and
+one citation anchor). No runtime suite ran and no coverage, gate, or release-readiness claim was
+made.
+
+**Result:** `PASS (2026-09-12)`; approval remains granted and separate. The canonical report,
+plan, checkpoint, and index row are synchronized.

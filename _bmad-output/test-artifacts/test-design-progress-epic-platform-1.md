@@ -9,7 +9,9 @@ epicSourceHeading: '## Epic 1: Platform Spec v1.5 Alignment'
 workflowStatus: 'generated'
 approval: 'granted'
 approvedAt: '2026-09-12'
-validation: 'NOT RUN'
+validation: 'PASS'
+validatedAt: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-1.md'
 totalSteps: 5
 stepsCompleted:
   - 'step-01-detect-mode'
@@ -27,17 +29,17 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-platform-1.md'
 
 # Test Design Progress — Epic PLAT-E1, Platform Spec v1.5 Alignment
 
-> ## Status: **generated, approved, NOT validated.** This is a new run and inherits nothing.
+> ## Status: **generated, approved, validation PASS (2026-09-12).** This run inherits nothing.
 >
 > - **Approval:** approved by the requester on 2026-09-12. This approval covers this run and
 >   the plan it records; it is not a validation verdict or release-readiness decision.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here, and no epic validation
->   report exists for this epic. `test-design-validation-report-epic-platform-1.md` is written
->   only when this epic is actually validated.
+> - **Validation:** PASS (2026-09-12), recorded in
+>   `test-design-validation-report-epic-platform-1.md` and synchronized with
+>   `test-design/README.md`.
 > - **Coverage:** none asserted. **No pass rate and no percentage appears anywhere in this file.**
 > - **`workflowStatus: 'generated'` means the plan document was written.** It does not itself
 >   mean validation or approval; those are separate states. This checkpoint records the
->   separate requester approval above, while validation remains NOT RUN.
+>   separate requester approval and validation projection above.
 
 ## Run identity
 
@@ -58,7 +60,7 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-platform-1.md'
 | Run baseline `HEAD` | `b3cc6de8d6944f3d4e7d4f3f1d9a2618fe6264a3`, captured before this run's first write |
 | `HEAD` at the index write | `28d8e2049d457b103cd7eee31587add7a970f4fc` — the branch advanced mid-run; see § A commit landed mid-run |
 | Approval | **approved by the requester on 2026-09-12** |
-| Validation | **NOT RUN** |
+| Validation | **PASS (2026-09-12)** — `test-design-validation-report-epic-platform-1.md` |
 | Coverage claimed | **none** |
 
 **The epic identity is reused verbatim from its canonical source. Nothing is renumbered**, and
@@ -140,7 +142,7 @@ used as a source of obligations, risk, or coverage.
 
 | Output | SHA-256 at the moment this checkpoint was written | Approval | Validation |
 | --- | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-platform-1.md` | `b8c7396b8f8b7d19db2a08a441c7ce02b1ea5bb488bedfadc6d94e286a5ed8ff` | ungranted | NOT RUN |
+| `_bmad-output/test-artifacts/test-design-epic-platform-1.md` | `ebdff6bae05d867c845d0c1abbbc6cff3e96084596651ffde4327a1eed63d75b` | granted | PASS (2026-09-12) |
 | `_bmad-output/test-artifacts/test-design/README.md` (index, **post-run**) | `54c5ade664d47c2880478849cbafac24f40c437dd70572a7cc08f7a335f39ec7` | n/a | n/a |
 
 The current-artifact index `test-design/README.md` was also updated by this run, as
@@ -176,6 +178,6 @@ therefore **newly stated from the epic's own acceptance criteria**, and the plan
 
 ## Next step
 
-**A separate Validate run scoped to this epic.** An epic Validate run writes
-`test-design-validation-report-epic-platform-1.md` and **never** overwrites the system report at
-`test-design-validation-report.md` or any other epic's report. Neither has happened.
+The latest Epic Validate for this plan is **PASS (2026-09-12)** in
+`test-design-validation-report-epic-platform-1.md`. Re-run Validate only after a substantive plan
+change; it must not overwrite the system report or another epic's report.

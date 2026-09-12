@@ -7,8 +7,12 @@ epicSourceHeading: '## Epic 2: Access Control Foundation'
 runScope: 'epic'
 runKey: 'epic-platform-2'
 workflowStatus: 'generated'
-approvalStatus: 'ungranted'
-validationStatus: 'not-run'
+approvalStatus: 'granted'
+approvalGrantedBy: 'Anna Pikula'
+approvalGrantedDate: '2026-09-12'
+validationStatus: 'PASS'
+validationDate: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md'
 totalSteps: 5
 stepsCompleted:
   [
@@ -48,8 +52,11 @@ inputDocuments:
 > **State of this document — read first.**
 >
 > - **WRITTEN.** Document generation only.
-> - **Approval: ungranted.** No Product Manager, Tech Lead, or QA Lead has approved this plan.
-> - **Validation: NOT RUN.** `test-design-validation-report-epic-platform-2.md` does not exist.
+> - **Approval: granted 2026-09-12 by Anna Pikula, the requester.** This human approval is
+>   separate from validation and covers only the test design.
+> - **Validation: PASS (2026-09-12).** Recorded in
+>   `test-design-validation-report-epic-platform-2.md` and synchronized with
+>   `test-design/README.md`.
 > - This plan asserts **no coverage, no pass rate, no gate result, and no release readiness.**
 >   Every quality-gate number below is a *planned threshold*, never an evaluated outcome.
 > - Shared policy lives in the platform pair (`test-design-architecture.md`, `test-design-qa.md`).
@@ -75,9 +82,10 @@ migration ledger is rewritten by either run: it still routes no obligation here,
 not claim it did.
 
 **`PLAT-E2` is not a greenfield epic.** Its single story `PLAT-E2-S2.1` / `ACF-1` is implemented,
-its 9 Stage-1 scenarios were AD-1 approved on 2026-08-30, and a real-PostgreSQL e2e suite exists.
+its 9 Stage-1 scenarios carry historical 2026-08-30 approval markers (not a current workflow
+state), and a real-PostgreSQL e2e suite exists.
 This is consequently a **rework and evidence-integrity plan**, not a from-scratch coverage plan. The
-bulk of the work below is closing gaps between what the approved scenarios say, what the committed
+bulk of the work below is closing gaps between what the scenario prose says, what the committed
 tests assert, and what the shipped resolver does.
 
 ---
@@ -91,16 +99,18 @@ projection, or UI ownership.
 **Risk Summary:**
 
 - Total risks identified: **9**
-- High-priority risks (≥6): **3** (`R-PLAT2-01` score 9, `R-PLAT2-02` score 6 — **mitigated 2026-09-11**, `R-PLAT2-03` score 6)
+- High-priority risks (≥6): **3** (`R-PLAT2-01` score 9, `R-PLAT2-02` score 6,
+  `R-PLAT2-03` score 6)
 - Critical categories: **SEC**, **TECH**
 
 **Coverage Summary (planned, not achieved):**
 
-- P0: 4 scenario obligations / **7** tests (~14–22 h)
-- P1: 2 scenario obligations / **3** tests (~6–10 h)
-- P2: 2 obligations / **1** test + 1 measurement + 1 documentation item (~4–8 h)
-- P3: 1 scenario obligation / **1** test (~1–2 h)
-- **Total: ~25–42 h (~4–6 days)**. No approval-latency exclusion applies: AD-1 stage approval was
+- P0: **4 API-E2E cases + 4 scenario-document alignment items**; 3 document items are complete
+- P1: **3 API-E2E cases + 1 repository audit**
+- P2: **1 measurement + 4 repository/document audits**
+- P3: **1 API-E2E case**
+- **Total: ~31–53 h (~1–2 weeks)**. Counts distinguish executable tests from documentation and
+  audit evidence. No approval-latency exclusion applies: AD-1 stage approval was
   retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`), so ordinary PR review is the
   only gate on these changes.
 
@@ -110,14 +120,14 @@ projection, or UI ownership.
 
 | Artifact | Count / state |
 | --- | --- |
-| Stage-1 scenario documents | **9** under `docs/test-cases/access-control-foundation/` (5 `ACF-AU-*`, 4 `ACF-FC-*`), each carrying `**Approved:** Anna Pikula, 2026-08-30` |
+| Stage-1 scenario documents | **9** under `docs/test-cases/access-control-foundation/` (5 `ACF-AU-*`, 4 `ACF-FC-*`); their historical `Approved` markers are provenance only, not a current AD-1 state |
 | Stage-2 e2e | `services/backend/test/access-control/audience-resolution.e2e-spec.ts` — **10** tests against real PostgreSQL |
-| Scenario documents whose expected result was **invalidated, then reworked** | **3** — `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02` (superseded 2026-09-01, reworked 2026-09-11) |
+| Scenario documents whose expected result was invalidated | **4** — `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02`, `ACF-FC-04`; the first three were reworked 2026-09-11, while `ACF-FC-04` remains open as `ACF-RW-04` |
 | `TR-*` rows receiving evidence from this suite | `TR-2.1-02`, `TR-2.1-05`, `TR-2.1-05A`, `TR-7-01` — **partial in every case**, per `test-design-qa.md` § U-19 |
 | `TR-*` rows receiving **full** evidence | **none** |
 | Performance record | `measurement (P6)` — `performance/p6-resolve-audiences-postgresql.md`, **a record, never a gate** |
 
-**None of the above is coverage.** A present, approved scenario document is not evidence that a
+**None of the above is coverage.** A present or historically approval-marked scenario document is not evidence that a
 requirement is satisfied; `test-design-qa.md` § U-19 states this for all 99 access-control scenario
 documents and it applies unchanged to these 9.
 
@@ -129,7 +139,7 @@ documents and it applies unchanged to these 9.
 | --- | --- | --- |
 | **Production `GET /users/:id` authorization** | *(Corrected 2026-09-11: the route **is** now wired — `@Get(':id')` carries `@RequireSectionAccess('profile:identity', 'read')` behind `SectionAccessGuard`, and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter`, not `InterimAccessControlAdapter`, at `user-management.module.ts:215`.)* It stays out of scope on the unchanged reason: the **route contract** — the `PM/AD-24` three-code denial oracle — is owned by `UM-E0-S0.1`, not this epic | Cross-epic dependency, tracked under `R-PLAT2-01` and `R-PLAT2-03`; the rework in P0 removes this plan's dependence on the route |
 | **Section matrix, `canAccessSection`, `isAllowed`** | Kernel substrate is `PLAT-E3` (`ACM-5`, `ACM-2`); S2–S16 is `PLAT-E6` | Consumed as cross-epic evidence; see Interworking |
-| **Multi-audience merge semantics** | `CAP-2` / `ACM-4R` is `PLAT-E3` | `ACF-AU-06` (P1) covers only the *Phase-0 boundary consequence*: this suite's own "one audience per viewer×target" scope claim is stale |
+| **Multi-audience combination and merge semantics** | `CAP-2` / `ACM-4R` is `PLAT-E3` | Consume `ACM4R-MA-01`; do not duplicate it here. `ACF-DOC-01` reconciles the foundation SPEC/README's stale “exactly one audience” wording with current applicable-set semantics while preserving Self exclusivity |
 | **Project line, Department walk, PP HR-line** | Explicitly fail-closed and out of Phase 0; owned by `PLAT-E8` / `PLAT-E5` | `ACF-FC-02` proves the *withholding*, not the positive walk; recorded as such |
 | **Dismissed-target read-only projection (AD-20)** | Needs a `Departure`/`EmploymentStatus` persistence seam absent from `prisma/schema.prisma` | Fail-closed is the sanctioned default; `ACF-FC-05` (P1) makes the empty-set rule explicit rather than incidental |
 | **Unknown / non-existent viewer or target id contract** | `deferred-work.md` sources this to `ACM-4R` (`PLAT-E3`) | Not duplicated here; recorded in Interworking |
@@ -145,7 +155,7 @@ documents and it applies unchanged to these 9.
 | Risk ID | Category | Description | P | I | Score | Mitigation | Owner | Timeline |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `R-PLAT2-01` | SEC | **`SEC-AUTH-01` (P0, open pending re-adjudication).** **Premise corrected 2026-09-11:** neither `InterimSessionResolverAdapter` nor the `Boolean(userId)` `isAllowedForTarget` stub exists at this branch's gitlink (`3bc801a`), the one it replaces (`81a5dc6`), or backend `main` (`d1ef680`) — both were deleted by `37a339a` (2026-09-04). `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`). The **fail-open substrate this risk was scored on no longer exists**, so the residual exposure is the persona shorthand behind `ALLOW_TEST_SESSION_TOKENS` (Joi-gated on `NODE_ENV`), not an unconditional bypass. Score kept at 9 pending re-adjudication with `SEC-AUTH-01` itself — QA does not re-score a security risk unilaterally | 3 | 3 | **9** | Move every allow case off the route and onto the facade (P0 `ACF-AU-R1`). Closure of `SEC-AUTH-01` itself is Architect + Security, **not this epic** | Architect and Security | Before first shared-environment deploy |
-| `R-PLAT2-02` | TECH | **MITIGATED 2026-09-11.** ~~Stage-1 and Stage-2 disagreed~~: `services/backend` commit `da7d1fa` (2026-09-03) reworked the `403` assertions for `ACF-AU-05`/`ACF-FC-01`/`ACF-FC-02` into resolver audience-label checks, while all three scenario documents still carried the invalidated `403` expected result. All three now carry a fresh `**Reworked & approved:** Anna Pikula, 2026-09-11` marker, explicitly recorded as a retro-anchor rather than a mechanical status swap | 3 | 2 | **6** (mitigated) | P0 `ACF-RW-01..03` — **done**. Rewrote the three scenario documents to the audience-set expectation, matching the code and test already at `da7d1fa` | Access Control owners + QA | Closed 2026-09-11 |
+| `R-PLAT2-02` | TECH | Stage-1 prose and current API-E2E evidence disagree. `ACF-AU-05`/`ACF-FC-01`/`ACF-FC-02` were realigned on 2026-09-11, but `ACF-FC-04` still combines a Colleague result with an obsolete HTTP `403` oracle while the current test asserts exact `{colleague}` | 3 | 2 | **6** | P0 `ACF-RW-01..04`: first three **done**; rework `ACF-FC-04` as a headless facade exact-set assertion while retaining its termination oracle | Access Control owners + QA | Before citing the suite as internally consistent |
 | `R-PLAT2-03` | TECH | **`ACF-AU-01..04` can pass for the wrong reason.** All four assert HTTP `200` on `GET /users/:id`. Since 2026-09-01 that route returns the S1 identity card `200` to *any* active authenticated viewer, so the assertion no longer discriminates the audience it names. `ACF-AU-01` (Self) additionally has **no `TR-*` row at all** | 3 | 2 | **6** | P0 `ACF-AU-R1`: re-express all four as facade audience-set assertions, the pattern `ACF-FC-04` already uses. Catalog gap handled by P2 `ACF-TR-01` | QA + Access Control owners | With the P0 rework |
 
 ### Medium-Priority Risks (Score 3–4)
@@ -154,8 +164,8 @@ documents and it applies unchanged to these 9.
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `R-PLAT2-04` | TECH | The empty-set rule for a deactivated or unconfirmed target (shipped in `9e69682`) **is stated by no approved scenario**. `deferred-work.md` records it as decided "by the placement of a join rather than by a decision" | 2 | 2 | 4 | P1 `ACF-FC-05` states the rule as a scenario in this suite | Access Control owners |
 | `R-PLAT2-05` | PERF | **P6 misread as production load.** The depth-499 × 500-target row is warm p50/p95/worst **960.940 / 983.087 / 984.351 ms** — ~49 % of the 2 s facade budget, and visually alarming. Real reporting chains run **5–10 levels**, where the balanced depth-5 × 500-target row is warm p95 **9.139 ms** | 2 | 2 | 4 | P2 `ACF-PERF-01`. Read deep-chain rows as a **canary for algorithmic change**, not production load. **Do not raise the fixture depth ceiling above 499** — `acyclic_depths` and `target_count` are hashed into `fixture_manifest_hash` and changing them invalidates every existing baseline | Platform / Backend |
-| `R-PLAT2-06` | TECH | The suite README's scope table still asserts **"Phase 0 resolves *one* audience per viewer×target"**. That stopped being true in `services/backend` commit `f36d1b2` (2026-08-30), which returns all audiences per target and walks upward from targets | 2 | 2 | 4 | P1 `ACF-AU-06` + P2 `ACF-DOC-01` correct the claim without importing `ACM-4R`'s merge semantics | Access Control owners |
-| `R-PLAT2-07` | OPS | **`PLAT-E2` status disagrees across three tracking surfaces** — see the dedicated section below | 3 | 1 | 3 | Reconciliation belongs to **Platform Story 1.1**. This plan records the conflict and changes none of the three | Platform epic owner |
+| `R-PLAT2-06` | TECH | The foundation SPEC and suite README still assert exactly one audience per target, while current resolver evidence returns the applicable set with Self exclusive and Colleague as fallback. Combination/precedence evidence belongs to PLAT-E3 | 2 | 2 | 4 | P2 `ACF-DOC-01` aligns the foundation wording; consume PLAT-E3 `ACM4R-MA-01` without duplicating it | Access Control owners |
+| `R-PLAT2-07` | OPS | The authoritative tracker and Epic 2 header say `done`, while global coverage deliberately keeps `PLAT-E2-S2.1` `in-progress` pending Story 1.1 | 3 | 1 | 3 | Reconciliation belongs to **Platform Story 1.1**. This plan records the one genuine divergence and changes neither surface | Platform epic owner |
 
 ### Low-Priority Risks (Score 1–2)
 
@@ -173,19 +183,18 @@ documents and it applies unchanged to these 9.
 
 ## Tracking-surface conflict for `PLAT-E2` (recorded, not resolved)
 
-Four surfaces disagree about this epic's status. **This plan changes none of them** (contract §5).
+One deliberate divergence remains. **This plan changes neither surface** (contract §5).
 
 | Surface | What it says at the run baseline |
 | --- | --- |
 | `_bmad-output/implementation-artifacts/platform/sprint-status.yaml:61-62` | `epic-2: done` · `2-1-resolve-phase-0-audiences-acf-1: done` |
 | `_bmad-output/planning-artifacts/global-coverage/global-fr-epic-story-coverage.yaml:95` | `PLAT-E2-S2.1 … status: in-progress` — deliberately *"left as in-progress here pending Platform Story 1.1 reconciliation rather than silently flipped"* |
-| `_bmad-output/planning-artifacts/platform/epics.md:394` | `**Status:** in-progress` |
-| `_bmad-output/planning-artifacts/platform/epics.md` § Overview | Says *"`sprint-status.yaml` still records `epic-3: in-progress` and `epic-2: in-progress`"* — **this caveat is itself now stale**: `sprint-status.yaml` records `done` for both keys |
+| `_bmad-output/planning-artifacts/platform/epics.md:403` | `**Status:** done` — agrees with the tracker |
 
-**Consequence for test design:** "`PLAT-E2` is done" is not mechanically verified from any single
-surface, and the epic body's own caveat about which surfaces conflict no longer describes the tree.
-Reconciliation is Platform Story 1.1's traceability matrix. The rework obligations below are
-independent of how that reconciliation lands.
+**Consequence for test design:** implementation is `done` according to the authoritative tracker;
+the coverage model intentionally withholds its own completion classification. Reconciliation is
+Platform Story 1.1's traceability matrix. The evidence obligations below are independent of how
+that reconciliation lands.
 
 ---
 
@@ -218,15 +227,16 @@ follow-up story. That story is **not** created by this plan.
 - [ ] The canonical epic tuple (`PLAT-E2` · `platform` · `epics.md` `## Epic 2`) is unchanged
 - [ ] Real PostgreSQL available to `test/access-control/` (this suite does not run on a stub)
 - [ ] The foundation fixture (Alice, Bob, Carol, Paula, Hana, Colin, Erin, InactiveMgr, Frank, CycleA/B) seeds through Prisma in test setup
-- [x] The three rework documents are rewritten — **done 2026-09-11**: `ACF-RW-01..03` (Anna Pikula, retro-anchor). No reviewer-availability gate applies: AD-1 stage approval was retired 2026-09-04
-- [ ] This plan has been human-reviewed (it is currently **approval ungranted**)
+- [x] Three rework documents are aligned — **done 2026-09-11**: `ACF-RW-01..03` (voluntary attribution only)
+- [ ] `ACF-RW-04` aligns the cyclic-chain scenario with its current exact-set API-E2E evidence
+- [x] This plan has been human-reviewed and approved by the requester — **2026-09-12**
 
 ## Exit Criteria
 
 - [ ] All P0 tests passing
 - [ ] All P1 tests passing, or failures triaged and recorded
-- [x] `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02` carry a **fresh** `**Approved:**` marker for the reworked expected result — **done 2026-09-11** (`**Reworked & approved:** Anna Pikula, 2026-09-11`); the 2026-08-30 approval did not carry over on its own
-- [ ] The suite README's "one audience per viewer×target" scope claim is corrected
+- [x] `ACF-RW-01..03` have an explicit rework-attribution record; this is not approval or a gate
+- [ ] `ACF-RW-04`, `ACF-DOC-01`, and `ACF-SCOPE-01/02` are complete
 - [ ] No open high-severity defect in `resolveAudiences`
 - [ ] **Not an exit criterion:** closure of `SEC-AUTH-01`. It blocks deployment, not this epic's test design
 
@@ -234,18 +244,23 @@ follow-up story. That story is **not** created by this plan.
 
 ## Test Coverage Plan
 
+> **P0/P1/P2/P3 are priority, not execution timing.** Execution timing is defined separately in
+> the PR/Nightly/Weekly strategy below. “API E2E” here means headless facade integration through a
+> real Nest module and migrated PostgreSQL; it is not a jsdom/network-mocked component test.
+
 ### P0 (Critical)
 
 **Criteria:** security or evidence-integrity impact with no safe workaround.
 
 | Requirement / obligation | Test Level | Risk Link | Test Count | Owner | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `ACF-RW-01` — rewrite `ACF-AU-05` expected result: `resolveAudiences(Colin,[Alice])` yields `{colleague}`, not `403` | Component (facade) | `R-PLAT2-02` | 1 | QA + AC | **DONE 2026-09-11.** Test was already green at `da7d1fa`; the document and its fresh approval were the deliverable |
-| `ACF-RW-02` — rewrite `ACF-FC-01`: `resolveAudiences(Frank,[Erin])` yields `{colleague}` and **not** `reporting` | Component | `R-PLAT2-02` | 1 | QA + AC | **DONE 2026-09-11.** Retro-anchors an existing green test to a reworked scenario |
-| `ACF-RW-03` — rewrite `ACF-FC-02`: `resolveAudiences(Hana,[Alice])` yields `{colleague}`, **no** `pp`, **no** `reporting` | Component | `R-PLAT2-02` | 1 | QA + AC | **DONE 2026-09-11.** Proves PP withholding only; the positive HR-line walk stays `PRODUCT/ARCH BLOCKED` under `PLAT-E5` |
-| `ACF-AU-R1` — re-express the four allow cases (`AU-01` Self, `AU-02` direct, `AU-03` transitive, `AU-04` PP) as facade audience-set assertions | Component | `R-PLAT2-01`, `R-PLAT2-03` | 4 | QA + AC | Removes the epic's dependence on an unprotected route. HTTP cases may be **kept as a separate marked-provisional layer**, never as the primary assertion |
+| `ACF-RW-01` — align `ACF-AU-05` to exact `{colleague}`, not HTTP `403` | Scenario-document alignment | `R-PLAT2-02` | 1 doc | QA + AC | **DONE 2026-09-11.** Existing API-E2E was already green at `da7d1fa`; this item repaired the evidence description |
+| `ACF-RW-02` — align `ACF-FC-01` to exact `{colleague}` and not `reporting` | Scenario-document alignment | `R-PLAT2-02` | 1 doc | QA + AC | **DONE 2026-09-11.** Retro-anchor over existing API-E2E evidence |
+| `ACF-RW-03` — align `ACF-FC-02` to exact `{colleague}`, no `pp`, no `reporting` | Scenario-document alignment | `R-PLAT2-02` | 1 doc | QA + AC | **DONE 2026-09-11.** Proves PP withholding only |
+| `ACF-RW-04` — align cyclic-chain `ACF-FC-04` to exact `{colleague}` while retaining its termination/hang oracle | Scenario-document alignment | `R-PLAT2-02` | 1 doc | QA + AC | Planned; current scenario contradicts the API-E2E assertion by retaining HTTP `403` |
+| `ACF-AU-R1` — re-express AU-01..04 as exact facade audience-set assertions | API E2E (headless facade integration) | `R-PLAT2-01`, `R-PLAT2-03` | 4 | QA + AC | Self must equal exactly `{self}`; direct/transitive/PP cases must equal their exact expected sets. HTTP status may remain only as separately labelled UM-owned route evidence |
 
-**Total P0:** 7 tests, **~14–22 h** (includes three scenario-document rework passes).
+**Total P0:** 4 API-E2E cases + 4 document-alignment items (3 complete), **~16–26 h**.
 
 ### P1 (High)
 
@@ -253,58 +268,70 @@ follow-up story. That story is **not** created by this plan.
 
 | Requirement / obligation | Test Level | Risk Link | Test Count | Owner | Notes |
 | --- | --- | --- | --- | --- | --- |
-| `ACF-AU-06` — a viewer who is **both** direct manager and assigned PP of the same target resolves both labels | Component | `R-PLAT2-06` | 1 | QA + AC | Phase-0 boundary only. **Does not** import `ACM-4R` merge precedence — that stays `PLAT-E3` |
-| `ACF-FC-05` — the empty-set rule stated as a scenario: (a) deactivated **target** yields an empty set, never the Colleague floor; (b) deactivated **viewer** yields an empty set | Component | `R-PLAT2-04` | 2 | QA + AC | Makes explicit what `9e69682` shipped. Does **not** implement the AD-20 dismissed-target projection |
+| `ACF-FC-05` — deactivated target and deactivated viewer each yield an empty set | API E2E (headless facade integration) | `R-PLAT2-04` | 2 | QA + AC | Makes explicit what `9e69682` shipped; not the AD-20 dismissed-target projection |
+| `ACF-NC-01` — prove resolver results are neither persisted nor served from a decision cache | Repository audit + API E2E | `R-PLAT2-04` | 1 API-E2E + 1 audit | QA + AC | Inspect writes/cache providers and prove relationship changes are observed by a fresh call; satisfies the binding SPEC constraint without duplicating PLAT-E3 merge tests |
 
-**Total P1:** 3 tests, **~6–10 h**.
+**Total P1:** 3 API-E2E cases + 1 repository audit, **~9–15 h**.
 
 ### P2 (Medium)
+
+**Criteria:** secondary evidence or document consistency with an acceptable temporary workaround.
+**Purpose:** make source, trace, and scope-boundary claims auditable.
 
 | Requirement / obligation | Test Level | Risk Link | Test Count | Owner | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `ACF-PERF-01` — add a realistic-depth row (chain depth **5–10**, 500 targets) to the P6 record so the epic's own performance artifact describes the shape production actually has | Measurement | `R-PLAT2-05` | 1 run | Platform / Backend | **Measurement only; no threshold, no gate, no CI wiring.** Must not raise the depth ceiling above 499 — `acyclic_depths` is hashed into `fixture_manifest_hash` |
-| `ACF-TR-01` — record a decision for the `ACF-AU-01` (Self) `TR-*` orphan: either register a row or record the deliberate absence | Documentation | `R-PLAT2-03` | — | QA + Architect | A **catalog** gap, not a scenario gap. `test-design-qa.md` § U-19 already names it |
+| `ACF-TR-01` — decide the `ACF-AU-01` Self `TR-*` orphan: register a row or record deliberate absence | Repository audit | `R-PLAT2-03` | 1 audit | QA + Architect | A catalog gap, not a scenario gap |
+| `ACF-DOC-01` — reconcile the foundation SPEC and suite README to applicable-set semantics with Self exclusive and Colleague as fallback | Documentation audit | `R-PLAT2-06` | 1 audit | AC + Architect | Consume PLAT-E3 `ACM4R-MA-01`; do not duplicate multi-audience precedence evidence |
+| `ACF-SCOPE-01` — verify the ACF-1 delivery range changes no User Management controller/guard/adapter or frontend file | Repository audit | `R-PLAT2-03` | 1 audit | QA + Architect | AC4; record the reviewed commits/pathspecs, not a claim about later unrelated changes |
+| `ACF-SCOPE-02` — verify ACF-1 enables no Project, Department, PP-HR-line, shared-link, full-profile, functional-permission, or section-matrix decision | Repository audit | `R-PLAT2-03` | 1 audit | QA + Architect | AC5; combine delivery-diff/API-surface audit with `ACF-FC-02` for PP-HR withholding |
 
-**Total P2:** 1 measurement run + 1 documentation item, **~4–8 h**.
+**Total P2:** 1 measurement run + 4 repository/document audits, **~5–10 h**.
 
 ### P3 (Low)
 
+**Criteria:** exploratory, low-frequency resilience beyond the core resolver contract.
+**Purpose:** broaden cycle-termination evidence without duplicating required coverage.
+
 | Requirement / obligation | Test Level | Test Count | Owner | Notes |
 | --- | --- | --- | --- | --- |
-| `ACF-FC-07` — a **three-person** reporting cycle terminates | Component | 1 | DEV | `ACF-FC-04` covers the two-person cycle only. Exploratory; the `NOT c.repeated` path guard is expected to hold |
+| `ACF-FC-07` — a **three-person** reporting cycle terminates | API E2E (headless facade integration) | 1 | DEV | `ACF-FC-04` covers the two-person cycle only. Exploratory; the `NOT c.repeated` path guard is expected to hold |
 
 **Total P3:** 1 test, **~1–2 h**.
 
+## Acceptance-Criterion Traceability
+
+| Story 2.1 AC | Planned verification | Level / owner | State |
+| --- | --- | --- | --- |
+| AC1 — only Self, Reporting, direct PP, or Colleague; Self exclusive | `ACF-AU-R1` exact sets (`{self}` for Self) plus `ACF-RW-01`; unexpected labels fail the assertion | API E2E / QA + AC | Planned; RW-01 complete |
+| AC2 — live direct reporting edges and target-assigned PP only | `ACF-AU-R1` positive direct/transitive/PP cases; `ACF-RW-02` broken-edge negative; `ACF-RW-03` PP-chain withholding | API E2E + aligned scenario prose / QA + AC | Positive rework planned; negative evidence aligned |
+| AC3 — empty input makes zero DB queries; broken/orphan data only reduces access | Existing `ACF-FC-03`; `ACF-RW-02..04`; planned `ACF-FC-05`; `ACF-NC-01` for non-persistence/cache | API E2E + repository audit / QA + AC | Mixed existing and planned evidence |
+| AC4 — no User Management controller/guard/adapter or frontend change | `ACF-SCOPE-01` commit-range/pathspec audit | Repository audit / QA + Architect | Planned |
+| AC5 — no Project/Department/PP-HR/shared-link/full-profile/FR/section-matrix decision | `ACF-SCOPE-02` delivery/API-surface audit plus `ACF-RW-03` for PP-HR withholding; positive ownership remains PLAT-E5/E6/E8 and UM | Repository audit + API E2E / QA + Architect | Planned; PP-HR negative evidence aligned |
+
 ---
 
-## Execution Order
+## Execution Strategy
 
-### Smoke (<1 min)
+**Philosophy:** run every functional API-E2E check in PRs when the suite stays below 15 minutes;
+defer only expensive measurement or genuinely long-running work. Priority does not determine timing.
 
-- [ ] `ACF-FC-03` empty bulk — zero queries (facade)
-- [ ] `ACF-AU-R1` Self (facade)
+### Every PR
 
-### P0 (<5 min)
+- Existing foundation regression, including `ACF-FC-03` zero-query and current cycle evidence.
+- `ACF-AU-R1` exact-set cases, `ACF-FC-05`, and `ACF-FC-07` once implemented.
+- Repository/document audits `ACF-NC-01`, `ACF-TR-01`, `ACF-DOC-01`, and
+  `ACF-SCOPE-01/02`; document alignment `ACF-RW-04` must complete in the same PR that claims it.
 
-- [ ] `ACF-AU-R1` × 4 — Self, direct, transitive, PP (facade)
-- [x] `ACF-RW-01..03` × 3 — colleague fallback, broken bridge, PP withholding (facade) — **done 2026-09-11**
+### Nightly / on demand
 
-**Total:** 7 scenarios
+- `ACF-PERF-01` P6 realistic-depth measurement only. It remains opt-in, non-blocking, and is
+  never evidence for Contract A.
 
-### P1 (<5 min)
+### Weekly
 
-- [ ] `ACF-AU-06` manager + PP dual audience (facade)
-- [ ] `ACF-FC-05` × 2 — inactive target, inactive viewer (facade)
-
-**Total:** 3 scenarios
-
-### P3 + measurement (nightly/on demand)
-
-- [ ] `ACF-FC-07` three-person cycle (facade)
-- [ ] `ACF-PERF-01` P6 realistic-depth run — **opt-in benchmark, never in the PR gate**
-
-**Execution model:** the whole functional set is facade-level against real PostgreSQL and runs well
-inside the PR budget. `ACF-PERF-01` is opt-in and belongs to neither PR nor a blocking nightly gate.
+- No separate PLAT-E2-only class. Investigate repeated PostgreSQL/cycle flakes from PR evidence;
+  do not rerun the same functional inventory merely to create another tier.
 
 ---
 
@@ -312,17 +339,16 @@ inside the PR budget. `ACF-PERF-01` is opt-in and belongs to neither PR nor a bl
 
 | Priority | Count | Total Hours | Notes |
 | --- | --- | --- | --- |
-| P0 | 7 tests / 4 obligations | ~14–22 | Three of the four are **document + approval** work over already-green tests |
-| P1 | 3 tests / 2 obligations | ~6–10 | New scenarios, new tests |
-| P2 | 1 run + 1 doc | ~4–8 | Measurement protocol care dominates |
+| P0 | 4 API-E2E cases + 4 docs | ~16–26 | Three document alignments are complete; RW-04 and AU-R1 remain |
+| P1 | 3 API-E2E cases + 1 audit | ~9–15 | Inactive identities plus non-cache/non-persistence evidence |
+| P2 | 1 run + 4 audits | ~5–10 | Measurement and scope/trace/source reconciliation |
 | P3 | 1 test | ~1–2 | Fixture extension |
-| **Total** | **12 tests + 1 run + 1 doc** | **~25–42** | **~4–6 days**; no approval-latency exclusion (AD-1 stage approval retired 2026-09-04) |
+| **Total** | **8 API-E2E cases + 1 run + 9 docs/audits** | **~31–53** | **~1–2 weeks**; no approval-latency exclusion |
 
 ### Prerequisites
 
-**Test data:** the existing foundation fixture, extended with (a) a persona who is simultaneously
-manager and PP of the same target (`ACF-AU-06`), and (b) a third cycle member (`ACF-FC-07`). Both
-are additive; no existing persona changes.
+**Test data:** the existing foundation fixture, extended with a third cycle member for
+`ACF-FC-07`. No PLAT-E2 fixture duplicates PLAT-E3's multi-audience evidence.
 
 **Tooling:** Jest/Nest e2e with a test-module override binding the real `AccessControlFacade`;
 `expectAudienceLabels` as the assertion helper; `measurementOnly` P6 spec for `ACF-PERF-01`.
@@ -348,8 +374,8 @@ opens its own transaction on a pooled connection.
 
 **Non-negotiable for this epic:**
 
-- [ ] No allow case relies on an HTTP `200` from a route that is not wired to the facade
-- [ ] No approved scenario document contradicts the test that claims to implement it
+- [ ] No allow case cites HTTP `200` as audience evidence; the route is wired but belongs to UM
+- [ ] No current scenario document contradicts the API-E2E evidence it describes
 - [ ] No P6 number is cited as evidence for Contract A or as a gate result
 - [ ] The `backend-acm9` job is **not** promoted to blocking as a mitigation for anything here
 
@@ -376,19 +402,17 @@ not on the retired one.
 **Verification:** every `ACF-*` assertion names an audience set, not an HTTP status. `SEC-AUTH-01`
 closure is verified against `blockers.yaml`, not against this plan.
 
-### `R-PLAT2-02`: Stage-1 / Stage-2 divergence (Score 6) — MITIGATED 2026-09-11
+### `R-PLAT2-02`: Stage-1 / API-E2E divergence (Score 6)
 
-**Strategy:** Rewrote `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02` to the audience-set expectation, each
-reviewed on rework. This was deliberately a **retro-anchor**: the code and tests already existed and
-were green, so the normal scenario → red → production order could not be re-run. The rework record
-says so plainly rather than implying the order was followed. That review was **voluntary** — AD-1
-stage approval had already been retired on 2026-09-04 — and is kept for evidence integrity, not as a
-satisfied gate.
+**Strategy:** `ACF-RW-01..03` aligned three scenario documents to their existing exact-set
+API-E2E evidence. `ACF-RW-04` must do the same for `ACF-FC-04`, retaining its cycle-termination
+oracle while removing the contradictory HTTP `403`. These are validation-only characterization
+repairs under `testing-strategy.md`; they do not claim the historical scenario → red → production
+order was re-run and require no per-stage approval.
 **Owner:** Access Control owners + QA.
-**Status:** Complete.
-**Verification:** each file carries a `**Reworked & approved:** Anna Pikula, 2026-09-11` marker
-naming the retro-anchor explicitly, and the suite README's own top note, provisional-mapping
-section, and layout table were updated to match. The platform pair's `test-design-qa.md` § U-19
+**Status:** Partially complete — RW-01..03 done; RW-04 open.
+**Verification:** each completed file states the corrected exact-set oracle and its attribution;
+`ACF-FC-04` must agree with the current `{colleague}` API-E2E assertion. The platform pair's `test-design-qa.md` § U-19
 table also no longer parenthesizes `ACF-FC-01` and `ACF-FC-02` as `(invalidated)` — corrected
 2026-09-11 via a **System Edit** under contract §4.3, done as its own confirmed edit rather than a
 side effect of this epic plan. That edit changed `test-design-qa.md`'s content after
@@ -412,13 +436,15 @@ facade test goes red while the HTTP case would have stayed green.
 
 ### Assumptions
 
-1. `PLAT-E2` remains an **active** canonical epic. If it is superseded, this plan is superseded with
-   it and is not migrated to another identity.
+1. `PLAT-E2` remains the canonical implemented Epic 2 identity. The authoritative tracker and epic
+   header say `done`; the separate coverage classification remains under Story 1.1 reconciliation.
 2. The 2026-09-01 User Management answer (`self`/`reporting`/`pp`/`colleague` → `200` S1 card;
    empty audience → `403`; unresolved session → `401`; no leak-free `404`) stays settled.
 3. Real reporting chains run **5–10 levels**. `ACF-PERF-01` is scoped from this. If the figure is
    revised, the realistic-depth row is re-scoped — the 499 ceiling still does not move.
-4. `f36d1b2` (all audiences per target, upward walk from targets) is the current resolver contract.
+4. Current implementation returns the applicable audience set; `ACF-DOC-01` must reconcile the
+   foundation SPEC/README wording. Until then this is an explicit source-consistency risk, not an
+   unqualified contract assumption.
 
 ### Dependencies
 
@@ -432,10 +458,9 @@ facade test goes red while the HTTP case would have stayed green.
 
 ### Risks to Plan
 
-- **Risk:** the three rework approvals are treated as a mechanical status swap.
+- **Risk:** the three rework attribution markers are treated as approval or a mechanical status swap.
   **Impact:** the same divergence returns, now with a signature on it.
-  **Contingency:** the suite README already states this is *not* a mechanical swap; the approval
-  record must name the retro-anchor explicitly.
+  **Contingency:** retain them only as historical attribution; current AD-1 has no scenario approval state.
 - **Risk:** `ACF-PERF-01` is read as an NFR gate for `PLAT-E2`.
   **Impact:** Contract C acquires a threshold it has never had.
   **Contingency:** the measurement spec stays `measurementOnly: true` and is never wired into CI as
@@ -449,7 +474,7 @@ facade test goes red while the HTTP case would have stayed green.
 | --- | --- | --- |
 | `services/backend` `src/access-control/` | The facade and `AudienceResolverService` are the subject | All of `test/access-control/` must stay green — **every** suite under that path, not a fixed subset (21 `*.e2e-spec.ts` files at run baseline `28d8e20`) |
 | `PLAT-E3` kernel (`ACM-3` inactive identity) | **Consumed, not duplicated.** `ACM3-II-01` (inactive viewer at chain top) and `ACM3-II-03` (inactive target under a live manager) are what actually closed `R-PLAT2-08` | `acm3-inactive-identity.e2e-spec.ts` must stay green; this plan adds no equivalent case |
-| `PLAT-E3` (`ACM-4R` multi-audience) | Owns merge precedence. `ACF-AU-06` must not restate it | `acm4r-multi-audience.e2e-spec.ts` |
+| `PLAT-E3` (`ACM-4R` multi-audience) | Owns combination and merge precedence; PLAT-E2 consumes, never duplicates, `ACM4R-MA-01` | `acm4r-multi-audience.e2e-spec.ts` |
 | `UM-E0` access-control adoption | Consumes `resolveAudiences`; the `403`/`401` route oracle is theirs | `test/user-management/access-control-adoption/` |
 | User Management read paths | `resolveAudiences` is called from the career-timeline, access-journal, and org-relationships facade adapters | `test/user-management/epic-3/`, `epic-4/`; `test/mentorship/` |
 | `prisma-relationship-graph.adapter.ts` | The recursive CTE is the cost centre; any change invalidates the P6 reading | Re-run `measurement (P6)`; **do not** reuse an old baseline across an adapter change |
@@ -458,24 +483,27 @@ facade test goes red while the HTTP case would have stayed green.
 
 ## Follow-on Workflows (Manual)
 
-- `bmad-testarch-test-design` **Validate**, scope `epic-platform-2` → writes
-  `test-design-validation-report-epic-platform-2.md`. **Not run.**
-- `/bmad-testarch-atdd` for the P0 set, once the three rework scenarios are approved.
+- `bmad-testarch-test-design` **Validate**, scope `epic-platform-2` → refreshes
+  `test-design-validation-report-epic-platform-2.md` after this Edit.
+- `/bmad-testarch-atdd` for the open P0 API-E2E set; ordinary review and CI apply.
 - `/bmad-testarch-trace` remains a planning audit with `allow_gate=false`.
 
 ---
 
 ## Approval
 
-**Test Design Approved By:**
+**Approval granted 2026-09-12 by Anna Pikula**, the requester, and recorded in this plan's
+frontmatter as `approvalStatus: granted`. This was an explicit human act after the independent
+validation; neither Create nor Validate conferred it.
 
-- [ ] Product Manager: ______ Date: ______
-- [ ] Tech Lead: ______ Date: ______
-- [ ] QA Lead: ______ Date: ______
+**What this approval covers:** the PLAT-E2 test design — risks, NFR planning, coverage
+obligations, acceptance-criterion traceability, priorities, execution strategy, and estimates.
 
-**Status: approval ungranted.** No box above is ticked, and none may be ticked by a workflow run.
-This document does not inherit the 2026-08-30 AD-1 approval of the 9 scenario documents, nor the
-2026-09-11 platform-pair approval.
+**What it does not become:** no runtime coverage, test execution, quality-gate result, NFR
+verdict, or release-readiness claim. The open ACF scenario, audit, measurement, tracker, and
+security obligations remain open. The validation report's statement that approval was ungranted
+is an accurate snapshot of the earlier validation run; this later approval does not rewrite that
+evidence record or require a new verdict.
 
 ---
 

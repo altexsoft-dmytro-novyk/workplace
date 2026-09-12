@@ -9,15 +9,19 @@ workflowStatus: 'generated'
 approvalStatus: 'granted'
 approvalGrantedBy: 'Anna Pikula'
 approvalGrantedDate: '2026-09-12'
-validationStatus: 'CONCERNS (2026-09-12, third run)'
+validationStatus: 'PASS'
+validationDate: '2026-09-12'
 validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-3.md'
-independentRevalidation: 'complete — two independent runs, 2026-09-12; the first superseded the same-day self-validated PASS, the second re-validated after the Edit. Both CONCERNS.'
+independentRevalidation: 'complete — fresh independent Epic-Level validation PASS, 2026-09-12; supersedes the fourth-run CONCERNS.'
 date: '2026-09-12'
 ---
 
 # Test Design: PLAT-E3 — Access Control Kernel MVP
 
-**Status:** Written — **approval granted 2026-09-12** by the requester; validation **CONCERNS (2026-09-12, third run)**. Approval and validation are separate states and neither confers the other.
+**Validation projection:** **PASS (2026-09-12, fresh independent validation)** — synchronized with
+`test-design/README.md` and `test-design-validation-report-epic-platform-3.md`.
+
+**Status:** Written — **approval granted 2026-09-12** by the requester; validation **PASS (2026-09-12, fresh independent validation)**. Approval and validation are separate states and neither confers the other.
 **Scope:** Epic-level test design for the deployable, headless Access Control kernel.
 **Canonical source:** `_bmad-output/planning-artifacts/platform/epics.md`, `## Epic 3: Access Control Kernel MVP`.
 
@@ -33,7 +37,7 @@ date: '2026-09-12'
 > the C-2 root-trace against primary sources, and returned **CONCERNS** again on two narrower
 > findings. This Edit closes both.
 >
-> The current verdict is therefore **CONCERNS (2026-09-12, third run)**. No verdict on this plan has
+> The current verdict is therefore **PASS (2026-09-12, fresh independent validation)**. No verdict on this plan has
 > ever turned on the design's substance — every concern raised across all three runs has been about
 > the document set's self-consistency. **An Edit cannot clear a verdict** — only a further Epic
 > Validate can. The corrections are listed in [Correction log](#correction-log).
@@ -60,24 +64,24 @@ covered, an approval exists, or a release gate is satisfied.
 
 ### Execution-state caveat — this epic is already implemented
 
-**Recorded, not resolved.** Every Epic 3 story key (`3-1` … `3-8`) is `done` in
-`_bmad-output/implementation-artifacts/platform/sprint-status.yaml`, and the epic's own
-Requirements Inventory calls the Phase-0 ACF-1 / ACM-3 and ACM-5 acceptance criteria
-**historical evidence** (SD-1). Four tracking surfaces disagree with each other, and this
-plan corrects none of them:
+**Current execution state:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
+is authoritative and records `epic-3` plus every Epic 3 story key (`3-1` … `3-8`) as `done`.
+The source's *Kernel MVP status caveat* agrees and says Epic 3 has no tracking divergence. One
+source-document contradiction remains: the Epic 3 body header still says `in-progress`. This plan
+records that stale header but does not edit the canonical epic source.
 
 | Surface | State | Note |
 | --- | --- | --- |
-| `platform/sprint-status.yaml` | `epic-2: done`, `epic-3: done` | All 8 child stories `done`. |
-| `epics.md` `## Epic 2` / `## Epic 3` headers | `**Status:** in-progress` | Contradicts the tracker. |
-| `epics.md` *Kernel MVP status caveat* | asserts `sprint-status.yaml` "still records `epic-3: in-progress`" | **Factually false at this HEAD** — the tracker records `done`. |
-| `global-coverage/global-fr-epic-story-coverage.yaml:95` | `PLAT-E2-S2.1: in-progress` | Deliberate; lines 121–123 say it is held pending Platform Story 1.1. |
+| `platform/sprint-status.yaml` | `epic-3: done`; `3-1` … `3-8: done` | Authoritative execution state. |
+| `epics.md` *Kernel MVP status caveat* | Epic 3 has no divergence | Agrees with the tracker. |
+| `epics.md` `## Epic 3` header | `**Status:** in-progress` | Stale source header; contradicts both rows above. |
 
 **Consequence for this plan.** The [QA effort estimate](#qa-effort-estimate) is *not* a forecast of
 unstarted work. It sizes **evidence design and verification against already-shipped behaviour** —
 writing or re-pointing the obligations below and confirming them against the current resolver — not
-building the kernel. Reconciling the four surfaces above belongs to **Platform Story 1.1's
-traceability matrix**; this plan neither performs nor claims it.
+building the kernel. Correcting the remaining source header belongs to **Platform Story 1.1's
+traceability work**; this plan neither performs nor claims it. The deliberate Epic 2
+coverage-status divergence is separate and is not an Epic 3 execution-state conflict.
 
 ## Scope and Boundaries
 
@@ -335,29 +339,26 @@ Ranges include PostgreSQL fixture/cleanup work and evidence capture. They are pl
 9. **Journal (§3.4) — the blocker record is stale, the blocker is not.** `CC-07` / PM/AD-29 is recorded `severity: P0`, `status: open`, `implementation_status: absent`, and its note says "No journal table exists". **That note is false at this HEAD:** `model AccessJournal` is defined at `services/backend/prisma/schema.prisma:106` with two applied migrations (`20260903011657_story_4_1_access_journal`, `20260903024004_story_4_3_department_edge_journal_subject`). `CC-07` nevertheless remains legitimately open, because its closure condition is broader than table existence — same-transaction enrolment proven for every listed kind, reader authorization matching PM/AD-29, and `idempotencyKey` uniqueness proven under retry — none of which this epic supplies. **This plan states the table ships and does not restate the stale note.** No relationship-change journal obligation is closed here either way.
 10. **Pact/browser tools:** PLAT-E3 has no consumer/provider or UI acceptance criterion. SmartBear Pact MCP was unavailable, and `playwright-cli` was not installed; neither absence blocks this headless plan.
 11. **Not evaluated by this plan:** `test-design-architecture.md` and `test-design-qa.md` were read for the thresholds and contracts cited above. This plan does not attest that its isolation or execution choices are consistent with every other policy in that pair.
-12. **The superseded interim binding is still asserted in seven artifacts, and the root is the SPEC — recorded, not resolved.** This plan's operating rules forbid any obligation from re-asserting a superseded acceptance criterion, and `E3-C07` applies that to the interim `ACCESS_CONTROL_PORT` binding. The stale claim runs four levels deep, and **the ordering matters: the scenario cards trace *to* CAP-6, so they cannot be corrected first without contradicting their own trace.**
+12. **Six stale surfaces remain after CAP-6 was corrected; a committed owner exists — recorded, not resolved.** This plan's operating rules forbid any obligation from re-asserting a superseded acceptance criterion, and `E3-C07` applies that to the interim `ACCESS_CONTROL_PORT` binding. CAP-6 now records the supersession and is no longer stale. Four scenario documents, their index row, and the production-source comment still carry the old expectation:
 
     | Level | Artifact | What it asserts |
     | --- | --- | --- |
-    | 1 — contract | `_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md:150` (CAP-6 *success*) | "`ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" |
-    | 2 — scenario prose | `.../acm8-kc-01-facade-resolves-from-real-container.md:5` | Trace quotes CAP-6's *success* criterion in full, **including** "while `ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" |
-    | 2 — scenario prose | `docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md` | Title, trace and scenario: the port "stays bound to `InterimAccessControlAdapter`" and the resolved instance is *not* `AccessControlFacade` |
-    | 2 — scenario prose | `.../acm8-kc-03-user-management-behavior-unchanged.md:27` | Same binding, by reference |
-    | 2 — scenario prose | `.../acm8-kc-05-corrected-module-header-comment.md:9, 29–30` | Trace quotes the sprint proposal's "`UserManagementModule` continues binding `ACCESS_CONTROL_PORT` to `InterimAccessControlAdapter`"; and its **Then** requires the corrected comment to state that rebinding "is a separate, **not-yet-authorized** decision" — which the UMAC-1 Stage 3 cutover made false |
-    | 3 — index | `docs/test-cases/access-control-kernel/README.md:452` | Index row repeats it |
-    | 4 — production source | `services/backend/src/access-control/access-control.module.ts:15` | Header comment: "user-management.module.ts **still binds** `ACCESS_CONTROL_PORT` to `InterimAccessControlAdapter`" |
+    | 1 — scenario prose | `.../acm8-kc-01-facade-resolves-from-real-container.md:5` | Trace still quotes the superseded half of CAP-6. |
+    | 1 — scenario prose | `docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md` | Title, trace and scenario still assert the interim binding. |
+    | 1 — scenario prose | `.../acm8-kc-03-user-management-behavior-unchanged.md:27` | Still repeats the interim binding by reference. |
+    | 1 — scenario prose | `.../acm8-kc-05-corrected-module-header-comment.md:9, 29–30` | Still quotes the superseded binding and calls the shipped rebind "not-yet-authorized". |
+    | 2 — index | `docs/test-cases/access-control-kernel/README.md:452` | Index row repeats the stale expectation. |
+    | 3 — production source | `services/backend/src/access-control/access-control.module.ts:17–18` | Header comment still says User Management binds the port to the interim adapter. |
 
-    `acm8-kc-04-no-http-or-debug-endpoint-added.md` is the one composition card that carries none of this. Note the two counts are different sets and neither is wrong: **seven artifacts** assert the superseded binding (the table above); the in-flight remediation story below is scoped to the **five** `ACM8-KC` cards plus the module comment, which is the right scope because all four stale cards sit inside it.
+    `acm8-kc-04-no-http-or-debug-endpoint-added.md` is the one composition card that carries none of this. The committed remediation story deliberately re-checks all **five** `ACM8-KC` cards plus the module comment even though only four cards currently need textual correction.
 
     **The executable test and the scenario document of the same name have diverged, and this plan must not conflate them.** `ACM8-KC-02` as executed — `services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts:90–98` — was realigned 2026-09-01 by the UMAC-1 Stage 3 cutover and asserts the facade-backed adapter. `ACM8-KC-02` as scenario prose was **not** realigned. Where this plan says "`ACM8-KC-02` already asserts the facade-backed adapter", that is true of the test and false of the document. Under AD-1 ordering scenario prose is first-class evidence, so this is material, not cosmetic.
 
     **This was recorded eleven days ago and nobody took it.** The UMAC-1 story that performed the rebind left an explicit list — *"Follow-ups for the Access Control context (not this story — `src/access-control/**` out of scope)"* — naming the `acm8-kc-02/03` realignment, the stale `access-control.module.ts` header comment, and two `deferred-work.md` entries. At this HEAD the first two are still untouched. The reason is structural, not neglect: **there is no `access-control` planning domain.** `_bmad-output/planning-artifacts/` has no such directory, so "the Access Control context" is a code-ownership area with no backlog, and nothing can be scheduled against it.
 
-    **Ownership — being claimed as this is written.** Correcting any of it is **outside this plan's allowed file set** (`SPEC.md`, `docs/test-cases/**` and `src/**` all are), so the disposition here stays record-only regardless of owner.
+    **Committed owner:** root commit `bfd43be46256820ccfc404d65fe1ebf58e05f146` amended CAP-6 and committed **`ACM-8R-scenarios`** in `spec-access-control-kernel-mvp/stories.yaml`. The story owns realignment of all five `ACM8-KC` scenario documents plus the module comment. Its target files remain stale, so the dependency is scheduled but not completed. Correcting them is outside this plan's allowed file set; this plan records the owner and current state only.
 
-    The table above is stated **at this plan's HEAD**. A concurrent, **uncommitted** change in the working tree is amending CAP-6 — recording the interim half as superseded and citing backend `0788f60` — and adds a story **`ACM-8R-scenarios`** to `spec-access-control-kernel-mvp/stories.yaml`: *"realign the CAP-6 Stage-1 artifacts to the superseded port binding"*, scoped to the five `ACM8-KC` Stage-1 scenario docs and the `access-control.module.ts` header comment. If that lands, level 1 closes, the ordering constraint below is satisfied, and **C-2's owner is `ACM-8R-scenarios`** — a better home than this plan's earlier suggestion of DEPT-4, since the root is CAP-6 and the story sits with the SPEC that owns it. Recorded as in-flight, not as done: it is another session's uncommitted work and may change.
-
-    Two constraints survive whoever takes it: **CAP-6 must be amended before the cards**, because they trace to it; and the cards are **approved artifacts** (`approvals.yaml`, `story_id: ACM-8-scenarios`, `stage: stage-1-scenarios`, approved 2026-08-31), so rewriting them requires new Stage-1 approval entries rather than a silent edit.
+    CAP-6's amendment has already satisfied the former ordering constraint. Per-stage human approval was retired by current AD-1 policy; the remediation requires ordinary review and CI, not new Stage-1 approval entries.
 
 ## Interworking and Regression
 
@@ -460,10 +461,28 @@ checkpoint's Pact input inventory is still incomplete; and this Open item cites 
 comment at `access-control.module.ts:15` while the quoted clause sits at `:17–18`. The requested
 scope was C-1 and C-2.
 
-Not applied: the canonical `epics.md` *Kernel MVP status caveat* is itself factually wrong about
-`sprint-status.yaml` and cites `global-fr-epic-story-coverage.yaml` at a path it does not occupy.
-Correcting the epic source is **Platform Story 1.1's** traceability work and is outside this
-plan's allowed file set; the discrepancy is recorded in the execution-state caveat above.
+Not applied: the canonical Epic 3 body header still says `in-progress` while its authoritative
+tracker and its own *Kernel MVP status caveat* say `done` with no Epic 3 divergence. Correcting
+that source header is **Platform Story 1.1's** traceability work and is outside this plan's allowed
+file set; the residual source contradiction is recorded in the execution-state caveat above.
+
+### Fifth pass — Edit after the fourth Epic Validate (2026-09-12)
+
+The fourth Epic Validate returned CONCERNS on two current-source consistency findings. This Edit
+closed both in the plan; the fresh independent Validate now records PASS:
+
+- **C-1 closed:** the execution-state caveat now reflects the current source. The tracker and
+  source caveat agree that Epic 3 is `done`; only the stale `## Epic 3` body header remains as a
+  source-document contradiction. The deliberate Epic 2 coverage divergence is no longer
+  misreported as an Epic 3 conflict.
+- **C-2 closed:** Open item 12 now records CAP-6 as already amended at committed root revision
+  `bfd43be`, names committed owner `ACM-8R-scenarios`, and counts the six still-stale target
+  surfaces. It no longer calls committed work concurrent or uncommitted. The dependency remains
+  open because those scenario/index/comment targets have not yet been realigned.
+
+Approval remains granted. No obligation, risk, priority, threshold, estimate, runtime-coverage
+claim, gate result, or release-readiness state changed. The fresh independent Validate supersedes
+the prior CONCERNS report.
 
 ## Approval
 
@@ -481,7 +500,7 @@ PASS/CONCERNS/FAIL, no release readiness. It closes no blocker — `CC-07`,
 `AC-SECTION-MATRIX-01`, `SEC-AUTH-01` and DEPT-2 all remain open — and resolves none of the open
 items below.
 
-**Validation state, stated plainly.** The current verdict is **CONCERNS (2026-09-12, third run)**.
+**Validation state, stated plainly.** The current verdict is **PASS (2026-09-12, fresh independent validation)**.
 The approval was granted when the verdict was the preceding CONCERNS — from the first run
 independent of this plan's authorship, which superseded a same-day PASS produced by the authoring
 session itself. The approval was granted against that history and does not retract it. Every
@@ -490,10 +509,10 @@ rather than the design's substance, and that it neither confers nor withdraws th
 design substance has now been checked three times and holds, including a full independent re-count
 of the 49 canonical acceptance criteria.
 
-**Open after this Edit:** C-2 below remains **recorded, not resolved** — closing it needs
-`SPEC.md`, `docs/test-cases/**` and `src/**`, none of which are in this plan's allowed file set.
-What this Edit closed is the plan's own description of it. A further Epic Validate is the only
-operation that can clear the CONCERNS verdict.
+**Current disposition after validation PASS:** the plan's two document-consistency concerns are
+closed. The underlying `ACM-8R-scenarios` remediation remains **recorded, not completed** because
+its scenario/index/comment targets are still stale; that external dependency does not invalidate
+this test design. The fresh independent validation report is the current evidence record.
 
 ## References
 

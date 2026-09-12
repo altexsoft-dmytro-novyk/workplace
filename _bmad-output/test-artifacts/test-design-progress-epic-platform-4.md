@@ -6,6 +6,10 @@ epicDomain: 'platform'
 epicSourcePath: '_bmad-output/planning-artifacts/platform/epics.md'
 epicNumber: 4
 workflowStatus: 'generated'
+approvalStatus: 'ungranted'
+validationStatus: 'CONCERNS'
+validationDate: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-4.md'
 totalSteps: 5
 stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output']
 lastStep: 'step-05-generate-output'
@@ -37,6 +41,9 @@ inputDocuments:
 ---
 
 # PLAT-E4 test-design progress
+
+**Validation projection:** **CONCERNS (2026-09-12)** —
+`test-design-validation-report-epic-platform-4.md`, synchronized with `test-design/README.md`.
 
 ## Resolved run
 
@@ -119,4 +126,4 @@ This is an evidence-maintenance plan, not a claim that completed tracker stories
 - Checklist review: Epic/story, PRD/architecture, system-pair, test inventory, risk matrix, NFR planning, atomic coverage, priority, PR/nightly/weekly strategy, estimates, entry/exit, out-of-scope, and interworking sections are present. The plan uses the canonical identity tuple and output paths.
 - Checklist exceptions resolved through repository policy: no new release claim or execution result; NFR verdict remains deferred; the `seeded-two-level` scope remains explicitly open. The plan's P1/P2 thresholds are planning criteria, not a product gate.
 - Verification: `git diff --check` passed. No browser session or temporary exploration artifact was created.
-- Generation state only: approval remains ungranted and validation not run.
+- Generation state only: approval remains ungranted; validation is **CONCERNS (2026-09-12)**.
