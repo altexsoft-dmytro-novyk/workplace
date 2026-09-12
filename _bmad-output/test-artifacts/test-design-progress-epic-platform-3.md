@@ -2,11 +2,15 @@
 runScope: 'epic'
 runKey: 'epic-platform-3'
 workflowStatus: 'generated'
-totalSteps: 6
-stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction']
-lastStep: 'step-06-post-validation-correction'
-nextStep: 'plan corrected against the CONCERNS validation report; proceed with human review, then re-validate for a byte-exact attestation'
-validationStatus: 'CONCERNS (2026-09-12) — plan and checkpoint corrected 2026-09-12'
+totalSteps: 7
+stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction', 'step-07-post-revalidation-edit']
+lastStep: 'step-07-post-revalidation-edit'
+nextStep: 'C-1, C-3, C-4 and W-1 closed; C-2 recorded as plan Open item 12 and owned by the access-control context. An Edit cannot clear a verdict — a further Epic Validate is required to supersede CONCERNS'
+approvalStatus: 'granted'
+approvalGrantedBy: 'Anna Pikula'
+approvalGrantedDate: '2026-09-12'
+validationStatus: 'CONCERNS (2026-09-12, re-validation)'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-3.md'
 lastSaved: '2026-09-12'
 epicId: 'PLAT-E3'
 epicDomain: 'platform'
@@ -103,7 +107,7 @@ Scores of 6+ require planned mitigation. Category legend: `SEC` security, `BUS` 
 | E3-C03 Functional permission decision | ACM-2 live FR joins; inactive/missing/unknown/ungranted/orphan deny; no AR read or cached/persisted decision; no branch on `hr-admin` or an individual permission name; decision re-read on each call after a mid-process grant revocation | headless facade + migrated PostgreSQL | P0 | Real `AccessControlModule` and Prisma adapters. |
 | E3-C04 Fail-closed audience resolution | ACM-3 request shape incl. empty list with no graph read, viewer validation ordering before any derivation, absent/inactive viewer or target with no Colleague fallback, normal Colleague fallback for an active pair, PP/manager bridge, termination, per-target cycles, path-local visited state, re-resolution on each call across a `Relationship` mutation | headless facade + migrated PostgreSQL | P0 | Exact `Map<string, Set<Audience>>` assertions; no HTTP endpoint. |
 | E3-C05 Audience merge disposition | ACM-4 Reporting+PP coexistence, Self exclusivity, Colleague floor, de-duplication, FR exclusion | headless facade + migrated PostgreSQL | P1 | Existing `acm-4-disposition.yaml` is a prerequisite for ACM-5, not a substitute for its own evidence. |
-| E3-C06 Base section decision | ACM-5 S1/S10/S11, empty/missing target, write-over-read merge, all unsupported sections deny, re-evaluation on each call across a `Relationship` mutation | headless facade + migrated PostgreSQL | P0 | Assert base decision only. Negative obligation: base `write` on `profile:identity` is never a mandate over the S1 *manager* / *people partner* / *department* fields (requirements §3.2 note ¹, §2.1 [NORMATIVE]). Consumer field/command projection excluded; S10/S11 Colleague narrowing has no named owner. |
+| E3-C06 Base section decision | ACM-5 S1/S10/S11, empty/missing target, write-over-read merge, all unsupported sections deny, re-evaluation on each call across a `Relationship` mutation | headless facade + migrated PostgreSQL | P0 | Assert base decision only. Negative obligation: base `write` on `profile:identity` is never a mandate over the S1 *manager* / *people partner* / *department* fields (requirements §3.2 note ¹, §2.1 [NORMATIVE]). Consumer field/command projection excluded. S10/S11 Colleague narrowing **is** owned — UM `FR-17` and the written story `TT-E1-S1.2` (`1-2-s10-leaves-read-projection-on-profile`); the real gap is that `FR-17` is deferred with no scheduled story. S1 photo mutation is the only piece with no named owner. See the plan's Open items 6–7. |
 | E3-C07 Composition boundary | ACM-8 real `AppModule` import/facade resolution; no UM file changes; no AC HTTP/test-only/debug endpoint. The canonical "`ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" criterion is **superseded** by UMAC-1 Stage 3 / `UM-E0-S0.1` and carries no obligation | module E2E + repository audit | P0 | Real module boot plus scoped audit; does not test `/users` authorization. Port binds `AccessControlFacadeAdapter` (`user-management.module.ts:215`); the interim adapter was deleted in backend `0788f60` (2026-09-02) and `ACM8-KC-02`, realigned 2026-09-01 by that cutover, already asserts the facade-backed adapter. |
 | E3-C08 Resolver performance | ACM-9 baseline/final 500-target representative audiences/depth shapes, manifests, explanations and breach stopping | measurement | P1 | Immutable `ACM9-MVP-v1` artifacts; Contract B only. |
 
@@ -159,7 +163,9 @@ recording that every Epic 3 story key is `done`; an acceptance-criterion traceab
 covering the five previously unnamed ACs; verbatim pair gate thresholds with the access-control
 suite clause restored and *covered* ≠ *pass*; priority criteria plus the stated P1-gates-P0
 inversion; the §3.2 note ¹ negative obligation as `R08`; DEPT-2/DEPT-4 ownership for the FR
-catalog drift; unnamed owners recorded for S10/S11 Colleague narrowing and S1 photo mutation;
+catalog drift; ownership recorded for S10/S11 Colleague narrowing (UM `FR-17` and story
+`TT-E1-S1.2`, the gap being that `FR-17` is deferred and unscheduled) and no named owner for S1
+photo mutation;
 residual-risk table, `PG-03` defect exit gate, risk legend and knowledge-base appendix; ACM-9
 baseline pinned with discovery framing; PM/AD-20 and `CC-07` named as deferrals.
 
@@ -185,9 +191,44 @@ conflation that finding F-4 was reported as fixing. Corrected in Step 4 above.
 additions. The "pre-correction text" exists only as session testimony and is not reconstructible
 from history; the source-file assertions are independently checkable and were re-checked.
 
-**Result:** correction only. No suite was executed, no approval is granted, and the CONCERNS
-verdict stands until a fresh Epic Validate runs against the corrected text. That run is the next
-action, not an optional follow-up: leaving a stale verdict against a changed document is the same
-class of defect this correction records against the canonical `epics.md` caveat. That run is the next
-action, not an optional follow-up: leaving a stale verdict against a changed document is the same
-class of defect this correction records against the canonical `epics.md` caveat.
+**Result of the second pass:** correction only. No suite was executed. That pass granted no
+approval and cleared no verdict; a re-validation was named as the required next action, because
+leaving a stale verdict against a changed document is the same class of defect this correction
+records against the canonical `epics.md` caveat.
+
+## Step 7 — Post-re-validation Edit (2026-09-12)
+
+Both follow-ups named above have since happened, and this step records their outcome.
+
+- **Self-validated Epic Validate** at baseline `83aeabf` returned **PASS**. Its own report bounded
+  that verdict: same session authored the corrections it validated.
+- **Approval granted 2026-09-12** by the requester, Anna Pikula. Recorded in the plan frontmatter
+  as `approvalStatus: granted`. A human act, separate from validation (contract §5).
+- **Independent Epic Validate** at baseline `ce84f7c` returned **CONCERNS**, superseding the PASS
+  at the same report path. Four concerns and five WARNs, all about document self-consistency
+  rather than design substance; it neither conferred nor withdrew the approval.
+
+This Edit run closes the findings that belong to the plan/checkpoint pair and records the one that
+does not:
+
+| Finding | Disposition |
+| --- | --- |
+| C-1 — checkpoint still claimed S10/S11 Colleague narrowing had "no named owner" after the plan retracted that as false | **Closed.** Both places corrected: the `E3-C06` coverage row and the second-pass summary now name UM `FR-17` and story `TT-E1-S1.2`, with the real gap stated as `FR-17` being deferred and unscheduled. Only S1 photo mutation lacks an owner. |
+| C-3 — plan contradicted itself: frontmatter said granted/PASS while the Correction record and Approval prose still said ungranted and "no fresh Validate has run" | **Closed.** Both prose blocks rewritten to the actual state; frontmatter `validationStatus` corrected from PASS to CONCERNS (re-validation), and `independentRevalidation` updated from "in progress" to its result. |
+| C-4 — plan and checkpoint disagreed on approval and validation status | **Closed.** This checkpoint's `validationStatus`, `nextStep` and Step 6 closing line now match the plan, and `approvalStatus` is carried here explicitly. |
+| W-1 — a sentence duplicated verbatim, back to back | **Closed.** One copy kept. |
+| C-2 — two ACM-8 scenario cards and the test-case README still assert the superseded interim `ACCESS_CONTROL_PORT` binding | **Recorded, not resolved** — plan Open item 12. `docs/test-cases/**` is outside this plan's allowed file set, and the backend spec header already names the realignment an open follow-up owned by the `access-control` context. The plan now distinguishes the executable `ACM8-KC-02` (realigned 2026-09-01, asserts the facade-backed adapter) from the scenario document of the same name (not realigned). |
+
+**§4.3 disposition, stated because it is a judgement call.** §4.3 says an epic Edit "may modify
+only the selected epic plan", yet C-1, C-4 and W-1 are checkpoint defects. This run edited the
+checkpoint as part of the same logical change: the validation report's own recommended next action
+names "an Edit run on the PLAT-E3 plan **and checkpoint**"; C-4 is unclosable otherwise, since an
+Edit confined to the plan would leave the pair inconsistent by construction; §4.1 treats the plan
+and its matching checkpoint as one epic write unit; and §4.3's restriction reads as scope
+isolation against other epics and the system pair rather than a bar on the run's own state file.
+The index was **not** written: both indexed facts — approval granted, verdict CONCERNS
+(re-validation) — were already current, so no indexed fact changed.
+
+**Result:** an Edit cannot clear a verdict. `CONCERNS (2026-09-12, re-validation)` stands until a
+further Epic Validate runs against this text. No suite was executed. The approval recorded above
+is unaffected.

@@ -6,24 +6,34 @@ epicDomain: 'platform'
 epicSourcePath: '_bmad-output/planning-artifacts/platform/epics.md'
 epicNumber: 3
 workflowStatus: 'generated'
-approvalStatus: 'ungranted'
-validationStatus: 'CONCERNS (2026-09-12) — corrected 2026-09-12'
+approvalStatus: 'granted'
+approvalGrantedBy: 'Anna Pikula'
+approvalGrantedDate: '2026-09-12'
+validationStatus: 'CONCERNS (2026-09-12, re-validation)'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-3.md'
+independentRevalidation: 'complete — 2026-09-12, verdict CONCERNS, superseded the same-day self-validated PASS'
 date: '2026-09-12'
 ---
 
 # Test Design: PLAT-E3 — Access Control Kernel MVP
 
-**Status:** Written — approval ungranted; last validation verdict CONCERNS (2026-09-12) against the pre-correction text; plan corrected the same day; **re-validation pending**.
+**Status:** Written — **approval granted 2026-09-12** by the requester; validation **CONCERNS (2026-09-12, re-validation)**. Approval and validation are separate states and neither confers the other.
 **Scope:** Epic-level test design for the deployable, headless Access Control kernel.
 **Canonical source:** `_bmad-output/planning-artifacts/platform/epics.md`, `## Epic 3: Access Control Kernel MVP`.
 
-> **Correction record (2026-09-12).** This plan was corrected after
-> [`test-design-validation-report-epic-platform-3.md`](test-design-validation-report-epic-platform-3.md)
-> returned CONCERNS. That report evaluated the **pre-correction** text and is left exactly as its
-> validation run wrote it — a verdict is an attestation and is never hand-edited. Its recorded
-> hashes therefore no longer match this file. **A fresh Epic Validate run against this corrected
-> text is required and pending**; until it completes, CONCERNS is the last verdict any validation
-> actually produced. The corrections are listed in [Correction log](#correction-log).
+> **Correction and validation record (2026-09-12).** Four passes ran against this plan on one day.
+> An Epic Validate returned CONCERNS and an independent requirements review returned *revisions
+> needed*; a correction pass addressed both. An independent audit of that correction found six
+> further defects — two of them fabricated citations inside the headline ACM-8 finding — which were
+> fixed and re-checked against primary sources. A second Epic Validate returned PASS, but that run
+> was a **self-validation** by the authoring session. An **independent re-validation then returned
+> CONCERNS**, superseding the PASS at the same report path
+> ([`test-design-validation-report-epic-platform-3.md`](test-design-validation-report-epic-platform-3.md)).
+>
+> The current verdict is therefore **CONCERNS (2026-09-12, re-validation)**. Its concerns are about
+> document self-consistency, not the design's substance; this Edit run closes C-1, C-3, C-4 and W-1
+> and records C-2. **An Edit cannot clear a verdict** — only a further Epic Validate can. The
+> corrections are listed in [Correction log](#correction-log).
 
 ## Executive Summary
 
@@ -322,6 +332,11 @@ Ranges include PostgreSQL fixture/cleanup work and evidence capture. They are pl
 9. **Journal (§3.4) — the blocker record is stale, the blocker is not.** `CC-07` / PM/AD-29 is recorded `severity: P0`, `status: open`, `implementation_status: absent`, and its note says "No journal table exists". **That note is false at this HEAD:** `model AccessJournal` is defined at `services/backend/prisma/schema.prisma:106` with two applied migrations (`20260903011657_story_4_1_access_journal`, `20260903024004_story_4_3_department_edge_journal_subject`). `CC-07` nevertheless remains legitimately open, because its closure condition is broader than table existence — same-transaction enrolment proven for every listed kind, reader authorization matching PM/AD-29, and `idempotencyKey` uniqueness proven under retry — none of which this epic supplies. **This plan states the table ships and does not restate the stale note.** No relationship-change journal obligation is closed here either way.
 10. **Pact/browser tools:** PLAT-E3 has no consumer/provider or UI acceptance criterion. SmartBear Pact MCP was unavailable, and `playwright-cli` was not installed; neither absence blocks this headless plan.
 11. **Not evaluated by this plan:** `test-design-architecture.md` and `test-design-qa.md` were read for the thresholds and contracts cited above. This plan does not attest that its isolation or execution choices are consistent with every other policy in that pair.
+12. **ACM-8 scenario prose still asserts the superseded interim binding — recorded, not resolved.** This plan's operating rules forbid any obligation from re-asserting a superseded acceptance criterion, and `E3-C07` applies that to the interim `ACCESS_CONTROL_PORT` binding. Three artifacts inside this plan's own declared evidence inventory still assert it: `docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md` (title, trace and scenario all state the port "stays bound to `InterimAccessControlAdapter`" and that the resolved instance is *not* `AccessControlFacade`), `.../acm8-kc-03-user-management-behavior-unchanged.md:27` (same binding by reference), and `docs/test-cases/access-control-kernel/README.md:452` (index row).
+
+    **The executable test and the scenario document of the same name have diverged, and this plan must not conflate them.** `ACM8-KC-02` as executed — `services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts:90–98` — was realigned 2026-09-01 by the UMAC-1 Stage 3 cutover and asserts the facade-backed adapter. `ACM8-KC-02` as scenario prose was **not** realigned and still asserts the retired expectation. Where this plan says "`ACM8-KC-02` already asserts the facade-backed adapter", that is true of the test and false of the document.
+
+    Under AD-1 ordering scenario prose is first-class evidence, so a card asserting a retired criterion is material, not cosmetic. The backend spec header at `acm8-kernel-composition.e2e-spec.ts:39–41` already names this an open **follow-up realignment for the `access-control` context**. **Owner: the `access-control` context, not this plan** — `docs/test-cases/**` is outside this plan's allowed file set, so the disposition here is record-only.
 
 ## Interworking and Regression
 
@@ -378,6 +393,21 @@ The pre-correction draft of this pass also appended a remediation record to the 
 itself. That was withdrawn: the report is written by a Validate run, and a correction pass editing
 it blurs who attested what. This log is the correction record; the report stays as its run left it.
 
+### Third pass — Edit after independent re-validation (2026-09-12)
+
+The independent Epic Validate that superseded the self-validated PASS raised four concerns and
+five WARNs about document self-consistency. An Edit run closed **C-1** (the checkpoint still
+claimed the S10/S11 Colleague narrowing had no named owner after this plan retracted that as
+false), **C-3** (this plan's frontmatter said granted/PASS while its Correction record and
+Approval prose still said ungranted with no Validate run yet), **C-4** (plan and checkpoint
+disagreed on approval and validation status) and **W-1** (a sentence duplicated verbatim in the
+checkpoint). **C-2** is recorded as [Open item 12](#dependencies-assumptions-and-open-items) and
+not resolved — it needs `docs/test-cases/**`, which is outside this plan's allowed file set.
+
+The full disposition table and the §4.3 reasoning for editing the checkpoint alongside the plan
+are in Step 7 of `test-design-progress-epic-platform-3.md`. An Edit cannot clear a verdict:
+**CONCERNS (2026-09-12, re-validation) stands** until a further Epic Validate runs.
+
 Not applied: the canonical `epics.md` *Kernel MVP status caveat* is itself factually wrong about
 `sprint-status.yaml` and cites `global-fr-epic-story-coverage.yaml` at a path it does not occupy.
 Correcting the epic source is **Platform Story 1.1's** traceability work and is outside this
@@ -385,10 +415,29 @@ plan's allowed file set; the discrepancy is recorded in the execution-state cave
 
 ## Approval
 
-No approval is granted by this Create run or by this correction. Human review may approve this
-plan; validation is a separate Epic Validate operation and returned **CONCERNS** on the
-pre-correction text. A correction pass cannot clear a validation verdict — only a fresh Epic
-Validate run against this text can, and it has not yet run.
+**Approval granted 2026-09-12 by Anna Pikula**, the requester, and recorded in this plan's
+frontmatter as `approvalStatus: granted`. Neither the Create run, the correction passes, nor any
+validation run conferred it — approval is a human act and remains separate from validation
+(contract §5).
+
+**What this approval covers:** the test design itself — the risk register, NFR planning, coverage
+obligations, acceptance-criterion traceability, priority model and estimates — as the design of
+record for PLAT-E3 evidence work.
+
+**What it does not become:** no test coverage, no gate result, no execution evidence, no NFR
+PASS/CONCERNS/FAIL, no release readiness. It closes no blocker — `CC-07`,
+`AC-SECTION-MATRIX-01`, `SEC-AUTH-01` and DEPT-2 all remain open — and resolves none of the open
+items below.
+
+**Validation state at the time of approval, stated plainly.** The current verdict is **CONCERNS
+(2026-09-12, re-validation)**, from a run independent of this plan's authorship, which superseded
+a same-day PASS produced by the authoring session itself. The approval was granted against that
+history and does not retract it. The independent run was explicit that its concerns are about the
+document set's self-consistency rather than the design's substance, and that it neither confers
+nor withdraws the approval.
+
+**Open at the time of this Edit:** C-2 below is recorded, not resolved. A further Epic Validate is
+the only operation that can clear the CONCERNS verdict.
 
 ## References
 
