@@ -2,10 +2,10 @@
 runScope: 'epic'
 runKey: 'epic-platform-3'
 workflowStatus: 'generated'
-totalSteps: 7
-stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction', 'step-07-post-revalidation-edit']
-lastStep: 'step-07-post-revalidation-edit'
-nextStep: 'C-1, C-3, C-4 and W-1 closed; C-2 recorded as plan Open item 12 and owned by the access-control context. An Edit cannot clear a verdict — a further Epic Validate is required to supersede CONCERNS'
+totalSteps: 8
+stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction', 'step-07-post-revalidation-edit', 'step-08-open-item-12-widened']
+lastStep: 'step-08-open-item-12-widened'
+nextStep: 'C-1, C-3, C-4 and W-1 closed; C-2 recorded as plan Open item 12 (five artifacts, root at SPEC CAP-6) and recommended to DEPT-4. An Edit cannot clear a verdict — a further Epic Validate is required to supersede CONCERNS'
 approvalStatus: 'granted'
 approvalGrantedBy: 'Anna Pikula'
 approvalGrantedDate: '2026-09-12'
@@ -217,7 +217,7 @@ does not:
 | C-3 — plan contradicted itself: frontmatter said granted/PASS while the Correction record and Approval prose still said ungranted and "no fresh Validate has run" | **Closed.** Both prose blocks rewritten to the actual state; frontmatter `validationStatus` corrected from PASS to CONCERNS (re-validation), and `independentRevalidation` updated from "in progress" to its result. |
 | C-4 — plan and checkpoint disagreed on approval and validation status | **Closed.** This checkpoint's `validationStatus`, `nextStep` and Step 6 closing line now match the plan, and `approvalStatus` is carried here explicitly. |
 | W-1 — a sentence duplicated verbatim, back to back | **Closed.** One copy kept. |
-| C-2 — two ACM-8 scenario cards and the test-case README still assert the superseded interim `ACCESS_CONTROL_PORT` binding | **Recorded, not resolved** — plan Open item 12. `docs/test-cases/**` is outside this plan's allowed file set, and the backend spec header already names the realignment an open follow-up owned by the `access-control` context. The plan now distinguishes the executable `ACM8-KC-02` (realigned 2026-09-01, asserts the facade-backed adapter) from the scenario document of the same name (not realigned). |
+| C-2 — ACM-8 artifacts still assert the superseded interim `ACCESS_CONTROL_PORT` binding | **Recorded, not resolved** — plan Open item 12, widened in Step 8 below from three artifacts to five once the root was traced. The plan distinguishes the executable `ACM8-KC-02` (realigned 2026-09-01, asserts the facade-backed adapter) from the scenario document of the same name (not realigned). |
 
 **§4.3 disposition, stated because it is a judgement call.** §4.3 says an epic Edit "may modify
 only the selected epic plan", yet C-1, C-4 and W-1 are checkpoint defects. This run edited the
@@ -232,3 +232,44 @@ The index was **not** written: both indexed facts — approval granted, verdict 
 **Result:** an Edit cannot clear a verdict. `CONCERNS (2026-09-12, re-validation)` stands until a
 further Epic Validate runs against this text. No suite was executed. The approval recorded above
 is unaffected.
+
+## Step 8 — Open item 12 widened after tracing C-2 to its root (2026-09-12)
+
+Step 7 recorded C-2 against three artifacts. Tracing the claim to its source showed the reach is
+five, and that the ordering implied by the earlier text was backwards.
+
+- **The root is the SPEC, not the cards.** `spec-access-control-kernel-mvp/SPEC.md:150` — CAP-6's
+  *success* criterion — still reads "`ACCESS_CONTROL_PORT` remains bound to
+  `InterimAccessControlAdapter`". The two scenario cards **trace to CAP-6**, so correcting them
+  first would put them in conflict with their own trace. CAP-6 must be amended first.
+- **A fifth artifact, in production source.** `services/backend/src/access-control/access-control.module.ts:15`
+  still states that user-management binds the port to the interim adapter. That is worse than a
+  stale doc: it misleads anyone reading the module.
+- **Provenance.** The UMAC-1 story that performed the rebind recorded this follow-up on
+  2026-09-01, naming the card realignment, the module header comment, and two `deferred-work.md`
+  entries. At this HEAD the first two are untouched.
+- **Why nothing was scheduled.** `_bmad-output/planning-artifacts/` has no `access-control`
+  domain, so the "Access Control context" the follow-up addresses has no backlog and nothing
+  could be assigned against it.
+- **An owner appeared while this step was being written.** A concurrent, **uncommitted** change
+  amends CAP-6 and adds story **`ACM-8R-scenarios`** to `spec-access-control-kernel-mvp` —
+  "realign the CAP-6 Stage-1 artifacts to the superseded port binding" — covering the five
+  `ACM8-KC` scenario docs and the `access-control.module.ts` header comment. Open item 12 records
+  it as in-flight and names it the owner if it lands, superseding this step's earlier DEPT-4
+  suggestion; the SPEC that owns CAP-6 is the more natural home than a test-fallout backlog. Not
+  treated as done — it is another session's uncommitted work.
+- **Re-approval constraint recorded.** The cards are approved Stage-1 artifacts (`approvals.yaml`,
+  `story_id: ACM-8-scenarios`, approved 2026-08-31), so rewriting them needs new approval entries.
+
+**Approval unaffected, and why.** The plan's Approval section enumerates its subject: risk
+register, NFR planning, coverage obligations, acceptance-criterion traceability, priority model
+and estimates. Open item 12 is a recorded external dependency and none of those. This change adds
+verified facts to it and alters no obligation, risk, priority, threshold or estimate, so
+`approvalStatus: granted` stands unchanged. Had an obligation moved, the approval would have
+needed re-granting under contract §5.
+
+**§4.3 disposition:** unchanged from Step 7 — the plan and its checkpoint were edited as one
+logical change, for the reasons stated there. The index was not written: no indexed fact changed.
+
+**Result:** record-only. C-2 remains **not resolved** — its fix lives in `SPEC.md`,
+`docs/test-cases/**` and `src/**`, all outside this plan's file set. The CONCERNS verdict stands.
