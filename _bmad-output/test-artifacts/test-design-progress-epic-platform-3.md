@@ -79,9 +79,9 @@ pact_mcp_reachable: false
 | PLAT-E3-R03 | Root normalization, bootstrap adoption/drift, or a concurrent deploy leaves a partial or wrong authority state. | DATA / OPS | 2 | 3 | 6 | Platform backend: invoke `db:seed` and `db:bootstrap:access-control`; assert transaction rollback, locks, singleton and restrictive FKs. |
 | PLAT-E3-R04 | Section-access merge or an unsupported section widens profile access. | SEC / BUS | 2 | 3 | 6 | Platform backend: exact S1/S10/S11 merge table and unsupported/empty result tests through the public facade. |
 | PLAT-E3-R05 | App composition alters `/users` or adds a test/debug HTTP route. | TECH / SEC | 2 | 3 | 6 | Platform backend: composition E2E plus repository/module-boundary audit; User Management owner retains adoption work. |
+| PLAT-E3-R06 | A 500-target resolver regression is hidden by incomplete/non-comparable measurement or is misreported as list-route evidence. | PERF / OPS | 2 | 3 | 6 | Platform backend: `ACM9-MVP-v1` baseline/final artifact protocol; report only Contract B, not `PG-04` / DIR-A1. |
 | PLAT-E3-R07 | A resolution cached in the facade or a consumer outlives a `Relationship` change, so a revoked audience survives into the next request (requirements §2.1 *Timing of revocation* [NORMATIVE]). | SEC | 2 | 3 | 6 | Platform backend: same-process re-resolution evidence across a mutation on every audience- and section-returning call. This epic's slice of `PR-002`. |
 | PLAT-E3-R08 | A consumer reads base `write` on `profile:identity` as a mandate over the S1 relationship fields, bypassing `org:relationships:write`, the self-assignment bar and the §3.4 journal. | SEC / BUS | 2 | 3 | 6 | Platform backend: negative obligation on E3-C06 — the decision is section-scoped, not field-scoped. Enforcement owner is `UM-E0-S0.1`. |
-| PLAT-E3-R06 | A 500-target resolver regression is hidden by incomplete/non-comparable measurement or is misreported as list-route evidence. | PERF / OPS | 2 | 3 | 6 | Platform backend: `ACM9-MVP-v1` baseline/final artifact protocol; report only Contract B, not `PG-04` / DIR-A1. |
 
 Scores of 6+ require planned mitigation. Category legend: `SEC` security, `BUS` business, `DATA` data integrity, `OPS` operational, `TECH` technical, `PERF` performance; score = probability × impact on 1–3 scales. `PLAT-E3-R01` is the only score-9 risk; it blocks any claim that the kernel is safe to consume until its headless-facade evidence is present. This is a design risk register, not a release verdict.
 
@@ -104,7 +104,7 @@ Scores of 6+ require planned mitigation. Category legend: `SEC` security, `BUS` 
 | E3-C04 Fail-closed audience resolution | ACM-3 request shape incl. empty list with no graph read, viewer validation ordering before any derivation, absent/inactive viewer or target with no Colleague fallback, normal Colleague fallback for an active pair, PP/manager bridge, termination, per-target cycles, path-local visited state, re-resolution on each call across a `Relationship` mutation | headless facade + migrated PostgreSQL | P0 | Exact `Map<string, Set<Audience>>` assertions; no HTTP endpoint. |
 | E3-C05 Audience merge disposition | ACM-4 Reporting+PP coexistence, Self exclusivity, Colleague floor, de-duplication, FR exclusion | headless facade + migrated PostgreSQL | P1 | Existing `acm-4-disposition.yaml` is a prerequisite for ACM-5, not a substitute for its own evidence. |
 | E3-C06 Base section decision | ACM-5 S1/S10/S11, empty/missing target, write-over-read merge, all unsupported sections deny, re-evaluation on each call across a `Relationship` mutation | headless facade + migrated PostgreSQL | P0 | Assert base decision only. Negative obligation: base `write` on `profile:identity` is never a mandate over the S1 *manager* / *people partner* / *department* fields (requirements §3.2 note ¹, §2.1 [NORMATIVE]). Consumer field/command projection excluded; S10/S11 Colleague narrowing has no named owner. |
-| E3-C07 Composition boundary | ACM-8 real `AppModule` import/facade resolution; no UM file changes; no AC HTTP/test-only/debug endpoint. The canonical "`ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" criterion is **superseded** by PLAT-E4-S4.1/S4.2 and carries no obligation | module E2E + repository audit | P0 | Real module boot plus scoped audit; does not test `/users` authorization. Port binds `AccessControlFacadeAdapter` (`user-management.module.ts:215`); the interim adapter was deleted in backend `37a339a` and `ACM8-KC-02` already asserts the facade-backed adapter. |
+| E3-C07 Composition boundary | ACM-8 real `AppModule` import/facade resolution; no UM file changes; no AC HTTP/test-only/debug endpoint. The canonical "`ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" criterion is **superseded** by UMAC-1 Stage 3 / `UM-E0-S0.1` and carries no obligation | module E2E + repository audit | P0 | Real module boot plus scoped audit; does not test `/users` authorization. Port binds `AccessControlFacadeAdapter` (`user-management.module.ts:215`); the interim adapter was deleted in backend `0788f60` (2026-09-02) and `ACM8-KC-02`, realigned 2026-09-01 by that cutover, already asserts the facade-backed adapter. |
 | E3-C08 Resolver performance | ACM-9 baseline/final 500-target representative audiences/depth shapes, manifests, explanations and breach stopping | measurement | P1 | Immutable `ACM9-MVP-v1` artifacts; Contract B only. |
 
 ### NFR evidence plan
@@ -120,7 +120,7 @@ Scores of 6+ require planned mitigation. Category legend: `SEC` security, `BUS` 
 - **Nightly / release candidate:** E3-C08 measurement because it is intentionally expensive and produces immutable run artifacts.
 - **Weekly:** no separate PLAT-E3-only test class; investigate repeated performance or isolation flakes from the recorded artifacts.
 - **Estimates:** P0 ~40–64 h, P1 ~16–30 h, total ~56–94 h; this is planning capacity, not time booked or execution progress.
-- **Design quality targets:** P0 functional scenarios must pass; P1 target ≥95%; every score-6+ risk has named evidence; full NFR assessment remains for `nfr-assess` after evidence exists. Coverage percentage is intentionally not asserted.
+- **Design quality targets:** the platform pair's three thresholds carried unchanged — **P0 = 100 % covered · P1 = ≥ 95 % covered · the access-control suite passes** (`test-design-qa.md` § *Gate thresholds carried from the handoff*). *Covered* is the pair's word and is not interchangeable with *passes* (`PR-009` coverage-state vocabulary). Every score-6+ risk has named evidence; full NFR assessment remains for `nfr-assess` after evidence exists. No coverage percentage is computed or asserted here.
 
 ## Step 5 — Generate output
 
@@ -163,7 +163,31 @@ catalog drift; unnamed owners recorded for S10/S11 Colleague narrowing and S1 ph
 residual-risk table, `PG-03` defect exit gate, risk legend and knowledge-base appendix; ACM-9
 baseline pinned with discovery framing; PM/AD-20 and `CC-07` named as deferrals.
 
+### Second pass — independent audit (2026-09-12)
+
+An independent auditor re-checked every correction against primary sources. Ten of fourteen
+verified cleanly, including the full 49-row acceptance-criterion enumeration, the `ACM9-MVP-v1`
+baseline pin, the DEPT-2/DEPT-4 ownership and the quoted gate thresholds. Six defects were fixed
+in a second pass — the full table is in the plan's Correction log. The two that matter here:
+
+- **`E3-C07`'s conclusion was right but both its citations were fabricated.** The rebind was
+  attributed to `PLAT-E4-S4.1/S4.2` (in fact section-key generalisation and the org-relationship
+  seed) and the deletion to backend `37a339a` (which deleted the *session resolver*). Corrected to
+  **UMAC-1 Stage 3 / `UM-E0-S0.1`** and backend **`0788f60`**.
+- **The superseded-criterion test was applied to ACM-8 but not to `CC-07`.** The plan restated
+  "no `AccessJournal` table exists" from two stale sources; the table ships at
+  `schema.prisma:106`. Open item 9 rewritten.
+
+This checkpoint's own defect: the design-quality target still carried the *covered*→*pass*
+conflation that finding F-4 was reported as fixing. Corrected in Step 4 above.
+
+**Provenance caveat.** The plan, this checkpoint and the validation report all enter git as
+additions. The "pre-correction text" exists only as session testimony and is not reconstructible
+from history; the source-file assertions are independently checkable and were re-checked.
+
 **Result:** correction only. No suite was executed, no approval is granted, and the CONCERNS
 verdict stands until a fresh Epic Validate runs against the corrected text. That run is the next
+action, not an optional follow-up: leaving a stale verdict against a changed document is the same
+class of defect this correction records against the canonical `epics.md` caveat. That run is the next
 action, not an optional follow-up: leaving a stale verdict against a changed document is the same
 class of defect this correction records against the canonical `epics.md` caveat.

@@ -50,7 +50,7 @@ covered, an approval exists, or a release gate is satisfied.
 **Recorded, not resolved.** Every Epic 3 story key (`3-1` … `3-8`) is `done` in
 `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`, and the epic's own
 Requirements Inventory calls the Phase-0 ACF-1 / ACM-3 and ACM-5 acceptance criteria
-**historical evidence** (SD-1). Three tracking surfaces disagree with each other, and this
+**historical evidence** (SD-1). Four tracking surfaces disagree with each other, and this
 plan corrects none of them:
 
 | Surface | State | Note |
@@ -58,7 +58,7 @@ plan corrects none of them:
 | `platform/sprint-status.yaml` | `epic-2: done`, `epic-3: done` | All 8 child stories `done`. |
 | `epics.md` `## Epic 2` / `## Epic 3` headers | `**Status:** in-progress` | Contradicts the tracker. |
 | `epics.md` *Kernel MVP status caveat* | asserts `sprint-status.yaml` "still records `epic-3: in-progress`" | **Factually false at this HEAD** — the tracker records `done`. |
-| `global-coverage/global-fr-epic-story-coverage.yaml:95` | `PLAT-E2-S2.1: in-progress` | Deliberate; lines 121–123 say it is held pending Platform Story 1.1. The epic caveat also cites this file at a `platform/` path it does not occupy. |
+| `global-coverage/global-fr-epic-story-coverage.yaml:95` | `PLAT-E2-S2.1: in-progress` | Deliberate; lines 121–123 say it is held pending Platform Story 1.1. |
 
 **Consequence for this plan.** The [QA effort estimate](#qa-effort-estimate) is *not* a forecast of
 unstarted work. It sizes **evidence design and verification against already-shipped behaviour** —
@@ -73,14 +73,14 @@ traceability matrix**; this plan neither performs nor claims it.
 | ACM-0 root identity prerequisite | User Management API/CRUD or population import | ACM-0 only creates the one deploy-time root row; User Management owns its surfaces. |
 | ACM-1 functional-role foundation | Runtime role management, `/roles`, grants API | Kernel MVP has a seed/migration-owned catalog only. UI-driven role administration (requirements §2.3) has **no named owner**; it is an open follow-up, not a silent exclusion. |
 | ACM-2 FR decision, ACM-3/4 audience resolution, ACM-5 base section access | `/users` enforcement, projection, dismissed-target behavior, S2–S9/S12+ section semantics | User Management and owning projections consume the facade later. |
-| ACM-8 module composition | Re-asserting the historical interim `ACCESS_CONTROL_PORT` binding | **Superseded — see `E3-C07`.** PLAT-E4-S4.1/S4.2 bound the port to `AccessControlFacadeAdapter`; the interim adapter no longer exists. |
+| ACM-8 module composition | Re-asserting the historical interim `ACCESS_CONTROL_PORT` binding | **Superseded — see `E3-C07`.** The rebind is **UMAC-1 Stage 3 / `UM-E0-S0.1`** (UM `FR-16`, SPEC CAP-1, AD-21), not an Epic 4 story; the interim adapter no longer exists. |
 | ACM-9 resolver evidence | Directory-list `PG-04` / DIR-A1 or P6 evidence | Contract B only; measurement job remains informational. |
-| Base section **decision** for S1/S10/S11 | Colleague field-subset narrowing for S10/S11; S1 photo mutation; relationship-field writes | **Open dependency, owner unnamed** — see [Open items 6 and 7](#dependencies-assumptions-and-open-items). Requirements §3.3.4 forbids solving it in the frontend. |
+| Base section **decision** for S1/S10/S11 | Colleague field-subset narrowing for S10/S11; S1 photo mutation; relationship-field writes | **Open dependencies** — S10/S11 narrowing is owned by UM `FR-17` / story `TT-E1-S1.2` but `FR-17` is deferred and unscheduled; S1 photo mutation has no named owner. See [Open items 6 and 7](#dependencies-assumptions-and-open-items). Requirements §3.3.4 forbids solving it in the frontend. |
 | Kernel eligibility via `User.isActive` | Departure/due-date cutoff at request time | **PM/AD-20**, deferred until the Departure persistence seam exists (`docs/architecture/access-control.md:46–48`). Requirements §4.16 remains unmet by the kernel alone. |
-| Revocation of platform-owned relations taking effect on the next facade call | The 15-minute project-assignment window (§5.1) | Project line is PLAT-E8. The **owned-relation** half is in scope here — see `E3-C03`…`E3-C07`. |
+| Revocation of platform-owned relations taking effect on the next facade call | The 15-minute project-assignment window (§5.1) | Project line is PLAT-E8. The **owned-relation** half is in scope here — obligations on `E3-C03`, `E3-C04` and `E3-C06`. |
 | HTTP denial oracle documentation alignment | Runtime 401/404/403 behaviour | `UM-E0-S0.1` (PM/AD-24). |
 | PostgreSQL constraints and real deploy entrypoints | Frontend/browser tests and a new HTTP/debug endpoint | The epic is headless. |
-| — | `AccessJournal` entries for relationship changes (§3.4) | `CC-07` / PM/AD-29, **P0 open** — no table exists. |
+| — | `AccessJournal` enrolment for relationship changes (§3.4) | `CC-07` / PM/AD-29, recorded **P0 open**. The table itself ships — see Open item 9; what is unproven is same-transaction enrolment, reader authorization and idempotency. |
 
 ### Immutable operating rules
 
@@ -198,7 +198,7 @@ PLAT-E3 has no user-facing HTTP or browser behavior.
 | E3-C03 | ACM-2 active granted allow; missing/inactive/unknown/ungranted/orphan deny; no AR read or decision persistence; **no branch on `hr-admin` or on any individual permission name**; **decision re-read on each call after a grant is revoked mid-process**. | Headless facade + PostgreSQL | R02, R07 | Platform backend | No route or provider override. |
 | E3-C04 | ACM-3 empty/duplicate target contract **with no relationship-graph read on an empty list**; **viewer validation ordering — viewer identity is confirmed before any audience derivation, Self included**; inactive/missing viewer/target; **no Colleague fallback for an inactive or missing party, and normal Colleague fallback for an active pair with no stronger audience**; bridge/PP failure; termination; cycles before/after viewer proof; per-target path state; **resolution re-run on each call across a `Relationship` mutation**. | Headless facade + PostgreSQL | R01, R07 | Platform backend | Assert every requested distinct key maps to an explicit set. |
 | E3-C06 | ACM-5 supported S1/S10/S11 matrix, missing/empty result, `write > read > none`, unsupported sections deny; **section decision re-evaluated on each call across a `Relationship` mutation**. | Headless facade + PostgreSQL | R04, R07, R08 | Platform backend | Base decision only. **Negative obligation:** a `write` on `profile:identity` is never a mandate over the S1 *manager*, *people partner* or *department* fields — requirements §3.2 note ¹ and §2.1 *Changing a relationship is a distinct class of operation* [NORMATIVE] put those behind `org:relationships:write`, a dedicated screen, a self-assignment bar and a §3.4 journal entry. S1 photo mutation and the S10/S11 colleague field subsets remain owning-consumer projection/command rules (Open items 6–7). |
-| E3-C07 | ACM-8 real `AppModule` composition; facade resolves; no User Management or HTTP/debug surface change. | Module E2E + scoped audit | R05 | Platform backend | Does not test `/users` authorization. **Superseded AC:** the canonical criterion "`ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" was overtaken by **PLAT-E4-S4.1/S4.2** — the port binds `AccessControlFacadeAdapter` (`services/backend/src/user-management/user-management.module.ts:215`), `interim-access-control.adapter.ts` was deleted in backend `37a339a`, and `ACM8-KC-02` already asserts the facade-backed adapter. **Do not write an obligation against the interim binding and do not "restore" it.** The surviving obligations are the other three: `AppModule` imports and resolves the facade, no file under `src/user-management/**` changes, and no AC HTTP/test-only/debug endpoint is introduced. |
+| E3-C07 | ACM-8 real `AppModule` composition; facade resolves; no User Management or HTTP/debug surface change. | Module E2E + scoped audit | R05 | Platform backend | Does not test `/users` authorization. **Superseded AC:** the canonical criterion "`ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" was overtaken by **UMAC-1 Stage 3 / `UM-E0-S0.1`** (UM `FR-16`: "`interim-access-control.adapter.ts` is deleted in the same cutover (no dual-running)"; SPEC CAP-1, AD-21) — the port binds `AccessControlFacadeAdapter` (`services/backend/src/user-management/user-management.module.ts:215`), `interim-access-control.adapter.ts` was deleted in backend `0788f60` (2026-09-02), and `ACM8-KC-02` — realigned 2026-09-01 by that same cutover — already asserts the facade-backed adapter. **Not** an Epic 4 story: `PLAT-E4-S4.1` is section-key generalisation and `S4.2` is the org-relationship seed. **Do not write an obligation against the interim binding and do not "restore" it.** The surviving obligations are the other three: `AppModule` imports and resolves the facade, no file under `src/user-management/**` changes, and no AC HTTP/test-only/debug endpoint is introduced. |
 
 ### P1 — high
 
@@ -215,8 +215,9 @@ lower-priority duplicate of this kernel plan.
 
 ## Acceptance-Criterion Traceability
 
-Every canonical Epic 3 acceptance criterion maps to exactly one obligation, an explicitly
-superseded marker, or a named external owner. **No row is a coverage or execution claim.**
+Every canonical Epic 3 acceptance criterion maps to at least one obligation, an explicitly
+superseded marker, a named external owner, or an explicit scope exclusion. **No row is a
+coverage or execution claim.**
 
 | Story | Acceptance criterion (abbreviated) | Obligation |
 | --- | --- | --- |
@@ -262,7 +263,7 @@ superseded marker, or a named external owner. **No row is a coverage or executio
 | 3.6 | S1 photo mutation and S10/S11 colleague subsets are owning-consumer rules | Open items 6–7 |
 | 3.7 (ACM-8) | `AppModule` imports `AccessControlModule` and resolves `AccessControlFacade` | E3-C07 |
 | 3.7 | No file under `src/user-management/**` changes | E3-C07 |
-| 3.7 | `ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter` | **SUPERSEDED** by PLAT-E4-S4.1/S4.2 — no obligation written; see E3-C07 |
+| 3.7 | `ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter` | **SUPERSEDED** by UMAC-1 Stage 3 / `UM-E0-S0.1` (UM `FR-16`, SPEC CAP-1, AD-21) — no obligation written; see E3-C07 |
 | 3.7 | No `/users` behaviour change, no AC HTTP/test-only/debug endpoint | E3-C07 |
 | 3.8 (ACM-9) | **Baseline runs after ACF-1 without changing behaviour under `src/access-control/**`** | E3-C08 |
 | 3.8 | Record p50, p95, worst case, breadth/depth, query count, PG version, `EXPLAIN (ANALYZE, BUFFERS)` | E3-C08 |
@@ -312,13 +313,13 @@ Ranges include PostgreSQL fixture/cleanup work and evidence capture. They are pl
 
 1. **ACM-4 prerequisite:** current `acm-4-disposition.yaml` says `disposition: no-gap` and `acm_5: unblocked`; a future missing scenario or behavior gap must halt and restart the AD-1 sequence rather than bypass it.
 2. **ACM-9 prerequisite — baseline pinned.** Six baseline artifacts exist under `_bmad-output/test-artifacts/performance/` (five `PASS`, one `INCOMPLETE`). This plan pins the pair the platform QA document names as the immutable Contract B evidence at commit `3a3cd71`: baseline `acm9-baseline-acm9-1788721821722-afd2fdac4a45.json` with final `acm9-final-acm9-1788722145229-13b089a4cb9f.json`, which records that baseline's run ID. Selecting a different baseline is a deliberate change and must be stated. A `FAIL` or `INCOMPLETE` baseline halts composition/final evidence and requires separately gated remediation.
-3. **FR catalog drift — owner named.** PLAT-E3's ACM-1 criterion states three canonical permissions; the shipped bootstrap holds six. The reconciliation is tracked as **DEPT-2** (return `CANONICAL_PERMISSIONS` to five by dropping `profile:timeline:write`, and make career-timeline write a dual gate) with test fallout as **DEPT-4** — both in `dept-epic.md`, **not** in Epic 4, which is `done`. Two corrections to the pre-correction text: the "older three-key test lock is stale" statement no longer holds — `acm1r-fr-foundation.e2e-spec.ts` derives its keys from the exported `CANONICAL_PERMISSIONS` (`dept-epic.md` GAP-1, closed 2026-09-08); and the sixth key is not merely a counting question. `profile:timeline:write` is a **recorded, PO-accepted, time-boxed deviation from requirements §2.2/§2.3** (`s42a-op-06`, ruling AF-2): its `canEditTimeline` gate has no audience half, so a seeded `hr-admin` can write any person's career timeline. Accordingly **`E3-C02` asserts the CAP-3 catalog's *shape* and must not canonize the present six-key membership as an invariant** while DEPT-2 is open.
+3. **FR catalog drift — owner named.** PLAT-E3's ACM-1 criterion states three canonical permissions; the shipped bootstrap holds six. The reconciliation is tracked as **DEPT-2** (return `CANONICAL_PERMISSIONS` to five by dropping `profile:timeline:write`, and make career-timeline write a dual gate) with test fallout as **DEPT-4** — both in `dept-epic.md`, **not** in Epic 4, which is `done`. Two corrections to the pre-correction text: the "older three-key test lock is stale" statement no longer holds — `acm1r-fr-foundation.e2e-spec.ts` derives its keys from the exported `CANONICAL_PERMISSIONS` (`dept-epic.md` GAP-1, closed 2026-09-08); and the sixth key is not merely a counting question. `profile:timeline:write` is a **recorded, PO-accepted, condition-boxed deviation from requirements §2.2/§2.3** (it closes when `canEditTimeline` gains its audience half, not on a date) (`s42a-op-06`, ruling AF-2): its `canEditTimeline` gate has no audience half, so a seeded `hr-admin` can write any person's career timeline. Accordingly **`E3-C02` asserts the CAP-3 catalog's *shape* and must not canonize the present six-key membership as an invariant** while DEPT-2 is open.
 4. **Reconciliation open at both ends.** This plan routes the three-versus-six `hr-admin` question to the E4 line; the `PLAT-E4` validation report records it as **unreceived** there. Until DEPT-2 is scheduled, the dependency has **no accepting owner** and is carried here as open, not as delegated.
 5. **Consumer boundary:** `/users` rebinding, projection, and actual consumer HTTP E2E are deliberately not kernel proof. They need their separate User Management-owned story (`UM-E0-S0.1`).
-6. **S10/S11 Colleague field narrowing — owner unnamed.** Requirements §3.2 gives Colleague only *dates without leave type* on S10 and *project name only* on S11, and §3.3.4 forbids implementing it by hiding fields in the frontend — "the API must not return them". ACM-5 grants Colleague plain `read` on both and delegates narrowing to the owning consumer, but **no epic, story or gate is named**. Open follow-up; a leak here is a §3.3.1 critical defect.
-7. **S1 photo mutation** is likewise an owning-consumer command rule with no named owner in this epic.
+6. **S10/S11 Colleague field narrowing — owner named, platform-side slice unwritten.** Requirements §3.2 gives Colleague only *dates without leave type* on S10 and *project name only* on S11, and §3.3.4 forbids implementing it by hiding fields in the frontend — "the API must not return them". ACM-5 grants Colleague plain `read` on both and delegates narrowing to the owning consumer. That consumer **is** named: UM **`FR-17`** owns the deferred profile-projection deliverable (the colleague S10 dates-only view on its own route `GET /users/:id/leaves`, and the S11 project-name-only view), and `timetracker/epics.md` carries a written story **`TT-E1-S1.2`** (`1-2-s10-leaves-read-projection-on-profile`) whose acceptance criteria assert "leave type is **absent** from the payload" for a Colleague-tier viewer — gated on the S10 kernel decision this plan's `E3-C06` produces. What is genuinely open is that `FR-17` is deferred with no scheduled story, recorded in `user-management/epics.md` as a real gap under the coverage model's `PM-FR-4` alias. A leak here is a §3.3.1 critical defect.
+7. **S1 photo mutation** is an owning-consumer command rule and, unlike the S10/S11 narrowing, genuinely has no named owner.
 8. **Departure / PM/AD-20:** kernel eligibility uses `User.isActive` only. Requirements §4.16 requires all access of a departed person to end immediately; request-time due/departure enforcement is **deferred until the Departure persistence seam exists** (`docs/architecture/access-control.md:46–48`). Recorded as a named deferral, not a silent exclusion.
-9. **Journal (§3.4):** `CC-07` / PM/AD-29 is **P0 open** — no `AccessJournal` table exists, so no relationship-change journal obligation can be closed by this epic.
+9. **Journal (§3.4) — the blocker record is stale, the blocker is not.** `CC-07` / PM/AD-29 is recorded `severity: P0`, `status: open`, `implementation_status: absent`, and its note says "No journal table exists". **That note is false at this HEAD:** `model AccessJournal` is defined at `services/backend/prisma/schema.prisma:106` with two applied migrations (`20260903011657_story_4_1_access_journal`, `20260903024004_story_4_3_department_edge_journal_subject`). `CC-07` nevertheless remains legitimately open, because its closure condition is broader than table existence — same-transaction enrolment proven for every listed kind, reader authorization matching PM/AD-29, and `idempotencyKey` uniqueness proven under retry — none of which this epic supplies. **This plan states the table ships and does not restate the stale note.** No relationship-change journal obligation is closed here either way.
 10. **Pact/browser tools:** PLAT-E3 has no consumer/provider or UI acceptance criterion. SmartBear Pact MCP was unavailable, and `playwright-cli` was not installed; neither absence blocks this headless plan.
 11. **Not evaluated by this plan:** `test-design-architecture.md` and `test-design-qa.md` were read for the thresholds and contracts cited above. This plan does not attest that its isolation or execution choices are consistent with every other policy in that pair.
 
@@ -328,7 +329,7 @@ Ranges include PostgreSQL fixture/cleanup work and evidence capture. They are pl
 | --- | --- | --- |
 | `services/backend/src/access-control/` | Owns kernel behavior. | Focused real-PostgreSQL ACM suites and ACM-9 protocol. |
 | `AppModule` | Imports AccessControlModule at ACM-8. | Module composition only; no added HTTP endpoint. |
-| `services/backend/src/user-management/` | Consumes the kernel through `ACCESS_CONTROL_PORT`, bound to `AccessControlFacadeAdapter` since PLAT-E4. | Audit that no file under it changes at ACM-8; adoption behaviour and `/users` authorization belong to `UM-E0-S0.1`. |
+| `services/backend/src/user-management/` | Consumes the kernel through `ACCESS_CONTROL_PORT`, bound to `AccessControlFacadeAdapter` since the UMAC-1 Stage 3 cutover. | Audit that no file under it changes at ACM-8; adoption behaviour and `/users` authorization belong to `UM-E0-S0.1`. |
 | PostgreSQL schema / deploy scripts | Enforces root/bootstrap and FR integrity. | Migrated DB, named seed/bootstrap entrypoints, raw constraint probes. |
 | Platform system design pair | Owns shared evidence, NFR, isolation and gate policies. | This plan **quotes** the gate thresholds and the Contract B protocol where an obligation depends on them, and references the pair for everything else. It does not redefine a threshold or a contract. |
 
@@ -338,7 +339,7 @@ Applied 2026-09-12 after validation CONCERNS. Ordered by severity.
 
 | # | Correction | Source finding |
 | --- | --- | --- |
-| 1 | `E3-C07` no longer re-asserts the interim `ACCESS_CONTROL_PORT` binding; the AC is marked superseded by PLAT-E4-S4.1/S4.2 with the three surviving obligations kept. Scope table, `R05` and the Interworking row corrected to match `main`. | Requirements review F1 |
+| 1 | `E3-C07` no longer re-asserts the interim `ACCESS_CONTROL_PORT` binding; the AC is marked superseded by **UMAC-1 Stage 3 / `UM-E0-S0.1`** with the three surviving obligations kept. Scope table, `R05` and the Interworking row corrected to match `main`. | Requirements review F1 |
 | 2 | Coverage IDs renumbered to ACM order, matching the checkpoint; identifier contract stated. | Validation F-1 / review F7 |
 | 3 | §2.1 revocation timing added as `PLAT-E3-R07`, an NFR row, and per-call obligations on `E3-C03`/`C04`/`C06`. | Requirements review F2 |
 | 4 | Execution-state caveat added; the estimate is reframed as evidence work against shipped behaviour. | Validation F-2 |
@@ -347,11 +348,31 @@ Applied 2026-09-12 after validation CONCERNS. Ordered by severity.
 | 7 | Priority criteria added; the P1-gates-P0 inversion stated and reconciled with the Kernel Dependency Graph. | Validation F-5 |
 | 8 | `E3-C06` negative obligation: base `write` on `profile:identity` is not a mandate over the §3.2 ¹ relationship fields; `PLAT-E3-R08` added. | Requirements review F5 |
 | 9 | Open item 3 rewritten — DEPT-2/DEPT-4 named, the stale-test-lock claim retired, the AF-2 deviation stated, `E3-C02` scoped to catalog shape. | Requirements review F3 / validation F-7 |
-| 10 | S10/S11 Colleague narrowing and S1 photo mutation recorded as open dependencies with owner unnamed. | Requirements review F6 |
+| 10 | S10/S11 Colleague narrowing and S1 photo mutation recorded as open dependencies. *(Second pass: the S10/S11 owner **is** named — UM `FR-17` and story `TT-E1-S1.2`; only S1 photo mutation has none.)* | Requirements review F6 |
 | 11 | Added residual-risk table, `PG-03` defect exit gate, risk-category legend, per-priority criteria, `PR-001`/`PR-002` linkage. | Validation F-6 |
 | 12 | ACM-9 baseline pinned to the `3a3cd71` pair; discovery-vs-gate framing stated. | Validation F-7 / review §4 |
 | 13 | PM/AD-20 departure deferral named with its identifier; `CC-07` journal gap recorded. | Requirements review F8 |
 | 14 | The `hr-admin` reconciliation recorded as open at both ends with no accepting owner. | Validation cross-link |
+
+### Second pass — independent audit (2026-09-12)
+
+An independent auditor re-checked all 14 corrections against primary sources. Ten verified
+cleanly. Six defects the first pass introduced or missed were fixed here:
+
+| Defect | Fix |
+| --- | --- |
+| The ACM-8 conclusion was right but **both supporting citations were fabricated**: the rebind was attributed to `PLAT-E4-S4.1/S4.2` (actually section-key generalisation and the org-relationship seed) and the deletion to backend `37a339a` (which deleted `interim-**session**-resolver.adapter.ts`). | Re-attributed to **UMAC-1 Stage 3 / `UM-E0-S0.1`** (UM `FR-16`, SPEC CAP-1, AD-21) and backend **`0788f60`**, both verified against `git log --diff-filter=D` and the `ACM8-KC-02` file header. |
+| **The superseded-criterion test was applied to ACM-8 but not to `CC-07`.** The plan asserted "no `AccessJournal` table exists" — copied from `epics.md` and `blockers.yaml`, both stale. | Open item 9 rewritten: the table ships (`schema.prisma:106`, two applied migrations); `CC-07` stays open on its broader closure conditions. |
+| A **fabricated criticism of `epics.md`** — that its caveat cites the coverage YAML at a `platform/` path — repeated three times and used to justify leaving `epics.md` alone. | Removed. The caveat uses a bare filename with no path; the file's only full citation (`epics.md:12`) is correct. The caveat's *other* error, about `sprint-status.yaml`, is real and stands. |
+| **"No named owner" for the S10/S11 Colleague narrowing was false.** | UM `FR-17` and the written story `TT-E1-S1.2` are named; the genuine gap is restated as `FR-17` being deferred with no scheduled story. |
+| Finding F-4 was **reported fixed while the offending line remained in the checkpoint**. | Checkpoint's design-quality target corrected to the pair's own *covered* wording with the access-control-suite clause restored. |
+| Minor: "three surfaces" against a four-row table; a `C03…C07` range implying revocation obligations on C05/C07; "time-boxed" for a condition-boxed deviation; a preamble promising "exactly one obligation". | All corrected. |
+
+**Provenance caveat.** This plan, its checkpoint and its validation report all enter git as
+**additions**. The "pre-correction text" they refer to existed only in the working tree during the
+session that produced them and cannot be reconstructed from history. Statements here about what
+the correction changed are therefore session testimony, not diffable claims; the substantive
+assertions about source files are independently checkable and were re-checked.
 
 The pre-correction draft of this pass also appended a remediation record to the validation report
 itself. That was withdrawn: the report is written by a Validate run, and a correction pass editing
