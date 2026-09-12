@@ -36,12 +36,12 @@ Cross-cutting planning/test/architecture alignment to spec **v1.5** after resear
 
 **Post-kernel extension (2026-09-02):** Epics 5–8 are added below to decompose the access-control gaps that the Kernel MVP deliberately left open. The ratification overlay's earlier "No Epic 4" note applied to the *documentation* CE pass and is superseded for this planning pass only; it does not reopen any Epic 1 story. **Epics 2 and 3 are not modified by this pass** — their stories are implemented and their acceptance criteria are historical evidence. Epic 5–8 story text never restates, supersedes, or re-scopes an Epic 2 or Epic 3 acceptance criterion.
 
-**Kernel MVP status caveat (verify before scheduling):** every Epic 3 story key is `done` in `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`, but two tracking artifacts disagree with that and are **not** corrected by this planning pass:
+**Kernel MVP status caveat (verify before scheduling):** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` is the authoritative execution tracker for both epics, and it records both `epic-2` and `epic-3` as `done`; the Epic 2 and Epic 3 `**Status:**` headers below are stated against that tracker. An earlier version of this caveat asserted that the tracker still carried both of those epic keys as unfinished while their child story keys were `done` — **that assertion is withdrawn here as false**; it never described this file's tracker, and it is not restated in any form below. Exactly one genuine divergence survives, and this planning pass does **not** correct it:
 
-- `sprint-status.yaml` still records `epic-3: in-progress` and `epic-2: in-progress` although every child story key is `done`.
-- `global-fr-epic-story-coverage.yaml` records `PLAT-E2-S2.1` as `status: in-progress` while `sprint-status.yaml` records `2-1-resolve-phase-0-audiences-acf-1: done`.
+- **Epic 3 — no divergence.** `epic-3` and every story key `3-1`…`3-8` are `done` in `sprint-status.yaml`, and no other tracking surface contradicts that. "PLAT-E3 is done" is mechanically verified.
+- **Epic 2 — disputed; recorded, not resolved.** `global-fr-epic-story-coverage.yaml` records `PLAT-E2-S2.1` as `status: in-progress` while `sprint-status.yaml` records `2-1-resolve-phase-0-audiences-acf-1: done`. That coverage status is held deliberately (`global-fr-epic-story-coverage.yaml:121-123`), so the tracker governs execution state while the coverage reconciliation stays open.
 
-Neither is an Epic 5–8 deliverable. Both are recorded here so that "PLAT-E3 is done" is not treated as mechanically verified when one of the two tracking surfaces still contradicts it. Reconciliation belongs to Platform Story 1.1's traceability matrix.
+That one divergence is not an Epic 5–8 deliverable, and it must not be closed by flipping either surface: `sprint-status.yaml` stays `done` and `global-fr-epic-story-coverage.yaml:95` stays `in-progress` until they are reconciled. Reconciliation belongs to Platform Story 1.1's traceability matrix, as the open-gate register at the end of this file already records ("PLAT-E2-S2.1 status conflict … Left to Platform Story 1.1").
 
 ## Requirements Inventory
 
@@ -239,7 +239,7 @@ Binding rule for Epics 5, 6 and 8 (SD-8):
 
 ## Epic 1: Platform Spec v1.5 Alignment
 
-**Status:** in-progress  
+**Status:** done (tracker) — coverage reconciliation open, see *Kernel MVP status caveat*  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 ### Story 1.1: Changelog Traceability Matrix
@@ -400,7 +400,7 @@ So that Alignment work is visible for the weekend build.
 ## Epic 2: Access Control Foundation
 
 **Production code.** Every story runs the full AD-1 three-stage **ordering** (scenario prose → committed-red E2E → production). The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI running the suites stand in its place.  
-**Status:** in-progress  
+**Status:** done  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 Deliver a narrow, reusable audience-resolution boundary without taking ownership of User Management routes, profile projection, or UI. This is a two-day technical foundation; it does not replace the full Access Control facade program or its complete Stage-1 suite.
