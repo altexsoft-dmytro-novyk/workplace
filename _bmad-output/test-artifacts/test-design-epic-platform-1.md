@@ -1,10 +1,13 @@
 # Test Design — Epic: Platform 1, Platform Spec v1.5 Alignment
 
-> ## Status: **written, ungranted, NOT validated.** This is a new document and inherits nothing.
+> ## Status: **written, approved, validation PASS (2026-09-12).** This document retains its
+> Create-run baseline and inherits no earlier run's approval or verdict.
 >
-> - **Approval:** ungranted. No human has approved this document.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here.
->   `test-design-validation-report-epic-platform-1.md` does not exist.
+> - **Approval:** granted by the requester on 2026-09-12; recorded in
+>   `test-design-progress-epic-platform-1.md`.
+> - **Validation:** **PASS (2026-09-12)** in
+>   `test-design-validation-report-epic-platform-1.md`, which supersedes the pre-edit
+>   CONCERNS attestation after F-1 through F-4 were corrected.
 > - **Coverage:** none asserted. This document plans and records; it does not state that any
 >   test or audit exists, that any suite passes, or that any gate is green. **No pass rate and
 >   no percentage appears anywhere in it.**
@@ -30,7 +33,7 @@
 
 **Date:** 2026-09-11
 **Mode:** Create, Epic-Level (`bmad-testarch-test-design`), routed by `docs/test-design-workflow-contract.md` §2.2
-**Status:** Draft — **approval ungranted**, validation **NOT RUN**
+**Status:** Approved — validation **PASS (2026-09-12)**
 
 **`epic-platform-1` is not `epic-platform-capabilities-1`.** `platform` and
 `platform-capabilities` are two different canonical domain slugs with two different `Epic 1`
@@ -147,7 +150,7 @@ records which of them this epic is a mitigation owner for, and **re-scores nothi
 | Risk | Category / score | Statement | Mitigation direction here |
 | --- | --- | --- | --- |
 | `plat:PR-009` | OPS 2 × 3 = **6** | Counting unexecuted access-control scenario documents as coverage creates false release confidence. Open — **less mitigated than in 2026-08-29**; the end-to-end CI job is `continue-on-error`. | **This epic is a mitigation owner, and also its sharpest test case.** `S1.3` rewrites access-control SPEC and Stage-1 scenario prose; `S1.6` refreshes the test-design artifacts that *report* coverage. Both edit the exact surfaces where a present-but-unexecuted document can be mistaken for tested behaviour. Mitigation direction: every obligation below is written so that satisfying it produces a **document statement**, never a coverage claim. Evidence level: `repository-audit`. The three coverage states are defined in `test-design-qa.md` § Coverage-state vocabulary and are not redefined here. |
-| `plat:PR-005` | TECH **9** | Unknown timetracker contract. Blocked on `PR-B-08`. | **Referenced, not owned.** `S1.6` cites `docs/integrations/timetracker-external-api.json`, which is **untracked at the ratification pin**. The epic's own AC requires that caveat be recorded **verbatim** alongside the gate IDs. This plan therefore treats the file's presence as **not** contract resolution, per the ledger's standing instruction. Committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4). |
+| `plat:PR-005` | TECH **9** | TimeTracker contract defects. Blocked on `PR-B-08` / `TT-IDENTITY-01` / `TT-PMDM-01`. | **Referenced, not owned.** `docs/integrations/timetracker-external-api.json` is tracked at ratification baseline `76a7220`; the former untracked-file caveat is retired. File presence does **not** resolve the substantive identity or project/delivery-manager contract defects, which remain open under the two successor gates. |
 
 **A risk this epic cannot mitigate, stated so it is not mistaken for one it can.** `S1.4` and
 `S1.6` document the `GET /users` whole-row serialization seam (`ARCH-ENV-01`, PM/AD-34
@@ -195,8 +198,8 @@ be read as renamed legacy IDs.
 | `plat-e1:AV-16` | `S1.5` | `P3` | `docs/architecture/dashboards.md` records the Unassigned bucket, risk "active" ≠ `low`, and project-line counter implications as **fixed product facts**, while the engine/widget model remains **TBD** with no improvised implementation. | `platform/epics.md` `S1.5` AC 1, 2. The TBD half is an obligation: inventing an engine design would satisfy the first clause and violate the second. |
 | `plat-e1:AV-17` | `S1.6` | `P1` | Platform test-design artifacts cite **v1.5 / current SoT**, name the post-consolidation canonical set exactly, and anchor any claim about what the superseded artifacts *said* to commit `76a7220701ac6f16843dad8b303934f9a958b54c`. | `platform/epics.md` `S1.6` AC 1. Four canonical filenames **reuse** a filename that previously held different content — the commit anchor is what stops a statement about the old document from silently describing the new one. |
 | `plat-e1:AV-18` | `S1.6` | `P1` | **`QUALITY-GATE-AC` (P0)** is cited against `gate-decision.json` at `c342138` **with its current evaluated state recorded as open debt** — `gate_status=FAIL`, `p0_status=NOT_MET`, `critical_open: 1`, ACM3-II-06 uncovered — and not papered over. | `platform/epics.md` `S1.6` AC 4. The obligation is to **record a failing gate as failing**. Gate identity and thresholds are owned by `test-design-qa.md` § Release and design gates. **No gate is asserted green here, and none is invented.** |
-| `plat-e1:AV-19` | `S1.6` | `P1` | **`QUALITY-GATE-AC-NFR`** ACM-9 evidence is tracked **separately** from the functional P0 gate, with baseline and final artifacts referenced by commit-pinned path. | `platform/epics.md` `S1.6` AC 5, read with **U-25 resolved**: `QUALITY-GATE-AC-NFR` governs **contract B (ACM-9 facade) only**. See § NFR. |
-| `plat-e1:AV-20` | `S1.6` | `P2` | Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01`, **not** superseded `TIMETRACKER-CONTRACT`; and the untracked-contract **evidence caveat is recorded verbatim** alongside those gate IDs. | `platform/epics.md` `S1.6` AC 6, 7. Pairs with `plat:PR-005` in § Risks. |
+| `plat-e1:AV-19` | `S1.6` | `P1` | **`QUALITY-GATE-AC-NFR`** ACM-9 Contract-B evidence is tracked **separately** from the functional P0 gate, with the [baseline JSON](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-baseline-acm9-1788721821722-afd2fdac4a45.json) and [final JSON](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-final-acm9-1788722145229-13b089a4cb9f.json) at commit `3a3cd71884bf62d8c56577da1b4b36f2a8b327a3`. | `platform/epics.md` `S1.6` AC 5, read with **U-25 resolved**: `QUALITY-GATE-AC-NFR` governs **contract B (ACM-9 facade) only**. Neither artifact discharges functional P0 or Contract A / `PG-04`. |
+| `plat-e1:AV-20` | `S1.6` | `P2` | Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01`, **not** superseded `TIMETRACKER-CONTRACT`; TimeTracker OpenAPI provenance is anchored at tracked baseline `76a7220`, while both successors remain substantively open. | `platform/epics.md` `S1.6` AC 6, 7. Pairs with `plat:PR-005` in § Risks; the former untracked-contract caveat is retired. |
 | `plat-e1:AV-21` | `S1.7` | `P3` | `spec-user-management-test-cases` CAP-1 is retired/superseded in favour of seed scenarios and the registration folder disposition matches `S1.1`, **without changing UM Epics 0–5 feature scope**. | `platform/epics.md` `S1.7` AC 1–3. The scope negative is explicit in the AC: denial-oracle alignment belongs to `S1.3`, not here. |
 
 **Priorities are this plan's own, derived from the consequence of the stated drift.** They are
@@ -206,25 +209,20 @@ the `P2` / `P3` rows above.
 
 ---
 
-## `S1.6` carries recorded debt, and this plan does not discharge it
+## `S1.6` completion boundary
 
-`platform/epics.md` records, under `S1.6`, debt added by the 2026-09-10 consolidation. It is
-**referenced here and left exactly as it stands**:
+At the 2026-09-11 Create-run baseline, consolidation alone updated artifact identities and
+dependency references only; it did not satisfy an S1.6 acceptance criterion. That historical
+boundary remains true. The subsequent **U-16 resolution (2026-09-12)** records the story as
+**satisfied for bounded documentation/evidence work**: the canonical artifacts record the
+historical functional-P0 debt at `c342138`, paired Contract-B evidence at `3a3cd71`, and corrected
+TimeTracker provenance. Its sprint key is therefore `done`.
 
-- The consolidation updated artifact identities and dependency references only. It granted no
-  approval, ran no validation, executed no suite and produced no coverage or gate result, so it
-  **does not by itself satisfy any `S1.6` acceptance criterion**.
-- `planning-artifacts/platform/reviews/review-cross-slice-seams-2026-09-02.md:66` records that
-  completing `S1.6` would **falsely close `PM-FR-15`**. **That warning stands and is not
-  discharged here.**
-- Whether `S1.6` is satisfied, partially satisfied, or made obsolete by the consolidation is
-  **open** — register of record `migration-map.md` §10, **U-16** — and belongs to the platform
-  epic owner.
-
-**This Create run is not `S1.6`.** Writing this plan changes no `S1.6` acceptance criterion,
-closes no part of it, and moves its sprint key `1-6-platform-test-design-refresh-v1-2-v1-5`
-off `backlog`. A reader who treats the existence of this plan as progress on `S1.6` has made
-exactly the error `PR-009` describes.
+This bounded completion does **not** close `QUALITY-GATE-AC`, `TT-IDENTITY-01`, `TT-PMDM-01`,
+`PM-FR-15`, any product requirement, or a release condition. The warning against falsely using
+documentation completion as product or runtime closure remains in force. This plan's original
+Create run was not itself S1.6 execution; the later evidence refresh and explicit decision are
+what close the documentation story.
 
 ---
 
@@ -298,11 +296,11 @@ Open, and **answered nowhere in this document**. Register of record:
 
 | Question | Subject | Owner |
 | --- | --- | --- |
-| **U-16** | Whether `PLAT-E1-S1.6` is satisfied, partially satisfied, or made obsolete by the 2026-09-10 consolidation. **Directly scoped to this epic.** | Platform epic owner |
+| **U-16** | **Resolved 2026-09-12** — `PLAT-E1-S1.6` is satisfied as bounded documentation/evidence work. Its closure records historical P0 debt, Contract-B evidence and corrected TimeTracker provenance; it does not close a gate, runtime dependency or product requirement. | Platform epic owner |
 | **U-25** | **Resolved** — `QUALITY-GATE-AC-NFR` = contract **B** (ACM-9) only; `PG-04` = contract **A**. Recorded because `AV-19` depends on it. | Platform epic owner + QA |
 | **U-24** | **Resolved** — harness `DIRA1-MVP-v1` (`docs/architecture/testing-strategy.md` § DIR-A1). | Platform / DevOps + QA |
-| **U-18** | **Resolved 2026-09-11** by the document's owner (Architect): `testing-strategy.md:84` and `:117–119` now match the authority at lines 25–38. Recorded because `PR-009` and `plat:DG-01` both cite it. **`test-design-architecture.md:770` still lists U-18 as open — that entry is stale, and this plan does not edit it.** | Owner of `docs/architecture/testing-strategy.md` |
-| **`PR-B-08`** | The timetracker contract itself — `docs/integrations/timetracker-external-api.json` is untracked at the ratification pin. Blocks `plat:PR-005`; scoped into `AV-20` only as a *caveat-recording* obligation. | Platform + Integration owner |
+| **U-18** | **Resolved 2026-09-11** by the document's owner (Architect): `testing-strategy.md:84` and `:117–119` now match the authority at lines 25–38. Recorded because `PR-009` and `plat:DG-01` both cite it; the matching record in `test-design-architecture.md` is also resolved. | Owner of `docs/architecture/testing-strategy.md` |
+| **`PR-B-08`** | TimeTracker contract defects — `docs/integrations/timetracker-external-api.json` is tracked at ratification pin `76a7220`, but `TT-IDENTITY-01` and `TT-PMDM-01` remain open on substantive contract defects. Blocks `plat:PR-005`; scoped into `AV-20` as a successor-gate and provenance obligation. | Platform + Integration owner |
 
 ---
 
