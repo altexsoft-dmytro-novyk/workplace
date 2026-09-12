@@ -173,7 +173,7 @@ eight accepted as recommended below; execute the task list against them.**
 |---|---|
 | AF-1 | New folder `dev-seed-spine/`, prefix `s42d-ds-*`, HTTP scenario in `access-control-adoption/` — accepted as recommended. |
 | AF-2 | Leave the orphaned `user-management:edit` key alone on old dev DBs; do not carry it forward, do not write cleanup — accepted as recommended. |
-| AF-3 | Direct Prisma writes for the spine, no `AccessJournal` row for seeded edges — accepted as recommended. |
+| AF-3 | Direct Prisma writes for the spine, no `AccessJournal` row for seeded edges — accepted as recommended. **SUPERSEDED 2026-09-12 (Anna Pikula, PO + Architect): the no-journal half is DECLINED.** §2.1/§3.4 and PM/AD-29 have no development-fixture exception. The script keeps direct Prisma writes, but each seeded edge now gets exactly one `kind: 'manager'` `AccessJournal` row in the same transaction, in `assignManager`'s shape with root as the actor. Scenario `docs/test-cases/access-control-kernel/dev-seed-spine/s42d-ds-07-seeded-edges-are-journaled.md`; backend branch `feat/plat-e4-dev-seed-journal`. |
 | AF-4 | No auto-repair when a synthesized lead deactivates; documented limitation, not a defect — accepted as recommended. |
 | AF-5 | Tie-break on lexicographically smallest `departmentId` for concurrent memberships — accepted as recommended. |
 | AF-6 | ACM-9 `seeded-two-level` measurement NOT folded in here; flagged for the PO to revisit the story-level open question now that real data exists to measure — accepted as recommended. |

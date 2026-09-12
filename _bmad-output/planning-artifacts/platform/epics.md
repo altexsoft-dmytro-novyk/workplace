@@ -746,11 +746,23 @@ and section→endpoint map — was completed before delivery.
   the ratified decision.
 - `PATCH /users/:id` and the `GET /users/:id` `canEdit` hint use
   `@RequireSectionAccess('profile:identity', 'write')`; `canEditS1` and the
-  `EDIT_USER_FEATURE` / `READ_USER_FEATURE` branches are gone.
-- `scripts/dev-grant-root.ts` still gives root `canEdit: true` on every active
-  card, with no adapter special case.
+  `EDIT_USER_FEATURE` / `READ_USER_FEATURE` branches are gone. A viewer holding
+  the baseline with only `colleague`/`self` audience gets `403` /
+  `canEdit:false`; a reporting-line manager or assigned PP gets `200` /
+  `canEdit:true`.
+- No functional-role or root special case remains in the adapter; root's write
+  reach on a dev DB comes only from Story 4.2's seeded spine.
+  **CORRECTED 2026-09-12 (summary aligned to the tickets):** this summary
+  previously said `scripts/dev-grant-root.ts` "still gives root `canEdit: true`
+  on every active card". That wording is superseded and is not in the full
+  Story 4.1 ticket: 4.2d retired `scripts/dev-grant-root.ts` (backend
+  `de508c9`), and Story 4.2's corrected criterion below gives root no
+  `canEdit` on its own card or on any production target.
 - Closes the two access-control deferred-work entries ("Generalise
-  section-access authorisation"; the `profile:timeline` rename follow-up).
+  section-access authorisation"; the `profile:timeline` rename follow-up). The
+  human-key rename is delivered; the remaining `profile:timeline`
+  `canAccessSection` work is rescheduled as **DEPT-2** in `dept-epic.md`, not
+  Epic 4 scope.
 
 **Story split:** completed during the architect pass and delivered through the
 recorded AD-1 increments.
@@ -760,11 +772,17 @@ recorded AD-1 increments.
 **ID:** `PLAT-E4-S4.2` · **Sprint key:** `4-2-default-org-relationship-seed`
 
 As the person running a fresh deployment (and as a developer on a seeded dev DB),
-I want the seed to place the root identity at the top of a real reporting tree
-and hold the §2.4 full-profile grant,
-So that root administers and edits the organisation through the ordinary
-audience-resolution path, with no functional-role override anywhere in the
-authorisation code.
+I want the deploy-time bootstrap to give the root identity the operator feature
+set and the §2.4 grant, and — on a dev DB only — a seeded reporting spine to
+work against,
+So that root can administer the organisation with no dev script and no
+functional-role override anywhere in the authorisation code.
+
+> **CORRECTED 2026-09-12 (summary aligned to the ticket's 2026-09-08 PO
+> correction).** Was: *"place the root identity at the top of a real reporting
+> tree … so that root administers and edits the organisation."* Root
+> administers; it does not edit profiles by virtue of being root. The people who
+> edit a profile are that person's reporting-line manager and assigned PP.
 
 **Recorded decision (Winston + Dmytro, 2026-09-03/04; ~~the organisation's
 boss~~ **CORRECTED 2026-09-08, PO** — see SCP §9.2):** the ACM-0 seeded root
@@ -789,6 +807,38 @@ is read-only on `profile:personal-contacts`, `profile:emergency-contacts`, and
 seeded root cannot write those without being the person's PP; §2.4 is read-only
 (PM/AD-28). Accept the boundary; revisit if a concrete need appears.
 
+**Known, accepted deviation — career-timeline write (PO ruling AF-2,
+`spec-4-2a`):** the canonical `hr-admin` set includes `profile:timeline:write`,
+whose gate `canEditTimeline` has no audience half. Any `hr-admin` holder,
+including root and a delegated HR Admin, can therefore write any employee's
+career timeline. This is the one sanctioned exception to "zero data access from
+a functional role" above. It is pinned by `s42a-op-06` and closes under
+**DEPT-2** (`dept-epic.md`: the key leaves the set, 6 → 5, and timeline write
+becomes a dual gate), not in this epic. Recorded in `access-control.md`.
+
+**Known boundary — HTTP denial oracle:** Epic 4's `403` criteria cover only a
+**visible** target. `docs/project-requirements.md` §3.3.8 and PM/AD-24 also
+require `401` for an invalid or inactive session, `404` for a missing or hidden
+target, and hidden-target `404` before any mutation-permission check. The
+shipped `SectionAccessGuard` returns `403` for a missing or inactive target on
+`GET` and `PATCH /users/:id`, and `s41c-sag-01` Tests 5–6 and `umac-05` Test 3
+still pin that superseded `403`. Blocker `CONFLICT-UM-01` tracks this
+divergence (open, P1; owners PO, Architect and QE; runtime owner `UM-E0-S0.1`
+per the coverage model). Epic 4 neither closes it nor
+widens it.
+
+**Development-fixture journal exception — DECLINED 2026-09-12 (Anna Pikula, PO
++ Architect; supersedes `spec-4-2d` AF-3):** `db:dev:seed-org` originally
+wrote its fake `direct` edges with no `AccessJournal` row (AF-3, accepted
+2026-09-07 under the PO's "finish epic 4" instruction). §2.1 ("every change is
+journaled per 3.4"), §3.4, and PM/AD-29 (journal row in the same transaction)
+have no development-fixture clause, so the exception is declined. Every edge the
+seed writes now carries exactly one `kind: 'manager'` journal row in the same
+transaction, in `OrgRelationshipRepository.assignManager`'s shape (actor root,
+`before: NULL`, `after` = the edge snapshot, the same idempotency key). A no-op
+rerun writes no row. Scenario `s42d-ds-07`; backend branch
+`feat/plat-e4-dev-seed-journal`, not yet merged.
+
 **Full ticket:**
 `_bmad-output/implementation-artifacts/platform/story-4-2-default-org-relationship-seed.md`
 
@@ -796,16 +846,29 @@ seeded root cannot write those without being the person's PP; §2.4 is read-only
 
 - `canEditS1` carries no FR-permission branch; the OR-override pinning test is
   deleted.
-- On a seeded dev DB, root resolves `reporting` → `write` on `profile:identity`
-  for every active user, `canEdit: true` on every card, no adapter special case.
+- **Dev (`db:dev:seed-org`):** root resolves `reporting` → `write` on
+  `profile:identity` for every **other** active member of the seeded spine and
+  gets `canEdit: true` on those cards through ordinary audience resolution, with
+  no adapter special case. Root's **own** card stays `canEdit: false`
+  (`self: 'read'`).
+- **Production (`db:deploy` → `db:seed` → `db:bootstrap:access-control` →
+  `db:import:population`):** root resolves `colleague` to every employee;
+  `PATCH /users/:id` → `403` on every target; `canEdit: false` everywhere.
+  **CORRECTED 2026-09-12 (summary aligned to the ticket's 2026-09-08 PO
+  correction):** previously *"root resolves `reporting` → `write` … for every
+  active user, `canEdit: true` on every card"*.
 - A delegated HR Admin (FR only, no relationship): global FR-gated routes
   allowed; `PATCH /users/:id` on an unrelated person → `403`; `canEdit: false`.
 - `resolveAudiences` walks upward from targets — a tree-root viewer opening one
-  profile queries bounded by chain depth, not org size (ACM-9 measurement
-  pattern).
-- `db:dev:seed-org` throws under `NODE_ENV=production`, absent from
-  `prisma/seed.ts` and `bootstrap-access-control.ts`; ACM-1 invariant suite
-  green.
+  profile queries bounded by chain depth, not org size. The property already
+  holds (`f36d1b2`) and is locked rather than changed. The ACM-9
+  `seeded-two-level` evidence run remains an **open, non-blocking** decision
+  (ticket "Open for decision"; `dept-epic.md` GAP-2); no speedup is claimed.
+- `db:dev:seed-org` throws under `NODE_ENV=production` and is absent from
+  `prisma/seed.ts` and `bootstrap-access-control.ts`; the
+  `acm1r-fr-foundation` ACM-1 invariant suite is green (count derived from
+  `CANONICAL_PERMISSIONS`, `dept-epic.md` GAP-1 closed 2026-09-08). Seeded
+  spine edges are journaled (development-fixture exception declined above).
 
 **Depends on:** 4.1's composition decision. The architect solution-design for
 the upward-walk resolver and the separate AD-1 stages were completed before

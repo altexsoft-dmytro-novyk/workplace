@@ -88,11 +88,13 @@ permission set is:
   `sprint-change-proposal-2026-09-04-section-access-consolidation.md` §9.1.
 
 > Originally (Kernel MVP, pre-Epic-4) this set was the three `user-management:*`
-> keys only. The drift lock is split across two suites and not yet reconciled:
-> `acm1r-fr-foundation.e2e-spec.ts` still pins the three-key shape (stale),
-> `s42a-op-bootstrap-canonical-set.e2e-spec.ts` is the intended post-4.2a
-> replacement. Reconciling the count is tracked as **DEPT-4** (dept-epic.md); it
-> self-resolves when DEPT-2 takes the set back to five.
+> keys only. The drift lock is split across two suites by responsibility:
+> `s42a-op-bootstrap-canonical-set.e2e-spec.ts` owns exact set membership, and
+> `acm1r-fr-foundation.e2e-spec.ts` owns the invariants only (drift, locking,
+> uniqueness, FK shape), deriving its keys and count from the exported
+> `CANONICAL_PERMISSIONS` (DEPT-4 item done 2026-09-08, `dept-epic.md` GAP-1
+> closed; 39/39 green). The count therefore follows 6 → 5 automatically when
+> DEPT-2 removes the timeline key; DEPT-4's remaining fallout rides DEPT-2.
 
 There are no other seed-owned default grants. Reruns non-destructively ensure the
 bootstrap identities, fail atomically on conflicting seed-owned drift, and never
