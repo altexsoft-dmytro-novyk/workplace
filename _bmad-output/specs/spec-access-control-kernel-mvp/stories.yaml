@@ -579,6 +579,45 @@
     exactly `PASS`, AND its protocol version equals the protocol this run uses; a PASS baseline recorded under a different protocol version is not comparable and does not satisfy the gate.
     Record the approval of the PRIOR stage in _bmad-output/specs/spec-access-control-kernel-mvp/approvals.yaml before starting: story_id, stage, artifact_path, commit, author, approver, decision, timestamp, with author != approver. Do not start until that record exists and verifies (commit resolves, artifact present at that revision).
 
+- id: "ACM-8R-scenarios"
+  title: "ACM-8R — realign the CAP-6 Stage-1 artifacts to the superseded port binding"
+  description: >-
+    The amended CAP-6 strikes "ACCESS_CONTROL_PORT remains bound to
+    InterimAccessControlAdapter" as superseded by services/backend 0788f60.
+    Realign the five ACM8-KC Stage-1 scenario docs and the now-false
+    access-control.module.ts header comment to match.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Stage-1 prose realignment only. Author no test, no production logic, and no
+    approval record. SUBJECT A — the five scenario docs under
+    docs/test-cases/access-control-kernel/kernel-composition/. acm8-kc-02 is
+    inverted: its title, trace quote, Given, and Then all assert the interim
+    binding is unchanged, and the class it names no longer exists; rewrite it to
+    assert ACCESS_CONTROL_PORT resolves to the facade-backed adapter from the
+    unmodified real container, matching the already-inverted KC-02 in
+    test/access-control/acm8-kernel-composition.e2e-spec.ts. acm8-kc-03 is
+    inverted the same way: GET /users/:id now goes through the real facade
+    (self 200 enveloped, stranger 403), not through an interim adapter.
+    acm8-kc-01, -04, and -05 are re-checked against amended CAP-6 and edited
+    only where they repeat the struck expectation. Every trace line must resolve
+    after editing; the AD-1, AD-2, and AD-3 spine citations still hold, because
+    ACM-8 itself still adopts nothing. SUBJECT B — the header comment at
+    services/backend/src/access-control/access-control.module.ts:18-19 still
+    states User Management "still binds ACCESS_CONTROL_PORT to
+    InterimAccessControlAdapter" and that rebinding "remains User Management's
+    own, separately-gated story". The first clause is false and must be
+    corrected; the second is still true and must survive the edit, because the
+    rebind that landed has no UMAC-1-production Stage-3 approval. Comment text
+    only — change no import, provider, or export.
+    DO NOT, in this story: ratify the rebind, write any record into
+    spec-user-management-access-control-adoption/approvals.yaml, or edit the
+    Stage-2 e2e spec, which was already realigned in-tree. Reconciling the
+    missing UMAC-1-production record is the adoption package's call and is
+    deliberately out of scope here. If you find that the rebind has since been
+    reverted or independently approved, stop and report rather than guessing
+    which way to write the docs.
+
 - id: "ACM-9-final"
   title: "ACM-9 — post-composition 500-target PostgreSQL gate"
   description: >-

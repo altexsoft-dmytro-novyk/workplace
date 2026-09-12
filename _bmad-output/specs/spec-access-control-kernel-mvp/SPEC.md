@@ -143,13 +143,30 @@ misrepresenting kernel evidence as production enforcement.
 
 - **CAP-6 — Deployable kernel composition (ACM-8)**
   - **intent:** The production application container makes the completed
-    headless Access Control Kernel available without adopting it in User
-    Management.
+    headless Access Control Kernel available. ACM-8 itself adopts nothing in
+    User Management.
   - **success:** After ACM-2, ACM-3, and ACM-5 complete, `AppModule` imports
-    `AccessControlModule` and resolves `AccessControlFacade`, while
-    `ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`; no
-    User Management file, `/users` behavior, or Access Control HTTP/debug
-    endpoint changes.
+    `AccessControlModule` and resolves `AccessControlFacade`, and ACM-8 changes
+    no User Management file, `/users` behavior, or Access Control HTTP/debug
+    endpoint. That composition is approved and shipped — `ACM-8-production`,
+    `services/backend` `d2335907`. **The criterion's original second half —
+    `ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter` — is
+    superseded and no longer describes the tree.** `services/backend` `0788f60`
+    (committed 2026-09-02, subject "User management WIP (#7)") rebound
+    `ACCESS_CONTROL_PORT` to `AccessControlFacadeAdapter` in
+    `user-management.module.ts` and deleted `interim-access-control.adapter.ts`.
+    That rebind **shipped ungated** — it is the subject of User Management's
+    `UMAC-1-production` Stage 3, and no Stage-3 approval existed when it
+    landed. It was ratified late on 2026-09-12 as seven per-artifact
+    `stage-3-production` records at `0788f60` in
+    `spec-user-management-access-control-adoption/approvals.yaml`. That
+    ratification records the fact; it does not make the change retroactively
+    gated, and the ledger entry says so. CAP-6 therefore asserts nothing about
+    the live port binding beyond its existence and its provenance; the binding
+    itself remains the adoption package's to own. The five ACM8-KC Stage-1
+    scenario docs still encode the struck expectation and are realigned by
+    `ACM-8R-scenarios`; the ACM-8 Stage-2 e2e artifact was already inverted
+    in-tree and needs no work.
 
 - **CAP-7 — 500-target PostgreSQL evidence (ACM-9)**
   - **intent:** The team can pass or fail the resolver's real PostgreSQL
@@ -392,9 +409,12 @@ misrepresenting kernel evidence as production enforcement.
 
 ## Non-goals
 
-- User Management adoption is deferred work, not a story in this SPEC. A later
-  User Management-owned package must define the consumer contract, production
-  port rebinding, projection, route mapping, and real-consumer HTTP E2E.
+- User Management adoption is not a story in this SPEC. The User
+  Management-owned package owns the consumer contract, production port
+  rebinding, projection, route mapping, and real-consumer HTTP E2E. Part of
+  that work has since landed ungated in `0788f60` (see CAP-6); it is recorded
+  there as drift and remains outside this SPEC's scope to authorize, ratify, or
+  revert.
 - `/roles` API/UI, runtime role or permission management, the complete §2.3
   catalog, and any other default grant.
 - Changes to `/users`, User Management files, frontend code, profile/list/
@@ -413,6 +433,9 @@ After each code slice independently passes all three human-gated AD-1 stages,
 the production container resolves the Access Control facade, the facade
 demonstrates the approved fail-closed audiences, FR decisions, and S1/S10/S11
 base decisions against migrated PostgreSQL, and both separate ACM-9 runs
-satisfy the two-second absolute pass/fail gate. User Management remains on its
-interim adapter, due/departure behavior remains explicitly deferred, and the
-product gate remains open for the separately deferred adoption work.
+satisfy the two-second absolute pass/fail gate. Due/departure behavior remains
+explicitly deferred and the product gate remains open for the separately owned
+adoption work. This signal no longer asserts that User Management sits on an
+interim adapter: `0788f60` removed it and rebound the port ahead of the
+`UMAC-1-production` gate, ratified late on 2026-09-12 and recorded in CAP-6
+with that provenance intact.

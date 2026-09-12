@@ -46,6 +46,7 @@ STORY_IDS = [
     "ACM-2-scenarios", "ACM-2-red-tests", "ACM-2-production",
     "ACM-5-scenarios", "ACM-5-red-tests", "ACM-5-production",
     "ACM-8-scenarios", "ACM-8-red-tests", "ACM-8-production",
+    "ACM-8R-scenarios",
     "ACM-9-final",
 ]
 
@@ -194,7 +195,7 @@ def _run_checks(r: Report) -> None:
     # --- Stories --------------------------------------------------------
     r.check("stories.yaml is a list", isinstance(stories, list))
     ids = [e["id"] for e in stories]
-    r.check("story count is 29", len(stories) == 29, f"got {len(stories)}")
+    r.check("story count is 30", len(stories) == 30, f"got {len(stories)}")
     r.check("story ids unchanged and in order", ids == STORY_IDS,
             f"got {ids}")
     r.check("story ids unique", len(ids) == len(set(ids)))

@@ -1,5 +1,5 @@
 ---
-status: in-review
+status: done-ratified-late
 title: 'UMAC-1 Stage 3 — rebind ACCESS_CONTROL_PORT to the real adapter'
 type: 'chore'
 created: '2026-09-01'
@@ -12,6 +12,24 @@ deferred: []
 ---
 
 # UMAC-1 Stage 3 — rebind ACCESS_CONTROL_PORT to the real adapter
+
+## Closure (2026-09-12)
+
+**Ratified late.** The work below shipped in `services/backend` `0788f60`
+before any Stage-3 approval existed, and inside a 59-file commit that mixed it
+with Story 1.1 population import — the exact separation this story's own Note
+demanded. Per-artifact Stage-3 records were appended to `approvals.yaml` on
+2026-09-12 (author Dmytro Novyk, approver Anna Pikula); read that entry's
+header for the scope and basis of the approval.
+
+Two open items below are closed by that record: the `um-pf-01..04` PO call was
+resolved by deleting `profile-v15.e2e-spec.ts` in the following commit
+`37a339a`, and the four sanctioned-retired suites are likewise gone from the
+tree. Both deletions are accepted as intended.
+
+The three Access Control follow-ups listed below are **not** closed. They are
+carried by `ACM-8R-scenarios` in the kernel package
+(`_bmad-output/specs/spec-access-control-kernel-mvp/stories.yaml`).
 
 ## Auto Run Result
 

@@ -29,11 +29,13 @@
 #   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
 #   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
 #
-# Status: UMAC-1 Stage 1 (scenarios) and Stage 2 (red tests) are recorded
-# below (Story 0.1 read path). No Stage-3 record exists yet; the next
-# dispatch is UMAC-1-production, after independently verifying the Stage-2
-# records. UMAC-2 (write path) is unstarted and blocked on the Open
-# Decision (i) option (a) kernel seed sequence for user-management:edit.
+# Status: UMAC-1 Stage 1 (scenarios), Stage 2 (red tests), and Stage 3
+# (production) are all recorded below (Story 0.1 read path). Stage 3 is a
+# LATE record: the production change shipped in services/backend 0788f60
+# before any Stage-3 approval existed, and was ratified per-artifact on
+# 2026-09-12 — read that entry's header before citing it as a clean gate
+# pass. UMAC-2 (write path) is unstarted and blocked on the Open Decision
+# (i) option (a) kernel seed sequence for user-management:edit.
 
 approvals:
   - story_id: "UMAC-1-scenarios"
@@ -226,6 +228,113 @@ approvals:
     approver: "Dmytro Novyk"
     decision: "approved"
     timestamp: "2026-09-01T15:30:00Z"
+
+  # UMAC-1 Stage 3 — LATE RECORD, written 2026-09-12.
+  #
+  # These artifacts SHIPPED WITHOUT A PRIOR STAGE-3 APPROVAL. They landed in
+  # services/backend 0788f60 ("User management WIP (#7)", committed
+  # 2026-09-02), which carries 59 files: the UMAC-1 paths recorded below plus
+  # Story 1.1 population import and its migration
+  # (20260902001941_story_1_1_import_population), mentorship and ACM-9
+  # measurement test edits, and the ~18 pre-existing uncommitted files the
+  # UMAC-1-production story had explicitly warned "must be separated from the
+  # UMAC-1 commit". They were not separated.
+  #
+  # SCOPE OF THIS APPROVAL: the artifact_paths listed below, at that revision.
+  # NOT the commit as a whole. Every path was verified present at 0788f60
+  # before this record was written. The story's declared deletions
+  # (interim-access-control.adapter.ts, get-user.action.ts) carry no entry
+  # because a deleted path cannot satisfy the ledger's verification rule; they
+  # are recorded here in prose instead.
+  #
+  # OPEN ITEM CLOSED BY THIS RECORD: the UMAC-1-production story stood at
+  # status: in-review with an unresolved PO call on the um-pf-01..04 write-path
+  # regressions in test/user-management/epic-1/profile-v15.e2e-spec.ts. That
+  # file was deleted in the following commit 37a339a — the decision was taken
+  # by deletion, never recorded. Anna Pikula accepts that deletion as the
+  # intended resolution. The four "sanctioned retired" suites named in the
+  # story (registration, list, deactivation, profile e2e) are likewise absent
+  # from the tree and accepted as retired.
+  #
+  # BASIS: approved on the scope and provenance analysis recorded above —
+  # commit composition, artifact presence at revision, and the Epic 4
+  # dependency (49fd0c4 added section-access.guard.ts, which injects
+  # ACCESS_CONTROL_PORT) that makes reverting the rebind infeasible — not on a
+  # line-by-line re-review of the 0788f60 diff. Recorded at the real time of
+  # decision; NOT backdated to the 2026-09-01 Stage-1/Stage-2 approvals.
+  #
+  # author != approver holds: Dmytro Novyk authored 0788f60 and approved
+  # UMAC-1 Stage 2, so Stage 3 is approved by Anna Pikula.
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/user-management.module.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/infrastructure/access-control-facade.adapter.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/interfaces/identity-card-access.port.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/services/identity-card-access.service.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/actions/get-user-card.action.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/dtos/user-card.response.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/controllers/users.controller.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
 
   # UMAC-10 — the user-management:edit FR-grant OR-override on the S1 section
   # gate. Authored 2026-09-04 from shipped behaviour that umac-07 (Variant A)
