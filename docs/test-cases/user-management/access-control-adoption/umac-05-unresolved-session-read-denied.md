@@ -1,5 +1,9 @@
 # UMAC-05 · `GET /users/:id` denials — `401` for an unresolved session, `403` for an authenticated viewer with no audience
 
+> **SUPERSEDED FOR THE LIVE ORACLE 2026-09-12 — [`umac-11`](umac-11-hidden-target-denial-oracle.md).**
+> The empty-audience `403` in Test 3 below is regenerated there as `404` (PM/AD-24,
+> `CONFLICT-UM-01`). The lines below are unchanged historical evidence.
+
 > **SUPERSEDED 2026-09-02 — PM/AD-24.** Historical AD-1 evidence of the 2026-09-01
 > empty-audience `403` product decision. Not the live denial oracle.
 > Live rule: invalid/inactive session `401`; missing or hidden-existence target

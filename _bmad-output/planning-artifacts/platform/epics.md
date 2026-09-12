@@ -203,7 +203,7 @@ These apply to **every** story in Epics 5, 6, 7, and 8. They are stated once and
 
 | Precondition | Severity / status | Effect on Epics 5–8 |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` **returned** `Boolean(userId)` and the interim session resolver **self-provisioned** a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check would widen the blast radius of that bypass rather than being protected by it. *(Corrected 2026-09-11: the bypass described above no longer exists in code. `interim-session-resolver.adapter.ts` and `interim-access-control.adapter.ts` were deleted in `services/backend` `37a339a` (2026-09-04); `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`), and the `Bearer <token:persona>` shorthand survives only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`. The precondition stays **open pending re-adjudication** — closure needs this project's own verification run, per `blockers.yaml` `status_note` — but it no longer rests on the evidence stated here.)* |
+| `SEC-AUTH-01` | **P0 — CLOSED 2026-09-12** (`architecture/blocker-verification-2026-09-12.md`; backend merge pending) | `isAllowedForTarget` **returned** `Boolean(userId)` and the interim session resolver **self-provisioned** a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check would widen the blast radius of that bypass rather than being protected by it. *(Corrected 2026-09-11: the bypass described above no longer exists in code. `interim-session-resolver.adapter.ts` and `interim-access-control.adapter.ts` were deleted in `services/backend` `37a339a` (2026-09-04); `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`), and the `Bearer <token:persona>` shorthand survives only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`. The precondition stays **open pending re-adjudication** — closure needs this project's own verification run, per `blockers.yaml` `status_note` — but it no longer rests on the evidence stated here.)* | *(2026-09-12: both interim paths are gone, and the residual `ALLOW_TEST_SESSION_TOKENS` production path is refused. This precondition no longer blocks Epics 5–8; the remaining rows still apply.)*
 | `UMAC-1` / `UM-E0-S0.1` | **in-progress** | Kernel consumer adoption is incomplete. Epics 5–8 deliver facade decisions; they do not rebind `/users`. Not a deliverable of this pass. |
 | `OQ-PERM-01` | P1 open | Default role-to-permission matrix is unapproved. No story seeds, infers, or defaults a functional-role grant. |
 | `CC-07` / PM/AD-29 | **P0 open** | No `AccessJournal` table exists. Any story whose behaviour requires a journal entry (Epic 7 shared-link access) may specify the same-transaction contract but cannot produce closure evidence. |
@@ -1734,7 +1734,7 @@ External gates, none of which any story here can close:
 - `AC-SECTION-MATRIX-01` (registered 2026-09-03) → PLAT-E6-S6.3 … S6.6
 - `PM-FR-5` (`specified` 2026-09-03 via `user-management` `UM-E8`/`UM-E7`; `UM-E7` unshipped) → PLAT-E6-S6.6
 - `CC-07` (P0) → PLAT-E7-S7.1 journal enrolment evidence
-- `SEC-AUTH-01` (P0) → production evidence for every story in Epics 5–8
+- `SEC-AUTH-01` (P0) → production evidence for every story in Epics 5–8 — **closed 2026-09-12**
 - `UMAC-1` in-progress → consumer adoption; not this pass
 
 ## Open Follow-Ups (Epics 5–8) — Not Stories
@@ -1760,7 +1760,7 @@ External gates, none of which any story here can close:
 
 | ID | Severity | Why it is not absorbed |
 |---|---|---|
-| `SEC-AUTH-01` | P0 open | Precondition. No E5–E8 story may reach production evidence while open. |
+| `SEC-AUTH-01` | P0 open *(2026-09-02 record; **closed 2026-09-12**, see `blocker-verification-2026-09-12.md`)* | Precondition. No E5–E8 story may reach production evidence while open. |
 | `UMAC-1` | in-progress | Precondition. Consumer adoption is not this pass. |
 | `TT-IDENTITY-01` | P0 open | Epic 8 cannot close it. Completing E8 must not promote PM-FR-2 to `implemented`. |
 | `DEPARTMENT-EDGE` | P1 open | Epic 5 cannot close it (PM/AD-35 schema unowned, SD-4). |

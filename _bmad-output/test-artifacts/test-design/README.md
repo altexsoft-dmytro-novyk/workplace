@@ -157,9 +157,10 @@ silently lost. **None of them counts as requirement coverage.**
    **informational and is not promoted here**. **C** = the P6 `resolveAudiences` measurement,
    **not a gate**. B and C are not evidence for A, and a PASS on A is not evidence for either.
 3. **`PG-01` is not schedulable today.** Its per-file-approval rationale is retired; its
-   conclusion rests on three currently open blockers (`SEC-AUTH-01` P0, `CC-07` P0,
-   `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1). **Schedulable when all four are closed at
-   implementation** (U-20 resolved); evaluated by Platform epic owner + Architect.
+   conclusion rests on the blockers still open: `CC-07` P0 and `AC-S9-S13`/`AC-SECTION-MATRIX-01` P1.
+   `SEC-AUTH-01` was **closed 2026-09-12** (`…/architecture/blocker-verification-2026-09-12.md`; backend
+   merge pending). **Schedulable when all four are closed at implementation** (U-20 resolved);
+   evaluated by Platform epic owner + Architect.
 
 ---
 

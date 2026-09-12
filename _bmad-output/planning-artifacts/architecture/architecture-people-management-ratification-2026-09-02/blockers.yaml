@@ -237,9 +237,10 @@ blockers:
     owner: Product Owner, Architect, and Quality Engineering
     severity: P1
     blocks: ['Single empty-audience denial oracle for GET /users/:id']
-    status: open
+    status: closed
+    closed: 2026-09-12
     design_status: resolved-approved
-    implementation_status: stale-and-divergent
+    implementation_status: implemented
     alternatives: [403, 404]
     superseded_design: empty-audience-403-2026-09-01
     decision_refs: [PM/AD-24]
@@ -258,6 +259,20 @@ blockers:
       Design resolved 2026-09-02 by PM/AD-24, which supersedes the UMAC 403
       empty-audience decision. Implementation still splits 403/404/bypass. Marked
       scenarios remain historical.
+    closure_note: >
+      Closed 2026-09-12 (requester: Anna Pikula; independently re-verified). The
+      regenerated Stage-1 scenario is
+      docs/test-cases/user-management/access-control-adoption/umac-11-hidden-target-denial-oracle.md.
+      Its Stage-2 suite was red on the 404 cases against backend d1ef680.
+      Production handler: SectionAccessGuard resolves :id as an active User and
+      returns a leak-free 404 before hasSectionAccess, on GET and PATCH /users/:id
+      (backend branch feat/conflict-um-01-hidden-target-404, commit 89ea674).
+      SessionGuard still returns 401 first, and 403 remains for a visible target.
+      Superseded 403 assertions (umac-05 Test 3, s41c-sag-01 Tests 5-6,
+      s41c-sag-04 Test 5) were flipped with annotations; the scenario docs received
+      SUPERSEDED blockquotes, not rewritten expectedResult lines. Record:
+      _bmad-output/planning-artifacts/architecture/blocker-verification-2026-09-12.md.
+      Reopens if that branch is not merged to services/backend main.
 
   - id: OQ-PERM-01
     owner: Product Owner
@@ -411,7 +426,8 @@ blockers:
       - Deployment of interim adapters to any shared environment
       - AD-12 privilege-escalation invariant
       - AD-16 no-provisioning-API invariant
-    status: open
+    status: closed
+    closed: 2026-09-12
     evidence:
       - services/backend/src/user-management/infrastructure/interim-session-resolver.adapter.ts:43-48
       - services/backend/src/user-management/infrastructure/interim-session-resolver.adapter.ts:74-87
@@ -482,6 +498,21 @@ blockers:
       has not happened. This correction retires the factual claim, not the blocker:
       SEC-AUTH-01 is open pending re-adjudication, no longer open on stated evidence.
       Downstream artifacts still carrying the retired claim are listed in that SCP.
+    closure_note: >
+      Closed 2026-09-12 (requester: Anna Pikula; this project's own verification,
+      independently re-verified; record:
+      _bmad-output/planning-artifacts/architecture/blocker-verification-2026-09-12.md).
+      The interim adapters are absent from the production module (git ls-files shows
+      no interim file; user-management.module.ts:214-215 binds
+      JwtSessionResolverAdapter and AccessControlFacadeAdapter). One residual path
+      was found and fixed. At d1ef680, env.validation.ts only defaulted
+      ALLOW_TEST_SESSION_TOKENS to false under NODE_ENV=production, and an explicit
+      true validated. That re-enabled the Bearer <token:persona> shorthand and Root
+      'HR Admin' self-provisioning, i.e. paths (1) and (2). Backend branch
+      fix/sec-auth-01-refuse-test-tokens-in-production (commit 45a671e) makes an
+      explicit true a startup validation error (valid(false)), with a unit test
+      that was red before the change. Reopens if that branch is not merged to
+      services/backend main.
 
   - id: CC-08
     owner: Architect

@@ -140,9 +140,12 @@ development_status:
   # ALL enter as `backlog`: coverage records them `status: specified`, which
   # means "a story exists that owns this FR" - it is NOT `done` and was not
   # converted into a tracking status. No story has execution evidence.
-  # Blocking preconditions are unchanged and are NOT closed by registration:
-  # SEC-AUTH-01 (P0 open) blocks production evidence for every story below, and
-  # each carries the SD-8 ACM-9 re-baseline obligation.
+  # Registration closes no blocking precondition. SEC-AUTH-01 (P0) was CLOSED
+  # 2026-09-12 by verification, not by registration
+  # (architecture/blocker-verification-2026-09-12.md; backend merge pending), so it
+  # no longer blocks production evidence for the stories below. The per-epic gates
+  # listed with each epic still apply, and each story carries the SD-8 ACM-9
+  # re-baseline obligation.
   # ---------------------------------------------------------------------------
 
   # Epic 5 - Department Walk and People Partner HR-Line.
