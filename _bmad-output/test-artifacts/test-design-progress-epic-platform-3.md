@@ -2,14 +2,14 @@
 runScope: 'epic'
 runKey: 'epic-platform-3'
 workflowStatus: 'generated'
-totalSteps: 8
-stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction', 'step-07-post-revalidation-edit', 'step-08-open-item-12-widened']
-lastStep: 'step-08-open-item-12-widened'
-nextStep: 'C-1, C-3, C-4 and W-1 closed; C-2 recorded as plan Open item 12 (five artifacts, root at SPEC CAP-6) and recommended to DEPT-4. An Edit cannot clear a verdict — a further Epic Validate is required to supersede CONCERNS'
+totalSteps: 9
+stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output', 'step-06-post-validation-correction', 'step-07-post-revalidation-edit', 'step-08-open-item-12-widened', 'step-09-post-third-validate-edit']
+lastStep: 'step-09-post-third-validate-edit'
+nextStep: 'Third Epic Validate returned CONCERNS on two findings; both closed by this Edit. C-2 remains recorded, not resolved — plan Open item 12, now seven artifacts, root at SPEC CAP-6, owner the in-flight `ACM-8R-scenarios` story (this supersedes the earlier DEPT-4 suggestion). Four WARNs from the third run are open and were out of this Edit''s requested scope. An Edit cannot clear a verdict — a further Epic Validate is required to supersede CONCERNS'
 approvalStatus: 'granted'
 approvalGrantedBy: 'Anna Pikula'
 approvalGrantedDate: '2026-09-12'
-validationStatus: 'CONCERNS (2026-09-12, re-validation)'
+validationStatus: 'CONCERNS (2026-09-12, third run)'
 validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-3.md'
 lastSaved: '2026-09-12'
 epicId: 'PLAT-E3'
@@ -236,7 +236,8 @@ is unaffected.
 ## Step 8 — Open item 12 widened after tracing C-2 to its root (2026-09-12)
 
 Step 7 recorded C-2 against three artifacts. Tracing the claim to its source showed the reach is
-five, and that the ordering implied by the earlier text was backwards.
+five, and that the ordering implied by the earlier text was backwards. *(Step 9 corrected the count
+again: the reach is **seven** — `acm8-kc-01` and `acm8-kc-05` also carry it.)*
 
 - **The root is the SPEC, not the cards.** `spec-access-control-kernel-mvp/SPEC.md:150` — CAP-6's
   *success* criterion — still reads "`ACCESS_CONTROL_PORT` remains bound to
@@ -273,3 +274,46 @@ logical change, for the reasons stated there. The index was not written: no inde
 
 **Result:** record-only. C-2 remains **not resolved** — its fix lives in `SPEC.md`,
 `docs/test-cases/**` and `src/**`, all outside this plan's file set. The CONCERNS verdict stands.
+
+## Step 9 — Edit after the third Epic Validate (2026-09-12)
+
+The third Epic Validate ran at baseline `4956cf6` and returned **CONCERNS** with two concerns and
+four WARNs. It verified the Step 7 closures rather than taking them on trust — zero surviving
+occurrences of the S10/S11 "no named owner" claim, of the stale "has not yet run" prose, or of the
+duplicated sentence — and re-checked Step 8's whole root-trace against primary sources, where every
+citation held: `SPEC.md:150`, the verbatim UMAC-1 follow-up list, the `ACM-8-scenarios` Stage-1
+approval record, the absent `access-control` planning domain, and the in-flight `ACM-8R-scenarios`
+story.
+
+| Finding | Disposition |
+| --- | --- |
+| C-1 — this checkpoint's `nextStep` still routed C-2 to DEPT-4, which Step 8's own body records as superseded by `ACM-8R-scenarios` | **Closed.** `nextStep` rewritten. The report noted this was the third instance of one pattern — the audit's F-4, then C-1 of the second run, then this — each a correction applied to a body with a metadata field left behind. |
+| C-2 — plan Open item 12 presented a completed root-trace whose enumeration was short by two | **Closed in the plan.** The table now lists **seven** artifacts: `acm8-kc-01:5` quotes CAP-6's success criterion including the struck clause, and `acm8-kc-05:9, 29–30` quotes the superseded binding and requires a corrected comment to call the rebind "not-yet-authorized", which the UMAC-1 Stage 3 cutover made false. `acm8-kc-04` is named as the one clean composition card. The seven-artifact reach and the in-flight story's five-card scope are now distinguished. |
+
+**The underlying dependency is unchanged.** C-2 stays **recorded, not resolved**: closing it needs
+`SPEC.md`, `docs/test-cases/**` and `src/**`, none of which this plan may write. What this Edit
+corrected is the plan's *description* of the dependency, not the dependency.
+
+**Metadata synced in the same pass, deliberately.** Closing only the two findings would have left
+`validationStatus`, `independentRevalidation`, the plan's Status line, its header record and its
+Approval section all naming the second run's verdict while a third had landed — re-creating the
+exact pattern C-1 names. Everything was carried to `CONCERNS (2026-09-12, third run)` together.
+
+**Out of scope, stated rather than silently skipped.** The third run's four WARNs are open: the
+pair's restated fourth gate threshold is still not carried; no test counts (by design, `PR-009`);
+this checkpoint's Pact input inventory still omits `pactjs-utils-zod-to-pact.md` and three
+`pact-*` documents; and Open item 12 cites the module header comment at `access-control.module.ts:15`
+while the quoted clause is at `:17–18`. The requested scope was C-1 and C-2.
+
+**§4.3 disposition.** Unchanged from Step 7 and for the same reasons: §4.1 treats the plan and its
+matching checkpoint as one epic write unit, C-1 is a checkpoint defect and unclosable otherwise,
+and §4.3's restriction reads as isolation from other epics and the system pair rather than a bar on
+this run's own state file.
+
+**Index not written.** Both indexed facts — approval granted, verdict CONCERNS (third run) — were
+already current in `test-design/README.md`, so no indexed fact changed. §4.3 permits an index write
+only when one does.
+
+**Result:** correction only. No suite was executed, no approval changed, and an Edit cannot clear a
+verdict. `CONCERNS (2026-09-12, third run)` stands until a further Epic Validate runs against this
+text. With both concerns closed, the findings remaining against this pair are WARN-level only.
