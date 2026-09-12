@@ -7,7 +7,7 @@ epicSourceHeading: '## Epic 1: Platform Spec v1.5 Alignment'
 runKey: 'epic-platform-1'
 validationScope: 'epic'
 validationDate: '2026-09-12'
-runBaselineHead: '83aeabfcd1a4679ffe952472eef4e5302ad85fac'
+runBaselineHead: 'ce84f7c80cdf10a6c2dff191d268acb0d328c0f9'
 verdict: 'PASS'
 supersedes: 'CONCERNS validation of the pre-edit PLAT-E1 plan on 2026-09-12'
 ---
@@ -18,7 +18,7 @@ supersedes: 'CONCERNS validation of the pre-edit PLAT-E1 plan on 2026-09-12'
 `_bmad-output/planning-artifacts/platform/epics.md` `## Epic 1: Platform Spec v1.5 Alignment`
 **Run key:** `epic-platform-1`
 **Repository `HEAD` (captured before this run's first write, run baseline):**
-`83aeabfcd1a4679ffe952472eef4e5302ad85fac`
+`ce84f7c80cdf10a6c2dff191d268acb0d328c0f9`
 
 > **What this report is not.** It grants no approval, asserts no achieved coverage, and changes no
 > sprint status, gate, ClickUp mapping, service code, or service gitlink. It evaluates the
@@ -27,8 +27,9 @@ supersedes: 'CONCERNS validation of the pre-edit PLAT-E1 plan on 2026-09-12'
 
 This report **supersedes the earlier 2026-09-12 CONCERNS validation** of the pre-edit plan. That
 report identified four E1 plan freshness/specificity defects (U-16, TimeTracker provenance, U-18,
-and ACM-9 evidence paths). The current plan hash below contains the scoped Edit that addressed all
-four; the earlier report is not a verdict on this content.
+and ACM-9 evidence paths). The previous PASS was then re-evaluated after the plan added an
+AC→AV trace, six focused artifact-verification obligations, and corrected source anchors; neither
+prior report is a verdict on the content hash below.
 
 ---
 
@@ -38,12 +39,12 @@ Working-tree content read before this report and its index update were written:
 
 | Artifact | Role | SHA-256 |
 | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-platform-1.md` | Evaluated epic plan | `f6a3d25e16778f7c051d06fd2980622b650268230c009742f5d6e701a789179c` |
+| `_bmad-output/test-artifacts/test-design-epic-platform-1.md` | Evaluated epic plan | `c21f664271a10fa91707e8d286866309cd331a9e244d8c373d843c0cdde5a31e` |
 | `_bmad-output/test-artifacts/test-design-architecture.md` | Canonical system pair — architecture | `133efa612ad55b012fc8be9bc6a77d1d6f55e4bbdba99a8ee0404acccb648ec5` |
 | `_bmad-output/test-artifacts/test-design-qa.md` | Canonical system pair — QA | `b9f95b0946054063df722f8b007577b37fa35893c0a2ba9cc35d5c6e69aad84c` |
 | `_bmad-output/test-artifacts/test-design-progress-epic-platform-1.md` | Identity cross-check and separately recorded requester approval | `b5d400095b9b70d3de913468e222a437bfc7fcf3e41656b036383a05517baa6a` |
 | `_bmad-output/planning-artifacts/platform/epics.md` | Canonical epic source | `ad5a90fba020c04a0fc58137ac5f9f28656e6f4477952a1f15714e38e8e36509` |
-| `_bmad-output/test-artifacts/test-design/README.md` | Current-artifact index; read for scope resolution and updated by this run | `f1bd8ee0d7957bcb7ce9b7e30738728af74545f8ad434bd18f91d1a6015b958b` |
+| `_bmad-output/test-artifacts/test-design/README.md` | Current-artifact index; read for scope resolution and updated by this run | `4521e8d7e0a14029d6998844aa06e15807c03bda97612f0d92d00feb39d030b6` |
 
 **Identity cross-check:** plan, checkpoint and canonical source agree on `PLAT-E1` /
 `platform` / `1` / `## Epic 1: Platform Spec v1.5 Alignment`. The `### Epic 1` occurrence is a
@@ -56,9 +57,10 @@ summary mention, not a second authoritative body. No identity mismatch was found
 ### Prerequisites and context loading — PASS
 
 The canonical Epic 1 body provides nine stories with explicit acceptance criteria. The architecture
-and QA system pair are available and were loaded. The plan's 21 `plat-e1:AV-*` obligations cover
+and QA system pair are available and were loaded. The plan's 27 `plat-e1:AV-*` obligations cover
 all nine stories via `repository-audit` / `manual-review`, appropriate evidence levels for a
-documentation-alignment epic with no runtime surface.
+documentation-alignment epic with no runtime surface. Its AC→AV trace makes every Epic 1 AC
+discoverable through a named obligation or an explicit external runtime-evidence owner.
 
 ### Risk assessment and NFR planning — PASS
 
@@ -69,9 +71,12 @@ separate. `QUALITY-GATE-AC-NFR` is explicitly Contract B only.
 
 ### Coverage design — PASS
 
-Every story has named obligations: S1.1 (`AV-01..04`), S1.2 (`AV-15`), S1.3 (`AV-09..12`), S1.4
-(`AV-13..14`), S1.5 (`AV-16`), S1.6 (`AV-17..20`), S1.7 (`AV-21`), S1.8 (`AV-05..07`) and S1.9
-(`AV-08`). Priorities are assigned without claiming runtime execution or coverage achieved.
+Every story and acceptance-criterion group has named obligations: S1.1 (`AV-01..04`, `AV-22`),
+S1.2 (`AV-15`), S1.3 (`AV-09..12`, `AV-23`), S1.4 (`AV-13..14`, `AV-24..25`), S1.5 (`AV-16`),
+S1.6 (`AV-17..20`, `AV-26`), S1.7 (`AV-21`), S1.8 (`AV-05..07`, `AV-27`) and S1.9 (`AV-08`).
+The trace distinguishes Epic 1's documentation audit from runtime proof: `TR-2.1-06` owns
+platform-relation next-request evidence and `TR-2.1-07` owns project timing/outage evidence.
+Priorities are assigned without claiming runtime execution or coverage achieved.
 
 The four pre-edit concerns are now addressed:
 
@@ -82,6 +87,10 @@ The four pre-edit concerns are now addressed:
 3. U-18 now consistently records its resolved state in both the plan and the system architecture.
 4. `AV-19` names the immutable baseline and final ACM-9 JSON paths at `3a3cd718…` and keeps them
    separate from functional P0 and Contract A / `PG-04`.
+5. The AC-traceability remediation corrects the S1.1 gate/count source anchors and S1.3
+   PM/AD-28 AC number; it adds reproducible audits for S1.1 traceability content, S1.3 audience
+   alignment, S1.4 journal/permission/invariant binding and revocation clocks, S1.6 integration
+   scope, and S1.8 handoff/resolved-decision boundaries.
 
 ### Deliverables, execution and quality criteria — PASS for this scope
 
@@ -94,8 +103,9 @@ canonical QA document rather than duplicating them in a documentation-only epic 
 
 The plan now agrees with the canonical Epic 1 source and the architecture pair on U-16, U-18,
 TimeTracker provenance, live successor gate IDs, historical P0 debt and the immutable ACM-9
-Contract-B evidence. It does not promote the evidence to a functional P0 or directory performance
-PASS.
+Contract-B evidence. The AC trace preserves the separate owners for next-request and project-sync
+runtime proof; it does not promote the documentation audit to a functional P0 or directory
+performance PASS.
 
 ### Evidence-based assessment and document quality — PASS
 
