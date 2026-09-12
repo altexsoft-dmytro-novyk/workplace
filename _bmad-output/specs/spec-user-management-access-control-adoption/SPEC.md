@@ -36,14 +36,16 @@ sources:
 > 2026-09-01 — see the alignment proposal §8): decision (i) = option (a),
 > (iii) = dedicated Epic 0, (iv) = Epic 2 owns the session resolver, (v) =
 > photo Self-only, (vi) = no separate photo permission. All three `UMAC-1`
-> stages are now recorded in this package's `approvals.yaml`, but Stage 3
-> (`UMAC-1-production`) is a **late record**: the rebind shipped in
+> stages have historical records in this package's `approvals.yaml`, but Stage 3
+> (`UMAC-1-production`) also has separate **late-ratification classifications**:
+> the rebind shipped in
 > `services/backend` `0788f60` before any Stage-3 approval existed, inside a
-> 59-file mixed commit, and was ratified per-artifact on 2026-09-12. Read that
-> ledger entry's header before citing UMAC-1 as a clean gate pass. `UMAC-2`
+> 59-file mixed commit, and was classified per-artifact on 2026-09-12. Those
+> `ratifications` records preserve the evidence and non-compliance; they do not
+> make UMAC-1 a clean gate pass. `UMAC-2`
 > remains blocked on the kernel seed for `user-management:edit`. Every
-> remaining stage still runs the AD-1 gate with independent human approval —
-> UMAC-1 is the exception this package must not repeat.
+> remaining stage follows AD-1 ordering without an approval gate — UMAC-1 is an
+> out-of-order historical exception this package must not repeat.
 
 # User Management — Access Control Adoption
 
@@ -301,11 +303,12 @@ separately tracked FR-17 Profile Projection story.
   shared links, and full-profile overlay all remain out of scope and
   fail-closed. The `access-control.md` "Open product decisions" (full-profile
   column mapping, Self precedence) are untouched.
-- **AD-1 unchanged.** Scenario prose (independently human-approved) → red
-  Stage-2 E2E (independently human-approved, committed red) → production, one
-  dispatch per stage, `author != approver`, recorded in this package's
-  `approvals.yaml`. The validation-only evidence exception does not apply —
-  every capability here changes production code.
+- **AD-1 ordering.** Scenario prose → committed-red Stage-2 E2E → production.
+  No approval ledger entry blocks a stage; historical `approvals` records do
+  not authorize one. A late `ratifications` record may only preserve the
+  evidence and rationale for already-completed out-of-order work, with
+  `recorded-late-not-gated` disposition. The validation-only evidence exception
+  does not apply — every capability here changes production code.
 - **`services/backend` only for code stages.** All test and production code
   lands in the `services/backend` submodule. `prisma/schema.prisma`,
   migrations, and `prisma/seed.ts` are **not** touched by this package —
@@ -357,8 +360,8 @@ active viewer's audience over the target is empty *(historical empty-audience
 `PUT /users/:id/photo` are refused unless both the functional permission and
 `write` S1 section access hold (once the permission exists); the
 real-consumer HTTP → router → session → AccessControl → PostgreSQL E2E passes
-with no provider overrides; and every stage carries an independent human
-approval in this package's `approvals.yaml`. The read leak
+with no provider overrides; and every stage preserves AD-1 ordering without a
+human approval gate. The read leak
 (`isAllowedForTarget` returning `Boolean(userId)`) is closed. The *further*
 FR-17 field/record narrowing and the broader access program remain
 explicitly deferred.

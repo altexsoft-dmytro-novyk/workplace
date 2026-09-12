@@ -34,3 +34,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/platform/spec-ci-promote-backend-unit-frontend-e2e-gates.md`
   summary: The `it.todo` count in `docs/ci.md` is stale — it says 19; there are 31, all under `services/backend/test/` (e2e), none in `src/`.
   evidence: Pre-existing sentence, left alone to respect the "do not rewrite beyond the affected passage" scope. Misleading next to the "19 cases" backend-unit figure.
+
+- source_spec: `_bmad-output/implementation-artifacts/platform/spec-r10-late-ratification-policy.md`
+  summary: Nine historical Access Control Foundation scenario documents retain `Approved:` metadata and need a separately scoped metadata migration.
+  evidence: The live authoring pattern now forbids approval-status lifecycle, but `docs/test-cases/access-control-foundation/**/*.md` retains nine historical `Approved:` lines. They are preserved as evidence rather than silently rewritten in this policy correction.
+
+- source_spec: `_bmad-output/implementation-artifacts/platform/spec-r10-late-ratification-policy.md`
+  summary: Historical scenario-area READMEs and stored dispatch artifacts still contain withdrawn AD-1 approval-gate wording and need a dedicated preservation-aware migration.
+  evidence: The correction updates canonical authority, the root authoring pattern, currently referenced specifications, and live dispatch indexes. A repository-wide rewrite would also change historical scenario records and stored stage artifacts across Access Control, User Management, Mentorship, and Frontend, exceeding this R10 policy correction.

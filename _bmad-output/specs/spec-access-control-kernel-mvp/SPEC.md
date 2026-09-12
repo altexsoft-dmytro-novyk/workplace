@@ -279,23 +279,21 @@ misrepresenting kernel evidence as production enforcement.
   ACM-3's approved partial Stage 2 is not a counter-precedent: a partial Stage 2
   is a legitimate increment that leaves its story `in-progress`, and ACM-3 has
   no Stage-3 approval either.
-- Every code slice follows AD-1 as three distinct dispatches: scenario prose,
-  explicit human approval, committed-red Stage-2 evidence, explicit human
-  approval, then production implementation. No automated workflow or agent may
-  author or cross two stages in one dispatch.
+- Every code slice follows AD-1 ordering: scenario prose, committed-red Stage-2
+  evidence, then production implementation. Human approval is not a stage gate,
+  and a dispatch may span stages only while preserving the committed ordering.
 - Every dispatch entry in `stories.yaml` has both `spec_checkpoint: true` and
-  `done_checkpoint: true`; the authoring agent cannot approve its own output.
-- Every AD-1 stage approval is appended to `approvals.yaml` beside this SPEC as
-  `story_id`, `stage`, `repo`, `artifact_path`, `commit`, `author`, `approver`,
-  `decision`, and `timestamp`. `repo` is `workspace` or `services/backend` and
-  `artifact_path` is relative to that repository's root: this workspace spans
-  two git repositories, so a bare revision cannot identify which one, and an
-  unresolvable approval is not verifiable. `author` and `approver` must differ,
-  and a dispatch may not start until the prior stage's record exists **and**
-  verifies — the commit resolves in the named repository and the artifact is
-  present at that revision. A prose
-  assertion that a stage was approved is not an approval. The ledger is
-  append-only; a superseding decision is appended, never edited in place.
+  `done_checkpoint: true`; they are workflow pauses, not human-approval gates.
+- `approvals.yaml` preserves historical AD-1 decision records with `story_id`,
+  `stage`, `repo`, `artifact_path`, `commit`, `author`, `approver`, `decision`,
+  and `timestamp`. It never authorizes or blocks a stage. A separately typed,
+  append-only `ratifications` record can classify only already-completed
+  out-of-order work, naming a resolvable artifact/commit, author, independent
+  ratifier, decision time, evidence, rationale, and
+  `recorded-late-not-gated` disposition. It records non-compliance and cannot
+  make a stage transition compliant. `repo` remains `workspace` or
+  `services/backend`; a bare revision cannot identify which repository it
+  belongs to.
 - Stage-2 uses the public `AccessControlFacade` through a real Nest testing
   module importing `AccessControlModule`, real Prisma adapters, migrated
   PostgreSQL, and seeded fixtures. Access Control repository fakes, User

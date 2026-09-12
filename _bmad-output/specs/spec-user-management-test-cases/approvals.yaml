@@ -1,11 +1,12 @@
-# AD-1 stage-approval ledger — User Management test cases
+# AD-1 historical-decision ledger — User Management test cases
 #
-# Append-only. A superseding decision is APPENDED; no entry is ever edited or
-# removed. This file is the persisted, independently verifiable form of the
-# AD-1 gate: a claim in a report that "a human approved this" is not an
-# approval, this record is.
+# `approvals` is append-only historical evidence from the withdrawn AD-1 gate;
+# its entries are never edited, removed, or used to authorize or block a stage.
+# A separately typed `ratifications` list may record a late classification of
+# already-completed out-of-order work. It records non-compliance and is never a
+# clean gate pass or a stage-transition authorization.
 #
-# Schema — every entry carries all eight fields:
+# Historical `approvals` schema — every entry carries all nine fields:
 #
 #   - story_id:      dispatch entry id (e.g. "UM-6-1-scenarios")
 #     stage:         stage-1-scenarios | stage-2-tests | stage-3-production
@@ -14,24 +15,23 @@
 #     commit:        revision in THAT repo at which the artifact was read
 #     author:        who produced the artifact
 #     approver:      who approved it
-#     decision:      approved | rejected
+#     decision:      historical approved | rejected decision
 #     timestamp:     ISO-8601
 #
-# Rules that make the record enforceable:
-#   1. author != approver (no self-certification).
-#   2. A dispatch may not start until the PRIOR stage's record exists and
-#      VERIFIES — `commit` resolves and `artifact_path` is present at it.
+# Late `ratifications` schema — every entry carries: story_id, stage, repo,
+# artifact_path, commit, author, ratifier, ratified_at, evidence, rationale,
+# and disposition: recorded-late-not-gated. `author != ratifier`; `commit` and
+# `artifact_path` must resolve in `repo`. The record can classify only work
+# already completed before `ratified_at`; it cannot validate that ordering.
 #
 # Verify:
 #   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
 #   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
 #
-# Status: Story 6.1 (read the current manager and People Partner) Stage-1
-# scenarios are recorded below. NOTE the ordering: the Stage-2 suite
+# Status: Story 6.1 historical Stage-1 records remain below. The Stage-2 suite
 # (services/backend test/user-management/epic-4/relationships-read.e2e-spec.ts)
-# was authored and green BEFORE these scenarios existed — an AD-1 inversion,
-# reconciled on 2026-09-04. No stage-2 record is claimed here; approving these
-# scenarios ratifies behaviour that already ships.
+# predated those scenarios — an AD-1 inversion recorded on 2026-09-04. The
+# records preserve that history; they do not authorize a later stage.
 
 approvals:
   - story_id: "UM-6-1-scenarios"

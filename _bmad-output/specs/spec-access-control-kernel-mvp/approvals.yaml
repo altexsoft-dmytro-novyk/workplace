@@ -1,11 +1,12 @@
-# AD-1 stage-approval ledger — Access Control Kernel MVP
+# AD-1 historical-decision ledger — Access Control Kernel MVP
 #
-# Append-only. A superseding decision is APPENDED; no entry is ever edited or
-# removed. This file is the persisted, independently verifiable form of the
-# AD-1 gate: a claim in a report that "a human approved this" is not an
-# approval, this record is.
+# `approvals` is append-only historical evidence from the withdrawn AD-1 gate;
+# its entries are never edited, removed, or used to authorize or block a stage.
+# A separately typed `ratifications` list may record a late classification of
+# already-completed out-of-order work. It records non-compliance and is never a
+# clean gate pass or a stage-transition authorization.
 #
-# Schema — every entry carries all eight fields:
+# Historical `approvals` schema — every entry carries all nine fields:
 #
 #   - story_id:      dispatch entry id from stories.yaml (e.g. "ACM-0-scenarios")
 #     stage:         stage-1-scenarios | stage-2-tests | stage-3-production
@@ -14,7 +15,7 @@
 #     commit:        revision in THAT repo at which the artifact was read
 #     author:        who produced the artifact
 #     approver:      who approved it
-#     decision:      approved | rejected
+#     decision:      historical approved | rejected decision
 #     timestamp:     ISO-8601, e.g. 2026-09-01T14:03:00Z
 #
 # `repo` exists because this workspace spans two git repositories: planning
@@ -23,27 +24,22 @@
 # to, and an approval nobody can resolve is not verifiable — the exact failure
 # this ledger was introduced to prevent.
 #
-# Two rules make the record enforceable rather than decorative:
-#
-#   1. author != approver. This is the persisted form of the
-#      no-self-certification rule in docs/architecture/testing-strategy.md.
-#   2. A dispatch may not start until the PRIOR stage's record exists and
-#      VERIFIES — `commit` resolves and `artifact_path` is present at that
-#      revision. An unverifiable record blocks the next stage exactly as a
-#      missing one does.
+# Late `ratifications` schema — every entry carries: story_id, stage, repo,
+# artifact_path, commit, author, ratifier, ratified_at, evidence, rationale,
+# and disposition: recorded-late-not-gated. `author != ratifier`; `commit` and
+# `artifact_path` must resolve in `repo`. The record can classify only work
+# already completed before `ratified_at`; it cannot validate that ordering.
 #
 # Verify a record before relying on it — `repo` selects the working directory,
 # so the check is unambiguous:
 #   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
 #   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
 # A record whose commit does not resolve, or whose artifact_path is absent at
-# that commit, blocks the next stage exactly as a missing record does.
+# that commit, is not independently verifiable and must not be ratified.
 #
-# Status: ACM-3-scenarios and ACM-1-scenarios stage-1-scenarios recorded
-# below. No other story has an approval yet, and no Stage-2 or Stage-3 record
-# exists for either — the next dispatch for each (ACM-3-red-tests /
-# ACM-1-red-tests) may proceed only after independently verifying its own
-# records below.
+# Status: historical ACM-3-scenarios and ACM-1-scenarios records are retained
+# below. They describe decisions that were made; they do not gate any next
+# dispatch under the withdrawn AD-1 approval rule.
 
 approvals:
   - story_id: "ACM-3-scenarios"

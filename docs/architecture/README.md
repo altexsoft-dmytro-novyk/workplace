@@ -31,8 +31,8 @@ Every rule cites a spine decision ID. To change a rule: change the spine first (
 
 ## Non-negotiables (the short list)
 
-1. No production code without a preceding approved scenario doc **and** a red E2E test (AD-1).
-2. **A gate stage is never self-certified.** "Approved by a developer" means a human sees the actual scenario doc or test file and says so — an agent's review of its own prior output is not an approval, and no single dispatch writes more than one stage before stopping for that approval (AD-1, extended 2026-08-26).
+1. No production code without preceding scenario evidence **and** a committed-red E2E test in history (AD-1).
+2. **AD-1 is ordered, not approval-gated.** Peer review remains valuable PR feedback, but no human sign-off or ledger row authorizes, blocks, or retroactively validates a stage transition (AD-1, amended 2026-09-04 and clarified 2026-09-12).
 3. **Fakes/mocks/stubs are scoped to a different, not-yet-built story/epic/context's dependency — never this unit's own deliverable.** If the current story or epic owns building the real thing, build it for real, following the hexagonal pattern, even if that means a new shared module. If the real implementation needs a technology choice nobody has made yet, stop and ask — don't guess, don't fake around it. A story is not done if any of its own acceptance criteria is satisfied by a fake (AD-15).
 4. Domain code imports nothing from application, infrastructure, NestJS transport, Prisma, or SDKs (AD-2).
 5. `application/actions/` never inject a port token directly — only `domain/services/` may; a port living in `domain/interfaces/` isn't itself a license to skip the domain service (AD-2, extended 2026-08-26).

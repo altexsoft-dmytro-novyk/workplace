@@ -1,3 +1,10 @@
+# LIVE AD-1 INTERPRETATION (2026-09-12): every contrary reference below to
+# human approval, a prior approval record, or waiting for a ledger is historical
+# provenance, not a live dispatch instruction. Stages must preserve scenario →
+# committed-red test → production ordering, but no `approvals.yaml` entry
+# authorizes, blocks, or validates a stage transition. `spec_checkpoint` and
+# `done_checkpoint` remain workflow pauses, not approval gates.
+
 - id: "ACM-9-baseline"
   title: "ACM-9 — 500-target PostgreSQL baseline gate"
   description: >-
