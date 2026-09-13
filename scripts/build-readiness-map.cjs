@@ -2,13 +2,34 @@
 'use strict';
 const fs = require('node:fs');
 const path = require('node:path');
+const { spawnSync } = require('node:child_process');
 const yaml = require('js-yaml');
 const { overlayEvidence } = require('./readiness-map.cjs');
 const ROOT = path.resolve(__dirname, '..');
+const IMPLEMENTATION_NOTES_SOURCE = 'docs/demo/workplace-readiness-data-2026-09-07.json';
+
+function isIsoDate(value) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
+  const [year, month, day] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+function checkoutSha(root) {
+  const result = spawnSync('git', ['rev-parse', 'HEAD'], { cwd: root, encoding: 'utf8' });
+  return result.status === 0 ? result.stdout.trim() : null;
+}
 
 function build(evidence, run = {}, root = ROOT) {
   const read = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
-  const seed = read('docs/demo/workplace-readiness-data-2026-09-07.json');
+  const seed = read(IMPLEMENTATION_NOTES_SOURCE);
+  const sourceDate = path.basename(IMPLEMENTATION_NOTES_SOURCE).match(/(\d{4}-\d{2}-\d{2})\.json$/)?.[1];
+  if (!isIsoDate(seed.implementationNotesSnapshotAt)) {
+    throw new Error('Readiness implementation notes must declare an ISO snapshot date');
+  }
+  if (seed.implementationNotesSnapshotAt !== sourceDate) {
+    throw new Error('Readiness implementation-notes snapshot date must match its source filename');
+  }
   // Use the exact mapping inventory selected by the CI evidence producer.
   const matrixName = path.basename(evidence.run_summary?.matrix_used || '');
   if (!/^tea-trace-coverage-matrix[\w.-]*\.json$/.test(matrixName)) throw new Error('CI evidence does not identify a valid trace matrix');
@@ -30,8 +51,13 @@ function build(evidence, run = {}, root = ROOT) {
   });
   if (seed.product.some(r => r.module === 'other')) seed.modules.push({id:'other',name:'Other requirements',note:'Implementation review needed'});
   const data = overlayEvidence(seed, evidence, run);
+  const checkedOutSha = run.checkoutSha || checkoutSha(root);
   data.inventory = { matrix: matrixPath, generatedAt: matrix.generated_at,
-    implementationNotesAt: '2026-09-07', canonicalBaseline: canonical.baseline_date };
+    implementationNotesSnapshotAt: seed.implementationNotesSnapshotAt,
+    implementationNotesSource: IMPLEMENTATION_NOTES_SOURCE,
+    checkoutSha: checkedOutSha,
+    evidenceMatchesCheckout: checkedOutSha ? checkedOutSha === evidence.source_sha : null,
+    canonicalBaseline: canonical.baseline_date };
   const template = fs.readFileSync(path.join(root, 'docs/demo/readiness-template.html'), 'utf8');
   if (template.split('__READINESS_DATA__').length !== 2) throw new Error('Invalid map template');
   const serialized = JSON.stringify(data).replace(/</g, '\\u003c');
