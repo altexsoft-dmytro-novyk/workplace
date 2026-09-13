@@ -1,7 +1,7 @@
 # Sprint-status bypass mitigation — second line of defense
 
-**Author:** Winston (architecture), 2026-09-09  
-**Trigger:** PR #47 review finding M2 — `guard:epic-ids` validates committed artifacts; status downgrade protection exists only in `scripts/sprint-status-generate.sh`, which a direct `uv run sprint_plan.py` (especially `generate --fresh`) bypasses.  
+**Author:** Winston (architecture), 2026-09-09
+**Trigger:** PR #47 review finding M2 — `guard:epic-ids` validates committed artifacts; status downgrade protection exists only in `scripts/sprint-status-generate.sh`, which a direct `uv run sprint_plan.py` (especially `generate --fresh`) bypasses.
 **Related:** [epic-number-collision verification](2026-09-09-epic-number-collision-verification.md), `_bmad/custom/bmad-sprint-planning.toml`, `.github/workflows/tests.yml` (`epic-id-guard` job comments)
 
 ---
