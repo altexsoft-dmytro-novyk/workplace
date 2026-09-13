@@ -11,7 +11,7 @@ approvalStatus: 'granted'
 approvalGrantedBy: 'Anna Pikula'
 approvalGrantedDate: '2026-09-12'
 validationStatus: 'PASS'
-validationDate: '2026-09-12'
+validationDate: '2026-09-13'
 validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md'
 totalSteps: 5
 stepsCompleted:
@@ -24,7 +24,7 @@ stepsCompleted:
   ]
 lastStep: 'step-05-generate-output'
 nextStep: 'document generation is complete; no Create step remains; proceed with human review, then choose Validate, Edit, or a fresh Create'
-lastSaved: '2026-09-12'
+lastSaved: '2026-09-13'
 runBaselineHead: '28d8e2049d457b103cd7eee31587add7a970f4fc'
 planPath: '_bmad-output/test-artifacts/test-design-epic-platform-2.md'
 ---
@@ -41,9 +41,10 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-platform-2.md'
 > stated below (contract §5).
 >
 > - Approval: **granted 2026-09-12 by Anna Pikula, the requester**
-> - Validation: **PASS (2026-09-12)** —
+> - Validation: **PASS (2026-09-13, fresh independent Epic-Level validation)** —
 >   `test-design-validation-report-epic-platform-2.md`, synchronized with
->   `test-design/README.md`
+>   `test-design/README.md`. Supersedes the prior PASS (2026-09-12, same report path); see Steps 7–8
+>   below.
 > - Coverage: **none asserted**
 >
 > This is the canonical **terminal successful document-generation state** of contract §4.4. Resume
@@ -285,3 +286,65 @@ from validation. It grants no runtime coverage, execution evidence, gate result,
 release-readiness state, and it closes none of the plan's open implementation/evidence
 obligations. The validation report is retained unchanged as the evidence record of its run; its
 approval wording describes the state at validation time.
+
+---
+
+## Step 7 — Edit: record 2026-09-13 completions
+
+**Edit run under `docs/test-design-workflow-contract.md` §4.3.** Target confirmed as the sole
+canonical `epic-platform-2` plan (`test-design-epic-platform-2.md`); loaded in full before any
+write. No other epic's plan or checkpoint was read or touched.
+
+**What changed in the plan:** coverage-table statuses, risk mitigation statuses, entry/exit
+criteria checkboxes, the Acceptance-Criterion Traceability table, the mitigation plans for
+`R-PLAT2-01/02/03`, and a new "Correction Log" section recording six 2026-09-13 completions —
+`ACF-AU-R1`, `ACF-FC-05`, `ACF-RW-04`, `ACF-DOC-01` (docs/ half only), `ACF-SCOPE-01`,
+`ACF-SCOPE-02` — plus the still-open items `ACF-TR-01`, `ACF-NC-01`, `ACF-PERF-01`, and
+`ACF-DOC-01`'s SPEC.md half. Evidence for each item was independently spot-checked before writing:
+
+- `b714327` confirmed present in `services/backend` git log for
+  `test/access-control/audience-resolution.e2e-spec.ts`.
+- `SEC-AUTH-01` re-checked against `.../blockers.yaml`: `status: closed` (2026-09-12), but its
+  stated reopen condition (branch `fix/sec-auth-01-refuse-test-tokens-in-production`, `45a671e`,
+  merged to `services/backend` `main`) was verified **unmet** — `git merge-base --is-ancestor
+  45a671e origin/main` returned false; `origin/main` is at `d1ef680`. This plan records that fact
+  without re-adjudicating the risk score or the blocker's open/closed status — that call belongs
+  to Architect + Security per `blockers.yaml`'s own owner field, consistent with this repository's
+  standing rule that QA does not re-score a security risk unilaterally.
+- `docs/test-cases/access-control-foundation/README.md:19` read directly: confirmed it now states
+  the applicable-set rule.
+- `docs/test-cases/access-control-foundation/fail-closed/acf-fc-04-cyclic-reporting-chain.md` read
+  directly: confirmed the `403` expectation is gone and the reworked-and-approved marker is present.
+- `test-review-plat-e2-e4-2026-09-13.md` read directly: confirmed the 100/100 per-file score for
+  `audience-resolution.e2e-spec.ts` (the file's overall 95/100 with two HIGH findings belongs to a
+  different file, `s42a-op-root-operator-set.e2e-spec.ts`, not cited as evidence for this epic).
+
+**What did not change:** no trace artifact (`traceability-matrix.md`, `e2e-trace-summary.json`,
+`tea-trace-coverage-matrix.json`, `live-verification-results.json`, `gate-decision.json`), no
+`sprint-status.yaml`, no other epic's plan or checkpoint, no service code, no gitlink, no ClickUp
+data. `_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md` was read but not
+edited — it is outside this Edit's writable file set (not the plan, checkpoint, or index); its
+still-stale "exactly one" wording is recorded in the plan as a remaining open item instead.
+
+**Index:** `test-design/README.md` was not edited by this Step — its `epic-platform-2` status
+prose is updated together with the fresh Validate below, per contract §4.5's synchronous
+projection requirement, rather than twice.
+
+**This Edit claims no approval, gate, coverage, or release-readiness status.** It is followed
+immediately, in the same session, by a fresh independent Validate for `epic-platform-2`.
+
+## Step 8 — Validate: fresh independent Epic-Level validation (2026-09-13)
+
+See `test-design-validation-report-epic-platform-2.md` for the full record. Summary projected
+here per contract §4.5:
+
+**Verdict: PASS.** Every 2026-09-13 completion claim added by Step 7's Edit (`ACF-AU-R1`,
+`ACF-FC-05`, `ACF-RW-04`, `ACF-DOC-01` docs/ half, `ACF-SCOPE-01`, `ACF-SCOPE-02`) was
+independently re-verified against its cited primary source (backend commit, scenario doc,
+`blockers.yaml`, or the 2026-09-13 test-review record) rather than trusted on the Edit's own word;
+all held, including their self-declared boundaries (the `ACF-DOC-01` SPEC.md residual and the
+`SEC-AUTH-01` unmet reopen condition). No approval, gate, coverage, or release-readiness claim
+follows. **Validation date:** 2026-09-13. **Report path:**
+`_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md`. This supersedes
+the 2026-09-12 validation projection above as the current validation state; the 2026-09-12 report
+remains unchanged as historical evidence of what it evaluated at the time.

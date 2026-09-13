@@ -10,7 +10,7 @@ approvalStatus: 'granted'
 approvalGrantedBy: 'Anna Pikula'
 approvalGrantedDate: '2026-09-12'
 validationStatus: 'PASS'
-validationDate: '2026-09-12'
+validationDate: '2026-09-13'
 validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-4.md'
 totalSteps: 5
 stepsCompleted: ['step-01-detect-mode', 'step-02-load-context', 'step-03-risk-and-testability', 'step-04-coverage-plan', 'step-05-generate-output']
@@ -47,12 +47,20 @@ inputDocuments:
   - '_bmad-output/implementation-artifacts/access-control/deferred-work.md'
   - '_bmad-output/planning-artifacts/architecture/architecture-people-management-ratification-2026-09-02/blockers.yaml'
   - '_bmad-output/test-artifacts/test-design-epic-user-management-0.md'
+  - 'docs/test-cases/user-management/access-control-adoption/umac-11-hidden-target-denial-oracle.md'
+  - 'docs/test-cases/access-control-kernel/fr-bootstrap/e4-av01-legacy-gate-absence-in-production-source.md'
+  - 'docs/test-cases/access-control-kernel/dev-seed-spine/s42d-ds-08-dev-seed-absent-from-deploy-entrypoints.md'
+  - '_bmad-output/test-artifacts/test-reviews/test-review-plat-e2-e4-2026-09-13.md'
 ---
 
 # PLAT-E4 test-design progress
 
-**Validation projection:** **PASS (2026-09-12)** —
-`test-design-validation-report-epic-platform-4.md`, synchronized with `test-design/README.md`.
+**Validation projection:** **PASS (2026-09-13)**, a fifth run, the first to independently
+re-verify the 2026-09-13 Edit below (two reproducible test runs, a `git merge-base` check, and a
+line-by-line risk-arithmetic recheck) —
+`test-design-validation-report-epic-platform-4.md`, synchronized with `test-design/README.md`. One
+non-blocking finding (H-1: a pre-existing, not-today's-work test-count undercount in the E4-C04d
+citation).
 
 ## Resolved run
 
@@ -168,3 +176,43 @@ This is an evidence-maintenance plan, not a claim that completed tracker stories
   - The Not-in-Scope ratification row was removed.
   - The Epic 4 source and the `spec-4-2d` AF-3 row record the supersession.
 - **Approval and validation:** approval stays granted; this decision was the requester's own and narrows no approved obligation. Epic Validate must run again for the edited content.
+
+## Edit record — 2026-09-13 (Epic-Level Edit, contract §4.3)
+
+- Operation: Edit · scope `epic` · `PLAT-E4` · domain `platform` · number `4` · `runKey`
+  `epic-platform-4`. Identity tuple unchanged.
+- Inputs verified before writing (each cited by file/test/commit in the plan): `blockers.yaml`
+  (`CONFLICT-UM-01` closed 2026-09-12); `git -C services/backend log --oneline 7ab095a..HEAD`
+  (`fc4c853`, `4ca2fb4`, `0a23457`, `b714327` on top of `89ea674`); `git -C services/backend status`
+  (uncommitted `s42a-op-root-operator-set.e2e-spec.ts`, untracked `legacy-gate-absence.spec.ts`,
+  `s42a-op-05-delegated-hr-admin.e2e-spec.ts`, `s42a-op-root-operator-set.fixtures.ts`);
+  `git -C services/backend merge-base --is-ancestor 89ea674 origin/main` (false — not merged);
+  `dept-epic.md` (GAP-2 closed 2026-09-12); `test-review-plat-e2-e4-2026-09-13.md` (two HIGH findings,
+  now fixed); direct test execution (below).
+- Plan changes: E4-C03b, E4-C04a, E4-C04b, E4-C04c evidence rows moved from Planned/blocked to Done,
+  with file citations updated for the `s42a-op-05`/`s42a-op-06` file move; the "blocked on
+  `CONFLICT-UM-01`" language was removed and replaced with the closed-blocker-but-unmerged-branch
+  nuance everywhere it appeared (Executive Summary, Not-in-Scope, Risk R08, Exit Criteria, Quality
+  Gate Criteria, Mitigation Plans, Assumptions/Dependencies, AC traceability); E4-C02/E4-AV01 static
+  oracle marked Done (`legacy-gate-absence.spec.ts`); E4-C06(6) marked Done
+  (`dev-seed-absence.spec.ts` / `s42d-ds-08`); GAP-2 marked closed 2026-09-12 everywhere it is
+  mentioned, while E4-C08's separate `seeded-two-level` decision is left open and undecided.
+- Test execution performed this run (from `services/backend`, `npm run test:e2e --`/`npm test --`,
+  local PostgreSQL up):
+  - `s42a-op-root-operator-set.e2e-spec.ts` + `s42a-op-05-delegated-hr-admin.e2e-spec.ts` together:
+    **37/37 passed.**
+  - `write-adoption.e2e-spec.ts` + `s42d-ds-root-resolves-over-seeded-population.e2e-spec.ts` +
+    `umac-11-hidden-target-denial-oracle.e2e-spec.ts` + `read-denial.e2e-spec.ts` +
+    `s41c-section-access-gate.e2e-spec.ts` together: **47/47 passed.**
+  - `legacy-gate-absence.spec.ts` + `dev-seed-absence.spec.ts` (unit): **12/12 passed.**
+- Not re-executed this run (evidence taken from the coordinator's report and independently
+  cross-checked against file content/line counts/git log instead of a fresh run): the AF-3
+  `feat/plat-e4-dev-seed-journal` suite (out of this edit's scope — E4-C06(7) stays open, unchanged).
+- Lifecycle: `workflowStatus` stays `generated`; approval frontmatter is untouched (still granted
+  2026-09-12, Anna Pikula) — this edit does not re-grant or revoke it. A fresh Epic Validate run
+  immediately followed this Edit and independently re-verified every claim above (two reproducible
+  test runs matching this section's own counts, plus its own `git merge-base` check), confirming
+  **PASS (2026-09-13)** with one new non-blocking finding (H-1: a pre-existing, not-introduced-today
+  test-count undercount in the E4-C04d citation) — see
+  `test-design-validation-report-epic-platform-4.md`. `validationStatus`/`validationDate` in this
+  checkpoint's frontmatter are updated to that result per contract §4.5.
