@@ -1,9 +1,30 @@
+---
+runScope: 'epic'
+runKey: 'epic-user-management-2'
+epicId: 'UM-E2'
+epicDomain: 'user-management'
+epicSourcePath: '_bmad-output/planning-artifacts/user-management/epics.md'
+epicNumber: 2
+workflowStatus: 'generated'
+approvalStatus: 'ungranted'
+validationStatus: 'PASS'
+validationDate: '2026-09-13'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-user-management-2.md'
+independentRevalidation: 'complete — fresh independent Epic-Level validation PASS, 2026-09-13; first validation of this scope.'
+date: '2026-09-10'
+---
+
 # Test Design — Epic: User Management 2, Magic-Link Authentication
+
+**Validation projection:** **PASS (2026-09-13, fresh independent validation)** — synchronized with
+`test-design/README.md` and `test-design-validation-report-epic-user-management-2.md`.
 
 > ## Status: **ungranted**. This is a new document and inherits nothing.
 >
 > - **Approval:** ungranted. No human has approved this document.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here.
+> - **Validation:** **PASS (2026-09-13)** — see
+>   `test-design-validation-report-epic-user-management-2.md`. A PASS is not approval and asserts
+>   no executed runtime coverage, gate result, or release readiness.
 > - **Coverage:** none asserted. This document plans and records; it does not state that any
 >   test exists, that any suite passes, or that any gate is green. **No pass rate appears
 >   anywhere in it.**
@@ -32,7 +53,9 @@
 
 **Date:** 2026-09-10
 **Author:** Test-design consolidation migration, Task 3 (`docs/superpowers/plans/2026-09-10-test-design-consolidation.md`)
-**Status:** Draft — **approval ungranted**, validation **NOT RUN**
+**Status:** Written — **approval ungranted**; validation **PASS (2026-09-13, fresh independent
+Epic-Level validation)** — `test-design-validation-report-epic-user-management-2.md`. Approval and
+validation are separate states and neither confers the other.
 
 ---
 

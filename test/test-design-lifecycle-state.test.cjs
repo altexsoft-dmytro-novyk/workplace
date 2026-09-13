@@ -13,7 +13,14 @@ test('discovers every canonical epic validation report without a hard-coded rost
   const reports = epicValidationReports(REPO_ROOT);
   assert.deepEqual(
     reports.map((report) => report.frontmatter.runKey),
-    ['epic-platform-1', 'epic-platform-2', 'epic-platform-3', 'epic-platform-4'],
+    [
+      'epic-platform-1',
+      'epic-platform-2',
+      'epic-platform-3',
+      'epic-platform-4',
+      'epic-user-management-1',
+      'epic-user-management-2',
+    ],
   );
 });
 
