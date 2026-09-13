@@ -88,9 +88,21 @@ hashes are recorded once, in `test-design-validation-report.md` § Evaluated inp
 
 ## Output of this run
 
-| Output | SHA-256 at the moment this checkpoint was written | Approval | Validation |
+| Output | SHA-256 (re-recorded 2026-09-11 — see the note below) | Approval | Validation |
 | --- | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-platform-capabilities-1.md` | `3e09b5ae9a7e2f1eb6265d587aea06f1c71c3ab2a943abf00f10ef9b2348972f` | ungranted | NOT RUN |
+| `_bmad-output/test-artifacts/test-design-epic-platform-capabilities-1.md` | `c8f0d3b280ced1235404f83bcf2062be4f1864e78e1098b5cc1b833f9d00f432` | ungranted | NOT RUN |
+
+> **Hash re-recorded 2026-09-11, and a mis-record corrected.** This column previously read
+> *"SHA-256 at the moment this checkpoint was written"* and held `3e09b5ae9a7e2f1eb6265d587aea06f1c71c3ab2a943abf00f10ef9b2348972f`.
+> That value was written by `a031928` (*docs: bind PG-04 contract A to DIRA1-MVP-v1 measurement
+> protocol*) and **matched the plan at no revision**: the plan hashed `f9a5a442…` at `a86df68`,
+> which is what this checkpoint originally and correctly recorded, and `47c411fc…` at `a031928`
+> itself. `acbe7d2` (*docs(test-design): resolve U-12 with DEV decision, cite unmerged
+> implementation*) then edited the plan again, to the value above. The entry was therefore both
+> mis-recorded and stale, and `npm run test:test-design-routing` reported `plan-hash-drift`.
+> The original value is preserved in this note and in git history. **Nothing else about this
+> checkpoint changes:** approval stays `ungranted`, validation stays `NOT RUN`. This re-record
+> accounts for an edit; it does not review or bless it.
 
 ## What this run did not do
 

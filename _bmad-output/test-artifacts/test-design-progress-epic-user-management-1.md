@@ -88,9 +88,19 @@ hashes are recorded once, in `test-design-validation-report.md` § Evaluated inp
 
 ## Output of this run
 
-| Output | SHA-256 at the moment this checkpoint was written | Approval | Validation |
+| Output | SHA-256 (re-recorded 2026-09-11 — see the note below) | Approval | Validation |
 | --- | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-user-management-1.md` | `12ef0c87ff694140914cd9b08cf308e0269e6cac68441e394667756dc5ad5372` | ungranted | NOT RUN |
+| `_bmad-output/test-artifacts/test-design-epic-user-management-1.md` | `d6874c456cf75df2c4df6d4c80de5d4aeeb67285fb729913a089c4c996327ada` | ungranted | NOT RUN |
+
+> **Hash re-recorded 2026-09-11.** This column previously read *"SHA-256 at the moment this
+> checkpoint was written"* and held `12ef0c87ff694140914cd9b08cf308e0269e6cac68441e394667756dc5ad5372`, which was correct for the plan as it
+> stood at `a86df68`, when this checkpoint was written (2026-09-10). Three later commits edited
+> the plan without re-recording the hash — `a031928` (*bind PG-04 contract A to DIRA1-MVP-v1*),
+> `a6c3983` (*close U-23 with verified implemented-test inventory*) and `acbe7d2` (*resolve U-12
+> with DEV decision*) — so `npm run test:test-design-routing` reported `plan-hash-drift`.
+> The original value is preserved in this note and in git history. **Nothing else about this
+> checkpoint changes:** approval stays `ungranted`, validation stays `NOT RUN`. This re-record
+> accounts for an edit; it does not review or bless it.
 
 ## What this run did not do
 
