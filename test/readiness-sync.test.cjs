@@ -4,7 +4,7 @@ const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
 const {syncOnce}=require('../scripts/sync-readiness-map.cjs');
-const {build}=require('../scripts/build-readiness-map.cjs');
+const {build,isTraceOutputPath}=require('../scripts/build-readiness-map.cjs');
 const evidence=()=>({source_sha:'abc',observed_at:'2026-09-07T12:00:00Z',producer:'CI',
   results:[{requirement_id:'ACF-AU-01',status:'fail',title:'<script>bad()</script>',evidence:'unit: example'}],
   run_summary:{missing_reports:[],matrix_used:'_bmad-output/test-artifacts/tea-trace-coverage-matrix.json'}});
@@ -54,6 +54,13 @@ test('build records when CI evidence does not describe the current checkout',t=>
   const root=fixtureRoot(t),result=build(evidence(),{checkoutSha:'def'},root);
   assert.equal(result.data.inventory.evidenceMatchesCheckout,false);
   assert.equal(build(evidence(),{checkoutSha:'abc'},root).data.inventory.evidenceMatchesCheckout,true);
+});
+
+test('only canonical trace outputs may bridge an evidence-only commit',()=>{
+  assert.equal(isTraceOutputPath('_bmad-output/test-artifacts/traceability-matrix.md'),true);
+  assert.equal(isTraceOutputPath('_bmad-output/test-artifacts/live-verification-results.json'),true);
+  assert.equal(isTraceOutputPath('_bmad-output/test-artifacts/test-design-epic-frontend.md'),false);
+  assert.equal(isTraceOutputPath('docs/test-cases/user-management/umac-11.md'),false);
 });
 
 test('the product UI distinguishes planning, implementation snapshots, and CI evidence',()=>{

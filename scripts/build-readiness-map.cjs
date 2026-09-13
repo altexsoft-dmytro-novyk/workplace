@@ -7,6 +7,12 @@ const yaml = require('js-yaml');
 const { overlayEvidence } = require('./readiness-map.cjs');
 const ROOT = path.resolve(__dirname, '..');
 const IMPLEMENTATION_NOTES_SOURCE = 'docs/demo/workplace-readiness-data-2026-09-07.json';
+const TRACE_OUTPUTS = new Set([
+  '_bmad-output/test-artifacts/traceability-matrix.md',
+  '_bmad-output/test-artifacts/tea-trace-coverage-matrix.json',
+  '_bmad-output/test-artifacts/e2e-trace-summary.json',
+  '_bmad-output/test-artifacts/live-verification-results.json',
+]);
 
 function isIsoDate(value) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value || '')) return false;
@@ -20,6 +26,10 @@ function checkoutSha(root) {
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
+function isTraceOutputPath(file) {
+  return TRACE_OUTPUTS.has(file);
+}
+
 function evidenceMatchesCheckout(root, evidenceSha, checkedOutSha) {
   if (!evidenceSha || !checkedOutSha) return null;
   if (evidenceSha === checkedOutSha) return true;
@@ -28,7 +38,7 @@ function evidenceMatchesCheckout(root, evidenceSha, checkedOutSha) {
   const diff = spawnSync('git', ['diff', '--name-only', evidenceSha, checkedOutSha], { cwd: root, encoding: 'utf8' });
   if (diff.status !== 0) return false;
   const paths = diff.stdout.split('\n').filter(Boolean);
-  return paths.length > 0 && paths.every(file => file.startsWith('_bmad-output/test-artifacts/'));
+  return paths.length > 0 && paths.every(isTraceOutputPath);
 }
 
 function build(evidence, run = {}, root = ROOT) {
@@ -95,4 +105,4 @@ if (require.main === module) {
     console.log(JSON.stringify({output, sourceSha:result.data.ci.sourceSha, ...result.data.ci.counts}));
   } catch (error) { console.error(error.stack || error.message); process.exitCode = 1; }
 }
-module.exports = { build, writeMap, evidenceMatchesCheckout };
+module.exports = { build, writeMap, evidenceMatchesCheckout, isTraceOutputPath };
