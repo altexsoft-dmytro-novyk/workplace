@@ -1,7 +1,7 @@
 ---
 stepsCompleted: ['step-01-load-context','step-02-discover-tests','step-03-map-criteria','step-04-analyze-gaps','step-05-gate-decision']
 lastStep: 'step-05-gate-decision'
-lastSaved: '2026-09-12'
+lastSaved: '2026-09-13'
 coverageBasis: 'acceptance_criteria'
 oracleConfidence: 'high'
 oracleResolutionMode: 'formal_requirements'
@@ -9,32 +9,30 @@ oracleSources: ['docs/test-cases/**', '_bmad-output/planning-artifacts/**/epics.
 externalPointerStatus: 'not_used'
 collectionStatus: 'COLLECTED'
 allowGate: false
-sourceSha: '1e0d51297d997cd4d0e84f5d2d511805025ee571'
-tempCoverageMatrixPath: '/tmp/tea-trace-coverage-matrix-2026-09-12T23-27-03.json'
+sourceSha: '827877ee3b27df56338e6e0fad6c8977a33066f9'
+tempCoverageMatrixPath: '/tmp/tea-trace-coverage-matrix-2026-09-13T00-53-19.json'
 ---
 
 # Traceability Matrix — whole repository, all epics
 
 **Planning audit. No quality gate was issued** (`gate_status: NOT_EVALUATED`). Generated
-2026-09-12 against [CI run 34715886564](https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34715886564)
+2026-09-13 against [CI run 34728869039](https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34728869039)
 — the completed, successful `Tests` run whose `head_sha` is this trace's commit.
 
-Workspace `1e0d512` (branch `docs/plat-e3-test-design-remediation`) · backend `a25ec28` · frontend `025dd7e`.
+Workspace `827877e` (branch `docs/plat-e3-test-design-remediation`) · backend `7ab095a` · frontend `025dd7e`.
 
-Supersedes the 2026-09-10 matrix (`sourceSha 43d50ad`, [PR #49](https://github.com/altexsoft-dmytro-novyk/workplace/pull/49)); that version stays in git history.
+Supersedes the 2026-09-12 matrix (sourceSha `1e0d512`, commit `e627386`); that version stays in git history.
 
 ## Read this first — what the commit under trace is
 
-- **This is not `main`.** `origin/main` is `367750e` (backend `d1ef680`). The traced commit is the
-  head of `docs/plat-e3-test-design-remediation`, whose backend gitlink `a25ec28`
-  sits on the **unmerged** backend branch `feat/plat-e4-dev-seed-journal`. `S4.2d-DS-07` below is
-  implemented and green *only* at that pin. It becomes `main` coverage when both merges land.
-- **Uncommitted work was excluded.** While this trace ran, another session had uncommitted edits
-  in the workspace (`docs/test-cases/user-management/access-control-adoption/{README,s41c-sag-01,umac-05}.md`,
-  a new untracked `umac-11-hidden-target-denial-oracle.md`, and a dirty `services/backend` checkout
-  on `fix/sec-auth-01-refuse-test-tokens-in-production`). The oracle was read with `git show HEAD:`
-  and the tests from the CI reports, so none of that is in these numbers. `UMAC-11` in particular
-  is **not** an oracle item yet.
+- **This is not `main`.** It is the current head of `docs/plat-e3-test-design-remediation`; no merge to `main` is required for this trace.
+- **Only committed content is traced.** The CI evidence was produced at this exact workspace SHA and the backend gitlink above. Uncommitted files in another session are excluded.
+
+## What changed in this refresh
+
+- Added **UMAC-11** as the active PM/AD-24 denial oracle. Its six real-app e2e cases and two guard unit cases all passed in CI.
+- The historical 403 assertions in UMAC-05 and S4.1c-SAG-01/04 remain preserved as historical evidence; their live 404 behavior is carried by UMAC-11.
+- Live verification is fresh for this workspace SHA: 584 passed, 40 failed, and 18 skipped records.
 
 ## Why there is no gate verdict
 
@@ -44,7 +42,7 @@ is declared, so every percentage below describes where coverage stands, never re
 
 ## What changed in the oracle since 43d50ad
 
-`git diff 43d50ad 1e0d512 -- docs/test-cases/` touches 64 files. 57 of them only add a
+`git diff 43d50ad 1e0d512 -- docs/test-cases/` (historical comparison) touches 64 files. 57 of them only add a
 `U-19 normative coverage` cross-reference or drop the per-file approval line (AD-1 stage approval
 was retired 2026-09-04) — no expected result changed. The other seven are the two READMEs, the
 `um-list-12` Stage-2 note (now pointing at `DIRA1-MVP-v1`), and the four documents in the table. All
@@ -59,7 +57,7 @@ oracle-relevant changes:
 | retired | `UMAC-10` | Doc header: SUPERSEDED 2026-09-05 by s41c-sag-04 (PLAT-E4-S4.1c). Three of four mapped tests no longer exist and the fourth entry had no title; it was counted FULL/P0 in the 09-08 and 09-10 traces |
 | remapped | `MEN-FLAG-04` | Tests narrowed to the one men-flag-04 case; the men-flag-01/02/03 cases (one under a truncated title that matched nothing) belong to their own requirements |
 
-**325 oracle ids known, 291 active, 34 retired** (09-10: 324 / 288 / 36).
+**326 oracle ids known, 292 active, 34 retired** (09-10: 324 / 288 / 36).
 
 Two of these correct the previous matrix rather than follow a document change:
 
@@ -78,21 +76,14 @@ P1 (PLAT-E4 `E4-C06 (7)`).
 ## Live evidence: fresh
 
 The CI job **Live verification evidence** built `live-verification-results.json` at
-`1e0d512` — the commit under trace. It was downloaded
-(`gh run download 34715886564 --name live-verification-results`) and adopted verbatim, as on 09-10.
+`827877e` — the commit under trace. It was downloaded from
+[CI run 34728869039](https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34728869039) and adopted verbatim.
 
-| Suite | Cases | Passed | Failed | Skipped/todo |
-| --- | --- | --- | --- | --- |
-| Backend unit | 50 | 50 | 0 | 0 |
-| Backend e2e (54 suites) | 509 | 451 | 40 | 18 |
-| Frontend Playwright | 124 | 124 | 0 | 0 |
+**642 records:** 584 passed, 40 failed, and 18 skipped.
 
-683 cases seen, 637 mapped to a requirement id, 35 unmatched, 11 declared untraceable.
-
-Dispositions against this oracle (workflow step 2 §1b / step 3 §1b): **555 counted**,
-39 fail, 18 skipped, 9 contradicted (a pass beside a fail for the same
-requirement), 16 unmatched (records naming retired documents whose tests still run),
-0 stale, 0 invalid. No requirement is covered by live evidence alone.
+Dispositions against this oracle: **557 counted**, 39 fail, 18 skipped,
+9 contradicted, 19 unmatched, 0 stale, and 0 invalid.
+No requirement is covered by live evidence alone.
 
 ## Coverage
 
@@ -100,17 +91,17 @@ requirement), 16 unmatched (records naming retired documents whose tests still r
 
 |  | Total | FULL | % |
 | --- | --- | --- | --- |
-| **All requirements** | 291 | 260 | **89%** |
-| P0 | 161 | 161 | 100% |
+| **All requirements** | 292 | 261 | **89%** |
+| P0 | 162 | 162 | 100% |
 | P1 | 106 | 87 | 82% |
 | P2 | 24 | 12 | 50% |
 
-**Verified** — was every mapped test observed passing at `1e0d512`?
+**Verified** — was every mapped test observed passing at `827877e`?
 
 |  | Total | Verified | % |
 | --- | --- | --- | --- |
-| **All requirements** | 291 | 232 | **80%** |
-| P0 | 161 | 146 | 91% |
+| **All requirements** | 292 | 233 | **80%** |
+| P0 | 162 | 147 | 91% |
 | P1 | 106 | 74 | 70% |
 | P2 | 24 | 12 | 50% |
 
@@ -158,20 +149,12 @@ Fixing the index to emit one record per mapping would move P0 verified from 146 
 - **Mentorship — 26 requirements, red by design:** 25 PARTIAL + `MEN-END-04` NONE; Stage-2 tests
   committed red under AD-1, no mentorship module under `services/backend/src`.
 
-### Wrong-reason passes (heuristic: auth negative paths)
+### Denial precedence is now directly verified
 
-Green does not mean correct here. The approved PLAT-E4 test design (risk `PLAT-E4-R08`, `E4-C03b`)
-names assertions that pin the **superseded** `403` for a missing or inactive target, where PM/AD-24
-requires `404` before mutation checks:
-
-- `S4.1c-SAG-01` Tests 5–6 — active, FULL, observed passing. At `1e0d512` its document still
-  states `403`, so the mapping matches its oracle; the document itself is what `CONFLICT-UM-01` has
-  to regenerate. (An uncommitted edit in the working tree marks it superseded by `umac-11`.)
-- `UMAC-05` Test 3 — retired document, test still green; its records are among the 16 unmatched.
-
-The `404` cases that replace them (`E4-C03b` (2)–(3), `E4-C04c`) are planned, not written. That is an
-open P0 blocker under `CONFLICT-UM-01` (runtime owner `UM-E0-S0.1`), and it is invisible to a coverage
-percentage.
+`UMAC-11` is the active PM/AD-24 oracle. Its two unit precedence checks and six real-app e2e
+cases passed in this CI run: unauthenticated session returns 401 first; missing or inactive targets
+return leak-free 404; a visible but unauthorized target returns 403. Historical 403 assertions in
+`UMAC-05` and `S4.1c-SAG-01/04` remain historical evidence and are not used as the active oracle.
 
 ### Retired documents whose tests still run
 
@@ -209,7 +192,7 @@ reworked back into the active set.
 Per-test mappings (file, title, level), live records and dispositions are in
 `_bmad-output/test-artifacts/tea-trace-coverage-matrix.json`.
 
-<details><summary>291 active requirements</summary>
+<details><summary>292 active requirements</summary>
 
 | Id | Area | Priority | Coverage | Observation | Tests | Levels |  |
 | --- | --- | --- | --- | --- | --- | --- | --- |
