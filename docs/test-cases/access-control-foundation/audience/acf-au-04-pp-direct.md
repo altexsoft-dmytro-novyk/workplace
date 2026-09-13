@@ -6,6 +6,8 @@
 
 **Approved:** Anna Pikula, 2026-08-30
 
+> **Reworked — 2026-09-13 (`ACF-AU-R1`, `R-PLAT2-01`/`R-PLAT2-03`).** Since 2026-09-01, `GET /users/:id` returns `200` to any active authenticated viewer, so `200` alone no longer discriminates PP. The test now asserts `resolveAudiences(Paula, [Alice])` is exactly `{pp}` as the primary oracle; the `200` below is kept only as separately labelled UM-owned route evidence.
+
 ## Scenario
 
 **Given** Paula is Alice's assigned People Partner through a `Relationship type='people_partner'` row, and Paula is nowhere in Alice's reporting chain.
@@ -26,4 +28,4 @@
     "body": {}
   }
   ```
-- **expectedResult:** `200`; the profile is returned. Per the provisional mapping, `pp` is an allowed audience.
+- **expectedResult:** `resolveAudiences(<paula-id>, [<alice-id>])` yields exactly `{pp}`. `GET /users/<alice-id>` also returns `200`, but only as UM-owned route evidence, not as the audience oracle.

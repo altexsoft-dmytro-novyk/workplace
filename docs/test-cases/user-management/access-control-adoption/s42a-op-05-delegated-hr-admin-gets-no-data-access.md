@@ -133,3 +133,17 @@ Produced by real in-suite steps, no hand-written ids:
     than §3.2's full matrix; Stage 2 asserts this test over the routes that
     exist and records which sections have no route yet, rather than inventing
     endpoints for them.
+- **Test 6 — the delegated holder PATCHes a missing target id** *(added 2026-09-13, E4-C04c / CONFLICT-UM-01)*
+  - **inputURL:** `PATCH /users/<freshly generated uuidv7>` `{ city }` with
+    `Bearer <token:<nadia-uuid>>`
+  - **expectedResult:** `404`, not `403` — the hidden-target question is
+    answered before any section or feature check, exactly as
+    [`umac-11`](./umac-11-hidden-target-denial-oracle.md) Test 3 proves for an
+    ordinary caller. Nadia's six canonical feature keys are never consulted.
+- **Test 7 — the delegated holder PATCHes an inactive target** *(added 2026-09-13, E4-C04c / CONFLICT-UM-01)*
+  - **precondition:** a real imported employee, deactivated in-suite
+    (`isActive: false`) after import — fixture setup only, mirroring
+    [`umac-11`](./umac-11-hidden-target-denial-oracle.md) Test 4.
+  - **inputURL:** `PATCH /users/<inactive-uuid>` `{ city }` with
+    `Bearer <token:<nadia-uuid>>`
+  - **expectedResult:** `404`, not `403`; the target's row is unchanged.

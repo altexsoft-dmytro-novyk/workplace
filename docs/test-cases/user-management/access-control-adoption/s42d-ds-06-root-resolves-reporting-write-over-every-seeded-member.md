@@ -127,3 +127,21 @@ provisioning:
   Test 4) and holds exactly one edge, straight to root; the one-hop case
   proven again, this time for a department the shape logic treats specially
   (lead and member are the same row)
+
+## Test 5 — root reads its own card
+
+*(added 2026-09-13, E4-C04a — `test-design-epic-platform-4.md`.)* The
+dev-spine counterpart of the production-shaped
+[`s42a-op-04`](./s42a-op-04-root-data-reach-unchanged-by-the-operator-set.md)
+Test 4. `db:dev:seed-org` writes an edge FOR every seeded member ONTO root; it
+never writes a `Relationship` row where root is the subject (asserted in Test
+1 above — "Root itself never becomes a subject"), so root's own audience over
+its own card resolves `self`, not `reporting`.
+
+- **inputURL:** `GET /users/<root-uuid>`
+- **inputRequest:**
+  ```json
+  { "headers": { "authorization": "Bearer <token:<root-uuid>>" } }
+  ```
+- **expectedResult:** `200`; `{ data, canEdit: false }` — §3.2 row S1 gives
+  Self `R`, not `RW`.

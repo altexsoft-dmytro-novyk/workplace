@@ -98,3 +98,27 @@ unchanged, plus:
     `src/access-control/domain/constants/`. A match means a feature key has
     entered the section-access path and the `access-control.md` line-19
     invariant is no longer structurally guaranteed.
+
+- **Test 4 — root reads its own card** *(added 2026-09-13, E4-C04a)*
+  - **inputURL:** `GET /users/<root-uuid>` with `Bearer <token:<root-uuid>>`
+  - **expectedResult:** `200`; `{ data, canEdit: false }`. Root's own card
+    resolves `self`, not `reporting` — the operator set gives root no
+    `Relationship` row of its own (precondition 1 /
+    [`s42b-tr-03`](./s42b-tr-03-root-has-no-upward-edge.md)), and §3.2 row S1
+    gives Self `R`, not `RW`. The dev-spine equivalent is
+    [`s42d-ds-06`](./s42d-ds-06-root-resolves-reporting-write-over-every-seeded-member.md)
+    Test 5.
+- **Test 5 — root PATCH of a missing target id** *(added 2026-09-13, E4-C04c / CONFLICT-UM-01)*
+  - **inputURL:** `PATCH /users/<freshly generated uuidv7>` `{ city }` with
+    `Bearer <token:<root-uuid>>`
+  - **expectedResult:** `404`, not `403` — `SectionAccessGuard` answers the
+    hidden-target question before any section or feature check, exactly as
+    [`umac-11`](./umac-11-hidden-target-denial-oracle.md) Test 3 proves for an
+    ordinary caller. Root's operator-set feature keys are never consulted.
+- **Test 6 — root PATCH of an inactive target** *(added 2026-09-13, E4-C04c / CONFLICT-UM-01)*
+  - **precondition:** a real imported employee, deactivated in-suite
+    (`isActive: false`) after import — fixture setup only, mirroring
+    [`umac-11`](./umac-11-hidden-target-denial-oracle.md) Test 4.
+  - **inputURL:** `PATCH /users/<inactive-uuid>` `{ city }` with
+    `Bearer <token:<root-uuid>>`
+  - **expectedResult:** `404`, not `403`; the target's row is unchanged.
