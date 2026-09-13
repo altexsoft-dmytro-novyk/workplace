@@ -54,7 +54,7 @@ the reviewer's to confirm.
 | `import/` | `fe-imp-01`…`09` | 17 | `e2e/flows/import/import.spec.ts` |
 | `organisation/` | `fe-org-01`…`16` | 39 | `e2e/flows/organisation/organisation.spec.ts` |
 | `profile/` | `fe-prof-01`…`11` | 24 | `e2e/flows/profile/profile.spec.ts` |
-| `dashboards/` | `fe-dash-01`…`08` | — | `e2e/flows/dashboards/dashboards.spec.ts` |
+| `dashboards/` | `fe-dash-01`…`13` | — | `e2e/flows/dashboards/dashboards.spec.ts` |
 
 **124 cases across 57 documents.** Note: the 2026-09-04 coverage matrix records
 this suite as 133 cases. That figure is wrong — `npx playwright test --list`

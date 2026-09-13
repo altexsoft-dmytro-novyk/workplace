@@ -12,13 +12,132 @@
 # Error details
 
 ```
-Error: browserType.launch: Executable doesn't exist at /tmp/cursor-sandbox-cache/10c32dff435630c8eebd6c49ba80e796/playwright/chromium_headless_shell-1228/chrome-headless-shell-linux64/chrome-headless-shell
-╔════════════════════════════════════════════════════════════╗
-║ Looks like Playwright was just installed or updated.       ║
-║ Please run the following command to download new browsers: ║
-║                                                            ║
-║     npx playwright install                                 ║
-║                                                            ║
-║ <3 Playwright Team                                         ║
-╚════════════════════════════════════════════════════════════╝
+Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
+Call log:
+  - navigating to "/dashboards", waiting until "load"
+
+```
+
+# Test source
+
+```ts
+  1   | import { test, expect } from '@playwright/test'
+  2   | import {
+  3   |   setupPopulatedDashboard,
+  4   |   setupLoadingDashboard,
+  5   |   setupZeroHeadcountDashboard,
+  6   |   setupOmittedColumnsDashboard,
+  7   |   setupAccessDeniedDashboard,
+  8   |   setupUnauthenticatedDashboard,
+  9   | } from './helpers'
+  10  | import { mockPopulatedUnitManagerDashboard } from './fixtures'
+  11  | 
+  12  | test.describe('People Management Dashboards — Unit Manager (Story 2.1 / PMC-E2-S2.1)', () => {
+  13  |   test.describe('FE-DASH-01 · Populated state with live scope, headcount, and people table', () => {
+  14  |     test('default load opens Unit Manager preset with .pghd band, .prov tag, and people grouping active', async ({
+  15  |       page,
+  16  |     }) => {
+  17  |       await setupPopulatedDashboard(page)
+> 18  |       await page.goto('/dashboards')
+      |                  ^ Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
+  19  | 
+  20  |       // .pghd band & eyebrow
+  21  |       const header = page.locator('.pghd')
+  22  |       await expect(header).toBeVisible()
+  23  |       await expect(header).toContainText('WORKSPACE / DASHBOARDS')
+  24  | 
+  25  |       // .prov tag stating live resolution scoped to dashboard header
+  26  |       const provTag = header.locator('.prov')
+  27  |       await expect(provTag).toBeVisible()
+  28  |       await expect(provTag).toContainText('SCOPE RESOLVED LIVE PER REQUEST')
+  29  | 
+  30  |       // Unit Manager preset tab active
+  31  |       const umTab = page.getByRole('tab', { name: /Unit Manager/i })
+  32  |       await expect(umTab).toBeVisible()
+  33  |       await expect(umTab).toHaveAttribute('aria-selected', 'true')
+  34  | 
+  35  |       // Grouping dimension control has People active with aria / data-state verification
+  36  |       const peopleGrouping = page
+  37  |         .getByRole('button', { name: /People/i })
+  38  |         .or(page.getByRole('tab', { name: /People/i }))
+  39  |         .or(page.getByRole('radio', { name: /People/i }))
+  40  |         .or(page.locator('[data-grouping="people"]'))
+  41  |       await expect(peopleGrouping).toBeVisible()
+  42  | 
+  43  |       const isGroupingActive = await peopleGrouping.evaluate((el) => {
+  44  |         return (
+  45  |           el.getAttribute('aria-pressed') === 'true' ||
+  46  |           el.getAttribute('aria-selected') === 'true' ||
+  47  |           el.getAttribute('aria-checked') === 'true' ||
+  48  |           el.getAttribute('data-state') === 'active' ||
+  49  |           el.getAttribute('data-state') === 'on' ||
+  50  |           el.classList.contains('active')
+  51  |         )
+  52  |       })
+  53  |       expect(isGroupingActive).toBe(true)
+  54  |     })
+  55  | 
+  56  |     test('renders active headcount in data-stat mono with .wscope footer', async ({ page }) => {
+  57  |       await setupPopulatedDashboard(page)
+  58  |       await page.goto('/dashboards')
+  59  | 
+  60  |       const headcountCard = page.getByTestId('dashboard-headcount-widget').or(page.locator('[data-widget="headcount"]'))
+  61  |       await expect(headcountCard).toBeVisible()
+  62  | 
+  63  |       // Count value rendered in mono typography
+  64  |       const countStat = headcountCard.locator('.data-stat').or(headcountCard.getByText('3', { exact: true }))
+  65  |       await expect(countStat).toBeVisible()
+  66  | 
+  67  |       // .wscope footer belonging to headcount card
+  68  |       const wscope = headcountCard.locator('.wscope, [data-slot="widget-scope-footer"]').filter({
+  69  |         hasText: /SCOPE: REPORTING_LINE/i,
+  70  |       })
+  71  |       await expect(wscope).toBeVisible()
+  72  |     })
+  73  | 
+  74  |     test('renders tier-projected people table rows for reporting-line employees with .wscope footer', async ({ page }) => {
+  75  |       await setupPopulatedDashboard(page)
+  76  |       await page.goto('/dashboards')
+  77  | 
+  78  |       const tableContainer = page
+  79  |         .getByTestId('dashboard-people-table-widget')
+  80  |         .or(page.locator('[data-widget="people-table"]'))
+  81  |         .or(page.locator('section').filter({ has: page.getByRole('table') }))
+  82  |       await expect(tableContainer).toBeVisible()
+  83  | 
+  84  |       const table = tableContainer.getByRole('table').or(page.getByTestId('dashboard-people-table'))
+  85  |       await expect(table).toBeVisible()
+  86  | 
+  87  |       // Rows for reporting-line employees
+  88  |       await expect(table.getByText('Alice Smith')).toBeVisible()
+  89  |       await expect(table.getByText('Bob Jones')).toBeVisible()
+  90  |       await expect(table.getByText('Charlie Brown')).toBeVisible()
+  91  | 
+  92  |       // .wscope footer scoped specifically to the people-table container (not matching headcount wscope)
+  93  |       const tableWscope = tableContainer.locator('.wscope, [data-slot="widget-scope-footer"]').filter({
+  94  |         hasText: /SCOPE: REPORTING_LINE/i,
+  95  |       })
+  96  |       await expect(tableWscope).toBeVisible()
+  97  |     })
+  98  | 
+  99  |     test('displays navigation shortcuts to related modules', async ({ page }) => {
+  100 |       await setupPopulatedDashboard(page)
+  101 |       await page.goto('/dashboards')
+  102 | 
+  103 |       // Scope navigation shortcuts to the Dashboard content panel
+  104 |       const dashboardPanel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  105 |       await expect(dashboardPanel.getByRole('link', { name: /All Employees/i })).toBeVisible()
+  106 |       await expect(dashboardPanel.getByRole('link', { name: /Saved Views/i })).toBeVisible()
+  107 |     })
+  108 |   })
+  109 | 
+  110 |   test.describe('FE-DASH-02 · Dashboard loading state with Skeleton placeholders', () => {
+  111 |     test('loading state renders Skeleton placeholders matching widget grid and table layout', async ({ page }) => {
+  112 |       await setupLoadingDashboard(page)
+  113 |       await page.goto('/dashboards')
+  114 | 
+  115 |       // Skeletons are visible matching layout
+  116 |       const skeletons = page.locator('[data-skeleton="true"]').or(page.locator('.animate-pulse'))
+  117 |       await expect(skeletons.first()).toBeVisible()
+  118 |     })
 ```

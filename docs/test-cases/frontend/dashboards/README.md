@@ -4,9 +4,9 @@
 
 ## Overview
 
-This directory contains Stage-1 behavioural scenario contracts for the People Management Dashboards (Unit Manager preset in Story 2.1).
+This directory contains Stage-1 behavioural scenario contracts for the People Management Dashboards (Unit Manager preset in Story 2.1 and explicit unavailable widget states in Story 2.2).
 
-The frontend scenarios consume the agreed application read-model contract (`UnitManagerDashboardReadModel`, `IDashboardDataSource`) defined in `_bmad-output/specs/spec-dashboards/dashboard-api-contract.md`. They decouple UI presentation, access evaluation, skeleton loading, and tier projection from backend HTTP transport decisions (`OQ-DASH-ROUTE-01`, `OQ-DASH-DTO-01`, `OQ-PERM-01`).
+The frontend scenarios consume the agreed application read-model contract (`UnitManagerDashboardReadModel`, `IDashboardDataSource`) defined in `_bmad-output/specs/spec-dashboards/dashboard-api-contract.md`. They decouple UI presentation, access evaluation, skeleton loading, tier projection, and explicit availability rendering from backend HTTP transport decisions (`OQ-DASH-ROUTE-01`, `OQ-DASH-DTO-01`, `OQ-PERM-01`).
 
 ## Scenarios (Story 2.1 / PMC-E2-S2.1)
 
@@ -21,7 +21,17 @@ The frontend scenarios consume the agreed application read-model contract (`Unit
 | `FE-DASH-07` | Dashboard access denial | [`fe-dash-07-dashboard-access-denial-fail-closed.md`](fe-dash-07-dashboard-access-denial-fail-closed.md) | Fail-closed access denial when dashboard-view functional permission is missing, global unauthenticated handler triggered on 401 |
 | `FE-DASH-08` | Preset navigation and accessibility | [`fe-dash-08-preset-navigation-keyboard-motion-and-no-customization.md`](fe-dash-08-preset-navigation-keyboard-motion-and-no-customization.md) | Unit Manager preset tab, keyboard/arrow-key navigation, `prefers-reduced-motion`, no customize affordances |
 
+## Scenarios (Story 2.2 / PMC-E2-S2.2)
+
+| Scenario ID | Title | File | Focus |
+|---|---|---|---|
+| `FE-DASH-09` | Explicit unavailable widget slots | [`fe-dash-09-explicit-unavailable-widget-slots-with-missing-capability-messaging.md`](fe-dash-09-explicit-unavailable-widget-slots-with-missing-capability-messaging.md) | Explicit unavailable cards for uncovered slots (`PM-FR-21`, `PM-FR-19`, `PM-FR-23`, `PM-FR-20`) with permission-literate copy naming missing capability and explanation |
+| `FE-DASH-10` | Prevention of fake representations | [`fe-dash-10-prevention-of-fake-zero-dashes-or-fabricated-data-in-unavailable-slots.md`](fe-dash-10-prevention-of-fake-zero-dashes-or-fabricated-data-in-unavailable-slots.md) | Strict prevention of numeric `0`, dashes `—`, blank containers, chart visualization DOM, fake risk chips, mock trend arrows, or synthetic placeholder data in unavailable slots (decorative/status icons permitted) |
+| `FE-DASH-11` | Multi-widget coexistence and slot isolation | [`fe-dash-11-independent-slot-availability-and-multi-widget-coexistence.md`](fe-dash-11-independent-slot-availability-and-multi-widget-coexistence.md) | Coexistence of available and all five approved unavailable widgets; independent slot metadata rendering; no cross-slot corruption |
+| `FE-DASH-12` | State disambiguation | [`fe-dash-12-state-disambiguation-unavailable-vs-zero-emptyst-loading-and-denial.md`](fe-dash-12-state-disambiguation-unavailable-vs-zero-emptyst-loading-and-denial.md) | Strict visual and semantic separation across unavailable source, legitimate measured zero (`data-stat` mono + `.wscope`), empty reporting scope (`.emptyst`), loading (`Skeleton`), and access denial (`AccessDeniedPanel`), reusing existing Story 2.1 tests for baseline behavior |
+| `FE-DASH-13` | Unavailable card semantics and layout | [`fe-dash-13-unavailable-widget-card-semantics-accessibility-and-layout.md`](fe-dash-13-unavailable-widget-card-semantics-accessibility-and-layout.md) | Accessible headings and screen-reader readable text, responsive grid stability, keyboard navigation without focus traps, and absence of card-level customization affordances |
+
 ## Test Suite Counterpart
 
 These scenarios map to the Playwright E2E suite at `services/frontend/e2e/flows/dashboards/dashboards.spec.ts`.
-Mocks operate at the data-source / network layer using typed helpers, asserting user-visible behaviors and accessibility semantics without depending on live backend HTTP endpoints.
+Mocks operate at the application data-source boundary (`IDashboardDataSource` / `MockDashboardDataSource`), asserting user-visible behaviors and accessibility semantics through typed read models without depending on or implying concrete backend HTTP routes (`OQ-DASH-ROUTE-01`) or transport DTOs (`OQ-DASH-DTO-01`).

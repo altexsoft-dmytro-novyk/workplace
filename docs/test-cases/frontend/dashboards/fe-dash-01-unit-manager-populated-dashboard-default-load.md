@@ -19,4 +19,4 @@ Covered by these cases in `services/frontend/e2e/flows/dashboards/dashboards.spe
 - renders tier-projected people table rows for reporting-line employees with .wscope footer
 - displays navigation shortcuts to related modules
 
-**Preconditions:** The client consumes the agreed application read-model contract (`UnitManagerDashboardReadModel`) through `IDashboardDataSource`. The test suite mocks data at the data-source / network layer, and assertions verify visible user outcomes (role/label locators, typography classes, text contents) rather than component internals.
+**Preconditions:** The client consumes the agreed application read-model contract (`UnitManagerDashboardReadModel`) through `IDashboardDataSource`. The test suite supplies mock data at the application data-source boundary, and assertions verify visible user outcomes (role/label locators, typography classes, text contents) rather than component internals.
