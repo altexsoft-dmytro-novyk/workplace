@@ -19,6 +19,7 @@
 
 activation_steps_prepend = [
   "Run `node {project-root}/scripts/epic-id-guard.cjs --json` before reading any epic file. If `ok` is false, stop and report the findings verbatim: every finding names a file, a line and the ambiguous Epic/Story ID. Do not generate, refresh or repair sprint-status.yaml while any Epic or Story ID resolves to more than one definition — the tracking file cannot record a status against an identifier that names two different things.",
+  "Any generate, refresh, repair, or write of a sprint-status.yaml must go through `{project-root}/scripts/sprint-status-generate.sh generate ...` (the guarded wrapper around sprint_plan.py). Never invoke sprint_plan.py directly — including `uv run .../sprint_plan.py generate` — for tracking-file writes: CI checks identifier uniqueness on the committed file, not status downgrades, and a direct run can produce a well-formed downgrade that still passes the guard. The wrapper re-runs the identity guard on the exact --epic-file arguments, compares the candidate with the live file key by key and status by status, and leaves the real file untouched on refusal.",
 ]
 
 persistent_facts = [
@@ -32,4 +33,4 @@ persistent_facts = [
 # the repository AND on the exact --epic-file arguments passed, then runs the
 # generator against a temporary copy and compares the candidate with the live
 # file key by key and status by status. On refusal the real file is untouched.
-on_complete = "If this run generated or repaired a tracking file, confirm it was produced via `{project-root}/scripts/sprint-status-generate.sh generate ...` (the guarded wrapper around sprint_plan.py), and report the guard result and the candidate comparison alongside the generator's JSON. If the wrapper refused, do not re-run it with SPRINT_STATUS_ALLOW_UNSAFE=1 to get past the refusal — report the dropped keys and unrequested status changes to the user and let them decide."
+on_complete = "If this run generated or repaired a tracking file, confirm the guarded wrapper was used as mandated at activation, and report its guard result and candidate comparison alongside the generator's JSON. If the wrapper refused, do not re-run it with SPRINT_STATUS_ALLOW_UNSAFE=1 to get past the refusal — report the dropped keys and unrequested status changes to the user and let them decide."
