@@ -1,0 +1,36 @@
+# Stories for People Management Dashboards (Epic 2 / PMC-E2)
+# Preserves canonical acceptance criteria from platform-capabilities/epics.md.
+# PMC-E2-S2.4 is gated on DEPARTMENT-EDGE and PM/AD-35 and is deliberately excluded from dispatchable stories.
+
+- id: "2-1"
+  title: Unit Manager Dashboard — Scope, Headcount, and People Table
+  description: >-
+    Deliver the people-grouped Unit Manager dashboard scoped to Reporting-line direct reports, rendering active headcount excluding dismissed employees and the tier-projected people table.
+    Preserves CAP-1 and all PMC-E2-S2.1 acceptance criteria with .pghd band, .prov tag, and .wscope footers.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Scope resolves via AccessControl facade per target, never inferred from holding a functional role.
+    People table consumes Epic 1 shared row read model. Measure scope-resolution delta in addition to citing Epic 1 performance evidence.
+
+- id: "2-2"
+  title: Unsourced Widget Slots Render Explicit Unavailable States
+  description: >-
+    Render explicit unavailable states for widget slots and table columns whose source functional requirements are uncovered (PM-FR-19, PM-FR-20, PM-FR-21, PM-FR-23, PM-FR-36, PM-FR-37).
+    Preserves CAP-2 and all PMC-E2-S2.2 acceptance criteria, ensuring legitimate measured zeros display distinctly as 0 in mono typography without fake data.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Availability keys on source FR provenance rather than returned values; never convert missing sources to 0, —, or empty charts.
+    Verification of availability declarations must be demonstrable at the read-model contract layer without seeding unapproved permission grants.
+
+- id: "2-3"
+  title: People Partner Dashboard — PP-Assigned Scope with No Resourcing Block
+  description: >-
+    Deliver the People Partner dashboard scoped strictly to assigned employees with tier-projected people table and HR widgets.
+    Preserves CAP-3 and all PMC-E2-S2.3 acceptance criteria, with resourcing functionality absent by construction.
+  spec_checkpoint: true
+  done_checkpoint: true
+  invoke_dev_with: >-
+    Scope resolves through direct Relationship type='people_partner' assignments only.
+    No resourcing block, slot, counter, or placeholder may exist in the PP read model or component tree.
