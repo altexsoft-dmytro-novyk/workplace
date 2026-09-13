@@ -20,6 +20,17 @@ function checkoutSha(root) {
   return result.status === 0 ? result.stdout.trim() : null;
 }
 
+function evidenceMatchesCheckout(root, evidenceSha, checkedOutSha) {
+  if (!evidenceSha || !checkedOutSha) return null;
+  if (evidenceSha === checkedOutSha) return true;
+  const ancestor = spawnSync('git', ['merge-base', '--is-ancestor', evidenceSha, checkedOutSha], { cwd: root });
+  if (ancestor.status !== 0) return false;
+  const diff = spawnSync('git', ['diff', '--name-only', evidenceSha, checkedOutSha], { cwd: root, encoding: 'utf8' });
+  if (diff.status !== 0) return false;
+  const paths = diff.stdout.split('\n').filter(Boolean);
+  return paths.length > 0 && paths.every(file => file.startsWith('_bmad-output/test-artifacts/'));
+}
+
 function build(evidence, run = {}, root = ROOT) {
   const read = file => JSON.parse(fs.readFileSync(path.join(root, file), 'utf8'));
   const seed = read(IMPLEMENTATION_NOTES_SOURCE);
@@ -56,7 +67,7 @@ function build(evidence, run = {}, root = ROOT) {
     implementationNotesSnapshotAt: seed.implementationNotesSnapshotAt,
     implementationNotesSource: IMPLEMENTATION_NOTES_SOURCE,
     checkoutSha: checkedOutSha,
-    evidenceMatchesCheckout: checkedOutSha ? checkedOutSha === evidence.source_sha : null,
+    evidenceMatchesCheckout: evidenceMatchesCheckout(root, evidence.source_sha, checkedOutSha),
     canonicalBaseline: canonical.baseline_date };
   const template = fs.readFileSync(path.join(root, 'docs/demo/readiness-template.html'), 'utf8');
   if (template.split('__READINESS_DATA__').length !== 2) throw new Error('Invalid map template');
@@ -84,4 +95,4 @@ if (require.main === module) {
     console.log(JSON.stringify({output, sourceSha:result.data.ci.sourceSha, ...result.data.ci.counts}));
   } catch (error) { console.error(error.stack || error.message); process.exitCode = 1; }
 }
-module.exports = { build, writeMap };
+module.exports = { build, writeMap, evidenceMatchesCheckout };

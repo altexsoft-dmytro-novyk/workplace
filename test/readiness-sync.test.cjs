@@ -53,6 +53,7 @@ test('build rejects impossible or relabelled implementation-note snapshot dates'
 test('build records when CI evidence does not describe the current checkout',t=>{
   const root=fixtureRoot(t),result=build(evidence(),{checkoutSha:'def'},root);
   assert.equal(result.data.inventory.evidenceMatchesCheckout,false);
+  assert.equal(build(evidence(),{checkoutSha:'abc'},root).data.inventory.evidenceMatchesCheckout,true);
 });
 
 test('the product UI distinguishes planning, implementation snapshots, and CI evidence',()=>{
