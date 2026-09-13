@@ -1,0 +1,11 @@
+---
+description: BMAD framework integration using existing _bmad setup
+globs: "*"
+alwaysApply: true
+---
+
+# BMAD Framework Rules
+
+- **Prompts & Agents:** Read all agent personas, workflows, and prompts directly from `_bmad/`.
+- **Output Storage:** Save all generated PRDs, architecture specs, user stories, and execution logs into `_bmad-output/`.
+- **Context Awareness:** When executing a phase, check past logs in `_bmad-output/` and project specifications in `docs/`.
