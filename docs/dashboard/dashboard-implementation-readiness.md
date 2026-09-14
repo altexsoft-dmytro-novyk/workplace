@@ -3,10 +3,11 @@
 **Date:** 2026-09-14  
 **Owner:** Carlos Nunes (BA)  
 **For:** Tamar Tchelidze (frontend), Anna Pikula (QA)  
-**Authoritative handoff:** `dashboard-feature-handoff-2026-09-11.md` (SRC-123)  
-**UX patterns (separate doc):** `dashboard-ux-approved-patterns.md`
+**Authoritative handoff:** `docs/dashboard/dashboard-feature-handoff-2026-09-11.md`
 
-This doc tells you what to build, what blocks you, and what is in the workspace vs the team repo. It does not replace the handoff. Where they differ, the handoff wins.
+This doc tells you what to build and what blocks you. It does not replace the handoff, the PRD, the epic, or the UX specs. Where they differ, those win.
+
+All paths below are relative to this repository root and resolve on `main`.
 
 ---
 
@@ -96,7 +97,7 @@ Run a fresh code review after each story. Push backend and frontend in separate 
 
 **Gate ID:** `OQ-PERM-01`  
 **Question:** Who gets the `dashboard-view` functional permission by default?  
-**Status (last verified 2026-09-14):** **OPEN** in team repo `blockers.yaml`
+**Status (last verified 2026-09-14 on `main`):** **`status: open`** in `_bmad-output/planning-artifacts/architecture/architecture-people-management-ratification-2026-09-02/blockers.yaml`
 
 **This is not a BMad workflow.** Do not run PRD, architecture, epic-creation, or sprint-planning skills for this.
 
@@ -116,51 +117,48 @@ Until answered:
 
 ---
 
-## 7. What is in this workspace
+## 7. Authoritative sources
 
-| Asset | Workspace path | Use it for |
-|-------|----------------|------------|
-| Developer handoff | `06_REQUIREMENTS_WORKSPACE/dashboard-feature-handoff-2026-09-11.md` | Full implementation rules |
-| Product §4.4 requirements | `06_REQUIREMENTS_WORKSPACE/people-management-platform-test-assignment-v1.2.md` §4.4 | UM/PP dashboard feature list |
-| v1.5 deltas | `06_REQUIREMENTS_WORKSPACE/spec-changelog-v1.2-to-v1.5.md` | Active risk ≠ `low`; access model changes |
-| Team 5 UX prototype | `03_DESIGN/current-state/team5-hi5-prototype/` | Layout reference only |
-| Team 5 gap analysis | `03_DESIGN/current-state/team5-hi5-prototype-vs-requirements.md` | What to copy vs reject |
-| UX approved patterns | `06_REQUIREMENTS_WORKSPACE/dashboard-ux-approved-patterns.md` | Tamar layout guide (SRC-123 companion) |
-| Implementation readiness | `06_REQUIREMENTS_WORKSPACE/dashboard-implementation-readiness.md` | This doc |
+All of these are on `main`. Read them instead of any summary, including this one.
 
-**Stale. Do not use:**
-- `workplace-old/docs/architecture/dashboards.md` says "NOT YET DECIDED." The team repo `dashboard` branch has the updated version.
+| Asset | Path | Use it for |
+|-------|------|------------|
+| Developer handoff | `docs/dashboard/dashboard-feature-handoff-2026-09-11.md` | Full implementation rules |
+| PRD **v1.5** §4.4 | `docs/project-requirements.md` | UM/PP dashboard feature list, risk model (§4.6) |
+| v1.2 → v1.5 changelog | `docs/requirements-changelog-v1.2-to-v1.5.md` | Access-model split, active risk ≠ `low`, `leaver` is a forecast |
+| Epic 2 stories and AC | `_bmad-output/planning-artifacts/platform-capabilities/epics.md` | Binding acceptance criteria for S2.1–S2.3 |
+| UX experience spec | `_bmad-output/planning-artifacts/ux-designs/ux-people-management-2026-09-02/EXPERIENCE.md` | Screen behavior, states, copy register |
+| UX design tokens | `_bmad-output/planning-artifacts/ux-designs/ux-people-management-2026-09-02/DESIGN.md` | `.pghd`, `.prov`, `.wscope`, `.emptyst`, token names |
+| Dashboard architecture | `docs/architecture/dashboards.md` | AD-33 binding rule — fixed read models, no widget framework |
+| Access control | `docs/architecture/access-control.md` | Scope resolution before aggregation |
+| Gate registry | `_bmad-output/planning-artifacts/architecture/architecture-people-management-ratification-2026-09-02/blockers.yaml` | `OQ-PERM-01`, `DEPARTMENT-EDGE`, `TT-IDENTITY-01` |
+| Story status | `_bmad-output/implementation-artifacts/platform-capabilities/sprint-status.yaml` | Sprint keys and current state |
+
+**UI comes from `EXPERIENCE.md` and `DESIGN.md`.** Reference tokens by name. Do not copy hex values or layouts from any cross-team prototype, and do not write a second UX spec.
 
 ---
 
-## 8. What is missing from this workspace
+## 8. Story status and sprint keys
 
-These files live in the **team repo** (`workplace`), on the **`dashboard` branch**, not on `main` and not in this bootcamp workspace.
+Source: `_bmad-output/implementation-artifacts/platform-capabilities/sprint-status.yaml` on `main`, verified 2026-09-14.
 
-| Missing file | Why you need it |
-|--------------|-----------------|
-| `_bmad-output/planning-artifacts/platform-capabilities/epics.md` | Full story acceptance criteria for Epic 2 |
-| `_bmad-output/implementation-artifacts/platform-capabilities/sprint-status.yaml` | Story status tracking |
-| `_bmad-output/planning-artifacts/architecture/architecture-people-management-ratification-2026-09-02/blockers.yaml` | Gate statuses (`OQ-PERM-01`, etc.) |
-| `docs/test-cases/dashboards/` | Test scenarios (Anna's side) |
-| `docs/architecture/dashboards.md` (updated) | Replaces stale `workplace-old` stub |
+| Story | Sprint key | Status |
+|-------|------------|--------|
+| PMC-E2-S2.1 | `2-1-unit-manager-dashboard-scope-headcount-and-people-table` | `backlog` |
+| PMC-E2-S2.2 | `2-2-unsourced-widget-slots-render-explicit-unavailable-states` | `backlog` |
+| PMC-E2-S2.3 | `2-3-people-partner-dashboard-pp-assigned-scope-with-no-resourcing-block` | `backlog` |
 
-### How to get them
+Read the sprint key from the YAML rather than from this table. Update status only through the normal sprint-status flow.
 
-1. Open or clone the team repo: `https://github.com/altexsoft-dmytro-novyk/workplace`
-2. Run: `git fetch origin && git checkout dashboard`
-3. Read or copy the files listed above
-4. Work from the `dashboard` branch, not `main`
+### Availability at sprint entry (epics.md, Epic 2 source audit)
 
-**Sprint keys on the dashboard branch:**
+S2.2 exists to make this distinction visible rather than paper over it.
 
-| Story | Sprint key |
-|-------|------------|
-| PMC-E2-S2.1 | `2-1-unit-manager-dashboard-scope-headcount-and-people-table` |
-| PMC-E2-S2.2 | `2-2-unsourced-widget-slots-render-explicit-unavailable-states` |
-| PMC-E2-S2.3 | `2-3-people-partner-dashboard-pp-assigned-scope-with-no-resourcing-block` |
+| Available today | Unavailable — must render an explicit unavailable state |
+|-----------------|----------------------------------------------------------|
+| Headcount, people-table identity columns, navigation shortcuts, People Partner scope, resourcing-absent-by-construction | Risk counts and the risk/trend column (`PM-FR-21`), action items (`PM-FR-19`), resourcing requests (`PM-FR-23`), campaigns (`PM-FR-20`), project column (`PM-FR-37`, also `TT-IDENTITY-01`), leave status (`PM-FR-36`) |
 
-All epic-2 stories are `backlog` as of 2026-09-14.
+Per S2.2, while `PM-FR-21` is uncovered, **no risk level, count, or trend arrow appears anywhere on the dashboard.**
 
 
 ---
@@ -169,6 +167,8 @@ All epic-2 stories are `backlog` as of 2026-09-14.
 
 - Do not create a new epic or new story IDs
 - Do not create or rewrite PRD, architecture, UX spec, test strategy, or traceability matrix
+- Do not show a risk level, count, or trend arrow anywhere on the dashboard while `PM-FR-21` is uncovered
+- Do not present `leaver` as a departure. It is a risk forecast; the fact of departure is `dismissed` employment status (PRD §4.6)
 - Do not run BMad PRD, architecture, epic-creation, test-design, or sprint-planning workflows
 - Do not edit planning artifacts to make implementation easier
 - Do not self-close, bypass, seed, or infer an open permission gate
@@ -192,17 +192,17 @@ All epic-2 stories are `backlog` as of 2026-09-14.
 |--------|------|
 | **Tamar** | Implements S2.1, S2.2, S2.3 per handoff |
 | **Anna** | Test scenarios, PASS gate, verification |
-| **Carlos** | This readiness doc, UX patterns doc, gate escalation, traceability support |
+| **Carlos** | This readiness doc, gate escalation, traceability support |
 | **Dmytro / Vitaliy** | Resolve `OQ-PERM-01`, branch merge strategy |
 
 ---
 
 ## 12. Start checklist for Tamar
 
-- [ ] Read `dashboard-feature-handoff-2026-09-11.md`
-- [ ] Read `dashboard-ux-approved-patterns.md` for layout. Use `team5-hi5-prototype-vs-requirements.md` for gap detail.
-- [ ] Checkout team repo `dashboard` branch
-- [ ] Confirm `OQ-PERM-01` status in `blockers.yaml`
+- [ ] Read `docs/dashboard/dashboard-feature-handoff-2026-09-11.md`
+- [ ] Read Epic 2 in `_bmad-output/planning-artifacts/platform-capabilities/epics.md` — the AC are binding
+- [ ] Read `_bmad-output/planning-artifacts/ux-designs/ux-people-management-2026-09-02/EXPERIENCE.md` and `DESIGN.md` for layout, states, and token names
+- [ ] Confirm `OQ-PERM-01` status in `_bmad-output/planning-artifacts/architecture/architecture-people-management-ratification-2026-09-02/blockers.yaml`
 - [ ] If gate open: start **S2.2 only**. Wait for PO answer before S2.1 and S2.3.
 - [ ] If gate closed: start S2.1 → S2.2 → S2.3 in order
 - [ ] Follow delivery sequence in Section 2 for every story
@@ -211,16 +211,11 @@ All epic-2 stories are `backlog` as of 2026-09-14.
 
 ---
 
-## 13. Share for team review
-
-**Copy-paste PR commands:** `06_REQUIREMENTS_WORKSPACE/workplace-pr/PR-COMMANDS.md`
-
-**Team repo copy:** `/Users/work/AI-Training/workplace/docs/dashboard/`
+## 13. Files in this folder
 
 | File | Purpose |
 |------|---------|
-| `dashboard-implementation-readiness.md` | This doc |
-| `dashboard-ux-approved-patterns.md` | Layout guide |
-| `dashboard-feature-handoff-2026-09-11.md` | Authoritative handoff |
+| `docs/dashboard/dashboard-feature-handoff-2026-09-11.md` | Authoritative handoff |
+| `docs/dashboard/dashboard-implementation-readiness.md` | This doc — scope, gates, source pointers |
 
-Run the commands in `PR-COMMANDS.md` to branch, commit, push, and open the PR for Tamar, Anna, and Dmytro.
+Layout guidance is not duplicated here. Use `EXPERIENCE.md` and `DESIGN.md` (Section 7).
