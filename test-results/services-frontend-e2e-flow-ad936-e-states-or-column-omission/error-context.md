@@ -1,0 +1,226 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: services/frontend/e2e/flows/dashboards/dashboards.spec.ts >> People Management Dashboards — Unit Manager (Story 2.1 / PMC-E2-S2.1) >> FE-DASH-06 · Tier-safe people table and uncovered columns >> handles uncovered project, leave, and risk columns via explicit unavailable states or column omission
+- Location: services/frontend/e2e/flows/dashboards/dashboards.spec.ts:260:5
+
+# Error details
+
+```
+Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
+Call log:
+  - navigating to "/dashboards", waiting until "load"
+
+```
+
+# Test source
+
+```ts
+  165 | 
+  166 |       const headcountCard = page.getByTestId('dashboard-headcount-widget').or(page.locator('[data-widget="headcount"]'))
+  167 |       // Headcount widget is NOT shown as unavailable
+  168 |       await expect(headcountCard.getByText(/unavailable/i)).not.toBeVisible()
+  169 |       await expect(headcountCard.getByText('0', { exact: true })).toBeVisible()
+  170 |     })
+  171 |   })
+  172 | 
+  173 |   test.describe('FE-DASH-04 · Scope correctness and reporting-line isolation', () => {
+  174 |     test('renders all reporting-line employee rows supplied by the read model', async ({ page }) => {
+  175 |       await setupPopulatedDashboard(page)
+  176 |       await page.goto('/dashboards')
+  177 | 
+  178 |       for (const row of mockPopulatedUnitManagerDashboard.peopleTable.data.rows) {
+  179 |         await expect(page.getByText(`${row.firstName} ${row.lastName}`)).toBeVisible()
+  180 |       }
+  181 |     })
+  182 | 
+  183 |     test('does not add or fabricate employees outside the supplied read model', async ({ page }) => {
+  184 |       await setupPopulatedDashboard(page)
+  185 |       await page.goto('/dashboards')
+  186 | 
+  187 |       // An unentitled employee not in the read model must not appear
+  188 |       await expect(page.getByText('Unknown Outside Employee')).not.toBeVisible()
+  189 |       await expect(page.getByText('Unassigned Colleague')).not.toBeVisible()
+  190 |     })
+  191 | 
+  192 |     test('renders the evaluated scope policy label and .wscope footer correctly', async ({ page }) => {
+  193 |       await setupPopulatedDashboard(page)
+  194 |       await page.goto('/dashboards')
+  195 | 
+  196 |       const wscopeElements = page.locator('.wscope, [data-slot="widget-scope-footer"]')
+  197 |       await expect(wscopeElements.first()).toBeVisible()
+  198 |       await expect(wscopeElements.first()).toContainText('SCOPE: REPORTING_LINE')
+  199 |     })
+  200 |   })
+  201 | 
+  202 |   test.describe('FE-DASH-05 · Active headcount rendering', () => {
+  203 |     test('faithfully renders the active headcount value supplied by the read model', async ({ page }) => {
+  204 |       await setupPopulatedDashboard(page)
+  205 |       await page.goto('/dashboards')
+  206 | 
+  207 |       const headcountCard = page.getByTestId('dashboard-headcount-widget').or(page.locator('[data-widget="headcount"]'))
+  208 |       await expect(headcountCard).toContainText('3')
+  209 |     })
+  210 | 
+  211 |     test('renders the headcount metric in data-stat mono with .wscope footer', async ({ page }) => {
+  212 |       await setupPopulatedDashboard(page)
+  213 |       await page.goto('/dashboards')
+  214 | 
+  215 |       const headcountCard = page.getByTestId('dashboard-headcount-widget').or(page.locator('[data-widget="headcount"]'))
+  216 |       const statElem = headcountCard.locator('.data-stat').or(headcountCard.getByText('3', { exact: true }))
+  217 |       await expect(statElem).toBeVisible()
+  218 |       await expect(
+  219 |         headcountCard.locator('.wscope, [data-slot="widget-scope-footer"]').filter({
+  220 |           hasText: /SCOPE: REPORTING_LINE/i,
+  221 |         })
+  222 |       ).toBeVisible()
+  223 |     })
+  224 | 
+  225 |     test('does not recompute or alter the supplied headcount value on the client', async ({ page }) => {
+  226 |       // Pass a specific count in the read model
+  227 |       await setupPopulatedDashboard(page, {
+  228 |         headcount: {
+  229 |           status: 'available',
+  230 |           data: {
+  231 |             count: 42,
+  232 |             wscope: 'SCOPE: REPORTING_LINE',
+  233 |           },
+  234 |         },
+  235 |       })
+  236 |       await page.goto('/dashboards')
+  237 | 
+  238 |       const headcountCard = page.getByTestId('dashboard-headcount-widget').or(page.locator('[data-widget="headcount"]'))
+  239 |       await expect(headcountCard).toContainText('42')
+  240 |     })
+  241 |   })
+  242 | 
+  243 |   test.describe('FE-DASH-06 · Tier-safe people table and uncovered columns', () => {
+  244 |     test('renders shared read model fields permitted for reporting tier', async ({ page }) => {
+  245 |       await setupPopulatedDashboard(page)
+  246 |       await page.goto('/dashboards')
+  247 | 
+  248 |       const table = page.getByRole('table').or(page.getByTestId('dashboard-people-table'))
+  249 |       await expect(table).toBeVisible()
+  250 | 
+  251 |       // Select deterministic employee row to verify projection without relying on globally unique field values
+  252 |       const aliceRow = table.getByRole('row').filter({ hasText: 'Alice Smith' })
+  253 |       await expect(aliceRow).toBeVisible()
+  254 |       await expect(aliceRow.getByText('Alice Smith')).toBeVisible()
+  255 |       await expect(aliceRow.getByText('Senior Engineer')).toBeVisible()
+  256 |       await expect(aliceRow.getByText('L4')).toBeVisible()
+  257 |       await expect(aliceRow.getByText('Full-time')).toBeVisible()
+  258 |     })
+  259 | 
+  260 |     test('handles uncovered project, leave, and risk columns via explicit unavailable states or column omission', async ({
+  261 |       page,
+  262 |     }) => {
+  263 |       // 1. Case A: With explicitly declared unavailable columns
+  264 |       await setupPopulatedDashboard(page)
+> 265 |       await page.goto('/dashboards')
+      |                  ^ Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
+  266 | 
+  267 |       const table = page.getByRole('table').or(page.getByTestId('dashboard-people-table'))
+  268 |       await expect(table).toBeVisible()
+  269 | 
+  270 |       // If uncovered columns exist in the table, verify they render explicit unavailable indicators/badges
+  271 |       const projectHeader = table.getByRole('columnheader', { name: /Project/i })
+  272 |       const leaveHeader = table.getByRole('columnheader', { name: /Leave/i })
+  273 |       const riskHeader = table.getByRole('columnheader', { name: /Risk/i })
+  274 | 
+  275 |       const hasProjectHeader = (await projectHeader.count()) > 0
+  276 |       const hasLeaveHeader = (await leaveHeader.count()) > 0
+  277 |       const hasRiskHeader = (await riskHeader.count()) > 0
+  278 | 
+  279 |       if (hasProjectHeader || hasLeaveHeader || hasRiskHeader) {
+  280 |         const unavailableBadges = table
+  281 |           .locator('.unavailable-column, [data-unavailable="true"]')
+  282 |           .or(table.getByText(/Unavailable|Not connected/i))
+  283 |         await expect(unavailableBadges.first()).toBeVisible()
+  284 |         const badgeCount = await unavailableBadges.count()
+  285 |         expect(badgeCount).toBeGreaterThan(0)
+  286 |       }
+  287 | 
+  288 |       // 2. Case B: With completely omitted uncovered columns
+  289 |       await setupOmittedColumnsDashboard(page)
+  290 |       await page.goto('/dashboards')
+  291 | 
+  292 |       const omittedTable = page.getByRole('table').or(page.getByTestId('dashboard-people-table'))
+  293 |       await expect(omittedTable).toBeVisible()
+  294 |       await expect(omittedTable.getByText('Diana Prince')).toBeVisible()
+  295 | 
+  296 |       // Explicitly assert that uncovered column headers are absent when omitted
+  297 |       await expect(omittedTable.getByRole('columnheader', { name: /^Project$/i })).not.toBeVisible()
+  298 |       await expect(omittedTable.getByRole('columnheader', { name: /^Leave/i })).not.toBeVisible()
+  299 |       await expect(omittedTable.getByRole('columnheader', { name: /^Risk/i })).not.toBeVisible()
+  300 |     })
+  301 | 
+  302 |     test('does not render silently blank cells or fabricated values for missing source capabilities', async ({ page }) => {
+  303 |       await setupPopulatedDashboard(page)
+  304 |       await page.goto('/dashboards')
+  305 | 
+  306 |       const table = page.getByRole('table').or(page.getByTestId('dashboard-people-table'))
+  307 |       await expect(table).toBeVisible()
+  308 | 
+  309 |       // Ensure no blank cells with whitespace-only
+  310 |       const emptyCells = table.locator('td:empty')
+  311 |       await expect(emptyCells).toHaveCount(0)
+  312 | 
+  313 |       // Ensure no raw undefined / null / NaN text in table cells
+  314 |       await expect(table.getByText('undefined', { exact: true })).not.toBeVisible()
+  315 |       await expect(table.getByText('null', { exact: true })).not.toBeVisible()
+  316 |       await expect(table.getByText('NaN', { exact: true })).not.toBeVisible()
+  317 |     })
+  318 |   })
+  319 | 
+  320 |   test.describe('FE-DASH-07 · Dashboard access denial and unauthenticated handling', () => {
+  321 |     test('renders access-denied panel when dashboard-view permission is not held', async ({ page }) => {
+  322 |       await setupAccessDeniedDashboard(page)
+  323 |       await page.goto('/dashboards')
+  324 | 
+  325 |       // Fail-closed access denied UI using stable test ID
+  326 |       const accessDeniedPanel = page.getByTestId('access-denied-panel')
+  327 |       await expect(accessDeniedPanel).toBeVisible()
+  328 |       await expect(accessDeniedPanel).toContainText(/Access denied|No permission/i)
+  329 | 
+  330 |       // Dashboard widgets and people table must NOT be rendered
+  331 |       await expect(page.getByTestId('dashboard-headcount-widget')).not.toBeVisible()
+  332 |       await expect(page.getByRole('table')).not.toBeVisible()
+  333 |     })
+  334 | 
+  335 |     test('unauthenticated 401 response triggers the application global unauthenticated redirect handler', async ({
+  336 |       page,
+  337 |     }) => {
+  338 |       await setupUnauthenticatedDashboard(page)
+  339 |       await page.goto('/dashboards')
+  340 | 
+  341 |       // Expect global unauthenticated redirect to /login per FE-AUTH-01 / FE-EMP-07 / spec-frontend-foundation
+  342 |       await expect(page).toHaveURL(/\/login(?:\?.*)?$/)
+  343 |     })
+  344 |   })
+  345 | 
+  346 |   test.describe('FE-DASH-08 · Preset navigation, keyboard accessibility, motion, and no customization', () => {
+  347 |     test('preset tab strip displays Unit Manager preset only and is arrow-key navigable', async ({ page }) => {
+  348 |       await setupPopulatedDashboard(page)
+  349 |       await page.goto('/dashboards')
+  350 | 
+  351 |       const tabList = page.getByRole('tablist')
+  352 |       await expect(tabList).toBeVisible()
+  353 | 
+  354 |       // Only Unit Manager tab present in Epic 2 Story 2.1 scope (no DM/PM tabs)
+  355 |       await expect(page.getByRole('tab', { name: /Unit Manager/i })).toBeVisible()
+  356 |       await expect(page.getByRole('tab', { name: /Delivery Manager/i })).not.toBeVisible()
+  357 |       await expect(page.getByRole('tab', { name: /Project Manager/i })).not.toBeVisible()
+  358 | 
+  359 |       // Arrow-key navigable
+  360 |       const umTab = page.getByRole('tab', { name: /Unit Manager/i })
+  361 |       await umTab.focus()
+  362 |       await page.keyboard.press('ArrowRight')
+  363 |       await expect(umTab).toBeFocused()
+  364 |     })
+  365 | 
+```
