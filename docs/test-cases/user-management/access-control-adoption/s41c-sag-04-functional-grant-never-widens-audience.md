@@ -1,5 +1,10 @@
 # S4.1c-SAG-04 · A live functional-role grant never widens a resolved audience
 
+> **Test 5 status code SUPERSEDED FOR THE LIVE ORACLE 2026-09-12 — [`umac-11`](umac-11-hidden-target-denial-oracle.md).**
+> The target in Test 5 is inactive, so it is a hidden target. It is now denied `404` before any
+> section or feature check (PM/AD-24, `CONFLICT-UM-01`). The claim itself is unchanged: the grant
+> never opens the target, and the row stays unchanged. The lines below are historical evidence.
+
 **Trace:**
 
 - [`access-control.md` line 19](../../../architecture/access-control.md) **NORMATIVE** — "A new functional role never widens data access (§2.3): FR grants features; what data those features can touch is bounded by the holder's computed access audiences. Feature permissions operate **within** the holder's resolved audiences only." Mirrored in [`docs/project-requirements.md` §2](../../../project-requirements.md).

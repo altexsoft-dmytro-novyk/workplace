@@ -1,5 +1,10 @@
 # S4.1c-SAG-01 · `GET /users/:id` read gate — any non-empty audience allows, `none` denies
 
+> **SUPERSEDED FOR THE LIVE ORACLE 2026-09-12 — [`umac-11`](umac-11-hidden-target-denial-oracle.md).**
+> Tests 5–6 below (deactivated target and unknown target id → `403`) are regenerated
+> there as `404`, ahead of the section check (PM/AD-24, `CONFLICT-UM-01`). The lines below are
+> unchanged historical evidence.
+
 **Trace:**
 
 - [`docs/project-requirements.md` §3.2](../../../project-requirements.md) row **S1** (Identity card) — `Self: R (photo RW)` · `Reporting line: RW¹` · `PP: RW¹` · `Colleague: R`. Every one of those cells is at least `R`, so every resolved audience satisfies a `'read'` requirement.

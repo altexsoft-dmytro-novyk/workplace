@@ -1,0 +1,537 @@
+---
+runScope: 'epic'
+runKey: 'epic-platform-3'
+epicId: 'PLAT-E3'
+epicDomain: 'platform'
+epicSourcePath: '_bmad-output/planning-artifacts/platform/epics.md'
+epicNumber: 3
+workflowStatus: 'generated'
+approvalStatus: 'granted'
+approvalGrantedBy: 'Anna Pikula'
+approvalGrantedDate: '2026-09-12'
+validationStatus: 'PASS'
+validationDate: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-3.md'
+independentRevalidation: 'complete — fresh independent Epic-Level validation PASS, 2026-09-12; supersedes the fourth-run CONCERNS.'
+date: '2026-09-12'
+---
+
+# Test Design: PLAT-E3 — Access Control Kernel MVP
+
+**Validation projection:** **PASS (2026-09-12, fresh independent validation)** — synchronized with
+`test-design/README.md` and `test-design-validation-report-epic-platform-3.md`.
+
+**Status:** Written — **approval granted 2026-09-12** by the requester; validation **PASS (2026-09-12, fresh independent validation)**. Approval and validation are separate states and neither confers the other.
+**Scope:** Epic-level test design for the deployable, headless Access Control kernel.
+**Canonical source:** `_bmad-output/planning-artifacts/platform/epics.md`, `## Epic 3: Access Control Kernel MVP`.
+
+> **Correction and validation record (2026-09-12).** Six passes ran against this plan on one day.
+> An Epic Validate returned CONCERNS and an independent requirements review returned *revisions
+> needed*; a correction pass addressed both. An independent audit of that correction found six
+> further defects — two of them fabricated citations inside the headline ACM-8 finding — which were
+> fixed and re-checked against primary sources. A second Epic Validate returned PASS, but that run
+> was a **self-validation** by the authoring session. An **independent re-validation then returned
+> CONCERNS**, superseding the PASS at the same report path
+> ([`test-design-validation-report-epic-platform-3.md`](test-design-validation-report-epic-platform-3.md)).
+> An Edit closed four of its findings; a **third Epic Validate** verified those closures, confirmed
+> the C-2 root-trace against primary sources, and returned **CONCERNS** again on two narrower
+> findings. This Edit closes both.
+>
+> The current verdict is therefore **PASS (2026-09-12, fresh independent validation)**. No verdict on this plan has
+> ever turned on the design's substance — every concern raised across all three runs has been about
+> the document set's self-consistency. **An Edit cannot clear a verdict** — only a further Epic
+> Validate can. The corrections are listed in [Correction log](#correction-log).
+
+## Executive Summary
+
+PLAT-E3 establishes a real PostgreSQL-backed Access Control kernel: fail-closed
+audience resolution, functional-role data and evaluation, a constrained base
+section decision, composition in `AppModule`, and the ACM-9 resolver measurement.
+The evidence boundary is intentionally headless: real Nest module, real Prisma
+adapters, migrated PostgreSQL, and the public `AccessControlFacade`; no test-only
+HTTP endpoint is permitted.
+
+Eight risks score 6 or higher. The score-9 concern is a possible audience leak from
+missing/inactive identities or cyclic relationship walks. The mitigation is
+real-database facade evidence, not mocked repositories or a simulated route.
+ACM-9 has a separate, append-only performance-evidence protocol. It is Contract B
+(facade resolver) only and is never evidence for the All Employees list / `PG-04`
+or the P6 resolver measurement.
+
+Existing `test/access-control/` files and kernel scenario prose are an inventory
+of intended or historical evidence, not a claim that tests pass, requirements are
+covered, an approval exists, or a release gate is satisfied.
+
+### Execution-state caveat — this epic is already implemented
+
+**Current execution state:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
+is authoritative and records `epic-3` plus every Epic 3 story key (`3-1` … `3-8`) as `done`.
+The source's *Kernel MVP status caveat* agrees and says Epic 3 has no tracking divergence. One
+source-document contradiction remains: the Epic 3 body header still says `in-progress`. This plan
+records that stale header but does not edit the canonical epic source.
+
+| Surface | State | Note |
+| --- | --- | --- |
+| `platform/sprint-status.yaml` | `epic-3: done`; `3-1` … `3-8: done` | Authoritative execution state. |
+| `epics.md` *Kernel MVP status caveat* | Epic 3 has no divergence | Agrees with the tracker. |
+| `epics.md` `## Epic 3` header | `**Status:** in-progress` | Stale source header; contradicts both rows above. |
+
+**Consequence for this plan.** The [QA effort estimate](#qa-effort-estimate) is *not* a forecast of
+unstarted work. It sizes **evidence design and verification against already-shipped behaviour** —
+writing or re-pointing the obligations below and confirming them against the current resolver — not
+building the kernel. Correcting the remaining source header belongs to **Platform Story 1.1's
+traceability work**; this plan neither performs nor claims it. The deliberate Epic 2
+coverage-status divergence is separate and is not an Epic 3 execution-state conflict.
+
+## Scope and Boundaries
+
+| In scope | Explicitly not in scope | Boundary / owner |
+| --- | --- | --- |
+| ACM-0 root identity prerequisite | User Management API/CRUD or population import | ACM-0 only creates the one deploy-time root row; User Management owns its surfaces. |
+| ACM-1 functional-role foundation | Runtime role management, `/roles`, grants API | Kernel MVP has a seed/migration-owned catalog only. UI-driven role administration (requirements §2.3) has **no named owner**; it is an open follow-up, not a silent exclusion. |
+| ACM-2 FR decision, ACM-3/4 audience resolution, ACM-5 base section access | `/users` enforcement, projection, dismissed-target behavior, S2–S9/S12+ section semantics | User Management and owning projections consume the facade later. |
+| ACM-8 module composition | Re-asserting the historical interim `ACCESS_CONTROL_PORT` binding | **Superseded — see `E3-C07`.** The rebind is **UMAC-1 Stage 3 / `UM-E0-S0.1`** (UM `FR-16`, SPEC CAP-1, AD-21), not an Epic 4 story; the interim adapter no longer exists. |
+| ACM-9 resolver evidence | Directory-list `PG-04` / DIR-A1 or P6 evidence | Contract B only; measurement job remains informational. |
+| Base section **decision** for S1/S10/S11 | Colleague field-subset narrowing for S10/S11; S1 photo mutation; relationship-field writes | **Open dependencies** — S10/S11 narrowing is owned by UM `FR-17` / story `TT-E1-S1.2` but `FR-17` is deferred and unscheduled; S1 photo mutation has no named owner. See [Open items 6 and 7](#dependencies-assumptions-and-open-items). Requirements §3.3.4 forbids solving it in the frontend. |
+| Kernel eligibility via `User.isActive` | Departure/due-date cutoff at request time | **PM/AD-20**, deferred until the Departure persistence seam exists (`docs/architecture/access-control.md:46–48`). Requirements §4.16 remains unmet by the kernel alone. |
+| Revocation of platform-owned relations taking effect on the next facade call | The 15-minute project-assignment window (§5.1) | Project line is PLAT-E8. The **owned-relation** half is in scope here — obligations on `E3-C03`, `E3-C04` and `E3-C06`. |
+| HTTP denial oracle documentation alignment | Runtime 401/404/403 behaviour | `UM-E0-S0.1` (PM/AD-24). |
+| PostgreSQL constraints and real deploy entrypoints | Frontend/browser tests and a new HTTP/debug endpoint | The epic is headless. |
+| — | `AccessJournal` enrolment for relationship changes (§3.4) | `CC-07` / PM/AD-29, recorded **P0 open**. The table itself ships — see Open item 9; what is unproven is same-transaction enrolment, reader authorization and idempotency. |
+
+### Immutable operating rules
+
+- Follow AD-1 ordering: scenario prose → committed-red Stage-2 evidence → production. Per-stage human approval was retired; ordinary review and CI remain.
+- Stage-2 uses the public facade, real `AccessControlModule`, Prisma adapters, and migrated PostgreSQL. Do not fake a kernel-owned repository or override a User Management provider.
+- Deploy-time evidence invokes `npm run db:seed` (ACM-0) and `npm run db:bootstrap:access-control` (ACM-1). Reimplementing their logic inside a test is invalid evidence.
+- ACM-5 may proceed only when `acm-4-disposition.yaml` declares `disposition: no-gap`; its current artifact does so.
+- ACM-8 and final ACM-9 require a persisted ACM-9 baseline with `status: PASS`; `FAIL` or `INCOMPLETE` halts them and requires separately gated remediation. The pinned baseline is named in [Open item 2](#dependencies-assumptions-and-open-items).
+- **No obligation in this plan re-asserts a superseded acceptance criterion.** Where the canonical AC has been overtaken by later shipped work, the row states the superseding story and keeps only the surviving obligation.
+
+## Risk Assessment
+
+**Category legend.** `SEC` security · `BUS` business impact · `DATA` data integrity · `OPS` operational/deployment · `TECH` technical/architectural · `PERF` performance.
+**Score** = probability × impact, each 1–3. 9 = critical, 6 = high, 4 = medium, ≤3 = low.
+
+| ID | Category | Risk | P | I | Score | Mitigation | Owner | Timing |
+| --- | --- | --- | ---: | ---: | ---: | --- | --- | --- |
+| PLAT-E3-R01 | SEC / BUS | Missing/inactive identities, dead bridges, or cycles leak an audience. | 3 | 3 | 9 | Real PostgreSQL facade cases for viewer/target/bridge state, termination, cycles, and path-local visited state. | Platform backend | Before ACM-3 completion |
+| PLAT-E3-R02 | SEC / DATA | FR and AR facts contaminate each other and widen feature or data access. | 2 | 3 | 6 | Type-separation constraint tests; FR-negative audience and `isAllowed` cases. | Platform backend | ACM-1/2/4 |
+| PLAT-E3-R03 | DATA / OPS | Root normalization, bootstrap adoption/drift, or concurrent deploy leaves partial or wrong authority state. | 2 | 3 | 6 | Invoke production entrypoints; assert singleton, lock, rollback, diagnostics, restrictive FKs. | Platform backend | ACM-0/1 |
+| PLAT-E3-R04 | SEC / BUS | Base section merge or an unknown section widens profile access. | 2 | 3 | 6 | Exact S1/S10/S11 access table, empty/missing target, merge precedence, and deny-by-default tests. | Platform backend | ACM-5 |
+| PLAT-E3-R05 | TECH / SEC | Composition changes `/users` or exposes a debug route. | 2 | 3 | 6 | `AppModule` composition test plus scoped repository/module audit. | Platform backend | ACM-8 |
+| PLAT-E3-R06 | PERF / OPS | A 500-target regression is hidden by incomplete/non-comparable evidence or misreported as list-route evidence. | 2 | 3 | 6 | `ACM9-MVP-v1` baseline/final protocol and immutable artifacts; preserve Contract B attribution. | Platform backend | ACM-9 |
+| PLAT-E3-R07 | SEC | A resolution cached inside the facade or a consumer outlives a `Relationship` change, so a revoked audience survives into the next request (requirements §2.1 *Timing of revocation* [NORMATIVE]). | 2 | 3 | 6 | Same-process re-resolution evidence across a mutation, on every audience- and section-returning call. | Platform backend | ACM-3/4/5 |
+| PLAT-E3-R08 | SEC / BUS | A consumer reads base `write` on `profile:identity` as a mandate over the S1 relationship fields, bypassing the dedicated permission, the self-assignment bar and the journal. | 2 | 3 | 6 | Negative obligation on `E3-C06`; the decision is asserted to be section-scoped, not field-scoped. | Platform backend | ACM-5 |
+
+All eight risks require mitigation evidence. This table is a design-time risk register, not a final evidence assessment or release decision.
+
+**Cross-scope risks this plan inherits** (registers owned by `test-design-architecture.md` §Risk register): **`PR-001`** projection and leak paths (SEC 3×3=9) — PLAT-E3 contributes the *decision* half only; the projection half is consumer-owned. **`PR-002`** stale graph state retains access (SEC 3×3=9, *"design in place, evidence absent"*) — `PLAT-E3-R07` is this epic's slice of it.
+
+### Residual risk after planned mitigation
+
+| Risk | Residual after this plan's evidence | Why it remains |
+| --- | --- | --- |
+| R01 | **Low.** | Fail-closed paths are directly observable through the facade on real PostgreSQL. |
+| R02 | **Low.** | Enforced by database constraints, not only by test assertion. |
+| R03 | **Low–medium.** | Concurrency evidence is inherently sampled; a rare interleaving can escape it. |
+| R04 | **Medium.** | Only S1/S10/S11 exist. `AC-SECTION-MATRIX-01` (P1 open) covers S2–S8/S14–S16; deny-by-default is proven, correct-allow for those sections is not. |
+| R05 | **Low.** | Composition and boundary are statically auditable. |
+| R06 | **Medium.** | A measurement is a point observation; NFR-AC-1 re-baselining rides SD-8 for Epics 5/6/8. |
+| R07 | **Medium–high.** | This plan proves *same-process* re-resolution only. Multi-instance, worker and consumer-side caching are outside the kernel boundary and remain `PR-002` evidence-absent. |
+| R08 | **Medium.** | The kernel can prove its decision is section-scoped; it cannot prove a consumer honours that. Enforcement is `org:relationships:write`, owner `UM-E0-S0.1`. |
+
+Residual risk is a design-time judgement. It is not an accepted-risk sign-off, and no waiver is granted here.
+
+## NFR Planning
+
+| Category | Requirement / threshold | Risk | Planned validation | Expected evidence |
+| --- | --- | --- | --- | --- |
+| Security | Missing/inactive data and unsupported sections fail closed. | R01, R02, R04, R05, R08 | Headless facade and constraint/entrypoint PostgreSQL tests. | Stage-2 results and module-boundary audit. |
+| Security — revocation | Requirements §2.1 [NORMATIVE]: platform-owned relations (manager, PP, department) take effect on the **next request** — "no grace period, no re-login, no cache that outlives the change". No numeric window applies to the owned-relation half. | R07 | Mutate a `Relationship` between two facade calls in one process; assert the second call reflects it without restart or explicit invalidation. | Stage-2 result per audience- and section-returning call. |
+| Performance | `ACM9-MVP-v1`: 500 active targets; warm p95 **and** absolute worst case ≤2 seconds, **per shape** (depths 5/25/50/100/200/300/400/499, each an independent gate — slow classes must not be aggregated away). | R06 | Baseline after ACF-1 and comparable final after ACM-8; stop on breach/timeout. | Reserved append-only ACM-9 JSON artifact with manifests, query count, and `EXPLAIN (ANALYZE, BUFFERS)`. |
+| Reliability | Atomic, idempotent deploy entrypoints; no partial state after concurrent/error paths. | R03 | Real seed/bootstrap runs plus rollback and race cases. | Process result and row-level PostgreSQL assertions. |
+| Maintainability | Facade/module boundary and no cross-context rewiring. | R05 | Module boot and scoped source/diff audit. | Focused E2E result, static/lint results, audit record. |
+
+**ACM-9 framing used by this plan.** Story 3.8's own AC is *discovery* ("identify the first
+target-count/depth shape that breaks two seconds"), while NFR-AC-1 / SD-8 state a pass/fail 2 s
+gate. **This plan applies the discovery framing to PLAT-E3** and treats the pass/fail gate as
+SD-8's obligation on Epics 5, 6 and 8, which formally carry it. `E3-C08` therefore records the
+breach point; it does not assert a gate verdict.
+
+**Unknown thresholds:** no numeric reliability or maintainability threshold is specified. No value is invented. Compliance, scalability, browser accessibility, and live third-party integration are outside PLAT-E3.
+
+## Entry and Exit Criteria
+
+### Entry
+
+- [ ] Canonical PLAT-E3 acceptance criteria and the system pair remain readable.
+- [ ] Migrated PostgreSQL is available; fixtures can be isolated and cleaned by ownership.
+- [ ] Required Stage-1 scenario prose and committed-red Stage-2 change exist for new behavior.
+- [ ] `ROOT_WORK_EMAIL` is controlled per scenario; deployment tests can invoke the named npm scripts.
+- [ ] `acm-4-disposition.yaml` records `no-gap` before ACM-5; the pinned PASS ACM-9 baseline artifact is selected before ACM-8/final ACM-9.
+- [ ] Each superseded canonical AC is identified with its superseding story before an obligation is written against it.
+
+### Exit
+
+- [ ] All PLAT-E3 P0 scenarios pass with the real module/database boundary.
+- [ ] P1 failures are triaged; no open score-9 risk or unmitigated score-6+ risk remains.
+- [ ] ACM-9 evidence, if executed, meets the immutable protocol and has correct Contract B attribution.
+- [ ] No User Management rebinding, consumer HTTP behavior, or out-of-scope projection is claimed as PLAT-E3 evidence.
+- [ ] **Defect gate (`PG-03`, restated from the platform pair):** zero unresolved leak, stale-access, self-assignment or due-departure defects in PLAT-E3 scope. Any open defect of those four classes blocks exit regardless of scenario pass count.
+- [ ] Full NFR PASS/CONCERNS/FAIL assessment remains for `nfr-assess` after implementation evidence exists.
+
+## Test Coverage Plan
+
+Priorities describe business/security importance, not scheduling or dependency order.
+Each row owns one behavioral boundary; the plan avoids a duplicate UI/API suite because
+PLAT-E3 has no user-facing HTTP or browser behavior.
+
+> **Identifier contract.** `E3-C01`…`E3-C08` follow **ACM order**, not table order:
+> C01=ACM-0, C02=ACM-1, C03=ACM-2, C04=ACM-3, C05=ACM-4, C06=ACM-5, C07=ACM-8, C08=ACM-9.
+> This plan and `test-design-progress-epic-platform-3.md` use the same mapping. The
+> pre-correction plan numbered by priority-table position, which made `E3-C05`/`E3-C06`/`E3-C07`
+> resolve to different families in each file.
+
+### Priority criteria
+
+- **P0** — a defect in this group can grant access that was not derived, or leave deploy-time authority state wrong. Fail-closed kernel behaviour and the authority substrate are P0 by default; the burden is on demoting a group, not promoting one. Six of eight groups qualify.
+- **P1** — a defect degrades confidence or evidence quality but cannot itself widen access: a validation-only merge disposition (`E3-C05`, no production code) and an expensive measurement (`E3-C08`).
+- **P2/P3** — none; see below.
+
+> **Priority is not dependency order.** The epic's Kernel Dependency Graph makes P1 `E3-C05`
+> (ACM-4) a prerequisite of P0 `E3-C06` (ACM-5), and P1 `E3-C08` (ACM-9 baseline) a gate on P0
+> `E3-C07` (ACM-8). That inversion is deliberate: importance and sequencing are separate axes,
+> and the gating artifacts (`acm-4-disposition.yaml` `no-gap`; a PASS ACM-9 baseline) are checked
+> as **persisted state**, not as a scheduling claim. **Execution order follows the dependency
+> graph; the P-label does not reorder it.**
+
+### P0 — critical
+
+| ID | Requirement / atomic scenarios | Level | Risk | Evidence owner | Notes |
+| --- | --- | --- | --- | --- | --- |
+| E3-C01 | ACM-0 normalization, blank/unmatched/ambiguous/inactive diagnostics, exact-one-before-active order, canonical storage, race convergence, no unintended CRUD. | Deploy entrypoint + PostgreSQL | R03 | Platform backend | Run the exact `db:seed` path. |
+| E3-C02 | ACM-1 canonical FR bootstrap, all CAP-3 row shapes/constraints, adoption vs drift, AR `hr-admin` exclusion, rollback and concurrent runs. | Deploy entrypoint + PostgreSQL | R02, R03 | Platform backend | Run the exact bootstrap script; use direct SQL only to prove database constraints. Asserts the **shape** of the catalog, **not** its current membership — see Open item 3. |
+| E3-C03 | ACM-2 active granted allow; missing/inactive/unknown/ungranted/orphan deny; no AR read or decision persistence; **no branch on `hr-admin` or on any individual permission name**; **decision re-read on each call after a grant is revoked mid-process**. | Headless facade + PostgreSQL | R02, R07 | Platform backend | No route or provider override. |
+| E3-C04 | ACM-3 empty/duplicate target contract **with no relationship-graph read on an empty list**; **viewer validation ordering — viewer identity is confirmed before any audience derivation, Self included**; inactive/missing viewer/target; **no Colleague fallback for an inactive or missing party, and normal Colleague fallback for an active pair with no stronger audience**; bridge/PP failure; termination; cycles before/after viewer proof; per-target path state; **resolution re-run on each call across a `Relationship` mutation**. | Headless facade + PostgreSQL | R01, R07 | Platform backend | Assert every requested distinct key maps to an explicit set. |
+| E3-C06 | ACM-5 supported S1/S10/S11 matrix, missing/empty result, `write > read > none`, unsupported sections deny; **section decision re-evaluated on each call across a `Relationship` mutation**. | Headless facade + PostgreSQL | R04, R07, R08 | Platform backend | Base decision only. **Negative obligation:** a `write` on `profile:identity` is never a mandate over the S1 *manager*, *people partner* or *department* fields — requirements §3.2 note ¹ and §2.1 *Changing a relationship is a distinct class of operation* [NORMATIVE] put those behind `org:relationships:write`, a dedicated screen, a self-assignment bar and a §3.4 journal entry. S1 photo mutation and the S10/S11 colleague field subsets remain owning-consumer projection/command rules (Open items 6–7). |
+| E3-C07 | ACM-8 real `AppModule` composition; facade resolves; no User Management or HTTP/debug surface change. | Module E2E + scoped audit | R05 | Platform backend | Does not test `/users` authorization. **Superseded AC:** the canonical criterion "`ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter`" was overtaken by **UMAC-1 Stage 3 / `UM-E0-S0.1`** (UM `FR-16`: "`interim-access-control.adapter.ts` is deleted in the same cutover (no dual-running)"; SPEC CAP-1, AD-21) — the port binds `AccessControlFacadeAdapter` (`services/backend/src/user-management/user-management.module.ts:215`), `interim-access-control.adapter.ts` was deleted in backend `0788f60` (2026-09-02), and `ACM8-KC-02` — realigned 2026-09-01 by that same cutover — already asserts the facade-backed adapter. **Not** an Epic 4 story: `PLAT-E4-S4.1` is section-key generalisation and `S4.2` is the org-relationship seed. **Do not write an obligation against the interim binding and do not "restore" it.** The surviving obligations are the other three: `AppModule` imports and resolves the facade, no file under `src/user-management/**` changes, and no AC HTTP/test-only/debug endpoint is introduced. |
+
+### P1 — high
+
+| ID | Requirement / atomic scenarios | Level | Risk | Evidence owner | Notes |
+| --- | --- | --- | --- | --- | --- |
+| E3-C05 | ACM-4 Reporting+PP coexistence, Self exclusivity, Colleague floor, fact de-duplication, FR exclusion. | Headless facade + PostgreSQL | R01, R02 | Platform backend | Validation-only story; `no-gap` outcome must not conceal a behavior gap. |
+| E3-C08 | ACM-9 500-target audience/depth shapes, manifests, query count, plans, baseline/final comparison and first-breach/timeout behavior; **the baseline run itself changes no file under `src/access-control/**`**. | Measurement | R06 | Platform backend | Expensive, append-only evidence; not a `PG-04` test. Discovery framing — see NFR Planning. |
+
+### P2/P3
+
+No separate P2 or P3 scenario is planned. Exploratory profile projection, `/users`
+HTTP behavior, and frontend coverage belong to their owning consumer work, not a
+lower-priority duplicate of this kernel plan.
+
+## Acceptance-Criterion Traceability
+
+Every canonical Epic 3 acceptance criterion maps to at least one obligation, an explicitly
+superseded marker, a named external owner, or an explicit scope exclusion. **No row is a
+coverage or execution claim.**
+
+| Story | Acceptance criterion (abbreviated) | Obligation |
+| --- | --- | --- |
+| 3.3 (ACM-0) | Normalize `ROOT_WORK_EMAIL` per DEC-UM-007 before validate/write/lookup | E3-C01 |
+| 3.3 | Store the normalized value, then validate eligibility | E3-C01 |
+| 3.3 | Count normalized matches **first**; non-one fails before `isActive` is consulted | E3-C01 |
+| 3.3 | Unrelated active employees never affect the count | E3-C01 |
+| 3.3 | Blank/unmatched/ambiguous/inactive fails with actionable diagnostics; a non-intended match is never adopted, mutated or reactivated | E3-C01 |
+| 3.3 | Concurrent runs converge via the unique violation, re-read and re-validate; no partial state | E3-C01 |
+| 3.3 | No permission/policy/grant/attachment, no UM route or runtime role management; DEC-UM-009 id reuse | E3-C01 |
+| 3.3 | Unset `ROOT_WORK_EMAIL` becomes an actionable failure, not a warn-and-skip | E3-C01 |
+| 3.3 | Stage-2 invokes the production entrypoint; inline reimplementation is invalid | Operating rule + E3-C01 |
+| 3.4 (ACM-1) | Seed exactly the three canonical `user-management:*` permissions | E3-C02 — **shape only**; membership is Open item 3 |
+| 3.4 | Exactly one `hr-admin` FR role and one bootstrap attachment | E3-C02 |
+| 3.4 | Resolve the bootstrap user only via the normalized `ROOT_WORK_EMAIL`; no `position` or first-user fallback | E3-C02 |
+| 3.4 | Absent/blank/unmatched/ambiguous/inactive/drifted root fails clearly and atomically | E3-C02 |
+| 3.4 | Every CAP-3 database invariant (13 named constraints, `pg_indexes` assertion, `ON DELETE RESTRICT` ×4) | E3-C02 |
+| 3.4 | Singleton-absent adoption rules; singleton-present drift fails atomically | E3-C02 |
+| 3.4 | An AR row with `targetRole='hr-admin'` is never adopted, mutated, counted or reported as drift | E3-C02 |
+| 3.4 | No `/roles` or `/users` route, no other role/permission/attachment/default grant | E3-C02 |
+| 3.5 (ACM-2) | `isAllowed` reads live FR data and **contains no branch for `hr-admin` or an individual permission name** | E3-C03 |
+| 3.5 | Inactive/missing users, unknown keys, absent grants, orphaned data return `false` | E3-C03 |
+| 3.5 | Reads no audience data, persists/caches no decision, grants no profile audience or section access | E3-C03 |
+| 3.1 (ACM-3) | One map entry per distinct requested target; duplicates collapse; **empty list returns an empty map with no relationship-graph read** | E3-C04 |
+| 3.1 | **Viewer validation runs before any audience derivation, Self included**; Self exclusive only after both parties confirmed | E3-C04 |
+| 3.1 | Inactive/missing viewer → empty set for every target; never Self, never Colleague floor | E3-C04 |
+| 3.1 | Inactive/missing target → empty set; **never falls back to Colleague** | E3-C04 |
+| 3.1 | Absent manager edge terminates cleanly; inactive endpoint treated as absent (before/after viewer proof); missing endpoint is defensive-only | E3-C04 |
+| 3.1 | Inactive PP endpoint grants no PP audience and bridges nowhere | E3-C04 |
+| 3.1 | Reaching the viewer is provisional; Reporting only on repeat-free termination; a cycle denies that target only | E3-C04 |
+| 3.1 | **For an active pair, other valid audiences may apply; otherwise normal Colleague fallback** | E3-C04 |
+| 3.1 | Ends at the audience result; owns no `canAccessSection`, no dismissed-target projection | Scope table (excluded) |
+| 3.2 (ACM-4) | Reporting and direct PP may coexist | E3-C05 |
+| 3.2 | Self exclusive after both confirmed; Colleague only when nothing stronger applies | E3-C05 |
+| 3.2 | Duplicate facts do not duplicate results; FR never participates in merging | E3-C05 |
+| 3.2 | Ends at merge; owns no `canAccessSection` | Scope table (excluded) |
+| 3.2 | Validation-only exception; a gap halts Stage 2 and reopens AD-1 | Operating rule + Open item 1 |
+| 3.6 (ACM-5) | Only S1/S10/S11 supported; every other section `none` | E3-C06 |
+| 3.6 | Absent target entry or empty audience set → `none` | E3-C06 |
+| 3.6 | S1 `read` for Self and Colleague, `write` for Reporting and direct PP | E3-C06 |
+| 3.6 | S10 and S11 `read` for every Phase-0 audience | E3-C06 (decision) + Open item 6 (field narrowing) |
+| 3.6 | Multiple audiences merge `write > read > none` | E3-C06 |
+| 3.6 | S1 photo mutation and S10/S11 colleague subsets are owning-consumer rules | Open items 6–7 |
+| 3.7 (ACM-8) | `AppModule` imports `AccessControlModule` and resolves `AccessControlFacade` | E3-C07 |
+| 3.7 | No file under `src/user-management/**` changes | E3-C07 |
+| 3.7 | `ACCESS_CONTROL_PORT` remains bound to `InterimAccessControlAdapter` | **SUPERSEDED** by UMAC-1 Stage 3 / `UM-E0-S0.1` (UM `FR-16`, SPEC CAP-1, AD-21) — no obligation written; see E3-C07 |
+| 3.7 | No `/users` behaviour change, no AC HTTP/test-only/debug endpoint | E3-C07 |
+| 3.8 (ACM-9) | **Baseline runs after ACF-1 without changing behaviour under `src/access-control/**`** | E3-C08 |
+| 3.8 | Record p50, p95, worst case, breadth/depth, query count, PG version, `EXPLAIN (ANALYZE, BUFFERS)` | E3-C08 |
+| 3.8 | Identify the first target-count/depth shape that breaks two seconds | E3-C08 |
+| 3.8 | Separately determine whether `SET LOCAL statement_timeout = '2s'` is the earlier failure point | E3-C08 |
+| 3.8 | Rerun after ACM-8; optimization is a separate gated story; no `/users` NFR claim | E3-C08 |
+| §2.1 [NORMATIVE] | Owned-relation revocation effective on the next request, no cache outliving the change | E3-C03, E3-C04, E3-C06 (R07) — **not** a canonical Epic 3 AC; added because the epic claims PM-FR-2 |
+| §3.2 note ¹ / §2.1 | Manager, PP and department are not writable through S1 | E3-C06 negative obligation; enforcement owner `UM-E0-S0.1` |
+
+## Execution Strategy
+
+- **PR:** run all focused functional PLAT-E3 suites when they fit within the repository's normal test budget: ACM-0/1 entrypoints, ACM-2/3/4/5 facade suites, ACM-8 composition, plus unit/static checks. Use real PostgreSQL and owned fixture cleanup.
+- **Nightly / release candidate:** run ACM-9 because it is deliberately expensive and emits immutable performance artifacts.
+- **Weekly:** no additional PLAT-E3-only suite. Investigate persistent measurement or isolation flakes from recorded artifacts.
+
+Run everything in PRs unless it is expensive or long-running; this plan does not create a redundant smoke/P0/P1 execution ladder.
+
+## QA Effort Estimate
+
+Sizing **evidence work against already-shipped behaviour** — see the
+[execution-state caveat](#execution-state-caveat--this-epic-is-already-implemented). These are not
+estimates to build the kernel.
+
+| Priority | Scope | Estimated effort |
+| --- | --- | --- |
+| P0 | Six core scenario families, fixtures, deploy-entrypoint and module-boundary evidence | ~40–64 hours |
+| P1 | Merge disposition and ACM-9 measurement evidence | ~16–30 hours |
+| P2/P3 | No separate work planned | N/A |
+| **Total** | Test-design implementation and evidence setup | **~56–94 hours (~2–4 weeks)** |
+
+Ranges include PostgreSQL fixture/cleanup work and evidence capture. They are planning estimates, not progress tracking.
+
+## Design Quality Criteria
+
+**Thresholds carried from the platform pair** (`test-design-qa.md` § *Gate thresholds carried from the handoff*), quoted rather than paraphrased:
+
+> Three thresholds survive unchanged: **P0 = 100 % covered · P1 = ≥ 95 % covered · the access-control suite passes.**
+
+- All three are carried here unchanged, including the third. *Covered* is the pair's word and is **not** interchangeable with *passes*: the pair's own [coverage-state vocabulary](test-design-qa.md) keeps a present scenario document, a committed-red Stage-2 test, and green production code with the suite executing in CI as three states that must never collapse (`PR-009`).
+- **This plan computes, asserts and publishes no coverage percentage against any of them.**
+- Every score-6+ risk has the mitigation named in this plan; the score-9 audience-leak risk cannot be waived by a mock, debug endpoint, or consumer-route test.
+- All in-scope acceptance-criterion groups have an explicitly selected evidence boundary — see [Acceptance-Criterion Traceability](#acceptance-criterion-traceability). No aggregate coverage percentage is claimed by this plan.
+- Security, performance, reliability, and maintainability each have an identified evidence source. `nfr-assess` makes any later PASS/CONCERNS/FAIL assessment.
+- These are design criteria, not an approval, test-execution result, or release-readiness gate.
+
+## Dependencies, Assumptions, and Open Items
+
+1. **ACM-4 prerequisite:** current `acm-4-disposition.yaml` says `disposition: no-gap` and `acm_5: unblocked`; a future missing scenario or behavior gap must halt and restart the AD-1 sequence rather than bypass it.
+2. **ACM-9 prerequisite — baseline pinned.** Six baseline artifacts exist under `_bmad-output/test-artifacts/performance/` (five `PASS`, one `INCOMPLETE`). This plan pins the pair the platform QA document names as the immutable Contract B evidence at commit `3a3cd71`: baseline `acm9-baseline-acm9-1788721821722-afd2fdac4a45.json` with final `acm9-final-acm9-1788722145229-13b089a4cb9f.json`, which records that baseline's run ID. Selecting a different baseline is a deliberate change and must be stated. A `FAIL` or `INCOMPLETE` baseline halts composition/final evidence and requires separately gated remediation.
+3. **FR catalog drift — owner named.** PLAT-E3's ACM-1 criterion states three canonical permissions; the shipped bootstrap holds six. The reconciliation is tracked as **DEPT-2** (return `CANONICAL_PERMISSIONS` to five by dropping `profile:timeline:write`, and make career-timeline write a dual gate) with test fallout as **DEPT-4** — both in `dept-epic.md`, **not** in Epic 4, which is `done`. Two corrections to the pre-correction text: the "older three-key test lock is stale" statement no longer holds — `acm1r-fr-foundation.e2e-spec.ts` derives its keys from the exported `CANONICAL_PERMISSIONS` (`dept-epic.md` GAP-1, closed 2026-09-08); and the sixth key is not merely a counting question. `profile:timeline:write` is a **recorded, PO-accepted, condition-boxed deviation from requirements §2.2/§2.3** (it closes when `canEditTimeline` gains its audience half, not on a date) (`s42a-op-06`, ruling AF-2): its `canEditTimeline` gate has no audience half, so a seeded `hr-admin` can write any person's career timeline. Accordingly **`E3-C02` asserts the CAP-3 catalog's *shape* and must not canonize the present six-key membership as an invariant** while DEPT-2 is open.
+4. **Reconciliation open at both ends.** This plan routes the three-versus-six `hr-admin` question to the E4 line; the `PLAT-E4` validation report records it as **unreceived** there. Until DEPT-2 is scheduled, the dependency has **no accepting owner** and is carried here as open, not as delegated.
+5. **Consumer boundary:** `/users` rebinding, projection, and actual consumer HTTP E2E are deliberately not kernel proof. They need their separate User Management-owned story (`UM-E0-S0.1`).
+6. **S10/S11 Colleague field narrowing — owner named, platform-side slice unwritten.** Requirements §3.2 gives Colleague only *dates without leave type* on S10 and *project name only* on S11, and §3.3.4 forbids implementing it by hiding fields in the frontend — "the API must not return them". ACM-5 grants Colleague plain `read` on both and delegates narrowing to the owning consumer. That consumer **is** named: UM **`FR-17`** owns the deferred profile-projection deliverable (the colleague S10 dates-only view on its own route `GET /users/:id/leaves`, and the S11 project-name-only view), and `timetracker/epics.md` carries a written story **`TT-E1-S1.2`** (`1-2-s10-leaves-read-projection-on-profile`) whose acceptance criteria assert "leave type is **absent** from the payload" for a Colleague-tier viewer — gated on the S10 kernel decision this plan's `E3-C06` produces. What is genuinely open is that `FR-17` is deferred with no scheduled story, recorded in `user-management/epics.md` as a real gap under the coverage model's `PM-FR-4` alias. A leak here is a §3.3.1 critical defect.
+7. **S1 photo mutation** is an owning-consumer command rule and, unlike the S10/S11 narrowing, genuinely has no named owner.
+8. **Departure / PM/AD-20:** kernel eligibility uses `User.isActive` only. Requirements §4.16 requires all access of a departed person to end immediately; request-time due/departure enforcement is **deferred until the Departure persistence seam exists** (`docs/architecture/access-control.md:46–48`). Recorded as a named deferral, not a silent exclusion.
+9. **Journal (§3.4) — the blocker record is stale, the blocker is not.** `CC-07` / PM/AD-29 is recorded `severity: P0`, `status: open`, `implementation_status: absent`, and its note says "No journal table exists". **That note is false at this HEAD:** `model AccessJournal` is defined at `services/backend/prisma/schema.prisma:106` with two applied migrations (`20260903011657_story_4_1_access_journal`, `20260903024004_story_4_3_department_edge_journal_subject`). `CC-07` nevertheless remains legitimately open, because its closure condition is broader than table existence — same-transaction enrolment proven for every listed kind, reader authorization matching PM/AD-29, and `idempotencyKey` uniqueness proven under retry — none of which this epic supplies. **This plan states the table ships and does not restate the stale note.** No relationship-change journal obligation is closed here either way.
+10. **Pact/browser tools:** PLAT-E3 has no consumer/provider or UI acceptance criterion. SmartBear Pact MCP was unavailable, and `playwright-cli` was not installed; neither absence blocks this headless plan.
+11. **Not evaluated by this plan:** `test-design-architecture.md` and `test-design-qa.md` were read for the thresholds and contracts cited above. This plan does not attest that its isolation or execution choices are consistent with every other policy in that pair.
+12. **Six stale surfaces remain after CAP-6 was corrected; a committed owner exists — recorded, not resolved.** This plan's operating rules forbid any obligation from re-asserting a superseded acceptance criterion, and `E3-C07` applies that to the interim `ACCESS_CONTROL_PORT` binding. CAP-6 now records the supersession and is no longer stale. Four scenario documents, their index row, and the production-source comment still carry the old expectation:
+
+    | Level | Artifact | What it asserts |
+    | --- | --- | --- |
+    | 1 — scenario prose | `.../acm8-kc-01-facade-resolves-from-real-container.md:5` | Trace still quotes the superseded half of CAP-6. |
+    | 1 — scenario prose | `docs/test-cases/access-control-kernel/kernel-composition/acm8-kc-02-interim-adapter-binding-unchanged.md` | Title, trace and scenario still assert the interim binding. |
+    | 1 — scenario prose | `.../acm8-kc-03-user-management-behavior-unchanged.md:27` | Still repeats the interim binding by reference. |
+    | 1 — scenario prose | `.../acm8-kc-05-corrected-module-header-comment.md:9, 29–30` | Still quotes the superseded binding and calls the shipped rebind "not-yet-authorized". |
+    | 2 — index | `docs/test-cases/access-control-kernel/README.md:452` | Index row repeats the stale expectation. |
+    | 3 — production source | `services/backend/src/access-control/access-control.module.ts:17–18` | Header comment still says User Management binds the port to the interim adapter. |
+
+    `acm8-kc-04-no-http-or-debug-endpoint-added.md` is the one composition card that carries none of this. The committed remediation story deliberately re-checks all **five** `ACM8-KC` cards plus the module comment even though only four cards currently need textual correction.
+
+    **The executable test and the scenario document of the same name have diverged, and this plan must not conflate them.** `ACM8-KC-02` as executed — `services/backend/test/access-control/acm8-kernel-composition.e2e-spec.ts:90–98` — was realigned 2026-09-01 by the UMAC-1 Stage 3 cutover and asserts the facade-backed adapter. `ACM8-KC-02` as scenario prose was **not** realigned. Where this plan says "`ACM8-KC-02` already asserts the facade-backed adapter", that is true of the test and false of the document. Under AD-1 ordering scenario prose is first-class evidence, so this is material, not cosmetic.
+
+    **This was recorded eleven days ago and nobody took it.** The UMAC-1 story that performed the rebind left an explicit list — *"Follow-ups for the Access Control context (not this story — `src/access-control/**` out of scope)"* — naming the `acm8-kc-02/03` realignment, the stale `access-control.module.ts` header comment, and two `deferred-work.md` entries. At this HEAD the first two are still untouched. The reason is structural, not neglect: **there is no `access-control` planning domain.** `_bmad-output/planning-artifacts/` has no such directory, so "the Access Control context" is a code-ownership area with no backlog, and nothing can be scheduled against it.
+
+    **Committed owner:** root commit `bfd43be46256820ccfc404d65fe1ebf58e05f146` amended CAP-6 and committed **`ACM-8R-scenarios`** in `spec-access-control-kernel-mvp/stories.yaml`. The story owns realignment of all five `ACM8-KC` scenario documents plus the module comment. Its target files remain stale, so the dependency is scheduled but not completed. Correcting them is outside this plan's allowed file set; this plan records the owner and current state only.
+
+    CAP-6's amendment has already satisfied the former ordering constraint. Per-stage human approval was retired by current AD-1 policy; the remediation requires ordinary review and CI, not new Stage-1 approval entries.
+
+## Interworking and Regression
+
+| Component | Impact | Regression boundary |
+| --- | --- | --- |
+| `services/backend/src/access-control/` | Owns kernel behavior. | Focused real-PostgreSQL ACM suites and ACM-9 protocol. |
+| `AppModule` | Imports AccessControlModule at ACM-8. | Module composition only; no added HTTP endpoint. |
+| `services/backend/src/user-management/` | Consumes the kernel through `ACCESS_CONTROL_PORT`, bound to `AccessControlFacadeAdapter` since the UMAC-1 Stage 3 cutover. | Audit that no file under it changes at ACM-8; adoption behaviour and `/users` authorization belong to `UM-E0-S0.1`. |
+| PostgreSQL schema / deploy scripts | Enforces root/bootstrap and FR integrity. | Migrated DB, named seed/bootstrap entrypoints, raw constraint probes. |
+| Platform system design pair | Owns shared evidence, NFR, isolation and gate policies. | This plan **quotes** the gate thresholds and the Contract B protocol where an obligation depends on them, and references the pair for everything else. It does not redefine a threshold or a contract. |
+
+## Correction log
+
+Applied 2026-09-12 after validation CONCERNS. Ordered by severity.
+
+| # | Correction | Source finding |
+| --- | --- | --- |
+| 1 | `E3-C07` no longer re-asserts the interim `ACCESS_CONTROL_PORT` binding; the AC is marked superseded by **UMAC-1 Stage 3 / `UM-E0-S0.1`** with the three surviving obligations kept. Scope table, `R05` and the Interworking row corrected to match `main`. | Requirements review F1 |
+| 2 | Coverage IDs renumbered to ACM order, matching the checkpoint; identifier contract stated. | Validation F-1 / review F7 |
+| 3 | §2.1 revocation timing added as `PLAT-E3-R07`, an NFR row, and per-call obligations on `E3-C03`/`C04`/`C06`. | Requirements review F2 |
+| 4 | Execution-state caveat added; the estimate is reframed as evidence work against shipped behaviour. | Validation F-2 |
+| 5 | Acceptance-Criterion Traceability table added; the five previously unnamed ACs carry obligations. | Validation F-3 |
+| 6 | Pair gate thresholds quoted verbatim, the access-control-suite clause restored, *covered* ≠ *pass* stated; the Interworking "references rather than restates" claim corrected. | Validation F-4 |
+| 7 | Priority criteria added; the P1-gates-P0 inversion stated and reconciled with the Kernel Dependency Graph. | Validation F-5 |
+| 8 | `E3-C06` negative obligation: base `write` on `profile:identity` is not a mandate over the §3.2 ¹ relationship fields; `PLAT-E3-R08` added. | Requirements review F5 |
+| 9 | Open item 3 rewritten — DEPT-2/DEPT-4 named, the stale-test-lock claim retired, the AF-2 deviation stated, `E3-C02` scoped to catalog shape. | Requirements review F3 / validation F-7 |
+| 10 | S10/S11 Colleague narrowing and S1 photo mutation recorded as open dependencies. *(Second pass: the S10/S11 owner **is** named — UM `FR-17` and story `TT-E1-S1.2`; only S1 photo mutation has none.)* | Requirements review F6 |
+| 11 | Added residual-risk table, `PG-03` defect exit gate, risk-category legend, per-priority criteria, `PR-001`/`PR-002` linkage. | Validation F-6 |
+| 12 | ACM-9 baseline pinned to the `3a3cd71` pair; discovery-vs-gate framing stated. | Validation F-7 / review §4 |
+| 13 | PM/AD-20 departure deferral named with its identifier; `CC-07` journal gap recorded. | Requirements review F8 |
+| 14 | The `hr-admin` reconciliation recorded as open at both ends with no accepting owner. | Validation cross-link |
+
+### Second pass — independent audit (2026-09-12)
+
+An independent auditor re-checked all 14 corrections against primary sources. Ten verified
+cleanly. Six defects the first pass introduced or missed were fixed here:
+
+| Defect | Fix |
+| --- | --- |
+| The ACM-8 conclusion was right but **both supporting citations were fabricated**: the rebind was attributed to `PLAT-E4-S4.1/S4.2` (actually section-key generalisation and the org-relationship seed) and the deletion to backend `37a339a` (which deleted `interim-**session**-resolver.adapter.ts`). | Re-attributed to **UMAC-1 Stage 3 / `UM-E0-S0.1`** (UM `FR-16`, SPEC CAP-1, AD-21) and backend **`0788f60`**, both verified against `git log --diff-filter=D` and the `ACM8-KC-02` file header. |
+| **The superseded-criterion test was applied to ACM-8 but not to `CC-07`.** The plan asserted "no `AccessJournal` table exists" — copied from `epics.md` and `blockers.yaml`, both stale. | Open item 9 rewritten: the table ships (`schema.prisma:106`, two applied migrations); `CC-07` stays open on its broader closure conditions. |
+| A **fabricated criticism of `epics.md`** — that its caveat cites the coverage YAML at a `platform/` path — repeated three times and used to justify leaving `epics.md` alone. | Removed. The caveat uses a bare filename with no path; the file's only full citation (`epics.md:12`) is correct. The caveat's *other* error, about `sprint-status.yaml`, is real and stands. |
+| **"No named owner" for the S10/S11 Colleague narrowing was false.** | UM `FR-17` and the written story `TT-E1-S1.2` are named; the genuine gap is restated as `FR-17` being deferred with no scheduled story. |
+| Finding F-4 was **reported fixed while the offending line remained in the checkpoint**. | Checkpoint's design-quality target corrected to the pair's own *covered* wording with the access-control-suite clause restored. |
+| Minor: "three surfaces" against a four-row table; a `C03…C07` range implying revocation obligations on C05/C07; "time-boxed" for a condition-boxed deviation; a preamble promising "exactly one obligation". | All corrected. |
+
+**Provenance caveat.** This plan, its checkpoint and its validation report all enter git as
+**additions**. The "pre-correction text" they refer to existed only in the working tree during the
+session that produced them and cannot be reconstructed from history. Statements here about what
+the correction changed are therefore session testimony, not diffable claims; the substantive
+assertions about source files are independently checkable and were re-checked.
+
+The pre-correction draft of this pass also appended a remediation record to the validation report
+itself. That was withdrawn: the report is written by a Validate run, and a correction pass editing
+it blurs who attested what. This log is the correction record; the report stays as its run left it.
+
+### Third pass — Edit after independent re-validation (2026-09-12)
+
+The independent Epic Validate that superseded the self-validated PASS raised four concerns and
+five WARNs about document self-consistency. An Edit run closed **C-1** (the checkpoint still
+claimed the S10/S11 Colleague narrowing had no named owner after this plan retracted that as
+false), **C-3** (this plan's frontmatter said granted/PASS while its Correction record and
+Approval prose still said ungranted with no Validate run yet), **C-4** (plan and checkpoint
+disagreed on approval and validation status) and **W-1** (a sentence duplicated verbatim in the
+checkpoint). **C-2** is recorded as [Open item 12](#dependencies-assumptions-and-open-items) and
+not resolved — it needs `docs/test-cases/**`, which is outside this plan's allowed file set.
+
+The full disposition table and the §4.3 reasoning for editing the checkpoint alongside the plan
+are in Step 7 of `test-design-progress-epic-platform-3.md`. An Edit cannot clear a verdict, so
+**CONCERNS (2026-09-12, re-validation) stood** at the close of that pass. The third Epic Validate
+has since run — see the fourth pass below.
+
+### Fourth pass — Edit after the third Epic Validate (2026-09-12)
+
+The third Epic Validate verified the previous Edit's four closures, re-checked the C-2 root-trace
+against primary sources and found it sound, and returned CONCERNS on two narrower findings. This
+Edit closes both.
+
+**C-1 — the checkpoint's `nextStep` still routed C-2 to DEPT-4**, the owner the same Step-8 pass
+had retracted in its own body. The validation report noted this was the **third** time a correction
+was applied to a body and left a metadata field behind (the audit's F-4, then C-1 of the second
+run, then this). Closed: `nextStep` now names `ACM-8R-scenarios`.
+
+**C-2 — Open item 12 presented a completed root-trace whose enumeration was short by two.**
+`acm8-kc-01` quotes CAP-6's success criterion including the struck clause, and `acm8-kc-05` both
+quotes the superseded binding and requires a corrected comment to call the rebind
+"not-yet-authorized", which the UMAC-1 Stage 3 cutover made false. Closed: the table now lists
+**seven** artifacts, names `acm8-kc-04` as the one clean composition card, and distinguishes the
+seven-artifact reach from the five-card scope of the in-flight remediation story.
+
+**Also synced, to avoid re-creating the defect C-1 names.** Fixing only the two findings would have
+left `validationStatus`, `independentRevalidation`, the Status line, the header record and the
+Approval section all pointing at the second run's verdict while a third had landed — the same
+body-corrected/metadata-stale pattern. All were carried forward to `CONCERNS (2026-09-12, third
+run)` in the same pass.
+
+**Not in scope, deliberately.** The third run's four WARNs were not addressed: the pair's restated
+fourth gate threshold is still not carried; no test counts (by design, per `PR-009`); the
+checkpoint's Pact input inventory is still incomplete; and this Open item cites the module header
+comment at `access-control.module.ts:15` while the quoted clause sits at `:17–18`. The requested
+scope was C-1 and C-2.
+
+Not applied: the canonical Epic 3 body header still says `in-progress` while its authoritative
+tracker and its own *Kernel MVP status caveat* say `done` with no Epic 3 divergence. Correcting
+that source header is **Platform Story 1.1's** traceability work and is outside this plan's allowed
+file set; the residual source contradiction is recorded in the execution-state caveat above.
+
+### Fifth pass — Edit after the fourth Epic Validate (2026-09-12)
+
+The fourth Epic Validate returned CONCERNS on two current-source consistency findings. This Edit
+closed both in the plan; the fresh independent Validate now records PASS:
+
+- **C-1 closed:** the execution-state caveat now reflects the current source. The tracker and
+  source caveat agree that Epic 3 is `done`; only the stale `## Epic 3` body header remains as a
+  source-document contradiction. The deliberate Epic 2 coverage divergence is no longer
+  misreported as an Epic 3 conflict.
+- **C-2 closed:** Open item 12 now records CAP-6 as already amended at committed root revision
+  `bfd43be`, names committed owner `ACM-8R-scenarios`, and counts the six still-stale target
+  surfaces. It no longer calls committed work concurrent or uncommitted. The dependency remains
+  open because those scenario/index/comment targets have not yet been realigned.
+
+Approval remains granted. No obligation, risk, priority, threshold, estimate, runtime-coverage
+claim, gate result, or release-readiness state changed. The fresh independent Validate supersedes
+the prior CONCERNS report.
+
+## Approval
+
+**Approval granted 2026-09-12 by Anna Pikula**, the requester, and recorded in this plan's
+frontmatter as `approvalStatus: granted`. Neither the Create run, the correction passes, nor any
+validation run conferred it — approval is a human act and remains separate from validation
+(contract §5).
+
+**What this approval covers:** the test design itself — the risk register, NFR planning, coverage
+obligations, acceptance-criterion traceability, priority model and estimates — as the design of
+record for PLAT-E3 evidence work.
+
+**What it does not become:** no test coverage, no gate result, no execution evidence, no NFR
+PASS/CONCERNS/FAIL, no release readiness. It closes no blocker — `CC-07`,
+`AC-SECTION-MATRIX-01`, `SEC-AUTH-01` and DEPT-2 all remain open — and resolves none of the open
+items below.
+
+**Validation state, stated plainly.** The current verdict is **PASS (2026-09-12, fresh independent validation)**.
+The approval was granted when the verdict was the preceding CONCERNS — from the first run
+independent of this plan's authorship, which superseded a same-day PASS produced by the authoring
+session itself. The approval was granted against that history and does not retract it. Every
+independent run has been explicit that its concerns are about the document set's self-consistency
+rather than the design's substance, and that it neither confers nor withdraws the approval. The
+design substance has now been checked three times and holds, including a full independent re-count
+of the 49 canonical acceptance criteria.
+
+**Current disposition after validation PASS:** the plan's two document-consistency concerns are
+closed. The underlying `ACM-8R-scenarios` remediation remains **recorded, not completed** because
+its scenario/index/comment targets are still stale; that external dependency does not invalidate
+this test design. The fresh independent validation report is the current evidence record.
+
+## References
+
+- Canonical epic: `_bmad-output/planning-artifacts/platform/epics.md` — `## Epic 3: Access Control Kernel MVP`.
+- Shared policy: `_bmad-output/test-artifacts/test-design-architecture.md` and `_bmad-output/test-artifacts/test-design-qa.md`.
+- Normative requirements: `docs/project-requirements.md` §2.1, §2.2, §2.3, §3.2 (incl. note ¹), §3.3, §3.4, §4.16.
+- Binding architecture: `docs/architecture/access-control.md`, `testing-strategy.md`, `database-schema.md`, `nestjs-di-tokens.md`, and `domain-driven-design.md`.
+- Cross-epic: `_bmad-output/planning-artifacts/platform/dept-epic.md` (DEPT-2, DEPT-4), `test-design-validation-report-epic-platform-4.md`.
+- Existing evidence inventory: `services/backend/test/access-control/`, `services/backend/test/measurement/acm9/`, and `docs/test-cases/access-control-kernel/`.
+
+### Knowledge-base appendix
+
+Applied from `.agents/skills/bmad-testarch-test-design/resources/knowledge/`:
+`risk-governance.md` (register shape, residual risk), `probability-impact.md` (1–3 scales, the
+scores above), `test-levels-framework.md` (deploy-entrypoint / headless-facade / module-E2E /
+measurement level selection), `test-priorities-matrix.md` (P0–P3 criteria), `nfr-criteria.md`
+(the four NFR categories and the unknown-threshold rule), `overview.md`, `api-request.md`,
+`auth-session.md`, `recurse.md`. **Not applicable:** `playwright-utils-mandate.md` and the six
+`pactjs-*` / `pact-mcp.md` documents — PLAT-E3 is headless with no browser target and no
+consumer/provider boundary.
+
+**Workflow:** `bmad-testarch-test-design` · **Run key:** `epic-platform-3`

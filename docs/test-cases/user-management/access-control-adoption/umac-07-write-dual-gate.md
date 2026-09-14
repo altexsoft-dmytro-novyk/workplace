@@ -87,3 +87,6 @@ through `DEFAULT_PERMISSIONS`. The change persists: a follow-up
   - **expectedResult:** `403` — §3.2 row S1 gives Self `R (photo RW)`, so `canAccessSection` resolves `read`, not `write`, and the audience half denies before the feature half is reached. (Self writes only the photo — `umac-09`.)
 - **Test 5 — unresolved session (`Bearer <token:Bob>`) → 403**
   - **expectedResult:** `403` under the interim session resolver (empty audience → `canAccessSection` returns `none` → denied). Target end state once the real magic-link middleware lands: `401` (`umac-05` / PM/AD-24).
+- **Test 6 — deactivated caller (`isActive: false`) → 401** *(added 2026-09-13, PLAT-E4-C03b(1) / PM-AD-24)*
+  - V is a real `User` row with `isActive: false`. T is an ordinary active target, not a missing one — [`umac-11`](./umac-11-hidden-target-denial-oracle.md) Test 6 already covers the deactivated-caller shape against a *missing* target id; this test is the same caller shape against a normal one, completing the `401` half of the E4-C03b(1) oracle for `PATCH`.
+  - **expectedResult:** `401`, before any audience/section question — the real session resolver returns no session for a caller who is not an active `User`, exactly as `read-denial.e2e-spec.ts` UMAC-05 Test 2 does for `GET`. T's row is unchanged.

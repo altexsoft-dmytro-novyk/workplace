@@ -1,337 +1,908 @@
 {
- "schema_version": "0.2.0",
- "snapshot_at": "2026-09-10T09:00:00.000Z",
- "repo": "people-management workspace",
- "collection_mode": "contract_static",
- "collection_status": "COLLECTED",
- "inventory_basis": "acceptance_criteria",
- "gate_basis": "not_applicable",
- "allow_gate": false,
- "source_sha": {
-  "workspace": "43d50add983ad70a31064e94576c4a88fb06bf74",
-  "backend": "f1eea3c048821011da96fba20d9b517f7d0e4f1b",
-  "frontend": "fa3d3198aa9921c26d22307542ab72834a03b899"
- },
- "target": {
-  "type": "planning_audit",
-  "id": "whole-repo-all-epics",
-  "label": "Whole repository — all epics (Access Control Kernel MVP + Epic 4 sections access, User Management, Mentorship, Frontend flows)"
- },
- "decision_mode": "not_applicable",
- "evaluator": "TEA Agent (bmad-testarch-trace)",
- "confidence": "high",
- "oracle": {
-  "resolution_mode": "formal_requirements",
+  "schema_version": "0.2.0",
+  "snapshot_at": "2026-09-14T10:02:41.000Z",
+  "repo": "people management",
+  "collection_mode": "contract_static",
+  "collection_status": "COLLECTED",
+  "inventory_basis": "acceptance_criteria",
+  "gate_basis": "none",
+  "source_sha": "33230f27768915b03059e34404f4adefba030071",
+  "source_sha_services": {
+    "backend": "28343b5ed60d77de6c1ea73b07c282e5c927c7bb",
+    "frontend": "025dd7ef36a1438a9ce4a6de3859966886175f70"
+  },
+  "target": {
+    "type": "planning_audit",
+    "id": "whole-repo-all-epics",
+    "label": "Whole repository — all epics (planning audit, no declared MVP target)"
+  },
+  "decision_mode": "deterministic",
+  "evaluator": "TEA Agent (bmad-testarch-trace)",
   "confidence": "high",
-  "synthetic": false,
-  "sources": [
-   "docs/test-cases/**",
-   "_bmad-output/planning-artifacts/**/epics.md",
-   "docs/project-requirements.md"
+  "oracle": {
+    "resolution_mode": "formal_requirements",
+    "confidence": "high",
+    "sources": [
+      "docs/test-cases/**",
+      "_bmad-output/planning-artifacts/**/epics.md",
+      "docs/project-requirements.md",
+      "_bmad-output/test-artifacts/test-design-epic-*.md"
+    ],
+    "external_pointer_status": "not_used",
+    "synthetic": false,
+    "ids_known": 329
+  },
+  "gate_status": "NOT_EVALUATED",
+  "gate_rationale": "Gate decision skipped because allow_gate=false and collection_status=COLLECTED.",
+  "coverage": {
+    "total_requirements": 295,
+    "fully_covered": 264,
+    "covered_requirements": 264,
+    "partially_covered": 30,
+    "uncovered": 1,
+    "overall_coverage_percentage": 89,
+    "verified_requirements": 246,
+    "overall_verified_percentage": 83,
+    "priority_breakdown": {
+      "P0": {
+        "total": 163,
+        "covered": 163,
+        "percentage": 100,
+        "verified": 158,
+        "verified_percentage": 97
+      },
+      "P1": {
+        "total": 108,
+        "covered": 89,
+        "percentage": 82,
+        "verified": 76,
+        "verified_percentage": 70
+      },
+      "P2": {
+        "total": 24,
+        "covered": 12,
+        "percentage": 50,
+        "verified": 12,
+        "verified_percentage": 50
+      },
+      "P3": {
+        "total": 0,
+        "covered": 0,
+        "percentage": 100,
+        "verified": 0,
+        "verified_percentage": 100
+      }
+    }
+  },
+  "tests": {
+    "files": 62,
+    "cases": 621,
+    "skipped_cases": 18,
+    "fixme_cases": 0,
+    "pending_cases": 0
+  },
+  "risk_summary": {
+    "critical_open": 0,
+    "high_open": 1,
+    "medium_open": 0,
+    "low_open": 0
+  },
+  "heuristics": {
+    "endpoint_gaps": 0,
+    "auth_negative_path_status": "partial",
+    "error_path_status": "present",
+    "ui_journey_status": "not_applicable",
+    "ui_state_status": "not_applicable"
+  },
+  "live_evidence": {
+    "present": true,
+    "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
+    "freshness": "fresh",
+    "recorded_source_sha": "33230f27768915b03059e34404f4adefba030071",
+    "current_source_sha": "33230f27768915b03059e34404f4adefba030071",
+    "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34750097766",
+    "counted": 246,
+    "failed": 35,
+    "contradicted": 0,
+    "skipped": 5,
+    "unmatched": 11,
+    "stale": 0,
+    "unverifiable": 0,
+    "blocked": 0,
+    "invalid": 0,
+    "requirements_live_only": 0,
+    "source_sha": "33230f27768915b03059e34404f4adefba030071",
+    "observed_at": "2026-09-13T09:48:43Z",
+    "summary": {
+      "counted": 246,
+      "failed": 35,
+      "contradicted": 0,
+      "skipped": 5,
+      "unmatched": 11
+    }
+  },
+  "blockers": [
+    {
+      "id": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts:um-ct-03 · assigned PP POSTs a backfill entry → 201 source:\"manual\" — unblock: FR-permission-matrix grants profile:timeline:write to the People Partner role (matrix §6 item 4) + DEC-UM-001 assignee scoping (PP → own assignees only)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "um-ct-03 · assigned PP POSTs a backfill entry → 201 source:\"manual\" — unblock: FR-permission-matrix grants profile:timeline:write to the People Partner role (matrix §6 item 4) + DEC-UM-001 assignee scoping (PP → own assignees only)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts:um-ct-04 · direct Unit Manager POSTs a backfill entry → 201 source:\"manual\" — unblock: FR-permission-matrix grants profile:timeline:write to the Unit Manager role + DEC-UM-001 \"direct UM\" scoping, which needs the AC department-tree-walk increment (targetType:\"department\" + recursion)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "um-ct-04 · direct Unit Manager POSTs a backfill entry → 201 source:\"manual\" — unblock: FR-permission-matrix grants profile:timeline:write to the Unit Manager role + DEC-UM-001 \"direct UM\" scoping, which needs the AC department-tree-walk increment (targetType:\"department\" + recursion)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-3/edit-delete-events.e2e-spec.ts:um-ct-05 · assigned PP soft-deletes the wrong event + POSTs the correction for her own assignee → 204 / 201, and the same for a non-assignee → 403 — unblock: FR-permission-matrix grants profile:timeline:write to the People Partner role (matrix §6 item 4) + DEC-UM-001 assignee scoping is wired (canAccessSection(\"profile:timeline\", target) === \"write\" narrowed to the assigned-PP edge)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-3/edit-delete-events.e2e-spec.ts",
+      "test_title": "um-ct-05 · assigned PP soft-deletes the wrong event + POSTs the correction for her own assignee → 204 / 201, and the same for a non-assignee → 403 — unblock: FR-permission-matrix grants profile:timeline:write to the People Partner role (matrix §6 item 4) + DEC-UM-001 assignee scoping is wired (canAccessSection(\"profile:timeline\", target) === \"write\" narrowed to the assigned-PP edge)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-3/edit-delete-events.e2e-spec.ts:um-ct-06 · direct Unit Manager DELETEs an event for a member of his own department → 204, and the same for someone outside it → 403 — unblock: FR-permission-matrix grants profile:timeline:write to the Unit Manager role + the AC department-tree-walk increment (targetType:\"department\" + recursion) for DEC-UM-001 \"direct UM\" scoping",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-3/edit-delete-events.e2e-spec.ts",
+      "test_title": "um-ct-06 · direct Unit Manager DELETEs an event for a member of his own department → 204, and the same for someone outside it → 403 — unblock: FR-permission-matrix grants profile:timeline:write to the Unit Manager role + the AC department-tree-walk increment (targetType:\"department\" + recursion) for DEC-UM-001 \"direct UM\" scoping"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts:um-ct-09 · a holder of profile:timeline:write who is not the assigned PP / direct UM POSTs an event → 403 — unblock: FR-permission-matrix grants profile:timeline:write to PP / Unit-Manager roles + DEC-UM-001 audience narrowing is wired (canAccessSection(\"profile:timeline\", target) === \"write\"); today such a holder is allowed, not denied",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "um-ct-09 · a holder of profile:timeline:write who is not the assigned PP / direct UM POSTs an event → 403 — unblock: FR-permission-matrix grants profile:timeline:write to PP / Unit-Manager roles + DEC-UM-001 audience narrowing is wired (canAccessSection(\"profile:timeline\", target) === \"write\"); today such a holder is allowed, not denied"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts:DEC-UM-001 · a non-direct reporting-line manager holding profile:timeline:write POSTs an event → 403 — unblock: FR-permission-matrix grants profile:timeline:write to PP / Unit-Manager roles + DEC-UM-001 audience narrowing lands (RW S9 read cell for the reporting line ≠ manual-write audience)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "DEC-UM-001 · a non-direct reporting-line manager holding profile:timeline:write POSTs an event → 403 — unblock: FR-permission-matrix grants profile:timeline:write to PP / Unit-Manager roles + DEC-UM-001 audience narrowing lands (RW S9 read cell for the reporting line ≠ manual-write audience)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts:um-ct-12 · the hr-admin role holds profile:timeline:write by default seed — Stage 3 / ACM bootstrap",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "um-ct-12 · the hr-admin role holds profile:timeline:write by default seed — Stage 3 / ACM bootstrap"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-5/record-departure.e2e-spec.ts:Test 4 — external PM/DM blocker is a read-only external-remediation item (needs the timetracker sync seam)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-5/record-departure.e2e-spec.ts",
+      "test_title": "Test 4 — external PM/DM blocker is a read-only external-remediation item (needs the timetracker sync seam)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts:um-dep-03 · DEFERRED — the Action Items context implements `applyDepartureEffects`: open Action Items assigned to the departing person become `cancelled — departed` (PM/AD-5: authored-for-active-assignee items stay open)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "um-dep-03 · DEFERRED — the Action Items context implements `applyDepartureEffects`: open Action Items assigned to the departing person become `cancelled — departed` (PM/AD-5: authored-for-active-assignee items stay open)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts:um-dep-03 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: active `MentorshipPair`s auto-close with a system note, bypassing the FR-M9 gate",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "um-dep-03 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: active `MentorshipPair`s auto-close with a system note, bypassing the FR-M9 gate"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts:um-dep-04 · DEFERRED — the Action Items context implements `applyDepartureEffects`: a resume after partial failure cancels no Action Item twice",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "um-dep-04 · DEFERRED — the Action Items context implements `applyDepartureEffects`: a resume after partial failure cancels no Action Item twice"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts:um-dep-04 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: a resume after partial failure closes no Mentorship pair twice",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "um-dep-04 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: a resume after partial failure closes no Mentorship pair twice"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-1/list-v15.e2e-spec.ts:um-list-12 Test 2 — @perf: 500+ rows + arbitrary filters resolve within 2000ms (deferred to a dedicated perf spec)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-1/list-v15.e2e-spec.ts",
+      "test_title": "um-list-12 Test 2 — @perf: 500+ rows + arbitrary filters resolve within 2000ms (deferred to a dedicated perf spec)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts:Test 5 — content-type spoof (PDF bytes declared image/png) → 400 IFF a magic-byte sniff is implemented (open decision)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Test 5 — content-type spoof (PDF bytes declared image/png) → 400 IFF a magic-byte sniff is implemented (open decision)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts:um-rel-12 T3 · after the move, Department B's manager resolves Reporting-line access to Alice on the next request and Department A's manager loses it — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts",
+      "test_title": "um-rel-12 T3 · after the move, Department B's manager resolves Reporting-line access to Alice on the next request and Department A's manager loses it — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts:um-rel-13 T3 · the new department manager (Nina) resolves Reporting-line access to every member of Department B AND its nested sub-departments' members on the next request, the old manager (Bob) does not (the recursive walk) — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts",
+      "test_title": "um-rel-13 T3 · the new department manager (Nina) resolves Reporting-line access to every member of Department B AND its nested sub-departments' members on the next request, the old manager (Bob) does not (the recursive walk) — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts:um-rel-17 · adding/removing a DepartmentMembership changes which department managers resolve Reporting-line access to the employee on the next request — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts",
+      "test_title": "um-rel-17 · adding/removing a DepartmentMembership changes which department managers resolve Reporting-line access to the employee on the next request — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)"
+    },
+    {
+      "id": "services/backend/test/user-management/epic-1/seed.e2e-spec.ts:um-seed-13 Test 2 · joined_company insert fails for one row → that row fully rolled back, others import (needs a fault-injection seam; AD-3 forbids provider overrides here)",
+      "severity": "high",
+      "reason": "it.todo / skipped in CI run 34715886564",
+      "test_file": "services/backend/test/user-management/epic-1/seed.e2e-spec.ts",
+      "test_title": "um-seed-13 Test 2 · joined_company insert fails for one row → that row fully rolled back, others import (needs a fault-injection seam; AD-3 forbids provider overrides here)"
+    },
+    {
+      "id": "repo-LIVE-102",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-SEED-02.",
+      "test_file": "services/backend/test/user-management/epic-1/seed.e2e-spec.ts",
+      "test_title": "UM-SEED-02 · POST /users is absent or permanently rejected › um-seed-02 Test 1 · HR-Admin session POST /users → 404/405, no row [RED: route wired, returns 201]"
+    },
+    {
+      "id": "repo-LIVE-103",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-SEED-02.",
+      "test_file": "services/backend/test/user-management/epic-1/seed.e2e-spec.ts",
+      "test_title": "UM-SEED-02 · POST /users is absent or permanently rejected › um-seed-02 Test 2 · unrelated session POST /users → identical status to Test 1 [RED: 403 today]"
+    },
+    {
+      "id": "repo-LIVE-113",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-SEED-10.",
+      "test_file": "services/backend/test/user-management/epic-1/seed.e2e-spec.ts",
+      "test_title": "UM-SEED-10 · import without capability → 403 › um-seed-10 Test 1 · Ida (unrelated FR permission, DEC-UM-002) → 403, nothing written [RED: POST /users/import is 404]"
+    },
+    {
+      "id": "repo-LIVE-114",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-SEED-10.",
+      "test_file": "services/backend/test/user-management/epic-1/seed.e2e-spec.ts",
+      "test_title": "UM-SEED-10 · import without capability → 403 › um-seed-10 Test 2 · unrelated active session, no FR policy → 403, identical body shape [RED: POST /users/import is 404]"
+    },
+    {
+      "id": "repo-LIVE-121",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-SEED-13.",
+      "test_file": "services/backend/test/user-management/epic-1/seed.e2e-spec.ts",
+      "test_title": "UM-SEED-13 · joined_company event in the row transaction › um-seed-13 Test 2 · joined_company insert fails for one row → that row fully rolled back, others import (needs a fault-injection seam; AD-3 forbids provider overrides here)"
+    },
+    {
+      "id": "repo-LIVE-134",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-LIST-05.",
+      "test_file": "services/backend/test/user-management/epic-1/list-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.5 — GET /users list/paginate/filter (e2e) › um-list-05 · dismissed hidden by default › Test 1 — baseline: the default list contains Colin and Alice [GREEN: characterization]"
+    },
+    {
+      "id": "repo-LIVE-135",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-LIST-05.",
+      "test_file": "services/backend/test/user-management/epic-1/list-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.5 — GET /users list/paginate/filter (e2e) › um-list-05 · dismissed hidden by default › Test 2 — after Colin is dismissed the default list omits him, keeps Alice [RED: no EmploymentStatus join, keys on isActive]"
+    },
+    {
+      "id": "repo-LIVE-154",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-LIST-12.",
+      "test_file": "services/backend/test/user-management/epic-1/list-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.5 — GET /users list/paginate/filter (e2e) › um-list-12 · perf / no per-row facade calls › um-list-12 Test 2 — @perf: 500+ rows + arbitrary filters resolve within 2000ms (deferred to a dedicated perf spec)"
+    },
+    {
+      "id": "repo-LIVE-155",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-01.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-01 · Self uploads a first photo — it persists and reflects on a read [RED] › PUT .../photo → 200 non-null photo ref; follow-up GET shows it at data.photo"
+    },
+    {
+      "id": "repo-LIVE-156",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-02.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-02 · Self replaces an existing photo — full-replace semantics [RED] › second PUT → 200 with a NEW photo ref (!== first); GET reflects the new one; old object not deleted synchronously"
+    },
+    {
+      "id": "repo-LIVE-157",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-03.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: AWS SDK error wrapper for AggregateError",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-03 · photo upload is Self-only — a manager, a colleague and a PP are denied [GREEN-under-interim] › Bob (reporting-line manager) → 403; Alice.photo unchanged; nothing stored"
+    },
+    {
+      "id": "repo-LIVE-158",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UM-PHOTO-03.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-03 · photo upload is Self-only — a manager, a colleague and a PP are denied [GREEN-under-interim] › Eve (unrelated colleague) → 403; Alice.photo unchanged"
+    },
+    {
+      "id": "repo-LIVE-159",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UM-PHOTO-03.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-03 · photo upload is Self-only — a manager, a colleague and a PP are denied [GREEN-under-interim] › Paula (assigned People Partner) → 403; Alice.photo unchanged"
+    },
+    {
+      "id": "repo-LIVE-163",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-05.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: AWS SDK error wrapper for AggregateError",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-05 · Self upload against a non-resolvable target → 403 (no 404) [GREEN] › target UUID matches no User row → 403, leak-free; nothing stored"
+    },
+    {
+      "id": "repo-LIVE-164",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-05.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: AWS SDK error wrapper for AggregateError",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-05 · Self upload against a non-resolvable target → 403 (no 404) [GREEN] › target is an inactive User → 403; that row.photo unchanged; nothing stored"
+    },
+    {
+      "id": "repo-LIVE-165",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-06.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: AWS SDK error wrapper for AggregateError",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-06 · photo upload input validation → 400 [RED] › Test 1 — disallowed content type (application/pdf) → 400; nothing stored"
+    },
+    {
+      "id": "repo-LIVE-166",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UM-PHOTO-06.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-06 · photo upload input validation → 400 [RED] › Test 1b — disallowed content type (image/gif) → 400; nothing stored"
+    },
+    {
+      "id": "repo-LIVE-167",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UM-PHOTO-06.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-06 · photo upload input validation → 400 [RED] › Test 2 — oversized file (> 5 MiB) → 400 (413 accepted equivalent); nothing stored"
+    },
+    {
+      "id": "repo-LIVE-168",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UM-PHOTO-06.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-06 · photo upload input validation → 400 [RED] › Test 3 — missing photo part (only a text field) → 400"
+    },
+    {
+      "id": "repo-LIVE-169",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-06.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: AWS SDK error wrapper for AggregateError",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-06 · photo upload input validation → 400 [RED] › Test 4 — zero-byte photo part → 400; nothing stored"
+    },
+    {
+      "id": "repo-LIVE-170",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-PHOTO-06.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-06 · photo upload input validation → 400 [RED] › Test 5 — content-type spoof (PDF bytes declared image/png) → 400 IFF a magic-byte sniff is implemented (open decision)"
+    },
+    {
+      "id": "repo-LIVE-171",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-07.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-07 · object store unreachable → 503, no half-apply [RED] › upload during the outage → 503; User.photo stays null; a retry (against the live store) then succeeds"
+    },
+    {
+      "id": "repo-LIVE-172",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-08.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-08 · the upload hits real object storage — Stage-2 bucket assertion (AD-15) [RED] › after a Self upload the object exists in the real bucket and is byte-identical to the uploaded file"
+    },
+    {
+      "id": "repo-LIVE-173",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UM-PHOTO-08.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-08 · the upload hits real object storage — Stage-2 bucket assertion (AD-15) [RED] › AD-15 gate — OBJECT_STORAGE_PORT resolves to the production S3StorageAdapter, no Fake/Mock/Stub bound"
+    },
+    {
+      "id": "repo-LIVE-174",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UM-PHOTO-09.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-09 · PATCH /users/:id never writes photo; photo upload never writes other S1 fields [RED] › Test 1 — PATCH carrying `photo` → 400 (forbidden property); no sibling field lands either"
+    },
+    {
+      "id": "repo-LIVE-175",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UM-PHOTO-09.",
+      "test_file": "services/backend/test/user-management/epic-1/photo-v15.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Epic 1 · Story 1.3 — Self Uploads Own Photo · PUT /users/:id/photo (e2e) › um-photo-09 · PATCH /users/:id never writes photo; photo upload never writes other S1 fields [RED] › Test 2 — a Self photo upload changes ONLY User.photo; every other S1 field is unchanged"
+    },
+    {
+      "id": "repo-LIVE-178",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-DEP-03.",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-03 · on the effective date the full UM-owned outcome materialises › um-dep-03 · DEFERRED — the Action Items context implements `applyDepartureEffects`: open Action Items assigned to the departing person become `cancelled — departed` (PM/AD-5: authored-for-active-assignee items stay open)"
+    },
+    {
+      "id": "repo-LIVE-179",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-DEP-03.",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-03 · on the effective date the full UM-owned outcome materialises › um-dep-03 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: active `MentorshipPair`s auto-close with a system note, bypassing the FR-M9 gate"
+    },
+    {
+      "id": "repo-LIVE-184",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-DEP-04.",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › um-dep-04 · DEFERRED — the Action Items context implements `applyDepartureEffects`: a resume after partial failure cancels no Action Item twice"
+    },
+    {
+      "id": "repo-LIVE-185",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-DEP-04.",
+      "test_file": "services/backend/test/user-management/epic-5/apply-departure.e2e-spec.ts",
+      "test_title": "Epic 5 · Story 5.2 — Apply an Effective Departure (e2e, committed red — SPLIT-GATE) › um-dep-04 · retry (worker resume or POST …/retry) is idempotent › um-dep-04 · DEFERRED — the Mentorship context implements `applyDepartureEffects`: a resume after partial failure closes no Mentorship pair twice"
+    },
+    {
+      "id": "repo-LIVE-199",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-DEP-02.",
+      "test_file": "services/backend/test/user-management/epic-5/record-departure.e2e-spec.ts",
+      "test_title": "Epic 5 · Story 5.1 — Record a Departure (e2e, committed red) › um-dep-02 · blocker check runs before any row; 409 with leak-safe body › Test 4 — external PM/DM blocker is a read-only external-remediation item (needs the timetracker sync seam)"
+    },
+    {
+      "id": "repo-LIVE-217",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-EDIT-03.",
+      "test_file": "services/backend/test/user-management/epic-1/edit-identity.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.2 — PATCH /users/:id identity-card data correctness (e2e) › um-edit-03 · duplicate workEmail rejected wholesale [GREEN: characterization] › um-edit-03 Test 1/2 — PATCH { position, workEmail: <in use> } → 409; neither field changes; the collided row is untouched"
+    },
+    {
+      "id": "repo-LIVE-218",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-EDIT-04.",
+      "test_file": "services/backend/test/user-management/epic-1/edit-identity.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.2 — PATCH /users/:id identity-card data correctness (e2e) › um-edit-04 · duplicate ttId rejected wholesale; null-vs-null OK [GREEN: characterization] › um-edit-04 Test 1 — PATCH { workPhone, ttId: <in use> } → 409; neither ttId nor workPhone changes"
+    },
+    {
+      "id": "repo-LIVE-219",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-EDIT-04.",
+      "test_file": "services/backend/test/user-management/epic-1/edit-identity.e2e-spec.ts",
+      "test_title": "Epic 1 · Story 1.2 — PATCH /users/:id identity-card data correctness (e2e) › um-edit-04 · duplicate ttId rejected wholesale; null-vs-null OK [GREEN: characterization] › um-edit-04 Test 2 — unrelated edit while Alice and Nina both hold ttId: null → 200, no 409"
+    },
+    {
+      "id": "repo-LIVE-254",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-REL-12.",
+      "test_file": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts",
+      "test_title": "Epic 4 · Story 4.3 — Change Employee Department / Department Manager (e2e, committed red — split-gate) › um-rel-12 T3 · after the move, Department B's manager resolves Reporting-line access to Alice on the next request and Department A's manager loses it — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)"
+    },
+    {
+      "id": "repo-LIVE-256",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-REL-13.",
+      "test_file": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts",
+      "test_title": "Epic 4 · Story 4.3 — Change Employee Department / Department Manager (e2e, committed red — split-gate) › um-rel-13 T3 · the new department manager (Nina) resolves Reporting-line access to every member of Department B AND its nested sub-departments' members on the next request, the old manager (Bob) does not (the recursive walk) — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)"
+    },
+    {
+      "id": "repo-LIVE-262",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-REL-17.",
+      "test_file": "services/backend/test/user-management/epic-4/department-change.e2e-spec.ts",
+      "test_title": "Epic 4 · Story 4.3 — Change Employee Department / Department Manager (e2e, committed red — split-gate) › um-rel-17 · adding/removing a DepartmentMembership changes which department managers resolve Reporting-line access to the employee on the next request — unblocks when the AC resolveAudiences walk for targetType:'department' + Department.parentId recursion reaches stage-3-production (spec-access-control-kernel-mvp)"
+    },
+    {
+      "id": "repo-LIVE-263",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-CT-05.",
+      "test_file": "services/backend/test/user-management/epic-3/edit-delete-events.e2e-spec.ts",
+      "test_title": "Epic 3 · Edit / delete events — DELETE (+ no PATCH) /users/:id/events/:eventId (e2e, committed red) › um-ct-05 · assigned People Partner corrects a wrongly-inferred event (soft-delete + append) [DEFERRED] › um-ct-05 · assigned PP soft-deletes the wrong event + POSTs the correction for her own assignee → 204 / 201, and the same for a non-assignee → 403 — unblock: FR-permission-matrix grants profile:timeline:write to the People Partner role (matrix §6 item 4) + DEC-UM-001 assignee scoping is wired (canAccessSection(\"profile:timeline\", target) === \"write\" narrowed to the assigned-PP edge)"
+    },
+    {
+      "id": "repo-LIVE-264",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-CT-06.",
+      "test_file": "services/backend/test/user-management/epic-3/edit-delete-events.e2e-spec.ts",
+      "test_title": "Epic 3 · Edit / delete events — DELETE (+ no PATCH) /users/:id/events/:eventId (e2e, committed red) › um-ct-06 · direct Unit Manager soft-deletes an event [DEFERRED] › um-ct-06 · direct Unit Manager DELETEs an event for a member of his own department → 204, and the same for someone outside it → 403 — unblock: FR-permission-matrix grants profile:timeline:write to the Unit Manager role + the AC department-tree-walk increment (targetType:\"department\" + recursion) for DEC-UM-001 \"direct UM\" scoping"
+    },
+    {
+      "id": "repo-LIVE-300",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-CT-12.",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "Epic 3 · Manual backfill — POST /users/:id/events (e2e, committed red) › um-ct-12 · HR Admin manually adds a backfill entry [LIVE — the one manual-add path Story 3.2 ships] › um-ct-12 · the hr-admin role holds profile:timeline:write by default seed — Stage 3 / ACM bootstrap"
+    },
+    {
+      "id": "repo-LIVE-308",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-CT-03.",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "Epic 3 · Manual backfill — POST /users/:id/events (e2e, committed red) › um-ct-03 · assigned People Partner manually adds a backfill entry [DEFERRED] › um-ct-03 · assigned PP POSTs a backfill entry → 201 source:\"manual\" — unblock: FR-permission-matrix grants profile:timeline:write to the People Partner role (matrix §6 item 4) + DEC-UM-001 assignee scoping (PP → own assignees only)"
+    },
+    {
+      "id": "repo-LIVE-309",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-CT-04.",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "Epic 3 · Manual backfill — POST /users/:id/events (e2e, committed red) › um-ct-04 · direct Unit Manager manually adds a backfill entry [DEFERRED] › um-ct-04 · direct Unit Manager POSTs a backfill entry → 201 source:\"manual\" — unblock: FR-permission-matrix grants profile:timeline:write to the Unit Manager role + DEC-UM-001 \"direct UM\" scoping, which needs the AC department-tree-walk increment (targetType:\"department\" + recursion)"
+    },
+    {
+      "id": "repo-LIVE-310",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-CT-09.",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "Epic 3 · Manual backfill — POST /users/:id/events (e2e, committed red) › um-ct-09 · holds the functional permission but lacks the narrowed S9 write audience → denied [DEFERRED] › um-ct-09 · a holder of profile:timeline:write who is not the assigned PP / direct UM POSTs an event → 403 — unblock: FR-permission-matrix grants profile:timeline:write to PP / Unit-Manager roles + DEC-UM-001 audience narrowing is wired (canAccessSection(\"profile:timeline\", target) === \"write\"); today such a holder is allowed, not denied"
+    },
+    {
+      "id": "repo-LIVE-311",
+      "severity": "medium",
+      "reason": "Live verification was skipped. Requirement: UM-CT-09.",
+      "test_file": "services/backend/test/user-management/epic-3/manual-events.e2e-spec.ts",
+      "test_title": "Epic 3 · Manual backfill — POST /users/:id/events (e2e, committed red) › um-ct-09 · DEC-UM-001 narrowing · a reporting-line manager who is not the direct UM / PP → denied for manual add [DEFERRED] › DEC-UM-001 · a non-direct reporting-line manager holding profile:timeline:write POSTs an event → 403 — unblock: FR-permission-matrix grants profile:timeline:write to PP / Unit-Manager roles + DEC-UM-001 audience narrowing lands (RW S9 read cell for the reporting line ≠ manual-write audience)"
+    },
+    {
+      "id": "repo-LIVE-320",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UMAC-09.",
+      "test_file": "services/backend/test/user-management/access-control-adoption/write-adoption.e2e-spec.ts",
+      "test_title": "UMAC-2 Stage 2 — PATCH / PUT photo write-path gates (e2e) › UMAC-09 · PUT /users/:id/photo is Self-only (Open Decision (v)) › UMAC-09 Test 2 — reporting-line manager uploads a report photo → 403"
+    },
+    {
+      "id": "repo-LIVE-321",
+      "severity": "high",
+      "reason": "Live result passed, but the same file records a failure for this requirement. Requirement: UMAC-09.",
+      "test_file": "services/backend/test/user-management/access-control-adoption/write-adoption.e2e-spec.ts",
+      "test_title": "UMAC-2 Stage 2 — PATCH / PUT photo write-path gates (e2e) › UMAC-09 · PUT /users/:id/photo is Self-only (Open Decision (v)) › UMAC-09 Test 3 — unrelated / colleague session uploads a photo → 403"
+    },
+    {
+      "id": "repo-LIVE-322",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: UMAC-09.",
+      "test_file": "services/backend/test/user-management/access-control-adoption/write-adoption.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "UMAC-2 Stage 2 — PATCH / PUT photo write-path gates (e2e) › UMAC-09 · PUT /users/:id/photo is Self-only (Open Decision (v)) › UMAC-09 Test 1 — Self uploads own photo → 200 with a non-null photo reference [GREEN: characterization]"
+    },
+    {
+      "id": "repo-LIVE-323",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-01.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-01 — end a pair with a closure note; note stored on the pair record"
+    },
+    {
+      "id": "repo-LIVE-324",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-02.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-02 — ending without a closure note is rejected; the pair stays active"
+    },
+    {
+      "id": "repo-LIVE-325",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-03.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-03 — closure note visible to reporting line (direct + transitive), project line, and PP"
+    },
+    {
+      "id": "repo-LIVE-326",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-04.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-04a — closure note hidden from the mentee (Self): pair visible, closureNote key absent"
+    },
+    {
+      "id": "repo-LIVE-327",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-04.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-04b — closure note hidden from the mentor: pair visible, closureNote key absent"
+    },
+    {
+      "id": "repo-LIVE-328",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-04.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-04c — a colleague has no S13 access to the pair at all → 404 leak-free"
+    },
+    {
+      "id": "repo-LIVE-329",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-05.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-05 — status returns to `open to mentoring` when no active mentee remains and the flag is still set"
+    },
+    {
+      "id": "repo-LIVE-330",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-06.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-06 — status does NOT return to the pool when the flag was cleared before the last pair ended"
+    },
+    {
+      "id": "repo-LIVE-331",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-END-07.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-07 — ending a pair writes `mentorship_end` to the career timeline (same transaction) [G-CT]"
+    },
+    {
+      "id": "repo-LIVE-332",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: MEN-END-08.",
+      "test_file": "services/backend/test/mentorship/end.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair end (men-end-*) — Stage-2 committed red [G-CTX + G-PERM (+G-S13 end-03/04, +G-CT end-07)] › men-end-08 — an ended pair stays in history on both profiles and in the all-pairs view"
+    },
+    {
+      "id": "repo-LIVE-347",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-CT-01.",
+      "test_file": "services/backend/test/user-management/epic-3/auto-events.e2e-spec.ts",
+      "test_title": "UM-CT-01 · population import → one joined_company system event per imported User (e2e) › um-ct-01 · the population import runs to completion [RED-or-GREEN: passes iff `npm run db:import:population` exists and succeeds]"
+    },
+    {
+      "id": "repo-LIVE-348",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-CT-01.",
+      "test_file": "services/backend/test/user-management/epic-3/auto-events.e2e-spec.ts",
+      "test_title": "UM-CT-01 · population import → one joined_company system event per imported User (e2e) › um-ct-01 · exactly one joined_company system event per imported row, eventDate = companyJoinDate, same tx [RED iff importer missing; GREEN half delivered by Story 1.1]"
+    },
+    {
+      "id": "repo-LIVE-349",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UM-CT-01.",
+      "test_file": "services/backend/test/user-management/epic-3/auto-events.e2e-spec.ts",
+      "test_title": "UM-CT-01 · population import → one joined_company system event per imported User (e2e) › um-ct-01 · GET /users/:id/events returns the joined_company event to Root [RED: route GET /users/:id/events does not exist → 404]"
+    },
+    {
+      "id": "repo-LIVE-408",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-VIEW-01.",
+      "test_file": "services/backend/test/mentorship/view.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship views (men-view-*) — Stage-2 committed red [G-CTX (+G-S13 view-01/04); view-05 directory scope] › men-view-01 — Self sees own mentor and (empty) mentee list plus own flag"
+    },
+    {
+      "id": "repo-LIVE-409",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-VIEW-02.",
+      "test_file": "services/backend/test/mentorship/view.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship views (men-view-*) — Stage-2 committed red [G-CTX (+G-S13 view-01/04); view-05 directory scope] › men-view-02 — the all-pairs view lists active and ended pairs with dates and status"
+    },
+    {
+      "id": "repo-LIVE-410",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-VIEW-03.",
+      "test_file": "services/backend/test/mentorship/view.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship views (men-view-*) — Stage-2 committed red [G-CTX (+G-S13 view-01/04); view-05 directory scope] › men-view-03 — the profile header shows the mentor (S1 `mentor` field)"
+    },
+    {
+      "id": "repo-LIVE-411",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-VIEW-04.",
+      "test_file": "services/backend/test/mentorship/view.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship views (men-view-*) — Stage-2 committed red [G-CTX (+G-S13 view-01/04); view-05 directory scope] › men-view-04 — S13 inline summary on the profile: PP sees the closure note, Self does not [G-S13]"
+    },
+    {
+      "id": "repo-LIVE-412",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-VIEW-05.",
+      "test_file": "services/backend/test/mentorship/view.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship views (men-view-*) — Stage-2 committed red [G-CTX (+G-S13 view-01/04); view-05 directory scope] › men-view-05 — mentorship status is a filterable directory field (non-leaking) [directory scope]"
+    },
+    {
+      "id": "repo-LIVE-470",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-PAIR-01.",
+      "test_file": "services/backend/test/mentorship/pair.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair create (men-pair-*) — Stage-2 committed red [G-CTX + G-PERM; men-pair-04 +G-CT] › men-pair-01 — create a pair with a mentee in the assigner’s access scope"
+    },
+    {
+      "id": "repo-LIVE-471",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-PAIR-02.",
+      "test_file": "services/backend/test/mentorship/pair.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair create (men-pair-*) — Stage-2 committed red [G-CTX + G-PERM; men-pair-04 +G-CT] › men-pair-02 — mentee outside the assigner’s access scope is rejected (resolveAudiences empty) → 403, no pair"
+    },
+    {
+      "id": "repo-LIVE-472",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-PAIR-03.",
+      "test_file": "services/backend/test/mentorship/pair.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair create (men-pair-*) — Stage-2 committed red [G-CTX + G-PERM; men-pair-04 +G-CT] › men-pair-03 — first active pair flips status `open to mentoring` → `mentor`"
+    },
+    {
+      "id": "repo-LIVE-473",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-PAIR-04.",
+      "test_file": "services/backend/test/mentorship/pair.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair create (men-pair-*) — Stage-2 committed red [G-CTX + G-PERM; men-pair-04 +G-CT] › men-pair-04 — pair creation writes `mentorship_start` to the career timeline (same transaction) [G-CT]"
+    },
+    {
+      "id": "repo-LIVE-474",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-PAIR-04.",
+      "test_file": "services/backend/test/mentorship/pair.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pair create (men-pair-*) — Stage-2 committed red [G-CTX + G-PERM; men-pair-04 +G-CT] › men-pair-05 — create denied without `mentorship:assign` → 403 (no-target isAllowed; Ida probe)"
+    },
+    {
+      "id": "repo-LIVE-489",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-FLAG-01.",
+      "test_file": "services/backend/test/mentorship/flag.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship flag (men-flag-*) — Stage-2 committed red [G-CTX; men-flag-03 +G-PERM; men-flag-04 Self-only] › men-flag-01 — Self sets own open-to-mentoring flag; appears in the pool"
+    },
+    {
+      "id": "repo-LIVE-490",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-FLAG-02.",
+      "test_file": "services/backend/test/mentorship/flag.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship flag (men-flag-*) — Stage-2 committed red [G-CTX; men-flag-03 +G-PERM; men-flag-04 Self-only] › men-flag-02 — Self clears own flag; leaves the pool"
+    },
+    {
+      "id": "repo-LIVE-491",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-FLAG-03.",
+      "test_file": "services/backend/test/mentorship/flag.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship flag (men-flag-*) — Stage-2 committed red [G-CTX; men-flag-03 +G-PERM; men-flag-04 Self-only] › men-flag-03 — clear the flag while holding an active mentee: flag clears, pair untouched, status stays `mentor`"
+    },
+    {
+      "id": "repo-LIVE-492",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-FLAG-03.",
+      "test_file": "services/backend/test/mentorship/flag.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship flag (men-flag-*) — Stage-2 committed red [G-CTX; men-flag-03 +G-PERM; men-flag-04 Self-only] › men-flag-04 — a non-Self actor cannot set someone else’s flag (Self-only identity equality, not a permission)"
+    },
+    {
+      "id": "repo-LIVE-500",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-POOL-01.",
+      "test_file": "services/backend/test/mentorship/pool.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pool (men-pool-*) — Stage-2 committed red [G-CTX + G-PERM] › men-pool-01 — permission-holder reads the company-wide pool: S1 identity + flag, every department"
+    },
+    {
+      "id": "repo-LIVE-501",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-POOL-02.",
+      "test_file": "services/backend/test/mentorship/pool.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pool (men-pool-*) — Stage-2 committed red [G-CTX + G-PERM] › men-pool-02 — the pool never exposes S13 (no mentees / pairs / closureNote keys on a pool row)"
+    },
+    {
+      "id": "repo-LIVE-502",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-POOL-03.",
+      "test_file": "services/backend/test/mentorship/pool.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship pool (men-pool-*) — Stage-2 committed red [G-CTX + G-PERM] › men-pool-03 — pool read denied without `mentorship:assign` → 403 (no-target isAllowed; Ida probe)"
+    },
+    {
+      "id": "repo-LIVE-503",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-DEP-01.",
+      "test_file": "services/backend/test/mentorship/departure.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship departure auto-close (men-dep-*) — Stage-2 BLOCKED [G-DEP + G-CTX] › men-dep-01 — a departure auto-closes ALL of the departing person’s active pairs (as mentor and as mentee)"
+    },
+    {
+      "id": "repo-LIVE-504",
+      "severity": "high",
+      "reason": "Live verification failed. Requirement: MEN-DEP-02.",
+      "test_file": "services/backend/test/mentorship/departure.e2e-spec.ts — Error: expect(received).toBe(expected) // Object.is equality",
+      "test_title": "Mentorship departure auto-close (men-dep-*) — Stage-2 BLOCKED [G-DEP + G-CTX] › men-dep-02 — the departure system note bypasses the mandatory-note gate (contrast men-end-02)"
+    },
+    {
+      "id": "repo-LIVE-505",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UMAC-05.",
+      "test_file": "services/backend/test/user-management/access-control-adoption/read-denial.e2e-spec.ts",
+      "test_title": "UMAC-1 — GET /users/:id denials: 401 unresolved session / 403 empty audience (e2e) › UMAC-05 Test 1 — literal placeholder id (Bearer <token:Bob>) → 401 (unresolved session, leak-free body)"
+    },
+    {
+      "id": "repo-LIVE-506",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UMAC-05.",
+      "test_file": "services/backend/test/user-management/access-control-adoption/read-denial.e2e-spec.ts",
+      "test_title": "UMAC-1 — GET /users/:id denials: 401 unresolved session / 403 empty audience (e2e) › UMAC-05 Test 2 — deactivated caller (isActive: false) → 401 (unresolved session, leak-free body)"
+    },
+    {
+      "id": "repo-LIVE-507",
+      "severity": "medium",
+      "reason": "Live result names a requirement that is not an active item of the resolved oracle (retired document whose test still runs). Requirement: UMAC-05.",
+      "test_file": "services/backend/test/user-management/access-control-adoption/read-denial.e2e-spec.ts",
+      "test_title": "UMAC-1 — GET /users/:id denials: 401 unresolved session / 403 empty audience (e2e) › UMAC-05 Test 3 — non-existent target, valid active caller → 403 denial (no existence distinction)"
+    }
   ],
-  "external_pointer_status": "not_used",
-  "ids_known": 324
- },
- "gate_status": "NOT_EVALUATED",
- "coverage": {
-  "inventory": {
-   "covered": 257,
-   "total": 288,
-   "pct": 89
-  },
-  "verified": {
-   "verified": 228,
-   "total": 288,
-   "pct": 79
-  },
-  "priority_breakdown": {
-   "P0": {
-    "total": 159,
-    "covered": 159,
-    "percentage": 100,
-    "verified": 143,
-    "verified_percentage": 90
-   },
-   "P1": {
-    "total": 105,
-    "covered": 86,
-    "percentage": 82,
-    "verified": 73,
-    "verified_percentage": 70
-   },
-   "P2": {
-    "total": 24,
-    "covered": 12,
-    "percentage": 50,
-    "verified": 12,
-    "verified_percentage": 50
-   },
-   "P3": {
-    "total": 0,
-    "covered": 0,
-    "percentage": 100,
-    "verified": 0,
-    "verified_percentage": 100
-   }
-  },
-  "by_level": {
-   "e2e": 59,
-   "api": 0,
-   "component": 0,
-   "unit": 4,
-   "contract": 0,
-   "measurement": 0,
-   "live": 631,
-   "other": 0
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "action": "Run /bmad-testarch-automate for 1 P1 requirements",
+      "requirements": [
+        "MEN-END-04"
+      ]
+    },
+    {
+      "priority": "MEDIUM",
+      "action": "Complete coverage for 30 partially covered requirements",
+      "requirements": [
+        "MEN-DEP-01",
+        "MEN-DEP-02",
+        "MEN-END-01",
+        "MEN-END-02",
+        "MEN-END-03",
+        "MEN-END-05",
+        "MEN-END-06",
+        "MEN-END-07",
+        "MEN-FLAG-01",
+        "MEN-FLAG-02",
+        "MEN-FLAG-03",
+        "MEN-FLAG-04",
+        "MEN-PAIR-01",
+        "MEN-PAIR-02",
+        "MEN-PAIR-03",
+        "MEN-PAIR-04",
+        "MEN-PAIR-05",
+        "MEN-POOL-01",
+        "MEN-POOL-02",
+        "MEN-POOL-03",
+        "MEN-VIEW-01",
+        "MEN-VIEW-02",
+        "MEN-VIEW-03",
+        "MEN-VIEW-04",
+        "MEN-VIEW-05",
+        "UM-CT-03",
+        "UM-CT-04",
+        "UM-CT-05",
+        "UM-CT-06",
+        "UM-CT-09"
+      ]
+    },
+    {
+      "priority": "HIGH",
+      "action": "Merge feat/plat-e4-dev-seed-journal and feat/conflict-um-01-hidden-target-404 to services/backend main; both are evidenced only on unmerged branches",
+      "requirements": [
+        "S4.2d-DS-07",
+        "UMAC-07",
+        "UMAC-11"
+      ]
+    },
+    {
+      "priority": "LOW",
+      "action": "Fix the object store (LocalStack) in the e2e job — recovers photo/UMAC-09 requirements now correctly shown failing",
+      "requirements": [
+        "UM-PHOTO-01",
+        "UM-PHOTO-02",
+        "UM-PHOTO-03",
+        "UM-PHOTO-05",
+        "UM-PHOTO-06",
+        "UM-PHOTO-07",
+        "UM-PHOTO-08",
+        "UM-PHOTO-09",
+        "UMAC-09"
+      ]
+    },
+    {
+      "priority": "LOW",
+      "action": "Run /bmad-testarch-test-review to assess test quality",
+      "requirements": []
+    }
+  ],
+  "links": {
+    "trace_report_path": "_bmad-output/test-artifacts/traceability-matrix.md",
+    "trace_report_url": "",
+    "artifact_url": "https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34715886564",
+    "journey_evidence_url": "",
+    "matrix": "_bmad-output/test-artifacts/tea-trace-coverage-matrix.json",
+    "live_verification": "_bmad-output/test-artifacts/live-verification-results.json"
   }
- },
- "tests": {
-  "files": 63,
-  "cases": 680,
-  "mapped_cases": 634,
-  "skipped_cases": 18,
-  "failed_cases": 40
- },
- "live_evidence": {
-  "present": true,
-  "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
-  "freshness": "fresh",
-  "recorded_source_sha": "43d50add983ad70a31064e94576c4a88fb06bf74",
-  "current_source_sha": "43d50add983ad70a31064e94576c4a88fb06bf74",
-  "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34400438569 (CI-produced live-verification-results artifact, adopted as-is — identical to a local re-resolve)",
-  "counted": 576,
-  "stale": 0,
-  "unverifiable": 0,
-  "failed": 40,
-  "contradicted": 15,
-  "blocked": 0,
-  "skipped": 18,
-  "unmatched": 35,
-  "invalid": 0,
-  "requirements_live_only": 0,
-  "scope_note": "CI run 34400438569 (push to main at 43d50ad). Same three uploaded reports as the 09-08 run; 634 of 680 cases mapped; all 634 records byte-identical to the 09-08 evidence set.",
-  "provenance_note": "The workspace HEAD (43d50ad) is the exact commit CI observed, and both submodules already sit at the SHAs that commit pins, so recorded_source_sha and current_source_sha are the same commit."
- },
- "blockers": [
-  {
-   "id": "MEN-DEP-01",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-DEP-02",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-END-01",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-END-02",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-END-03",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-END-04",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-END-05",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-END-06",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-END-07",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-FLAG-01",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-FLAG-02",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-FLAG-03",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-PAIR-01",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-PAIR-02",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-PAIR-03",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-PAIR-04",
-   "severity": "high",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-POOL-01",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-POOL-02",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-POOL-03",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-VIEW-01",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-VIEW-02",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-VIEW-03",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-VIEW-04",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "MEN-VIEW-05",
-   "severity": "medium",
-   "reason": "Stage-2 test committed red under AD-1: route returns 404, the mentorship module does not exist in services/backend/src"
-  },
-  {
-   "id": "UMAC-09",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-01",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-02",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-03",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-05",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-06",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-07",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-08",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "UM-PHOTO-09",
-   "severity": "high",
-   "reason": "Environment fault, not a product regression: the localstack container came up unhealthy, so every S3-backed case failed with an AWS SDK AggregateError. Static coverage unchanged; no fresh passing evidence. Re-run once LocalStack is healthy."
-  },
-  {
-   "id": "ACM1-FB-02",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1-FB-04",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1-FB-05",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1-FB-06",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1-FB-07",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1R-FB-10",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1R-FB-12",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1R-FB-13",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1R-FB-21",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "ACM1R-FB-22",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  },
-  {
-   "id": "UMAC-10",
-   "severity": "medium",
-   "reason": "Matrix index miss: acm1r-fr-foundation.e2e-spec.ts ran 39/39 green, but the case titles the matrix carries date from before the suite was rewritten in 49fd0c4, so the exact (file, title) lookup no longer resolves. Re-map against the current titles."
-  }
- ]
 }

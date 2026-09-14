@@ -3,3 +3,4 @@ persistent_facts = ["file:docs/test-design-workflow-contract.md"]
 activation_steps_prepend = [
   "Before workflow mode selection, read {project-root}/_bmad-output/test-artifacts/test-design/README.md and {project-root}/docs/test-design-workflow-contract.md; resolve the requested scope exactly as the contract requires before choosing or writing any input, output, checkpoint, edit target, resume target, or validation report. On ambiguity or identity mismatch, halt without writes.",
 ]
+on_complete = "Before completing any Create, Resume, Edit, or Validate run, run `npm run test:test-design-lifecycle`. If it reports lifecycle-state drift, keep the run incomplete and synchronize the selected canonical report, current-artifact index row, plan validation projection, and progress-checkpoint validation projection as required by `docs/test-design-workflow-contract.md`. Never require the user to inspect every test-design artifact manually."

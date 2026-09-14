@@ -4,6 +4,7 @@ const fs=require('node:fs');
 const os=require('node:os');
 const path=require('node:path');
 const {syncOnce}=require('../scripts/sync-readiness-map.cjs');
+const {build,isTraceOutputPath}=require('../scripts/build-readiness-map.cjs');
 const evidence=()=>({source_sha:'abc',observed_at:'2026-09-07T12:00:00Z',producer:'CI',
   results:[{requirement_id:'ACF-AU-01',status:'fail',title:'<script>bad()</script>',evidence:'unit: example'}],
   run_summary:{missing_reports:[],matrix_used:'_bmad-output/test-artifacts/tea-trace-coverage-matrix.json'}});
@@ -17,7 +18,7 @@ function fixtureRoot(t){
   t.after(()=>fs.rmSync(dir,{recursive:true,force:true}));
   fs.mkdirSync(path.join(dir,'docs/demo'),{recursive:true});
   fs.writeFileSync(path.join(dir,'docs/demo/workplace-readiness-data-2026-09-07.json'),JSON.stringify({
-    modules:[],product:[],areas:[],
+    implementationNotesSnapshotAt:'2026-09-07',modules:[],product:[],areas:[],
   }));
   fs.writeFileSync(path.join(dir,'docs/demo/readiness-template.html'),
     '<!doctype html><html><body><script type="application/json" id="workplace-data">__READINESS_DATA__</script></body></html>');
@@ -31,6 +32,43 @@ function fixtureRoot(t){
     'baseline_date: "2026-09-01"\nrequirements:\n  - id: ACF-AU-01\n    summary: Example requirement\n');
   return dir;
 }
+
+test('build labels implementation notes as a dated snapshot and rejects unlabelled notes',t=>{
+  const root=fixtureRoot(t),result=build(evidence(),{},root);
+  assert.equal(result.data.inventory.implementationNotesSnapshotAt,'2026-09-07');
+  assert.equal(result.data.inventory.implementationNotesSource,'docs/demo/workplace-readiness-data-2026-09-07.json');
+  const seed=path.join(root,'docs/demo/workplace-readiness-data-2026-09-07.json');
+  fs.writeFileSync(seed,JSON.stringify({modules:[],product:[],areas:[]}));
+  assert.throws(()=>build(evidence(),{},root),/must declare an ISO snapshot date/);
+});
+
+test('build rejects impossible or relabelled implementation-note snapshot dates',t=>{
+  const root=fixtureRoot(t),seed=path.join(root,'docs/demo/workplace-readiness-data-2026-09-07.json');
+  fs.writeFileSync(seed,JSON.stringify({implementationNotesSnapshotAt:'2026-99-99',modules:[],product:[],areas:[]}));
+  assert.throws(()=>build(evidence(),{},root),/must declare an ISO snapshot date/);
+  fs.writeFileSync(seed,JSON.stringify({implementationNotesSnapshotAt:'2026-09-08',modules:[],product:[],areas:[]}));
+  assert.throws(()=>build(evidence(),{},root),/must match its source filename/);
+});
+
+test('build records when CI evidence does not describe the current checkout',t=>{
+  const root=fixtureRoot(t),result=build(evidence(),{checkoutSha:'def'},root);
+  assert.equal(result.data.inventory.evidenceMatchesCheckout,false);
+  assert.equal(build(evidence(),{checkoutSha:'abc'},root).data.inventory.evidenceMatchesCheckout,true);
+});
+
+test('only canonical trace outputs may bridge an evidence-only commit',()=>{
+  assert.equal(isTraceOutputPath('_bmad-output/test-artifacts/traceability-matrix.md'),true);
+  assert.equal(isTraceOutputPath('_bmad-output/test-artifacts/live-verification-results.json'),true);
+  assert.equal(isTraceOutputPath('_bmad-output/test-artifacts/test-design-epic-frontend.md'),false);
+  assert.equal(isTraceOutputPath('docs/test-cases/user-management/umac-11.md'),false);
+});
+
+test('the product UI distinguishes planning, implementation snapshots, and CI evidence',()=>{
+  const template=fs.readFileSync(path.join(__dirname,'../docs/demo/readiness-template.html'),'utf8');
+  assert.match(template,/Planning statuses are sourced from current canonical coverage/);
+  assert.match(template,/Implementation notes are a snapshot/);
+  assert.match(template,/evidenceMatchesCheckout===false/);
+});
 
 test('sync writes new failing CI data, safely embeds titles, and retains output when the artifact later expires',async t=>{
   const output=fixture(t),root=fixtureRoot(t),state={};let expired=false;

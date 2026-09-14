@@ -6,8 +6,10 @@
 > target `404`; visible resource but forbidden feature/action `403`; lists omit
 > invisible rows; hidden-target `404` precedes mutation permission checks.
 > Do not rewrite historical expectedResult lines as if they had always said `404`.
-> Regeneration is a new AD-1 dispatch. Implementation still diverges (guard `403`,
-> action `404`, interim adapter bypass).
+> Regeneration is a new AD-1 dispatch. **Regenerated 2026-09-12 as
+> [`umac-11`](umac-11-hidden-target-denial-oracle.md)** (`CONFLICT-UM-01`), which covers
+> `GET` and `PATCH /users/:id`: `401`, then `404` for a hidden or missing target before any
+> section or feature check, then `403` only for a visible target.
 
 > **Amended 2026-09-05 (PLAT-E4-S4.1c — `@RequireSectionAccess` gate).** Two
 > things below changed and are marked inline: (a) **"Variant A" is superseded.**

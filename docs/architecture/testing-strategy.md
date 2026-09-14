@@ -1,8 +1,8 @@
-# Testing Strategy — the Three-Stage Gate
+# Testing Strategy — Ordered Three-Stage Delivery
 
 Binding rules for how every feature is built. Spine: AD-1, AD-3, AD-4, AD-15, AD-19, AD-20.
 
-## The gate (AD-1) — no exceptions to ordering or stage separation
+## AD-1 — no exceptions to scenario → committed-red test → production ordering
 
 Every feature, every developer, in this order:
 
@@ -38,12 +38,15 @@ What this changes, stated plainly so nobody has to infer it:
 - **Nothing blocks a Stage-2 test or production code.** The previous rule —
   *"a dispatch may not start until the prior stage's record exists and
   verifies"* — is withdrawn.
-- **No new ledger entries are written.** The two existing ledgers
-  (`spec-access-control-kernel-mvp/approvals.yaml`,
-  `spec-user-management-access-control-adoption/approvals.yaml`) are **kept as
-  history**. Their 113 entries record decisions that were genuinely made, and
-  all 113 still resolve; they are not deleted and not edited. They simply stop
-  being a precondition for anything.
+- **Approval entries are historical, not stage gates.** Existing `approvals`
+  entries in an `approvals.yaml` are preserved read-only: **An approval is a persisted record of a decision, never a prerequisite for starting or completing a stage.** They cannot authorize, block, or retroactively validate a transition.
+- **A late ratification is a separate, non-gating record.** A ledger may append
+  a typed `ratifications` record only for an already-completed out-of-order
+  dispatch. It must identify the exact artifact and resolvable commit, original
+  author, independent ratifier, decision time, evidence, and rationale; its
+  disposition is `recorded-late-not-gated`. It records the non-compliance and
+  is never a clean gate pass, approval for a later stage, or a waiver of the
+  committed-red requirement.
 
 The control this removes was real: it existed because a single agent dispatch
 once wrote the scenario, the tests and the production code back to back, then
@@ -69,8 +72,8 @@ The exception is narrow and carries three conditions:
   the remediation.
 
 ACM-4 in the Access Control Kernel MVP runs under this exception. Any missing
-approved scenario coverage **or** concrete behavior gap it finds halts Stage 2
-onward, opens a separately approved AD-1 sequence, and requires a Story
+scenario coverage **or** concrete behavior gap it finds halts Stage 2 onward,
+opens an ordinary ordered AD-1 remediation sequence, and requires a Story
 Breakdown re-run before the package resumes.
 
 ### Done means built for real, not merely green (AD-15)
@@ -114,10 +117,10 @@ scoped Stage-2 boundary for ACM-1, ACM-2, ACM-3, ACM-4, ACM-5, and ACM-8:
 - Do not fake an Access Control repository and do not override a User
   Management provider.
 - Do not create a test-only, debug, or artificial HTTP endpoint.
-- Preserve AD-1 as currently defined above: scenario prose, then a separate
-  Stage-2 dispatch committed red, then a separate production dispatch — no
-  human approval gates any of these transitions (per "Stage approval was
-  removed on 2026-09-04" above).
+- Preserve AD-1 as currently defined above: scenario prose, then committed-red
+  Stage-2 evidence, then production in that order — no human approval gate or
+  ledger record blocks any transition (per "Stage approval was removed on
+  2026-09-04" above).
 
 ACM-0 sits inside the same boundary but has no facade call to make: its subject
 is the deploy-time root User step, so its Stage-2 evidence runs against migrated

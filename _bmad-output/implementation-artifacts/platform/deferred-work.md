@@ -34,3 +34,19 @@
 - source_spec: `_bmad-output/implementation-artifacts/platform/spec-ci-promote-backend-unit-frontend-e2e-gates.md`
   summary: The `it.todo` count in `docs/ci.md` is stale — it says 19; there are 31, all under `services/backend/test/` (e2e), none in `src/`.
   evidence: Pre-existing sentence, left alone to respect the "do not rewrite beyond the affected passage" scope. Misleading next to the "19 cases" backend-unit figure.
+
+- source_spec: `_bmad-output/implementation-artifacts/platform/spec-r10-late-ratification-policy.md`
+  summary: Nine historical Access Control Foundation scenario documents retain `Approved:` metadata and need a separately scoped metadata migration.
+  evidence: The live authoring pattern now forbids approval-status lifecycle, but `docs/test-cases/access-control-foundation/**/*.md` retains nine historical `Approved:` lines. They are preserved as evidence rather than silently rewritten in this policy correction.
+
+- source_spec: `_bmad-output/implementation-artifacts/platform/spec-r10-late-ratification-policy.md`
+  summary: Historical scenario-area READMEs and stored dispatch artifacts still contain withdrawn AD-1 approval-gate wording and need a dedicated preservation-aware migration.
+  evidence: The correction updates canonical authority, the root authoring pattern, currently referenced specifications, and live dispatch indexes. A repository-wide rewrite would also change historical scenario records and stored stage artifacts across Access Control, User Management, Mentorship, and Frontend, exceeding this R10 policy correction.
+
+- source_spec: `_bmad-output/implementation-artifacts/platform/spec-plat-e2-e3-status-surface-correction.md`
+  summary: `_bmad-output/test-artifacts/test-design-epic-platform-3.md:58-77` describes the pre-correction HEAD and is now stale — its "Four tracking surfaces" count, its `epics.md` header row (`**Status:** in-progress`) and its caveat row ("Factually false at this HEAD") no longer match `epics.md`. Needs a test-design **Edit** run, not an inline fix from here.
+  evidence: This pass corrected `epics.md:39-44`, `:403` and `:427`, so rows 2-3 of that table now misdescribe the file and only one divergence (`PLAT-E2-S2.1` coverage vs tracker) survives of the four surfaces it tabulates. The artifact is governed by `docs/test-design-workflow-contract.md`, which reserves edits to its canonical epic plan for a scoped Edit run and keeps approval and validation as separate states; it currently carries `approvalStatus: granted` with `validationStatus: CONCERNS (2026-09-12, re-validation)`, and per that contract an Edit cannot clear the verdict. Left untouched here because the spec's boundaries forbid touching `test-artifacts/**`.
+
+- source_spec: `_bmad-output/implementation-artifacts/platform/spec-readiness-map-snapshot-freshness.md`
+  summary: Re-audit and replace the 42 manual implementation notes in the readiness-map snapshot with evidence tied to a new repository revision.
+  evidence: The snapshot currently records 2026-09-07 implementation conclusions. The generator now identifies that provenance and prevents it from being relabelled, but it cannot infer fresh implementation assessments from planning status or CI results.

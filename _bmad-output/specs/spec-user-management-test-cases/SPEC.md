@@ -16,16 +16,16 @@ sources:
 > **Canonical contract.** This SPEC and the files in `companions:` are the
 > preservation-validated contract for the `user-management` stage-1 scenario
 > suite. The README companion indexes the scenario files that carry the
-> request-level assertions. **v1.5 refresh (2026-09-01) — nothing here is
-> approved**; every changed or new file runs its own AD-1 stage-1 human
-> approval.
+> request-level assertions. **v1.5 refresh (2026-09-01; AD-1 clarified
+> 2026-09-12):** scenario files carry no human-approval status. Their Trace and
+> committed history are the stage evidence; peer review is not a gate.
 
 # User-Management Test-Case Suite
 
 ## Why
 
-AD-1's three-stage quality gate requires an approved prose scenario per feature
-before any E2E test or production code. This suite is the stage-1 artifact for
+AD-1's ordered three-stage delivery requires prose scenario evidence per feature
+before its committed-red E2E test and production code. This suite is the stage-1 artifact for
 the `User` entity's own lifecycle and workflow correctness **and** for the
 adoption of the real Access Control facade by the `/users/:id` routes (Epic 0).
 The base access-control model (who is entitled: audience derivation, §3.2 matrix

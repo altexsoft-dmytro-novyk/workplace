@@ -55,6 +55,12 @@ items:
       'HR Admin' row is no longer granted user-management:create|deactivate|list
       by role name. The self-provisioning itself is unchanged, so severity,
       deploy_gate and expiry_trigger stand.
+      Update 2026-09-12: the blocker SEC-AUTH-01 is closed. Both interim adapters are
+      removed from the production module (the deploy_gate's "removed" limb). The
+      folded-in persona shorthand and Root self-provisioning can no longer be enabled
+      under NODE_ENV=production, because ALLOW_TEST_SESSION_TOKENS=true now fails
+      env validation (backend 45a671e, merge pending). See
+      blocker-verification-2026-09-12.md.
     rescope_reason: >
       The previous description covered only the persona-token path and omitted root
       self-provisioning entirely, which is the part that bypasses the Access Control

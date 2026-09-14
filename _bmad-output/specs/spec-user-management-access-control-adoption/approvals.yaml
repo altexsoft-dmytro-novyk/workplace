@@ -1,11 +1,12 @@
-# AD-1 stage-approval ledger — User Management ↔ Access Control Adoption
+# AD-1 historical-decision ledger — User Management ↔ Access Control Adoption
 #
-# Append-only. A superseding decision is APPENDED; no entry is ever edited or
-# removed. This file is the persisted, independently verifiable form of the
-# AD-1 gate: a claim in a report that "a human approved this" is not an
-# approval, this record is.
+# `approvals` is append-only historical evidence from the withdrawn AD-1 gate;
+# its entries are never edited, removed, or used to authorize or block a stage.
+# A separately typed `ratifications` list may record a late classification of
+# already-completed out-of-order work. It records non-compliance and is never a
+# clean gate pass or a stage-transition authorization.
 #
-# Schema — every entry carries all eight fields:
+# Historical `approvals` schema — every entry carries all nine fields:
 #
 #   - story_id:      dispatch entry id from stories.yaml (e.g. "UMAC-1-scenarios")
 #     stage:         stage-1-scenarios | stage-2-tests | stage-3-production
@@ -14,26 +15,27 @@
 #     commit:        revision in THAT repo at which the artifact was read
 #     author:        who produced the artifact
 #     approver:      who approved it
-#     decision:      approved | rejected
+#     decision:      historical approved | rejected decision
 #     timestamp:     ISO-8601, e.g. 2026-09-01T14:03:00Z
 #
 # `repo` exists because this workspace spans two git repositories: planning
 # artifacts live here, tests and production code live in `services/backend`.
 #
-# Rules that make the record enforceable:
-#   1. author != approver (no self-certification).
-#   2. A dispatch may not start until the PRIOR stage's record exists and
-#      VERIFIES — `commit` resolves and `artifact_path` is present at it.
+# Late `ratifications` schema — every entry carries: story_id, stage, repo,
+# artifact_path, commit, author, ratifier, ratified_at, evidence, rationale,
+# and disposition: recorded-late-not-gated. `author != ratifier`; `commit` and
+# `artifact_path` must resolve in `repo`. The record can classify only work
+# already completed before `ratified_at`; it cannot validate that ordering.
 #
 # Verify:
 #   repo: workspace         -> git -C . cat-file -e <commit>:<artifact_path>
 #   repo: services/backend  -> git -C services/backend cat-file -e <commit>:<artifact_path>
 #
-# Status: UMAC-1 Stage 1 (scenarios) and Stage 2 (red tests) are recorded
-# below (Story 0.1 read path). No Stage-3 record exists yet; the next
-# dispatch is UMAC-1-production, after independently verifying the Stage-2
-# records. UMAC-2 (write path) is unstarted and blocked on the Open
-# Decision (i) option (a) kernel seed sequence for user-management:edit.
+# Status: the historical UMAC-1 records remain below. Stage 3 shipped in
+# services/backend 0788f60 before any contemporaneous stage record existed.
+# Its separate `ratifications` records classify that non-compliance without
+# making it a clean gate pass. UMAC-2 (write path) remains unstarted pending
+# its Open Decision (i) option (a) kernel seed sequence.
 
 approvals:
   - story_id: "UMAC-1-scenarios"
@@ -227,6 +229,113 @@ approvals:
     decision: "approved"
     timestamp: "2026-09-01T15:30:00Z"
 
+  # UMAC-1 Stage 3 — LATE RECORD, written 2026-09-12.
+  #
+  # These artifacts SHIPPED WITHOUT A PRIOR STAGE-3 APPROVAL. They landed in
+  # services/backend 0788f60 ("User management WIP (#7)", committed
+  # 2026-09-02), which carries 59 files: the UMAC-1 paths recorded below plus
+  # Story 1.1 population import and its migration
+  # (20260902001941_story_1_1_import_population), mentorship and ACM-9
+  # measurement test edits, and the ~18 pre-existing uncommitted files the
+  # UMAC-1-production story had explicitly warned "must be separated from the
+  # UMAC-1 commit". They were not separated.
+  #
+  # SCOPE OF THIS APPROVAL: the artifact_paths listed below, at that revision.
+  # NOT the commit as a whole. Every path was verified present at 0788f60
+  # before this record was written. The story's declared deletions
+  # (interim-access-control.adapter.ts, get-user.action.ts) carry no entry
+  # because a deleted path cannot satisfy the ledger's verification rule; they
+  # are recorded here in prose instead.
+  #
+  # OPEN ITEM CLOSED BY THIS RECORD: the UMAC-1-production story stood at
+  # status: in-review with an unresolved PO call on the um-pf-01..04 write-path
+  # regressions in test/user-management/epic-1/profile-v15.e2e-spec.ts. That
+  # file was deleted in the following commit 37a339a — the decision was taken
+  # by deletion, never recorded. Anna Pikula accepts that deletion as the
+  # intended resolution. The four "sanctioned retired" suites named in the
+  # story (registration, list, deactivation, profile e2e) are likewise absent
+  # from the tree and accepted as retired.
+  #
+  # BASIS: approved on the scope and provenance analysis recorded above —
+  # commit composition, artifact presence at revision, and the Epic 4
+  # dependency (49fd0c4 added section-access.guard.ts, which injects
+  # ACCESS_CONTROL_PORT) that makes reverting the rebind infeasible — not on a
+  # line-by-line re-review of the 0788f60 diff. Recorded at the real time of
+  # decision; NOT backdated to the 2026-09-01 Stage-1/Stage-2 approvals.
+  #
+  # author != approver holds: Dmytro Novyk authored 0788f60 and approved
+  # UMAC-1 Stage 2, so Stage 3 is approved by Anna Pikula.
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/user-management.module.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/infrastructure/access-control-facade.adapter.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/interfaces/identity-card-access.port.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/services/identity-card-access.service.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/actions/get-user-card.action.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/dtos/user-card.response.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/controllers/users.controller.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    approver: "Anna Pikula"
+    decision: "approved"
+    timestamp: "2026-09-12T04:37:53Z"
+
   # UMAC-10 — the user-management:edit FR-grant OR-override on the S1 section
   # gate. Authored 2026-09-04 from shipped behaviour that umac-07 (Variant A)
   # had deferred; see that file's stage-ordering note.
@@ -240,3 +349,105 @@ approvals:
     approver: "Anna Pikula"
     decision: "approved"
     timestamp: "2026-09-04T00:00:00Z"
+
+# Late-ratification classifications. These append-only records supersede no
+# historical approval entry and do not turn the 2026-09-02 out-of-order work
+# into a compliant AD-1 stage transition.
+ratifications:
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/user-management.module.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    ratifier: "Anna Pikula"
+    ratified_at: "2026-09-12T04:37:53Z"
+    evidence:
+      reviewed_commit_range: "0788f605893f4447f2996c21107fa427915a894f^..0788f605893f4447f2996c21107fa427915a894f"
+      verification: "The named path was verified present in services/backend at the recorded commit."
+    rationale: "The rebind shipped in a 59-file mixed commit before any Stage-3 record; reverting it would break the later Epic 4 consumer of ACCESS_CONTROL_PORT."
+    disposition: "recorded-late-not-gated"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/infrastructure/access-control-facade.adapter.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    ratifier: "Anna Pikula"
+    ratified_at: "2026-09-12T04:37:53Z"
+    evidence:
+      reviewed_commit_range: "0788f605893f4447f2996c21107fa427915a894f^..0788f605893f4447f2996c21107fa427915a894f"
+      verification: "The named path was verified present in services/backend at the recorded commit."
+    rationale: "The rebind shipped in a 59-file mixed commit before any Stage-3 record; reverting it would break the later Epic 4 consumer of ACCESS_CONTROL_PORT."
+    disposition: "recorded-late-not-gated"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/interfaces/identity-card-access.port.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    ratifier: "Anna Pikula"
+    ratified_at: "2026-09-12T04:37:53Z"
+    evidence:
+      reviewed_commit_range: "0788f605893f4447f2996c21107fa427915a894f^..0788f605893f4447f2996c21107fa427915a894f"
+      verification: "The named path was verified present in services/backend at the recorded commit."
+    rationale: "The rebind shipped in a 59-file mixed commit before any Stage-3 record; reverting it would break the later Epic 4 consumer of ACCESS_CONTROL_PORT."
+    disposition: "recorded-late-not-gated"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/domain/services/identity-card-access.service.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    ratifier: "Anna Pikula"
+    ratified_at: "2026-09-12T04:37:53Z"
+    evidence:
+      reviewed_commit_range: "0788f605893f4447f2996c21107fa427915a894f^..0788f605893f4447f2996c21107fa427915a894f"
+      verification: "The named path was verified present in services/backend at the recorded commit."
+    rationale: "The rebind shipped in a 59-file mixed commit before any Stage-3 record; reverting it would break the later Epic 4 consumer of ACCESS_CONTROL_PORT."
+    disposition: "recorded-late-not-gated"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/actions/get-user-card.action.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    ratifier: "Anna Pikula"
+    ratified_at: "2026-09-12T04:37:53Z"
+    evidence:
+      reviewed_commit_range: "0788f605893f4447f2996c21107fa427915a894f^..0788f605893f4447f2996c21107fa427915a894f"
+      verification: "The named path was verified present in services/backend at the recorded commit."
+    rationale: "The rebind shipped in a 59-file mixed commit before any Stage-3 record; reverting it would break the later Epic 4 consumer of ACCESS_CONTROL_PORT."
+    disposition: "recorded-late-not-gated"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/dtos/user-card.response.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    ratifier: "Anna Pikula"
+    ratified_at: "2026-09-12T04:37:53Z"
+    evidence:
+      reviewed_commit_range: "0788f605893f4447f2996c21107fa427915a894f^..0788f605893f4447f2996c21107fa427915a894f"
+      verification: "The named path was verified present in services/backend at the recorded commit."
+    rationale: "The rebind shipped in a 59-file mixed commit before any Stage-3 record; reverting it would break the later Epic 4 consumer of ACCESS_CONTROL_PORT."
+    disposition: "recorded-late-not-gated"
+
+  - story_id: "UMAC-1-production"
+    stage: "stage-3-production"
+    repo: "services/backend"
+    artifact_path: "src/user-management/application/controllers/users.controller.ts"
+    commit: "0788f605893f4447f2996c21107fa427915a894f"
+    author: "Dmytro Novyk"
+    ratifier: "Anna Pikula"
+    ratified_at: "2026-09-12T04:37:53Z"
+    evidence:
+      reviewed_commit_range: "0788f605893f4447f2996c21107fa427915a894f^..0788f605893f4447f2996c21107fa427915a894f"
+      verification: "The named path was verified present in services/backend at the recorded commit."
+    rationale: "The rebind shipped in a 59-file mixed commit before any Stage-3 record; reverting it would break the later Epic 4 consumer of ACCESS_CONTROL_PORT."
+    disposition: "recorded-late-not-gated"

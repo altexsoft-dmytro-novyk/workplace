@@ -133,3 +133,56 @@ Produced by real in-suite steps, no hand-written ids:
     than §3.2's full matrix; Stage 2 asserts this test over the routes that
     exist and records which sections have no route yet, rather than inventing
     endpoints for them.
+- **Test 6 — the delegated holder PATCHes a missing target id** *(added 2026-09-13, E4-C04c / CONFLICT-UM-01)*
+  - **inputURL:** `PATCH /users/<freshly generated uuidv7>` `{ city }` with
+    `Bearer <token:<nadia-uuid>>`
+  - **expectedResult:** `404`, not `403` — the hidden-target question is
+    answered before any section or feature check, exactly as
+    [`umac-11`](./umac-11-hidden-target-denial-oracle.md) Test 3 proves for an
+    ordinary caller. Nadia's six canonical feature keys are never consulted.
+- **Test 7 — the delegated holder PATCHes an inactive target** *(added 2026-09-13, E4-C04c / CONFLICT-UM-01)*
+  - **precondition:** a real imported employee, deactivated in-suite
+    (`isActive: false`) after import — fixture setup only, mirroring
+    [`umac-11`](./umac-11-hidden-target-denial-oracle.md) Test 4.
+  - **inputURL:** `PATCH /users/<inactive-uuid>` `{ city }` with
+    `Bearer <token:<nadia-uuid>>`
+  - **expectedResult:** `404`, not `403`; the target's row is unchanged.
+
+## Tests 8–18 — every other route the six-key canonical role gates *(added 2026-09-13, E4-C04b)*
+
+`test-design-epic-platform-4.md` E4-C04b's Planned half: "every other `hr-admin`
+feature route that exists at run time." Test 4 above already proved
+`org:relationships:write` and `employee:departure:record` open for Nadia
+through exactly one route each (`POST .../relationships`,
+`POST .../departures`). These tests enumerate the REMAINING routes carrying
+those same two feature keys — `relationships.controller.ts`,
+`departments.controller.ts`, `departures.controller.ts` — plus
+`user-management:create` and `user-management:deactivate`, neither of which
+had any route exercised by Nadia elsewhere. All real HTTP against the real
+bootstrap-delegated role, never a `RunFixtures` grant. `user-management:list`
+(Test 1) and `profile:timeline:write` (`s42a-op-06` Tests 1–2) already have
+their one live route covered.
+
+- **Test 8 — `PUT /users/<S2>/relationships/people-partner { targetId: <T> }`** → `200`, edge persisted (`type: 'people_partner'`).
+- **Test 9 — `DELETE /users/<S2>/relationships/people-partner`** → `200`, edge gone.
+- **Test 10 — `DELETE /users/<S2>/relationships/<relationshipId>`** (the `direct` S2→T edge Test 4 created) → `200`, edge gone.
+- **Test 11 — `POST /users/<T>/departments { departmentId: <JS dept> }`** → `201`, a second concurrent `DepartmentMembership` row for T.
+- **Test 12 — `DELETE /users/<T>/departments/<JS dept>`** → `200`, that membership closed.
+- **Test 13 — `PUT /departments/<QA dept>/manager { managerUserId: <T> }`** → `200`. Not S: S already carries a scheduled departure from `s42a-op-03` Test 3, and `SetDepartmentManagerAction` refuses that target with `409` — a real business rule, unrelated to the capability gate.
+- **Test 14 — `DELETE /departments/<QA dept>/manager`** → `200`, the `unit-manager` AR policy link removed.
+- **Test 15 — `POST /users/import`** (one more employee, real CSV through the real route) → `200`, `created: 1`.
+- **Test 16 — `DELETE /users/<the employee Test 15 created>`** → `200`, `isActive: false`.
+- **Test 17 — `GET /users/<S2>/departures/<the departure Test 4 recorded>`** → `200`.
+**N/A, recorded rather than tested:** the E4-C04b ticket text names "`POST /users`
+and role assignment" as example hr-admin routes. `POST /users` (a bare create)
+was removed from the binding docs by platform story 1-8's create-path removal
+— `users.controller.ts` declares no such route, only `POST /users/import`
+(Test 15). "Role assignment" (attaching an FR policy to a user) has no HTTP
+route anywhere in the codebase at all — `grep -rn "@Post\|@Put\|@Patch" src`
+over every controller shows no route touching `Policies` / `UserPolicies`; the
+only way a user is attached to the canonical `hr-admin` policy today is the
+administrator-shaped raw insert this suite's own precondition performs (the
+same one that delegates to Nadia). Both are recorded here as not existing at
+run time, not silently dropped.
+
+- **Test 18 — structural, not HTTP.** `POST :id/departures/:departureId/retry` (Story 5.2, needs a `retry_wait` state from a fenced-apply failure) and `POST :id/departure-reparenting` (needs an unresolved blocker) need domain preconditions this suite does not build elsewhere and are not independently HTTP-tested for Nadia here. Test 18 instead confirms by source read that `departures.controller.ts` decorates all four of its routes — `record`, `findOne`, `retry`, `reparent` — with the identical `@RequireFeature(RECORD_A_DEPARTURE_FEATURE)`, the same constant and the same `AccessControlGuard` mechanism Tests 4 and 17 already prove open for Nadia. **This is the one E4-C04b sub-case recorded as evidenced structurally rather than by an additional live HTTP call — not an N/A: the route exists, and the gate is the same gate.**

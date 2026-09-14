@@ -7,8 +7,12 @@ epicSourceHeading: '## Epic 2: Access Control Foundation'
 runScope: 'epic'
 runKey: 'epic-platform-2'
 workflowStatus: 'generated'
-approvalStatus: 'ungranted'
-validationStatus: 'not-run'
+approvalStatus: 'granted'
+approvalGrantedBy: 'Anna Pikula'
+approvalGrantedDate: '2026-09-12'
+validationStatus: 'PASS'
+validationDate: '2026-09-13'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md'
 totalSteps: 5
 stepsCompleted:
   [
@@ -20,7 +24,7 @@ stepsCompleted:
   ]
 lastStep: 'step-05-generate-output'
 nextStep: 'document generation is complete; no Create step remains; proceed with human review, then choose Validate, Edit, or a fresh Create'
-lastSaved: '2026-09-11'
+lastSaved: '2026-09-13'
 runBaselineHead: '28d8e2049d457b103cd7eee31587add7a970f4fc'
 planPath: '_bmad-output/test-artifacts/test-design-epic-platform-2.md'
 ---
@@ -33,11 +37,15 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-platform-2.md'
 **Run baseline `HEAD`:** `28d8e2049d457b103cd7eee31587add7a970f4fc` (captured before this run's first write)
 
 > **`workflowStatus: generated` means only that documents were written.** Approval, validation,
-> coverage, execution evidence, and release readiness are separate states and none of them is
-> claimed here (contract §5).
+> coverage, execution evidence, and release readiness are separate fields; current values are
+> stated below (contract §5).
 >
-> - Approval: **ungranted**
-> - Validation: **NOT RUN** — `test-design-validation-report-epic-platform-2.md` does not exist
+> - Approval: **granted 2026-09-12 by Anna Pikula, the requester**
+> - Validation: **PASS (2026-09-13, second same-day fresh independent Epic-Level validation)** —
+>   `test-design-validation-report-epic-platform-2.md`, synchronized with
+>   `test-design/README.md`. Supersedes the first same-day PASS (Steps 7–8, `ACF-AU-R1` etc.),
+>   which itself superseded the 2026-09-12 PASS at the same report path; this run additionally
+>   verified the `ACF-TR-01` closure (`TR-3.2-SELF` registered). See Steps 9–10 below.
 > - Coverage: **none asserted**
 >
 > This is the canonical **terminal successful document-generation state** of contract §4.4. Resume
@@ -136,19 +144,20 @@ classification remain **UNKNOWN** — no value was invented.
 
 ## Step 4 — Coverage plan
 
-Planned, not achieved: **12 tests + 1 measurement run + 1 documentation item**, ~25–42 h (~4–6 days),
-excluding human AD-1 approval latency.
+Planned, not achieved: **8 API-E2E cases + 1 measurement run + 9 document/audit items**,
+~31–53 h (~1–2 weeks). Counts separate executable tests from evidence-maintenance work; current
+AD-1 has no per-stage approval latency.
 
 | Priority | Obligations | Tests | Hours |
 | --- | --- | --- | --- |
-| P0 | `ACF-RW-01..03`, `ACF-AU-R1` | 7 | ~14–22 |
-| P1 | `ACF-AU-06`, `ACF-FC-05` | 3 | ~6–10 |
-| P2 | `ACF-PERF-01`, `ACF-TR-01` | 1 run + 1 doc | ~4–8 |
+| P0 | `ACF-RW-01..04`, `ACF-AU-R1` | 4 API-E2E + 4 docs | ~16–26 |
+| P1 | `ACF-FC-05`, `ACF-NC-01` | 3 API-E2E + 1 audit | ~9–15 |
+| P2 | `ACF-PERF-01`, `ACF-TR-01`, `ACF-DOC-01`, `ACF-SCOPE-01/02` | 1 run + 4 audits | ~5–10 |
 | P3 | `ACF-FC-07` | 1 | ~1–2 |
 
-All functional scenarios are facade-level against real PostgreSQL and fit the PR budget;
-`ACF-PERF-01` is opt-in and is wired into no gate. `ACM3-II-01/03` and `ACM-4R` are **consumed** as
-cross-epic evidence rather than duplicated.
+All functional scenarios are API E2E through the headless facade against real PostgreSQL and fit
+the PR budget; `ACF-PERF-01` is opt-in and wired into no gate. `ACM3-II-01/03` and `ACM-4R` are
+**consumed** as cross-epic evidence rather than duplicated.
 
 ---
 
@@ -228,13 +237,175 @@ plan and this checkpoint should say about that risk's status.
   remains planned.
 - No sprint-status, coverage YAML, trace, or gate-decision file was touched.
 
-**State unchanged by this action:** `workflowStatus: generated`, approval of *this plan* still
-**ungranted**, validation still **NOT RUN**. The fresh approval recorded above is an AD-1 approval
+**State at the prior validation:** `workflowStatus: generated`, approval of *this plan* still
+**ungranted**, validation was **CONCERNS (2026-09-12)**. The fresh approval recorded above is an AD-1 approval
 of three Stage-1 scenario documents — a different approval from, and not a substitute for, human
 approval of this test-design plan.
 
 ## Result
 
-**WRITTEN · approval ungranted · validation NOT RUN.** One planned P0 obligation (`ACF-RW-01..03`)
-was executed and its scenario documents carry a fresh AD-1 approval; the plan itself remains
-unapproved and unvalidated.
+**Prior validation result:** **WRITTEN · approval ungranted · validation CONCERNS (2026-09-12).** `ACF-RW-01..03` were
+executed as validation-only characterization repairs with voluntary attribution; the plan was
+still unapproved at that point. A fresh Validate was required after the remediation below.
+
+## Step 6 — Post-validation remediation after independent reviews (2026-09-12)
+
+Two read-only agents independently reviewed the plan: one against the full Epic-Level TEA
+checklist, one against all five Story 2.1 acceptance criteria and current primary sources. The Edit
+addressed every plan-quality blocker they agreed would prevent PASS:
+
+- added explicit AC1–AC5 traceability and repository-audit obligations for AC4/AC5;
+- required exact `{self}` and other exact audience sets;
+- reclassified real-Nest/PostgreSQL facade checks as API E2E, not Component;
+- replaced Smoke/P-tier execution timing with PR/Nightly/Weekly;
+- corrected the tracker section to the single deliberate coverage divergence;
+- removed duplicate PLAT-E3 multi-audience work and made `ACF-DOC-01` concrete;
+- captured the still-contradictory `ACF-FC-04` as open `ACF-RW-04`;
+- added non-cache/non-persistence verification, reconciled counts/estimates, and removed obsolete
+  scenario-approval and “Validate not run” language.
+
+External source/scenario inconsistencies are planned obligations, not claims of completed work.
+This Edit changed neither approval nor the prior validation verdict; the fresh Validate below
+supersedes that prior CONCERNS result. No runtime code, scenario file, source SPEC, tracker, ClickUp, trace, gate, or
+other epic artifact was changed.
+
+## Validation projection (2026-09-12)
+
+**Fresh independent Epic-Level Validate:** **PASS.** The selected plan and canonical system pair
+were re-evaluated against the complete checklist. ACF-NC-01 now counts its dynamic API-E2E proof
+and repository audit consistently across the P1 row and all totals; current §U-19 no longer states
+a live per-file AD-1 approval gate or that `GET /users/:id` is unprotected/not adopted; and the
+checkpoint retains the canonical five Create steps and terminal Resume metadata. No runtime
+coverage, approval, gate, or release-readiness claim is made. Canonical report:
+`test-design-validation-report-epic-platform-2.md`.
+
+## Human approval (2026-09-12)
+
+Anna Pikula, the requester, explicitly approved this PLAT-E2 test design after the independent
+validation returned PASS. Approval covers the plan's design content only and remains separate
+from validation. It grants no runtime coverage, execution evidence, gate result, NFR verdict, or
+release-readiness state, and it closes none of the plan's open implementation/evidence
+obligations. The validation report is retained unchanged as the evidence record of its run; its
+approval wording describes the state at validation time.
+
+---
+
+## Step 7 — Edit: record 2026-09-13 completions
+
+**Edit run under `docs/test-design-workflow-contract.md` §4.3.** Target confirmed as the sole
+canonical `epic-platform-2` plan (`test-design-epic-platform-2.md`); loaded in full before any
+write. No other epic's plan or checkpoint was read or touched.
+
+**What changed in the plan:** coverage-table statuses, risk mitigation statuses, entry/exit
+criteria checkboxes, the Acceptance-Criterion Traceability table, the mitigation plans for
+`R-PLAT2-01/02/03`, and a new "Correction Log" section recording six 2026-09-13 completions —
+`ACF-AU-R1`, `ACF-FC-05`, `ACF-RW-04`, `ACF-DOC-01` (docs/ half only), `ACF-SCOPE-01`,
+`ACF-SCOPE-02` — plus the still-open items `ACF-TR-01`, `ACF-NC-01`, `ACF-PERF-01`, and
+`ACF-DOC-01`'s SPEC.md half. Evidence for each item was independently spot-checked before writing:
+
+- `b714327` confirmed present in `services/backend` git log for
+  `test/access-control/audience-resolution.e2e-spec.ts`.
+- `SEC-AUTH-01` re-checked against `.../blockers.yaml`: `status: closed` (2026-09-12), but its
+  stated reopen condition (branch `fix/sec-auth-01-refuse-test-tokens-in-production`, `45a671e`,
+  merged to `services/backend` `main`) was verified **unmet** — `git merge-base --is-ancestor
+  45a671e origin/main` returned false; `origin/main` is at `d1ef680`. This plan records that fact
+  without re-adjudicating the risk score or the blocker's open/closed status — that call belongs
+  to Architect + Security per `blockers.yaml`'s own owner field, consistent with this repository's
+  standing rule that QA does not re-score a security risk unilaterally.
+- `docs/test-cases/access-control-foundation/README.md:19` read directly: confirmed it now states
+  the applicable-set rule.
+- `docs/test-cases/access-control-foundation/fail-closed/acf-fc-04-cyclic-reporting-chain.md` read
+  directly: confirmed the `403` expectation is gone and the reworked-and-approved marker is present.
+- `test-review-plat-e2-e4-2026-09-13.md` read directly: confirmed the 100/100 per-file score for
+  `audience-resolution.e2e-spec.ts` (the file's overall 95/100 with two HIGH findings belongs to a
+  different file, `s42a-op-root-operator-set.e2e-spec.ts`, not cited as evidence for this epic).
+
+**What did not change:** no trace artifact (`traceability-matrix.md`, `e2e-trace-summary.json`,
+`tea-trace-coverage-matrix.json`, `live-verification-results.json`, `gate-decision.json`), no
+`sprint-status.yaml`, no other epic's plan or checkpoint, no service code, no gitlink, no ClickUp
+data. `_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md` was read but not
+edited — it is outside this Edit's writable file set (not the plan, checkpoint, or index); its
+still-stale "exactly one" wording is recorded in the plan as a remaining open item instead.
+
+**Index:** `test-design/README.md` was not edited by this Step — its `epic-platform-2` status
+prose is updated together with the fresh Validate below, per contract §4.5's synchronous
+projection requirement, rather than twice.
+
+**This Edit claims no approval, gate, coverage, or release-readiness status.** It is followed
+immediately, in the same session, by a fresh independent Validate for `epic-platform-2`.
+
+## Step 8 — Validate: fresh independent Epic-Level validation (2026-09-13)
+
+See `test-design-validation-report-epic-platform-2.md` for the full record. Summary projected
+here per contract §4.5:
+
+**Verdict: PASS.** Every 2026-09-13 completion claim added by Step 7's Edit (`ACF-AU-R1`,
+`ACF-FC-05`, `ACF-RW-04`, `ACF-DOC-01` docs/ half, `ACF-SCOPE-01`, `ACF-SCOPE-02`) was
+independently re-verified against its cited primary source (backend commit, scenario doc,
+`blockers.yaml`, or the 2026-09-13 test-review record) rather than trusted on the Edit's own word;
+all held, including their self-declared boundaries (the `ACF-DOC-01` SPEC.md residual and the
+`SEC-AUTH-01` unmet reopen condition). No approval, gate, coverage, or release-readiness claim
+follows. **Validation date:** 2026-09-13. **Report path:**
+`_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md`. This supersedes
+the 2026-09-12 validation projection above as the current validation state; the 2026-09-12 report
+remains unchanged as historical evidence of what it evaluated at the time.
+
+---
+
+## Step 9 — Edit: close `ACF-TR-01` (`TR-3.2-SELF`)
+
+**Edit run under `docs/test-design-workflow-contract.md` §4.3.** Target confirmed as the sole
+canonical `epic-platform-2` plan; loaded in full before any write. This Edit ran alongside a
+**separate, explicitly confirmed System Edit** to `test-design-qa.md` (the platform-pair member),
+per the same contract section — not as a side effect of this epic Edit.
+
+**Decision already made, not re-opened by this Edit.** The user, acting as QA + Architect, decided
+**option A**: register a new normative-coverage row for the Self audience rather than fold it into
+an existing `TR-3.2-S*` row.
+
+**What changed in the plan:** the executive-summary P2 bullet, the "`TR-*` rows receiving evidence
+from this suite" row, `R-PLAT2-03`'s description and mitigation note, the P2 `ACF-TR-01` table row
+and P2 totals, the Acceptance-Criterion Traceability AC1 row, the Resource Estimates P2 row, the
+Execution Strategy "Every PR" bullet, and a new Correction Log entry. `ACF-TR-01` moves from
+**OPEN** to **DONE (2026-09-13)**.
+
+**What changed outside the plan (companion writes, each its own confirmed target):**
+
+- `test-design-qa.md` § Normative coverage map — System Edit registering `TR-3.2-SELF` (row count
+  119 → 120), adding it to the U-19 scenario-file mapping (`ACF-AU-01` primary, `ACM4R-MA-02`
+  component), and closing the U-19 orphan finding for `ACF-AU-01`.
+- `docs/test-cases/access-control-foundation/audience/acf-au-01-self.md:5` — updated to cite
+  `TR-3.2-SELF`, matching `acf-au-02-reporting-direct.md:5`'s phrasing.
+- `docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md` —
+  its existing `TR-2.1-01` U-19 note extended to also cite `TR-3.2-SELF` as component evidence.
+
+**Evidence independently checked before writing:** `docs/project-requirements.md` §1 roles table
+and §3.2 audiences/section-matrix Self column (requirement source); `docs/architecture/access-control.md`
+line 303 (architecture-only exclusivity clause, `PM/AD-28`, correctly labelled as architecture text
+rather than v1.5 normative text); `ACF-AU-01`'s facade exact-set assertion; `ACM4R-MA-02`'s
+exact-`Set{'self'}` assertion; `grep -rn "TR-3.2-SELF"` confirmed the id is unique repo-wide.
+
+**What did not change:** any other epic's plan or checkpoint, `sprint-status.yaml`, ClickUp data,
+any trace or coverage JSON, service code, service gitlinks, `_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md`
+(unaffected by this Edit — its stale wording is a separate, still-open item under `ACF-DOC-01`).
+
+**This Edit claims no approval, gate, coverage, or release-readiness status.** It is followed
+immediately, in the same session, by a fresh independent Validate for both `system` and
+`epic-platform-2`.
+
+## Step 10 — Validate: second same-day fresh independent Epic-Level validation (2026-09-13)
+
+See `test-design-validation-report-epic-platform-2.md` for the full record. Summary projected
+here per contract §4.5:
+
+**Verdict: PASS.** The `ACF-TR-01` closure was independently re-verified against
+`test-design-qa.md`'s current content (row uniqueness, row-count arithmetic, source citations, and
+the orphan-finding resolution) and against both cited scenario files (`ACF-AU-01`, `ACM4R-MA-02`)
+rather than trusted on the Edit's own word. Every completion claim from Step 7 was also
+re-confirmed against current content (none regressed by this Edit). No approval, gate, coverage,
+or release-readiness claim follows. **Validation date:** 2026-09-13. **Report path:**
+`_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md`. This supersedes
+the Step 8 validation projection above as the current validation state; that report remains
+unchanged as historical evidence of what it evaluated at the time. The companion system Validate
+(`test-design-validation-report.md`) ran in the same session and independently confirms the same
+`TR-3.2-SELF` registration from the system side.

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 08-27-2026 16:16
-last_updated: 09-09-2026 00:00
+last_updated: 09-12-2026 00:00
 project: people management
 project_key: NOKEY
 tracking_system: file-system
@@ -52,7 +52,10 @@ development_status:
   # and project-scoped counter facts; implementation remains explicitly absent
   # per PM/AD-33.
   1-5-dashboards-4-4-v1-5-fixed-facts: done
-  1-6-platform-test-design-refresh-v1-2-v1-5: backlog
+  # DONE 2026-09-12: current v1.5 test-design set records the historical P0
+  # baseline, commit-pinned Contract-B evidence, and corrected TimeTracker
+  # provenance. Documentation closure only; runtime gates remain independent.
+  1-6-platform-test-design-refresh-v1-2-v1-5: done
   1-7-um-planning-residual-non-epic-2-4-scope: done  # CAP-1 is seed; registration folder retired
   1-8-doc-pass-create-path-removal-from-binding-docs: done  # api-conventions + DEC-UM-006/008 retired
   1-9-register-epic-in-platform-sprint-status: done
@@ -137,9 +140,12 @@ development_status:
   # ALL enter as `backlog`: coverage records them `status: specified`, which
   # means "a story exists that owns this FR" - it is NOT `done` and was not
   # converted into a tracking status. No story has execution evidence.
-  # Blocking preconditions are unchanged and are NOT closed by registration:
-  # SEC-AUTH-01 (P0 open) blocks production evidence for every story below, and
-  # each carries the SD-8 ACM-9 re-baseline obligation.
+  # Registration closes no blocking precondition. SEC-AUTH-01 (P0) was CLOSED
+  # 2026-09-12 by verification, not by registration
+  # (architecture/blocker-verification-2026-09-12.md; backend merge pending), so it
+  # no longer blocks production evidence for the stories below. The per-epic gates
+  # listed with each epic still apply, and each story carries the SD-8 ACM-9
+  # re-baseline obligation.
   # ---------------------------------------------------------------------------
 
   # Epic 5 - Department Walk and People Partner HR-Line.

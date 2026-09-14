@@ -8,7 +8,10 @@ epicSourcePath: '_bmad-output/planning-artifacts/user-management/epics.md'
 epicSourceHeading: '### Epic 2: Magic-Link Authentication'
 workflowStatus: 'generated'
 approval: 'ungranted'
-validation: 'NOT RUN'
+validation: 'PASS'
+validationStatus: 'PASS'
+validationDate: '2026-09-13'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-user-management-2.md'
 totalSteps: 5
 stepsCompleted:
   - 'step-01-detect-mode'
@@ -27,12 +30,17 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-user-management-2.md'
 
 # Test Design Progress — Epic UM-E2, Magic-Link Authentication
 
-> ## Status: **generated, ungranted, NOT validated.** This is a new run and inherits nothing.
+**Validation projection:** **PASS (2026-09-13, fresh independent validation)** —
+`test-design-validation-report-epic-user-management-2.md`, synchronized with
+`test-design/README.md`.
+
+> ## Status: **generated, ungranted, validated PASS.** This is a new run; validation does not
+> confer approval.
 >
 > - **Approval:** ungranted. No human has approved this run or the plan it records.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here, and no epic validation
->   report exists for this epic. `test-design-validation-report-epic-user-management-2.md` is
->   written only when this epic is actually validated.
+> - **Validation:** **PASS (2026-09-13)**. `test-design-validation-report-epic-user-management-2.md`
+>   now exists and records the verdict, evaluated content hashes, and findings. A PASS is not
+>   approval and asserts no executed runtime coverage, gate result, or release readiness.
 > - **Coverage:** none asserted. **No pass rate appears anywhere in this file.**
 > - **`workflowStatus: 'generated'` means the plan document was written.** It does not mean it
 >   was validated and it does not mean anyone approved it. Those are three different states,
@@ -62,7 +70,7 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-user-management-2.md'
 | Date | 2026-09-10 |
 | Baseline commit | `76a7220701ac6f16843dad8b303934f9a958b54c` (backend `f1eea3c0…`, frontend `fa3d3198…`) |
 | Approval | **ungranted** |
-| Validation | **NOT RUN** |
+| Validation | **PASS (2026-09-13, fresh independent Epic-Level validation)** |
 | Coverage claimed | **none** |
 
 **The epic identity is reused verbatim from its canonical source. Nothing is renumbered**, and
@@ -90,7 +98,7 @@ hashes are recorded once, in `test-design-validation-report.md` § Evaluated inp
 
 | Output | SHA-256 at the moment this checkpoint was written | Approval | Validation |
 | --- | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-user-management-2.md` | `2705e61413ec42863847a3053c1cb3dd6ad241f9d5940fffc5e7c46cfa556e36` | ungranted | NOT RUN |
+| `_bmad-output/test-artifacts/test-design-epic-user-management-2.md` | `2705e61413ec42863847a3053c1cb3dd6ad241f9d5940fffc5e7c46cfa556e36` (at Task 3; the plan's projection banner was added after this hash was recorded) | ungranted | PASS (2026-09-13) |
 
 ## What this run did not do
 
@@ -102,6 +110,8 @@ hashes are recorded once, in `test-design-validation-report.md` § Evaluated inp
 
 ## Next step
 
-**Human review, then a separate Validate run scoped to this epic.** An epic Validate run writes
-`test-design-validation-report-epic-user-management-2.md` and **never** overwrites the system
-report at `test-design-validation-report.md`. Neither has happened.
+**Human review.** The epic Validate run scoped to this epic has completed and written
+`test-design-validation-report-epic-user-management-2.md` (verdict **PASS**, 2026-09-13); it did
+**not** overwrite the system report at `test-design-validation-report.md`. A PASS is not human
+approval — that remains a separate, ungranted state. Next: human review, then Edit or a fresh
+Create if the report's non-blocking findings (W-1, W-2, W-3) are to be addressed.

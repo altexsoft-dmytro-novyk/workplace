@@ -1,10 +1,27 @@
+---
+runScope: 'epic'
+runKey: 'epic-platform-1'
+epicId: 'PLAT-E1'
+epicDomain: 'platform'
+epicNumber: 1
+validationStatus: 'PASS'
+validationDate: '2026-09-12'
+validationReport: '_bmad-output/test-artifacts/test-design-validation-report-epic-platform-1.md'
+---
+
 # Test Design — Epic: Platform 1, Platform Spec v1.5 Alignment
 
-> ## Status: **written, ungranted, NOT validated.** This is a new document and inherits nothing.
+> **Validation projection:** synchronized with `test-design/README.md` and
+> `test-design-validation-report-epic-platform-1.md`.
 >
-> - **Approval:** ungranted. No human has approved this document.
-> - **Validation:** NOT RUN. No verdict of any kind is claimed here.
->   `test-design-validation-report-epic-platform-1.md` does not exist.
+> ## Status: **written, approved, validation PASS (2026-09-12).** This document retains its
+> Create-run baseline and inherits no earlier run's approval or verdict.
+>
+> - **Approval:** granted by the requester on 2026-09-12; recorded in
+>   `test-design-progress-epic-platform-1.md`.
+> - **Validation:** **PASS (2026-09-12)** in
+>   `test-design-validation-report-epic-platform-1.md`, which supersedes the pre-edit
+>   CONCERNS attestation after F-1 through F-4 were corrected.
 > - **Coverage:** none asserted. This document plans and records; it does not state that any
 >   test or audit exists, that any suite passes, or that any gate is green. **No pass rate and
 >   no percentage appears anywhere in it.**
@@ -30,7 +47,7 @@
 
 **Date:** 2026-09-11
 **Mode:** Create, Epic-Level (`bmad-testarch-test-design`), routed by `docs/test-design-workflow-contract.md` §2.2
-**Status:** Draft — **approval ungranted**, validation **NOT RUN**
+**Status:** Approved — validation **PASS (2026-09-12)**
 
 **`epic-platform-1` is not `epic-platform-capabilities-1`.** `platform` and
 `platform-capabilities` are two different canonical domain slugs with two different `Epic 1`
@@ -147,7 +164,7 @@ records which of them this epic is a mitigation owner for, and **re-scores nothi
 | Risk | Category / score | Statement | Mitigation direction here |
 | --- | --- | --- | --- |
 | `plat:PR-009` | OPS 2 × 3 = **6** | Counting unexecuted access-control scenario documents as coverage creates false release confidence. Open — **less mitigated than in 2026-08-29**; the end-to-end CI job is `continue-on-error`. | **This epic is a mitigation owner, and also its sharpest test case.** `S1.3` rewrites access-control SPEC and Stage-1 scenario prose; `S1.6` refreshes the test-design artifacts that *report* coverage. Both edit the exact surfaces where a present-but-unexecuted document can be mistaken for tested behaviour. Mitigation direction: every obligation below is written so that satisfying it produces a **document statement**, never a coverage claim. Evidence level: `repository-audit`. The three coverage states are defined in `test-design-qa.md` § Coverage-state vocabulary and are not redefined here. |
-| `plat:PR-005` | TECH **9** | Unknown timetracker contract. Blocked on `PR-B-08`. | **Referenced, not owned.** `S1.6` cites `docs/integrations/timetracker-external-api.json`, which is **untracked at the ratification pin**. The epic's own AC requires that caveat be recorded **verbatim** alongside the gate IDs. This plan therefore treats the file's presence as **not** contract resolution, per the ledger's standing instruction. Committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4). |
+| `plat:PR-005` | TECH **9** | TimeTracker contract defects. Blocked on `PR-B-08` / `TT-IDENTITY-01` / `TT-PMDM-01`. | **Referenced, not owned.** `docs/integrations/timetracker-external-api.json` is tracked at ratification baseline `76a7220`; the former untracked-file caveat is retired. File presence does **not** resolve the substantive identity or project/delivery-manager contract defects, which remain open under the two successor gates. |
 
 **A risk this epic cannot mitigate, stated so it is not mistaken for one it can.** `S1.4` and
 `S1.6` document the `GET /users` whole-row serialization seam (`ARCH-ENV-01`, PM/AD-34
@@ -172,8 +189,8 @@ be read as renamed legacy IDs.
 
 | Obligation | Story | Priority | Subject | Authority |
 | --- | --- | --- | --- | --- |
-| `plat-e1:AV-01` | `S1.1` | `P1` | Every live `gates:` ID in `global-fr-epic-story-coverage.yaml` resolves to an ID in `blockers.yaml` — and resolves to a **current** ID, not a superseded historical one (`TIMETRACKER-CONTRACT`, architecture `OQ-118`, architecture `CC-11`). | `platform/epics.md:255`. Mechanical: both files are machine-readable. |
-| `plat-e1:AV-02` | `S1.1` | `P1` | Mechanical blocker counts match `blockers.yaml` open/closed/superseded **at execution time** — narrative counts are not accepted. | `platform/epics.md:254`. The AC itself forbids a narrative-only check. |
+| `plat-e1:AV-01` | `S1.1` | `P1` | Every live `gates:` ID in `global-fr-epic-story-coverage.yaml` resolves to an ID in `blockers.yaml` — and resolves to a **current** ID, not a superseded historical one (`TIMETRACKER-CONTRACT`, architecture `OQ-118`, architecture `CC-11`). | `platform/epics.md:258`. Mechanical: both files are machine-readable. |
+| `plat-e1:AV-02` | `S1.1` | `P1` | Mechanical blocker counts match `blockers.yaml` open/closed/superseded **at execution time** — narrative counts are not accepted. | `platform/epics.md:257`. The AC itself forbids a narrative-only check. |
 | `plat-e1:AV-03` | `S1.1` | `P2` | Every `PLAT-E1-S1.x` resolves to an entry in `global-fr-epic-story-coverage.yaml`, **or** is recorded there as decision/gate-serving work with no PM-FR owner, with the modelling gap called out explicitly. | `platform/epics.md:259`. `unmapped-stories-classification.md` §3.1 is the current instance of that explicit record; check 2 of `verify-coverage.py` is why the exemption exists rather than a forced mapping. |
 | `plat-e1:AV-04` | `S1.1` | `P2` | The superseded-ID mapping is documented in full, including `P-1…P-9` → `PLAT-E1-S1.1…S1.9`, **without re-keying** `S1.9`'s pre-oracle `done` status and **without rewriting** the 2026-08-27 SCP. | `platform/epics.md:260`, `:389`. The "record, do not re-key" clause is the load-bearing half. |
 | `plat-e1:AV-05` | `S1.8` | `P1` | `docs/architecture/api-conventions.md` states no `POST /users` create route exists (expected phrases *"There is no `POST /users` create route"* and *"no `POST /users` employee-creation route"*), **and** owned sub-collection `POST /users/:id/<collection>` routes remain. | `platform/epics.md` `S1.8` AC 1. A phrase-level check with an explicit must-not-delete companion. |
@@ -187,44 +204,69 @@ be read as renamed legacy IDs.
 | --- | --- | --- | --- | --- |
 | `plat-e1:AV-09` | `S1.3` | `P0` | **No live empty-audience `403`** is presented as the current oracle in the access-control SPEC, Stage-1 scenarios, binding architecture prose, `user-management/epics.md`, or UM PRD FR-16/FR-17 text. Historical UMAC `403` text may remain **only** with an explicit superseded-by-PM/AD-24 annotation. | `platform/epics.md` `S1.3` AC 6. **`P0`: the denial oracle is the access-control contract's observable surface**, and a stale `403` in binding prose is the defect that encodes a wrong oracle into Stage-2 E2E. The 2026-09-01 decision record is **annotated, never rewritten** — that constraint is part of the obligation. |
 | `plat-e1:AV-10` | `S1.3` | `P1` | The PM/AD-24 denial oracle is stated completely: 401 invalid/inactive session; 404 missing **or hidden-existence** target; 403 visible resource, forbidden feature/action; lists omit invisible rows; **hidden-target 404 precedes mutation permission checks**. | `platform/epics.md` `S1.3` AC 5. The ordering clause is the half most often dropped when the rule is summarized. |
-| `plat-e1:AV-11` | `S1.3` | `P1` | **PM/AD-28 honesty:** no live claim that `matrix/full-profile-access/` scenarios exist; documents state the scenarios are **not authored** and require AD-1 dispatch. | `platform/epics.md` `S1.3` AC 7. This is `PR-009` stated as a single checkable sentence: a claimed-but-absent scenario set is the purest form of the risk. |
+| `plat-e1:AV-11` | `S1.3` | `P1` | **PM/AD-28 honesty:** no live claim that `matrix/full-profile-access/` scenarios exist; documents state the scenarios are **not authored** and require AD-1 dispatch. | `platform/epics.md` `S1.3` AC 8. This is `PR-009` stated as a single checkable sentence: a claimed-but-absent scenario set is the purest form of the risk. |
 | `plat-e1:AV-12` | `S1.3` | `P2` | **Cross-slice editing license is respected:** Platform may annotate UM- and mentorship-owned planning artifacts for PM/AD-24 alignment **only**. Gate-alias changes in `mentorship/epics.md` are **out of scope**; canonical gate IDs live in `spec-mentorship-domain/SPEC.md` and its coverage companions. | `platform/epics.md` `S1.3`, cross-slice clause. A scope **negative** — the obligation is partly that certain edits did *not* happen. |
 | `plat-e1:AV-13` | `S1.4` | `P1` | `ARCHITECTURE-SPINE` AD-10 and `docs/architecture/access-control.md` document **Reporting vs Project line** behaviour and department management as a manager-access relation; `access-control.md`'s short denial summary **links to** the complete PM/AD-24 rule rather than partially duplicating it. | `platform/epics.md` `S1.4` AC 1, 2, 8. The "link, do not duplicate" clause exists so a second, drifting copy of the oracle cannot appear. Reporting-chain depth is a real-world 5–10 levels; the split-line model, not a single transitive Manager line, is what the binding prose must describe. |
-| `plat-e1:AV-14` | `S1.4` | `P2` | `OQ-118` → `ARCH-ENV-01` and `CC-11` → `ARCH-PROJ-WRITER-01` entries are marked **`superseded` with a pointer**, and are **not rewritten**. | `platform/epics.md` `S1.4` AC 5, 6. "Marked, not rewritten" is checkable and is the difference between a preserved history and a falsified one. |
+| `plat-e1:AV-14` | `S1.4` | `P2` | `OQ-118` → `ARCH-ENV-01` and `CC-11` → `ARCH-PROJ-WRITER-01` entries are marked **`superseded` with a pointer**, and are **not rewritten**; their live replacements document profile assembly plus its response envelope and TimeTracker sync as the sole writer of project membership. | `platform/epics.md` `S1.4` AC 5, 6. "Marked, not rewritten" is checkable and is the difference between a preserved history and a falsified one. |
 | `plat-e1:AV-15` | `S1.2` | `P2` | The addendum drift register drops obsolete "pending v1.3" framing where v1.5 closed it; Pattern E states timetracker **required** and PeopleForce **good-to-have prefill only**; memlog assumptions still citing v1.2 as authoritative are corrected or struck. | `platform/epics.md` `S1.2` AC 1–3. |
 | `plat-e1:AV-16` | `S1.5` | `P3` | `docs/architecture/dashboards.md` records the Unassigned bucket, risk "active" ≠ `low`, and project-line counter implications as **fixed product facts**, while the engine/widget model remains **TBD** with no improvised implementation. | `platform/epics.md` `S1.5` AC 1, 2. The TBD half is an obligation: inventing an engine design would satisfy the first clause and violate the second. |
 | `plat-e1:AV-17` | `S1.6` | `P1` | Platform test-design artifacts cite **v1.5 / current SoT**, name the post-consolidation canonical set exactly, and anchor any claim about what the superseded artifacts *said* to commit `76a7220701ac6f16843dad8b303934f9a958b54c`. | `platform/epics.md` `S1.6` AC 1. Four canonical filenames **reuse** a filename that previously held different content — the commit anchor is what stops a statement about the old document from silently describing the new one. |
 | `plat-e1:AV-18` | `S1.6` | `P1` | **`QUALITY-GATE-AC` (P0)** is cited against `gate-decision.json` at `c342138` **with its current evaluated state recorded as open debt** — `gate_status=FAIL`, `p0_status=NOT_MET`, `critical_open: 1`, ACM3-II-06 uncovered — and not papered over. | `platform/epics.md` `S1.6` AC 4. The obligation is to **record a failing gate as failing**. Gate identity and thresholds are owned by `test-design-qa.md` § Release and design gates. **No gate is asserted green here, and none is invented.** |
-| `plat-e1:AV-19` | `S1.6` | `P1` | **`QUALITY-GATE-AC-NFR`** ACM-9 evidence is tracked **separately** from the functional P0 gate, with baseline and final artifacts referenced by commit-pinned path. | `platform/epics.md` `S1.6` AC 5, read with **U-25 resolved**: `QUALITY-GATE-AC-NFR` governs **contract B (ACM-9 facade) only**. See § NFR. |
-| `plat-e1:AV-20` | `S1.6` | `P2` | Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01`, **not** superseded `TIMETRACKER-CONTRACT`; and the untracked-contract **evidence caveat is recorded verbatim** alongside those gate IDs. | `platform/epics.md` `S1.6` AC 6, 7. Pairs with `plat:PR-005` in § Risks. |
+| `plat-e1:AV-19` | `S1.6` | `P1` | **`QUALITY-GATE-AC-NFR`** ACM-9 Contract-B evidence is tracked **separately** from the functional P0 gate, with the [baseline JSON](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-baseline-acm9-1788721821722-afd2fdac4a45.json) and [final JSON](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-final-acm9-1788722145229-13b089a4cb9f.json) at commit `3a3cd71884bf62d8c56577da1b4b36f2a8b327a3`. | `platform/epics.md` `S1.6` AC 5, read with **U-25 resolved**: `QUALITY-GATE-AC-NFR` governs **contract B (ACM-9 facade) only**. Neither artifact discharges functional P0 or Contract A / `PG-04`. |
+| `plat-e1:AV-20` | `S1.6` | `P2` | Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01`, **not** superseded `TIMETRACKER-CONTRACT`; TimeTracker OpenAPI provenance is anchored at tracked baseline `76a7220`, while both successors remain substantively open. | `platform/epics.md` `S1.6` AC 6, 7. Pairs with `plat:PR-005` in § Risks; the former untracked-contract caveat is retired. |
 | `plat-e1:AV-21` | `S1.7` | `P3` | `spec-user-management-test-cases` CAP-1 is retired/superseded in favour of seed scenarios and the registration folder disposition matches `S1.1`, **without changing UM Epics 0–5 feature scope**. | `platform/epics.md` `S1.7` AC 1–3. The scope negative is explicit in the AC: denial-oracle alignment belongs to `S1.3`, not here. |
+| `plat-e1:AV-22` | `S1.1` | `P2` | The changelog traceability matrix contains the `docs/project-requirements.md` SoT row; enumerates **Breaking, Roles, Departments, Profile, Risks, Resourcing, Sharing, Lifecycle, Integrations, and DoD**; assigns each category a `done`, `gap`, or `N/A` status across PRD / SPEC / architecture / test-design; lives under `planning-artifacts/platform/` (or is linked from the epic); and contains the ratification row with `blockers.yaml`, `evidence-matrix.yaml`, and `transition-debt.yaml` companion statuses. | `platform/epics.md:253–256`, `S1.1` AC 1–4. This is separate from mechanical gate, count, story-map, and alias checks in `AV-01…04`. |
+| `plat-e1:AV-23` | `S1.3` | `P0` | The named access-control SPEC, its live Stage-1 scenario documents, and `docs/architecture/access-control.md` preserve the Reporting-vs-Project split; state HR Admin as configuration-only and full-profile access as a separate mechanism; retain never-share `{S3, S7, S13, S14}` and §4.8 cfg defaults; close/rewrite OQ2/OQ3/OQ4/OQ6, including the obsolete “department-manager tier is provisional-only because it is not in requirements” claim; and ensure `spec-mentorship-domain/SPEC.md` plus its coverage companion resolve only to current `blockers.yaml` IDs, with no live `G-CTX`, `G-PERM`, `G-S13`, `G-CT`, `G-DEP`, or `OQ-M1…OQ-M7` aliases. | `platform/epics.md:282–285, :290`, `S1.3` AC 1–4 and 9. This complements the denial-oracle, scenario-honesty, and cross-slice-scope checks in `AV-09…12`. |
+| `plat-e1:AV-24` | `S1.4` | `P1` | Architecture binding records the full-profile grant and revocation mechanism plus the narrow relationship/access journal: manager, People Partner, department, department-manager, full-profile, and shared-link events with actor, subject, before/after, timestamp, and constrained readers. `Permissions.key` is the unique append-only functional-role identity (`title` display-only), and ACF/AD-4 explicitly supersedes the former live `{id, title, description}` catalog shape. ACF inherited invariants include PM/AD-22, PM/AD-23's exact five-field `applyDepartureEffects` contract, and PM/AD-24 without merging PM and ACF namespaces. | `platform/epics.md:302–306`, `S1.4` AC 3, 4, and 7; `docs/project-requirements.md` §§2.3–2.4 and §3.4. |
+| `plat-e1:AV-25` | `S1.4` | `P0` | Revocation timing in binding architecture is linked to the SoT and preserves the **three clocks required by this AC**: platform-owned reporting, department, and PP relations revoke on the next request; project-derived access changes within 15 minutes; and a TimeTracker outage serves last-known data behind a visible stale-data banner but withdraws project-derived access after four hours. | `platform/epics.md:302`, `S1.4` AC 3; `docs/project-requirements.md` §5.1; `docs/architecture/access-control.md` § Revocation timing. Runtime proof is external: `test-design-qa.md` `TR-2.1-06` owns platform-relation next-request evidence and `TR-2.1-07` owns project timing/outage evidence. Departure cutoff is separately owned and is not implied by this audit. |
+| `plat-e1:AV-26` | `S1.6` | `P1` | The canonical platform test-design artifacts state PeopleForce as optional prefill only, never a required vacancy source of truth; state TimeTracker as the only required integration; retain narrowed Project-line DoD negatives (**S2/S3 denied; S5 CV/certificates only**); and record `PR-B-04` as an open, re-gated profile/projection dependency rather than closed by documentation refresh. | `platform/epics.md:329–330`, `S1.6` AC 2–3; `docs/architecture/testing-strategy.md:82`; `test-design-qa.md` `TR-4.2-01`. This complements the provenance and successor-gate check in `AV-20`; it does not execute the TimeTracker contract. |
+| `plat-e1:AV-27` | `S1.8` | `P2` | Binding documentation records `POST /users` code removal as an implementation handoff, not an Epic 1 code deliverable, and contains no live “open”, “not yet decided”, or “pending” instruction for designs resolved by PM/AD-32, PM/AD-34, or PM/AD-35 in `database-schema.md`, `api-conventions.md`, or `mentorship.md`; implementation-absent status may remain when it does not reopen a resolved design. | `platform/epics.md:385, :387`, `S1.8` AC 3 and 5. This complements the route, departure-boundary, and decision-disposition checks in `AV-05…07`. |
 
 **Priorities are this plan's own, derived from the consequence of the stated drift.** They are
 not inherited from a legacy priority table and they re-score no risk. The `risk_threshold: p1`
 configured in `_bmad/tea/config.yaml` is a reporting threshold, not an instruction to suppress
 the `P2` / `P3` rows above.
 
+### Acceptance-criteria trace
+
+This is an **AC → verification-obligation** map, not runtime coverage. It makes the boundary
+auditable: an Epic 1 AC is either checked by an E1 artifact audit below or, where it names a
+runtime behaviour, linked to its owning system-level evidence rather than duplicated here.
+Each referenced `AV-*` row carries the exact authority and verification method; this map only
+indexes those rows so it does not create a second, drifting source of AC detail.
+
+| Story | Epic AC coverage in this plan | External runtime owner, if applicable |
+| --- | --- | --- |
+| `S1.1` | AC 1–4 → `AV-22`; AC 5–8 → `AV-01…04` | — |
+| `S1.2` | AC 1–3 → `AV-15` | — |
+| `S1.3` | AC 1–4, 9 → `AV-23`; AC 5–8 → `AV-09…12` | — |
+| `S1.4` | AC 1–2, 5–6, 8 → `AV-13…14`; AC 3–4, 7 → `AV-24…25` | `TR-2.1-06` for platform next-request effects; `TR-2.1-07` for project timing/outage; Access Control + TimeTracker own runtime proof |
+| `S1.5` | AC 1–2 → `AV-16` | — |
+| `S1.6` | AC 1 → `AV-17`; AC 2–3 → `AV-26`; AC 4 → `AV-18`; AC 5 → `AV-19`; AC 6–7 → `AV-20` | Functional P0, TimeTracker successors, and performance contracts remain external and open as recorded in each AV |
+| `S1.7` | AC 1–3 → `AV-21` | — |
+| `S1.8` | AC 1 → `AV-05`; AC 2 → `AV-07`; AC 3 and 5 → `AV-27`; AC 4 → `AV-06` | User Management implementation owner for code removal |
+| `S1.9` | AC 1–2 → `AV-08` | — |
+
+The map is deliberately not a release claim. In particular, `AV-25` verifies that Epic 1's
+documentation states the required revocation contract; runtime proof remains `TR-2.1-07` in the
+canonical QA plan and the owning TimeTracker / Access Control work.
+
 ---
 
-## `S1.6` carries recorded debt, and this plan does not discharge it
+## `S1.6` completion boundary
 
-`platform/epics.md` records, under `S1.6`, debt added by the 2026-09-10 consolidation. It is
-**referenced here and left exactly as it stands**:
+At the 2026-09-11 Create-run baseline, consolidation alone updated artifact identities and
+dependency references only; it did not satisfy an S1.6 acceptance criterion. That historical
+boundary remains true. The subsequent **U-16 resolution (2026-09-12)** records the story as
+**satisfied for bounded documentation/evidence work**: the canonical artifacts record the
+historical functional-P0 debt at `c342138`, paired Contract-B evidence at `3a3cd71`, and corrected
+TimeTracker provenance. Its sprint key is therefore `done`.
 
-- The consolidation updated artifact identities and dependency references only. It granted no
-  approval, ran no validation, executed no suite and produced no coverage or gate result, so it
-  **does not by itself satisfy any `S1.6` acceptance criterion**.
-- `planning-artifacts/platform/reviews/review-cross-slice-seams-2026-09-02.md:66` records that
-  completing `S1.6` would **falsely close `PM-FR-15`**. **That warning stands and is not
-  discharged here.**
-- Whether `S1.6` is satisfied, partially satisfied, or made obsolete by the consolidation is
-  **open** — register of record `migration-map.md` §10, **U-16** — and belongs to the platform
-  epic owner.
-
-**This Create run is not `S1.6`.** Writing this plan changes no `S1.6` acceptance criterion,
-closes no part of it, and moves its sprint key `1-6-platform-test-design-refresh-v1-2-v1-5`
-off `backlog`. A reader who treats the existence of this plan as progress on `S1.6` has made
-exactly the error `PR-009` describes.
+This bounded completion does **not** close `QUALITY-GATE-AC`, `TT-IDENTITY-01`, `TT-PMDM-01`,
+`PM-FR-15`, any product requirement, or a release condition. The warning against falsely using
+documentation completion as product or runtime closure remains in force. This plan's original
+Create run was not itself S1.6 execution; the later evidence refresh and explicit decision are
+what close the documentation story.
 
 ---
 
@@ -298,11 +340,11 @@ Open, and **answered nowhere in this document**. Register of record:
 
 | Question | Subject | Owner |
 | --- | --- | --- |
-| **U-16** | Whether `PLAT-E1-S1.6` is satisfied, partially satisfied, or made obsolete by the 2026-09-10 consolidation. **Directly scoped to this epic.** | Platform epic owner |
+| **U-16** | **Resolved 2026-09-12** — `PLAT-E1-S1.6` is satisfied as bounded documentation/evidence work. Its closure records historical P0 debt, Contract-B evidence and corrected TimeTracker provenance; it does not close a gate, runtime dependency or product requirement. | Platform epic owner |
 | **U-25** | **Resolved** — `QUALITY-GATE-AC-NFR` = contract **B** (ACM-9) only; `PG-04` = contract **A**. Recorded because `AV-19` depends on it. | Platform epic owner + QA |
 | **U-24** | **Resolved** — harness `DIRA1-MVP-v1` (`docs/architecture/testing-strategy.md` § DIR-A1). | Platform / DevOps + QA |
-| **U-18** | **Resolved 2026-09-11** by the document's owner (Architect): `testing-strategy.md:84` and `:117–119` now match the authority at lines 25–38. Recorded because `PR-009` and `plat:DG-01` both cite it. **`test-design-architecture.md:770` still lists U-18 as open — that entry is stale, and this plan does not edit it.** | Owner of `docs/architecture/testing-strategy.md` |
-| **`PR-B-08`** | The timetracker contract itself — `docs/integrations/timetracker-external-api.json` is untracked at the ratification pin. Blocks `plat:PR-005`; scoped into `AV-20` only as a *caveat-recording* obligation. | Platform + Integration owner |
+| **U-18** | **Resolved 2026-09-11** by the document's owner (Architect): `testing-strategy.md:84` and `:117–119` now match the authority at lines 25–38. Recorded because `PR-009` and `plat:DG-01` both cite it; the matching record in `test-design-architecture.md` is also resolved. | Owner of `docs/architecture/testing-strategy.md` |
+| **`PR-B-08`** | TimeTracker contract defects — `docs/integrations/timetracker-external-api.json` is tracked at ratification pin `76a7220`, but `TT-IDENTITY-01` and `TT-PMDM-01` remain open on substantive contract defects. Blocks `plat:PR-005`; scoped into `AV-20` as a successor-gate and provenance obligation. | Platform + Integration owner |
 
 ---
 

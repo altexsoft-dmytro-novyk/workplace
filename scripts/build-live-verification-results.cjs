@@ -181,14 +181,19 @@ function findNewestMatrix(explicit) {
 }
 
 function loadMatrixIndex(matrixPath) {
-  const index = new Map(); // `${file}\u0000${title}` -> requirement id
+  // `${file}\u0000${title}` -> requirement ids. One test can legitimately evidence several
+  // requirements (a shared `it` for ACM1-FB-01 and ACM1-FB-02..07), so every id is kept: a
+  // first-wins index silently left the narrower requirements `not_observed` although green.
+  const index = new Map();
   if (!matrixPath || !fs.existsSync(matrixPath)) return { index, matrixPath: null };
   const matrix = JSON.parse(fs.readFileSync(matrixPath, 'utf8'));
   for (const requirement of matrix.requirements || []) {
     for (const test of requirement.tests || []) {
       if (!test || !test.file || !test.title) continue;
       const key = `${normalizeFile(test.file)}\u0000${test.title.trim()}`;
-      if (!index.has(key)) index.set(key, requirement.id);
+      const ids = index.get(key) || [];
+      if (!ids.includes(requirement.id)) ids.push(requirement.id);
+      index.set(key, ids);
     }
   }
   return { index, matrixPath: path.relative(REPO_ROOT, matrixPath) };
@@ -373,14 +378,14 @@ function firstLine(text) {
 
 function resolveRequirement(testCase, matrixIndex, oracleIds) {
   const exact = matrixIndex.get(`${testCase.file}\u0000${testCase.title}`);
-  if (exact) return { id: exact, via: 'matrix' };
+  if (exact) return { ids: exact, via: 'matrix' };
 
   // Innermost title first: `describe('um-rel-09 ...')` beats a file-level
   // describe that lists several IDs in prose.
   const chain = [testCase.title, ...[...testCase.ancestors].reverse()];
   for (const text of chain) {
     const found = longestIdIn(text, oracleIds);
-    if (found) return { id: found, via: 'title' };
+    if (found) return { ids: [found], via: 'title' };
   }
   return null;
 }
@@ -490,20 +495,22 @@ function main() {
       continue;
     }
     viaCounts[match.via] += 1;
-    seq += 1;
     const fullTitle = [...testCase.ancestors, testCase.title].filter(Boolean).join(' › ');
-    results.push({
-      id: `${opts.target}-LIVE-${String(seq).padStart(3, '0')}`,
-      requirement_id: match.id,
-      title: fullTitle,
-      status: testCase.status,
-      evidence: [
-        `${testCase.suite}: ${testCase.file}`,
-        testCase.detail ? `— ${testCase.detail}` : '',
-      ]
-        .filter(Boolean)
-        .join(' '),
-    });
+    for (const requirementId of match.ids) {
+      seq += 1;
+      results.push({
+        id: `${opts.target}-LIVE-${String(seq).padStart(3, '0')}`,
+        requirement_id: requirementId,
+        title: fullTitle,
+        status: testCase.status,
+        evidence: [
+          `${testCase.suite}: ${testCase.file}`,
+          testCase.detail ? `— ${testCase.detail}` : '',
+        ]
+          .filter(Boolean)
+          .join(' '),
+      });
+    }
   }
 
   const sourceSha = opts.sourceSha || gitHeadSha();
@@ -526,7 +533,8 @@ function main() {
       matrix_used: matrixPath,
       oracle_ids_known: oracleIds.size,
       cases_seen: cases.length,
-      cases_mapped: results.length,
+      cases_mapped: viaCounts.matrix + viaCounts.title,
+      results_emitted: results.length,
       mapped_via: viaCounts,
       status_counts: statusCounts,
       untraceable_count: untraceable.length,
@@ -569,7 +577,7 @@ function main() {
   console.log(`Wrote ${rel}`);
   console.log(`  source_sha:  ${sourceSha || '(unresolved)'}`);
   console.log(`  cases seen:  ${cases.length}`);
-  console.log(`  mapped:      ${results.length} (matrix ${viaCounts.matrix}, title ${viaCounts.title})`);
+  console.log(`  mapped:      ${viaCounts.matrix + viaCounts.title} cases -> ${results.length} results (matrix ${viaCounts.matrix}, title ${viaCounts.title})`);
   console.log(`  statuses:    ${JSON.stringify(statusCounts)}`);
   console.log(`  unmatched:   ${unmatched.length} ${JSON.stringify(manifest.unmatched_summary.by_suite)}`);
   console.log(`  untraceable: ${untraceable.length} (registry-declared, excluded from the to-do list)`);
@@ -577,4 +585,6 @@ function main() {
   if (!sourceSha) console.log('  WARNING: source_sha is empty; trace will treat every result as unverifiable.');
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { loadMatrixIndex, resolveRequirement };

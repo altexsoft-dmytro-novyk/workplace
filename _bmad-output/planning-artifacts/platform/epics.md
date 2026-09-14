@@ -36,12 +36,12 @@ Cross-cutting planning/test/architecture alignment to spec **v1.5** after resear
 
 **Post-kernel extension (2026-09-02):** Epics 5–8 are added below to decompose the access-control gaps that the Kernel MVP deliberately left open. The ratification overlay's earlier "No Epic 4" note applied to the *documentation* CE pass and is superseded for this planning pass only; it does not reopen any Epic 1 story. **Epics 2 and 3 are not modified by this pass** — their stories are implemented and their acceptance criteria are historical evidence. Epic 5–8 story text never restates, supersedes, or re-scopes an Epic 2 or Epic 3 acceptance criterion.
 
-**Kernel MVP status caveat (verify before scheduling):** every Epic 3 story key is `done` in `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`, but two tracking artifacts disagree with that and are **not** corrected by this planning pass:
+**Kernel MVP status caveat (verify before scheduling):** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml` is the authoritative execution tracker for both epics, and it records both `epic-2` and `epic-3` as `done`; the Epic 2 and Epic 3 `**Status:**` headers below are stated against that tracker. An earlier version of this caveat asserted that the tracker still carried both of those epic keys as unfinished while their child story keys were `done` — **that assertion is withdrawn here as false**; it never described this file's tracker, and it is not restated in any form below. Exactly one genuine divergence survives, and this planning pass does **not** correct it:
 
-- `sprint-status.yaml` still records `epic-3: in-progress` and `epic-2: in-progress` although every child story key is `done`.
-- `global-fr-epic-story-coverage.yaml` records `PLAT-E2-S2.1` as `status: in-progress` while `sprint-status.yaml` records `2-1-resolve-phase-0-audiences-acf-1: done`.
+- **Epic 3 — no divergence.** `epic-3` and every story key `3-1`…`3-8` are `done` in `sprint-status.yaml`, and no other tracking surface contradicts that. "PLAT-E3 is done" is mechanically verified.
+- **Epic 2 — disputed; recorded, not resolved.** `global-fr-epic-story-coverage.yaml` records `PLAT-E2-S2.1` as `status: in-progress` while `sprint-status.yaml` records `2-1-resolve-phase-0-audiences-acf-1: done`. That coverage status is held deliberately (`global-fr-epic-story-coverage.yaml:121-123`), so the tracker governs execution state while the coverage reconciliation stays open.
 
-Neither is an Epic 5–8 deliverable. Both are recorded here so that "PLAT-E3 is done" is not treated as mechanically verified when one of the two tracking surfaces still contradicts it. Reconciliation belongs to Platform Story 1.1's traceability matrix.
+That one divergence is not an Epic 5–8 deliverable, and it must not be closed by flipping either surface: `sprint-status.yaml` stays `done` and `global-fr-epic-story-coverage.yaml:95` stays `in-progress` until they are reconciled. Reconciliation belongs to Platform Story 1.1's traceability matrix, as the open-gate register at the end of this file already records ("PLAT-E2-S2.1 status conflict … Left to Platform Story 1.1").
 
 ## Requirements Inventory
 
@@ -53,8 +53,8 @@ Exactly the FRs this file owns or extends. Verbatim-sourced from PRD §4.1 / §4
 - **PM-FR-2** *[PRD §4.1 FR-2; requirements §2.1, §5.1]*: Resolve Reporting, Project, and People Partner access transitively with required revocation windows. Epic 8 owns Project-line derivation, column narrowness, 15 min / 4 h withdrawal, and the AD-31 read-only membership boundary. Epic 5 owns the department-management contribution to Reporting line and the `isHr`-bounded PP HR-line. Phase-0 Self / reports-to / direct PP remains ACF-1 / ACM-3 historical evidence (SD-1).
 - **PM-FR-3** *[PRD §4.1 FR-3; requirements §3.2, §3.3]*: Enforce the S1–S16 section matrix. Kernel substrate S1/S10/S11 remains ACM-5 historical evidence. Epic 6 owns S2–S16 relationship-derived columns. Epic 7 owns the Shared-link column and the AD-28 overlay evaluation.
 - **PM/AD-24**: HTTP denial oracle — 401 / 404 / 403 (platform Epic 1 = documentation alignment; runtime `PM-FR-4` owner is `UM-E0-S0.1` per coverage model)
-- **PM-FR-36 / PM-FR-37**: TimeTracker required integration (§5.1) — documentation alignment in Epic 1; identity/population owned by `timetracker/epics.md` and gated by `TT-IDENTITY-01`
-- **PM-FR-38**: PeopleForce optional prefill only (§5.2)
+- **PM-FR-36 / PM-FR-37**: TimeTracker required integration (§5.1) — owned by the TimeTracker delivery epics. Epic 1 records documentation alignment only and is not an FR delivery owner.
+- **PM-FR-38**: PeopleForce optional prefill only (§5.2) — deferred; Epic 1 records the scope boundary and is not an FR delivery owner.
 
 **Referenced but not owned by this slice** (Epics 5–8 consume or bound these; they are not platform deliverables):
 
@@ -104,7 +104,6 @@ None — no `bmad-ux` contract exists for platform scope.
 | PM-FR-2 | PLAT-E2, PLAT-E3, PLAT-E5, PLAT-E8 | PLAT-E2-S2.1; PLAT-E3-S3.1–S3.4; PLAT-E5-S5.1–S5.3; PLAT-E8-S8.1–S8.4 |
 | PM-FR-3 | PLAT-E3, PLAT-E4, PLAT-E6, PLAT-E7 | PLAT-E3-S3.6 (S1/S10/S11); PLAT-E4-S4.1–S4.2 (implemented consolidation hardening); PLAT-E6-S6.1–S6.6 (S2–S16); PLAT-E7-S7.1–S7.3 (Shared link column + full-profile overlay) |
 | PM/AD-24 | PLAT-E1 | PLAT-E1-S1.3, PLAT-E1-S1.4 (documentation alignment; runtime owner is UM-E0-S0.1 per coverage model) |
-| PM-FR-36, PM-FR-37, PM-FR-38 | PLAT-E1 | PLAT-E1-S1.6 |
 | PLAT-E1 | PLAT-E1 | PLAT-E1-S1.1–S1.9 |
 | PLAT-E2 | PLAT-E2 | PLAT-E2-S2.1 |
 | PLAT-E3 | PLAT-E3 | PLAT-E3-S3.1–S3.8 |
@@ -129,7 +128,8 @@ None — no `bmad-ux` contract exists for platform scope.
 
 Cross-cutting planning, spec, architecture, and test-design alignment to v1.5 SoT plus 2026-09-02 ratification documentation debt. Planning artifacts only — no application code.
 
-**FRs covered:** PM/AD-24 (documentation alignment), PM-FR-36, PM-FR-37, PM-FR-38, NFR-AC-2, NFR-AC-3
+**Scope:** documentation alignment only. Epic 1 has no product-FR delivery coverage; it records
+the relevant requirements and evidence boundaries for their delivery owners.
 
 ### Epic 2: Access Control Foundation
 
@@ -203,7 +203,7 @@ These apply to **every** story in Epics 5, 6, 7, and 8. They are stated once and
 
 | Precondition | Severity / status | Effect on Epics 5–8 |
 |---|---|---|
-| `SEC-AUTH-01` | **P0 open** | `isAllowedForTarget` **returned** `Boolean(userId)` and the interim session resolver **self-provisioned** a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check would widen the blast radius of that bypass rather than being protected by it. *(Corrected 2026-09-11: the bypass described above no longer exists in code. `interim-session-resolver.adapter.ts` and `interim-access-control.adapter.ts` were deleted in `services/backend` `37a339a` (2026-09-04); `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`), and the `Bearer <token:persona>` shorthand survives only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`. The precondition stays **open pending re-adjudication** — closure needs this project's own verification run, per `blockers.yaml` `status_note` — but it no longer rests on the evidence stated here.)* |
+| `SEC-AUTH-01` | **P0 — CLOSED 2026-09-12** (`architecture/blocker-verification-2026-09-12.md`; backend merge pending) | `isAllowedForTarget` **returned** `Boolean(userId)` and the interim session resolver **self-provisioned** a privileged account. **No story in Epics 5–8 may reach production evidence, or be deployed to any shared environment, while this is open.** A new audience or section decision behind a bypassed target check would widen the blast radius of that bypass rather than being protected by it. *(Corrected 2026-09-11: the bypass described above no longer exists in code. `interim-session-resolver.adapter.ts` and `interim-access-control.adapter.ts` were deleted in `services/backend` `37a339a` (2026-09-04); `SESSION_RESOLVER_PORT` binds `JwtSessionResolverAdapter` and `ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter` (`user-management.module.ts:214-215`), and the `Bearer <token:persona>` shorthand survives only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`. The precondition stays **open pending re-adjudication** — closure needs this project's own verification run, per `blockers.yaml` `status_note` — but it no longer rests on the evidence stated here.)* | *(2026-09-12: both interim paths are gone, and the residual `ALLOW_TEST_SESSION_TOKENS` production path is refused. This precondition no longer blocks Epics 5–8; the remaining rows still apply.)*
 | `UMAC-1` / `UM-E0-S0.1` | **in-progress** | Kernel consumer adoption is incomplete. Epics 5–8 deliver facade decisions; they do not rebind `/users`. Not a deliverable of this pass. |
 | `OQ-PERM-01` | P1 open | Default role-to-permission matrix is unapproved. No story seeds, infers, or defaults a functional-role grant. |
 | `CC-07` / PM/AD-29 | **P0 open** | No `AccessJournal` table exists. Any story whose behaviour requires a journal entry (Epic 7 shared-link access) may specify the same-transaction contract but cannot produce closure evidence. |
@@ -239,7 +239,7 @@ Binding rule for Epics 5, 6 and 8 (SD-8):
 
 ## Epic 1: Platform Spec v1.5 Alignment
 
-**Status:** in-progress  
+**Status:** done (tracker) — coverage reconciliation open, see *Kernel MVP status caveat*  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 ### Story 1.1: Changelog Traceability Matrix
@@ -331,26 +331,34 @@ So that PF vacancies SoT and dual-required integrations are not planned as manda
 - **QUALITY-GATE-AC (P0):** Platform test-design artifacts cite [`gate-decision.json`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138/_bmad-output/test-artifacts/gate-decision.json) (`c342138`, whose rationale names ACM3-II-06 as the uncovered critical requirement) explicitly; gate closes only when `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and ACM3-II-06 is covered — current evaluated state (`FAIL` / `NOT_MET` / `critical_open: 1`) is recorded as open debt, not papered over.
 - **QUALITY-GATE-AC-NFR:** ACM-9 500-target / 2s performance evidence is tracked separately from the functional P0 gate; baseline and final artifacts are referenced by commit-pinned path.
 - Live coverage gates use `TT-IDENTITY-01` and/or `TT-PMDM-01` — not superseded `TIMETRACKER-CONTRACT`.
-- **Evidence caveat:** Both TimeTracker gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin — record the caveat verbatim alongside gate IDs; committing the contract is a separate owner decision (`ARCHITECTURE-RATIFICATION.md` §4 evidence baseline).
+- **Evidence provenance (corrected):** `docs/integrations/timetracker-external-api.json` is tracked at the
+  ratification baseline [`76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/docs/integrations/timetracker-external-api.json).
+  The former “untracked at the ratification pin” caveat is false and retired. File presence does not close
+  `TT-IDENTITY-01` or `TT-PMDM-01`: their substantive contract defects remain open.
 
-**Recorded debt (added 2026-09-10 by the test-design consolidation; this story is _not_ declared complete).**
-The consolidation updated artifact identities and dependency references only. It granted no approval,
-ran no validation, executed no suite and produced no coverage or gate result, so it does not by itself
-satisfy any acceptance criterion above.
+**Completion record (2026-09-12).** The 2026-09-10 consolidation alone did not satisfy this story;
+its “NOT RUN / approval ungranted” statement is preserved as a historical boundary. Subsequent human
+approval and system documentation validation PASS are recorded in `test-design-validation-report.md`,
+and the following current evidence satisfies the documentation-refresh acceptance criteria:
 
-- The canonical `test-design-validation-report.md` carries verdict **NOT RUN**, and every artifact in the
-  canonical set is **approval ungranted**. A new document does not inherit the superseded documents' 2026-08-25
-  human approval or validation PASS.
-- `_bmad-output/planning-artifacts/platform/reviews/review-cross-slice-seams-2026-09-02.md:66` records that
-  completing this story would **falsely close `PM-FR-15`**. That warning stands and is not discharged here.
-- Whether this story is satisfied, partially satisfied, or made obsolete by the consolidation is **open** and
-  belongs to the platform epic owner — [`migration-map.md` §10, **U-16** at `d99b1dc`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/d99b1dcc6634e1a579d3b92dcbc3d8b7b1910f38/_bmad-output/test-artifacts/test-design/migration-map.md).
-  The sprint-status key `1-6-platform-test-design-refresh-v1-2-v1-5` is unchanged at `backlog`, and no coverage
-  field, FR mapping or gate identity was altered.
-- `QUALITY-GATE-AC-NFR` above is evaluated on ACM-9 facade-resolver evidence, while `PMC-E1-S1.9` routes
-  **directory-list** evidence into the same gate name. Which subject the gate governs is **open** — [`migration-map.md` §10, **U-25** (§6, F-15) at `d99b1dc`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/d99b1dcc6634e1a579d3b92dcbc3d8b7b1910f38/_bmad-output/test-artifacts/test-design/migration-map.md). The All Employees list ≤2-second requirement itself has **no measurement and no chosen
-  harness** (**U-24**); ACM-9 and P6 measure different subjects and are not evidence for it. Nothing here reopens,
-  closes or renames the blocker, and the standing decision that the ACM-9 CI job stays informational is undisturbed.
+- The canonical architecture, QA, handoff, validation, index and migration set uses v1.5/current SoT
+  and commit `76a7220` for claims about superseded content.
+- PeopleForce remains optional prefill; no PeopleForce vacancy source of truth is required. TimeTracker
+  remains the only required integration; project-line negatives and the `PR-B-04` re-registration are
+  recorded without treating design closure as implementation closure.
+- The canonical QA document records the historical functional-P0 result at `c342138`: `FAIL`,
+  `NOT_MET`, `critical_open: 1`, `ACM3-II-06` uncovered. This is open debt, **not** a current PASS.
+- The canonical QA document cites the paired baseline and final `ACM9-MVP-v1` artifacts at immutable
+  commit `3a3cd71`; that Contract-B evidence remains separate from functional P0 and directory-list
+  performance.
+- The canonical architecture uses `TT-IDENTITY-01` / `TT-PMDM-01`, retires
+  `TIMETRACKER-CONTRACT`, and records the corrected OpenAPI provenance beside those live successor gates.
+
+**U-16 resolution and boundary.** Story 1.6 is **satisfied as documentation/evidence work**; its
+sprint key may move to `done`. This decision does not close `QUALITY-GATE-AC`, either TimeTracker
+successor, `PM-FR-15`, or any product/release requirement. The erroneous `PM-FR-36` / `PM-FR-37` /
+`PM-FR-38` attachment is removed from this epic's FR coverage map: those requirements are owned by
+the TimeTracker delivery epics (with `PM-FR-38` deferred), not by a test-design refresh.
 
 ### Story 1.7: UM Planning Residual (Non–Epic-2–4 Scope)
 
@@ -392,7 +400,7 @@ So that Alignment work is visible for the weekend build.
 ## Epic 2: Access Control Foundation
 
 **Production code.** Every story runs the full AD-1 three-stage **ordering** (scenario prose → committed-red E2E → production). The per-stage **human approval** was retired 2026-09-04 (`docs/architecture/testing-strategy.md:25–38`, ruling `D-1`); ordinary PR review and CI running the suites stand in its place.  
-**Status:** in-progress  
+**Status:** done  
 **Tracker:** `_bmad-output/implementation-artifacts/platform/sprint-status.yaml`
 
 Deliver a narrow, reusable audience-resolution boundary without taking ownership of User Management routes, profile projection, or UI. This is a two-day technical foundation; it does not replace the full Access Control facade program or its complete Stage-1 suite.
@@ -738,11 +746,23 @@ and section→endpoint map — was completed before delivery.
   the ratified decision.
 - `PATCH /users/:id` and the `GET /users/:id` `canEdit` hint use
   `@RequireSectionAccess('profile:identity', 'write')`; `canEditS1` and the
-  `EDIT_USER_FEATURE` / `READ_USER_FEATURE` branches are gone.
-- `scripts/dev-grant-root.ts` still gives root `canEdit: true` on every active
-  card, with no adapter special case.
+  `EDIT_USER_FEATURE` / `READ_USER_FEATURE` branches are gone. A viewer holding
+  the baseline with only `colleague`/`self` audience gets `403` /
+  `canEdit:false`; a reporting-line manager or assigned PP gets `200` /
+  `canEdit:true`.
+- No functional-role or root special case remains in the adapter; root's write
+  reach on a dev DB comes only from Story 4.2's seeded spine.
+  **CORRECTED 2026-09-12 (summary aligned to the tickets):** this summary
+  previously said `scripts/dev-grant-root.ts` "still gives root `canEdit: true`
+  on every active card". That wording is superseded and is not in the full
+  Story 4.1 ticket: 4.2d retired `scripts/dev-grant-root.ts` (backend
+  `de508c9`), and Story 4.2's corrected criterion below gives root no
+  `canEdit` on its own card or on any production target.
 - Closes the two access-control deferred-work entries ("Generalise
-  section-access authorisation"; the `profile:timeline` rename follow-up).
+  section-access authorisation"; the `profile:timeline` rename follow-up). The
+  human-key rename is delivered; the remaining `profile:timeline`
+  `canAccessSection` work is rescheduled as **DEPT-2** in `dept-epic.md`, not
+  Epic 4 scope.
 
 **Story split:** completed during the architect pass and delivered through the
 recorded AD-1 increments.
@@ -752,11 +772,17 @@ recorded AD-1 increments.
 **ID:** `PLAT-E4-S4.2` · **Sprint key:** `4-2-default-org-relationship-seed`
 
 As the person running a fresh deployment (and as a developer on a seeded dev DB),
-I want the seed to place the root identity at the top of a real reporting tree
-and hold the §2.4 full-profile grant,
-So that root administers and edits the organisation through the ordinary
-audience-resolution path, with no functional-role override anywhere in the
-authorisation code.
+I want the deploy-time bootstrap to give the root identity the operator feature
+set and the §2.4 grant, and — on a dev DB only — a seeded reporting spine to
+work against,
+So that root can administer the organisation with no dev script and no
+functional-role override anywhere in the authorisation code.
+
+> **CORRECTED 2026-09-12 (summary aligned to the ticket's 2026-09-08 PO
+> correction).** Was: *"place the root identity at the top of a real reporting
+> tree … so that root administers and edits the organisation."* Root
+> administers; it does not edit profiles by virtue of being root. The people who
+> edit a profile are that person's reporting-line manager and assigned PP.
 
 **Recorded decision (Winston + Dmytro, 2026-09-03/04; ~~the organisation's
 boss~~ **CORRECTED 2026-09-08, PO** — see SCP §9.2):** the ACM-0 seeded root
@@ -781,6 +807,38 @@ is read-only on `profile:personal-contacts`, `profile:emergency-contacts`, and
 seeded root cannot write those without being the person's PP; §2.4 is read-only
 (PM/AD-28). Accept the boundary; revisit if a concrete need appears.
 
+**Known, accepted deviation — career-timeline write (PO ruling AF-2,
+`spec-4-2a`):** the canonical `hr-admin` set includes `profile:timeline:write`,
+whose gate `canEditTimeline` has no audience half. Any `hr-admin` holder,
+including root and a delegated HR Admin, can therefore write any employee's
+career timeline. This is the one sanctioned exception to "zero data access from
+a functional role" above. It is pinned by `s42a-op-06` and closes under
+**DEPT-2** (`dept-epic.md`: the key leaves the set, 6 → 5, and timeline write
+becomes a dual gate), not in this epic. Recorded in `access-control.md`.
+
+**Known boundary — HTTP denial oracle:** Epic 4's `403` criteria cover only a
+**visible** target. `docs/project-requirements.md` §3.3.8 and PM/AD-24 also
+require `401` for an invalid or inactive session, `404` for a missing or hidden
+target, and hidden-target `404` before any mutation-permission check. The
+shipped `SectionAccessGuard` returns `403` for a missing or inactive target on
+`GET` and `PATCH /users/:id`, and `s41c-sag-01` Tests 5–6 and `umac-05` Test 3
+still pin that superseded `403`. Blocker `CONFLICT-UM-01` tracks this
+divergence (open, P1; owners PO, Architect and QE; runtime owner `UM-E0-S0.1`
+per the coverage model). Epic 4 neither closes it nor
+widens it.
+
+**Development-fixture journal exception — DECLINED 2026-09-12 (Anna Pikula, PO
++ Architect; supersedes `spec-4-2d` AF-3):** `db:dev:seed-org` originally
+wrote its fake `direct` edges with no `AccessJournal` row (AF-3, accepted
+2026-09-07 under the PO's "finish epic 4" instruction). §2.1 ("every change is
+journaled per 3.4"), §3.4, and PM/AD-29 (journal row in the same transaction)
+have no development-fixture clause, so the exception is declined. Every edge the
+seed writes now carries exactly one `kind: 'manager'` journal row in the same
+transaction, in `OrgRelationshipRepository.assignManager`'s shape (actor root,
+`before: NULL`, `after` = the edge snapshot, the same idempotency key). A no-op
+rerun writes no row. Scenario `s42d-ds-07`; backend branch
+`feat/plat-e4-dev-seed-journal`, not yet merged.
+
 **Full ticket:**
 `_bmad-output/implementation-artifacts/platform/story-4-2-default-org-relationship-seed.md`
 
@@ -788,16 +846,29 @@ seeded root cannot write those without being the person's PP; §2.4 is read-only
 
 - `canEditS1` carries no FR-permission branch; the OR-override pinning test is
   deleted.
-- On a seeded dev DB, root resolves `reporting` → `write` on `profile:identity`
-  for every active user, `canEdit: true` on every card, no adapter special case.
+- **Dev (`db:dev:seed-org`):** root resolves `reporting` → `write` on
+  `profile:identity` for every **other** active member of the seeded spine and
+  gets `canEdit: true` on those cards through ordinary audience resolution, with
+  no adapter special case. Root's **own** card stays `canEdit: false`
+  (`self: 'read'`).
+- **Production (`db:deploy` → `db:seed` → `db:bootstrap:access-control` →
+  `db:import:population`):** root resolves `colleague` to every employee;
+  `PATCH /users/:id` → `403` on every target; `canEdit: false` everywhere.
+  **CORRECTED 2026-09-12 (summary aligned to the ticket's 2026-09-08 PO
+  correction):** previously *"root resolves `reporting` → `write` … for every
+  active user, `canEdit: true` on every card"*.
 - A delegated HR Admin (FR only, no relationship): global FR-gated routes
   allowed; `PATCH /users/:id` on an unrelated person → `403`; `canEdit: false`.
 - `resolveAudiences` walks upward from targets — a tree-root viewer opening one
-  profile queries bounded by chain depth, not org size (ACM-9 measurement
-  pattern).
-- `db:dev:seed-org` throws under `NODE_ENV=production`, absent from
-  `prisma/seed.ts` and `bootstrap-access-control.ts`; ACM-1 invariant suite
-  green.
+  profile queries bounded by chain depth, not org size. The property already
+  holds (`f36d1b2`) and is locked rather than changed. The ACM-9
+  `seeded-two-level` evidence run remains an **open, non-blocking** decision
+  (ticket "Open for decision"; `dept-epic.md` GAP-2); no speedup is claimed.
+- `db:dev:seed-org` throws under `NODE_ENV=production` and is absent from
+  `prisma/seed.ts` and `bootstrap-access-control.ts`; the
+  `acm1r-fr-foundation` ACM-1 invariant suite is green (count derived from
+  `CANONICAL_PERMISSIONS`, `dept-epic.md` GAP-1 closed 2026-09-08). Seeded
+  spine edges are journaled (development-fixture exception declined above).
 
 **Depends on:** 4.1's composition decision. The architect solution-design for
 the upward-walk resolver and the separate AD-1 stages were completed before
@@ -828,7 +899,11 @@ Consequence for this epic, stated so it cannot be misread as progress:
 
 Additional gates: `TT-PMDM-01` (P1 open — `projectManager` and `deliveryManager` are untyped strings; joining an authorization edge on an unformatted display name is a fail-open risk) and `ARCH-PROJ-WRITER-01` / PM/AD-31 (P1 open — sync is the sole writer; sync is absent).
 
-**Evidence caveat (inherited from `blockers.yaml`):** all three gates cite `docs/integrations/timetracker-external-api.json`, which is untracked at the ratification pin. Every finding resting on it is a working-tree observation, not a reproducible baseline claim.
+**Evidence provenance (corrected):** all three gates cite
+`docs/integrations/timetracker-external-api.json`, which is tracked at the ratification baseline
+[`76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/docs/integrations/timetracker-external-api.json).
+The earlier untracked-file claim is retired; the gates remain open for their stated substantive
+contract defects, not for file availability.
 
 ### Story 8.1: Project-Line Derivation from Explicit PM/DM Attachments
 
@@ -1659,7 +1734,7 @@ External gates, none of which any story here can close:
 - `AC-SECTION-MATRIX-01` (registered 2026-09-03) → PLAT-E6-S6.3 … S6.6
 - `PM-FR-5` (`specified` 2026-09-03 via `user-management` `UM-E8`/`UM-E7`; `UM-E7` unshipped) → PLAT-E6-S6.6
 - `CC-07` (P0) → PLAT-E7-S7.1 journal enrolment evidence
-- `SEC-AUTH-01` (P0) → production evidence for every story in Epics 5–8
+- `SEC-AUTH-01` (P0) → production evidence for every story in Epics 5–8 — **closed 2026-09-12**
 - `UMAC-1` in-progress → consumer adoption; not this pass
 
 ## Open Follow-Ups (Epics 5–8) — Not Stories
@@ -1685,7 +1760,7 @@ External gates, none of which any story here can close:
 
 | ID | Severity | Why it is not absorbed |
 |---|---|---|
-| `SEC-AUTH-01` | P0 open | Precondition. No E5–E8 story may reach production evidence while open. |
+| `SEC-AUTH-01` | P0 open *(2026-09-02 record; **closed 2026-09-12**, see `blocker-verification-2026-09-12.md`)* | Precondition. No E5–E8 story may reach production evidence while open. |
 | `UMAC-1` | in-progress | Precondition. Consumer adoption is not this pass. |
 | `TT-IDENTITY-01` | P0 open | Epic 8 cannot close it. Completing E8 must not promote PM-FR-2 to `implemented`. |
 | `DEPARTMENT-EDGE` | P1 open | Epic 5 cannot close it (PM/AD-35 schema unowned, SD-4). |

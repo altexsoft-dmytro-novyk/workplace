@@ -7,9 +7,12 @@
 # adoption package. Field set mirrors
 # _bmad-output/specs/spec-access-control-kernel-mvp/stories.yaml exactly:
 # id, title, description, spec_checkpoint, done_checkpoint, invoke_dev_with.
-# No entry is authorized. Each stage is one dispatch; author != approver;
-# every approval is recorded in this package's approvals.yaml (created on the
-# first approval — it does not exist yet, so nothing here has a prior record).
+# LIVE AD-1 INTERPRETATION (2026-09-12): every contrary reference below to
+# human approval, a prior approval record, or waiting for a ledger is historical
+# provenance, not a live dispatch instruction. Stages must preserve scenario →
+# committed-red test → production ordering, but no `approvals.yaml` entry
+# authorizes, blocks, or validates a stage transition. `spec_checkpoint` and
+# `done_checkpoint` remain workflow pauses, not approval gates.
 #
 # UMAC-1 rebinds the port, adopts the READ route, and ships the
 # { data, canEdit } envelope for GET /users/:id (CAP-1 + CAP-2 read half +

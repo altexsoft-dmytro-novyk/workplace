@@ -34,6 +34,25 @@
 > — only Validate may do that — and its PASS verdict stands as an accurate record of what it
 > evaluated on 2026-09-11 before this correction. Re-validate if a byte-exact attestation of the
 > current file is needed.
+>
+> **System Edit — 2026-09-12.** § U-19 was aligned with the retired per-file AD-1 approval gate
+> and the production wiring now present on `GET /users/:id`. This is another content-only System
+> Edit: the 2026-09-11 validation report remains historical evidence for the bytes it evaluated
+> and is not rewritten here.
+>
+> **System Edit — 2026-09-13 (`ACF-TR-01`).** § Normative coverage map registered a new row,
+> `TR-3.2-SELF`, for the Self audience-derivation rule. **Decision: option A** — a new `TR-*` row
+> rather than folding Self into an existing `TR-3.2-S*` section row — made by the user acting as
+> QA + Architect; this edit carries out that decision and does not re-open it. The row is mapped
+> to `ACF-AU-01` (primary) and kernel `ACM4R-MA-02` (component) in the U-19 scenario-file mapping,
+> and the U-19 orphan finding for `ACF-AU-01` is closed accordingly. Row count moves from 119 to
+> 120 (`AC STAGE-1 DRAFT` 23 → 24); U-19's evidenced-row count moves from 14 to 15 of 120 (the
+> 105-row zero-evidence count is unchanged). **This is a System Edit under
+> `docs/test-design-workflow-contract.md` §4.3**, applied through the explicitly confirmed member
+> `test-design-qa.md`, not a Create or Validate run. It does not retroactively rewrite the
+> 2026-09-11 or 2026-09-12 validation-report hashes; those reports remain historical evidence for
+> the bytes they evaluated. Re-validate for a byte-exact attestation of the current file — see the
+> fresh system Validate run dated 2026-09-13.
 
 **Purpose:** The one platform **execution and coverage strategy**. It owns evidence contracts,
 execution strategy, isolation policy, level strategy, the risk → evidence map, the coverage plan,
@@ -80,7 +99,7 @@ HTTP/list route), contract **B** (the ACM-9 facade resolver) and contract **C** 
 is **never** evidence for another. See [NFR measurement contracts](#nfr-measurement-contracts).
 
 **What this document deliberately does not settle.** Open questions — U-4, U-5, U-6, U-9, U-10,
-U-11, U-13, U-16, U-17, U-21..U-22 — remain open; **U-2**, **U-12**, **U-18**, **U-19**, **U-20**,
+U-11, U-13, U-17, U-21..U-22 — remain open; **U-2**, **U-12**, **U-16**, **U-18**, **U-19**, **U-20**,
 **U-23**, **U-24**, and **U-25** are resolved below. This document **answers none of the still-open items
 them**. `DEC-UM-012` remains a **draft decision**. No unknown threshold is filled in anywhere. See
 [Unknown thresholds](#unknown-thresholds) and [Open questions](#open-questions).
@@ -651,7 +670,12 @@ result mapping — **not** an HTTP list route.
 plus the absolute worst case.
 - **Threshold:** **fail when warm p95 *or* worst case exceeds 2 s**, per shape.
 - **Evidence:** `measurement (ACM9-MVP-v1)`; artifacts under
-`_bmad-output/test-artifacts/performance/`. Tracked as blocker `QUALITY-GATE-AC-NFR`.
+`_bmad-output/test-artifacts/performance/`. The immutable paired evidence is the
+[baseline JSON at `3a3cd71`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-baseline-acm9-1788721821722-afd2fdac4a45.json)
+and [final JSON at `3a3cd71`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/3a3cd71884bf62d8c56577da1b4b36f2a8b327a3/_bmad-output/test-artifacts/performance/acm9-final-acm9-1788722145229-13b089a4cb9f.json).
+Both are `PASS`; the final records the baseline run ID. They are **Contract B only** and
+cannot discharge functional P0 coverage or the Contract A / `PG-04` directory gate. Tracked as
+blocker `QUALITY-GATE-AC-NFR`.
 - **The ACM-9 CI job stays informational.** That is a standing repository decision, it is **not
 disturbed here**, and **this document proposes no promotion of it to a blocking check.**
 Promoting an informational job to a required check is repository governance, outside a migration
@@ -938,8 +962,10 @@ contract is [contract A](#contract-a--all-employees-httplist-route).
 
 ## Normative coverage map
 
-**119 normative** `TR-`* **rows, preserved with their identifier, requirement statement, planned level
-and planning state.** Every row's approval status is **ungranted**.
+**120 normative** `TR-`* **rows** — 119 preserved with their identifier, requirement statement,
+planned level and planning state, **plus `TR-3.2-SELF`, registered 2026-09-13 by System Edit
+(`ACF-TR-01`, option A)** for the Self audience-derivation rule. Every row's approval status is
+**ungranted**.
 
 **Read this table as a plan, not as coverage.** A planned level is not a written test; a planning
 state is not an approval; and `AC STAGE-1 DRAFT` **records what the source said on 2026-08-29**, not
@@ -947,16 +973,20 @@ a live state of any file (see [Ownership](#ownership), ruling D-1). Rows marked
 `PRODUCT/ARCH BLOCKED` keep their named blocker; rows marked `OUT OF SCOPE` keep that state and its
 v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 
-**Machine-counted at the time of writing — 119 rows:** 45 `E2E DEPENDENCY` · 23 `AC STAGE-1 DRAFT` ·
-23 `PRODUCT/ARCH BLOCKED` · 21 `READY NOW` · 4 `READY FOR FORMAL SIGN-OFF` · 3 `OUT OF SCOPE`.
+**Machine-counted at the time of writing — 119 rows** (before the 2026-09-13 `TR-3.2-SELF`
+addition): 45 `E2E DEPENDENCY` · 23 `AC STAGE-1 DRAFT` · 23 `PRODUCT/ARCH BLOCKED` · 21 `READY NOW`
+· 4 `READY FOR FORMAL SIGN-OFF` · 3 `OUT OF SCOPE`. **After the addition — 120 rows:** 45
+`E2E DEPENDENCY` · 24 `AC STAGE-1 DRAFT` · 23 `PRODUCT/ARCH BLOCKED` · 21 `READY NOW` · 4
+`READY FOR FORMAL SIGN-OFF` · 3 `OUT OF SCOPE`.
 
 > **The dependency column, and the one clause retired from it.** Where a source dependency cell
 > read "approval pending", that clause named the per-file approval gate removed on 2026-09-04. It
 > is **retired under ruling D-1** and is marked inline rather than carried as a live obligation.
-> **Which of the 99 access-control scenario documents covers which of these 119 rows** — that is
+> **Which of the 99 access-control scenario documents covers which of these 120 rows** — that is
 > **U-19**, **resolved 2026-09-11**: see [§ U-19 normative coverage — scenario file
 > mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11) immediately after
-> this table. 14 of 119 rows receive partial evidence; 105 receive none. Does not affect `PG-01`.
+> this table. 15 of 120 rows receive partial evidence (updated 2026-09-13 for `TR-3.2-SELF`); 105
+> receive none. Does not affect `PG-01`.
 
 
 | Trace ID      | v1.5 source | Requirement statement (preserved)                                                                                                                                       | Planned level                                                                              | Planning state at source (2026-08-29) | Dependency / ownership                                                                                                                                                                                          |
@@ -993,6 +1023,7 @@ v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 | `TR-3.2-S14`  | v1.5 §3.2   | S14 tasks matrix and self completion exception                                                                                                                          | API E2E                                                                                    | AC STAGE-1 DRAFT                      | Campaign exception needs campaign consumer                                                                                                                                                                      |
 | `TR-3.2-S15`  | v1.5 §3.2   | S15 request-history matrix                                                                                                                                              | API E2E                                                                                    | AC STAGE-1 DRAFT                      | Resourcing workflow separately owned                                                                                                                                                                            |
 | `TR-3.2-S16`  | v1.5 §3.2   | S16 per-field visibility matrix                                                                                                                                         | API E2E                                                                                    | AC STAGE-1 DRAFT                      | Runtime filter/projection is PRODUCT/ARCH BLOCKED by OQ-114                                                                                                                                                     |
+| `TR-3.2-SELF` | v1.5 §1; §3.2 | **Registered 2026-09-13, System Edit (`ACF-TR-01`, option A) — not part of the original 2026-08-29 preserved catalog.** Self audience-derivation rule: when the viewer is the target (`viewerId === targetEmployeeId`), the applicable audience set is exactly `{self}`, to the exclusion of Reporting line, Project line, PP, and Colleague. Source text: §1 roles table — Employee "[g]rants access to one's own profile (Self)"; §3.2 audiences — "Self — the employee whose profile it is", carrying its own matrix column distinct from Reporting line/Project line/PP/Colleague throughout S1–S16. v1.5 states the Self column but does not itself state the exclusivity rule in those words. | API E2E + policy unit | AC STAGE-1 DRAFT (consistent with sibling `TR-3.2-S*` rows) | The exclusivity clause itself ("Self is exclusive of Reporting, Project, PP, and Colleague") is stated only at the architecture level — `docs/architecture/access-control.md` § Audience columns (3.2), rule 3 ("When `viewerId === targetId`, Self is exclusive of Reporting, Project, PP, and Colleague (PM/AD-28)") — an architecture-only source, not itself v1.5 normative text. Evidence: `ACF-AU-01` (facade exact-set assertion, `resolveAudiences` yields exactly `{self}`, reworked 2026-09-13 under `ACF-AU-R1`) plus kernel `ACM4R-MA-02` (Self exclusive after identity confirmation, mechanism-level); see U-19 mapping below. |
 | `TR-3.3-01`   | v1.5 §3.3   | `—`, narrowed, and flag-gated facts absent from UI/API/export/search/errors/notifications                                                                               | API/UI/download E2E                                                                        | E2E DEPENDENCY                        | Projection-surface suite deferred; each consumer must prove its surface                                                                                                                                         |
 | `TR-3.3-02`   | v1.5 §3.3   | Colleague whitelist exactly S1 + S10 dates + S11 project name                                                                                                           | API/UI E2E                                                                                 | AC STAGE-1 DRAFT                      | Base section projection only; list/profile consumers still required                                                                                                                                             |
 | `TR-3.3-03`   | v1.5 §3.3   | Hidden custom values cannot be inferred through filters/columns                                                                                                         | API/UI E2E                                                                                 | PRODUCT/ARCH BLOCKED                  | PR-B-01 / OQ-114                                                                                                                                                                                                |
@@ -1114,12 +1145,13 @@ anywhere**; the five apparent matches are all the unrelated scenario id `S4.2b-T
 file now also carries an inline `**U-19 normative coverage:**` note (or, for kernel files, an
 appended `**Trace:**` bullet) recording the same finding at the point of use.
 
-**Result: 14 of the 119 rows receive any evidence, and none receives full coverage.**
+**Result: 15 of the 120 rows receive any evidence, and none receives full coverage** (updated
+2026-09-13 for the `TR-3.2-SELF` addition; the 105-row zero-evidence count is unchanged).
 
 | `TR-*` row | Evidence level | Scenario file(s) |
 | --- | --- | --- |
 | `TR-2.1-01` | Facade/unit-level only, not API E2E | `ACM4R-MA-01..06`, `ACM2-IA-01..10`, `S4.1a-DP-01..03`, `ACM5-SA-05` |
-| `TR-2.1-02` | HTTP allow case (route unprotected, `SEC-AUTH-01` open) + facade robustness; 2 of the HTTP files were invalidated and reworked to the resolver audience-set assertion, 2026-09-11 | `ACF-AU-02` (component), `ACF-AU-03` (primary), `ACF-FC-01` (reworked 2026-09-11), `ACF-FC-04`, `ACM3-II-01..14` |
+| `TR-2.1-02` | HTTP allow case on the production-wired route + facade robustness; 2 of the HTTP files were invalidated and reworked to the resolver audience-set assertion, 2026-09-11. HTTP `200` is UM-owned route evidence, not PLAT-E2 audience-set evidence | `ACF-AU-02` (component), `ACF-AU-03` (primary), `ACF-FC-01` (reworked 2026-09-11), `ACF-FC-04`, `ACM3-II-01..14` |
 | `TR-2.1-05` | HTTP allow case (same route caveat) + facade | `ACF-AU-04`, `ACM3-II-11` (boundary) |
 | `TR-2.1-05A` | Negative/boundary only — positive walk stays `PRODUCT/ARCH BLOCKED`, no file proves it | `ACF-FC-02` (reworked 2026-09-11), `ACM3-II-11` |
 | `TR-2.3-02` | Only the "removal immediate" half; "independently grantable via UI" half has no scenario | `ACM2-IA-02` |
@@ -1131,32 +1163,38 @@ appended `**Trace:**` bullet) recording the same finding at the point of use.
 | `TR-3.2-S01` | Read/write/none shape only — no photo exception, no field matrix | `ACM5-SA-01`, `ACM5-SA-02` |
 | `TR-3.2-S10` | Shape only — no "colleague dates only" field restriction | `ACM5-SA-03` |
 | `TR-3.2-S11` | Shape only — no "colleague project name only" field restriction | `ACM5-SA-04` |
+| `TR-3.2-SELF` | Facade exact-set assertion is the primary oracle (HTTP `200` is UM-owned route evidence, not the audience oracle, per the same `ACF-AU-R1` rework as `TR-2.1-02`); kernel evidence proves the exclusivity mechanism after identity confirmation, not the HTTP path. Added 2026-09-13 (`ACF-TR-01`). | `ACF-AU-01` (primary), `ACM4R-MA-02` (component) |
 | `TR-7-01` | Same partial set as above; row's own text already says "Phase 1 only" | `ACF-FC-03`, `ACF-FC-04`, plus everything above |
 
-**The remaining 105 of 119 rows have zero evidence from any of the 99 scenario documents** — not a search gap:
+**The remaining 105 of 120 rows have zero evidence from any of the 99 scenario documents** — not a search gap:
 `docs/test-cases/access-control-foundation/README.md` and `access-control-kernel/README.md` each
 state their own scope exclusions (Project line, Department, PP HR-line positive walk; every section
 but S1/S10/S11; `/roles` catalog CRUD; projection/whitelist; PP/Department-mutation journal), and
 everything under v1.5 §4–§6, §8–§9 (directory, dashboards, resourcing, CDS, mentorship, campaigns,
 timetracker, repository process) belongs to epics this suite does not touch.
 
-**Orphan finding:** `ACF-AU-01` (Self) has no corresponding `TR-*` row at all — no `TR-2.1-*` or
-`TR-3.2-S*` row names Self as a distinct subject, even though §3.2 defines it. This is a gap in the
-`TR-*` catalog, not in scenario coverage, and is recorded here rather than silently left unmapped.
+**Orphan finding — resolved 2026-09-13 (`ACF-TR-01`).** `ACF-AU-01` (Self) previously had no
+corresponding `TR-*` row at all — no `TR-2.1-*` or `TR-3.2-S*` row named Self as a distinct
+subject, even though §3.2 defines it. That was a gap in the `TR-*` catalog, not in scenario
+coverage. It is now closed: the user, acting as QA + Architect, decided **option A** — register a
+new row rather than fold Self into an existing `TR-3.2-S*` row — and `TR-3.2-SELF` was added to
+the normative coverage map above by System Edit and mapped to `ACF-AU-01` (primary) and kernel
+`ACM4R-MA-02` (component) in the table above.
 
 **This closes U-19 as originally scoped** — "which file covers which row" is no longer unanswerable
 from any artifact. **It does not change `PG-01`.** `PG-01` schedulability is governed separately by
 **U-20** (`SEC-AUTH-01`, `CC-07`, `AC-S9-S13`, `AC-SECTION-MATRIX-01` all closed at implementation);
-none of those four close by mapping files to rows, and none of the mapped files above constitute
-production-wired evidence — most are themselves still draft, pending their own independent AD-1
-Stage-1 approval (`approvals.yaml` records only nine `ACM1-FB` and three `ACM3-II` as approved).
+none of those four close by mapping files to rows, and the mapped files above do not by themselves
+constitute complete production evidence. Per-file AD-1 stage approval was retired 2026-09-04;
+historical approval records are provenance, not a current gate.
 Three foundation files' expected results were invalidated 2026-09-01 and have since been reworked
 to the resolver audience-set assertion and freshly approved (Anna Pikula, 2026-09-11, recorded as a
 retro-anchor — the underlying resolver behaviour and its e2e coverage at `da7d1fa` predate this
-approval); see each file and the suite's own README. This closes the "invalidated" state, not the
-draft/approval gap the rest of this paragraph describes — none of the three constitutes
-production-wired evidence, since `GET /users/:id` is still not adopted by User Management
-(`UM-E0-S0.1`).
+approval); see each file and the suite's own README. This closes the "invalidated" state. The
+production route is now wired: `GET /users/:id` carries
+`@RequireSectionAccess('profile:identity', 'read')` behind `SectionAccessGuard`, and
+`ACCESS_CONTROL_PORT` binds `AccessControlFacadeAdapter`. Its HTTP contract remains UM-owned, so
+an HTTP `200` is not evidence that PLAT-E2 returned the exact audience set.
 
 ---
 
@@ -1216,31 +1254,26 @@ and the 171-file subject does not exist. *(The real inventory is **99 scenario d
 correction of a prior error, not a current input.)*
 - **The gate is nevertheless NOT promoted to schedulable**, because the blockers listed below
 independently keep access control unschedulable, **none of which is an approval state**:
-  - `SEC-AUTH-01` **— P0 open pending re-adjudication (corrected 2026-09-11).** The support
-  previously stated here — that `interim-session-resolver.adapter.ts` "is still wired as
-  `SESSION_RESOLVER_PORT` and still self-provisions `position: 'HR Admin'`" — is **false**. That
-  file was deleted in `services/backend` `37a339a` on **2026-09-04**, and is absent at the gitlink
-  this branch replaces (`81a5dc6`), at the one it introduces (`3bc801a`), and at backend `main`
-  (`d1ef680`). `user-management.module.ts:214` binds `SESSION_RESOLVER_PORT` to
-  `JwtSessionResolverAdapter`; the `Bearer <token:persona>` shorthand and `Root` self-provisioning
-  survive only behind `ALLOW_TEST_SESSION_TOKENS`, Joi-gated on `NODE_ENV`
-  (`src/config/env.validation.ts:109`). **This does not close the blocker here** — closure requires
-  the project's own verification run (the `QUALITY-GATE-AC` pattern, per
-  `sprint-change-proposal-2026-09-03-sec-auth-01-reconciliation.md`), and `blockers.yaml` stays the
-  authority. It removes this bullet's stated support, nothing more.
+  - `SEC-AUTH-01` **— P0 CLOSED 2026-09-12** (`blockers.yaml` closure note;
+  `…/architecture/blocker-verification-2026-09-12.md`). The interim adapters are absent from the
+  production module (deleted in backend `37a339a`). The one residual path is also closed:
+  `ALLOW_TEST_SESSION_TOKENS=true` used to validate under `NODE_ENV=production`, and it is now a
+  startup validation error (backend `45a671e`; merge pending, and the blocker reopens if that
+  branch is not merged). The 2026-09-11 correction of this bullet's stale premise stands as
+  history. **This removes one of `PG-01`'s four preconditions; it does not make `PG-01`
+  schedulable.**
   - `CC-07` **— P0 open, implementation `partial` (corrected 2026-09-11; was misstated here and in
   `test-design-architecture.md` § Open blockers as "zero occurrences" — the table, repository,
   service and controller endpoint exist, but per-kind enrolment, AD-29-complete reader
   authorization and a live grant/revoke endpoint are still owed). This correction does not change
-  `PG-01`'s conclusion: `SEC-AUTH-01` and `AC-S9-S13`/`AC-SECTION-MATRIX-01` remain independently
-  open regardless of `CC-07`'s true state.
+  `PG-01`'s conclusion: `AC-S9-S13`/`AC-SECTION-MATRIX-01` remain independently open regardless of
+  `CC-07`'s true state (`SEC-AUTH-01` closed 2026-09-12).
   - `AC-S9-S13` **/** `AC-SECTION-MATRIX-01` **— P1 open.** `SECTION_ACCESS_MATRIX`
   (`src/access-control/domain/constants/section-access-matrix.ts`) carries exactly three rows —
   `profile:identity`, `profile:leave`, `profile:projects`, the renamed S1 / S10 / S11 — and the
   facade returns `none` for every key absent from it. *(Citation corrected 2026-09-11: the former
   `access-control.facade.ts:52-54` reference predates the rename from hardcoded branches to a
-  matrix lookup. Verified unchanged in substance — this bullet, unlike `SEC-AUTH-01`'s, still holds
-  on the code.)*
+  matrix lookup. Verified unchanged in substance; this bullet still holds on the code.)*
 - **Authority:** `…/architecture-people-management-ratification-2026-09-02/blockers.yaml` and
 `…/blocker-verification-2026-09-03.md`.
 - **This is a replacement of the rationale, not a re-derivation of the same conclusion from the
@@ -1275,6 +1308,16 @@ gate (D-1), and the "ATDD" phase is superseded by the current ordering rule.
 percentage must **never** be presented as release readiness, and `gate-decision.json` does not exist
 unless a run issues a verdict. **This migration issues no verdict and regenerates no trace
 artifact.** (AGENTS.md § Trace artifacts; `_bmad/custom/bmad-testarch-trace.toml`.)
+
+### Historical functional P0 baseline — not a current verdict
+
+The immutable [historical `gate-decision.json` at `c342138`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/c342138035e8189665955453e5b5308a20a2ed00/_bmad-output/test-artifacts/gate-decision.json)
+evaluated the Access Control Kernel MVP on 2026-08-31. It recorded `gate_status: FAIL`,
+`p0_status: NOT_MET`, `critical_open: 1`, with `ACM3-II-06` as the uncovered critical requirement.
+This is open functional-P0 debt, not a green result to inherit or paper over. That historical gate
+could close only with `gate_status=PASS`, `p0_status=MET`, `critical_open=0`, and coverage of
+`ACM3-II-06`. It does not create a current release verdict; the current whole-repository trace
+remains a planning audit as stated above.
 
 ---
 
@@ -1752,7 +1795,7 @@ owner is not resolving a question. The register of record is `test-design/migrat
 | **U-11** | Frontend performance budgets, frontend accessibility requirements, photo-upload size limits                                                                                                                                                                    | Product Owner                                                               | [Unknown thresholds](#unknown-thresholds), `P2-PLAT-01`                                                                                                                                                                                                                  |
 | **U-12** | **Resolved by DEV (2026-09-11)** — co-located `*.test.ts` / `*.test.tsx` next to the file under test; a second config, `vitest.config.ts`, separate from `vitest.contract.config.ts` and `playwright.config.ts`; `@testing-library/react` + `@testing-library/jest-dom` + `@testing-library/user-event`. Backend keeps its existing co-located `*.spec.ts` under `src/`. Authority is `services/frontend` branch `feat/u-12-unit-component-testing` (`60bc882`), proven by two passing specs; **not yet merged to `main`** | DEV                                                                         | [Frontend execution](#frontend) — was a prerequisite for **all** frontend net-new work; unblocked once the branch merges                                                                                                                                                |
 | **U-13** | Whether the application should proactively log out on a timer or `visibilitychange`                                                                                                                                                                            | Product                                                                     | [Not in scope — frontend](#not-in-scope--frontend)                                                                                                                                                                                                                       |
-| **U-16** | Whether `platform/epics.md` Story 1.6 is satisfied, partially satisfied, or made obsolete                                                                                                                                                                      | Platform epic owner                                                         | Story 1.6 artifact references                                                                                                                                                                                                                                            |
+| **U-16** | **Resolved 2026-09-12** — Story 1.6 is satisfied as a documentation/evidence refresh; its completion does not close functional P0 debt, a runtime gate, or a product requirement | Platform epic owner | Story 1.6 completion record; historical P0 baseline and Contract-B evidence above |
 | **U-17** | For the six blockers now closed at design, what closes them at **implementation**; and what closes the **six** register entries that remain open (corrected 2026-09-11 — was "five"; `test-design-architecture.md` § Dependencies names them). **Partially re-verified, not resolved**: `CC-07` and `CC-05` were re-checked against the actual baseline commit — both were **partial**, not "absent" as previously recorded; see `test-design-architecture.md` § Open blockers and § Ratified design decisions for the corrected rows and named remaining gaps | Architect + the per-entry owners                                            | `DG-02`, the coverage plan's blocked rows                                                                                                                                                                                                                                |
 | **U-18** | **Resolved 2026-09-11** — the document's owner (Architect) edited both `:84` and `:117–119` to match the authority named by ruling D-1 (lines 25–38); no reading of `docs/architecture/testing-strategy.md` now states a per-stage human-approval requirement | Owner of `docs/architecture/testing-strategy.md` (Architect) | `DG-01` |
 | **U-19** *(resolved 2026-09-11)* | **Resolved** — 14 of 119 `TR-*` rows receive partial evidence from the 99 scenario documents (none full coverage); 105 receive none. Matched via each document's own `**Trace:**` §-citation, never guessed from filenames. **Does not affect `PG-01`** (governed by U-20 alone) | Access Control owners + QA                                                  | [§ U-19 normative coverage — scenario file mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11), immediately after the [Normative coverage map](#normative-coverage-map)                                                                                                                                  |

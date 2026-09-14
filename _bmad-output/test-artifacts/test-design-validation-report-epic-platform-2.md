@@ -1,292 +1,233 @@
 ---
+runScope: 'epic'
+runKey: 'epic-platform-2'
 epicId: 'PLAT-E2'
 epicDomain: 'platform'
 epicNumber: 2
 epicSourcePath: '_bmad-output/planning-artifacts/platform/epics.md'
 epicSourceHeading: '## Epic 2: Access Control Foundation'
-runKey: 'epic-platform-2'
-validationScope: 'epic'
-validationDate: '2026-09-11'
-runBaselineHead: '28d8e2049d457b103cd7eee31587add7a970f4fc'
-verdict: 'CONCERNS'
+operation: 'Epic Validate'
+verdict: 'PASS'
+supersedes: 'PASS (2026-09-13, first same-day report at same path); PASS (2026-09-12, prior report at same path)'
+date: '2026-09-13'
+runBaseline: 'e8681c90f7ece602d8ad65560a5f77828f2f4458'
+independence: 'second same-day fresh independent Epic-Level validation; prior verdicts not inherited'
 ---
 
-# Test Design Validation Report — Epic `PLAT-E2` (Access Control Foundation)
+# Epic Validation Report — PLAT-E2 Access Control Foundation
 
-**Scope kind:** `epic` · **Identity tuple:** `PLAT-E2` · domain `platform` · number `2` ·
-`_bmad-output/planning-artifacts/platform/epics.md` `## Epic 2: Access Control Foundation`
-**Run key:** `epic-platform-2`
-**Repository `HEAD` (captured before this run's first write, run baseline):** `28d8e2049d457b103cd7eee31587add7a970f4fc`
+**Verdict: PASS.** The plan's second 2026-09-13 Edit — closing `ACF-TR-01` by registering
+`TR-3.2-SELF` in the platform pair's `test-design-qa.md` (decision: option A, made by the user
+acting as QA + Architect) — was independently re-verified against primary sources rather than
+trusted on its own word. Every citation checked out, and every completion claim from the first
+2026-09-13 Edit was re-confirmed against current content as part of this run. This report grants
+no approval, asserts no executed runtime coverage, issues no quality gate, and makes no
+release-readiness claim. Approval status (granted 2026-09-12 by the requester, for the design
+only) is unchanged by this validation.
 
-> **What this report is not.** It grants no approval, asserts no coverage achieved, and changes no
-> sprint status, gate, ClickUp mapping, or service code. Per `docs/test-design-workflow-contract.md`
-> §5, `workflowStatus: generated` on the plan's checkpoint means only that documents were written;
-> this validation evaluates the plan's internal quality and its alignment with the epic's stated
-> requirements and Story `ACF-1` acceptance criteria — nothing more.
+## Identity and evaluated content
 
-**Focus requested:** validate the plan against the epic's requirements and story acceptance
-criteria; identify coverage gaps, missing scenarios, and misalignment with acceptance criteria.
+| Field | Value |
+| --- | --- |
+| Scope / run key | epic / `epic-platform-2` |
+| Canonical identity | `PLAT-E2` · platform · number 2 |
+| Source / heading | `_bmad-output/planning-artifacts/platform/epics.md` · `## Epic 2: Access Control Foundation` |
+| Plan | `_bmad-output/test-artifacts/test-design-epic-platform-2.md` |
+| Checkpoint | `_bmad-output/test-artifacts/test-design-progress-epic-platform-2.md` |
+| Report | `_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md` |
+| Repository `HEAD` (baseline, before this run's first write) | `e8681c90f7ece602d8ad65560a5f77828f2f4458` — `chore: refresh live verification results` |
 
----
+Identity metadata agrees across source, plan, checkpoint, and index: `epicId: PLAT-E2`,
+`epicDomain: platform`, `epicNumber: 2`, `epicSourcePath`/`epicSourceHeading` match the canonical
+epic body (line 392, the sole authoritative occurrence — the line-134 mention is a summary-list
+repeat, not a second body), and `runKey: epic-platform-2` is identical across all four surfaces.
+The selected checkpoint carries `workflowStatus: generated`, all five canonical Create steps
+recorded complete, `lastStep: step-05-generate-output`, and records this run's own Edit (Step 9)
+and Validate (Step 10) as post-generation actions, consistent with contract §4.4's terminal
+document-generation state plus the post-generation-action pattern already used for the
+2026-09-11/12/13 events in this same checkpoint.
 
-## Evaluated artifacts and content hashes
+### SHA-256 content hashes (current content, evaluated by this run)
 
-Working-tree content at the time of this validation (the repository has uncommitted changes on
-several of these paths relative to `HEAD` above; the hash is of what was actually read).
+| Evaluated path | SHA-256 |
+| --- | --- |
+| `test-design-epic-platform-2.md` | `1649d31406a4e6fcc12c5a24720e8b540f9849717bde049e547ea02275540e8f` |
+| `test-design-progress-epic-platform-2.md` | `cfa4a5013f600884c179dff5fe742f87825f94527df92f9259807f9b1574a7fa` |
+| `test-design/README.md` (pre-projection, before this run's index update) | `902001c39cb847014f111c29170ccfe1c209d1b3903e0a812babc24ca638d781` |
+| `test-design-architecture.md` | `133efa612ad55b012fc8be9bc6a77d1d6f55e4bbdba99a8ee0404acccb648ec5` |
+| `test-design-qa.md` | `54338ca7cd72c6f88f431fb1ade4bcee2eaa7d34324806f4b262ea21cc300cef` |
+| `planning-artifacts/platform/epics.md` | `3d037ff07f5153b1c9a5042b486e067cb8fcfd6db212311579f4c4067db4fd41` |
+| `docs/project-requirements.md` | `495017d0bc2f1c01ae5c7b1cdd6d4753f9c32410eb2ba1e2e3ca88003f4bf0d8` |
+| `docs/architecture/access-control.md` | `bdbe74a27a04a159b547c2a9c5ac990c2703a51cb504707e71568473661fee34` |
+| `specs/spec-access-control-audience-foundation/SPEC.md` | `3889dcedc1c61d3444d2c5e719439df4d5954c7310493373ba32c11247b7acbf` |
+| `docs/test-cases/access-control-foundation/README.md` | `d0877f16fe7070cfbbd91197d7cd9dda510572bad7e72c84409d5d0586bc4b97` |
+| `docs/test-cases/access-control-foundation/fail-closed/acf-fc-04-cyclic-reporting-chain.md` | `0087c9087d81059984c592966f206c5c46caa808566c2133444b8a915ae8cd41` |
+| `docs/test-cases/access-control-foundation/fail-closed/acf-fc-05-deactivated-identity-empty-set.md` | `2da09455a6762d4259809080b2c16f8e5186e38c1dfb9a916c1d985438a88989` |
+| `docs/test-cases/access-control-foundation/audience/acf-au-01-self.md` | `bea4521a72044186f73d777433108b8e888833e7fa0e318033053e1aaf845b97` |
+| `docs/test-cases/access-control-foundation/audience/acf-au-02-reporting-direct.md` | `83bb1b1d7556e42da8f1e8afb649ef743f4c42324e6abf6c5ad59bafca6b81ac` |
+| `docs/test-cases/access-control-foundation/audience/acf-au-03-reporting-transitive.md` | `993240a034cd37317736e437c941aaac27f36126d1090afbc30434ce15a86e55` |
+| `docs/test-cases/access-control-foundation/audience/acf-au-04-pp-direct.md` | `875892c3697219390a09b04eb150b0c1797597442846d20ad5367669fa092c50` |
+| `docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md` | `1fda5988444cc626b2c7ec4c88e456d625a4fb77e57d5ec1ca654b2d60f9f2ed` |
+| `.../architecture-people-management-ratification-2026-09-02/blockers.yaml` | `65d0ffb91d3d344bc6d8b60d13472166b52a7745713504c641de50f31129ee23` |
+| `test-reviews/test-review-plat-e2-e4-2026-09-13.md` | `3a66b3e885a57617c2ac5321b919e3ea9538621a7ece7d602e5823c3a988d88f` |
+| `services/backend/test/access-control/audience-resolution.e2e-spec.ts` (working tree, backend `HEAD` `fc4c853`) | `010ff5570da332e496b2ff8a38dc83d700db1f8263d4a84d5fddf993106e014a` |
+| `implementation-artifacts/access-control/deferred-work.md` | `45b97a1f427066389645b8723d1e4ef9bae99d1a85fe44ca1f0164142d29d34f` |
+| `performance/p6-resolve-audiences-postgresql.md` | `ced0cb0b7a74f4c2c92622db7eb3556beb82ca49e4a61af8c3944c1809a66a7e` |
 
-| Artifact | Role | SHA-256 |
+`test-design-architecture.md` is byte-identical to the hash recorded in the first 2026-09-13
+report; it was not touched by either 2026-09-13 Edit. `test-design-qa.md`'s hash changed from the
+first 2026-09-13 report's recorded value (`3863906ad2c…`) — expected, since the `ACF-TR-01` System
+Edit registered `TR-3.2-SELF` in it between the two reports. `test-design-epic-platform-2.md`'s
+hash also changed from the first report's recorded value, reflecting the second Edit's content
+changes to this epic's own plan. Two new reference inputs appear in this run that the first
+2026-09-13 report did not evaluate: `docs/architecture/access-control.md` (the architecture-only
+Self-exclusivity source) and `acm4r-ma-02-self-exclusive-after-confirmation.md` (new component
+evidence); both are newly cited by the `TR-3.2-SELF` registration.
+
+## Independent re-verification of the second 2026-09-13 Edit's claims
+
+Every claim the second Edit added was checked directly against its cited source, not accepted on
+the Edit's own say-so.
+
+### Decision attribution — verified, and not re-opened
+
+The plan's Correction Log, `test-design-qa.md`'s System Edit note, and
+`docs/test-cases/access-control-foundation/audience/acf-au-01-self.md` all attribute the choice of
+**option A** (register a new row, `TR-3.2-SELF`, rather than fold Self into an existing
+`TR-3.2-S*` row) to "the user, acting as QA + Architect," with no document claiming this Edit or
+this Validate run made or revisited that decision. **Claim holds; this validation does not
+re-adjudicate the decision, consistent with the routing contract's separation of approval from
+validation.**
+
+### `TR-3.2-SELF` registration in `test-design-qa.md` — verified
+
+Read directly: the normative coverage map now carries a `TR-3.2-SELF` row between `TR-3.2-S16` and
+`TR-3.3-01`, citing `docs/project-requirements.md` §1 (Employee "[g]rants access to one's own
+profile (Self)") and §3.2 (the Self audience definition and its distinct matrix column), and
+separately citing `docs/architecture/access-control.md` as an **architecture-only** source for the
+exclusivity clause — the row does not misattribute exclusivity to v1.5 text. The intro count
+("**120 normative** `TR-`\* rows"), the machine-counted breakdown (`AC STAGE-1 DRAFT` 24, others
+unchanged, summing to 120), the U-19 evidenced-row count ("15 of 120... 105 receive none"), and the
+U-19 orphan-finding paragraph (now "resolved 2026-09-13") were all read directly and are internally
+consistent: 45+24+23+21+4+3 = 120, and 120 − 15 = 105 matches the unchanged zero-evidence count.
+**Claim holds.**
+
+### Requirement and architecture sources — verified
+
+`docs/project-requirements.md` was read at §1 (roles table) and §3.2 (audiences list and section
+matrix): both passages exist verbatim as cited. `docs/architecture/access-control.md` line 303 was
+read directly and states: "When `viewerId === targetId`, Self is exclusive of Reporting, Project,
+PP, and Colleague (PM/AD-28)." **The row's own text correctly labels this an architecture-only
+source, not v1.5 normative text — confirmed accurate, not an overclaim.**
+
+### `ACF-AU-01` (primary evidence) — verified
+
+`docs/test-cases/access-control-foundation/audience/acf-au-01-self.md:5` was read directly: it now
+reads "Primary evidence for `TR-3.2-SELF`" and cites the same sources as the `test-design-qa.md`
+row, in phrasing matching `acf-au-02-reporting-direct.md:5`'s established pattern ("Component
+evidence for `TR-2.1-02`..."). Its scenario body's oracle (`resolveAudiences(<alice-id>,
+[<alice-id>])` yields exactly `{self}`) is unchanged by this Edit and was already independently
+re-verified against `audience-resolution.e2e-spec.ts` in the first 2026-09-13 report. **Claim
+holds.**
+
+### `ACM4R-MA-02` (component evidence) — verified
+
+`docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md`
+was read directly. Its scenario asserts `resolveAudiences(martaId, [martaId])` returns exactly
+`Set {'self'}`, "contains neither Reporting nor PP nor Colleague." Its own U-19 note now reads
+"Mechanism-level evidence for `TR-2.1-01` ... **Also component evidence for `TR-3.2-SELF`**
+(registered 2026-09-13, `ACF-TR-01`, option A ...)" — the pre-existing `TR-2.1-01` citation is
+preserved, not overwritten, and the new citation is additive. **Claim holds; no prior citation was
+silently dropped.**
+
+### Row-id uniqueness — verified
+
+`grep -rn "TR-3.2-SELF"` and `grep -rn "TR-2.1-00"` were re-run against the full repository tree.
+`TR-2.1-00` returns zero matches anywhere (confirming it was never used, consistent with the
+System Edit's stated grep check). `TR-3.2-SELF` returns matches only in the files this Edit and its
+companion System Edit are documented to have touched: `test-design-qa.md` (row, U-19 mapping row,
+System Edit note, orphan-finding paragraph), `test-design-epic-platform-2.md` (multiple sections
+and the Correction Log), `test-design-progress-epic-platform-2.md` (Steps 9–10), `test-design/README.md`
+(two rows), `test-design-validation-report.md` (the companion system Validate report, this same
+session), `acf-au-01-self.md`, and `acm4r-ma-02-self-exclusive-after-confirmation.md`. **No
+collision with any pre-existing identifier found.**
+
+### Plan-side updates (`R-PLAT2-03`, P2 table, totals, AC1, resource estimates, execution strategy) — verified
+
+Each location the Correction Log claims was changed was read directly in the current plan content:
+`R-PLAT2-03`'s mitigation column now states the catalog gap is closed and names `TR-3.2-SELF`; the
+P2 `ACF-TR-01` row now reads **DONE 2026-09-13** with the decision and both cited scenario files;
+the P2 total line reads "4 of 5" with only `ACF-PERF-01` (plus `ACF-DOC-01`'s SPEC.md half) still
+open; the AC1 traceability row states the catalog gap is closed; the Resource Estimates P2 row and
+the "Every PR" execution-strategy bullet were both updated consistently with the same facts. **No
+location claimed as changed was found unchanged, and no other P0/P1/P3 content was disturbed by
+this Edit.**
+
+### Companion system Validate — verified
+
+The system-scope `test-design-validation-report.md` dated 2026-09-13 was read directly: it
+independently re-verifies the same `TR-3.2-SELF` registration from the system side (its own
+"Independent re-verification" section), evaluates `test-design-qa.md` at the same SHA-256 hash
+recorded in this report, and reaches the same PASS verdict. **The two reports agree on the
+evaluated `test-design-qa.md` content and do not contradict each other.**
+
+## Full checklist evaluation
+
+All Epic-Level checklist criteria were evaluated for this run; sections unaffected by the second
+2026-09-13 Edit were re-confirmed against current content rather than assumed unchanged from the
+first 2026-09-13 report.
+
+| Checklist group | Result | Note |
 | --- | --- | --- |
-| `_bmad-output/test-artifacts/test-design-epic-platform-2.md` | Evaluated epic plan | `4785169572be84330d954b07afed4220252657575d40374fdfafae68a40b736f` |
-| `_bmad-output/test-artifacts/test-design-architecture.md` | Canonical system pair (architecture) | `4fd5d91a6b47b347ba7056d963c7bb928828270cc94bb717cedab0955d44b565` |
-| `_bmad-output/test-artifacts/test-design-qa.md` | Canonical system pair (QA) | `df186148b1b5e3c128c991362f09c791a524030c8518904e277221ca4f1a37fd` |
-| `_bmad-output/test-artifacts/test-design-progress-epic-platform-2.md` | Epic checkpoint (identity cross-check only, not itself evaluated for content quality) | `a6a273de395368f59ae43d0510bef9118b5ab0c3f03c315970c61346aeff330e` |
-| `_bmad-output/planning-artifacts/platform/epics.md` | Canonical epic source (`## Epic 2`, Story 2.1 / `ACF-1` acceptance criteria) | `45cc660d3adffb0d67012367d340ba0611bc5be11e4824be1de2657408b6c7aa` |
-| `_bmad-output/test-artifacts/test-design/README.md` | Current-artifact index (read for scope resolution; updated by this run — see below) | `04158caa3d7026c42c6cb3a59b11f7447cfc26de04de8c34c0c100732534a0c9` |
+| Prerequisites | PASS | Story 2.1 AC1–AC5, epic/PRD sources, architecture pair, and testability inputs exist; unchanged since 2026-09-13 (first report). |
+| Context loading | PASS | Index, contract, canonical pair (including the now-current `test-design-qa.md`), canonical epic, selected plan/checkpoint, and current primary evidence (including the two newly-cited files) were inspected. |
+| Risk assessment | PASS | Nine risks retain valid categories, 1–3 P/I scores, correct arithmetic, high-risk flags, owners, and timelines. `R-PLAT2-03`'s mitigation note now correctly reflects the `ACF-TR-01` closure; its score is unchanged and this Edit does not re-score it. |
+| NFR planning | PASS | Contracts A/B/C remain distinct; unaffected by this Edit. |
+| Coverage design | PASS | P2 coverage table and totals correctly reflect `ACF-TR-01` DONE; no duplicate `PLAT-E3` coverage introduced; no other priority row disturbed. |
+| Targeted claim verification | PASS | Decision attribution, `TR-3.2-SELF` registration, requirement/architecture sources, `ACF-AU-01`, `ACM4R-MA-02`, row-id uniqueness, plan-side updates, and the companion system Validate were each independently re-verified against primary sources (see above); all hold as stated. |
+| Deliverables | PASS | Risk, coverage, AC traceability, NFR, execution, estimates, gates, entry/exit, exclusions, interworking, and the Correction Log (now two 2026-09-13 entries) are present and internally consistent. |
+| Risk matrix | PASS | IDs, categories, arithmetic, high-priority marking, mitigations, owners, timelines, and residual risk validate; `R-PLAT2-01`'s `SEC-AUTH-01` reopen-condition caveat is untouched by this Edit and remains accurate. |
+| Coverage matrix | PASS | Test-count arithmetic in the P0/P1/P2 tables and Resource Estimates table is internally consistent with the `ACF-TR-01` completion. |
+| Execution strategy | PASS | Simple PR/Nightly/Weekly structure unaffected in shape; the "Every PR" bullet's audit list was updated to move `ACF-TR-01` from planned to completed. |
+| Resource estimates | PASS | Totals (`~31–53 h`) are unchanged and not re-estimated by this Edit; the P2 note now states what is done vs. open. |
+| Quality gate criteria | PASS | Planned thresholds remain explicit and unevaluated; no gate, pass-rate outcome, coverage, or release claim is made anywhere in the second 2026-09-13 changes. |
+| Evidence-based assessment | PASS | Every claim in the second Edit cites a file path, section, or scenario title; none is asserted from memory or inference alone. |
+| Not-in-scope / entry / exit / interworking | PASS | Not-in-Scope, Entry, and Exit Criteria sections are unaffected by this Edit (`ACF-TR-01` was never an entry/exit checkbox item) and remain accurate. |
+| Cross-document consistency | PASS | Plan, checkpoint, this report, `test-design-qa.md`, and the companion system validation report agree on the `TR-3.2-SELF` identity, its evidence files, and the decision attribution. |
+| Workflow routing and projections | PASS | Canonical domain-qualified paths and identity tuple are correct; the System Edit to `test-design-qa.md` was made as its own explicitly confirmed target, not as a side effect of this epic Edit; only the selected report, plan projection, checkpoint projection, and index row are in scope for this run. |
+| Epic-Level completion | PASS | No blocking design inconsistency remains; `ACF-PERF-01` and `ACF-DOC-01`'s SPEC.md half remain named as open, not hidden. |
 
-Also read, not hashed (supporting context, not themselves evaluated outputs): `SPEC.md` for
-`spec-access-control-audience-foundation`, the 9 Stage-1 scenario documents under
-`docs/test-cases/access-control-foundation/` and their README, and the epic checkpoint's identity
-metadata.
+## Not executed / not applicable
 
-**Identity cross-check:** the plan's frontmatter, the checkpoint's frontmatter, and the canonical
-source heading all agree on `PLAT-E2` / `platform` / `2` / `## Epic 2: Access Control Foundation`.
-No mismatch found.
+- No runtime, service, E2E, measurement, browser, or repository-audit execution was performed as
+  evidence by this Validate run itself. `ACF-AU-01` and `ACM4R-MA-02`'s test suites were not
+  re-run; this run read their scenario documents and (for `ACF-AU-01`) relied on the first
+  2026-09-13 report's independent confirmation that `audience-resolution.e2e-spec.ts` is 16/16
+  green.
+- The full re-verification performed by the first 2026-09-13 report (backend commit checks,
+  `blockers.yaml` reopen-condition check, test-review citation check) was not repeated line-by-line
+  here; this run instead re-read each affected plan section to confirm no regression, per the
+  Checklist table above.
+- System-only structural and handoff checks are not applicable here; the system pair was evaluated
+  as shared authority by the companion system Validate run in the same session, not duplicated by
+  this epic-scope report.
+- Scenario files other than `acf-au-01-self.md` and `acm4r-ma-02-self-exclusive-after-confirmation.md`,
+  QA design (beyond the `TR-3.2-SELF` addition), architecture design, source epic, requirements,
+  tracker, ClickUp, trace/gate artifacts, service code, gitlinks, and every other epic's
+  plan/checkpoint/report were not changed by this run.
 
----
+## Required next action
 
-## Scope resolution (contract §3)
-
-1. Index and routing contract read.
-2. User supplied the exact target file `test-design-epic-platform-2.md`, which resolves uniquely to
-   `runKey epic-platform-2` per the index's §3 Epic-scope table.
-3. Canonical source verified: `epics.md` contains exactly one authoritative body at `## Epic 2:
-   Access Control Foundation` (the `### Epic 2` occurrence inside `## Epic List` is a summary
-   mention, not a second body).
-4. Per contract §4.5, this is an **epic Validate**: evaluates the canonical system pair plus the
-   selected epic plan, writes `test-design-validation-report-epic-platform-2.md` (this file) and
-   the epic's index entry. No system or other-epic report is written or modified.
-
----
-
-## Checklist results
-
-### Prerequisites (Epic-Level Mode)
-
-| Item | Result |
-| --- | --- |
-| Story markdown with clear acceptance criteria exists | PASS — Story 2.1 (`ACF-1`), 5 acceptance criteria, `epics.md` lines 400–414 |
-| PRD or epic documentation available | PASS — `epics.md` `## Epic 2`; `SPEC.md` for `spec-access-control-audience-foundation` |
-| Architecture documents available (system pair) | PASS — both loaded |
-| Requirements are testable and unambiguous | PASS, with one exception — see **Finding F-1** (Self-exclusivity phrasing) |
-
-### Step 1 — Context Loading
-
-PASS. Index, contract, canonical epic source, canonical system pair, `SPEC.md`, the 9 scenario
-documents, and cross-epic evidence sources were all loaded per the checkpoint's own Step 2 record,
-and independently re-verified for this validation.
-
-### Step 2 — Risk Assessment
-
-PASS. 9 risks, unique IDs, correct category assignment (SEC/TECH/PERF/OPS), P and I both in
-{1,2,3}, scores computed correctly (spot-checked: `R-PLAT2-01` 3×3=9, `R-PLAT2-02` 3×2=6,
-`R-PLAT2-07` 3×1=3), high-priority (≥6) risks flagged and given owners/timelines, residual risk
-stated for `R-PLAT2-01` (open until `SEC-AUTH-01` closes — consistent with `blockers.yaml` and both
-system-pair documents; see Cross-Document Consistency below).
-
-### Step 2A — NFR Planning
-
-PASS. Contracts A/B/C kept separate and consistently described against the system pair. Two
-thresholds (DB-timeout headroom, `SQLSTATE 57014` classification) are explicitly `UNKNOWN` rather
-than invented.
-
-### Step 3 — Coverage Design
-
-**CONCERNS.** See **Findings F-1 through F-4** below — this is the section the requested review
-targeted, and it is where the substantive gaps live. Positive findings: no duplicate coverage across
-levels (explicit non-duplication with `PLAT-E3`'s kernel suites), priorities assigned to every
-scenario, P0 criteria correctly applied to genuinely blocking items, execution order defined.
-
-### Step 4 — Deliverables Generation
-
-PASS. Risk matrix, coverage tables, execution order, interval-based resource estimates, quality
-gate criteria, and NFR summary are all present; output was written to the contract-mandated path.
-
-### Output Validation — Risk Assessment Matrix / Coverage Matrix / Quality Gate Criteria
-
-PASS for the Risk Assessment Matrix (see Step 2 above). **CONCERNS** for the Coverage Matrix's "all
-requirements mapped to test levels" criterion — see Finding F-1/F-2. Quality Gate Criteria: PASS
-(100% P0 / ≥95% P1 / ≥90% P2-P3, high-risk mitigation required, NFR evidence deferred to
-`nfr-assess`, none evaluated by this document as required).
-
-### Execution Strategy
-
-**CONCERNS.** See **Finding F-5**: the plan's "Execution Order" section is structured as
-Smoke/P0/P1/P3+measurement tiers, not the PR/Nightly/Weekly structure the checklist specifies for
-this section, and the checklist's own "Common Issues" note ("Don't create smoke/P0/P1/P2/P3 tier
-structure") names exactly this pattern.
-
-### Resource Estimates
-
-PASS. All four priority bands and the total use interval ranges (e.g. "~14–22 h", "~25–42 h"); no
-false-precision exact numbers found.
-
-### Priority Assignment Accuracy
-
-PASS. P0–P3 section headers carry only "Criteria," no execution-timing language; execution timing is
-correctly isolated to the separate Execution Order section.
-
-### Test Level Selection
-
-PASS. Facade/component-level assertions used throughout in preference to HTTP/E2E, consistent with
-`R-PLAT2-01`'s finding that the HTTP layer is not trustworthy evidence for this epic; no misuse of
-E2E for non-critical paths.
-
-### Evidence-Based Assessment
-
-PASS. Every risk and mitigation cites a concrete artifact (commit hash, blocker ID, scenario
-document, or measurement file); no speculative business-impact language found.
-
-### Cross-Document Consistency
-
-PASS, with one asymmetry noted for information. `SEC-AUTH-01` is referenced identically (P0, open,
-blocks shared-environment deployment) across the epic plan, `test-design-qa.md`, and
-`blockers.yaml`. The epic plan's account of the `test-design-qa.md` § U-19 same-day correction
-(removing the `(invalidated)` markers on `ACF-FC-01`/`ACF-FC-02`) matches that document's own
-"Post-validation correction" note. **Asymmetry (not a defect):** `test-design-architecture.md`
-contains zero references to `PLAT-E2`, `ACF-`, or `epic-platform-2` — the architecture doc is a
-system-level, cross-epic risk/testability baseline and is not required to name every epic by ID, so
-this is recorded as an observation, not a finding.
-
-### Not in Scope / Entry / Exit Criteria
-
-PASS. Each excluded item carries reasoning and a mitigation pointer; entry/exit criteria are stated
-as checkboxes with three already correctly ticked to reflect the same-session `ACF-RW-01..03`
-completion, and the plan correctly marks `SEC-AUTH-01` closure as explicitly **not** an exit
-criterion for this epic's test design.
-
-### Document Quality (Anti-Bloat)
-
-PASS. No repeated boilerplate notes, professional tone, no AI-slop markers, length proportionate to
-a single-story rework plan.
+`ACF-PERF-01` (P2 measurement) and `ACF-DOC-01`'s `_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md:23`
+half (owner AC + Architect) remain the epic's only named open items besides `ACF-NC-01` (P1) and
+`SEC-AUTH-01`'s reopen-condition adjudication (owner Architect + Security). Human review of both
+2026-09-13 Edits and any separate implementation/evidence workflows remain distinct from this
+validation. Approval (granted 2026-09-12, design only) is unaffected.
 
 ---
 
-## Findings — coverage gaps, missing scenarios, and AC misalignment
+**Completed by:** independent Master Test Architect
 
-These are ranked by how directly they affect whether Story `ACF-1`'s 5 acceptance criteria are
-actually covered by the plan's Test Coverage Plan (P0–P3 tables), which is what was asked.
+**Date:** 2026-09-13
 
-### F-1 (Medium) — Acceptance Criteria 4 and 5 have no verification mechanism in the plan at all
-
-Story 2.1's acceptance criteria include two boundary/non-goal clauses:
-
-- AC4: *"No User Management controller, guard, adapter, or frontend file changes are included."*
-- AC5: *"No Project, Department, PP HR-line, shared-link, full-profile, functional-permission, or
-  section-matrix decision is enabled by this story."*
-
-The plan's "Not in Scope" table gives reasoning for each excluded capability, and `ACF-FC-02`
-provides scenario evidence for the PP HR-line sub-clause of AC5 specifically. But nothing in the
-Test Coverage Plan (P0–P3) verifies AC4 at all, and nothing verifies the remaining five sub-clauses
-of AC5 (Project line, Department, shared-link, full-profile, functional-permission, section-matrix)
-beyond narrative assertion. This repository has a working precedent for exactly this class of
-acceptance criterion: `test-design-epic-platform-1.md` states 21 `plat-e1:AV-*`
-artifact-verification obligations at `repository-audit` / `manual-review` evidence level for
-documentation-alignment claims that are not runtime behavior. `PLAT-E2` has no equivalent obligation
-for AC4/AC5, so a reader cannot tell from the plan itself what evidence would satisfy them, or that
-any is planned.
-
-**Recommendation:** add one or two lightweight `repository-audit` obligations (e.g., "confirm no
-file under `services/backend/src/user-management/**` or a frontend path changed in the `ACF-1`
-delivery commit(s)") to the P2/P3 band, mirroring the `plat-e1:AV-*` pattern, or explicitly state in
-the plan that AC4/AC5 are considered self-evidencing by the absence of such commits and name where
-that absence is recorded.
-
-### F-2 (Medium) — No acceptance-criteria-to-scenario traceability table inside the epic plan itself
-
-The plan traces its P0–P3 test rows to **risk IDs** (`R-PLAT2-*`) and, indirectly through the
-scenario documents' own `**Trace:**`/`**U-19 normative coverage:**` lines, to **PRD-level `TR-*`
-rows** in `test-design-qa.md`. It never states, in one place, which of Story 2.1's five acceptance
-criteria each planned test row satisfies. Manually reconstructing that mapping for this validation:
-
-| AC | Coverage |
-| --- | --- |
-| AC1 (audience restricted to the 4 values; **Self exclusive**) | `ACF-AU-R1` (Self/direct/transitive/PP), `ACF-RW-01` (colleague) — see **F-1's sibling, F-4** below on Self-exclusivity specifically |
-| AC2 (Reporting only live `direct` edges; PP only the assigned edge, not the PP's own chain) | Well covered: `ACF-FC-01` (broken edge doesn't bridge), `ACF-FC-02` (PP doesn't inherit through Paula's manager chain) |
-| AC3 (empty input → no DB query; broken/orphaned data reduces, never grants) | Well covered: `ACF-FC-03` (zero queries), `ACF-FC-01`/`ACF-FC-02`/`ACF-FC-04` (fail-closed family) |
-| AC4 (no UM file changes) | **Not covered** — F-1 |
-| AC5 (no Project/Department/…/section-matrix decision enabled) | **Partially covered** (PP HR-line only) — F-1 |
-
-AC2 and AC3 are genuinely well covered; the gap is concentrated in AC4/AC5 and the exclusivity half
-of AC1. This table itself is offered as a starting point for the plan's own Edit pass, not as a
-replacement for one.
-
-### F-3 (Low) — `PLAT-E2` risk register score cross-check
-
-Independently recomputed: all nine `P × I` products match the stated scores, and every ≥6 score
-appears in the High-Priority table with none omitted or misplaced into Medium. No defect found;
-recorded to show the check was actually performed rather than assumed.
-
-### F-4 (Low) — Self-exclusivity assertion strength is unstated
-
-AC1's clause "Self is exclusive of other audiences" is a distinct, testable claim: even where a
-person could independently qualify for another audience toward themselves (a self-referencing edge,
-however unlikely given the schema's CHECK constraint), Self must still be the only label returned.
-The existing `ACF-AU-01` scenario and the planned `ACF-AU-R1` rework both describe the Self case only
-as "the read is allowed" / "re-express as a facade audience-set assertion" — unlike `ACF-RW-01..03`,
-whose Notes explicitly commit to an exact-set assertion ("yields `{colleague}`, not `403`"), `ACF-AU-
-R1`'s Notes column does not say whether the Self case will assert the resolved set equals exactly
-`{self}` (satisfying "exclusive") or merely contains `self` (which would not). This is plausible,
-not confirmed, since the test does not yet exist.
-
-**Recommendation:** when `ACF-AU-R1` is implemented, its Self case assertion should be
-`expectAudienceLabels(...) === {self}` (exact-set equality), and the plan's Notes column should say
-so explicitly so the exclusivity clause of AC1 is traceably covered rather than incidentally covered.
-
-### F-5 (Low, process) — Execution Order section uses tiered structure the checklist flags as an anti-pattern
-
-The plan's "Execution Order" section is organized as Smoke / P0 (<5 min) / P1 (<5 min) / P3 +
-measurement, mirroring its own priority bands. The workflow checklist's Execution Strategy section
-is explicit that this section should use a simple PR / Nightly / Weekly structure "NOT complex
-smoke/P0/P1/P2 tiers," and separately lists "smoke/P0/P1/P2/P3 tier structure" under Common Issues
-as something to avoid. The plan's content is not wrong (everything functional does fit the PR
-budget, and the one opt-in measurement item is correctly kept out of any gate), only its structure —
-relabeling the same four groups as "Every PR" and "Nightly/on-demand" would satisfy the checklist
-without changing what is planned.
-
----
-
-## Overall verdict: CONCERNS
-
-No finding here contradicts the plan's own stated state (approval ungranted, validation previously
-not run, coverage none asserted), and none invalidates the `ACF-RW-01..03` rework already completed
-and evidenced same-day. The risk register, NFR handling, resource estimates, and fail-closed/AC2/AC3
-coverage are sound. The concerns are specific and addressable in a single Edit pass before human
-approval:
-
-1. Add explicit (even minimal) verification for AC4 and the non-PP-HR-line clauses of AC5 (F-1).
-2. Add an AC-to-scenario traceability note inside the plan itself so F-2's table does not have to be
-   reconstructed by a future reader (F-2).
-3. Commit `ACF-AU-R1`'s Self case to an exact-set assertion in the Notes column (F-4).
-4. Relabel the Execution Order section's tiers to PR / Nightly-or-on-demand (F-5).
-
-None of these require new risk analysis or a change to the risk register, coverage counts, or
-resource estimates already stated.
-
-## Checks not executed
-
-- No test suite was run; this validation is a document-quality and AC-alignment review, not test
-  execution. `services/backend/test/access-control/audience-resolution.e2e-spec.ts`'s current pass
-  state was not re-verified here.
-- The `plat-e1:AV-*` precedent cited in F-1 was read for pattern comparison only; `PLAT-E1`'s own
-  validation status was not re-evaluated.
-- BMAD Handoff Validation checklist section: not applicable — epic-level validation writes no
-  handoff (system-scope only, per contract §4.1).
-- System-Level Mode two-document structural checklist (Quick Guide tiers, Purpose statement
-  placement, etc.): not applicable to an epic plan; the system pair's own structure was last
-  validated by `test-design-validation-report.md` (PASS, 2026-09-11) and is not re-validated here.
-
----
-
-**Completed by:** Anna Pikula (session), acting as Master Test Architect
-**Date:** 2026-09-11
-**Epic:** `PLAT-E2` — Access Control Foundation
+**Epic:** PLAT-E2 — Access Control Foundation

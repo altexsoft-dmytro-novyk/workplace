@@ -21,6 +21,7 @@ of a defect — and never treat a PASS as a substitute for the human review gate
 
 from __future__ import annotations
 
+from datetime import datetime
 import re
 import subprocess
 import sys
@@ -46,6 +47,7 @@ STORY_IDS = [
     "ACM-2-scenarios", "ACM-2-red-tests", "ACM-2-production",
     "ACM-5-scenarios", "ACM-5-red-tests", "ACM-5-production",
     "ACM-8-scenarios", "ACM-8-red-tests", "ACM-8-production",
+    "ACM-8R-scenarios",
     "ACM-9-final",
 ]
 
@@ -58,6 +60,22 @@ DISPOSITION = "_bmad-output/implementation-artifacts/access-control/acm-4-dispos
 ACM4_AUDIT = "../../implementation-artifacts/access-control/acm-4-coverage-audit.md"
 ACM1_AUDIT = ("../../implementation-artifacts/access-control/"
               "acm-1-stage1-coverage-audit.md")
+UMAC_LEDGER = (REPO / "_bmad-output/specs/"
+               "spec-user-management-access-control-adoption/approvals.yaml")
+LEDGERS = (
+    SPEC_DIR / "approvals.yaml",
+    UMAC_LEDGER,
+    REPO / "_bmad-output/specs/spec-user-management-test-cases/approvals.yaml",
+)
+UMAC_LATE_PATHS = {
+    "src/user-management/user-management.module.ts",
+    "src/user-management/infrastructure/access-control-facade.adapter.ts",
+    "src/user-management/domain/interfaces/identity-card-access.port.ts",
+    "src/user-management/domain/services/identity-card-access.service.ts",
+    "src/user-management/application/actions/get-user-card.action.ts",
+    "src/user-management/application/dtos/user-card.response.ts",
+    "src/user-management/application/controllers/users.controller.ts",
+}
 
 # Repair item -> (file, one substring that must be present)
 REPAIR_LANDINGS = {
@@ -124,6 +142,39 @@ def artifact_resolves(repo: str, commit: str, artifact_path: str) -> bool:
     return result.returncode == 0
 
 
+def commit_timestamp(repo: str, commit: str) -> datetime | None:
+    """Return the recorded commit time, or None when the revision does not resolve."""
+    repo_dir = REPO if repo == "workspace" else REPO / "services" / "backend"
+    result = subprocess.run(
+        ["git", "-C", str(repo_dir), "show", "-s", "--format=%cI", commit],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return datetime.fromisoformat(result.stdout.strip())
+
+
+def parse_timestamp(value: object) -> datetime | None:
+    if not isinstance(value, str):
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+def git_range_resolves(repo: str, revision_range: object) -> bool:
+    if not isinstance(revision_range, str):
+        return False
+    repo_dir = REPO if repo == "workspace" else REPO / "services" / "backend"
+    result = subprocess.run(
+        ["git", "-C", str(repo_dir), "rev-list", "--quiet", revision_range],
+        capture_output=True,
+    )
+    return result.returncode == 0
+
+
 def main() -> int:
     r = Report()
     try:
@@ -152,10 +203,8 @@ def _run_checks(r: Report) -> None:
     stories = yaml.safe_load(stories_raw)
 
     # --- SPEC frontmatter status ---------------------------------------
-    # The package gate was approved by the user on 2026-08-31. That authorizes
-    # Stage-1 dispatch only; Stage-2 and Stage-3 still need their own per-stage
-    # human approvals, so `authorized` must never appear here while the ledger
-    # is empty.
+    # The package review was approved by the user on 2026-08-31. It does not
+    # grant implementation authorization or create per-stage approval gates.
     r.check("SPEC status is approved", "\nstatus: approved" in spec)
     r.check("SPEC implementation_status is stage-1-authorized",
             "\nimplementation_status: stage-1-authorized" in spec)
@@ -194,7 +243,7 @@ def _run_checks(r: Report) -> None:
     # --- Stories --------------------------------------------------------
     r.check("stories.yaml is a list", isinstance(stories, list))
     ids = [e["id"] for e in stories]
-    r.check("story count is 29", len(stories) == 29, f"got {len(stories)}")
+    r.check("story count is 30", len(stories) == 30, f"got {len(stories)}")
     r.check("story ids unchanged and in order", ids == STORY_IDS,
             f"got {ids}")
     r.check("story ids unique", len(ids) == len(set(ids)))
@@ -312,14 +361,7 @@ def _run_checks(r: Report) -> None:
         r.check("ACM-1 Stage-1 audit halts both downstream dispatches",
                 "ACM-1-red-tests" in a1 and "ACM-1-production" in a1)
 
-    # --- R10 ledger referenced by every stage-2/stage-3 dispatch --------
-    for sid in [i for i in ids
-                if (i.endswith("-red-tests") or i.endswith("-tests")
-                    or i.endswith("-production"))
-                and i not in ("ACM-4-red-tests", "ACM-4-production",
-                              "ACM-1-red-tests")]:
-        r.check(f"{sid} references approvals ledger",
-                "approvals.yaml" in by_id[sid]["invoke_dev_with"])
+    # --- R10 historical ledgers and late-ratification classification -------
     ledger = SPEC_DIR / "approvals.yaml"
     r.check("approvals.yaml exists", ledger.exists())
     if ledger.exists():
@@ -327,8 +369,7 @@ def _run_checks(r: Report) -> None:
         r.check("approvals ledger has an approvals key",
                 isinstance(led, dict) and "approvals" in led)
         entries = led.get("approvals") or []
-        # Empty is correct while no stage artifact exists. If entries appear,
-        # they must be real: eight fields, a named repo, and author != approver.
+        # Historical entries retain the former nine-field evidence schema.
         r.check("approvals ledger entries are well-formed",
                 all(isinstance(e, dict)
                     and {"story_id", "stage", "repo", "artifact_path",
@@ -337,7 +378,7 @@ def _run_checks(r: Report) -> None:
                     and e.get("author") != e.get("approver")
                     and e.get("repo") in ("workspace", "services/backend")
                     for e in entries),
-                "a stage approval is missing fields, names no repo, or was "
+                "a historical decision is missing fields, names no repo, or was "
                 "self-approved")
         r.check("approval story ids are known",
                 all(e.get("story_id") in STORY_IDS for e in entries),
@@ -345,7 +386,118 @@ def _run_checks(r: Report) -> None:
         r.check("every approval's commit+artifact_path resolves in its repo",
                 all(artifact_resolves(e["repo"], e["commit"], e["artifact_path"])
                     for e in entries),
-                "an approval names a commit/artifact_path that does not resolve")
+                "a historical decision names a commit/artifact_path that does not resolve")
+
+    strategy = (REPO / "docs/architecture/testing-strategy.md").read_text(
+        encoding="utf-8")
+    pm_spine = (REPO / "_bmad-output/planning-artifacts/architecture/"
+                "architecture-people-management-2026-08-19/"
+                "ARCHITECTURE-SPINE.md").read_text(encoding="utf-8")
+    acf_spine = (REPO / "_bmad-output/planning-artifacts/architecture/"
+                 "architecture-access-control-foundation-2026-08-29/"
+                 "ARCHITECTURE-SPINE.md").read_text(encoding="utf-8")
+    r.check("R10 strategy makes late ratification non-gating",
+            "recorded-late-not-gated" in strategy
+            and "never a clean gate pass" in strategy)
+    r.check("R10 parent spine preserves the non-gating policy",
+            "recorded-late-not-gated" in pm_spine
+            and "cannot authorize, block" in pm_spine)
+    r.check("R10 ACF spine preserves the non-gating policy",
+            "recorded-late-not-gated" in acf_spine
+            and "never a clean gate pass" in acf_spine)
+
+    for ledger_path in LEDGERS:
+        r.check(f"ledger exists: {ledger_path.name}", ledger_path.exists())
+        if ledger_path.exists():
+            data = yaml.safe_load(ledger_path.read_text(encoding="utf-8"))
+            ledger_ratifications = (data or {}).get("ratifications", [])
+            r.check(f"ratifications is a list: {ledger_path.name}",
+                    isinstance(ledger_ratifications, list))
+            r.check(f"ratification schema is valid: {ledger_path.name}",
+                    isinstance(ledger_ratifications, list)
+                    and all(isinstance(item, dict)
+                            and {"story_id", "stage", "repo", "artifact_path",
+                                 "commit", "author", "ratifier", "ratified_at",
+                                 "evidence", "rationale", "disposition"} <= set(item)
+                            and item.get("author") != item.get("ratifier")
+                            and item.get("repo") in ("workspace", "services/backend")
+                            and item.get("disposition") == "recorded-late-not-gated"
+                            and isinstance(item.get("evidence"), dict)
+                            and {"reviewed_commit_range", "verification"}
+                                <= set(item["evidence"])
+                            and parse_timestamp(item.get("ratified_at")) is not None
+                            and artifact_resolves(item["repo"], item["commit"],
+                                                  item["artifact_path"])
+                            and git_range_resolves(
+                                item["repo"], item["evidence"]["reviewed_commit_range"])
+                            for item in ledger_ratifications),
+                    "a late-ratification lacks schema, evidence, a valid timestamp, or resolvable Git evidence")
+
+    r.check("UMAC late-ratification ledger exists", UMAC_LEDGER.exists())
+    if UMAC_LEDGER.exists():
+        umac = yaml.safe_load(UMAC_LEDGER.read_text(encoding="utf-8"))
+        ratifications = umac.get("ratifications") or []
+        umac_stories = yaml.safe_load(
+            (UMAC_LEDGER.parent / "stories.yaml").read_text(encoding="utf-8"))
+        umac_story_ids = {item["id"] for item in umac_stories}
+        stage_for_suffix = {
+            "-scenarios": "stage-1-scenarios",
+            "-red-tests": "stage-2-tests",
+            "-tests": "stage-2-tests",
+            "-production": "stage-3-production",
+        }
+        required = {"story_id", "stage", "repo", "artifact_path", "commit",
+                    "author", "ratifier", "ratified_at", "evidence",
+                    "rationale", "disposition"}
+        r.check("UMAC retains every expected late-ratification path",
+                UMAC_LATE_PATHS <= {item.get("artifact_path") for item in ratifications})
+        r.check("UMAC late-ratification paths are unique",
+                len({item.get("artifact_path") for item in ratifications})
+                == len(ratifications))
+        r.check("UMAC late-ratification schema is complete and independent",
+                all(isinstance(item, dict)
+                    and required <= set(item)
+                    and item.get("author") != item.get("ratifier")
+                    and item.get("repo") in ("workspace", "services/backend")
+                    and item.get("disposition") == "recorded-late-not-gated"
+                    and isinstance(item.get("evidence"), dict)
+                    and {"reviewed_commit_range", "verification"}
+                        <= set(item["evidence"])
+                    and bool(item.get("rationale"))
+                    for item in ratifications),
+                "a late-ratification record lacks schema, independent ratifier, "
+                "evidence, rationale, or the non-gating disposition")
+        r.check("UMAC late-ratification stories and stages are real",
+                all(item["story_id"] in umac_story_ids
+                    and any(item["story_id"].endswith(suffix)
+                            and item["stage"] == expected
+                            for suffix, expected in stage_for_suffix.items())
+                    for item in ratifications),
+                "a late-ratification names an unknown story or mismatched stage")
+        r.check("every UMAC late-ratification artifact resolves",
+                all(artifact_resolves(item["repo"], item["commit"],
+                                      item["artifact_path"])
+                    for item in ratifications),
+                "a late-ratification names a commit/artifact_path that does not resolve")
+        r.check("UMAC late-ratifications postdate their reviewed commits",
+                all((commit_time := commit_timestamp(item["repo"], item["commit"])) is not None
+                    and (ratified_at := parse_timestamp(item["ratified_at"])) is not None
+                    and ratified_at > commit_time
+                    and item["evidence"]["reviewed_commit_range"].endswith(item["commit"])
+                    for item in ratifications),
+                "a late-ratification is not after its reviewed commit or lacks its commit range")
+        historical = umac.get("approvals") or []
+        r.check("UMAC late records are demonstrably out of order",
+                all(any(record.get("story_id") == item["story_id"]
+                            and record.get("stage") == item["stage"]
+                            and record.get("artifact_path") == item["artifact_path"]
+                            and record.get("commit") == item["commit"]
+                            and (recorded_at := parse_timestamp(record.get("timestamp")))
+                                is not None
+                            and recorded_at > commit_timestamp(item["repo"], item["commit"])
+                            for record in historical)
+                    for item in ratifications),
+                "a late-ratification lacks a matching historical record created after its work")
 
     # --- R4 no invented soft-delete behavior ---------------------------
     # `User` has no soft-delete column, so the retired taxonomy that treated a
