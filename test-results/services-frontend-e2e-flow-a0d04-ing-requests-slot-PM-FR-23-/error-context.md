@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: services/frontend/e2e/flows/dashboards/dashboards.spec.ts >> People Management Dashboards — Unit Manager (Story 2.1 / PMC-E2-S2.1) >> FE-DASH-08 · Preset navigation, keyboard accessibility, motion, and no customization >> customization affordances (customize mode, widget catalog, drag/remove handles, custom tabs) are absent
-- Location: services/frontend/e2e/flows/dashboards/dashboards.spec.ts:448:5
+- Name: services/frontend/e2e/flows/dashboards/dashboards.spec.ts >> People Management Dashboards — Unsourced Widget Slots (Story 2.2 / PMC-E2-S2.2) >> FE-DASH-09 · Explicit unavailable state rendering for uncovered widget slots with permission-literate messaging >> renders explicit unavailable card for uncovered resourcing requests slot (PM-FR-23)
+- Location: services/frontend/e2e/flows/dashboards/dashboards.spec.ts:497:5
 
 # Error details
 
@@ -21,53 +21,6 @@ Call log:
 # Test source
 
 ```ts
-  352 |       await expect(tabList).toBeVisible()
-  353 | 
-  354 |       // Only Unit Manager tab present in Epic 2 Story 2.1 scope (no DM/PM tabs)
-  355 |       await expect(page.getByRole('tab', { name: /Unit Manager/i })).toBeVisible()
-  356 |       await expect(page.getByRole('tab', { name: /Delivery Manager/i })).not.toBeVisible()
-  357 |       await expect(page.getByRole('tab', { name: /Project Manager/i })).not.toBeVisible()
-  358 | 
-  359 |       // Arrow-key navigable
-  360 |       const umTab = page.getByRole('tab', { name: /Unit Manager/i })
-  361 |       await umTab.focus()
-  362 |       await page.keyboard.press('ArrowRight')
-  363 |       await expect(umTab).toBeFocused()
-  364 |     })
-  365 | 
-  366 |     test('grouping dimension displays People as active', async ({ page }) => {
-  367 |       await setupPopulatedDashboard(page)
-  368 |       await page.goto('/dashboards')
-  369 | 
-  370 |       const peopleGrouping = page
-  371 |         .getByRole('button', { name: /People/i })
-  372 |         .or(page.getByRole('tab', { name: /People/i }))
-  373 |         .or(page.getByRole('radio', { name: /People/i }))
-  374 |         .or(page.locator('[data-grouping="people"]'))
-  375 |       await expect(peopleGrouping).toBeVisible()
-  376 | 
-  377 |       const isGroupingActive = await peopleGrouping.evaluate((el) => {
-  378 |         return (
-  379 |           el.getAttribute('aria-pressed') === 'true' ||
-  380 |           el.getAttribute('aria-selected') === 'true' ||
-  381 |           el.getAttribute('aria-checked') === 'true' ||
-  382 |           el.getAttribute('data-state') === 'active' ||
-  383 |           el.getAttribute('data-state') === 'on' ||
-  384 |           el.classList.contains('active')
-  385 |         )
-  386 |       })
-  387 |       expect(isGroupingActive).toBe(true)
-  388 |     })
-  389 | 
-  390 |     test('prefers-reduced-motion disables transitions and animations', async ({ page }) => {
-  391 |       await page.emulateMedia({ reducedMotion: 'reduce' })
-  392 |       await setupPopulatedDashboard(page)
-  393 |       await page.goto('/dashboards')
-  394 | 
-  395 |       // Ensure Dashboard UI is rendered and interactive
-  396 |       const dashboardHeader = page.locator('.pghd')
-  397 |       await expect(dashboardHeader).toBeVisible()
-  398 | 
   399 |       // Verify reduced-motion media query matches in browser context
   400 |       const mediaMatches = await page.evaluate(() => {
   401 |         return window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -121,8 +74,7 @@ Call log:
   449 |       page,
   450 |     }) => {
   451 |       await setupPopulatedDashboard(page)
-> 452 |       await page.goto('/dashboards')
-      |                  ^ Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
+  452 |       await page.goto('/dashboards')
   453 | 
   454 |       // Customization controls must be absent by construction (PM/AD-33, SD-1)
   455 |       await expect(page.getByRole('button', { name: /Customize/i })).not.toBeVisible()
@@ -169,7 +121,8 @@ Call log:
   496 | 
   497 |     test('renders explicit unavailable card for uncovered resourcing requests slot (PM-FR-23)', async ({ page }) => {
   498 |       await setupPopulatedDashboard(page)
-  499 |       await page.goto('/dashboards')
+> 499 |       await page.goto('/dashboards')
+      |                  ^ Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
   500 | 
   501 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
   502 |       const resourcingSlot = panel.locator('[data-slot="resourcingRequests"]')
@@ -223,4 +176,51 @@ Call log:
   550 |       // Negative assertions: no numeric counters, fake 0, trend arrows, or risk chips
   551 |       await expect(riskSlot.locator('.data-stat')).not.toBeVisible()
   552 |       await expect(riskSlot.getByText('0', { exact: true })).not.toBeVisible()
+  553 |       await expect(riskSlot.getByText('—', { exact: true })).not.toBeVisible()
+  554 |       await expect(riskSlot.locator('.rchip, .trend-arrow, [data-trend]')).not.toBeVisible()
+  555 |       await expect(riskSlot.getByText(/low risk|medium risk|high risk/i)).not.toBeVisible()
+  556 |     })
+  557 | 
+  558 |     test('unavailable action items slots do not render numeric 0, dashes, or blank list containers', async ({ page }) => {
+  559 |       await setupPopulatedDashboard(page)
+  560 |       await page.goto('/dashboards')
+  561 | 
+  562 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  563 |       const unitActionSlot = panel.locator('[data-slot="unitActionItems"]')
+  564 |       const myActionSlot = panel.locator('[data-slot="myActionItems"]')
+  565 | 
+  566 |       for (const slot of [unitActionSlot, myActionSlot]) {
+  567 |         await expect(slot).toBeVisible()
+  568 |         await expect(slot.locator('.data-stat')).not.toBeVisible()
+  569 |         await expect(slot.getByText('0', { exact: true })).not.toBeVisible()
+  570 |         await expect(slot.getByText('—', { exact: true })).not.toBeVisible()
+  571 |         await expect(slot.locator('.task-item, [data-action-item]')).not.toBeVisible()
+  572 |       }
+  573 |     })
+  574 | 
+  575 |     test('unavailable resourcing slot does not render numeric 0, dashes, or empty chart visualizations', async ({
+  576 |       page,
+  577 |     }) => {
+  578 |       await setupPopulatedDashboard(page)
+  579 |       await page.goto('/dashboards')
+  580 | 
+  581 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  582 |       const resourcingSlot = panel.locator('[data-slot="resourcingRequests"]')
+  583 | 
+  584 |       await expect(resourcingSlot).toBeVisible()
+  585 |       await expect(resourcingSlot.locator('.data-stat')).not.toBeVisible()
+  586 |       await expect(resourcingSlot.getByText('0', { exact: true })).not.toBeVisible()
+  587 |       await expect(resourcingSlot.getByText('—', { exact: true })).not.toBeVisible()
+  588 |       // Prohibit chart canvases, SVG chart graphics, and empty visualization containers (while allowing standard status icons)
+  589 |       await expect(resourcingSlot.locator('canvas, .recharts-surface, [data-chart], .chart-container, svg.chart')).not.toBeVisible()
+  590 |     })
+  591 | 
+  592 |     test('unavailable campaigns slot does not render numeric 0, dashes, or synthetic items', async ({ page }) => {
+  593 |       await setupPopulatedDashboard(page)
+  594 |       await page.goto('/dashboards')
+  595 | 
+  596 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  597 |       const campaignsSlot = panel.locator('[data-slot="openCampaigns"]')
+  598 | 
+  599 |       await expect(campaignsSlot).toBeVisible()
 ```

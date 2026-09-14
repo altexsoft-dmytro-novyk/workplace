@@ -6,8 +6,8 @@
 
 # Test info
 
-- Name: services/frontend/e2e/flows/dashboards/dashboards.spec.ts >> People Management Dashboards — Unit Manager (Story 2.1 / PMC-E2-S2.1) >> FE-DASH-08 · Preset navigation, keyboard accessibility, motion, and no customization >> prefers-reduced-motion disables transitions and animations
-- Location: services/frontend/e2e/flows/dashboards/dashboards.spec.ts:390:5
+- Name: services/frontend/e2e/flows/dashboards/dashboards.spec.ts >> People Management Dashboards — Unsourced Widget Slots (Story 2.2 / PMC-E2-S2.2) >> FE-DASH-09 · Explicit unavailable state rendering for uncovered widget slots with permission-literate messaging >> renders explicit unavailable card for uncovered unit action items and my action items slots (PM-FR-19)
+- Location: services/frontend/e2e/flows/dashboards/dashboards.spec.ts:478:5
 
 # Error details
 
@@ -21,95 +21,6 @@ Call log:
 # Test source
 
 ```ts
-  293 |       await expect(omittedTable).toBeVisible()
-  294 |       await expect(omittedTable.getByText('Diana Prince')).toBeVisible()
-  295 | 
-  296 |       // Explicitly assert that uncovered column headers are absent when omitted
-  297 |       await expect(omittedTable.getByRole('columnheader', { name: /^Project$/i })).not.toBeVisible()
-  298 |       await expect(omittedTable.getByRole('columnheader', { name: /^Leave/i })).not.toBeVisible()
-  299 |       await expect(omittedTable.getByRole('columnheader', { name: /^Risk/i })).not.toBeVisible()
-  300 |     })
-  301 | 
-  302 |     test('does not render silently blank cells or fabricated values for missing source capabilities', async ({ page }) => {
-  303 |       await setupPopulatedDashboard(page)
-  304 |       await page.goto('/dashboards')
-  305 | 
-  306 |       const table = page.getByRole('table').or(page.getByTestId('dashboard-people-table'))
-  307 |       await expect(table).toBeVisible()
-  308 | 
-  309 |       // Ensure no blank cells with whitespace-only
-  310 |       const emptyCells = table.locator('td:empty')
-  311 |       await expect(emptyCells).toHaveCount(0)
-  312 | 
-  313 |       // Ensure no raw undefined / null / NaN text in table cells
-  314 |       await expect(table.getByText('undefined', { exact: true })).not.toBeVisible()
-  315 |       await expect(table.getByText('null', { exact: true })).not.toBeVisible()
-  316 |       await expect(table.getByText('NaN', { exact: true })).not.toBeVisible()
-  317 |     })
-  318 |   })
-  319 | 
-  320 |   test.describe('FE-DASH-07 · Dashboard access denial and unauthenticated handling', () => {
-  321 |     test('renders access-denied panel when dashboard-view permission is not held', async ({ page }) => {
-  322 |       await setupAccessDeniedDashboard(page)
-  323 |       await page.goto('/dashboards')
-  324 | 
-  325 |       // Fail-closed access denied UI using stable test ID
-  326 |       const accessDeniedPanel = page.getByTestId('access-denied-panel')
-  327 |       await expect(accessDeniedPanel).toBeVisible()
-  328 |       await expect(accessDeniedPanel).toContainText(/Access denied|No permission/i)
-  329 | 
-  330 |       // Dashboard widgets and people table must NOT be rendered
-  331 |       await expect(page.getByTestId('dashboard-headcount-widget')).not.toBeVisible()
-  332 |       await expect(page.getByRole('table')).not.toBeVisible()
-  333 |     })
-  334 | 
-  335 |     test('unauthenticated 401 response triggers the application global unauthenticated redirect handler', async ({
-  336 |       page,
-  337 |     }) => {
-  338 |       await setupUnauthenticatedDashboard(page)
-  339 |       await page.goto('/dashboards')
-  340 | 
-  341 |       // Expect global unauthenticated redirect to /login per FE-AUTH-01 / FE-EMP-07 / spec-frontend-foundation
-  342 |       await expect(page).toHaveURL(/\/login(?:\?.*)?$/)
-  343 |     })
-  344 |   })
-  345 | 
-  346 |   test.describe('FE-DASH-08 · Preset navigation, keyboard accessibility, motion, and no customization', () => {
-  347 |     test('preset tab strip displays Unit Manager preset only and is arrow-key navigable', async ({ page }) => {
-  348 |       await setupPopulatedDashboard(page)
-  349 |       await page.goto('/dashboards')
-  350 | 
-  351 |       const tabList = page.getByRole('tablist')
-  352 |       await expect(tabList).toBeVisible()
-  353 | 
-  354 |       // Only Unit Manager tab present in Epic 2 Story 2.1 scope (no DM/PM tabs)
-  355 |       await expect(page.getByRole('tab', { name: /Unit Manager/i })).toBeVisible()
-  356 |       await expect(page.getByRole('tab', { name: /Delivery Manager/i })).not.toBeVisible()
-  357 |       await expect(page.getByRole('tab', { name: /Project Manager/i })).not.toBeVisible()
-  358 | 
-  359 |       // Arrow-key navigable
-  360 |       const umTab = page.getByRole('tab', { name: /Unit Manager/i })
-  361 |       await umTab.focus()
-  362 |       await page.keyboard.press('ArrowRight')
-  363 |       await expect(umTab).toBeFocused()
-  364 |     })
-  365 | 
-  366 |     test('grouping dimension displays People as active', async ({ page }) => {
-  367 |       await setupPopulatedDashboard(page)
-  368 |       await page.goto('/dashboards')
-  369 | 
-  370 |       const peopleGrouping = page
-  371 |         .getByRole('button', { name: /People/i })
-  372 |         .or(page.getByRole('tab', { name: /People/i }))
-  373 |         .or(page.getByRole('radio', { name: /People/i }))
-  374 |         .or(page.locator('[data-grouping="people"]'))
-  375 |       await expect(peopleGrouping).toBeVisible()
-  376 | 
-  377 |       const isGroupingActive = await peopleGrouping.evaluate((el) => {
-  378 |         return (
-  379 |           el.getAttribute('aria-pressed') === 'true' ||
-  380 |           el.getAttribute('aria-selected') === 'true' ||
-  381 |           el.getAttribute('aria-checked') === 'true' ||
   382 |           el.getAttribute('data-state') === 'active' ||
   383 |           el.getAttribute('data-state') === 'on' ||
   384 |           el.classList.contains('active')
@@ -121,8 +32,7 @@ Call log:
   390 |     test('prefers-reduced-motion disables transitions and animations', async ({ page }) => {
   391 |       await page.emulateMedia({ reducedMotion: 'reduce' })
   392 |       await setupPopulatedDashboard(page)
-> 393 |       await page.goto('/dashboards')
-      |                  ^ Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
+  393 |       await page.goto('/dashboards')
   394 | 
   395 |       // Ensure Dashboard UI is rendered and interactive
   396 |       const dashboardHeader = page.locator('.pghd')
@@ -211,7 +121,8 @@ Call log:
   479 |       page,
   480 |     }) => {
   481 |       await setupPopulatedDashboard(page)
-  482 |       await page.goto('/dashboards')
+> 482 |       await page.goto('/dashboards')
+      |                  ^ Error: page.goto: Protocol error (Page.navigate): Cannot navigate to invalid URL
   483 | 
   484 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
   485 |       const unitActionSlot = panel.locator('[data-slot="unitActionItems"]')
@@ -223,4 +134,93 @@ Call log:
   491 | 
   492 |       await expect(myActionSlot).toBeVisible()
   493 |       await expect(myActionSlot.getByText(mockPopulatedUnitManagerDashboard.widgets.myActionItems.missingCapability)).toBeVisible()
+  494 |       await expect(myActionSlot.getByText(mockPopulatedUnitManagerDashboard.widgets.myActionItems.unavailableReason)).toBeVisible()
+  495 |     })
+  496 | 
+  497 |     test('renders explicit unavailable card for uncovered resourcing requests slot (PM-FR-23)', async ({ page }) => {
+  498 |       await setupPopulatedDashboard(page)
+  499 |       await page.goto('/dashboards')
+  500 | 
+  501 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  502 |       const resourcingSlot = panel.locator('[data-slot="resourcingRequests"]')
+  503 | 
+  504 |       await expect(resourcingSlot).toBeVisible()
+  505 |       await expect(resourcingSlot.getByText(mockPopulatedUnitManagerDashboard.widgets.resourcingRequests.missingCapability)).toBeVisible()
+  506 |       await expect(resourcingSlot.getByText(mockPopulatedUnitManagerDashboard.widgets.resourcingRequests.unavailableReason)).toBeVisible()
+  507 |     })
+  508 | 
+  509 |     test('renders explicit unavailable card for uncovered open campaigns slot (PM-FR-20)', async ({ page }) => {
+  510 |       await setupPopulatedDashboard(page)
+  511 |       await page.goto('/dashboards')
+  512 | 
+  513 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  514 |       const campaignsSlot = panel.locator('[data-slot="openCampaigns"]')
+  515 | 
+  516 |       await expect(campaignsSlot).toBeVisible()
+  517 |       await expect(campaignsSlot.getByText(mockPopulatedUnitManagerDashboard.widgets.openCampaigns.missingCapability)).toBeVisible()
+  518 |       await expect(campaignsSlot.getByText(mockPopulatedUnitManagerDashboard.widgets.openCampaigns.unavailableReason)).toBeVisible()
+  519 |     })
+  520 | 
+  521 |     test('displays missing capability name and explanation without apologetic or motivational filler across all unavailable slots', async ({
+  522 |       page,
+  523 |     }) => {
+  524 |       await setupPopulatedDashboard(page)
+  525 |       await page.goto('/dashboards')
+  526 | 
+  527 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  528 |       const slotKeys = ['riskCounts', 'unitActionItems', 'myActionItems', 'resourcingRequests', 'openCampaigns'] as const
+  529 | 
+  530 |       for (const key of slotKeys) {
+  531 |         const slot = panel.locator(`[data-slot="${key}"]`)
+  532 |         await expect(slot).toBeVisible()
+  533 |         await expect(slot.getByText(/sorry/i)).not.toBeVisible()
+  534 |         await expect(slot.getByText(/coming soon/i)).not.toBeVisible()
+  535 |         await expect(slot.getByText(/we('?re| are) working on this/i)).not.toBeVisible()
+  536 |       }
+  537 |     })
+  538 |   })
+  539 | 
+  540 |   test.describe('FE-DASH-10 · Prevention of fake zero, dashes, blank space, empty charts, or fabricated data in unavailable slots', () => {
+  541 |     test('unavailable risk slot does not render numeric 0, trend arrows, or fake risk chips', async ({ page }) => {
+  542 |       await setupPopulatedDashboard(page)
+  543 |       await page.goto('/dashboards')
+  544 | 
+  545 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  546 |       const riskSlot = panel.locator('[data-slot="riskCounts"]')
+  547 | 
+  548 |       await expect(riskSlot).toBeVisible()
+  549 | 
+  550 |       // Negative assertions: no numeric counters, fake 0, trend arrows, or risk chips
+  551 |       await expect(riskSlot.locator('.data-stat')).not.toBeVisible()
+  552 |       await expect(riskSlot.getByText('0', { exact: true })).not.toBeVisible()
+  553 |       await expect(riskSlot.getByText('—', { exact: true })).not.toBeVisible()
+  554 |       await expect(riskSlot.locator('.rchip, .trend-arrow, [data-trend]')).not.toBeVisible()
+  555 |       await expect(riskSlot.getByText(/low risk|medium risk|high risk/i)).not.toBeVisible()
+  556 |     })
+  557 | 
+  558 |     test('unavailable action items slots do not render numeric 0, dashes, or blank list containers', async ({ page }) => {
+  559 |       await setupPopulatedDashboard(page)
+  560 |       await page.goto('/dashboards')
+  561 | 
+  562 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  563 |       const unitActionSlot = panel.locator('[data-slot="unitActionItems"]')
+  564 |       const myActionSlot = panel.locator('[data-slot="myActionItems"]')
+  565 | 
+  566 |       for (const slot of [unitActionSlot, myActionSlot]) {
+  567 |         await expect(slot).toBeVisible()
+  568 |         await expect(slot.locator('.data-stat')).not.toBeVisible()
+  569 |         await expect(slot.getByText('0', { exact: true })).not.toBeVisible()
+  570 |         await expect(slot.getByText('—', { exact: true })).not.toBeVisible()
+  571 |         await expect(slot.locator('.task-item, [data-action-item]')).not.toBeVisible()
+  572 |       }
+  573 |     })
+  574 | 
+  575 |     test('unavailable resourcing slot does not render numeric 0, dashes, or empty chart visualizations', async ({
+  576 |       page,
+  577 |     }) => {
+  578 |       await setupPopulatedDashboard(page)
+  579 |       await page.goto('/dashboards')
+  580 | 
+  581 |       const panel = page.getByRole('tabpanel').or(page.locator('#preset-panel-unit-manager, main'))
+  582 |       const resourcingSlot = panel.locator('[data-slot="resourcingRequests"]')
 ```

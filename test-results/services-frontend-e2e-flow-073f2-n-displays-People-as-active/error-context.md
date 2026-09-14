@@ -218,4 +218,9 @@ Call log:
   461 |   })
   462 | })
   463 | 
+  464 | test.describe('People Management Dashboards — Unsourced Widget Slots (Story 2.2 / PMC-E2-S2.2)', () => {
+  465 |   test.describe('FE-DASH-09 · Explicit unavailable state rendering for uncovered widget slots with permission-literate messaging', () => {
+  466 |     test('renders explicit unavailable card for uncovered risk counts slot (PM-FR-21)', async ({ page }) => {
+  467 |       await setupPopulatedDashboard(page)
+  468 |       await page.goto('/dashboards')
 ```
