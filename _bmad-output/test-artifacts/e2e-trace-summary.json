@@ -1,14 +1,14 @@
 {
   "schema_version": "0.2.0",
-  "snapshot_at": "2026-09-13T00:54:35.394Z",
+  "snapshot_at": "2026-09-14T10:02:41.000Z",
   "repo": "people management",
   "collection_mode": "contract_static",
   "collection_status": "COLLECTED",
   "inventory_basis": "acceptance_criteria",
   "gate_basis": "none",
-  "source_sha": "827877ee3b27df56338e6e0fad6c8977a33066f9",
+  "source_sha": "33230f27768915b03059e34404f4adefba030071",
   "source_sha_services": {
-    "backend": "7ab095afc69ccc4597f617dee934c5d544743f88",
+    "backend": "28343b5ed60d77de6c1ea73b07c282e5c927c7bb",
     "frontend": "025dd7ef36a1438a9ce4a6de3859966886175f70"
   },
   "target": {
@@ -30,32 +30,32 @@
     ],
     "external_pointer_status": "not_used",
     "synthetic": false,
-    "ids_known": 326
+    "ids_known": 329
   },
   "gate_status": "NOT_EVALUATED",
   "gate_rationale": "Gate decision skipped because allow_gate=false and collection_status=COLLECTED.",
   "coverage": {
-    "total_requirements": 292,
-    "fully_covered": 261,
-    "covered_requirements": 261,
+    "total_requirements": 295,
+    "fully_covered": 264,
+    "covered_requirements": 264,
     "partially_covered": 30,
     "uncovered": 1,
     "overall_coverage_percentage": 89,
-    "verified_requirements": 233,
-    "overall_verified_percentage": 80,
+    "verified_requirements": 246,
+    "overall_verified_percentage": 83,
     "priority_breakdown": {
       "P0": {
-        "total": 162,
-        "covered": 162,
+        "total": 163,
+        "covered": 163,
         "percentage": 100,
-        "verified": 147,
-        "verified_percentage": 91
+        "verified": 158,
+        "verified_percentage": 97
       },
       "P1": {
-        "total": 106,
-        "covered": 87,
+        "total": 108,
+        "covered": 89,
         "percentage": 82,
-        "verified": 74,
+        "verified": 76,
         "verified_percentage": 70
       },
       "P2": {
@@ -98,27 +98,27 @@
     "present": true,
     "results_file": "_bmad-output/test-artifacts/live-verification-results.json",
     "freshness": "fresh",
-    "recorded_source_sha": "827877ee3b27df56338e6e0fad6c8977a33066f9",
-    "current_source_sha": "827877ee3b27df56338e6e0fad6c8977a33066f9",
-    "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34728869039",
-    "counted": 557,
-    "failed": 39,
-    "contradicted": 9,
-    "skipped": 18,
-    "unmatched": 19,
+    "recorded_source_sha": "33230f27768915b03059e34404f4adefba030071",
+    "current_source_sha": "33230f27768915b03059e34404f4adefba030071",
+    "producer": "GitHub Actions · https://github.com/altexsoft-dmytro-novyk/workplace/actions/runs/34750097766",
+    "counted": 246,
+    "failed": 35,
+    "contradicted": 0,
+    "skipped": 5,
+    "unmatched": 11,
     "stale": 0,
     "unverifiable": 0,
     "blocked": 0,
     "invalid": 0,
     "requirements_live_only": 0,
-    "source_sha": "827877ee3b27df56338e6e0fad6c8977a33066f9",
-    "observed_at": "2026-09-13T00:53:19Z",
+    "source_sha": "33230f27768915b03059e34404f4adefba030071",
+    "observed_at": "2026-09-13T09:48:43Z",
     "summary": {
-      "counted": 557,
-      "failed": 39,
-      "contradicted": 9,
-      "skipped": 18,
-      "unmatched": 19
+      "counted": 246,
+      "failed": 35,
+      "contradicted": 0,
+      "skipped": 5,
+      "unmatched": 11
     }
   },
   "blockers": [
@@ -869,28 +869,26 @@
     },
     {
       "priority": "HIGH",
-      "action": "Fix the first-wins (file,title) index in scripts/build-live-verification-results.cjs loadMatrixIndex so a test shared by several requirements emits evidence for each; recovers 10 P0 requirement(s) whose tests already pass in CI",
+      "action": "Merge feat/plat-e4-dev-seed-journal and feat/conflict-um-01-hidden-target-404 to services/backend main; both are evidenced only on unmerged branches",
       "requirements": [
-        "ACM1-FB-02",
-        "ACM1-FB-04",
-        "ACM1-FB-05",
-        "ACM1-FB-06",
-        "ACM1-FB-07",
-        "ACM1R-FB-10",
-        "ACM1R-FB-12",
-        "ACM1R-FB-13",
-        "ACM1R-FB-21",
-        "ACM1R-FB-22",
-        "MEN-FLAG-04",
-        "MEN-PAIR-05"
+        "S4.2d-DS-07",
+        "UMAC-07",
+        "UMAC-11"
       ]
     },
     {
-      "priority": "HIGH",
-      "action": "Add negative-path auth/authz tests for the PM/AD-24 404 oracle (E4-C03b/C04c) and retire the superseded-403 assertions under CONFLICT-UM-01",
+      "priority": "LOW",
+      "action": "Fix the object store (LocalStack) in the e2e job — recovers photo/UMAC-09 requirements now correctly shown failing",
       "requirements": [
-        "S4.1c-SAG-01",
-        "UMAC-05"
+        "UM-PHOTO-01",
+        "UM-PHOTO-02",
+        "UM-PHOTO-03",
+        "UM-PHOTO-05",
+        "UM-PHOTO-06",
+        "UM-PHOTO-07",
+        "UM-PHOTO-08",
+        "UM-PHOTO-09",
+        "UMAC-09"
       ]
     },
     {
