@@ -5,7 +5,7 @@ workflowStatus: 'generated'
 approval: 'granted'
 approvedAt: '2026-09-11'
 validation: 'PASS'
-validatedAt: '2026-09-11'
+validatedAt: '2026-09-13'
 totalSteps: 5
 stepsCompleted:
   - 'step-01-detect-mode'
@@ -39,7 +39,9 @@ supersedes:
 >   its own date and its own approval in history.
 > - **Its human approval does not transfer.** This run's approval is **granted 2026-09-11**.
 > - **Its ticked validation boxes do not transfer.** Validation for this run was reset at
->   migration, then **PASS** recorded 2026-09-11 in `test-design-validation-report.md`.
+>   migration, then **PASS** recorded 2026-09-11 in `test-design-validation-report.md`, refreshed
+>   by a fresh independent system Validate **PASS (2026-09-13)** after the `ACF-TR-01` System Edit
+>   (`TR-3.2-SELF` registered in `test-design-qa.md`).
 > - Read the [superseded User Management run at `76a7220`](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-progress-system.md).
 >   The superseded **platform** run is
 >   [`test-design-progress-platform.md` at the same commit](https://github.com/altexsoft-dmytro-novyk/workplace/blob/76a7220701ac6f16843dad8b303934f9a958b54c/_bmad-output/test-artifacts/test-design-progress-platform.md).
@@ -145,7 +147,8 @@ actual Validate run against **this** artifact set.
 - [ ] Every epic plan has a matching checkpoint with the correct `runKey`
 - [ ] Migration ledger reconciles to outputs and consumers
 - [x] Human approval of this artifact set (2026-09-11)
-- [x] Validate run recorded in `test-design-validation-report.md` (2026-09-11, PASS)
+- [x] Validate run recorded in `test-design-validation-report.md` (2026-09-11, PASS; refreshed by
+      a fresh independent Validate, 2026-09-13, PASS, after the `ACF-TR-01` System Edit)
 
 ## Open decisions carried by this run
 
@@ -163,6 +166,7 @@ the six design-closed `PR-B-*` blockers at **implementation** (U-17); and contra
 
 ## Next step
 
-**Human approval and system Validate are recorded (2026-09-11).** This checkpoint does not
+**Human approval (2026-09-11) and system Validate are recorded, refreshed 2026-09-13** after the
+`ACF-TR-01` System Edit registered `TR-3.2-SELF` in `test-design-qa.md`. This checkpoint does not
 authorise deployment or assert product/release readiness; open product decisions in the register
 remain separate work.

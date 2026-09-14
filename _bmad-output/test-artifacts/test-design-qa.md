@@ -39,6 +39,20 @@
 > and the production wiring now present on `GET /users/:id`. This is another content-only System
 > Edit: the 2026-09-11 validation report remains historical evidence for the bytes it evaluated
 > and is not rewritten here.
+>
+> **System Edit — 2026-09-13 (`ACF-TR-01`).** § Normative coverage map registered a new row,
+> `TR-3.2-SELF`, for the Self audience-derivation rule. **Decision: option A** — a new `TR-*` row
+> rather than folding Self into an existing `TR-3.2-S*` section row — made by the user acting as
+> QA + Architect; this edit carries out that decision and does not re-open it. The row is mapped
+> to `ACF-AU-01` (primary) and kernel `ACM4R-MA-02` (component) in the U-19 scenario-file mapping,
+> and the U-19 orphan finding for `ACF-AU-01` is closed accordingly. Row count moves from 119 to
+> 120 (`AC STAGE-1 DRAFT` 23 → 24); U-19's evidenced-row count moves from 14 to 15 of 120 (the
+> 105-row zero-evidence count is unchanged). **This is a System Edit under
+> `docs/test-design-workflow-contract.md` §4.3**, applied through the explicitly confirmed member
+> `test-design-qa.md`, not a Create or Validate run. It does not retroactively rewrite the
+> 2026-09-11 or 2026-09-12 validation-report hashes; those reports remain historical evidence for
+> the bytes they evaluated. Re-validate for a byte-exact attestation of the current file — see the
+> fresh system Validate run dated 2026-09-13.
 
 **Purpose:** The one platform **execution and coverage strategy**. It owns evidence contracts,
 execution strategy, isolation policy, level strategy, the risk → evidence map, the coverage plan,
@@ -948,8 +962,10 @@ contract is [contract A](#contract-a--all-employees-httplist-route).
 
 ## Normative coverage map
 
-**119 normative** `TR-`* **rows, preserved with their identifier, requirement statement, planned level
-and planning state.** Every row's approval status is **ungranted**.
+**120 normative** `TR-`* **rows** — 119 preserved with their identifier, requirement statement,
+planned level and planning state, **plus `TR-3.2-SELF`, registered 2026-09-13 by System Edit
+(`ACF-TR-01`, option A)** for the Self audience-derivation rule. Every row's approval status is
+**ungranted**.
 
 **Read this table as a plan, not as coverage.** A planned level is not a written test; a planning
 state is not an approval; and `AC STAGE-1 DRAFT` **records what the source said on 2026-08-29**, not
@@ -957,16 +973,20 @@ a live state of any file (see [Ownership](#ownership), ruling D-1). Rows marked
 `PRODUCT/ARCH BLOCKED` keep their named blocker; rows marked `OUT OF SCOPE` keep that state and its
 v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 
-**Machine-counted at the time of writing — 119 rows:** 45 `E2E DEPENDENCY` · 23 `AC STAGE-1 DRAFT` ·
-23 `PRODUCT/ARCH BLOCKED` · 21 `READY NOW` · 4 `READY FOR FORMAL SIGN-OFF` · 3 `OUT OF SCOPE`.
+**Machine-counted at the time of writing — 119 rows** (before the 2026-09-13 `TR-3.2-SELF`
+addition): 45 `E2E DEPENDENCY` · 23 `AC STAGE-1 DRAFT` · 23 `PRODUCT/ARCH BLOCKED` · 21 `READY NOW`
+· 4 `READY FOR FORMAL SIGN-OFF` · 3 `OUT OF SCOPE`. **After the addition — 120 rows:** 45
+`E2E DEPENDENCY` · 24 `AC STAGE-1 DRAFT` · 23 `PRODUCT/ARCH BLOCKED` · 21 `READY NOW` · 4
+`READY FOR FORMAL SIGN-OFF` · 3 `OUT OF SCOPE`.
 
 > **The dependency column, and the one clause retired from it.** Where a source dependency cell
 > read "approval pending", that clause named the per-file approval gate removed on 2026-09-04. It
 > is **retired under ruling D-1** and is marked inline rather than carried as a live obligation.
-> **Which of the 99 access-control scenario documents covers which of these 119 rows** — that is
+> **Which of the 99 access-control scenario documents covers which of these 120 rows** — that is
 > **U-19**, **resolved 2026-09-11**: see [§ U-19 normative coverage — scenario file
 > mapping](#u-19-normative-coverage--scenario-file-mapping-resolved-2026-09-11) immediately after
-> this table. 14 of 119 rows receive partial evidence; 105 receive none. Does not affect `PG-01`.
+> this table. 15 of 120 rows receive partial evidence (updated 2026-09-13 for `TR-3.2-SELF`); 105
+> receive none. Does not affect `PG-01`.
 
 
 | Trace ID      | v1.5 source | Requirement statement (preserved)                                                                                                                                       | Planned level                                                                              | Planning state at source (2026-08-29) | Dependency / ownership                                                                                                                                                                                          |
@@ -1003,6 +1023,7 @@ v1.5 GOOD TO HAVE or §10 basis and are **not** promoted.
 | `TR-3.2-S14`  | v1.5 §3.2   | S14 tasks matrix and self completion exception                                                                                                                          | API E2E                                                                                    | AC STAGE-1 DRAFT                      | Campaign exception needs campaign consumer                                                                                                                                                                      |
 | `TR-3.2-S15`  | v1.5 §3.2   | S15 request-history matrix                                                                                                                                              | API E2E                                                                                    | AC STAGE-1 DRAFT                      | Resourcing workflow separately owned                                                                                                                                                                            |
 | `TR-3.2-S16`  | v1.5 §3.2   | S16 per-field visibility matrix                                                                                                                                         | API E2E                                                                                    | AC STAGE-1 DRAFT                      | Runtime filter/projection is PRODUCT/ARCH BLOCKED by OQ-114                                                                                                                                                     |
+| `TR-3.2-SELF` | v1.5 §1; §3.2 | **Registered 2026-09-13, System Edit (`ACF-TR-01`, option A) — not part of the original 2026-08-29 preserved catalog.** Self audience-derivation rule: when the viewer is the target (`viewerId === targetEmployeeId`), the applicable audience set is exactly `{self}`, to the exclusion of Reporting line, Project line, PP, and Colleague. Source text: §1 roles table — Employee "[g]rants access to one's own profile (Self)"; §3.2 audiences — "Self — the employee whose profile it is", carrying its own matrix column distinct from Reporting line/Project line/PP/Colleague throughout S1–S16. v1.5 states the Self column but does not itself state the exclusivity rule in those words. | API E2E + policy unit | AC STAGE-1 DRAFT (consistent with sibling `TR-3.2-S*` rows) | The exclusivity clause itself ("Self is exclusive of Reporting, Project, PP, and Colleague") is stated only at the architecture level — `docs/architecture/access-control.md` § Audience columns (3.2), rule 3 ("When `viewerId === targetId`, Self is exclusive of Reporting, Project, PP, and Colleague (PM/AD-28)") — an architecture-only source, not itself v1.5 normative text. Evidence: `ACF-AU-01` (facade exact-set assertion, `resolveAudiences` yields exactly `{self}`, reworked 2026-09-13 under `ACF-AU-R1`) plus kernel `ACM4R-MA-02` (Self exclusive after identity confirmation, mechanism-level); see U-19 mapping below. |
 | `TR-3.3-01`   | v1.5 §3.3   | `—`, narrowed, and flag-gated facts absent from UI/API/export/search/errors/notifications                                                                               | API/UI/download E2E                                                                        | E2E DEPENDENCY                        | Projection-surface suite deferred; each consumer must prove its surface                                                                                                                                         |
 | `TR-3.3-02`   | v1.5 §3.3   | Colleague whitelist exactly S1 + S10 dates + S11 project name                                                                                                           | API/UI E2E                                                                                 | AC STAGE-1 DRAFT                      | Base section projection only; list/profile consumers still required                                                                                                                                             |
 | `TR-3.3-03`   | v1.5 §3.3   | Hidden custom values cannot be inferred through filters/columns                                                                                                         | API/UI E2E                                                                                 | PRODUCT/ARCH BLOCKED                  | PR-B-01 / OQ-114                                                                                                                                                                                                |
@@ -1124,7 +1145,8 @@ anywhere**; the five apparent matches are all the unrelated scenario id `S4.2b-T
 file now also carries an inline `**U-19 normative coverage:**` note (or, for kernel files, an
 appended `**Trace:**` bullet) recording the same finding at the point of use.
 
-**Result: 14 of the 119 rows receive any evidence, and none receives full coverage.**
+**Result: 15 of the 120 rows receive any evidence, and none receives full coverage** (updated
+2026-09-13 for the `TR-3.2-SELF` addition; the 105-row zero-evidence count is unchanged).
 
 | `TR-*` row | Evidence level | Scenario file(s) |
 | --- | --- | --- |
@@ -1141,18 +1163,23 @@ appended `**Trace:**` bullet) recording the same finding at the point of use.
 | `TR-3.2-S01` | Read/write/none shape only — no photo exception, no field matrix | `ACM5-SA-01`, `ACM5-SA-02` |
 | `TR-3.2-S10` | Shape only — no "colleague dates only" field restriction | `ACM5-SA-03` |
 | `TR-3.2-S11` | Shape only — no "colleague project name only" field restriction | `ACM5-SA-04` |
+| `TR-3.2-SELF` | Facade exact-set assertion is the primary oracle (HTTP `200` is UM-owned route evidence, not the audience oracle, per the same `ACF-AU-R1` rework as `TR-2.1-02`); kernel evidence proves the exclusivity mechanism after identity confirmation, not the HTTP path. Added 2026-09-13 (`ACF-TR-01`). | `ACF-AU-01` (primary), `ACM4R-MA-02` (component) |
 | `TR-7-01` | Same partial set as above; row's own text already says "Phase 1 only" | `ACF-FC-03`, `ACF-FC-04`, plus everything above |
 
-**The remaining 105 of 119 rows have zero evidence from any of the 99 scenario documents** — not a search gap:
+**The remaining 105 of 120 rows have zero evidence from any of the 99 scenario documents** — not a search gap:
 `docs/test-cases/access-control-foundation/README.md` and `access-control-kernel/README.md` each
 state their own scope exclusions (Project line, Department, PP HR-line positive walk; every section
 but S1/S10/S11; `/roles` catalog CRUD; projection/whitelist; PP/Department-mutation journal), and
 everything under v1.5 §4–§6, §8–§9 (directory, dashboards, resourcing, CDS, mentorship, campaigns,
 timetracker, repository process) belongs to epics this suite does not touch.
 
-**Orphan finding:** `ACF-AU-01` (Self) has no corresponding `TR-*` row at all — no `TR-2.1-*` or
-`TR-3.2-S*` row names Self as a distinct subject, even though §3.2 defines it. This is a gap in the
-`TR-*` catalog, not in scenario coverage, and is recorded here rather than silently left unmapped.
+**Orphan finding — resolved 2026-09-13 (`ACF-TR-01`).** `ACF-AU-01` (Self) previously had no
+corresponding `TR-*` row at all — no `TR-2.1-*` or `TR-3.2-S*` row named Self as a distinct
+subject, even though §3.2 defines it. That was a gap in the `TR-*` catalog, not in scenario
+coverage. It is now closed: the user, acting as QA + Architect, decided **option A** — register a
+new row rather than fold Self into an existing `TR-3.2-S*` row — and `TR-3.2-SELF` was added to
+the normative coverage map above by System Edit and mapped to `ACF-AU-01` (primary) and kernel
+`ACM4R-MA-02` (component) in the table above.
 
 **This closes U-19 as originally scoped** — "which file covers which row" is no longer unanswerable
 from any artifact. **It does not change `PG-01`.** `PG-01` schedulability is governed separately by

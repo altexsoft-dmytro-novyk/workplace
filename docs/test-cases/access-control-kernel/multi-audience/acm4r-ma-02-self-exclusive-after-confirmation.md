@@ -6,7 +6,7 @@
 - SPEC [CAP-1](../../../../_bmad-output/specs/spec-access-control-kernel-mvp/SPEC.md#capabilities) — identity validation precedes every audience derivation, including Self.
 - [access-control.md § Audience columns](../../../architecture/access-control.md#audience-columns-32) — a confirmed Self does not merge manager columns.
 - [testing-strategy.md § Scoped headless-facade gate](../../../architecture/testing-strategy.md#scoped-headless-facade-gate--access-control-kernel-mvp) — public-facade scenario format.
-- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — strongest applicable audience is per section) — headless-facade proof, not API E2E. See `test-design-qa.md` § Normative coverage map.
+- **U-19 normative coverage:** Mechanism-level evidence for `TR-2.1-01` (v1.5 §2.1 — strongest applicable audience is per section) — headless-facade proof, not API E2E. **Also component evidence for `TR-3.2-SELF`** (registered 2026-09-13, `ACF-TR-01`, option A — the Self audience-derivation rule; primary evidence is `ACF-AU-01`), since this scenario is the mechanism-level proof that a confirmed Self excludes Reporting/PP/Colleague. See `test-design-qa.md` § Normative coverage map.
 
 ## Scenario
 

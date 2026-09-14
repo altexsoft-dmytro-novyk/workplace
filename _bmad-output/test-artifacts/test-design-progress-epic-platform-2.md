@@ -41,10 +41,11 @@ planPath: '_bmad-output/test-artifacts/test-design-epic-platform-2.md'
 > stated below (contract §5).
 >
 > - Approval: **granted 2026-09-12 by Anna Pikula, the requester**
-> - Validation: **PASS (2026-09-13, fresh independent Epic-Level validation)** —
+> - Validation: **PASS (2026-09-13, second same-day fresh independent Epic-Level validation)** —
 >   `test-design-validation-report-epic-platform-2.md`, synchronized with
->   `test-design/README.md`. Supersedes the prior PASS (2026-09-12, same report path); see Steps 7–8
->   below.
+>   `test-design/README.md`. Supersedes the first same-day PASS (Steps 7–8, `ACF-AU-R1` etc.),
+>   which itself superseded the 2026-09-12 PASS at the same report path; this run additionally
+>   verified the `ACF-TR-01` closure (`TR-3.2-SELF` registered). See Steps 9–10 below.
 > - Coverage: **none asserted**
 >
 > This is the canonical **terminal successful document-generation state** of contract §4.4. Resume
@@ -348,3 +349,63 @@ follows. **Validation date:** 2026-09-13. **Report path:**
 `_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md`. This supersedes
 the 2026-09-12 validation projection above as the current validation state; the 2026-09-12 report
 remains unchanged as historical evidence of what it evaluated at the time.
+
+---
+
+## Step 9 — Edit: close `ACF-TR-01` (`TR-3.2-SELF`)
+
+**Edit run under `docs/test-design-workflow-contract.md` §4.3.** Target confirmed as the sole
+canonical `epic-platform-2` plan; loaded in full before any write. This Edit ran alongside a
+**separate, explicitly confirmed System Edit** to `test-design-qa.md` (the platform-pair member),
+per the same contract section — not as a side effect of this epic Edit.
+
+**Decision already made, not re-opened by this Edit.** The user, acting as QA + Architect, decided
+**option A**: register a new normative-coverage row for the Self audience rather than fold it into
+an existing `TR-3.2-S*` row.
+
+**What changed in the plan:** the executive-summary P2 bullet, the "`TR-*` rows receiving evidence
+from this suite" row, `R-PLAT2-03`'s description and mitigation note, the P2 `ACF-TR-01` table row
+and P2 totals, the Acceptance-Criterion Traceability AC1 row, the Resource Estimates P2 row, the
+Execution Strategy "Every PR" bullet, and a new Correction Log entry. `ACF-TR-01` moves from
+**OPEN** to **DONE (2026-09-13)**.
+
+**What changed outside the plan (companion writes, each its own confirmed target):**
+
+- `test-design-qa.md` § Normative coverage map — System Edit registering `TR-3.2-SELF` (row count
+  119 → 120), adding it to the U-19 scenario-file mapping (`ACF-AU-01` primary, `ACM4R-MA-02`
+  component), and closing the U-19 orphan finding for `ACF-AU-01`.
+- `docs/test-cases/access-control-foundation/audience/acf-au-01-self.md:5` — updated to cite
+  `TR-3.2-SELF`, matching `acf-au-02-reporting-direct.md:5`'s phrasing.
+- `docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md` —
+  its existing `TR-2.1-01` U-19 note extended to also cite `TR-3.2-SELF` as component evidence.
+
+**Evidence independently checked before writing:** `docs/project-requirements.md` §1 roles table
+and §3.2 audiences/section-matrix Self column (requirement source); `docs/architecture/access-control.md`
+line 303 (architecture-only exclusivity clause, `PM/AD-28`, correctly labelled as architecture text
+rather than v1.5 normative text); `ACF-AU-01`'s facade exact-set assertion; `ACM4R-MA-02`'s
+exact-`Set{'self'}` assertion; `grep -rn "TR-3.2-SELF"` confirmed the id is unique repo-wide.
+
+**What did not change:** any other epic's plan or checkpoint, `sprint-status.yaml`, ClickUp data,
+any trace or coverage JSON, service code, service gitlinks, `_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md`
+(unaffected by this Edit — its stale wording is a separate, still-open item under `ACF-DOC-01`).
+
+**This Edit claims no approval, gate, coverage, or release-readiness status.** It is followed
+immediately, in the same session, by a fresh independent Validate for both `system` and
+`epic-platform-2`.
+
+## Step 10 — Validate: second same-day fresh independent Epic-Level validation (2026-09-13)
+
+See `test-design-validation-report-epic-platform-2.md` for the full record. Summary projected
+here per contract §4.5:
+
+**Verdict: PASS.** The `ACF-TR-01` closure was independently re-verified against
+`test-design-qa.md`'s current content (row uniqueness, row-count arithmetic, source citations, and
+the orphan-finding resolution) and against both cited scenario files (`ACF-AU-01`, `ACM4R-MA-02`)
+rather than trusted on the Edit's own word. Every completion claim from Step 7 was also
+re-confirmed against current content (none regressed by this Edit). No approval, gate, coverage,
+or release-readiness claim follows. **Validation date:** 2026-09-13. **Report path:**
+`_bmad-output/test-artifacts/test-design-validation-report-epic-platform-2.md`. This supersedes
+the Step 8 validation projection above as the current validation state; that report remains
+unchanged as historical evidence of what it evaluated at the time. The companion system Validate
+(`test-design-validation-report.md`) ran in the same session and independently confirms the same
+`TR-3.2-SELF` registration from the system side.

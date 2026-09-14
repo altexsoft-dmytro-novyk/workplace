@@ -39,8 +39,12 @@ inputDocuments:
   - _bmad-output/test-artifacts/performance/p6-resolve-audiences-postgresql.md
   - services/backend/test/access-control/audience-resolution.e2e-spec.ts
   - _bmad-output/test-artifacts/test-reviews/test-review-plat-e2-e4-2026-09-13.md
+  - docs/test-cases/access-control-foundation/audience/acf-au-01-self.md
+  - docs/test-cases/access-control-kernel/multi-audience/acm4r-ma-02-self-exclusive-after-confirmation.md
+  - docs/architecture/access-control.md
+  - docs/project-requirements.md
 lastEditDate: '2026-09-13'
-lastEditSummary: 'Recorded 2026-09-13 completions: ACF-AU-R1, ACF-FC-05, ACF-RW-04, ACF-DOC-01 (docs/ half), ACF-SCOPE-01, ACF-SCOPE-02. See Correction Log.'
+lastEditSummary: 'Recorded 2026-09-13 completions: ACF-AU-R1, ACF-FC-05, ACF-RW-04, ACF-DOC-01 (docs/ half), ACF-SCOPE-01, ACF-SCOPE-02; then closed ACF-TR-01 (TR-3.2-SELF registered, option A). See Correction Log.'
 ---
 
 # Test Design: Epic PLAT-E2 — Access Control Foundation
@@ -117,7 +121,7 @@ projection, or UI ownership.
 - P1: **3 API-E2E cases + 1 repository audit** — `ACF-FC-05`'s 2 cases done 2026-09-13;
   `ACF-NC-01` (1 API-E2E + 1 audit) remains open
 - P2: **1 measurement + 4 repository/document audits** — `ACF-DOC-01` (docs/ half), `ACF-SCOPE-01`,
-  and `ACF-SCOPE-02` done 2026-09-13 (3 of 5 items); `ACF-PERF-01` and `ACF-TR-01` remain open, and
+  `ACF-SCOPE-02`, and `ACF-TR-01` done 2026-09-13 (4 of 5 items); `ACF-PERF-01` remains open, and
   `ACF-DOC-01`'s `_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md` half is a
   separate remaining open item (owner AC + Architect)
 - P3: **1 API-E2E case** — open
@@ -137,7 +141,7 @@ projection, or UI ownership.
 | Stage-2 e2e | `services/backend/test/access-control/audience-resolution.e2e-spec.ts` — **10** tests against real PostgreSQL |
 | Scenario documents whose expected result was invalidated | **4** — `ACF-AU-05`, `ACF-FC-01`, `ACF-FC-02`, `ACF-FC-04`; all four are now reworked — the first three on 2026-09-11, `ACF-FC-04` on 2026-09-13 via `ACF-RW-04` |
 | New scenario document added 2026-09-13 | `acf-fc-05-deactivated-identity-empty-set.md` (`ACF-FC-05`) — states the deactivated-target/deactivated-viewer empty-set rule as a scenario for the first time (was `R-PLAT2-04`) |
-| `TR-*` rows receiving evidence from this suite | `TR-2.1-02`, `TR-2.1-05`, `TR-2.1-05A`, `TR-7-01` — **partial in every case**, per `test-design-qa.md` § U-19 |
+| `TR-*` rows receiving evidence from this suite | `TR-2.1-02`, `TR-2.1-05`, `TR-2.1-05A`, `TR-7-01`, `TR-3.2-SELF` (registered 2026-09-13, `ACF-TR-01`) — **partial in every case**, per `test-design-qa.md` § U-19 |
 | `TR-*` rows receiving **full** evidence | **none** |
 | Performance record | `measurement (P6)` — `performance/p6-resolve-audiences-postgresql.md`, **a record, never a gate** |
 
@@ -170,7 +174,7 @@ documents and it applies unchanged to these 9.
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | `R-PLAT2-01` | SEC | **`SEC-AUTH-01`.** **Status per `blockers.yaml`, re-checked 2026-09-13: `status: closed`, `closed: 2026-09-12`** (requester Anna Pikula; `.../blocker-verification-2026-09-12.md`), **but the closure carries an explicit, currently-unmet reopen condition.** The interim adapters are confirmed absent from the production module. One residual path was found and fixed in source (`env.validation.ts` no longer defaults `ALLOW_TEST_SESSION_TOKENS` permissively under `NODE_ENV=production`) on backend branch `fix/sec-auth-01-refuse-test-tokens-in-production` (`45a671e`) — **verified 2026-09-13 that this branch is not yet merged to `services/backend` `main`** (`origin/main` at `d1ef680`; `git merge-base --is-ancestor 45a671e origin/main` → false). `blockers.yaml` states verbatim: *"Reopens if that branch is not merged to services/backend main."* **This plan records that fact and does not decide whether the blocker is therefore open; QA does not re-score or re-adjudicate a security risk unilaterally — that is Architect + Security's call, named in `blockers.yaml`'s own owner field.** Score kept at 9 pending that adjudication | 3 | 3 | **9** | Move every allow case off the route and onto the facade — **P0 `ACF-AU-R1`: DONE 2026-09-13** (backend `b714327`). Closure/reopening of `SEC-AUTH-01` itself is Architect + Security, **not this epic** | Architect and Security | Before first shared-environment deploy |
 | `R-PLAT2-02` | TECH | Stage-1 prose and current API-E2E evidence disagree. `ACF-AU-05`/`ACF-FC-01`/`ACF-FC-02` were realigned on 2026-09-11; **`ACF-FC-04` was realigned 2026-09-13** (`ACF-RW-04`) — the obsolete HTTP `403` oracle was dropped and the doc now states the exact `{colleague}` result the current test asserts, retaining the termination/hang oracle | 3 | 2 | **6** | P0 `ACF-RW-01..04`: **all four done** (2026-09-11 / 2026-09-13) | Access Control owners + QA | Complete |
-| `R-PLAT2-03` | TECH | **`ACF-AU-01..04` could pass for the wrong reason.** All four previously asserted only HTTP `200` on `GET /users/:id`, which no longer discriminates the audience since the route returns `200` to any active authenticated viewer. **`ACF-AU-01` (Self) additionally has no `TR-*` row at all — still true; `ACF-TR-01` remains open, see P2.** | 3 | 2 | **6** | P0 `ACF-AU-R1`: **DONE 2026-09-13.** `audience-resolution.e2e-spec.ts` now asserts exact facade audience sets via `AccessControlFacade.resolveAudiences` for AU-01 `{self}`, AU-02 `{reporting}`, AU-03 `{reporting}` (transitive), AU-04 `{pp}`; HTTP `200` is retained only as a separately labelled "UM route evidence" case. Backend commit `b714327`; scenario docs `docs/test-cases/access-control-foundation/audience/acf-au-0{1..4}-*.md` updated to match. Spec confirmed 16/16 green (`test-review-plat-e2-e4-2026-09-13.md` scored the file 100/100, 0 findings). Catalog gap (`ACF-AU-01` `TR-*` row) still handled by open P2 `ACF-TR-01` | QA + Access Control owners | Rework complete; `TR-*` catalog decision still open |
+| `R-PLAT2-03` | TECH | **`ACF-AU-01..04` could pass for the wrong reason.** All four previously asserted only HTTP `200` on `GET /users/:id`, which no longer discriminates the audience since the route returns `200` to any active authenticated viewer. **`ACF-AU-01` (Self) additionally had no `TR-*` row at all — resolved 2026-09-13: `ACF-TR-01` closed, see P2.** | 3 | 2 | **6** | P0 `ACF-AU-R1`: **DONE 2026-09-13.** `audience-resolution.e2e-spec.ts` now asserts exact facade audience sets via `AccessControlFacade.resolveAudiences` for AU-01 `{self}`, AU-02 `{reporting}`, AU-03 `{reporting}` (transitive), AU-04 `{pp}`; HTTP `200` is retained only as a separately labelled "UM route evidence" case. Backend commit `b714327`; scenario docs `docs/test-cases/access-control-foundation/audience/acf-au-0{1..4}-*.md` updated to match. Spec confirmed 16/16 green (`test-review-plat-e2-e4-2026-09-13.md` scored the file 100/100, 0 findings). Catalog gap (`ACF-AU-01` `TR-*` row) closed by P2 `ACF-TR-01`: `TR-3.2-SELF` registered in `test-design-qa.md` § Normative coverage map (System Edit, 2026-09-13; QA + Architect decision, option A), mapped to `ACF-AU-01` (primary) and kernel `ACM4R-MA-02` (component) | QA + Access Control owners | Rework complete; `TR-*` catalog decision made — `TR-3.2-SELF` registered |
 
 ### Medium-Priority Risks (Score 3–4)
 
@@ -308,12 +312,12 @@ follow-up story. That story is **not** created by this plan.
 | Requirement / obligation | Test Level | Risk Link | Test Count | Owner | Notes |
 | --- | --- | --- | --- | --- | --- |
 | `ACF-PERF-01` — add a realistic-depth row (chain depth **5–10**, 500 targets) to the P6 record so the epic's own performance artifact describes the shape production actually has | Measurement | `R-PLAT2-05` | 1 run | Platform / Backend | **Measurement only; no threshold, no gate, no CI wiring.** Must not raise the depth ceiling above 499 — `acyclic_depths` is hashed into `fixture_manifest_hash` |
-| `ACF-TR-01` — decide the `ACF-AU-01` Self `TR-*` orphan: register a row or record deliberate absence | Repository audit | `R-PLAT2-03` | 1 audit | QA + Architect | **Still OPEN.** A catalog gap, not a scenario gap; the decision itself is QA + Architect's, not made by this edit |
+| `ACF-TR-01` — decide the `ACF-AU-01` Self `TR-*` orphan: register a row or record deliberate absence | Repository audit | `R-PLAT2-03` | 1 audit | QA + Architect | **DONE 2026-09-13.** Decision: **option A** — register a new row, `TR-3.2-SELF`, rather than folding Self into an existing `TR-3.2-S*` row. Made by the user acting as QA + Architect. Registered in `test-design-qa.md` § Normative coverage map by System Edit (contract §4.3), mapped to `ACF-AU-01` (primary) and kernel `ACM4R-MA-02` (component) in the U-19 scenario-file mapping; the prior U-19 orphan finding for `ACF-AU-01` is closed. `docs/test-cases/access-control-foundation/audience/acf-au-01-self.md:5` updated to cite the new row |
 | `ACF-DOC-01` — reconcile the foundation SPEC and suite README to applicable-set semantics with Self exclusive and Colleague as fallback | Documentation audit | `R-PLAT2-06` | 1 audit | AC + Architect | **DONE for the `docs/` half, 2026-09-13** — `docs/test-cases/access-control-foundation/README.md:19` now states the applicable-set rule and consumes `PLAT-E3` `ACM4R-MA-01` without duplicating it. **`_bmad-output/specs/spec-access-control-audience-foundation/SPEC.md:23` still says "exactly one" and remains open** — outside this Edit's writable file set; a proposed replacement text is on file in the audit report for a proper spec-edit workflow to apply |
 | `ACF-SCOPE-01` — verify the ACF-1 delivery range changes no User Management controller/guard/adapter or frontend file | Repository audit | `R-PLAT2-03` | 1 audit | QA + Architect | **DONE — PASS, 2026-09-13.** Backend squash commit `c1b34c2`, 40 pathspecs reviewed, zero under `src/user-management/` or `test/user-management/`; `app.module.ts`'s 2-line diff only imports/registers `AccessControlModule` |
 | `ACF-SCOPE-02` — verify ACF-1 enables no Project, Department, PP-HR-line, shared-link, full-profile, functional-permission, or section-matrix decision | Repository audit | `R-PLAT2-03` | 1 audit | QA + Architect | **DONE — PASS for the `resolveAudiences` capability, 2026-09-13.** Its call graph touches only `IdentityPort`/`RelationshipGraphPort`; no Project/Department/PP-HR-line/functional-permission/section-matrix read; `ACF-FC-02` independently proves PP-HR withholding. **Caveat:** `c1b34c2` is one squash merge that also contains `PLAT-E3`'s Kernel MVP (`isAllowed`, `canAccessSection`, etc.), so "the ACF-1 commit" is not an isolable range that excludes that code — the PASS verdict is scoped to `resolveAudiences`'s own call graph, not to a claim that the commit touches nothing else |
 
-**Total P2:** 1 measurement run + 4 repository/document audits — **3 of 4 audit/document items complete (`ACF-DOC-01` docs/ half, `ACF-SCOPE-01`, `ACF-SCOPE-02`) as of 2026-09-13**; `ACF-PERF-01` and `ACF-TR-01` remain open, and `ACF-DOC-01`'s SPEC.md half remains open, **~5–10 h**.
+**Total P2:** 1 measurement run + 4 repository/document audits — **4 of 5 audit/document items complete (`ACF-DOC-01` docs/ half, `ACF-SCOPE-01`, `ACF-SCOPE-02`, `ACF-TR-01`) as of 2026-09-13**; `ACF-PERF-01` remains open, and `ACF-DOC-01`'s SPEC.md half remains open, **~5–10 h**.
 
 ### P3 (Low)
 
@@ -330,7 +334,7 @@ follow-up story. That story is **not** created by this plan.
 
 | Story 2.1 AC | Planned verification | Level / owner | State |
 | --- | --- | --- | --- |
-| AC1 — only Self, Reporting, direct PP, or Colleague; Self exclusive | `ACF-AU-R1` exact sets (`{self}` for Self) plus `ACF-RW-01`; unexpected labels fail the assertion | API E2E / QA + AC | **Complete 2026-09-13** — `ACF-AU-R1` and `ACF-RW-01` both done; `ACF-AU-01`'s `TR-*` catalog gap is separately tracked as open `ACF-TR-01` |
+| AC1 — only Self, Reporting, direct PP, or Colleague; Self exclusive | `ACF-AU-R1` exact sets (`{self}` for Self) plus `ACF-RW-01`; unexpected labels fail the assertion | API E2E / QA + AC | **Complete 2026-09-13** — `ACF-AU-R1` and `ACF-RW-01` both done; `ACF-AU-01`'s `TR-*` catalog gap is also closed 2026-09-13 (`ACF-TR-01` — `TR-3.2-SELF` registered) |
 | AC2 — live direct reporting edges and target-assigned PP only | `ACF-AU-R1` positive direct/transitive/PP cases; `ACF-RW-02` broken-edge negative; `ACF-RW-03` PP-chain withholding | API E2E + aligned scenario prose / QA + AC | **Complete 2026-09-13** — positive rework (`ACF-AU-R1`) and negative evidence (`ACF-RW-02/03`) both done |
 | AC3 — empty input makes zero DB queries; broken/orphan data only reduces access | Existing `ACF-FC-03`; `ACF-RW-02..04`; `ACF-FC-05`; `ACF-NC-01` for non-persistence/cache | API E2E + repository audit / QA + AC | **Mostly complete 2026-09-13** — `ACF-RW-02..04` and `ACF-FC-05` all done; `ACF-NC-01` (non-persistence/cache audit) remains open |
 | AC4 — no User Management controller/guard/adapter or frontend change | `ACF-SCOPE-01` commit-range/pathspec audit | Repository audit / QA + Architect | **Complete — PASS, 2026-09-13** |
@@ -347,8 +351,9 @@ defer only expensive measurement or genuinely long-running work. Priority does n
 
 - Existing foundation regression, including `ACF-FC-03` zero-query and current cycle evidence.
 - `ACF-AU-R1` exact-set cases, `ACF-FC-05`, and `ACF-FC-07` once implemented.
-- Repository/document audits `ACF-NC-01`, `ACF-TR-01`, `ACF-DOC-01`, and
-  `ACF-SCOPE-01/02`; document alignment `ACF-RW-04` completed 2026-09-13 (see Correction Log).
+- Repository/document audits `ACF-NC-01` and `ACF-DOC-01`'s remaining SPEC.md half; document
+  alignment `ACF-RW-04` and audits `ACF-TR-01`/`ACF-DOC-01` (docs/ half)/`ACF-SCOPE-01/02`
+  completed 2026-09-13 (see Correction Log).
 
 ### Nightly / on demand
 
@@ -368,7 +373,7 @@ defer only expensive measurement or genuinely long-running work. Priority does n
 | --- | --- | --- | --- |
 | P0 | 4 API-E2E cases + 4 docs | ~16–26 | **All 8 items complete as of 2026-09-13** (RW-01..04, AU-R1) |
 | P1 | 3 API-E2E cases + 1 audit | ~9–15 | `ACF-FC-05` (2 cases) done 2026-09-13; `ACF-NC-01` (1 case + 1 audit) open |
-| P2 | 1 run + 4 audits | ~5–10 | `ACF-DOC-01` (docs/ half), `ACF-SCOPE-01`, `ACF-SCOPE-02` done 2026-09-13; `ACF-PERF-01`, `ACF-TR-01`, and `ACF-DOC-01`'s SPEC.md half open |
+| P2 | 1 run + 4 audits | ~5–10 | `ACF-DOC-01` (docs/ half), `ACF-SCOPE-01`, `ACF-SCOPE-02`, `ACF-TR-01` done 2026-09-13; `ACF-PERF-01` and `ACF-DOC-01`'s SPEC.md half open |
 | P3 | 1 test | ~1–2 | Fixture extension |
 | **Total** | **8 API-E2E cases + 1 run + 9 docs/audits** | **~31–53** | **~1–2 weeks**; no approval-latency exclusion |
 
@@ -576,6 +581,33 @@ afterward (same session) and returned PASS (2026-09-13)**, re-verifying every co
 above against its cited source; see that report for the current content hash and the
 per-claim verification record. **No approval, gate, or release status is claimed by this edit, by
 the Validate that followed it, or by any item above.**
+
+**2026-09-13 — Edit: close `ACF-TR-01` (the `ACF-AU-01` Self `TR-*` orphan).** The user, acting as
+QA + Architect, decided **option A**: register a new normative-coverage row for the Self audience
+rather than fold it into an existing `TR-3.2-S*` row. This edit carries out that decision; it does
+not re-open it.
+
+- `test-design-qa.md` § Normative coverage map — **System Edit** (contract §4.3) registered
+  `TR-3.2-SELF`: the Self audience-derivation rule (viewer = target ⇒ exactly `{self}`, exclusive
+  of Reporting/Project/PP/Colleague). Source: `docs/project-requirements.md` §1 roles table and §3.2
+  audiences/section-matrix Self column; the exclusivity clause itself is architecture-only —
+  `docs/architecture/access-control.md` § Audience columns (3.2), rule 3, `PM/AD-28`. Evidence:
+  `ACF-AU-01` (primary, facade exact-set assertion) and kernel `ACM4R-MA-02` (component,
+  Self-exclusive-after-confirmation). Row count moves 119 → 120; the U-19 orphan finding for
+  `ACF-AU-01` is closed. See that document's own 2026-09-13 System Edit note for the full text.
+- `docs/test-cases/access-control-foundation/audience/acf-au-01-self.md:5` — updated to cite
+  `TR-3.2-SELF` in place of the "no corresponding `TR-*` row exists" statement, matching the
+  phrasing of `acf-au-02-reporting-direct.md:5`.
+- This plan — `R-PLAT2-03`'s mitigation note, the "`TR-*` rows receiving evidence" row, the P2
+  `ACF-TR-01` row and totals, the AC1 traceability row, and the executive-summary P2 bullet above
+  were all updated to record this closure. No approval, coverage, gate, or release-readiness claim
+  is made by this edit.
+- This edit changed `test-design-qa.md`'s content after the 2026-09-11/2026-09-12
+  `test-design-validation-report.md` recorded its hashes for that file, and changed this plan's own
+  content after `test-design-validation-report-epic-platform-2.md` recorded its 2026-09-13 hash for
+  this file. Both reports remain historical evidence for the bytes they evaluated. **A fresh
+  independent system Validate and a fresh independent Epic Validate for `epic-platform-2` both ran
+  immediately afterward (same session)** — see those reports for current content hashes.
 
 ---
 
